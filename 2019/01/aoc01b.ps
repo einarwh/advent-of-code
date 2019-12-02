@@ -1,0 +1,13 @@
+/map { [ 3 1 roll forall ] } def
+
+/fold { 3 1 roll exch 3 -1 roll forall } def 
+
+/sum { 0 { add } fold } def 
+
+/fuel { 3 idiv 2 sub } def
+
+/gen { { fuel dup 0 le { pop exit } if dup } loop } def 
+
+/zeno { [ exch gen ] sum } def
+
+[ (input) run ] { zeno } map sum
