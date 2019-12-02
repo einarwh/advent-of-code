@@ -1,0 +1,132 @@
+% [ 1 0 0 0 99 ]
+% [ 2 3 0 3 99 ] 
+% [ 2 4 4 5 99 0 ]
+% [ 1 1 1 4 99 5 6 0 99 ]
+[ (alarm) run ]
+0
+false 
+
+% pos arr -> stop=true pos arr
+/opstop { 
+    true 
+} def
+
+% { op } pos arr -> stop=false pos arr
+/opbin {
+    3 1 roll        % pos arr {op}
+    2 copy          % pos arr pos arr {op}
+    1 add           % pos+1 arr pos arr {op}
+    3 getinterval   % [ai bi si] pos arr {op}
+    aload pop       % si bi ai pos arr {op}
+    3 1 roll        % bi ai si pos arr {op}
+    4 index exch    % bi arr ai si pos arr {op}
+    get             % b ai si pos arr {op}
+    exch            % ai b si pos arr {op}
+    4 index exch    % ai arr b si pos arr {op}
+    get             % a b si pos arr {op}
+    6 -1 roll       % {op} a b si pos arr
+    exec            % a?b si pos arr (op!)
+    3 index         % arr a?b si pos arr 
+    3 1 roll        % a?b si arr pos arr 
+    put             % pos arr
+    4 add           % pos+4 arr
+    false           % continue! pos+4 arr
+} def
+
+% pos arr -> stop=false pos arr
+/opadd {
+    { add } opbin
+} def
+
+% pos arr -> stop=false pos arr
+/opmul {
+    { mul } opbin
+} def
+
+% pos arr -> { op } pos arr
+/loadop {
+    2 copy                     % pos arr pos arr
+    get                        % arr[pos] pos arr | arr[pos] == opcode
+    dup                        % opcode opcode pos arr 
+    99 eq                      % stop? opcode pos arr
+    {                          % opcode pos arr (stop!)
+        pop { opstop }         % { opstop } pos arr
+    } 
+    {                          % opcode pos arr (!stop)
+        dup
+        1 eq                   % add? opcode pos arr
+        {                      % opcode pos arr (add!)
+            pop { opadd }      % { opadd } pos arr
+        }
+        {                      % opcode pos arr (!add)
+            dup
+            2 eq               % mul? opcode pos arr
+            {                  % opcode pos arr (mul!)
+                pop { opmul }  % { opmul } pos arr
+            }
+            {                  % opcode pos arr (!mul)
+                pop stop       % error
+            }
+            ifelse
+        }
+        ifelse
+    }
+    ifelse
+} def
+
+/main {
+    {
+        { exit } if
+        loadop exec
+    } loop
+    pop
+    0 get
+} def 
+
+main 
+10 string cvs 
+
+/answer {
+    /Helvetica findfont 50 scalefont setfont 
+    newpath 
+    0 0 moveto 
+    false
+    charpath 
+    stroke
+} def 
+
+300 300 translate 
+dup answer
+
+30 rotate 
+dup answer
+
+30 rotate 
+dup answer
+
+30 rotate 
+dup answer
+
+30 rotate 
+dup answer
+
+30 rotate 
+dup answer
+
+30 rotate 
+dup answer
+
+30 rotate 
+dup answer
+
+30 rotate 
+dup answer
+
+30 rotate 
+dup answer
+
+30 rotate 
+dup answer
+
+30 rotate 
+dup answer
