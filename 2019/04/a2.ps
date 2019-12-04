@@ -35,17 +35,15 @@
     dup 
     { eq } find
     exch 
-    { gt } find not 
+    { lt } find not
     and
 } def 
 
 /main {
-    [
+    0
     183564 1 657474 {
-        dup 
-        valid not { pop } if
+        valid { 1 add } if
     } for
-    ]
 } def
 
-%main length
+main
