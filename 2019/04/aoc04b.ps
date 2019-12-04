@@ -48,11 +48,11 @@
             exch            % c n 
             dup             % c c n 
             2 eq            % c=2? c n 
-            {               % c n
-                exch        % n c
-                exit        % n c --- exit loop
+            {               % 2 n
+                exch        % n 2
+                exit        % n 2 --- exit loop
             }
-            {               % c n 
+            {               % c!=2 n 
                 pop 1       % 1 n
                 exch        % n 1
             } ifelse        % n 1
