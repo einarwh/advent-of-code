@@ -1,8 +1,3 @@
-% [ 1 0 0 0 99 ]
-% [ 2 3 0 3 99 ] 
-% [ 2 4 4 5 99 0 ]
-% [ 1 1 1 4 99 5 6 0 99 ]
-
 % pos arr -> stop=true pos arr
 /opstop { 
     true 
@@ -72,10 +67,8 @@
 } def
 
 % -> bool pos arr
-/init {
+/read {
     [ (alarm) run ]
-    0
-    false 
 } def 
 
 % stop? pos arr -> result
@@ -88,16 +81,45 @@
     0 get
 } def 
 
+/target 19690720 def
+
+% j i -> _
+/output {
+    exch            % i j 
+    100 mul add     % result
+    pstack
+} def 
+
 /main {
     0 1 99 
-    {
-        1 exch put
+    {                       % i
         0 1 99 
-        {
-            2 exch put
-            program
+        {                   % j i 
+            2 copy          % j i j i
+            read            % arr j i j i 
+            3 1 roll        % j i arr j i
+            2 index         % arr j i arr j i
+            2               % 2 arr j i arr j i
+            3 -1 roll       % j 2 arr i arr j i
+            put             % i arr j i
+            1 index         % arr i arr j i
+            1               % 1 arr i arr j i
+            3 -1 roll       % i 1 arr arr j i
+            put             % arr j i
+            0               % pos=0 arr j i
+            false           % stop=false pos=0 arr j i
+            program         % result j i
+            target          % v result j i
+            eq              % found? j i
+            {               % j i
+                output
+                stop
+            }
+            { pop }         % i
+            ifelse
         } for
+        pop                 %
     } for
-}
+} def
 
 main
