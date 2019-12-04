@@ -1,0 +1,60 @@
+/gen {
+    {                       % n
+        dup                 % n n
+        10 lt { exit } if   % n
+        dup 10 mod          % d n
+        exch 10 idiv        % r d
+    } loop
+} def
+
+/digits { [ exch gen ] } def
+
+/find {                     % op A
+    (--find--\n) print
+    false                   % F op A
+    exch                    % op F A
+    -1                      % -1 op F A
+    4 -1 roll               % A -1 op F
+    {                       % n p op F
+        exch                % p n op F
+        1 index             % n p n op F
+        3 index             % op n p n op F
+        exec                % found? n op F
+        {                   % n op F
+            3 -1 roll       % F n op 
+            not             % T n op 
+            3 1 roll        % n op T
+            exit
+        } 
+        if
+    } forall
+    pop pop                 % found?
+} def
+
+/main {
+    183564 1 657474 {
+        dup digits
+        (--...--\n) print
+        pstack
+        dup 
+        (--...--\n) print
+        pstack
+        { eq } 
+        (--...--\n) print
+        pstack
+        find
+        (--...--\n) print
+        pstack
+        exch 
+        (...\n) print
+        pstack
+        dup { gt } find not 
+        (...\n) print
+        pstack
+        and not
+        (...\n) print
+        pstack
+    } for
+} def
+
+main
