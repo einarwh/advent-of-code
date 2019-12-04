@@ -1,0 +1,50 @@
+% Pushes the digits onto the stack one by one
+/gen {
+    {                       % n
+        dup                 % n n
+        10 lt { exit } if   % n
+        dup 10 mod          % d n
+        exch 10 idiv        % r d
+    } loop
+} def
+
+/digits { [ exch gen ] } def
+
+/find {                     % op _ A
+    exch                    % _ op A
+    3 -1 roll               % A _ op 
+    false                   % F A _ op
+    4 1 roll                % A _ op F
+    {                       % n p op F
+        exch                % p n op F
+        1 index             % n p n op F
+        3 index             % op n p n op F
+        exec                % found? n op F
+        {                   % n op F
+            3 -1 roll       % F n op 
+            not             % T n op 
+            3 1 roll        % n op T
+            exit
+        } 
+        if
+    } forall
+    pop pop                 % found?
+} def
+
+/valid {
+    digits
+    dup 
+    false { eq } find
+    exch 
+    10 { lt } find not
+    and
+} def 
+
+/main {
+    0
+    183564 1 657474 {
+        valid { 1 add } if
+    } for
+} def
+
+main
