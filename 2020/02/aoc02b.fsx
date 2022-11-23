@@ -1,5 +1,5 @@
 // Advent of Code 2020. Day 2, part B.
-// dotnet fsi aoc2b.fsx
+// dotnet fsi aoc02b.fsx
 
 open System.IO
 open System.Text.RegularExpressions
