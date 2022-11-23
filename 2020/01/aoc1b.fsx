@@ -19,11 +19,8 @@ let check (values : int array) (a : int, b : int, c : int) : int option =
     let vc = values.[c]
     if va + vb + vc = 2020 then Some (va * vb * vc) else None
 
-[<EntryPoint>]
-let main argv =
-    let expenses = read argv.[0]
-    indexes (Array.length expenses)
-    |> Seq.choose (check expenses)
-    |> Seq.head
-    |> printfn "%d"
-    0 
+let expenses = read "input"
+indexes (Array.length expenses)
+|> Seq.choose (check expenses)
+|> Seq.head
+|> printfn "%d"

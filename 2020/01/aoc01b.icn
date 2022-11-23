@@ -1,7 +1,7 @@
 procedure main() 
   local file, lines, line, i, j, k
   lines := []
-  file := open("input.txt","r")
+  file := open("input","r")
   while line := read(file) do
     put(lines, integer(line))
   close(file)
