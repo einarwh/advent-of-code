@@ -1,3 +1,6 @@
+// Advent of Code 2020. Day 2, part B.
+// dotnet fsi aoc2b.fsx
+
 open System.IO
 open System.Text.RegularExpressions
 
@@ -15,11 +18,7 @@ let check (s : string) : string option =
     else
         None
 
-[<EntryPoint>]
-let main argv =
-    argv.[0]
-    |> File.ReadAllLines
-    |> Array.choose check
-    |> Array.length
-    |> printfn "%d"
-    0 
+File.ReadAllLines "input"
+|> Array.choose check
+|> Array.length
+|> printfn "%d" 

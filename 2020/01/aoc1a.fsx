@@ -1,5 +1,5 @@
-// Advent of Code 2020. Day 1, part B.
-// dotnet fsi aoc1b.fsx
+// Advent of Code 2020. Day 1, part A.
+// dotnet fsi aoc1a.fsx
 
 open System
 open System.IO
