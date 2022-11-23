@@ -1,0 +1,128 @@
+% Read input file:
+% <file-name> => Array of strings
+/read-input
+{                                   % fn
+    [                               % | fn
+    exch                            % fn |
+    (r) file                        % F |
+    {
+        dup                         % F F ... |
+        80 string                   % buf F F ... |
+        readline                    % (s) F ... |
+        {
+            exch                    % F (s) ... |
+        }
+        {
+            exch                    % F (s) ... |
+            closefile               % (s) ... |
+            ]                       % | (s) ... |
+            exit
+        } ifelse 
+    } loop                          % Rs
+} def 
+
+% Roll array:
+% A => A'
+% Roll right: [ 1 3 5 7 9 ] 2 roll-array => [ 7 9 1 3 5 ]
+% Roll left: [ 1 3 5 7 9 ] -2 roll-array => [ 5 7 9 1 3 ]
+/roll-array 
+{                                   % i A 
+    [                               % | i A 
+    3 1 roll                        % i A |
+    exch                            % A i | 
+    dup length                      % L A i | 
+    exch                            % A L i | 
+    aload                           % A ... L i | 
+    length                          % L ... L i | 
+    2 add                           % L+2 ... L i | 
+    -2 roll                         % L i ... | 
+    exch                            % i L ... | 
+    roll                            % ... | 
+    ]                               % A'
+} def 
+
+% Convert string to array:
+% S => A
+/string-to-array 
+{
+    [ exch {} forall ] 
+} def 
+
+% Check if we hit a tree.
+% R i C n ... => i C n' ...
+% R: the row (string)
+% i: index of the row (integer)
+% C: config [x y], x is horisontal movement, y is vertical movement.
+% n: Number of trees so far.
+% n': n+1 if we hit a tree, n otherwise.
+/check-row                          
+{                                   % R i C n
+    string-to-array                 % A i C n 
+    2 index                         % C A i C n
+    aload pop                       % y x A i C n
+    3 index                         % i y x A i C n  
+    exch                            % y i x A i C n
+    mod                             % % x A i C n
+    0 eq                            % ? x A i C n
+    {                               % x A i C n (include)
+        2 index mul                 % i*x A i C n
+        neg                         % -i*x A i C n
+        roll-array                  % A' i C n
+        0 get                       % ch i C n
+        (#) 0 get                   % # ch i C n
+        eq                          % ch=#? i C n
+        {                           % i C n (hit a tree)
+            3 -1 roll               % n i C
+            1 add                   % n+1 i C
+            3 1 roll                % i C n+1 
+        } if 
+    }
+    {                               % x R i C n (exclude)
+        pop pop                     % i C n
+    } ifelse                        % i C n
+} def
+
+% Multiply the numbers in the array.
+% A => p
+/multiply
+{                                   % A
+    1 exch                          % A p=1
+    {                               % n p
+        mul                         % p'=n*p
+    } forall                        %p
+} def
+
+% Run with a given config array.
+% Cs => p
+/run {                              % Cs 
+    [                               % | Cs 
+    (input.txt) read-input          % Rs | Cs 
+    3 -1 roll                       % Cs Rs |
+    % Loop all configs 
+    {                               % C Rs ... |
+        0                           % i=0 C Rs ... |
+        2 index                     % Rs i C Rs ... | 
+        0                           % n=0 Rs i C Rs ... |
+        4 1 roll                    % Rs i C n Rs ... |
+        % Loop all strings
+        {                           % R i C n Rs ... |
+            check-row               % i C n Rs ... |
+            1 add                   % i++ C n Rs ... |
+        } forall                    % i C n Rs ... |
+        pop                         % C n Rs ... |
+        pop                         % n Rs ... |
+        exch                        % Rs n ... |
+    } forall                        % Rs n ... |
+    pop                             % n... | 
+    ]                               % A 
+    1 exch                          % A p=1
+    { mul } forall                  % p
+} def 
+
+/run1 {
+    [ [ 3 1 ] ] run
+} def 
+
+/run2 {
+    [ [1 1] [3 1] [5 1] [7 1] [1 2] ] run
+} def 

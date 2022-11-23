@@ -1,0 +1,523 @@
+/read-input
+{                               % fn
+    [                           % | fn
+    exch                        % fn |
+    (r) file                    % F |
+    {   
+        dup                     % F F ... |
+        80 string               % buf F F ... |
+        readline                % (s) F ... |
+        {   
+            exch                % F (s) ... |
+        }   
+        {   
+            exch                % F (s) ... |
+            closefile           % (s) ... |
+            ]                   % | (s) ... |
+            exit    
+        } ifelse    
+    } loop                      % Rs
+} def   
+
+/split-string {                 % (z=sep) (s=string)
+    [                           % | z s
+    3 1 roll                    % z s | 
+    {                           % z s |
+        search                  % found? (h=head z)? s'=rest |
+        {                       % h z s' | (yes, found)
+            3 1 roll            % z s' h | 
+        }
+        {                       % s | (not found)
+            exit                % s |
+        } ifelse
+    } loop
+    ]
+} def 
+
+% A = [ s1 s2 ... sn ] => [ G1 G2 ... Gn ]
+/group-lines {                  % A
+    [ exch                      % A | 
+    [ exch                      % A | | 
+    {                           % s ... | ... |
+        dup length              % L[s] s ... | ... | 
+        0 eq                    % empty? s ... | ... |
+        {                       % () ... | ... |
+            pop                 % ... | ... |
+            ]                   % G ... | 
+            [                   % | G ... |
+        }
+        {                       % s ... | ... | 
+        } ifelse                % ... | 
+    } forall 
+    ]                           % G ... | 
+    dup length                  % L[G] G ... | 
+    0 eq                        % empty? G ... | 
+    {                           % () ... | 
+        pop
+    } if
+    ]                           % [ G1 G2 ... Gn ]
+} def 
+
+% Ex: 
+% In : [(hcl:#7d3b0c pid:431742871) (ecl:hzl hgt:169cm cid:340) (eyr:2023) (iyr:2017 byr:1994)]
+% Out : [(hcl:#7d3b0c) (pid:431742871) (ecl:hzl) (hgt:169cm) (cid:340) (eyr:2023) (iyr:2017) (byr:1994)]
+/to-property-strings {          % A 
+    [ exch                      % A | 
+    {                           % s | 
+        ( ) split-string        % S |
+        {} forall               % p1 p2 ... | 
+    } forall
+    ]
+} def 
+
+/index-of {                     % x V
+    1 index                     % V x V
+    0 exch                      % V 0 x V
+    {                           % v i x V
+        2 index                 % x v i x V 
+        eq                      % x=v? i x V
+        {                       % i x V % found it
+            exit                % i x V
+        }
+        {                       % i x V % keep looking
+            1 add               % i+1 x V
+        } ifelse
+    } forall                    % i x V
+    exch pop                    % i V 
+    exch length                 % L i 
+    1 index                     % i L i 
+    eq                          % L=i? i % not found
+    {                           % i % i=L
+        pop                     % 
+        null                    % -1
+    } if 
+} def
+
+% Return array with values or null
+% 0: byr (Birth Year)
+% 1: iyr (Issue Year)
+% 2: eyr (Expiration Year)
+% 3: hgt (Height)
+% 4: hcl (Hair Color)
+% 5: ecl (Eye Color)
+% 6: pid (Passport ID)
+% Ex: 
+% In: (hcl:#7d3b0c) (pid:431742871) (ecl:hzl) (hgt:169cm) (cid:340) (eyr:2023) (iyr:2017) (byr:1994)
+% Out: [ (1994) (2017) (2023) (169cm) (#7d3b0c) (hzl) (431742871) ]
+/to-property-array {            % indexes A
+    exch                        % A indexes
+    1 index length array        % R A indexes % R is array of same length as indexes
+    exch                        % A R indexes 
+    {                           % p R indexes % p is e.g. (hcl:#7d3b0c)
+        (:) split-string        % [(k) (v)] R indexes 
+        aload pop               % (v) (k) R indexes 
+        exch                    % (k) (v) R indexes 
+        3 index                 % indexes (k) (v) R indexes
+        exch                    % (k) indexes (v) R indexes
+        index-of                % ix (v) R indexes
+        dup null eq             % ix=null? ix (v) R indexes 
+        {                       % ix (v) R indexes % unknown key, drop value
+            pop pop             % R indexes
+        }
+        {
+            exch                % (v) ix R indexes 
+            2 index             % R (v) ix R indexes 
+            3 1 roll            % (v) ix R R indexes 
+            put                 % R' indexes 
+        } ifelse 
+    } forall                    % R' indexes
+    exch pop                    % R'
+} def 
+
+/indexes [ (byr) (iyr) (eyr) (hgt) (hcl) (ecl) (pid) ] def 
+
+/contains {                     % v A
+    exch                        % A v 
+    false                       % f A v 
+    3 1 roll                    % A v f 
+    {                           % e v f 
+        1 index                 % v e v f 
+        eq                      % e=v? v f
+        {                       % v f % yes
+            exch                % f v
+            not                 % t v
+            exch                % v t
+            exit 
+        } if 
+    } forall                    % v b
+    pop                         % b
+} def 
+
+/contains-null {                % A 
+    null contains 
+} def 
+
+/read-passports {               % (filename)
+    read-input                  % I 
+    group-lines                 % G 
+    [ exch                      % G |
+    {                           % g 
+        to-property-strings     % PS 
+        indexes                 % I PS 
+        to-property-array       % P 
+    } forall 
+    ]
+} def
+
+/run {                          % {filter}
+    (input.txt)                 % (s) {f}
+    [ 3 1 roll                  % (s) {f} |
+    read-passports              % P {f} |
+    {                           % p {f} ... |
+        1 index                 % {f} p {f} ... | 
+        exec                    % valid? {f} ... |
+        { 1 exch } if           % {f} 1* ... |
+    } forall                    % {f} 1* ... |
+    pop                         % ... |
+    ]                           % [...]
+    length
+} def 
+
+/part-1 {
+    { contains-null not }
+    run
+} def 
+
+% c => digit or null
+/parse-digit {                  % c
+    (0) 0 get                   % '0' c
+    sub                         % x
+    dup dup                     % x x x
+    0 ge                        % x>=0 x x
+    exch                        % x x>=0 x
+    9 le                        % x<=9 x>=0 x
+    and                         % x>=0&&x<=9 x 
+    not                         % invalid? x 
+    {
+        pop null 
+    } if                        % d or null
+} def
+
+% (s) => number or null
+/parse-number {                 % (s)
+    dup                         % (s) (s)
+    [ exch                      % (s) | (s)
+    { parse-digit } forall 
+    ]                           % A % digits or null
+    dup length                  % L A (s)
+    0 eq                        % L=0 A (s)
+    {                           % A (s) % empty string is not a number
+        pop pop null            % null
+    }
+    {                           % A (s) 
+        contains-null           % nulls? (s)
+        {                       % (s) % not all digits
+            pop null
+        }
+        {                       % (s) % all digits
+            cvi
+        } ifelse
+    } ifelse
+} def
+
+% Check if number is in range (start and end both inclusive)
+/number-in-range {              % end start n
+    2 index                     % n end start n 
+    ge                          % end>=n start n 
+    3 1 roll                    % start n end>=n 
+    ge                          % n>=start end>=n
+    and                         % start<=n<=end
+} def 
+
+/valid-byr {                    % (s)
+    parse-number                % r 
+    dup null eq                 % r=null? r 
+    {
+        pop false               % false 
+    }
+    {
+        1920 2002               % 2002 1920 n
+        number-in-range         % b
+    } ifelse
+} def 
+
+/valid-iyr {                    % (s)
+    parse-number                % r 
+    dup null eq                 % r=null? r 
+    {
+        pop false               % false 
+    }
+    {
+        2010 2020               % 2020 2010 n
+        number-in-range         % b
+    } ifelse
+} def 
+
+/valid-eyr {                    % (s)
+    parse-number                % r 
+    dup null eq                 % r=null? r 
+    {
+        pop false               % false 
+    }
+    {
+        2020 2030               % 2030 2020 n
+        number-in-range         % b
+    } ifelse
+} def 
+
+% Returns height value or null.
+/parse-hgt {                    % (unit) (s)
+    search                      % found? (s1) (unit) (s2)
+    {                           % (s1) (unit) (s2) % found the unit
+        exch pop                % (s1) (s2)
+        exch                    % (s2) (s1)
+        length 0 eq             % empty? (s1)
+        {                       % (s1) % ok, nothing after unit
+            parse-number        % result
+        }
+        {                       % (s1) % not ok, something after unit
+            pop null            % null
+        } ifelse
+    }
+    {                           % (s) % not found
+        pop null                % null
+    } ifelse                    % result
+} def
+
+/valid-hgt-cm {                 % (s) 
+    (cm) parse-hgt              % result % number or null
+    dup null eq                 % null? result
+    {                           % null
+        pop false               % false
+    }
+    {                           % n
+        150 193                 % 193 150 n 
+        number-in-range         % b
+    } ifelse 
+} def 
+
+/valid-hgt-in {                 % (s) 
+    (in) parse-hgt              % result % number or null
+    dup null eq                 % null? result
+    {                           % null
+        pop false               % false
+    }
+    {                           % n
+        59 76                   % 76 59 n 
+        number-in-range         % b
+    } ifelse 
+} def 
+
+/valid-hgt {                    % (s) 
+    dup valid-hgt-cm            % valid? (s)
+    {                           % (s) % valid hgt in cm
+        pop true                % t
+    }
+    {                           % (s) % not valid in cm
+        valid-hgt-in            % valid?
+    } ifelse                    % b
+} def 
+
+/valid-hcl {                    % (s)
+    dup length 7 eq             % L=7? (s) 
+    {                           % (s) % yes
+        dup 0 get               % s[0] (s) 
+        (#) 0 get               % # s[0] (s)
+        eq                      % s[0]=#? (s)
+        {                       % (s) % found #
+            pop false
+        }
+        {                       % (s) % invalid hcl, missing #
+            pop false
+        } ifelse 
+    }
+    {                           % (s) % no
+        pop false               % f
+    } ifelse
+} def 
+
+/valid-ecl {                    % (s)
+    [ (amb) (blu) (brn) (gry) (grn) (hzl) (oth) ] 
+    exch                        % (s) A 
+    contains 
+} def 
+
+/valid-pid {                    % (s)
+    dup length 9 eq             % L=9? (s) 
+    {                           % (s) % yes
+        parse-number            % r 
+        null ne                 % r!=null
+    }
+    {                           % (s) % no
+        pop false               % f
+    } ifelse
+} def 
+
+/run-test {                     % V procname % V = [ [(input-string) expected ] ... ]
+    1 index cvx                 % proc V name
+    exch                        % V proc name 
+    {                           % [(s) expected] proc name
+        aload pop exch          % (s) expected proc name
+        dup                     % (s) (s) expected proc name
+        3 1 roll                % (s) expected (s) proc name 
+        3 index                 % proc (s) expected (s) proc name
+        exec                    % actual expected (s) proc name
+        ne                      % a!=e (s) proc name
+        {                       % (s) proc name % a!=e
+            exch pop            % (s) name 
+            exch                % name (s) 
+            30 string cvs print
+            ( failed test for input ) print 
+            30 string cvs print 
+            (.\n) print 
+                               % 
+            stop
+        }
+        {                       % (s) proc name % a==e
+            pop                 % proc name
+        } ifelse 
+    } forall                    % proc name 
+    pop                         % name
+    30 string cvs print
+    ( passed all tests.\n) print
+} def 
+
+/test-parse-number {
+    /parse-number
+    [ 
+        [() null] 
+        [(abc) null]
+        [(a2000) null]
+        [(2000a) null] 
+        [(20a2) null] 
+        [(222) 222]
+        [(0) 0]
+    ]
+    run-test
+} def 
+
+/test-byr {
+    /valid-byr
+    [ 
+        [(abc) false]
+        [(a2000) false]
+        [(2000a) false] 
+        [(222) false]
+        [(1919) false]
+        [(1920) true]
+        [(2002) true]
+        [(2003) false]
+        [(20000) false]
+    ]
+    run-test
+} def 
+
+/test-iyr {
+    /valid-iyr
+    [ 
+        [(abc) false]
+        [(a2000) false]
+        [(2000a) false] 
+        [(222) false]
+        [(2009) false]
+        [(2010) true]
+        [(2020) true]
+        [(2021) false]
+        [(20000) false]
+    ]
+    run-test
+} def 
+
+/test-eyr {
+    /valid-eyr
+    [ 
+        [(abc) false]
+        [(a2000) false]
+        [(2000a) false] 
+        [(222) false]
+        [(2019) false]
+        [(2020) true]
+        [(2030) true]
+        [(2031) false]
+        [(20000) false]
+    ]
+    run-test
+} def 
+
+/test-hgt {
+    /valid-hgt
+    [ 
+        [() false] 
+        [(170) false] 
+        [(149cm) false]
+        [(150cm) true]
+        [(193cm) true]
+        [(194cm) false]
+        [(150cm ) false]
+        [(a150cm) false]
+        [(58in) false]
+        [(59in) true]
+        [(76in) true]
+        [(77in) false]
+        [(59in ) false]
+        [(a59in) false]
+    ]
+    run-test
+} def 
+
+/test-hcl {
+    /valid-hcl
+    [ 
+        [() false] 
+        [(#123abc) true] 
+        [(#059abf) true] 
+        [(#059abg) false] 
+        [(#12aabc) false] 
+        [(a#123abc) false] 
+        [(#123abcd) false] 
+    ]
+    run-test
+} def 
+
+/test-ecl {
+    /valid-ecl
+    [ 
+        [(amb) true] 
+        [(blu) true] 
+        [(brn) true]
+        [(gry) true] 
+        [(grn) true]
+        [(hzl) true] 
+        [(oth) true] 
+        [() false] 
+        [(foo) false] 
+        [(otho) false] 
+        [(hhzl) false] 
+        [(200) false]
+    ]
+    run-test
+} def 
+
+/test-pid {
+    /valid-pid
+    [ 
+        [(1) false] 
+        [(000000001) true] 
+        [(123456789) true] 
+        [(1234-6789) false] 
+        [(0123456789) false]
+        [(a12345678) false] 
+        [(123456789a) false] 
+    ]
+    run-test
+} def 
+
+test-parse-number
+test-byr
+test-iyr
+test-eyr
+test-hgt
+test-hcl
+test-ecl
+test-pid
+

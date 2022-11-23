@@ -1,0 +1,51 @@
+[                               % [
+
+(input.txt) (r) file            % F [
+
+{
+    dup                         % F F ... [
+    80 string                   % buf F F ... [
+    readline                    % (s) F ... [
+    {
+        exch                    % F (s) ... [
+    }
+    {
+        exch                    % F (s) ... [
+        closefile               % (s) ... [
+        ]                       % [ (s) ... ]
+        exit
+    } ifelse 
+} loop                          % A
+                                
+0 exch                          % A n=0
+{                               % (s) n=0
+    (: ) search                 % true (d1-d2 c) (: ) (p) n
+    {
+        exch pop                % (d1-d2 c) (p) n
+        ( ) search              % true (d1-d2) ( ) (c) (p) n
+        pop exch pop            % (d1-d2) (c) (p) n
+        (-) search              % true (d1) (-) (d2) (c) (p) n
+        pop exch pop            % (d1) (d2) (c) (p) n
+        cvi 1 sub exch          % (d2) i1 (c) (p) n
+        cvi 1 sub exch          % i1 i2 (c) (p) n
+        4 2 roll                % (c) (p) i1 i2 n
+        0 get exch              % (p) c i1 i2 n  
+        4 -2 roll               % i1 i2 (p) c n
+        3 index                 % c i1 i2 (p) c n 
+        3 index                 % (p) c i1 i2 (p) c n
+        3 -1 roll               % i1 (p) c i2 (p) c n 
+        get                     % p[i1] c i2 (p) c n
+        eq                      % =1? i2 (p) c n 
+        4 1 roll                % i2 (p) c =1? n 
+        get                     % p[i2] c =1? n
+        eq                      % =2? =1? n 
+        eq not                  % valid? n
+        {
+            1 add               % n+1
+        } if                    % n'
+    } 
+    { pop }
+    ifelse
+} forall                        % n'
+
+=                               %

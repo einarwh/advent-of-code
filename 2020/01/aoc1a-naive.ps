@@ -1,0 +1,44 @@
+[ (input.txt) run ]         % A
+
+dup length 1 sub            % L-1 A
+
+0 exch                      % L-1 0 A 
+1 exch                      % 1 0 A
+{                           % i A
+    exch                    % A i 
+    dup length 1 sub        % L-1 A i
+    0 exch                  % L-1 0 A i
+    1 exch                  % L-1 1 0 A i 
+    {                       % j A i 
+        2 index             % i j A i
+        2 copy              % i j i j A i
+        eq                  % =? i j A i
+        {                   % i j A i (i = j, skip)
+            pop pop         % A i
+        } 
+        {                   % i j A i (i != j, check)
+            2 index         % A i j A i
+            exch            % i A j A i
+            get             % [i] j A i
+            3 1 roll        % j A [i] i
+            1 index         % A j A [i] i
+            exch            % j A A [i] i
+            get             % [j] A [i] i
+            3 -1 roll       % [i] [j] A i
+            2 copy          % [i] [j] [i] [j] A i
+            add             % [i]+[j] [i] [j] A i
+            2020            % 2020 [i]+[j] [i] [j] A i
+            eq              % =? [i] [j] A i
+            {               % [i] [j] A i ([i]+[j] = 2020)
+                mul         % [i]*[j] A i
+                =           % A i
+            } 
+            {               % [i] [j] A i ([i]+[j] != 2020)
+                pop pop     % A i
+            } ifelse
+        } ifelse
+    } for                   % A i 
+    exch pop
+} for                       % A 
+
+pop                         %

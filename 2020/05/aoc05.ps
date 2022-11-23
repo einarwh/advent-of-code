@@ -1,0 +1,236 @@
+/read-input
+{                           % fn
+    [                       % | fn
+    exch                    % fn |
+    (r) file                % F |
+    {
+        dup                 % F F ... |
+        80 string           % buf F F ... |
+        readline            % (s) F ... |
+        {
+            exch            % F (s) ... |
+        }
+        {
+            exch            % F (s) ... |
+            closefile       % (s) ... |
+            ]               % | (s) ... |
+            exit
+        } ifelse 
+    } loop                  % Rs
+} def 
+
+/split-at {                 % i A 
+    2 copy                  % i A i A 
+    0 exch                  % i 0 A i A 
+    getinterval             % A'=A[0,i-1] i A
+    3 1 roll                % i A A' 
+    1 index length          % L i A A'
+    1 index                 % i L i A A'
+    sub                     % c i A A'
+    getinterval             % A''=A[i,L-1] A'           
+} def 
+
+/to-bits {                  % ch A
+    exch                    % A ch
+    [                       % | A ch 
+    3 1 roll                % A ch | 
+    {                       % x ch ... | 
+        1 index             % ch x ch ... |
+        eq 
+        { 1 }               % 1 ch ... |
+        { 0 }               % 0 ch ... |
+        ifelse              % n ch ... |
+        exch                % ch n ... |
+    } forall                % ch ... |
+    pop                     % ... | 
+    ]                       % A'
+} def 
+
+/to-mask {                  % A 
+    dup length              % s=L A
+    exch                    % A s
+    0                       % m=0 A s
+    3 1 roll                % A s m
+    {                       % x s m
+        exch                % s x m
+        1 sub               % s' x m
+        exch                % x s' m 
+        1 index             % s' x s' m 
+        bitshift            % x' s' m
+        3 -1 roll           % m x' s'
+        or                  % m' s'
+        exch                % s' m'
+    } forall                % s m 
+    pop                     % m
+} def 
+
+/pos { 0 get to-bits to-mask } def 
+
+/row { (B) pos } def
+
+/col { (R) pos } def 
+
+/seat-id {                  % S
+    [ exch {} forall ]      % A(chars) 
+    7 split-at              % A1(col) A2(row)
+    col exch row            % r c 
+    8 mul add               % id
+} def 
+
+/find-highest {             % A 
+    0                       % r=0 A
+    exch                    % A r
+    {                       % x r
+        seat-id             % id r 
+        2 copy              % id r id r 
+        lt                  % ? id r 
+        {                   % id r (r < id)
+            exch            % r id 
+        } if  
+        pop                 % max(r, id)
+    } forall
+} def 
+
+% A => [ A ix more? ]
+/iter-state {               % A 
+    dup length              % L A 
+    0                       % 0 L A
+    exch                    % L 0 A
+    1 index                 % 0 L 0 A 
+    gt                      % L>0 0 A
+    3 array                 % A' L>0 0 A 
+    astore                  % A' 
+} def 
+
+/next-state {               % I 
+    dup                     % I I 
+    aload pop               % ? i A I
+    {                       % i A I (true)
+        1 add               % i+1 A I 
+        1 index length      % L i+1 A I
+        1 index             % i+1 L i+1 A I 
+        gt                  % L>i+1? i+1 A I
+        3 array astore      % I' I 
+        exch pop            % I'
+    }
+    {                       % i A I (false)             
+        pop pop             % I 
+    } ifelse
+} def
+
+% I1 I2 => a I1' I2
+/choose-next                % I1 I2 
+{
+    dup                     % I1 I1 I2
+    aload pop               % more1? i1 A1 I1 I2
+    {                       % i1 A1 I1 I2 (i1 in range)
+        get                 % a1 I1 I2 
+        2 index             % I2 a1 I1 I2 
+        aload pop           % more2? i2 A2 a1 I1 I2 
+        {                   % i2 A2 a1 I1 I2 (i2 in range)
+            get             % a2 a1 I1 I2 
+            2 copy          % a2 a1 a2 a1 I1 I2 
+            lt              % a1<a2? a2 a1 I1 I2 
+            {               % a2 a1 (a1 < a2) I1 I2 
+                pop         % a1 I1 I2 
+                exch        % I1 a1 I2 
+                next-state  % I1' a1 I2 
+                exch        % a1 I1' I2 
+            }
+            {               % a2 a1 (a2 < a1)
+                exch pop    % a2 I1 I2
+                3 -1 roll   % I2 a2 I1 
+                next-state  % I2' a2 I1 
+                3 1 roll    % a2 I1 I2'
+            } ifelse        % a I1 I2
+        }
+        {                   % i2 A2 a1 I1 I2 (i2 out of range)
+            pop pop         % a1 I1 I2 
+            exch            % I1 a1 I2 
+            next-state      % I1' a1 I2 
+            exch            % a1 I1' I2 
+        } ifelse            % a I1 I2
+    } 
+    {                       % i1 A1 I1 I2 (i1 out of range, i2 must be in range)
+        pop pop             % I1 I2 
+        1 index             % I2 I1 I2 
+        aload pop           % more2? i2 A2 I1 I2 
+        {                   % i2 A2 I1 I2 (i2 in range)
+            get             % a2 I1 I2 
+            3 -1 roll       % I2 a2 I1 
+            next-state      % I2' a2 I1 
+            3 1 roll        % a2 I1 I2'
+        }
+        {                   % I2 A2 I1 I2 (i2 out of range)
+            (out of range\n) print
+            pop pop "err"
+        } ifelse            % a I1 I2 
+    } ifelse                % a I1 I2 
+} def
+
+/merge {                    % A1 A2 
+    2 copy                  % A1 A2 A1 A2
+    length                  % L1 A2 A1 A2 
+    exch                    % A2 L1 A1 A2
+    length                  % L2 L1 A1 A2 
+    add                     % L A1 A2
+    array                   % A A1 A2
+    3 1 roll                % A1 A2 A
+    iter-state              % I1 A2 A 
+    exch                    % A2 I1 A 
+    iter-state              % I2 I1 A 
+    2 index                 % A I2 I1 A 
+    length                  % L I2 I1 A
+    1 sub                   % L-1 I2 A1 A
+    0 exch                  % L-1 j=0 I2 I1 A
+    1 exch                  % L-1 k=1 j I2 I1 A
+    {                       % i I2 I1 A
+        3 1 roll            % I2 I1 i A 
+        choose-next         % a I2 I1 i A 
+        4 index             % A a I2 I1 i A 
+        5 -1 roll           % i A a I2 I1 A 
+        3 -1 roll           % a i A I2 I1 A 
+        put                 % I2 I1 A
+    } for                   % I2 I1 A 
+    pop pop                 % A
+} def
+
+% A => A' 
+/merge-sort {               % A
+    dup length              % L A 
+    1                       % 1 L A 
+    gt                      % L>1? A 
+    {                       % A (L>1)
+        dup length          % L A 
+        2 idiv              % L/2 A 
+        split-at            % A1 A2 
+        merge-sort          % A1' A2
+        exch                % A2 A1'
+        merge-sort          % A2' A1'
+        merge 
+    } if                    % A
+} def 
+
+/find-my-seat {             % A
+    [ exch { seat-id } forall ] merge-sort
+    dup 0 get               % p=A[0] A 
+    exch                    % A' p
+    {                       % a p
+        dup                 % a a p 
+        3 -1 roll           % p a a 
+        sub                 % g a 
+        2 eq                % ? a
+        {                   % a (gap = 2)
+            1 sub           % a-1 
+            exit            % a
+        } if 
+    } forall 
+} def
+
+/part-1 {
+    (input.txt) read-input find-highest
+} def 
+
+/part-2 {
+    (input.txt) read-input find-my-seat
+} def 

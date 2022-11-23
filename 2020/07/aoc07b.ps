@@ -1,0 +1,209 @@
+/read-input
+{                               % fn
+    [                           % | fn
+    exch                        % fn |
+    (r) file                    % F |
+    {   
+        dup                     % F F ... |
+        160 string              % buf F F ... |
+        readline                % (s) F ... |
+        {   
+            exch                % F (s) ... |
+        }   
+        {   
+            exch                % F (s) ... |
+            closefile           % (s) ... |
+            ]                   % | (s) ... |
+            exit    
+        } ifelse    
+    } loop                      % Rs
+} def 
+
+/split-string {                 % (z=sep) (s=string)
+    [                           % | z s
+    3 1 roll                    % z s | 
+    {                           % z s |
+        search                  % found? (h=head z)? s'=rest |
+        {                       % h z s' | (yes, found)
+            3 1 roll            % z s' h | 
+        }
+        {                       % s | (not found)
+            exit                % s |
+        } ifelse
+    } loop
+    ]
+} def 
+
+/concat-strings {               % s1 s2 
+    2 copy length               % L1 s2 s1 s2
+    exch length                 % L2 L1 s1 s2 
+    add                         % L s1 s2 
+    string                      % s s1 s2 
+    dup dup                     % s s s s1 s2 
+    4 3 roll                    % s1 s s s s2 
+    4 index                     % s2 s1 s s s s2 
+    length                      % L2 s1 s s s s2 
+    exch putinterval 
+    3 1 roll 
+    exch 
+    0 exch 
+    putinterval
+} def
+
+% Ex: [ (light) (red) (bags) (contain) (1) (bright) (white) (bag,) (2) (muted) (yellow) (bags.) ] => [ (faded blue) [ [ 1 (bright white) ] [ 2 (muted yellow) ] ] ]
+/create-contained {             % A (multiple of 4 elements)
+    dup length                  % L A 
+    4 idiv 1 sub                % n A (n = #groups - 1)
+    [                           % | n A 
+    3 1 roll                    % n A |
+    0 exch                      % n 0 A |
+    1 exch                      % n 1 0 A |
+    {                           % i A |
+        4 mul                   % j=4i A |
+        [                       % | j A | 
+        3 1 roll                % j A | |
+        1 index                 % A j A | |
+        4 1 roll                % j A | A |
+        0 1 2                   % 2 1 0 j A | A |
+        {                       % k j A | A |
+            3 copy              % k j A k j A | A |
+            add get             % A[j+k] k j A | A | 
+            4 1 roll            % k i A A[j+k] | A |
+            pop                 % i A A[j+k] | A |
+        } for                   % i A ... | A |
+        pop pop                 % ... | A | 
+        ]                       % [...] A | 
+        exch                    % A [...] | 
+    } for                       % A ... |
+    pop                         % ... | 
+    ]                           % Gs
+    [ exch                      % Gs |                                             
+    {                           % G=[ (n) (adv) (col) ] |
+        [                       % | G |
+        exch                    % G | |
+        dup                     % G G | |
+        0 get                   % (n) G | |
+        cvi                     % n G | |
+        exch                    % G n | |
+        1 2 getinterval         % G'=[ (adv) (col) ] n | |
+        aload pop               % (adv) (col) n | |
+        concat-strings          % (advcol) n | | 
+        ]                       % [ n (advcol) ] |
+    } forall 
+    ]                           % C
+} def 
+
+% Ex: [ (faded) (blue) (bags) (contain) (no) (other) (bags.) ] => [ (faded blue) [] ]
+% Ex: [ (light) (red) (bags) (contain) (1) (bright) (white) (bag,) (2) (muted) (yellow) (bags.) ] => [ (faded blue) [ [ 1 (bright white) ] [ 2 (muted yellow) ] ] ]
+/create-rule {                  % A=[ e1 e2 e3 e4 e5 ...]
+    dup 0 2 getinterval         % A1=[ e1 e2 ] A
+    aload pop                   % e2 e1 A 
+    concat-strings              % s1 A 
+    exch                        % A s1 
+    dup length 2 sub            % L-2 A s1 
+    2 exch                      % L-2 2 A s1 
+    getinterval                 % A2=[e3 e4 e5...] s1 
+    dup length 2 sub            % L2-2 A2 s1 
+    2 exch                      % L2-2 2 A2 s1 
+    getinterval                 % A3=[e5...] s1 
+    dup 0 get                   % e5 A3 s1 
+    (no) eq                     % e5=(no)? A3 s1 
+    {                           % A3 s1 (nothing more)
+        pop                     % s1 
+        0 array                 % [] s1 
+    }    
+    {                           % A3 s1 (more)
+        create-contained        % CB s1 
+    } ifelse                    % CB s1
+    [ 3 1 roll ]                % [ s1 CB ]
+} def 
+
+% Lookup the index of string s in array R.
+/lookup-index {                 % s R
+    exch                        % R s 
+    0                           % 0 R s 
+    3 1 roll                    % R s 0
+    {                           % l s i 
+        0 get                   % z s i 
+        1 index                 % s z s i 
+        eq                      % s=z? s i 
+        {                       % s i (found it!)
+            pop                 % i 
+            exit 
+        } 
+        {                       % s i (keep looking)
+            exch                % i s 
+            1 add               % i+1 s 
+            exch                % s i+1
+        } ifelse
+    } forall 
+} def 
+
+% A looks like this:
+% [(lightred) [[1 (brightwhite)] [2 (mutedyellow)]]]
+% A[0] = (lightred)
+% A[1] = [[1 (brightwhite)] [2 (mutedyellow)]]
+% R: all the rules.
+/to-index-rule {                % A R
+    [ 3 1 roll                  % A R | 
+    1 get                       % A[1] R |
+    {                           % [n (z)] R |
+        dup 0 get               % 1 [n (z)] R |
+        exch                    % [n (z)] 1 R |
+        1 get                   % (z) n R |
+        2 index                 % R (z) n R |
+        exch                    % (z) R n R |
+        lookup-index            % iz n R |
+        [                       % | iz n R |
+        3 1 roll                % iz n | R |
+        ]                       % [n iz] R |
+        exch                    % R [n iz] |
+    } forall                    % R ... |
+    pop                         % ... |
+    ]                           % [...]
+} def 
+
+% Elements of R look like this:
+% [(lightred) [[1 (brightwhite)] [2 (mutedyellow)]]]
+/to-index-rules {               % R
+    dup                         % R R 
+    [ 3 1 roll                  % R |
+    {                           % A R | 
+        1 index exch            % A R R | 
+        to-index-rule           % r R |
+        exch                    % R r | 
+    } forall 
+    pop 
+    ]
+} def 
+
+/count-contained-bags {         % ix R
+    1 index                     % R ix R 
+    exch                        % ix R R 
+    get                         % r R 
+    0 exch                      % r Z=0 R 
+    {                           % p=[n i] Z R 
+        aload pop               % i n Z R 
+        3 index                 % R i n Z R 
+        exch                    % i R n Z R 
+        count-contained-bags    % z n Z R
+        1 add                   % z+1 n Z R
+        mul                     % (z+1)*n Z R 
+        add                     % Z' R
+    } forall                    % Z R
+    exch pop                    % Z
+} def 
+
+/part-2 {
+    (input.txt) read-input
+    [ exch { ( ) split-string create-rule } forall ]
+    dup 
+    (shinygold)
+    lookup-index
+    exch 
+    to-index-rules
+    exch 
+    count-contained-bags
+} def 
+
+part-2

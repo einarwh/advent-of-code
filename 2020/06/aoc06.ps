@@ -1,0 +1,430 @@
+/read-input
+{                               % fn
+    [                           % | fn
+    exch                        % fn |
+    (r) file                    % F |
+    {   
+        dup                     % F F ... |
+        80 string               % buf F F ... |
+        readline                % (s) F ... |
+        {   
+            exch                % F (s) ... |
+        }   
+        {   
+            exch                % F (s) ... |
+            closefile           % (s) ... |
+            ]                   % | (s) ... |
+            exit    
+        } ifelse    
+    } loop                      % Rs
+} def 
+
+/string-to-array 
+{
+    [ exch {} forall ] 
+} def 
+
+/split-at {                     % i A 
+    2 copy                      % i A i A 
+    0 exch                      % i 0 A i A 
+    getinterval                 % A'=A[0,i-1] i A
+    3 1 roll                    % i A A' 
+    1 index length              % L i A A'
+    1 index                     % i L i A A'
+    sub                         % c i A A'
+    getinterval                 % A''=A[i,L-1] A'           
+} def 
+
+% A => [ A ix more? ]
+/iter-state {                   % A 
+    dup length                  % L A 
+    0                           % 0 L A
+    exch                        % L 0 A
+    1 index                     % 0 L 0 A 
+    gt                          % L>0 0 A
+    3 array                     % A' L>0 0 A 
+    astore                      % A' 
+} def 
+
+/next-state {                   % I 
+    dup                         % I I 
+    aload pop                   % ? i A I
+    {                           % i A I (true)
+        1 add                   % i+1 A I 
+        1 index length          % L i+1 A I
+        1 index                 % i+1 L i+1 A I 
+        gt                      % L>i+1? i+1 A I
+        3 array astore          % I' I 
+        exch pop                % I'
+    }   
+    {                           % i A I (false)             
+        pop pop                 % I 
+    } ifelse    
+} def   
+
+% I1 I2 => a I1' I2'    
+/choose-next                    % I1 I2 
+{   
+    dup                         % I1 I1 I2
+    aload pop                   % more1? i1 A1 I1 I2
+    {                           % i1 A1 I1 I2 (i1 in range)
+        get                     % a1 I1 I2 
+        2 index                 % I2 a1 I1 I2 
+        aload pop               % more2? i2 A2 a1 I1 I2 
+        {                       % i2 A2 a1 I1 I2 (i2 in range)
+            get                 % a2 a1 I1 I2 
+            2 copy              % a2 a1 a2 a1 I1 I2 
+            lt                  % a1<a2? a2 a1 I1 I2 
+            {                   % a2 a1 (a1 < a2) I1 I2 
+                pop             % a1 I1 I2 
+                exch            % I1 a1 I2 
+                next-state      % I1' a1 I2 
+                exch            % a1 I1' I2 
+            }   
+            {                   % a2 a1 (a2 < a1)
+                exch pop        % a2 I1 I2
+                3 -1 roll       % I2 a2 I1 
+                next-state      % I2' a2 I1 
+                3 1 roll        % a2 I1 I2'
+            } ifelse            % a I1 I2
+        }   
+        {                       % i2 A2 a1 I1 I2 (i2 out of range)
+            pop pop             % a1 I1 I2 
+            exch                % I1 a1 I2 
+            next-state          % I1' a1 I2 
+            exch                % a1 I1' I2 
+        } ifelse                % a I1 I2
+    } 
+    {                           % i1 A1 I1 I2 (i1 out of range, i2 must be in range)
+        pop pop                 % I1 I2 
+        1 index                 % I2 I1 I2 
+        aload pop               % more2? i2 A2 I1 I2 
+        {                       % i2 A2 I1 I2 (i2 in range)
+            get                 % a2 I1 I2 
+            3 -1 roll           % I2 a2 I1 
+            next-state          % I2' a2 I1 
+            3 1 roll            % a2 I1 I2'
+        }   
+        {                       % I2 A2 I1 I2 (i2 out of range)
+            (out of range\n) print
+            pop pop "err"
+        } ifelse                % a I1 I2 
+    } ifelse                    % a I1 I2 
+} def
+
+/merge {                        % A1 A2 
+    2 copy                      % A1 A2 A1 A2
+    length                      % L1 A2 A1 A2 
+    exch                        % A2 L1 A1 A2
+    length                      % L2 L1 A1 A2 
+    add                         % L A1 A2
+    array                       % A A1 A2
+    3 1 roll                    % A1 A2 A
+    iter-state                  % I1 A2 A 
+    exch                        % A2 I1 A 
+    iter-state                  % I2 I1 A 
+    2 index                     % A I2 I1 A 
+    length                      % L I2 I1 A
+    1 sub                       % L-1 I2 A1 A
+    0 exch                      % L-1 j=0 I2 I1 A
+    1 exch                      % L-1 k=1 j I2 I1 A
+    {                           % i I2 I1 A
+        3 1 roll                % I2 I1 i A 
+        choose-next             % a I2 I1 i A 
+        4 index                 % A a I2 I1 i A 
+        5 -1 roll               % i A a I2 I1 A 
+        3 -1 roll               % a i A I2 I1 A 
+        put                     % I2 I1 A
+    } for                       % I2 I1 A 
+    pop pop                     % A
+} def   
+
+% A => A'   
+/merge-sort {                   % A
+    dup length                  % L A 
+    1                           % 1 L A 
+    gt                          % L>1? A 
+    {                           % A (L>1)
+        dup length              % L A 
+        2 idiv                  % L/2 A 
+        split-at                % A1 A2 
+        merge-sort              % A1' A2
+        exch                    % A2 A1'
+        merge-sort              % A2' A1'
+        merge   
+    } if                        % A
+} def 
+
+% I1 I2 => A I1' I2' (A = [a] if intersect found, otherwise [])
+/intersect-step                 % I1 I2 
+{
+    dup                         % I1 I1 I2
+    aload pop                   % more1? i1 A1 I1 I2
+    {                           % i1 A1 I1 I2 (i1 in range)
+        get                     % a1 I1 I2 
+        2 index                 % I2 a1 I1 I2 
+        aload pop               % more2? i2 A2 a1 I1 I2 
+        {                       % i2 A2 a1 I1 I2 (i2 in range)
+            get                 % a2 a1 I1 I2 
+            2 copy              % a2 a1 a2 a1 I1 I2 
+            eq                  % a1=a2? a2 a1 I1 I2 
+            {                   % a a I1 I2 (a2=a1=a)
+                pop             % a I1 I2 
+                3 1 roll        % I1 I2 a 
+                next-state      % I1' I2 a 
+                exch            % I2 I1 a 
+                next-state      % I2' I1' a 
+                exch            % I1' I2' a 
+                3 -1 roll       % a I1' I2' 
+                [ exch ]        % [a] I1' I2'
+            }
+            {                   % a2 a1 I1 I2 (a1!=a2)
+                2 copy          % a2 a1 a2 a1 I1 I2 
+                lt              % a1<a2? a2 a1 I1 I2 
+                {               % a2 a1 (a1 < a2) I1 I2 
+                    pop         % a1 I1 I2 
+                    exch        % I1 a1 I2 
+                    next-state  % I1' a1 I2 
+                    exch        % a1 I1' I2 
+                }
+                {               % a2 a1 (a2 < a1) I1 I2 
+                    exch pop    % a2 I1 I2
+                    3 -1 roll   % I2 a2 I1 
+                    next-state  % I2' a2 I1 
+                    3 1 roll    % a2 I1 I2'
+                } ifelse        % a I1 I2
+                pop             % I1 I2 
+                []              % [] I1 I2
+            } ifelse            % A I1 I2 
+        }                       % A I1 I2
+        {                       % i2 A2 a1 I1 I2 (i2 out of range, consume i1)
+            pop pop pop         % I1 I2 
+            next-state          % I1' I2 
+            []                  % [] I1' I2 
+        } ifelse                % A I1 I2
+    } 
+    {                           % i1 A1 I1 I2 (i1 out of range, consume i2)
+        pop pop                 % I1 I2 
+        exch                    % I2 I1 
+        next-state              % I2' I1 (don't care if I2 is already done)
+        exch                    % I1 I2 
+        []                      % [] I1 I2
+    } ifelse                    % A I1 I2 
+} def
+
+/continue-loop                  % I1 I2 
+{
+    2 copy                      % I1 I2 I1 I2 
+    aload pop                   % more1? i1 A1 I2 I1 I2
+    3 1 roll pop pop            % more1? I2 I1 I2 
+    exch                        % I2 more1? I1 I2 
+    aload pop                   % more2? i2 A2 more1? I1 I2
+    3 1 roll pop pop            % more2? more1? I1 I2 
+    or                          % more? I1 I2 
+} def
+
+/intersect {                    % A1 A2 
+    iter-state                  % I1 A2
+    exch                        % A2 I1 
+    iter-state                  % I2 I1
+    exch                        % I1 I2 
+    [                           % | I1 I2 
+    3 1 roll                    % I1 I2 |
+    {                           % I1 I2 (.?) |
+        continue-loop           % more? I1 I2 (.?) |
+        {                       % I1 I2 (yes more)
+            intersect-step      % A I1' I2' (.?) |
+            aload length        % L (a?) I1' I2' (.?) | (a? is there if intersect-step had a result)
+            1 eq                % L=1? (a?) I1' I2' (.?) |
+            {                   % a! I1' I2' (.?) | (L=1, so a - the intersect value - is there)
+                3 1 roll        % I1' I2' a (.?) | 
+            } if    
+        }
+        {                       % I1 I2 (.?) | (no more)
+            exit                % I1 I2 (.?) |
+        } ifelse                % I1 I2 (.?) |
+    } loop                      % I2 I1 (.?) |
+    pop pop                     % (.?) | 
+    ]                           % A
+} def
+
+/union-step                     % I1 I2 
+{
+    dup                         % I1 I1 I2
+    aload pop                   % more1? i1 A1 I1 I2
+    {                           % i1 A1 I1 I2 (i1 in range)
+        get                     % a1 I1 I2 
+        2 index                 % I2 a1 I1 I2 
+        aload pop               % more2? i2 A2 a1 I1 I2 
+        {                       % i2 A2 a1 I1 I2 (i2 in range)
+            get                 % a2 a1 I1 I2 
+            2 copy              % a2 a1 a2 a1 I1 I2 
+            eq                  % a1=a2? a2 a1 I1 I2 
+            {                   % a a I1 I2 (a2=a1=a)
+                pop             % a I1 I2 
+                3 1 roll        % I1 I2 a 
+                next-state      % I1' I2 a 
+                exch            % I2 I1 a 
+                next-state      % I2' I1' a 
+                exch            % I1' I2' a 
+                3 -1 roll       % a I1' I2' 
+                [ exch ]        % [a] I1' I2'
+            }
+            {                   % a2 a1 I1 I2 (a1!=a2)
+                2 copy          % a2 a1 a2 a1 I1 I2 
+                lt              % a1<a2? a2 a1 I1 I2 
+                {               % a2 a1 (a1 < a2) I1 I2 
+                    pop         % a1 I1 I2 
+                    exch        % I1 a1 I2 
+                    next-state  % I1' a1 I2 
+                    exch        % a1 I1' I2 
+                }
+                {               % a2 a1 (a2 < a1)
+                    exch pop    % a2 I1 I2
+                    3 -1 roll   % I2 a2 I1 
+                    next-state  % I2' a2 I1 
+                    3 1 roll    % a2 I1 I2'
+                } ifelse        % a I1 I2
+                [ exch ]        % A=[a] I1 I2
+            } ifelse            % A I1 I2 
+        }                       % A I1 I2
+        {                       % i2 A2 a1 I1 I2 (i2 out of range, use i1)
+            pop pop             % a1 I1 I2 
+            exch                % I1 a1 I2 
+            next-state          % I1' a1 I2 
+            exch                % a1 I1' I2 
+            [ exch ]            % A=[a1] I1' I2
+        } ifelse                % A I1 I2
+    } 
+    {                           % i1 A1 I1 I2 (i1 out of range, i2 should be in range)
+
+        pop pop                 % I1 I2 
+        1 index                 % I2 I1 I2 
+        aload pop               % more2? i2 A2 I1 I2 
+        {                       % i2 A2 I1 I2 (i2 in range)
+            get                 % a2 I1 I2 
+            3 -1 roll           % I2 a2 I1 
+            next-state          % I2' a2 I1 
+            3 1 roll            % a2 I1 I2'
+            [ exch ]            % A=[a2] I1 I2'
+        }   
+        {                       % I2 A2 I1 I2 (i2 out of range?!)
+            (out of range\n) print
+            pop pop []
+        } ifelse                % A I1 I2 
+    } ifelse                    % A I1 I2 
+} def
+
+/union {                        % A1 A2 
+    iter-state                  % I1 A2
+    exch                        % A2 I1 
+    iter-state                  % I2 I1
+    exch                        % I1 I2 
+    [                           % | I1 I2 
+    3 1 roll                    % I1 I2 |
+    {                           % I1 I2 (.?) |
+        continue-loop           % more? I1 I2 (.?) |
+        {                       % I1 I2 (yes more)
+            union-step          % A I1' I2' (.?) |
+            aload length        % L a I1' I2' (.?) |
+            1 eq                % L=1? (a?) I1' I2' (.?) |
+            {                   % a! I1' I2' (.?) | 
+                3 1 roll        % I1' I2' a (.?) | 
+            } if    
+        }
+        {                       % I1 I2 (.?) | (no more)
+            exit                % I1 I2 (.?) |
+        } ifelse                % I1 I2 (.?) |
+    } loop                      % I2 I1 (.?) |
+    pop pop                     % (.?) | 
+    ]                           % A
+} def
+
+% set-op A[A] => A
+/reduce-set {                   % op AA
+    exch                        % AA op 
+    dup length 0 eq             % L=0? AA op 
+    {                           % AA op (AA = [])
+        pop pop []              % []
+    }
+    {
+        dup length 1 eq         % L=1? AA op 
+        {                       % AA op (AA = [A])
+            0 get               % A op 
+            exch pop            % A 
+        }
+        {                       % AA op (AA = [A1 A2 ...])
+            1 split-at          % T [H] op (T = [A2...], H = A1)
+            exch                % [H] T op 
+            0 get               % H T op 
+            exch                % T P=H op 
+            {                   % A P op 
+                2 index         % op A P op 
+                exec            % P' op 
+            } forall            % A op
+            exch pop            % A 
+        } ifelse 
+    } ifelse 
+} def 
+
+/create-groups {                % A[Strings]
+    [ [                         % | | A[S]
+    3 -1 roll                   % A[S] | |
+    {                           % S | |
+        dup length 0 eq         % L=0? S (A?) | (G?) |
+        {                       % S (A?) | (G?) | (Empty line, close group)
+            pop                 % (A?) | (G?) | 
+            ]                   % G=[(A?)] (G?) |
+            [                   % | G (G?) | (Start new group)
+
+        }
+        {                       % S (A?) | (G?) | (Add to group)
+            string-to-array     % A (A?) | (G?) |
+            merge-sort          % A' (A?) | (G?) |
+        } ifelse 
+    } forall 
+    ] ]
+} def 
+
+/sum {                         
+    0 exch { add } forall
+} def 
+
+/count {                        % op Gs 
+    [                           % | op G
+    3 1 roll                    % op G | 
+    exch                        % G op |  
+    {                           % g op | 
+        1 index                 % op g op | 
+        exec                    % s op | 
+        length                  % n op | 
+        exch                    % op n | 
+    } forall                    % op n... |
+    pop                         % n...|
+    ]                           % N
+    sum 
+} def 
+
+/run {                          % {op} 
+    (input.txt)                 % S {op}
+    read-input                  % A {op}
+    create-groups               % G {op}
+    exch                        % {op} G
+    count                       % n
+} def
+
+/everyone {
+    /intersect load reduce-set
+} def 
+
+/anyone {
+    /union load reduce-set
+} def 
+
+/part-1 {
+    /anyone load run 
+} def 
+
+/part-2 {
+    /everyone load run 
+} def 

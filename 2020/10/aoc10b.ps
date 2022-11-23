@@ -1,0 +1,84 @@
+/read-input
+{   
+    [ exch run ]                             
+} def 
+
+/find-max {                     % A 
+    0 exch                      % A m=0
+    {                           % n m
+        2 copy                  % n m n m 
+        lt                      % m<n? n m 
+        {                       % n m %%% yes, replace m with n
+            exch                % n'<-m m'<-n
+        } if 
+        pop                     % m'
+    } forall 
+} def 
+
+/init-cache {                   % C A %%% C is cache, A is adapters.
+    dup length                  % L C A 
+    1 sub                       % L-1 C A 
+    0 exch                      % L-1 0 C A
+    1 exch                      % L-1 1 0 C A 
+    {                           % i C A
+        1 index                 % C i C A
+        exch                    % i C C A 
+        0 put                   % C A 
+    } for                       % C A
+    exch                        % A C 
+    {                           % a C 
+        1 index                 % C a C 
+        exch                    % a C C 
+        null put                % C'
+    } forall                    % C
+    dup                         % C C 
+    0 null put                  % C' 
+    dup dup length 1 sub        % L-1 C C 
+    1 put                       % C'
+} def 
+
+/arr {                          % a C %%% a is adapter (index in cache), C is cache.
+    1 index length              % L a C 
+    1 index                     % a L a C
+    le                          % L<=a? a C 
+    {                           % a C %%% out of bounds, nothing here.
+        pop pop 0               % 0
+    }
+    {                           % a C 
+        2 copy                  % a C a C 
+        get                     % c=C[a] a C 
+        dup                     % c c a C 
+        null eq                 % c=null? c a C 
+        {                       % c a C %%% null, must calculate and add to cache.
+            pop                 % a C 
+            2 copy              % a C a C 
+            1 add               % a+1 C a C 
+            arr                 % c1 a C 
+            3 1 roll            % a C c1 
+            2 copy              % a C a C c1 
+            2 add               % a+2 C a C c1
+            arr                 % c2 a C c1 
+            3 1 roll            % a C c2 c1
+            2 copy              % a C a C c2 c1 
+            3 add               % a+3 C a C c2 c1 
+            arr                 % c3 a C c2 c1 
+            3 1 roll            % a C c3 c2 c1 
+            5 2 roll            % c3 c2 c1 a C 
+            add add             % c a C 
+            dup                 % c c a C 
+            4 1 roll            % c a C c 
+            put                 % c
+        }
+        {                       % c a C %%% not null, already in cache.
+            3 1 roll            % a C c 
+            pop pop             % c
+        } ifelse
+    } ifelse 
+} def 
+
+/part-2 {
+    (input.txt) read-input 
+    dup find-max 1 add array 
+    init-cache 
+    0 arr 
+} def

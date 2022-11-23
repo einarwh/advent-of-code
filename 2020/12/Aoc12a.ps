@@ -1,0 +1,230 @@
+/read-input
+{                                   % fn
+    [                               % | fn
+    exch                            % fn |
+    (r) file                        % F |
+    {       
+        dup                         % F F ... |
+        20 string                   % buf F F ... |
+        readline                    % (s) F ... |
+        {       
+            exch                    % F (s) ... |
+        }       
+        {       
+            exch                    % F (s) ... |
+            closefile               % (s) ... |
+            ]                       % | (s) ... |
+            exit        
+        } ifelse        
+    } loop                          % Rs
+} def 
+
+/split-at {                         % i A 
+    2 copy                          % i A i A 
+    0 exch                          % i 0 A i A 
+    getinterval                     % A'=A[0,i-1] i A
+    3 1 roll                        % i A A' 
+    1 index length                  % L i A A'
+    1 index                         % i L i A A'
+    sub                             % c i A A'
+    getinterval                     % A''=A[i,L-1] A'           
+} def 
+
+%%% Parse into [ number opname ]
+/parse {                            % (s) %%% string is N, W, S, E, L, R or F followed by number.
+    1 split-at                      % (n) (opname)
+    cvi exch                        % (opname) n
+    cvn cvx                         % opname n
+    [ 3 1 roll ]                    % [ n opname ]
+} def 
+
+/map-array {                        % {op} A %%% {op} is operation to be called for each element in A
+    [ 3 1 roll                      % {op} A | 
+    exch                            % A {op} |
+    {                               % e {op} |
+        1 index                     % {op} e {op} | 
+        exec                        % r {op} | %%% r is result of executing {op} on e
+        exch                        % {op} r | 
+    } forall                        % {op} ... | 
+    pop                             % ... |
+    ]                               % [ r1 r2 ... ]
+} def
+
+/filter-array {                     % {p} A %%% {p} is predicate to be called for each element in A
+    [ 3 1 roll                      % {p} A | 
+    exch                            % A {p} | 
+    {                               % e {p} | 
+        2 copy                      % e {p} e {p} |
+        exch                        % {p} e e {p} | 
+        exec                        % include? e {p} | 
+        {                           % e {p} | %%% yes, keep e
+            exch                    % {p} e |
+        }
+        {                           % e {p} | %%% no, reject e
+            pop                     % {p} | 
+        } ifelse                    % {p} e? |
+    } forall                        % {p} ... | 
+    pop                             % ... |
+    ]                               % [ e... ]
+} def 
+
+/flatten-array {                    % A[B] %%% A is an array containing arrays.
+    [ exch                          % A[B] | 
+    {                               % B | 
+        {} forall                   % ... |
+    } forall                        % ... |
+    ]                               % [ ... ]
+} def 
+
+/flatmap-array {
+    map-array flatten-array
+} def 
+
+% Roll array:
+% A => A'
+% Roll right: [ 1 3 5 7 9 ] 2 roll-array => [ 7 9 1 3 5 ]
+% Roll left: [ 1 3 5 7 9 ] -2 roll-array => [ 5 7 9 1 3 ]
+/roll-array 
+{                                   % i A 
+    [                               % | i A 
+    3 1 roll                        % i A |
+    exch                            % A i | 
+    dup length                      % L A i | 
+    exch                            % A L i | 
+    aload                           % A ... L i | 
+    length                          % L ... L i | 
+    2 add                           % L+2 ... L i | 
+    -2 roll                         % L i ... | 
+    exch                            % i L ... | 
+    roll                            % ... | 
+    ]                               % A'
+} def 
+
+%%% Move n steps to the north
+/north {                            % n P %%% n is number of steps, P is position [x y]
+    exch                            % P n 
+    aload pop                       % y x n
+    3 -1 roll                       % n y x 
+    add                             % y+n x 
+    [ 3 1 roll ]
+} def 
+
+%%% Move n steps to the south
+/south {                            % n P %%% n is number of steps, P is position [x y]
+    exch                            % P n 
+    aload pop                       % y x n
+    3 -1 roll                       % n y x 
+    sub                             % y-n x 
+    [ 3 1 roll ]
+} def 
+
+%%% Move n steps to the east
+/east {                             % n P %%% n is number of steps, P is position [x y]
+    exch                            % P n 
+    aload pop                       % y x n 
+    exch                            % x y n 
+    3 -1 roll                       % n x y 
+    add                             % x+n y 
+    exch                            % y x+n
+    [ 3 1 roll ]
+} def 
+
+%%% Move n steps to the west
+/west {                             % n P %%% n is number of steps, P is position [x y]
+    exch                            % P n 
+    aload pop                       % y x n 
+    exch                            % x y n 
+    3 -1 roll                       % n x y 
+    sub                             % x-n y 
+    exch                            % y x-n
+    [ 3 1 roll ]
+} def 
+
+/move {                             % {op} n [P D] %%% n is number of steps, P is position [x y], D is dirs    
+    3 -1 roll                       % [P D] {op} n 
+    aload pop                       % D P {op} n
+    exch                            % P D {op} n
+    4 2 roll                        % {op} n P D 
+    exec                            % P' D 
+    exch                            % D P'
+    [ 3 1 roll ]                    % [P' D]
+} def 
+
+%%% Move n steps to the north
+/N {                                % n [P D] %%% n is number of steps, P is position [x y], D is dirs
+    {north} move 
+} def 
+
+%%% Move n steps to the south
+/S {                                % n [P D] %%% n is number of steps, P is position [x y], D is dirs
+    {south} move 
+} def 
+
+%%% Move n steps to the east
+/E {                                % n [P D] %%% n is number of steps, P is position [x y], D is dirs
+    {east} move 
+} def 
+
+%%% Move n steps to the west
+/W {                                % n [P D] %%% n is number of steps, P is position [x y], D is dirs
+    {west} move 
+} def 
+
+/directions [ /E cvx /N cvx /W cvx /S cvx ] def
+
+%%% Rotate directions to the right
+/right {                            % d D %%% d is number of degrees (90, 180, 270), D is array of ops [ north west south east ]
+    90 idiv                         % r D %%% r is number of rotations
+    roll-array 
+} def
+
+%%% Rotate directions to the left
+/left {                             % d D %%% d is number of degrees (90, 180, 270), D is array of ops [ north west south east ]
+    360 exch sub                    % 360-d D 
+    right
+} def
+
+%%% Rotate directions to the right
+/R {                                % d [P D] %%% d is number of degrees (90, 180, 270), P is pos, D is array of ops [ north west south east ]
+    exch                            % [P D] d 
+    aload pop                       % D P d 
+    3 -1 roll                       % d D P 
+    right                           % D' P 
+    [ 3 1 roll ]                    % [P D']
+} def
+
+%%% Rotate directions to the left
+/L {                                % d [P D] %%% d is number of degrees (90, 180, 270), P is pos, D is array of ops [ north west south east ]
+    360 exch sub                    % 360-d [P D] 
+    R
+} def
+
+%%% Move forward in the appropriate direction
+/F {                                % n [P D] %%% n is number of steps, P is position [x y], D is dirs
+    exch                            % [P D] n 
+    dup 1 get                       % D [P D] n
+    0 get                           % {op} [P D] n
+    3 -1 roll                       % n {op} [P D]
+    exch                            % {op} n [P D]
+    exec                            % [P' D]
+} def
+
+/manhattan {                        % [x y] 
+    aload pop                       % y x 
+    abs exch abs add 
+} def 
+
+/compile {
+    read-input 
+    { length 0 ne } filter-array 
+    { parse } flatmap-array
+    cvx
+} def 
+
+/run {
+    [ [0 0] directions ]
+    (input.txt) compile
+    exec
+    0 get 
+    manhattan
+} def

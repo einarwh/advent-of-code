@@ -1,0 +1,14 @@
+procedure main() 
+  local file, lines, line, i, j
+  lines := []
+  file := open("input.txt","r")
+  while line := read(file) do
+    put(lines, integer(line))
+  close(file)
+  if i := 1 to *lines &
+     j := i+1 to *lines & 
+     lines[i] + lines[j] = 2020 
+  then {
+    write(lines[i] * lines[j])
+  }
+end

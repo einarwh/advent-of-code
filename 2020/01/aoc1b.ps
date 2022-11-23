@@ -1,0 +1,49 @@
+[ (input.txt) run ]             % A
+dup length 1 sub                % L-1 A
+0 exch                          % L-1 0 A 
+1 exch                          % L-1 1 0 A
+{                               % i A
+    exch                        % A i 
+    1 index 1 add               % i+1 A i        
+    1                           % 1 i+1 A i 
+    2 index                     % A 1 i+1 A i 
+    length 1 sub                % L-1 1 i+1 A i  
+    {                           % j A i (invariant i < j)
+        exch                    % A j i
+        1 index 1 add           % j+1 A j i 
+        1                       % 1 j+1 A j i
+        2 index                 % A 1 j+1 A j i
+        length 1 sub            % L-1 1 j+1 A j i
+        {                       % k A j i (invariant j < k)
+            1 index             % A k A j i
+            exch                % k A A j i 
+            get                 % [k] A j i
+            exch                % A [k] j i
+            2 index             % j A [k] j i
+            1 index             % A j A [k] j i
+            exch                % j A A [k] j i
+            get                 % [j] A [k] j i
+            exch                % A [j] [k] j i
+            4 index             % i A [j] [k] j i
+            1 index             % A i A [j] [k] j i
+            exch                % i A A [j] [k] j i
+            get                 % [i] A [j] [k] j i 
+            exch                % A [i] [j] [k] j i
+            4 1 roll            % [i] [j] [k] A j i
+            3 copy              % [i] [j] [k] [i] [j] [k] A j i
+            add add             % [i]+[j]+[k] [i] [j] [k] A j i
+            2020                % 2020 [i]+[j]+[k] [i] [j] [k] A j i
+            eq                  % =? [i] [j] [k] A j i
+            {                   % [i] [j] [k] A j i (found it!)
+                mul mul         % [i]*[j]*[k] A j i
+                =               % A j i
+            }   
+            {                   % [i] [j] [k] A j i (no match)
+                pop pop pop     % A j i
+            } ifelse    
+        } for                   % A j i
+        exch pop                % A i
+    } for                       % A i 
+    exch pop    
+} for                           % A 
+pop                             %

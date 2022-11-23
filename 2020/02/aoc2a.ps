@@ -1,0 +1,60 @@
+[                               % [
+
+(input.txt) (r) file            % F [
+
+{
+    dup                         % F F ... [
+    80 string                   % buf F F ... [
+    readline                    % (s) F ... [
+    {
+        exch                    % F (s) ... [
+    }
+    {
+        exch                    % F (s) ... [
+        closefile               % (s) ... [
+        ]                       % [ (s) ... ]
+        exit
+    } ifelse 
+} loop                          % A
+                                
+0 exch                          % A n=0
+{                               % (s) n=0
+    (: ) search                 % true (d1-d2 c) (: ) (p) n
+    {
+        exch pop                % (d1-d2 c) (p) n
+        ( ) search              % true (d1-d2) ( ) (c) (p) n
+        pop exch pop            % (d1-d2) (c) (p) n
+        (-) search              % true (d1) (-) (d2) (c) (p) n
+        pop exch pop            % (d1) (d2) (c) (p) n
+        cvi exch                % (d2) d1 (c) (p) n
+        cvi exch                % d1 d2 (c) (p) n
+        4 2 roll                % (c) (p) d1 d2 n
+        0 get                   % c (p) d1 d2 n
+        exch                    % (p) c d1 d2 n
+        0                       % k=0 (p) c d1 d2 n
+        3 1 roll                % (p) c k d1 d2 n
+        {                       % x c k d1 d2 n
+            1 index             % c x c k d1 d2 n
+            eq                  % =? c k d1 d2 n
+            {
+                exch            % k c d1 d2 n 
+                1 add           % k+1 c d1 d2 n
+                exch            % c k+1 d1 d2 n
+            } if                % c k' d1 d2 n
+        } forall                % c k' d1 d2 n
+        pop                     % k' d1 d2 n 
+        dup                     % k' k' d1 d2 n 
+        4 -1 roll               % d2 k' k' d1 n 
+        le                      % k'<=d2 k' d1 n
+        3 1 roll                % k' d1 k'<=d2 n 
+        le                      % d1<=k' k'<=d2 n
+        and                     % d1<=k'<=d2 n
+        {
+            1 add               % n+1
+        } if                    % n'
+    } 
+    { pop }
+    ifelse
+} forall                        % n'
+
+=                               %

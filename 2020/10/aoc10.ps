@@ -1,0 +1,129 @@
+/read { 
+    [ exch run ]                             
+} def 
+
+/device {                       % A 
+    0 exch                      % A m=0
+    {                           % n m
+        2 copy                  % n m n m 
+        lt                      % m<n? n m 
+        {                       % n m %%% yes, replace m with n
+            exch                % n'<-m m'<-n
+        } if 
+        pop                     % m'
+    } forall 
+    3 add                       % d
+} def 
+
+/cache {                        % C A %%% C is cache, A is adapters.
+    dup length                  % L C A 
+    1 sub                       % L-1 C A 
+    0 exch                      % L-1 0 C A
+    1 exch                      % L-1 1 0 C A 
+    {                           % i C A
+        1 index                 % C i C A
+        exch                    % i C C A 
+        0 put                   % C A 
+    } for                       % C A
+    exch                        % A C 
+    {                           % a C 
+        1 index                 % C a C 
+        exch                    % a C C 
+        null put                % C'
+    } forall                    % C
+    dup                         % C C 
+    0 null put                  % C' 
+    dup dup length 1 sub        % L-1 C C 
+    1 put                       % C'
+} def 
+
+/arrangements {                 % a C %%% a is adapter (index in cache), C is cache.
+    1 index length              % L a C 
+    1 index                     % a L a C
+    le                          % L<=a? a C 
+    {                           % a C %%% out of bounds, nothing here.
+        pop pop 0               % 0
+    }
+    {                           % a C 
+        2 copy                  % a C a C 
+        get                     % c=C[a] a C 
+        dup                     % c c a C 
+        null eq                 % c=null? c a C 
+        {                       % c a C %%% null, must calculate and add to cache.
+            pop                 % a C 
+            2 copy              % a C a C 
+            1 add               % a+1 C a C 
+            arrangements        % c1 a C 
+            3 1 roll            % a C c1 
+            2 copy              % a C a C c1 
+            2 add               % a+2 C a C c1
+            arrangements        % c2 a C c1 
+            3 1 roll            % a C c2 c1
+            2 copy              % a C a C c2 c1 
+            3 add               % a+3 C a C c2 c1 
+            arrangements        % c3 a C c2 c1 
+            3 1 roll            % a C c3 c2 c1 
+            5 2 roll            % c3 c2 c1 a C 
+            add add             % c a C 
+            dup                 % c c a C 
+            4 1 roll            % c a C c 
+            put                 % c
+        }
+        {                       % c a C %%% not null, already in cache.
+            3 1 roll            % a C c 
+            pop pop             % c
+        } ifelse
+    } ifelse 
+} def 
+
+/intervals {                    % C %%% C is cache
+    [ exch                      % C | 
+    dup length 1 sub            % L-1 C | 
+    1 exch                      % L-1 1 C | 
+    getinterval                 % C' | 
+    1 exch                      % C' n<-1 | %%% n is current interval
+    {                           % c n | 
+        0 eq                    % c=0? n | %%% 0: not an adapter, increment n
+        {
+            1 add               % n+1 | 
+        }
+        {                       % n | %%% c is an adapter, keep n and reset interval
+            1                   % 1 n | 
+        } ifelse 
+    } forall                    % ... | 
+    pop                         % ... | %%% last doesn't connect to anything
+    ]
+} def 
+
+/occurrences {                  % n I %%% n: interval length, I: intervals
+    exch                        % I n 
+    0                           % c<-0 I n %%% c: count 
+    3 1 roll                    % I n c 
+    {                           % i n c 
+        1 index                 % n i n c 
+        eq                      % n=i? n c 
+        {                       % n c %%% yes, increment
+            exch 1 add exch     % n c+1
+        } if
+    } forall                    % n c
+    pop                         % c 
+} def 
+
+/part-1 {
+    (input.txt) read 
+    dup device 1 add array 
+    cache 
+    intervals
+    dup 
+    1 occurrences
+    exch 
+    3 occurrences
+    mul
+} def
+
+/part-2 {
+    (input.txt) read
+    dup device 1 add array 
+    cache 
+    0 arrangements
+} def

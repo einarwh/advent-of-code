@@ -1,0 +1,212 @@
+/read { 
+    [ exch run ]                             
+} def 
+
+% Check if there is a pair of numbers that sum to n in the range [a, b) of the array A.
+/is-valid-number {              % A b a n 
+    false                       % F A b a n
+    exch                        % A F b a n
+    4 2 roll                    % b a A F n
+    1 sub                       % b-1 a A F n 
+    dup                         % b-1 b-1 a A F n 
+    3 1 roll                    % b-1 a b-1 A F n 
+    1 sub                       % b-2 a b-1 A F n 
+    1 exch                      % b-2 1 a b-1 A F n %%% i in range [a, b-2]
+    {                           % i b-1 A F n 
+        dup                     % i i b-1 A F n 
+        1 add                   % i+1 i b-1 A F n 
+        2 index                 % b-1 i+1 i b-1 A F n 
+        1 exch                  % b-1 1 i+1 i b-1 A F n 
+        {                       % j i b-1 A F n 
+            3 index             % A j i b-1 A F n 
+            exch                % j A i b-1 A F n 
+            get                 % A[j] i b-1 A F n 
+            3 index             % A A[j] i b-1 A F n 
+            2 index             % i A A[j] i b-1 A F n 
+            get                 % A[i] A[j] i b-1 A F n 
+            2 copy              % A[i] A[j] A[i] A[j] i b-1 A F n 
+            eq                  % A[j]=A[i]? A[i] A[j] i b-1 A F n 
+            {                   % A[i] A[j] i b-1 A F n %%% A[j]=A[i]
+                pop pop         % i b-1 A F n 
+            }
+            {                   % A[i] A[j] i b-1 A F n %%% A[j]!=A[i]
+                add             % z i b-1 A F n 
+                5 index         % n z i b-1 A F n 
+                eq              % n=z? i b-1 A F n 
+                {               % i b-1 A F n %%% found it!
+                    4 -1 roll   % F i b-1 A n 
+                    pop true    % T i b-1 A n 
+                    4 1 roll    % i b-1 A T n 
+                    exit
+                } 
+                {} ifelse       % i b-1 A R n 
+            } ifelse            % i b-1 A R n
+        } for                   % i b-1 A R n 
+        pop                     % b-1 A R n
+        2 index                 % R b-1 A R n 
+        {                       % b-1 A R n %%% found it, exit.
+            exit 
+        } if 
+    } for                       % b-1 A R n 
+    pop pop                     % R n 
+    exch pop                    % R 
+} def 
+
+/find-invalid-number {          % A pl %%% A : array of numbers, pl : preamble length
+    null                        % N A pl 
+    3 1 roll                    % A pl N
+    1 index                     % pl A pl N
+    1 index length              % L pl A pl N
+    1 sub                       % L-1 pl A pl N
+    1 exch                      % L-1 1 pl A pl N 
+    {                           % i A pl N
+        2 copy get              % n<-A[i] i A pl N
+        dup                     % n n i A pl N 
+        3 -1 roll               % i n n A pl N
+        dup                     % i i n n A pl N
+        5 index                 % pl i i n n A pl N
+        sub                     % i-pl i n n A pl N
+        exch                    % i i-pl n n A pl N
+        4 index                 % A i i-pl n n A pl N
+        is-valid-number         % valid? n A pl N
+        {                       % n A pl N %%% valid, keep going.
+            pop                 % A pl N 
+        }
+        {                       % n A pl F %%% found invalid number
+            4 -1 roll           % F n A pl
+            pop                 % n A pl 
+            3 1 roll            % A pl n 
+            exit                % A pl n
+        } ifelse  
+    } for                       % A pl R
+    pop pop                     % R
+} def 
+
+/find {                         % {op} j i A 
+    4 1 roll                    % j i A {op}
+    2 index                     % A j i A {op}
+    2 index                     % i A j i A {op}
+    get                         % v j i A {op}
+    4 1 roll                    % j i A v {op}
+    1 exch                      % j 1 i A v {op}
+    {                           % k A v {op}
+        1 index                 % A k A v {op} 
+        exch                    % k A A v {op} 
+        get                     % n A v {op} 
+        dup                     % n n A v {op} 
+        3 index                 % v n n A v {op} 
+        5 index                 % {op} v n n A v {op}
+        exec                    % op(v)? n A min {op}
+        {                       % n A v {op} %%% op(v), replace v
+            3 -1 roll pop       % n A {op}
+            exch                % A v'<-n {op}
+        }
+        {                       % n A v {op}
+            pop                 % A v {op}
+        } ifelse                % A v {op}
+    } for                       % A v {op}
+    pop                         % v {op} 
+    exch pop                    % v
+} def 
+
+/scan {                         % i A n %%% i : start index, A : numbers, n : target sum
+    2 copy                      % i A i A n 
+    get                         % acc i A n %%% must be at least two numbers
+    3 1 roll                    % i A acc n 
+    dup                         % i i A acc n 
+    null                        % _ i i A acc n 
+    5 2 roll                    % i A acc _ i n 
+    1 add                       % i+1 A acc _ i n 
+    1 index length              % L i+1 A acc _ i n 
+    1 sub                       % L-1
+    1 exch                      % L-1 1 i+1 A acc _ i n 
+    {                           % j A acc _ i n
+        2 copy                  % j A j A acc _ i n 
+        get                     % A[j] j A acc _ i n 
+        4 -1 roll               % acc A[j] j A _ i n 
+        add                     % acc' j A _ i n 
+        5 index                 % n acc' j A _ i n 
+        2 copy                  % n acc' n acc' j A _ i n
+        lt                      % acc'<n? n acc' j A _ i n %%% most likely
+        {                       % n acc' j A _ i n %%% acc too small, keep looking
+            pop                 % acc' j A _ i n 
+            3 1 roll            % j A acc' _ i n 
+            pop                 % A acc' _ i n 
+        }
+        {                       % n acc' j A _ i n
+            2 copy              % n acc' n acc' j A _ i n
+            gt                  % acc>n? n acc' j A _ i n
+            {                   % n acc' j A _ i n %%% acc too large, stop looking
+                pop             % acc' j A _ i n
+                3 1 roll        % j A acc' _ i n 
+                pop             % A acc' _ i n 
+                exit            % A acc' _ i n 
+            }
+            {                   % n acc' j A _ i n %%% acc = n, found it!
+                pop             % acc' j A _ i n 
+                4 -1 roll       % _ acc' j A i n 
+                pop             % acc' j A i n 
+                3 -1 roll       % A acc' j i n 
+                exit            % A acc' j i n 
+            } ifelse 
+        } ifelse                % A acc' j? i n
+    } for                       % A acc' j? i n 
+    exch pop                    % A j? i n 
+    4 -1 roll                   % n A j? i 
+    pop                         % A j? i 
+    3 1 roll                    % j? i A 
+    dup                         % j? j? i A 
+    null eq                     % j=null? j? i A
+    {                           % null i A %%% didn't find it here
+        3 1 roll                % i A null 
+        pop pop                 % null
+    }
+    {                           % j i A %%% found it!
+        3 copy                  % j i A j i A 
+        {lt} find               % min j i A 
+        4 1 roll                % j i A min 
+        {gt} find               % max min 
+        add                     % weakness
+    } ifelse 
+} def 
+
+/find-weakness {                % n A %%% n : invalid number, A : numbers
+    null                        % _ n A 
+    3 1 roll                    % n A _
+    exch                        % A n _ 
+    dup length                  % L A n _
+    2 sub                       % L-2 A n _ %%% no need to start looking at last element 
+    0 exch                      % L-2 0 A n _ 
+    1 exch                      % L-2 1 0 A n _
+    {                           % i A n _
+        3 copy                  % i A n i A n _
+        scan                    % weakness? i A n _
+        dup                     % w? w? i A n _
+        null eq                 % w=null? w? i A n _
+        {                       % null i A n _ %%% no weakness
+            pop pop             % A n _ 
+        }
+        {                       % w i A n _ %%% weakness found!
+
+            exch pop            % w A n _ 
+            4 -1 roll pop       % w A n 
+            3 1 roll            % A n w
+            exit 
+        } ifelse
+    } for                       % A n w?
+    pop pop 
+} def 
+
+/part-1 {
+    (input.txt) read
+    25 exch 
+    find-invalid-number
+} def 
+
+/part-2 {
+    (input.txt) read
+    dup 
+    25 exch 
+    find-invalid-number
+    find-weakness
+} def 
