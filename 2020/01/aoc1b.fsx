@@ -1,3 +1,6 @@
+// Advent of Code 2020. Day 1, part B.
+// dotnet fsi aoc1b.fsx
+
 open System.IO
 
 let read (path : string) : int array =
