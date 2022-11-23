@@ -1,4 +1,4 @@
-// Advent of Code 2021. Day 2, part A.
+// Advent of Code 2021. Day 2, part B.
 // dotnet fsi aoc02b.fsx
 
 open System
@@ -7,8 +7,8 @@ open System.Text.RegularExpressions
 
 type Command = 
   | Forward of int 
-  | Up of int 
   | Down of int 
+  | Up of int 
 
 let parse (line : string) : Command option = 
     let pattern = "^([a-z]+) (\d+)$"
