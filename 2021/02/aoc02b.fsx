@@ -1,5 +1,5 @@
 // Advent of Code 2021. Day 2, part A.
-// dotnet fsi aoc02a.fsx
+// dotnet fsi aoc02b.fsx
 
 open System
 open System.IO
@@ -7,8 +7,8 @@ open System.Text.RegularExpressions
 
 type Command = 
   | Forward of int 
-  | Down of int 
   | Up of int 
+  | Down of int 
 
 let parse (line : string) : Command option = 
     let pattern = "^([a-z]+) (\d+)$"
@@ -24,15 +24,15 @@ let parse (line : string) : Command option =
     else 
         None
 
-let apply (h, d) (cmd : Command) = 
+let apply (horizontal, depth, aim) (cmd : Command) = 
     match cmd with 
-    | Forward steps -> (h + steps, d)
-    | Down steps -> (h, d + steps)
-    | Up steps -> (h, d - steps)
+    | Forward steps -> (horizontal + steps, depth + aim * steps, aim)
+    | Down steps -> (horizontal, depth, aim + steps)
+    | Up steps -> (horizontal, depth, aim - steps)
 
 "input"
 |> File.ReadAllLines 
 |> Array.choose parse
-|> Array.fold apply (0, 0)
-|> fun (h, d) -> h * d
+|> Array.fold apply (0, 0, 0)
+|> fun (h, d, _) -> h * d
 |> printfn "%d"
