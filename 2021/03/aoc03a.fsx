@@ -7,11 +7,11 @@ let decimal (bits : int array) : int =
     |> Array.sum
 
 let binary (line : string) : int array = 
-    line |> Seq.map (fun c -> if c = '1' then ' else 0) |> Seq.toArray
+    line |> Seq.map (fun c -> if c = '1' then 1 else 0) |> Seq.toArray
     
 let gammaRate (numbers : int) (bits : int array) = 
     let half = numbers / 2
-    bits |> Array.map (fun n -> if n > half then 1 else 0)
+    bits |> Array.map (fun n -> if n >= half then 1 else 0)
 
 let invert (bits : int array) = 
     bits |> Array.map (fun n -> if n = 1 then 0 else 1)
@@ -34,6 +34,7 @@ let run file =
     let bits = count counters lines
     let gamma = gammaRate numberOfLines bits 
     let epsilon = invert gamma
-    decimal gamma * decimal epsilon
+    let powerConsumption = decimal gamma * decimal epsilon
+    printfn "Power consumption: %d" powerConsumption
 
-run "input" |> printfn "%d"
+run "input"

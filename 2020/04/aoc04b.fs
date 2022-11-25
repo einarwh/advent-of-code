@@ -70,7 +70,7 @@ let validEyeColor (s : string) : bool =
     
 let checkEyeColor = makeCheck "ecl" validEyeColor
 
-// pid (Passport ID) - a nine-digit number, including leading zeroes.
+// pid (Passport ID) - a nine-digit number, including leading zeros.
 let validPassportId (s : string) : bool =
     Regex.IsMatch(s, "^\d{9}$")
 

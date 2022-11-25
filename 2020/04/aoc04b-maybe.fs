@@ -170,7 +170,7 @@ module Domain =
             match eyeColor with
             | EyeColor s -> s
 
-    // pid (Passport ID) - a nine-digit number, including leading zeroes.
+    // pid (Passport ID) - a nine-digit number, including leading zeros.
     module PassportId =
         
         let parse (s : string) : PassportId option =
