@@ -5,18 +5,19 @@ open System
 open System.IO
 open System.Text.RegularExpressions
 
-type Board = int option[,]
+type BoardNumber = int option
+type BoardSequence = BoardNumber list
+type Board = BoardNumber[,]
 
 let parseNumbers (numberString : string) : int list =
     numberString.Split(",") 
     |> Array.toList 
     |> List.map int 
 
-let parseRow (rowString : string) : int option list = 
+let parseRow (rowString : string) : BoardSequence = 
     Regex(" +").Split(rowString.Trim())
     |> Array.toList 
-    |> List.map int
-    |> List.map Some  
+    |> List.map (int >> Some)
 
 let parseBoard (boardString : string) : Board = 
     boardString.Split("\n") 
@@ -35,28 +36,24 @@ let parseText (text : string) =
         let boards = parseAllBoards t
         (numbers, boards)
 
-let updater (number : int) (maybe : int option) = 
-    match maybe with 
-    | None -> None 
-    | Some n -> if n = number then None else Some n
-
 let updateBoard (number : int) (board : Board) = 
-    board |> Array2D.map (updater number)
+    let update = Option.bind (fun n -> if n = number then None else Some n)
+    board |> Array2D.map update
 
-let rows (board : Board) : int option list list = 
+let rows (board : Board) : BoardSequence list = 
     let rowCount = board |> Array2D.length1 
     [0 .. rowCount - 1] |> List.map (fun r -> board[r, 0..] |> Array.toList)
 
-let columns (board : Board) : int option list list = 
+let columns (board : Board) : BoardSequence list = 
     let colCount = board |> Array2D.length2
     [0 .. colCount - 1] |> List.map (fun c -> board[0.., c] |> Array.toList)
 
-let winningNumbers (numbers : int option list) : bool = 
-    numbers |> List.forall Option.isNone
+let winningSequence (sequence : BoardSequence) : bool = 
+    sequence |> List.forall Option.isNone
 
 let winningBoard (board : Board) : bool = 
     let lists = rows board @ columns board 
-    lists |> List.exists winningNumbers
+    lists |> List.exists winningSequence
 
 let losingBoard board = board |> winningBoard |> not
 
