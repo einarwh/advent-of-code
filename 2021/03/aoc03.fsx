@@ -1,3 +1,6 @@
+// Advent of Code 2021. Day 3.
+// dotnet fsi aoc03.fsx
+
 open System.IO
 
 let decimal (bits : int array) : int =
