@@ -1,4 +1,4 @@
-// Advent of Code 2021. Day 9, part A. 
+// Advent of Code 2021. Day 9, Part A. 
 // dotnet fsi aoc09a.fsx
 
 open System
