@@ -226,13 +226,6 @@ toSvg model =
       ]
       rects
 
-basinHtml : Basin -> Html Msg 
-basinHtml basin = 
-  let
-    myStr = basin2str basin 
-  in 
-    Html.div [] [ Html.text myStr ]
-
 view : Model -> Html Msg
 view model =
   let
@@ -243,7 +236,6 @@ view model =
     threeLargestBasinsStr = threeLargestBasins |> List.map String.fromInt |> String.join " x "
     basinProduct = threeLargestBasins |> List.foldl (*) 1
     basinStr = "Basin product: " ++ threeLargestBasinsStr ++ " = " ++ String.fromInt basinProduct
-    basinElements = model.basins |> List.map basinHtml 
   in 
     Html.table 
       []
