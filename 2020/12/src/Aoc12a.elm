@@ -128,7 +128,6 @@ times : Int -> (a -> a) -> (a -> a)
 times n fn = 
   if n < 1 then identity 
   else fn >> times (n - 1) fn 
-  
 
 left : Int -> (Position, Direction) -> (Position, Direction)
 left n (pos, dir) =
