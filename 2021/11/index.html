@@ -5339,8 +5339,7 @@ var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
 };
 var $author$project$Aoc11$init = function (_v0) {
-	var sample = '11111\n19991\n19191\n19991\n11111';
-	var input = '5483143223\n2745854711\n5264556173\n6141336146\n6357385478\n4167524645\n2176841721\n6882881134\n4846848554\n5283751526';
+	var input = '1224346384\n5621128587\n6388426546\n1556247756\n1451811573\n1832388122\n2748545647\n2582877432\n3185643871\n2224876627';
 	var lines = $elm$core$String$lines(input);
 	var numberLines = A2(
 		$elm$core$List$map,
@@ -5359,11 +5358,11 @@ var $author$project$Aoc11$init = function (_v0) {
 	var arr = $elm$core$Array$fromList(
 		$elm$core$List$concat(numberLines));
 	var grid = {array: arr, height: rowCount, width: colCount};
-	var model = {counter: 0, debug: '...', grid: grid, last: 0, paused: true, total: 0};
+	var model = {counter: 0, debug: '...', grid: grid, last: 0, paused: false, total: 0};
 	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 };
 var $author$project$Aoc11$Tick = {$: 'Tick'};
-var $author$project$Aoc11$delay = 5000;
+var $author$project$Aoc11$delay = 100;
 var $elm$time$Time$Every = F2(
 	function (a, b) {
 		return {$: 'Every', a: a, b: b};
@@ -6145,6 +6144,7 @@ var $author$project$Aoc11$incrementArray = function (arr) {
 		},
 		arr);
 };
+var $author$project$Aoc11$maxSteps = 100;
 var $author$project$Aoc11$resetFlashedArray = function (arr) {
 	return A2(
 		$elm$core$Array$map,
@@ -6178,6 +6178,7 @@ var $author$project$Aoc11$updateModel = function (model) {
 				$elm$core$List$length(flashing)),
 			grid: updatedGrid,
 			last: flashCount,
+			paused: _Utils_cmp(steps, $author$project$Aoc11$maxSteps) > -1,
 			total: model.total + flashCount
 		});
 };
@@ -6232,12 +6233,16 @@ var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
+var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
+var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var $author$project$Aoc11$octopusRadius = 20;
-var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
+var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
 var $author$project$Aoc11$toColor = function (n) {
 	switch (n) {
 		case 0:
-			return '#ffdce2';
+			return '#b10000';
 		case 1:
 			return '#ffcbd1';
 		case 2:
@@ -6260,28 +6265,25 @@ var $author$project$Aoc11$toColor = function (n) {
 			return '#b10000';
 	}
 };
-var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
-var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
-var $author$project$Aoc11$toOctopusNumberElement = F2(
-	function (_v0, energy) {
-		var xVal = _v0.a;
-		var yVal = _v0.b;
+var $author$project$Aoc11$toOctopusElement = F2(
+	function (pos, energy) {
+		var xVal = pos.a;
+		var yVal = pos.b;
 		var yStr = $elm$core$String$fromInt($author$project$Aoc11$octopusRadius + ((yVal * 2) * $author$project$Aoc11$octopusRadius));
 		var xStr = $elm$core$String$fromInt($author$project$Aoc11$octopusRadius + ((xVal * 2) * $author$project$Aoc11$octopusRadius));
-		var radius = (energy > 9) ? $author$project$Aoc11$octopusRadius : (($author$project$Aoc11$octopusRadius / 2) | 0);
-		var energyStr = $elm$core$String$fromInt(energy);
+		var radius = (!energy) ? $author$project$Aoc11$octopusRadius : (($author$project$Aoc11$octopusRadius / 2) | 0);
 		var color = $author$project$Aoc11$toColor(energy);
 		return A2(
-			$elm$svg$Svg$text_,
+			$elm$svg$Svg$circle,
 			_List_fromArray(
 				[
-					$elm$svg$Svg$Attributes$x(xStr),
-					$elm$svg$Svg$Attributes$y(yStr)
+					$elm$svg$Svg$Attributes$cx(xStr),
+					$elm$svg$Svg$Attributes$cy(yStr),
+					$elm$svg$Svg$Attributes$r(
+					$elm$core$String$fromInt(radius)),
+					$elm$svg$Svg$Attributes$fill(color)
 				]),
-			_List_fromArray(
-				[
-					$elm$svg$Svg$text(energyStr)
-				]));
+			_List_Nil);
 	});
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
@@ -6293,7 +6295,7 @@ var $author$project$Aoc11$toSvg = function (model) {
 			F2(
 				function (ix, energy) {
 					return A2(
-						$author$project$Aoc11$toOctopusNumberElement,
+						$author$project$Aoc11$toOctopusElement,
 						A2($author$project$Aoc11$index2pos, grid.width, ix),
 						energy);
 				}),
@@ -6396,13 +6398,6 @@ var $author$project$Aoc11$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(totalStr)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(model.debug)
 									]))
 							]))
 					])),

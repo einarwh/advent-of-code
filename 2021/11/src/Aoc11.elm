@@ -11,7 +11,10 @@ import Svg.Attributes exposing (..)
 import Time
 
 delay : Float
-delay = 5000
+delay = 100
+
+maxSteps : Int 
+maxSteps = 100
 
 octopusRadius : Int
 octopusRadius = 20
@@ -61,9 +64,9 @@ pos2str pos =
 init : () -> (Model, Cmd Msg)
 init _ =
   let 
-    sample = "11111\n19991\n19191\n19991\n11111"
-    input = "5483143223\n2745854711\n5264556173\n6141336146\n6357385478\n4167524645\n2176841721\n6882881134\n4846848554\n5283751526"
-
+    -- smallSample = "11111\n19991\n19191\n19991\n11111"
+    -- sample = "5483143223\n2745854711\n5264556173\n6141336146\n6357385478\n4167524645\n2176841721\n6882881134\n4846848554\n5283751526"
+    input = "1224346384\n5621128587\n6388426546\n1556247756\n1451811573\n1832388122\n2748545647\n2582877432\n3185643871\n2224876627" 
     lines = String.lines input 
     numberLines = 
       lines 
@@ -80,7 +83,7 @@ init _ =
            , height = rowCount }
 
     model = { grid = grid
-            , paused = True
+            , paused = False
             , counter = 0
             , total = 0
             , last = 0
@@ -166,7 +169,7 @@ updateModel model =
     updatedGrid = { grid | array = arr |> resetFlashedArray } 
     steps = model.counter + 1
   in
-    { model | grid = updatedGrid, counter = steps, total = model.total + flashCount, last = flashCount, debug = "Flashing: " ++ (flashing |> List.length |> String.fromInt) }
+    { model | grid = updatedGrid, counter = steps, paused = steps >= maxSteps, total = model.total + flashCount, last = flashCount, debug = "Flashing: " ++ (flashing |> List.length |> String.fromInt) }
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -201,7 +204,7 @@ pos2index width (x, y) =
 toColor : Int -> String 
 toColor n = 
   case n of 
-    0 -> "#ffdce2"
+    0 -> "#b10000"
     1 -> "#ffcbd1"
     2 -> "#f69697"
     3 -> "#ee6b6e"
@@ -219,7 +222,6 @@ toOctopusNumberElement (xVal, yVal) energy =
     color = toColor energy
     xStr = String.fromInt (octopusRadius + xVal * 2 * octopusRadius)
     yStr = String.fromInt (octopusRadius + yVal * 2 * octopusRadius) 
-    radius = if energy > 9 then octopusRadius else octopusRadius // 2
     energyStr = String.fromInt energy
   in 
     Svg.text_ [ x xStr, y yStr ] [ Svg.text energyStr ]
@@ -232,7 +234,7 @@ toOctopusElement pos energy =
         color = toColor energy
         xStr = String.fromInt (octopusRadius + xVal * 2 * octopusRadius)
         yStr = String.fromInt (octopusRadius + yVal * 2 * octopusRadius) 
-        radius = if energy > 9 then octopusRadius else octopusRadius // 2
+        radius = if energy == 0 then octopusRadius else octopusRadius // 2
       in 
         circle
           [ cx xStr
@@ -246,7 +248,7 @@ toSvg : Model -> Html Msg
 toSvg model = 
   let 
     grid = model.grid 
-    octopusElements = grid.array |> Array.indexedMap (\ix energy -> toOctopusNumberElement (index2pos grid.width ix) energy) |> Array.toList
+    octopusElements = grid.array |> Array.indexedMap (\ix energy -> toOctopusElement (index2pos grid.width ix) energy) |> Array.toList
   in 
     svg
       [ viewBox "0 0 400 400"
@@ -286,7 +288,7 @@ view model =
               , Html.div [] [ Html.text tickStr ]
               , Html.div [] [ Html.text lastStr ]
               , Html.div [] [ Html.text totalStr ]
-              , Html.div [] [ Html.text model.debug ]
+--              , Html.div [] [ Html.text model.debug ]
               ] ]
       , Html.tr 
           []
