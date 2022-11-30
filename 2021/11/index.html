@@ -6141,7 +6141,15 @@ var $author$project$Aoc11$incrementArray = function (arr) {
 	return A2(
 		$elm$core$Array$map,
 		function (energy) {
-			return (energy > 9) ? 0 : (energy + 1);
+			return energy + 1;
+		},
+		arr);
+};
+var $author$project$Aoc11$resetFlashedArray = function (arr) {
+	return A2(
+		$elm$core$Array$map,
+		function (energy) {
+			return (energy > 9) ? 0 : energy;
 		},
 		arr);
 };
@@ -6159,7 +6167,9 @@ var $author$project$Aoc11$updateModel = function (model) {
 	var flashCount = _v0.b;
 	var updatedGrid = _Utils_update(
 		grid,
-		{array: arr});
+		{
+			array: $author$project$Aoc11$resetFlashedArray(arr)
+		});
 	return _Utils_update(
 		model,
 		{

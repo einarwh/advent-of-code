@@ -94,12 +94,15 @@ type Msg = Tick | Step
 
 incrementArray : Array Int -> Array Int 
 incrementArray arr = 
-  arr |> Array.map (\energy -> if energy > 9 then 0 else energy + 1)
+  arr |> Array.map (\energy -> energy + 1)
+
+resetFlashedArray : Array Int -> Array Int 
+resetFlashedArray arr = 
+  arr |> Array.map (\energy -> if energy > 9 then 0 else energy)
 
 findFlashingIndexes : Array Int -> List Int 
 findFlashingIndexes arr =
   arr |> Array.indexedMap (\ix energy -> if energy > 9 then Just ix else Nothing) |> Array.toList |> List.filterMap identity
-
 
 isValidPosition : Int -> Int -> Position -> Bool 
 isValidPosition width height (x, y) = 
@@ -159,9 +162,8 @@ updateModel model =
     incremented = incrementArray grid.array
     flashingIndexes = findFlashingIndexes incremented
     flashing = flashingIndexes |> List.map (index2pos grid.width)
-
     (arr, flashCount) = cascade grid.width grid.height flashing Set.empty incremented
-    updatedGrid = { grid | array = arr } 
+    updatedGrid = { grid | array = arr |> resetFlashedArray } 
     steps = model.counter + 1
   in
     { model | grid = updatedGrid, counter = steps, total = model.total + flashCount, last = flashCount, debug = "Flashing: " ++ (flashing |> List.length |> String.fromInt) }
