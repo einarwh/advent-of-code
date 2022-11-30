@@ -6,11 +6,13 @@ import Html.Attributes
 import Set exposing (Set)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
-import Task
 import Time
 
 delay : Float
-delay = 1000
+delay = 500
+
+cellSize : Int
+cellSize = 6
 
 -- MAIN
 
@@ -179,34 +181,42 @@ subscriptions model =
 
 -- VIEW
 
-basin2str : Basin -> String 
-basin2str basin = 
-  let 
-    lowPointStr = "lowPoint = " ++ pos2str basin.lowPoint
-    filledPoints = basin.filledPoints |> Set.toList |> List.sort
-    explorationPointsStr = "explorationPoints(" ++ String.fromInt (List.length basin.explorationPoints) ++ ") = [" ++ (basin.explorationPoints |> List.map pos2str |> String.join ",") ++ "]"
-    filledPointsStr = "filledPoints(" ++ String.fromInt (List.length filledPoints) ++ ") = [" ++ (filledPoints |> List.map pos2str |> String.join ",") ++ "]"
-  in 
-    "{" ++ lowPointStr ++ "," ++ filledPointsStr ++ "}"
-
 toCellRect : String -> Position -> Svg Msg 
 toCellRect color pos = 
   case pos of 
     (xVal, yVal) -> 
       let 
-        w = 10 
-        h = 10 
-        xStr = String.fromInt (xVal * w)
-        yStr = String.fromInt (yVal * h) 
+        xStr = String.fromInt (xVal * cellSize)
+        yStr = String.fromInt (yVal * cellSize) 
       in 
         rect
           [ x xStr
           , y yStr
-          , width (String.fromInt w)
-          , height (String.fromInt h)
+          , width (String.fromInt cellSize)
+          , height (String.fromInt cellSize)
           , fill color
           ]
           []
+
+findCenterPosition posList = 
+  let 
+    xSum = posList |> List.map (\(x, y) -> x) |> List.sum 
+    ySum = posList |> List.map (\(x, y) -> y) |> List.sum 
+    len = posList |> List.length 
+  in 
+    (xSum // len, ySum // len)
+
+createBasinText basin = 
+  let 
+    (xVal, yVal) = basin.filledPoints |> Set.toList |> findCenterPosition
+    xStr = String.fromInt (xVal * cellSize) 
+    yStr = String.fromInt (yVal * cellSize + 12)
+    count = basin.filledPoints |> Set.size
+    countStr = String.fromInt count
+  in 
+    Svg.text_ [ x xStr, y yStr ] [ Svg.text countStr ]
+    --Svg.text_ [ Svg.Attributes.textAnchor "middle", x xStr, y yStr ] [ Svg.text countStr ]
+  
 
 toSvg : Model -> Html Msg 
 toSvg model = 
@@ -217,7 +227,12 @@ toSvg model =
     basinRects = 
        model.basins
        |> List.concatMap (\basin -> basin.filledPoints |> Set.toList |> List.map (toCellRect "lightblue"))
-    rects = borderRects ++ basinRects
+    basinTexts = 
+       model.basins 
+       |> List.filter (\basin -> List.isEmpty basin.explorationPoints)
+       |> List.map createBasinText
+
+    rects = borderRects ++ basinRects ++ basinTexts
   in 
     svg
       [ viewBox "0 0 600 600"

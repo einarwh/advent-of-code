@@ -5525,7 +5525,7 @@ var $author$project$Aoc09$init = function (_v0) {
 	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 };
 var $author$project$Aoc09$Tick = {$: 'Tick'};
-var $author$project$Aoc09$delay = 1000;
+var $author$project$Aoc09$delay = 500;
 var $elm$time$Time$Every = F2(
 	function (a, b) {
 		return {$: 'Every', a: a, b: b};
@@ -6569,22 +6569,66 @@ var $elm$core$List$take = F2(
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $author$project$Aoc09$cellSize = 6;
+var $author$project$Aoc09$findCenterPosition = function (posList) {
+	var ySum = $elm$core$List$sum(
+		A2(
+			$elm$core$List$map,
+			function (_v1) {
+				var x = _v1.a;
+				var y = _v1.b;
+				return y;
+			},
+			posList));
+	var xSum = $elm$core$List$sum(
+		A2(
+			$elm$core$List$map,
+			function (_v0) {
+				var x = _v0.a;
+				var y = _v0.b;
+				return x;
+			},
+			posList));
+	var len = $elm$core$List$length(posList);
+	return _Utils_Tuple2((xSum / len) | 0, (ySum / len) | 0);
+};
+var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
+var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
+var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
+var $author$project$Aoc09$createBasinText = function (basin) {
+	var count = $elm$core$Set$size(basin.filledPoints);
+	var countStr = $elm$core$String$fromInt(count);
+	var _v0 = $author$project$Aoc09$findCenterPosition(
+		$elm$core$Set$toList(basin.filledPoints));
+	var xVal = _v0.a;
+	var yVal = _v0.b;
+	var xStr = $elm$core$String$fromInt(xVal * $author$project$Aoc09$cellSize);
+	var yStr = $elm$core$String$fromInt((yVal * $author$project$Aoc09$cellSize) + 12);
+	return A2(
+		$elm$svg$Svg$text_,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$x(xStr),
+				$elm$svg$Svg$Attributes$y(yStr)
+			]),
+		_List_fromArray(
+			[
+				$elm$svg$Svg$text(countStr)
+			]));
+};
+var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
-var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
-var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
 var $author$project$Aoc09$toCellRect = F2(
 	function (color, pos) {
 		var xVal = pos.a;
 		var yVal = pos.b;
-		var w = 10;
-		var xStr = $elm$core$String$fromInt(xVal * w);
-		var h = 10;
-		var yStr = $elm$core$String$fromInt(yVal * h);
+		var yStr = $elm$core$String$fromInt(yVal * $author$project$Aoc09$cellSize);
+		var xStr = $elm$core$String$fromInt(xVal * $author$project$Aoc09$cellSize);
 		return A2(
 			$elm$svg$Svg$rect,
 			_List_fromArray(
@@ -6592,9 +6636,9 @@ var $author$project$Aoc09$toCellRect = F2(
 					$elm$svg$Svg$Attributes$x(xStr),
 					$elm$svg$Svg$Attributes$y(yStr),
 					$elm$svg$Svg$Attributes$width(
-					$elm$core$String$fromInt(w)),
+					$elm$core$String$fromInt($author$project$Aoc09$cellSize)),
 					$elm$svg$Svg$Attributes$height(
-					$elm$core$String$fromInt(h)),
+					$elm$core$String$fromInt($author$project$Aoc09$cellSize)),
 					$elm$svg$Svg$Attributes$fill(color)
 				]),
 			_List_Nil);
@@ -6607,6 +6651,15 @@ var $author$project$Aoc09$toSvg = function (model) {
 			return A2($author$project$Aoc09$toCellRect, 'black', pos);
 		},
 		model.border);
+	var basinTexts = A2(
+		$elm$core$List$map,
+		$author$project$Aoc09$createBasinText,
+		A2(
+			$elm$core$List$filter,
+			function (basin) {
+				return $elm$core$List$isEmpty(basin.explorationPoints);
+			},
+			model.basins));
 	var basinRects = A2(
 		$elm$core$List$concatMap,
 		function (basin) {
@@ -6616,7 +6669,9 @@ var $author$project$Aoc09$toSvg = function (model) {
 				$elm$core$Set$toList(basin.filledPoints));
 		},
 		model.basins);
-	var rects = _Utils_ap(borderRects, basinRects);
+	var rects = _Utils_ap(
+		borderRects,
+		_Utils_ap(basinRects, basinTexts));
 	return A2(
 		$elm$svg$Svg$svg,
 		_List_fromArray(
