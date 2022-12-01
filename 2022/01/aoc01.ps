@@ -290,11 +290,10 @@
     3 1 roll                % n A |    
     0 max                   % n' A |, n' >= 0
     1 index length          % L n' A | 
-    1 sub                   % L-1 n' A |
     min                     % k A |, k = min (n', L-1)
-    pstack
-    0 exch                  % k 0 A | 
-    1 exch                  % k 1 0 A | 
+    1 sub                   % k' A |
+    0 exch                  % k' 0 A | 
+    1 exch                  % k' 1 0 A | 
     {                       % i A |
         1 index exch        % i A A |
         get                 % v A | 
@@ -469,4 +468,7 @@
     /sum load map
     merge-sort 
     reverse
+    dup 3 take sum exch
+    dup 1 get exch 
+    pop 
 } def 
