@@ -264,7 +264,6 @@
 
 /sum { 0 { add } fold } def 
 
-                            % Stack top to the left
 /min {                      % n m 
     2 copy                  % n m n m 
     gt                      % n<m n m 
@@ -274,7 +273,6 @@
     pop                     % min
 } def
 
-                            % Stack top to the left
 /max {                      % n m 
     2 copy                  % n m n m 
     lt                      % n>m n m 
@@ -284,7 +282,6 @@
     pop                     % max
 } def
 
-                            % Stack top to the left
 /take {                     % n A
     [                       % | n A 
     3 1 roll                % n A |    
@@ -302,7 +299,6 @@
     pop ]                   % | ... |
 } def
 
-                            % Stack top to the left
 /mirror-copy {              % i A A' 
     1 index length          % L i A A' 
     1 sub                   % L-1 i A A'
@@ -315,7 +311,6 @@
     put                     % A'[k] = A[i]
 } def
 
-                            % Stack top to the left
 /reverse {                  % A  
     dup length array        % A' A
     exch                    % A A'
