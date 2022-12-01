@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Aoc11</title>
+  <title>Aoc11a</title>
   <style>body { padding: 0; margin: 0; }</style>
 </head>
 
@@ -5327,7 +5327,7 @@ var $elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
-var $author$project$Aoc11$toEnergyLevel = function (ch) {
+var $author$project$Aoc11a$toEnergyLevel = function (ch) {
 	return A2(
 		$elm$core$Maybe$withDefault,
 		0,
@@ -5338,12 +5338,12 @@ var $elm$core$String$foldr = _String_foldr;
 var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
 };
-var $author$project$Aoc11$init = function (_v0) {
+var $author$project$Aoc11a$init = function (_v0) {
 	var input = '1224346384\n5621128587\n6388426546\n1556247756\n1451811573\n1832388122\n2748545647\n2582877432\n3185643871\n2224876627';
 	var lines = $elm$core$String$lines(input);
 	var numberLines = A2(
 		$elm$core$List$map,
-		$elm$core$List$map($author$project$Aoc11$toEnergyLevel),
+		$elm$core$List$map($author$project$Aoc11a$toEnergyLevel),
 		A2($elm$core$List$map, $elm$core$String$toList, lines));
 	var rowCount = $elm$core$List$length(numberLines);
 	var colCount = function () {
@@ -5361,8 +5361,8 @@ var $author$project$Aoc11$init = function (_v0) {
 	var model = {counter: 0, debug: '...', grid: grid, last: 0, paused: false, total: 0};
 	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 };
-var $author$project$Aoc11$Tick = {$: 'Tick'};
-var $author$project$Aoc11$delay = 50;
+var $author$project$Aoc11a$Tick = {$: 'Tick'};
+var $author$project$Aoc11a$delay = 50;
 var $elm$time$Time$Every = F2(
 	function (a, b) {
 		return {$: 'Every', a: a, b: b};
@@ -5780,12 +5780,12 @@ var $elm$time$Time$every = F2(
 	});
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $author$project$Aoc11$subscriptions = function (model) {
+var $author$project$Aoc11a$subscriptions = function (model) {
 	return model.paused ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		$author$project$Aoc11$delay,
+		$author$project$Aoc11a$delay,
 		function (_v0) {
-			return $author$project$Aoc11$Tick;
+			return $author$project$Aoc11a$Tick;
 		});
 };
 var $elm$core$Set$Set_elm_builtin = function (a) {
@@ -5854,15 +5854,15 @@ var $elm$core$Array$get = F2(
 			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
 			A3($elm$core$Array$getHelp, startShift, index, tree)));
 	});
-var $author$project$Aoc11$isFlashing = function (energyLevel) {
+var $author$project$Aoc11a$isFlashing = function (energyLevel) {
 	return energyLevel === 10;
 };
-var $author$project$Aoc11$getFlashingNeighbours = F2(
+var $author$project$Aoc11a$getFlashingNeighbours = F2(
 	function (neighbours, arr) {
 		return A2(
 			$elm$core$List$filter,
 			function (ix) {
-				return $author$project$Aoc11$isFlashing(
+				return $author$project$Aoc11a$isFlashing(
 					A2(
 						$elm$core$Maybe$withDefault,
 						0,
@@ -5870,7 +5870,7 @@ var $author$project$Aoc11$getFlashingNeighbours = F2(
 			},
 			neighbours);
 	});
-var $author$project$Aoc11$getCandidateNeighbourPositions = function (_v0) {
+var $author$project$Aoc11a$getCandidateNeighbourPositions = function (_v0) {
 	var x = _v0.a;
 	var y = _v0.b;
 	return _List_fromArray(
@@ -5885,18 +5885,18 @@ var $author$project$Aoc11$getCandidateNeighbourPositions = function (_v0) {
 			_Utils_Tuple2(x + 1, y + 1)
 		]);
 };
-var $author$project$Aoc11$isValidPosition = F3(
+var $author$project$Aoc11a$isValidPosition = F3(
 	function (width, height, _v0) {
 		var x = _v0.a;
 		var y = _v0.b;
 		return (x >= 0) && ((_Utils_cmp(x, width) < 0) && ((y >= 0) && (_Utils_cmp(y, height) < 0)));
 	});
-var $author$project$Aoc11$getValidNeighbourPositions = F3(
+var $author$project$Aoc11a$getValidNeighbourPositions = F3(
 	function (width, height, pos) {
 		return A2(
 			$elm$core$List$filter,
-			A2($author$project$Aoc11$isValidPosition, width, height),
-			$author$project$Aoc11$getCandidateNeighbourPositions(pos));
+			A2($author$project$Aoc11a$isValidPosition, width, height),
+			$author$project$Aoc11a$getCandidateNeighbourPositions(pos));
 	});
 var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
 var $elm$core$Elm$JsArray$indexedMap = _JsArray_indexedMap;
@@ -5966,7 +5966,7 @@ var $elm$core$List$member = F2(
 			},
 			xs);
 	});
-var $author$project$Aoc11$incrementNeighbours = F2(
+var $author$project$Aoc11a$incrementNeighbours = F2(
 	function (neighbours, arr) {
 		return A2(
 			$elm$core$Array$indexedMap,
@@ -5977,7 +5977,7 @@ var $author$project$Aoc11$incrementNeighbours = F2(
 			arr);
 	});
 var $elm$core$Basics$modBy = _Basics_modBy;
-var $author$project$Aoc11$index2pos = F2(
+var $author$project$Aoc11a$index2pos = F2(
 	function (width, ix) {
 		var y = (ix / width) | 0;
 		var x = A2($elm$core$Basics$modBy, width, ix);
@@ -5997,7 +5997,7 @@ var $elm$core$Set$member = F2(
 		var dict = _v0.a;
 		return A2($elm$core$Dict$member, key, dict);
 	});
-var $author$project$Aoc11$pos2index = F2(
+var $author$project$Aoc11a$pos2index = F2(
 	function (width, _v0) {
 		var x = _v0.a;
 		var y = _v0.b;
@@ -6027,7 +6027,7 @@ var $elm$core$Set$size = function (_v0) {
 	var dict = _v0.a;
 	return $elm$core$Dict$size(dict);
 };
-var $author$project$Aoc11$cascade = F5(
+var $author$project$Aoc11a$cascade = F5(
 	function (width, height, flashing, flashed, arr) {
 		cascade:
 		while (true) {
@@ -6051,16 +6051,16 @@ var $author$project$Aoc11$cascade = F5(
 					arr = $temp$arr;
 					continue cascade;
 				} else {
-					var neighbourPositions = A3($author$project$Aoc11$getValidNeighbourPositions, width, height, pos);
+					var neighbourPositions = A3($author$project$Aoc11a$getValidNeighbourPositions, width, height, pos);
 					var neighbourIndexes = A2(
 						$elm$core$List$map,
-						$author$project$Aoc11$pos2index(width),
+						$author$project$Aoc11a$pos2index(width),
 						neighbourPositions);
-					var incrementedArr = A2($author$project$Aoc11$incrementNeighbours, neighbourIndexes, arr);
-					var flashingNeighbours = A2($author$project$Aoc11$getFlashingNeighbours, neighbourIndexes, incrementedArr);
+					var incrementedArr = A2($author$project$Aoc11a$incrementNeighbours, neighbourIndexes, arr);
+					var flashingNeighbours = A2($author$project$Aoc11a$getFlashingNeighbours, neighbourIndexes, incrementedArr);
 					var flashingPositions = A2(
 						$elm$core$List$map,
-						$author$project$Aoc11$index2pos(width),
+						$author$project$Aoc11a$index2pos(width),
 						flashingNeighbours);
 					var updatedFlashing = $elm$core$Set$toList(
 						$elm$core$Set$fromList(
@@ -6098,7 +6098,7 @@ var $elm$core$List$filterMap = F2(
 			_List_Nil,
 			xs);
 	});
-var $author$project$Aoc11$findFlashingIndexes = function (arr) {
+var $author$project$Aoc11a$findFlashingIndexes = function (arr) {
 	return A2(
 		$elm$core$List$filterMap,
 		$elm$core$Basics$identity,
@@ -6136,7 +6136,7 @@ var $elm$core$Array$map = F2(
 			A2($elm$core$Elm$JsArray$map, helper, tree),
 			A2($elm$core$Elm$JsArray$map, func, tail));
 	});
-var $author$project$Aoc11$incrementArray = function (arr) {
+var $author$project$Aoc11a$incrementArray = function (arr) {
 	return A2(
 		$elm$core$Array$map,
 		function (energy) {
@@ -6144,11 +6144,8 @@ var $author$project$Aoc11$incrementArray = function (arr) {
 		},
 		arr);
 };
-var $elm$core$Array$length = function (_v0) {
-	var len = _v0.a;
-	return len;
-};
-var $author$project$Aoc11$resetFlashedArray = function (arr) {
+var $author$project$Aoc11a$maxSteps = 100;
+var $author$project$Aoc11a$resetFlashedArray = function (arr) {
 	return A2(
 		$elm$core$Array$map,
 		function (energy) {
@@ -6156,26 +6153,24 @@ var $author$project$Aoc11$resetFlashedArray = function (arr) {
 		},
 		arr);
 };
-var $author$project$Aoc11$updateModel = function (model) {
+var $author$project$Aoc11a$updateModel = function (model) {
 	var steps = model.counter + 1;
+	var paused = _Utils_cmp(steps, $author$project$Aoc11a$maxSteps) > -1;
 	var grid = model.grid;
-	var incremented = $author$project$Aoc11$incrementArray(grid.array);
-	var flashingIndexes = $author$project$Aoc11$findFlashingIndexes(incremented);
+	var incremented = $author$project$Aoc11a$incrementArray(grid.array);
+	var flashingIndexes = $author$project$Aoc11a$findFlashingIndexes(incremented);
 	var flashing = A2(
 		$elm$core$List$map,
-		$author$project$Aoc11$index2pos(grid.width),
+		$author$project$Aoc11a$index2pos(grid.width),
 		flashingIndexes);
-	var _v0 = A5($author$project$Aoc11$cascade, grid.width, grid.height, flashing, $elm$core$Set$empty, incremented);
+	var _v0 = A5($author$project$Aoc11a$cascade, grid.width, grid.height, flashing, $elm$core$Set$empty, incremented);
 	var arr = _v0.a;
 	var flashCount = _v0.b;
 	var updatedGrid = _Utils_update(
 		grid,
 		{
-			array: $author$project$Aoc11$resetFlashedArray(arr)
+			array: $author$project$Aoc11a$resetFlashedArray(arr)
 		});
-	var paused = _Utils_eq(
-		flashCount,
-		$elm$core$Array$length(updatedGrid.array));
 	return _Utils_update(
 		model,
 		{
@@ -6188,19 +6183,12 @@ var $author$project$Aoc11$updateModel = function (model) {
 			total: model.total + flashCount
 		});
 };
-var $author$project$Aoc11$update = F2(
+var $author$project$Aoc11a$update = F2(
 	function (msg, model) {
-		if (msg.$ === 'Tick') {
-			return _Utils_Tuple2(
-				$author$project$Aoc11$updateModel(model),
-				$elm$core$Platform$Cmd$none);
-		} else {
-			return _Utils_Tuple2(
-				$author$project$Aoc11$updateModel(model),
-				$elm$core$Platform$Cmd$none);
-		}
+		return _Utils_Tuple2(
+			$author$project$Aoc11a$updateModel(model),
+			$elm$core$Platform$Cmd$none);
 	});
-var $author$project$Aoc11$Step = {$: 'Step'};
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -6210,32 +6198,13 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$align = $elm$html$Html$Attributes$stringProperty('align');
-var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
@@ -6243,9 +6212,9 @@ var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
 var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
 var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
-var $author$project$Aoc11$octopusRadius = 20;
+var $author$project$Aoc11a$octopusRadius = 20;
 var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
-var $author$project$Aoc11$toColor = function (n) {
+var $author$project$Aoc11a$toColor = function (n) {
 	switch (n) {
 		case 0:
 			return '#b10000';
@@ -6271,14 +6240,14 @@ var $author$project$Aoc11$toColor = function (n) {
 			return '#b10000';
 	}
 };
-var $author$project$Aoc11$toOctopusElement = F2(
+var $author$project$Aoc11a$toOctopusElement = F2(
 	function (pos, energy) {
 		var xVal = pos.a;
 		var yVal = pos.b;
-		var yStr = $elm$core$String$fromInt($author$project$Aoc11$octopusRadius + ((yVal * 2) * $author$project$Aoc11$octopusRadius));
-		var xStr = $elm$core$String$fromInt($author$project$Aoc11$octopusRadius + ((xVal * 2) * $author$project$Aoc11$octopusRadius));
-		var radius = (!energy) ? $author$project$Aoc11$octopusRadius : (($author$project$Aoc11$octopusRadius / 2) | 0);
-		var color = $author$project$Aoc11$toColor(energy);
+		var yStr = $elm$core$String$fromInt($author$project$Aoc11a$octopusRadius + ((yVal * 2) * $author$project$Aoc11a$octopusRadius));
+		var xStr = $elm$core$String$fromInt($author$project$Aoc11a$octopusRadius + ((xVal * 2) * $author$project$Aoc11a$octopusRadius));
+		var radius = (!energy) ? $author$project$Aoc11a$octopusRadius : (($author$project$Aoc11a$octopusRadius / 2) | 0);
+		var color = $author$project$Aoc11a$toColor(energy);
 		return A2(
 			$elm$svg$Svg$circle,
 			_List_fromArray(
@@ -6293,7 +6262,7 @@ var $author$project$Aoc11$toOctopusElement = F2(
 	});
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
-var $author$project$Aoc11$toSvg = function (model) {
+var $author$project$Aoc11a$toSvg = function (model) {
 	var grid = model.grid;
 	var octopusElements = $elm$core$Array$toList(
 		A2(
@@ -6301,8 +6270,8 @@ var $author$project$Aoc11$toSvg = function (model) {
 			F2(
 				function (ix, energy) {
 					return A2(
-						$author$project$Aoc11$toOctopusElement,
-						A2($author$project$Aoc11$index2pos, grid.width, ix),
+						$author$project$Aoc11a$toOctopusElement,
+						A2($author$project$Aoc11a$index2pos, grid.width, ix),
 						energy);
 				}),
 			grid.array));
@@ -6317,10 +6286,10 @@ var $author$project$Aoc11$toSvg = function (model) {
 		octopusElements);
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $author$project$Aoc11$view = function (model) {
+var $author$project$Aoc11a$view = function (model) {
 	var totalStr = 'Flashed total: ' + $elm$core$String$fromInt(model.total);
 	var tickStr = 'Steps: ' + $elm$core$String$fromInt(model.counter);
-	var s = $author$project$Aoc11$toSvg(model);
+	var s = $author$project$Aoc11a$toSvg(model);
 	var lastStr = 'Flashed last: ' + $elm$core$String$fromInt(model.last);
 	return A2(
 		$elm$html$Html$table,
@@ -6406,37 +6375,15 @@ var $author$project$Aoc11$view = function (model) {
 										$elm$html$Html$text(totalStr)
 									]))
 							]))
-					])),
-				A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$td,
-						_List_Nil,
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$button,
-								_List_fromArray(
-									[
-										$elm$html$Html$Events$onClick($author$project$Aoc11$Step)
-									]),
-								_List_fromArray(
-									[
-										$elm$svg$Svg$text('Step')
-									]))
-							]))
 					]))
 			]));
 };
-var $author$project$Aoc11$main = $elm$browser$Browser$element(
-	{init: $author$project$Aoc11$init, subscriptions: $author$project$Aoc11$subscriptions, update: $author$project$Aoc11$update, view: $author$project$Aoc11$view});
-_Platform_export({'Aoc11':{'init':$author$project$Aoc11$main(
+var $author$project$Aoc11a$main = $elm$browser$Browser$element(
+	{init: $author$project$Aoc11a$init, subscriptions: $author$project$Aoc11a$subscriptions, update: $author$project$Aoc11a$update, view: $author$project$Aoc11a$view});
+_Platform_export({'Aoc11a':{'init':$author$project$Aoc11a$main(
 	$elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));
 
-  var app = Elm.Aoc11.init({ node: document.getElementById("elm") });
+  var app = Elm.Aoc11a.init({ node: document.getElementById("elm") });
 }
 catch (e)
 {

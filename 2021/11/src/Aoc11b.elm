@@ -1,4 +1,4 @@
-module Aoc11 exposing (..)
+module Aoc11b exposing (..)
 
 import Browser
 import Html exposing (Html)
@@ -93,7 +93,7 @@ init _ =
 
 -- UPDATE
 
-type Msg = Tick | Step
+type Msg = Tick
 
 incrementArray : Array Int -> Array Int 
 incrementArray arr = 
@@ -178,9 +178,6 @@ update msg model =
   case msg of
     Tick ->
       (updateModel model, Cmd.none)
-    Step -> 
-      (updateModel model, Cmd.none)
-
 
 -- SUBSCRIPTIONS
 
@@ -290,10 +287,4 @@ view model =
               , Html.div [] [ Html.text tickStr ]
               , Html.div [] [ Html.text lastStr ]
               , Html.div [] [ Html.text totalStr ]
---              , Html.div [] [ Html.text model.debug ]
-              ] ]
-      , Html.tr 
-          []
-          [ Html.td 
-              []
-              [ Html.button [ onClick Step ] [ text "Step" ] ] ] ]
+              ] ] ]

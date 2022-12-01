@@ -1,4 +1,4 @@
-module Aoc11 exposing (..)
+module Aoc11a exposing (..)
 
 import Browser
 import Html exposing (Html)
@@ -93,7 +93,7 @@ init _ =
 
 -- UPDATE
 
-type Msg = Tick | Step
+type Msg = Tick
 
 incrementArray : Array Int -> Array Int 
 incrementArray arr = 
@@ -168,8 +168,7 @@ updateModel model =
     (arr, flashCount) = cascade grid.width grid.height flashing Set.empty incremented
     updatedGrid = { grid | array = arr |> resetFlashedArray } 
     steps = model.counter + 1
-    --paused = steps >= maxSteps
-    paused = flashCount == Array.length updatedGrid.array
+    paused = steps >= maxSteps
   in
     { model | grid = updatedGrid, counter = steps, paused = paused, total = model.total + flashCount, last = flashCount, debug = "Flashing: " ++ (flashing |> List.length |> String.fromInt) }
 
@@ -178,9 +177,6 @@ update msg model =
   case msg of
     Tick ->
       (updateModel model, Cmd.none)
-    Step -> 
-      (updateModel model, Cmd.none)
-
 
 -- SUBSCRIPTIONS
 
@@ -290,10 +286,4 @@ view model =
               , Html.div [] [ Html.text tickStr ]
               , Html.div [] [ Html.text lastStr ]
               , Html.div [] [ Html.text totalStr ]
---              , Html.div [] [ Html.text model.debug ]
-              ] ]
-      , Html.tr 
-          []
-          [ Html.td 
-              []
-              [ Html.button [ onClick Step ] [ text "Step" ] ] ] ]
+              ] ] ]
