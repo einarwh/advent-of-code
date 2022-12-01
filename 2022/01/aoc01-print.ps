@@ -477,37 +477,24 @@
     pop 
 } def 
 
-solve
-
-%200 200 translate 
+/print-string {
+    newpath 
+    moveto
+    false
+    charpath 
+    stroke
+} def 
 
 /Helvetica findfont 40 scalefont setfont
 
-(Advent of Code 2022)
-newpath 
-120 600 moveto
-false
-charpath 
-stroke
+solve
+
+250 350 print-string
+
+235 250 print-string
 
 (Day 1: Calorie Counting)
-newpath 
-100 500 moveto
-false
-charpath 
-stroke
+100 500 print-string
 
-newpath 
-250 350 moveto
-false
-charpath 
-stroke
-
-newpath 
-235 250 moveto
-false
-charpath 
-stroke
-
-
-
+(Advent of Code 2022)
+120 600 print-string
