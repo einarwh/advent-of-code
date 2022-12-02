@@ -1,3 +1,6 @@
+// Advent of Code 2020. Day 6.
+// dotnet fsi aoc06-refactored.fsx
+
 open System.IO
 
 let countGroup reducer =
@@ -10,10 +13,9 @@ let all = countGroup Set.intersect
 let count counter =
     Array.map counter >> Array.sum >> printfn "%d"
 
-[<EntryPoint>]
-let main argv =
-    let text = File.ReadAllText argv.[0]
+let run (text : string) =
     let groups = text.Trim().Split("\n\n") |> Array.map (fun s -> s.Split("\n"))
     groups |> count any
     groups |> count all 
-    0 
+
+"input" |> File.ReadAllText |> run 

@@ -1,10 +1,12 @@
+// Advent of Code 2020. Day 6, Part A.
+// dotnet fsi aoc06a.fsx
+
 open System.IO
 
-[<EntryPoint>]
-let main argv =
-    let text = File.ReadAllText argv.[0]
+let run (text : string) =
     text.Split("\n\n")
     |> Array.map (fun s -> s.Replace("\n", "") |> Seq.distinct |> Seq.length)
     |> Array.sum
     |> printfn "%d"
-    0 
+
+"input" |> File.ReadAllText |> run 

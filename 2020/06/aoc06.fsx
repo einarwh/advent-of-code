@@ -1,3 +1,6 @@
+// Advent of Code 2020. Day 6.
+// dotnet fsi aoc06.fsx
+
 open System.IO
 
 let anyone (s : string) : int =
@@ -12,10 +15,9 @@ let everyone (s : string) : int =
 let countBy (counter : string -> int) =
     Array.map counter >> Array.sum >> printfn "%d"
 
-[<EntryPoint>]
-let main argv =
-    let text = File.ReadAllText argv.[0]
+let run (text : string) =
     let groups = text.Trim().Split("\n\n")
     groups |> countBy anyone 
     groups |> countBy everyone 
-    0 
+
+"input" |> File.ReadAllText |> run 
