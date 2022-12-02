@@ -1,3 +1,6 @@
+// Advent of Code 2020. Day 12, Part A.
+// dotnet fsi aoc12a.fsx
+
 open System.IO
 open System.Text.RegularExpressions
 
@@ -115,12 +118,12 @@ let read =
     >> List.filter (fun s -> String.length s > 0)
     >> List.map parseInstruction
 
-[<EntryPoint>]
-let main argv =
-    File.ReadAllLines argv.[0]
+let run lines =
+    lines
     |> read
     |> List.fold (fun state inst -> move inst state) ((0, 0), East)
     |> fst
     |> distance
-    |> printfn "%d"
-    0 
+    |> printfn "Manhattan distance (Part 1): %d"
+
+"input" |> File.ReadAllLines |> run 
