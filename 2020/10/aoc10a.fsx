@@ -1,3 +1,6 @@
+// Advent of Code 2020. Day 10, Part A.
+// dotnet fsi aoc10a.fsx
+
 open System.IO
 
 let read (path : string) : int array =
@@ -20,8 +23,4 @@ let part1 (input : int array): int =
     let threes = counted |> Array.pick (choose 3)
     ones * threes
 
-[<EntryPoint>]
-let main argv =
-    let input = read argv.[0]
-    input |> part1 |> printfn "%d"
-    0 
+"input" |> read |> part1 |> printfn "%d"

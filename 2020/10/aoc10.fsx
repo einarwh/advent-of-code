@@ -1,3 +1,6 @@
+// Advent of Code 2020. Day 10.
+// dotnet fsi aoc10.fsx
+
 open System.IO
 
 type Adapter = int 
@@ -54,9 +57,8 @@ let part2 (input : Adapter array) : Count =
     |> Array.toList
     |> arrangements device 
 
-[<EntryPoint>]
-let main argv =
-    let input = read argv.[0]
+let run input =
     input |> part1 |> printfn "Part 1: %d"
     input |> part2 |> printfn "Part 2: %d"
-    0 
+
+"input" |> read |> run 
