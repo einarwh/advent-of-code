@@ -1,3 +1,6 @@
+// Advent of Code 2020. Day 4, Part B. 
+// dotnet fsi aoc04b-parsing.fsx
+
 module Domain =
     
     open System
@@ -226,12 +229,11 @@ module Domain =
 open System.IO
 open Domain
 
-[<EntryPoint>]
-let main argv =
-    let text = File.ReadAllText argv.[0]
+let run (text : string) =
     text.Split("\n\n")
     |> Array.map (fun s -> s.Trim())
     |> Array.choose (Passport.parse)
     |> Array.length
-    |> printfn "%d"
-    0 
+    |> printfn "Valid passports: %d"
+
+"input" |> File.ReadAllText |> run 

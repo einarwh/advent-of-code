@@ -1,3 +1,6 @@
+// Advent of Code 2020. Day 4, Part A.
+// dotnet fsi aoc04a.fsx
+
 open System.IO
 
 let readKeys (chunk : string) : string list =
@@ -11,12 +14,11 @@ let check (keys : string list) =
     |> List.map (fun req -> (List.contains req keys))
     |> List.reduce (&&)
 
-[<EntryPoint>]
-let main argv =
-    let text = File.ReadAllText argv.[0]
+let run (text : string) = 
     text.Split("\n\n")
     |> Array.map readKeys
     |> Array.filter check
     |> Array.length
     |> printfn "%d"
-    0 
+
+"input" |> File.ReadAllText |> run 

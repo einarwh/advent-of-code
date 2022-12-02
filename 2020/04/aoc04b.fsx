@@ -1,3 +1,6 @@
+// Advent of Code 2020. Day 4, Part B. 
+// dotnet fsi aoc04b.fsx
+
 open System
 open System.Collections.Generic
 open System.IO
@@ -87,12 +90,11 @@ let check (values : IDictionary<string, string>) : bool =
     |> List.map (fun c -> c values)
     |> List.reduce (&&)
 
-[<EntryPoint>]
-let main argv =
-    let text = File.ReadAllText argv.[0]
+let run (text : string) =
     text.Split("\n\n")
     |> Array.map readValues
     |> Array.filter check
     |> Array.length
-    |> printfn "%d"
-    0 
+    |> printfn "Valid passports: %d"
+
+"input" |> File.ReadAllText |> run 

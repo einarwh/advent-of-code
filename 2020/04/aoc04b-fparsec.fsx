@@ -1,3 +1,8 @@
+// Advent of Code 2020. Day 4, Part B. 
+// dotnet fsi aoc04b-fparsec.fsx
+
+#r "nuget: FParsec"
+
 open System
 open System.IO
 open FParsec
@@ -136,11 +141,8 @@ let getValidPassports input =
         parsed |> List.choose (function | Valid p -> Some p | Invalid _ -> None)
     | Failure (str, _, _) -> failwith str 
 
-[<EntryPoint>]
-let main argv =
-    argv.[0]
-    |> readInput
-    |> getValidPassports
-    |> List.length
-    |> printfn "Valid passports: %d"
-    0 
+"input"
+|> readInput
+|> getValidPassports
+|> List.length
+|> printfn "Valid passports: %d"
