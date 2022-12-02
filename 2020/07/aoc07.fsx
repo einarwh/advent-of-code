@@ -1,3 +1,6 @@
+// Advent of Code 2020. Day 7.
+// dotnet fsi aoc07.fsx
+
 open System.IO
 open System.Text.RegularExpressions
 
@@ -54,9 +57,7 @@ let rec countContainedBags (bag : Bag) (rules : Rule list) : int =
     |> List.map (fun { bag = b; count = c } -> c * (1 + countContainedBags b rules))
     |> List.sum
         
-[<EntryPoint>]
-let main argv =
-    let lines = File.ReadAllLines argv.[0]
+let run lines =
     let rules = lines |> Array.toList |> List.map parseRule
     let goldBag = Bag "shiny gold"
 
@@ -67,4 +68,5 @@ let main argv =
     rules |>
     countContainedBags goldBag
     |> printfn "%d contained bags"
-    0
+
+"input" |> File.ReadAllLines |> run 

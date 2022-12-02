@@ -1,3 +1,6 @@
+// Advent of Code 2020. Day 8.
+// dotnet fsi aoc08.fsx
+
 open System.IO
 open System.Text.RegularExpressions
 
@@ -81,10 +84,9 @@ let runUntilFixed (instructions : Instruction array) : int =
             | Normal n -> n
     loop (instructions :: permute instructions)
 
-[<EntryPoint>]
-let main argv =
-    let lines = File.ReadAllLines argv.[0]
+let solve lines =
     let instructions = lines |> Array.map parse
     instructions |> runOnce |> printfn "%d" 
     instructions |> runUntilFixed |> printfn "%d" 
-    0 
+
+"input" |> File.ReadAllLines |> solve 

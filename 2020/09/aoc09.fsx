@@ -1,3 +1,6 @@
+// Advent of Code 2020. Day 9.
+// dotnet fsi aoc09.fsx
+
 open System.IO
 
 let toValues : string array -> int64 list = 
@@ -44,9 +47,8 @@ let rec findWeakness (numbers : int64 list) (num : int64) : int64 option =
         findWeaknessAt numbers [] 0L num
         |> Option.orElse (findWeakness rest num)
     
-[<EntryPoint>]
-let main argv =
-    let values = File.ReadAllLines argv.[0] |> toValues
+let run lines =
+    let values = lines |> toValues
     let (preamble, numbers) = values |> List.splitAt 25
     match findFirstInvalid preamble numbers with
     | None -> printfn "No invalid number found?"
@@ -56,4 +58,5 @@ let main argv =
         | None -> printfn "No weakness found?"
         | Some weakness ->
             weakness |> printfn "%d" 
-    0 
+
+"input" |> File.ReadAllLines |> run 

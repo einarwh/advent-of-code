@@ -1,3 +1,6 @@
+// Advent of Code 2020. Day 9, Part A.
+// dotnet fsi aoc09a.fsx
+
 open System.IO
 
 let findPairs (preceding : int64 list) (num : int64) : (int64 * int64) list =
@@ -10,7 +13,7 @@ let invalid preceding : int64 -> bool =
     
 let update (preceding : int64 list) (num : int64): int64 list =
     (List.tail preceding) @ [num]
-            
+
 let partition (preambleLength : int) (input : int64 list) : (int64 list * int64 list) =
     let preamble = input |> List.take preambleLength
     let numbers = input |> List.skip preambleLength
@@ -28,11 +31,11 @@ let rec findFirstInvalid (preceding : int64 list) (numbers : int64 list) : int64
         else 
             findFirstInvalid (update preceding n) rest
     
-[<EntryPoint>]
-let main argv =
+let run lines =
     let (preamble, numbers) =
-        File.ReadAllLines argv.[0]
+        lines
         |> toValues
         |> partition 25     
     findFirstInvalid preamble numbers |> printfn "%A"
-    0 
+
+"input" |> File.ReadAllLines |> run
