@@ -1,3 +1,6 @@
+// Advent of Code 2020. Day 5.
+// dotnet fsi aoc05.fsx
+
 open System.IO
 
 type Step = Lower | Upper
@@ -29,10 +32,9 @@ let findMySeat (seatIds : int seq) =
     |> Seq.pairwise
     |> Seq.pick (fun (lo, hi) -> if hi - lo = 2 then Some (lo + 1) else None)
  
-[<EntryPoint>]
-let main argv =
-    let lines = File.ReadLines argv.[0]
+let run lines =
     let seatIds = lines |> Seq.map getSeatId |> Seq.sort
     seatIds |> Seq.last |> printfn "Highest seat ID %d"
     seatIds |> findMySeat |> printfn "My seat ID %d"
-    0 
+
+"input" |> File.ReadLines |> run 
