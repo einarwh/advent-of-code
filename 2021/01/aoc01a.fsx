@@ -1,7 +1,6 @@
 // Advent of Code 2021. Day 1, part A.
 // dotnet fsi aoc01a.fsx
 
-open System
 open System.IO
 
 "input"
