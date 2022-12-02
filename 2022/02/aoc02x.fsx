@@ -34,16 +34,9 @@ let interpretGoal s =
     | "Z" -> Win
     | _ -> failwith "boo"
 
-let parse1 (line : string) : (Play * Play) = 
+let parse1 (line : string) : (Play * Goal) = 
     let ss = line.Split(" ")
-    (interpretElf ss.[0], interpretPlay ss.[1])
-
-let parse2 (line : string) : (Play * Goal) = 
-    let ss = line.Split(" ")
-    (interpretElf ss.[0], interpretGoal ss.[1])
-
-let solve1 (elf, play) : (Play * Goal) = 
-    match (elf, play) with 
+    match (interpretElf ss.[0], interpretPlay ss.[1]) with 
     | Rock, Rock -> Rock, Draw
     | Rock, Paper -> Paper, Win
     | Rock, Scissors -> Scissors, Lose
@@ -54,8 +47,9 @@ let solve1 (elf, play) : (Play * Goal) =
     | Scissors, Paper -> Paper, Lose
     | Scissors, Scissors -> Scissors, Draw
 
-let solve2 (elf, goal) : (Play * Goal) = 
-    match (elf, goal) with 
+let parse2 (line : string) : (Play * Goal) = 
+    let ss = line.Split(" ")
+    match (interpretElf ss.[0], interpretGoal ss.[1]) with 
     | Rock, Lose -> Scissors, Lose
     | Rock, Draw -> Rock, Draw
     | Rock, Win -> Paper, Win
@@ -81,11 +75,11 @@ let scoreGoal goal =
 let scoreRound (play, goal) = 
     scorePlay play + scoreGoal goal
 
-let score parser solver lines = 
-    lines |> Array.map (parser >> solver >> scoreRound) |> Array.sum
+let score parser lines = 
+    lines |> Array.sumBy (parser >> scoreRound)
 
 let run lines = 
-    lines |> score parse1 solve1 |> printfn "%A" 
-    lines |> score parse2 solve2 |> printfn "%A" 
+    lines |> score parse1 |> printfn "%d" 
+    lines |> score parse2 |> printfn "%d" 
 
 "input" |> File.ReadAllLines |> run 

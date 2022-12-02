@@ -28,7 +28,7 @@ let score2 = function
     | _ -> 0 
 
 let run lines = 
-    lines |> Array.map score1 |> Array.sum |> printfn "%d"
-    lines |> Array.map score2 |> Array.sum |> printfn "%d"
+    lines |> Array.sumBy score1 |> printfn "%d"
+    lines |> Array.sumBy score2 |> printfn "%d"
 
 "input" |> File.ReadAllLines |> run 
