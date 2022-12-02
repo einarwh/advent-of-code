@@ -1,8 +1,10 @@
+// Advent of Code 2020. Day 11.
+// dotnet fsi aoc11.fsx
+
 open System.IO
 
 type Seat = | Empty | Occupied
 type Position = Seat option
-type Lookup = Position option 
 type Row = Position array 
 type Layout = Row array
 
@@ -131,10 +133,9 @@ let evolve1 = evolve evolveSeatDirectNeighbors
 
 let evolve2 = evolve evolveSeatInDirection
 
-[<EntryPoint>]
-let main argv =
-    let lines = File.ReadAllLines argv.[0]
+let run lines =
     let layout = readLayout lines
     layout |> evolve1 |> printfn "%d"
     layout |> evolve2 |> printfn "%d"
-    0
+
+"input" |> File.ReadAllLines |> run 

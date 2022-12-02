@@ -1,3 +1,6 @@
+// Advent of Code 2020. Day 11, Part A.
+// dotnet fsi aoc11a.fsx
+
 open System.IO
 
 type Seat = | Empty | Occupied
@@ -94,11 +97,10 @@ let evolve (layout : Layout) : Layout =
             loop currentLayout (evolveLayout currentLayout)
     loop layout (evolveLayout layout)
 
-[<EntryPoint>]
-let main argv =
-    let lines = File.ReadAllLines "C:/einarwh/Aoc/11/input.txt"
+let run lines =
     let layout = readLayout lines
     let layout' = evolve layout
     let count = countOccupiedTotal layout'
     printfn "count: %d" count
-    0 // return an integer exit code
+
+"input" |> File.ReadAllLines |> run 
