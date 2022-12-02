@@ -1,3 +1,6 @@
+// Advent of Code 2020. Day 3, Part A.
+// dotnet fsi aoc03a.fsx
+
 open System.IO
 
 let lines = "input" |> File.ReadAllLines
