@@ -1,3 +1,6 @@
+// Advent of Code 2020. Day 3.
+// dotnet fsi aoc03.fsx
+
 open System.IO
 
 let trees (lines : string array) (right : int, left : int) : int64 =
@@ -13,9 +16,7 @@ let run (lines : string array) (configs : (int * int) list) =
     |> List.reduce (*)
     |> printfn "%d"
 
-[<EntryPoint>]
-let main argv =
-    let lines = File.ReadAllLines argv.[0]
-    [ (3, 1) ] |> run lines
-    [ (1, 1); (3, 1); (5, 1); (7, 1); (1, 2) ] |> run lines
-    0 
+let lines = "input" |> File.ReadAllLines
+
+[ (3, 1) ] |> run lines
+[ (1, 1); (3, 1); (5, 1); (7, 1); (1, 2) ] |> run lines
