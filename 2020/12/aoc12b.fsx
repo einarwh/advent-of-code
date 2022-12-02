@@ -1,5 +1,6 @@
-// Advent of Code 2020. Day 12, Part A.
-// dotnet fsi aoc12a.fsx
+// Advent of Code 2020. 
+// Day 12: Rain Risk, Part B.
+// dotnet fsi aoc12b.fsx
 
 open System.IO
 open System.Text.RegularExpressions

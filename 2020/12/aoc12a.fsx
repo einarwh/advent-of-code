@@ -1,4 +1,5 @@
-// Advent of Code 2020. Day 12, Part A.
+// Advent of Code 2020. 
+// Day 12: Rain Risk, Part A.
 // dotnet fsi aoc12a.fsx
 
 open System.IO

@@ -1,8 +1,10 @@
+// Advent of Code 2020. 
+// Day 13: Shuttle Search, Part A.
+// dotnet fsi aoc13a.fsx
+
 open System.IO
 
-[<EntryPoint>]
-let main argv =
-    let lines = File.ReadAllLines argv.[0]
+let run (lines : string array) =
     let timestamp = int lines.[0]
     lines.[1].Split(',')
     |> Array.toList
@@ -12,4 +14,5 @@ let main argv =
     |> List.minBy snd
     |> (fun (bus, minutes) -> bus*minutes)
     |> printfn "%d"
-    0 
+
+"input" |> File.ReadAllLines |> run
