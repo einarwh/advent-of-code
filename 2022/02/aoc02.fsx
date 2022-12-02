@@ -27,11 +27,8 @@ let score2 = function
     | "C Z" -> 7 
     | _ -> 0 
 
-let solve scorer round = 
-    round |> Array.map scorer |> Array.sum |> printfn "%d"
-
 let run lines = 
-    lines |> solve score1
-    lines |> solve score2
+    lines |> Array.map score1 |> Array.sum |> printfn "%d"
+    lines |> Array.map score2 |> Array.sum |> printfn "%d"
 
 "input" |> File.ReadAllLines |> run 
