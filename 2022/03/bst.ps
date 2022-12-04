@@ -1,0 +1,122 @@
+% Binary search tree. 
+% Node: [ v L R ] | null
+
+/bst-value-index 0 def 
+
+/bst-left-child-index 1 def 
+
+/bst-right-child-index 2 def 
+
+/bst-create-node {                          % v 
+    null null                               % v _ _ 
+    3 array                                 % v _ _ A 
+    astore                                  % R
+} def   
+
+/bst-get-value {                            % T
+    dup null ne                             % T ? 
+    {                                       % T (T is not null)
+        bst-value-index get                 % v
+    } if    
+} def   
+
+/bst-get-left-child {                       % T
+    dup null ne                             % T ? 
+    {                                       % T (T is not null)
+        bst-left-child-index get            % L
+    } if        
+} def       
+
+/bst-get-right-child {                      % T
+    dup null ne                             % T ? 
+    {                                       % T (T is not null)
+        bst-right-child-index get           % R
+    } if    
+} def   
+
+/bst-put-value {                            % T v
+    exch                                    % v T
+    dup null ne                             % v T T=null? 
+    {                                       % v T (T is not null)
+        exch                                % T v 
+        bst-left-child-index                % T v i
+        exch                                % T i v
+        put                                 %
+    } if    
+} def   
+
+/bst-put-left-child {                       % T L
+    exch                                    % L T
+    dup null ne                             % L T T=null? 
+    {                                       % L T (T is not null)
+        exch                                % T L 
+        bst-left-child-index                % T L i
+        exch                                % T i L
+        put                                 %
+    } if
+} def   
+
+/bst-put-right-child {                      % T R
+    exch                                    % R T
+    dup null ne                             % R T T=null? 
+    {                                       % R T (T is not null)
+        exch                                % T R 
+        bst-right-child-index               % T R i
+        exch                                % T i R
+        put                                 %
+    } if
+} def   
+
+/bst-insert {                               % T x 
+    exch dup                                % x T T 
+    null eq                                 % x T ? 
+    {                                       % x T (T is null)
+        pop pop                             %  
+    }       
+    {                                       % x T 
+        exch                                % T x
+        1 index bst-get-value               % T x v 
+        2 copy eq                           % T x v x=v?
+        {                                   % T x v (v=x, already present!)
+            pop pop pop                     % 
+        }       
+        {                                   % T x v (v!=x, insert x)
+            2 copy                          % T x v x v 
+            gt                              % T x v (x>v?)
+            {                               % T x v (x>v: x -> right)
+                2 index                     % T x v T
+                bst-get-right-child         % T x v R
+                null eq                     % T x v R=null?
+                {                           % T x v (R is null, insert directly at R)
+                    pop                     % T x 
+                    bst-create-node         % T N
+                    bst-put-right-child     %
+                }
+                {                           % T x v (R is not null, recurse)
+                    pop                     % T x 
+                    exch                    % x T 
+                    bst-get-right-child     % x R 
+                    exch                    % R x 
+                    bst-insert              % 
+                } ifelse                    % 
+            }
+            {                               % T x v (x<v: x -> left)
+                2 index                     % T x v T
+                bst-get-left-child          % T x v L
+                null eq                     % T x v L=null?
+                {                           % T x v (L is null, insert directly at L)
+                    pop                     % T x 
+                    bst-create-node         % T N
+                    bst-put-left-child      %
+                }
+                {                           % T x v (L is not null, recurse)
+                    pop                     % T x 
+                    exch                    % x T 
+                    bst-get-left-child      % x L
+                    exch                    % L x 
+                    bst-insert              % 
+                } ifelse                    % 
+            } ifelse                        % 
+        } ifelse                            %
+    } ifelse                                %
+} def
