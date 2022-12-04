@@ -1,6 +1,5 @@
 % Binary search tree. 
-% Tree: [ root ]
-% Node: [ v L R ] | null
+% Node: [ [ v L R ] | [null] ]
 
 /bst-value-index 0 def 
 
@@ -8,93 +7,141 @@
 
 /bst-right-child-index 2 def 
 
+/bst-wrap {
+    1 array astore 
+} def 
+
+/bst-unwrap {
+    0 get 
+} def 
+
+/bst-create-empty {                         % 
+    null                                    % _
+    bst-wrap                                % T
+} def   
+
 /bst-create-node {                          % v 
     null null                               % v _ _ 
     3 array                                 % v _ _ A 
-    astore                                  % R
+    astore                                  % V
+    bst-wrap
 } def   
 
-/bst-create-tree {
-    
-} def 
-
 /bst-get-value {                            % T
-    dup null ne                             % T ? 
-    {                                       % T (T is not null)
+    (bst-get-value\n) print
+    dup bst-is-nil                          % T T=nil?
+    {
+        pop 
+        (tried to get value of nil\n) print
+        stop
+    }
+    {                                       % T (T is not nil)
+        bst-unwrap                          % U 
         bst-value-index get                 % v
-    } if    
+    } ifelse 
 } def   
 
 /bst-get-left-child {                       % T
-    (bst-get-left-child\n) print 
-    pstack
-    (\n) print
-
-    dup null ne                             % T ? 
-    {                                       % T (T is not null)
-        (Node is not null, get L child.\n) print 
-        pstack
-        (\n) print
-
+    (bst-get-left-child\n) print
+    dup bst-is-nil                          % T T=nil?
+    {
+        pop
+        (tried to get left child of nil\n) print
+        stop
+    }
+    {                                       % T (T is not nil)
+        bst-unwrap                          % U 
         bst-left-child-index get            % L
-
-        (This should be L child.\n) print 
-        pstack
-        (\n) print
-
-    } if        
-} def       
+    } ifelse 
+} def
 
 /bst-get-right-child {                      % T
-    dup null ne                             % T ? 
-    {                                       % T (T is not null)
+    (bst-get-right-child\n) print
+    dup bst-is-nil                          % T T=nil?
+    {
+        pop
+        (tried to get right child of nil\n) print
+        stop
+    }
+    {                                       % T (T is not nil)
+        bst-unwrap                          % U 
         bst-right-child-index get           % R
-    } if    
-} def   
+    } ifelse 
+} def
 
 /bst-put-value {                            % T v
-    (bst-put-value\n) print 
-    pstack
-    (\n) print
+    (bst-put-value\n) print
     exch                                    % v T
-    dup null ne                             % v T T=null? 
+    dup bst-is-nil                          % v T T=nil?   
+    {                                       % v T (T is nil)
+        pop pop                             % 
+        (tried to update value of nil node\n) print
+        stop
+    }
     {                                       % v T (T is not null)
-        exch                                % T v 
-        bst-value-index                     % T v i
-        exch                                % T i v
+        bst-unwrap                          % v U 
+        exch                                % U v 
+        bst-value-index                     % U v i
+        exch                                % U v i
         put                                 %
-    } if    
+    } ifelse 
 } def   
 
 /bst-put-left-child {                       % T L
+    (bst-put-left-child\n) print
     exch                                    % L T
-    dup null ne                             % L T T=null? 
+    dup bst-is-nil                          % L T T=nil?   
+    {                                       % L T (T is null)
+        pop pop                             % 
+        (tried to update left child of nil node\n) print
+        stop
+    }
     {                                       % L T (T is not null)
-        exch                                % T L 
-        bst-left-child-index                % T L i
-        exch                                % T i L
+        bst-unwrap                          % L U 
+        exch                                % U L 
+        bst-left-child-index                % U L i
+        exch                                % U i L
         put                                 %
-    } if
+    } ifelse 
 } def   
 
 /bst-put-right-child {                      % T R
+    (bst-put-right-child\n) print
     exch                                    % R T
-    dup null ne                             % R T T=null? 
+    dup bst-is-nil                          % R T T=nil?   
+    {                                       % R T (T is null)
+        pop pop                             % 
+        (tried to update left child of nil node\n) print
+        stop
+    }
     {                                       % R T (T is not null)
-        exch                                % T R 
-        bst-right-child-index               % T R i
-        exch                                % T i R
+        bst-unwrap                          % R U 
+        exch                                % U R 
+        bst-right-child-index               % U R i
+        exch                                % U i R
         put                                 %
-    } if
-} def   
+    } ifelse 
+} def 
+
+/bst-is-nil {                               % T
+    bst-unwrap                              % U
+    null eq                                 % U=null?
+} def 
 
 /bst-insert {                               % T x 
-    exch dup                                % x T T 
-    null eq                                 % x T ? 
-    {                                       % x T (T is null)
-        pop pop                             %  
+    (bst-insert\n) print
+    exch                                    % x T
+    dup bst-is-nil                          % x T T=nil? 
+    {                                       % x T (T is nil)
+        (bst-insert: T is nil\n) print
+        exch                                % T x 
+        bst-create-node                     % T X(x)
+        bst-unwrap                          % T U(x)
+        pstack
+        0 exch put                          %
     }       
-    {                                       % x T 
+    {                                       % x T (T is not nil)
+        (bst-insert: T is not nil\n) print
         exch                                % T x
         1 index bst-get-value               % T x v 
         2 copy eq                           % T x v x=v?
@@ -406,8 +453,11 @@
     } ifelse 
 } def 
 
-% [5 3 6 7 1 2 4] bst-from-array
-% dup 5 bst-remove
+[5 3 6 7 1 2 4] bst-from-array
+dup 5 bst-remove
 
-[6 [4 [1 null null] null] null]
-dup 6 bst-remove
+%[6 [4 [1 null null] null] null]
+%dup 6 bst-remove
+
+%[[3 [[1 null [[2 null null]]]] [[4 null [[8 [[6 null null]] null]]]]]]
+%dup 2 bst-insert
