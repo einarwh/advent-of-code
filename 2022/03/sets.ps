@@ -1,0 +1,92 @@
+/is-array {                     % x
+    type                        % t
+    [] type                     % t arraytype
+    eq                          % b (true if t is arraytype)
+} def     
+    
+/value-eq {                     % x y  
+    2 copy                      % x y x y
+    eq                          % x y b (b: x == y)
+    { % identical    
+        pop pop                 % 
+        true                    % T
+    }    
+    { % not identity equal    
+        2 copy                  % x y x y 
+        is-array                % x y x ya?
+        exch is-array           % x y ya? xa?
+        and                     % x y ya&&xa?
+        { % both are arrays
+            2 copy              % x y x y 
+            length              % x y x Ly
+            exch length         % x y Ly Lx
+            eq { % same length  % x y b (b: Lx == Ly)
+                true            % x y T
+                0 1             % x y T 0 1
+                3 index         % x y T 0 1 y
+                length 1 sub    % x y T 0 1 L-1
+                {               % x y T i
+                    3 index     % x y T i x 
+                    1 index     % x y T i x i 
+                    get         % x y T i x[i]
+                    3 index     % x y T i x[i] y
+                    2 index     % x y T i x[i] y i 
+                    get         % x y T i x[i] y[i]
+                    value-eq    % x y T i b
+                    exch pop    % x y T b
+                    and         % x y b
+                } for           % x y b
+                exch pop        % x b 
+                exch pop        % b
+            }
+            { % unequal length
+                pop pop 
+                false 
+            } ifelse
+        }
+        { % not both arrays
+            pop pop             % 
+            false               % F
+        } ifelse 
+
+    } ifelse
+} def
+
+/value-ne { 
+    value-ne not 
+} def
+
+/compare-elements {             % x y
+    0 1                         % x y 0 1 
+    2 index length              % x y 0 1 L 
+    1 sub                       % x y 0 1 L-1
+    {                           % x y i
+        2 index                 % x y i x 
+        1 index                 % x y i x i 
+        get                     % x y i x[i]
+        2 index                 % x y i x[i] y 
+        2 index                 % x y i x[i]
+
+    } for 
+} def  
+
+/compare {                      % x y
+    2 copy                      % x y x y 
+    is-array                    % x y x ya? 
+    exch is-array               % x y ya? xa?
+    {                           % x y ya? (x is array)
+        {                       % x y (x is array, y is array)
+
+        } 
+        {} ifelse
+    }
+    {
+
+    } ifelse 
+} def 
+
+% Sort order:
+% Arrays > Values
+% Two arrays are compared by value.
+% Compare each value recursively.
+% Extra elements in one array: greater.
