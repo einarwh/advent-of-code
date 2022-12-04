@@ -120,3 +120,39 @@
         } ifelse                            %
     } ifelse                                %
 } def
+
+/bst-contains {                             % T x 
+    exch dup                                % x T T 
+    null eq                                 % x T ? 
+    {                                       % x T (T is null)
+        pop pop                             %
+        false                               % f
+    }
+    {                                       % x T 
+        exch                                % T x
+        1 index bst-get-value               % T x v 
+        2 copy eq                           % T x v x=v?
+        {                                   % T x v (v=x, found it!)
+            pop pop pop                     % 
+            true                            % t
+        }
+        {                                   % T x v (v!=x, continue search for x)
+            2 copy                          % T x v x v 
+            gt                              % T x v (x>v?)
+            {                               % T x v (x>v: search right subtree)
+                pop                         % T x 
+                exch                        % x T 
+                bst-get-right-child         % x R 
+                exch                        % R x 
+                bst-contains                % b
+            }
+            {                               % T x v (x<v: search left subtree)
+                pop                         % T x 
+                exch                        % x T 
+                bst-get-left-child          % x R 
+                exch                        % R x 
+                bst-contains                % b
+            } ifelse 
+        } ifelse 
+    } ifelse 
+} def 
