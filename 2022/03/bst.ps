@@ -1,4 +1,5 @@
 % Binary search tree. 
+% Tree: [ root ]
 % Node: [ v L R ] | null
 
 /bst-value-index 0 def 
@@ -13,6 +14,10 @@
     astore                                  % R
 } def   
 
+/bst-create-tree {
+    
+} def 
+
 /bst-get-value {                            % T
     dup null ne                             % T ? 
     {                                       % T (T is not null)
@@ -21,9 +26,22 @@
 } def   
 
 /bst-get-left-child {                       % T
+    (bst-get-left-child\n) print 
+    pstack
+    (\n) print
+
     dup null ne                             % T ? 
     {                                       % T (T is not null)
+        (Node is not null, get L child.\n) print 
+        pstack
+        (\n) print
+
         bst-left-child-index get            % L
+
+        (This should be L child.\n) print 
+        pstack
+        (\n) print
+
     } if        
 } def       
 
@@ -35,11 +53,14 @@
 } def   
 
 /bst-put-value {                            % T v
+    (bst-put-value\n) print 
+    pstack
+    (\n) print
     exch                                    % v T
     dup null ne                             % v T T=null? 
     {                                       % v T (T is not null)
         exch                                % T v 
-        bst-left-child-index                % T v i
+        bst-value-index                     % T v i
         exch                                % T i v
         put                                 %
     } if    
@@ -156,3 +177,237 @@
         } ifelse 
     } ifelse 
 } def 
+
+/bst-min-node {                             % T 
+    dup null ne                             % T
+    {                                       % T (T is not null)
+        dup bst-get-left-child              % T L
+        dup                                 % T L L 
+        null eq                             % T L L=null?
+        {                                   % T L (L is null, return T)
+            pop                             % T
+        }
+        {                                   % T L (L is not null, recur)
+            exch pop                        % L
+            bst-min-node                    % M
+        } ifelse
+    } if 
+} def 
+
+/bst-min-value {                            % T
+    bst-min-node                            % M
+    bst-get-value                           % m
+} def 
+
+/bst-max-node {                             % T 
+    dup null ne                             % T
+    {                                       % T (T is not null)
+        dup bst-get-right-child             % T R
+        dup                                 % T R R 
+        null eq                             % T R R=null?
+        {                                   % T R (R is null, return T)
+            pop                             % T
+        }
+        {                                   % T R (R is not null, recur)
+            exch pop                        % R
+            bst-max-node                    % M
+        } ifelse
+    } if 
+} def 
+
+/bst-max-value {                            % T
+    bst-max-node                            % M
+    bst-get-value                           % m
+} def 
+
+/bst-overwrite {                            % T N 
+    2 copy                                  % T N T N 
+    bst-get-value bst-put-value             % T N 
+    2 copy                                  % T N T N 
+    bst-get-left-child bst-put-left-child   % T N 
+    bst-get-right-child bst-put-right-child %
+} def 
+
+/bst-remove-return-root {                   % T x
+    (bst-remove-return-root\n) print
+    (remove value ) print 
+    dup == 
+    (\n) print
+    pstack
+    (\n) print
+
+    exch dup                                % x T T 
+    null eq                                 % x T ? 
+    {                                       % x T (T is null, it wasn't here)
+        (done, it wasn't here\n) print
+    
+        pop pop                             %
+        null                                % _
+    }
+    {                                       % x T 
+        (It's not null\n) print
+        pstack
+        (\n) print
+
+        exch                                % T x
+        1 index bst-get-value               % T x v 
+        2 copy eq                           % T x v x=v?
+        {                                   % T x v (v=x, found it! now we have work to do)
+            (Found the node with the value to remove!\n) print
+            pstack
+            (\n) print
+
+            pop pop                         % T
+            dup                             % T T
+            bst-get-right-child             % T R 
+            null eq                         % T R=null?
+            {                               % T (R is null, return L as root)
+                (R is null, return L\n) print
+                pstack
+                (\n) print
+
+                dup bst-get-left-child      % T L (regardless if L is null or not)
+
+                (Is this L?\n) print
+                pstack
+                (\n) print
+            }
+            {                               % T (R is not null)
+                (R is not null, check L\n) print
+                pstack
+                (\n) print
+
+                dup                         % T T 
+                bst-get-left-child          % T L
+                null eq                     % T L=null?
+                {                           % T (L is null, return R as root)
+                    (L is null, return R\n) print
+                    pstack
+                    (\n) print
+
+                    bst-get-right-child     % R
+                    (Return value is R on top \n) print
+                    pstack
+                    (\n) print
+                }
+                {                           % T (Neither is null)
+                    (Neither is null, it's complicated.\n) print
+                    pstack
+                    (\n) print
+
+                    dup                     % T T 
+                    bst-get-right-child     % T R 
+                    bst-min-value           % T m
+                    (Got min larger value.\n) print
+                    pstack
+                    (\n) print
+
+                    2 copy                  % T m T m 
+                    (Make recursive remove call.\n) print
+                    pstack
+                    (\n) print
+
+                    bst-remove-return-root  % T m T
+                    (Returned from recursive remove.\n) print
+                    pstack
+                    (\n) print
+
+                    exch                    % T T m
+                    bst-put-value           % T 
+                } ifelse 
+            } ifelse                        % T N
+
+            % Should have replacement node on top of stack here.
+            % But what if replacement node is null?
+            % Can't overwrite non-null node with null.
+            % Must have fixed, non-null root.
+            1 index exch                    % T T N 
+            bst-overwrite                   % T<-N
+        }
+        {                                   % T x v (v!=x, continue search for x)
+            (It's the wrong value: ) print
+            dup == 
+            (Continue search\n) print
+            pstack
+            (\n) print
+
+            2 copy                          % T x v x v 
+            gt                              % T x v (x>v?)
+            {                               % T x v (x>v: remove from right child)
+                (The value to remove is greater. Remove from right child\n) print
+                pstack
+                (\n) print
+
+                pop                         % T x 
+                1 index                     % T x T
+                bst-get-right-child         % T x R 
+                exch                        % T R x 
+
+                (Call recursive remove to the right...\n) print
+                pstack
+                (\n) print
+
+                bst-remove-return-root      % T R
+                1 index exch                % T T R
+
+                (After recursive remove to the right...\n) print
+                pstack
+                (\n) print
+
+                bst-put-right-child         % T 
+
+                (After put right child...\n) print
+                pstack
+                (\n) print
+
+            }
+            {                               % T x v (x<v: remove from left child)
+                (The value to remove is smaller. Remove from left child\n) print
+                pstack
+                (\n) print
+
+                pop                         % T x 
+                1 index                     % T x T
+                bst-get-left-child          % T x L 
+                exch                        % T L x 
+
+                (Call recursive remove to the left...\n) print
+                pstack
+                (\n) print
+
+                bst-remove-return-root      % T L
+                1 index exch                % T T L
+
+                bst-put-left-child          % T 
+            } ifelse 
+        } ifelse 
+    } ifelse 
+} def 
+
+/bst-remove {                               % T x
+    bst-remove-return-root pop              % 
+} def 
+
+/bst-from-array {                           % A 
+    dup length                              % A L 
+    0 eq                                    % A L=0?
+    {                                       % A (A empty)
+        pop null                            % _
+    }
+    {                                       % A (A not empty)
+        dup 0 get                           % A e 
+        bst-create-node                     % A N
+        exch                                % N A
+        {                                   % N e
+            1 index                         % N e N 
+            exch                            % N N e 
+            bst-insert                      % N
+        } forall
+    } ifelse 
+} def 
+
+% [5 3 6 7 1 2 4] bst-from-array
+% dup 5 bst-remove
+
+[6 [4 [1 null null] null] null]
+dup 6 bst-remove
