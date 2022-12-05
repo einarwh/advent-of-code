@@ -1,3 +1,6 @@
+// Advent of Code 2022. 
+// Day 4: Camp Cleanup.
+// dotnet fsi aoc04.fsx
 
 open System.IO
 open System.Text.RegularExpressions
