@@ -13,7 +13,11 @@ type Command = {
 
 type Stack = char list
 
+type Crates = char list 
+
 type Stacks = Stack array
+
+type CrateMover = Command -> Stacks -> Stacks
 
 let parseStackCount (s : string) = 
     Regex.Split(s.Trim(), "\s+") |> Array.last |> int
@@ -61,30 +65,45 @@ let parseCommands (s : string) =
     let commandLines = s.Split("\n") |> Array.toList 
     commandLines |> List.map parseCommand
 
-let move (sourceIndex : int) (targetIndex : int) (stacks : Stacks) : Stacks = 
-    match stacks.[sourceIndex] with 
-    | [] -> failwith "underflow"
-    | top :: rest -> 
-        stacks.[sourceIndex] <- rest 
-        stacks.[targetIndex] <- (top :: stacks.[targetIndex])
+let takeAmount (amount : int) (stack : Stack) : (Crates * Stack) = 
+    let rec fn (amount : int) (taken : Crates) (stack : Stack) = 
+        if amount > 0 then 
+            match stack with 
+            | [] -> failwith "takeAmount underflow"
+            | top :: rest -> 
+                rest |> fn (amount - 1) (top :: taken) 
+        else 
+            (taken, stack)
+    fn amount [] stack
+
+let moveAmount9000 (amount : int) (sourceIndex : int) (targetIndex : int) (stacks : Stacks) : Stacks = 
+    match takeAmount amount stacks.[sourceIndex] with 
+    | (taken, stack) -> 
+        stacks.[sourceIndex] <- stack 
+        stacks.[targetIndex] <- (taken @ stacks.[targetIndex])
         stacks
 
-let runCommand (command : Command) (stacks : Stacks) = 
-    let rec moveAmount (amount : int) (sourceIndex : int) (targetIndex) (stacks : Stacks) = 
-        if amount > 0 then 
-            moveAmount (amount - 1) sourceIndex targetIndex (move sourceIndex targetIndex stacks)
-        else 
-            stacks
-    moveAmount command.amount (command.source - 1) (command.target - 1) stacks
+let moveAmount9100 (amount : int) (sourceIndex : int) (targetIndex : int) (stacks : Stacks) : Stacks = 
+    match takeAmount amount stacks.[sourceIndex] with 
+    | (taken, stack) -> 
+        stacks.[sourceIndex] <- stack 
+        stacks.[targetIndex] <- (List.rev taken @ stacks.[targetIndex])
+        stacks
 
-let rec runCommands (commandNo : int) stacks commands = 
+let runCommand9000 (command : Command) (stacks : Stacks) = 
+    moveAmount9000 command.amount (command.source - 1) (command.target - 1) stacks
+
+let runCommand9100 (command : Command) (stacks : Stacks) = 
+    moveAmount9100 command.amount (command.source - 1) (command.target - 1) stacks
+
+let rec runCommands (commandNo : int) (mover : CrateMover) stacks commands = 
     match commands with 
     | [] -> stacks
     | cmd :: rest ->
-        rest |> runCommands (commandNo + 1) (runCommand cmd stacks) 
+        rest |> runCommands (commandNo + 1) mover (mover cmd stacks) 
 
-let tops (stacks : Stacks) : char array =
-    stacks |> Array.map (List.head)
+let printTopCrates (stacks : Stacks) = 
+    stacks |> Array.map (List.head) |> (fun cs -> System.String(cs)) |> printfn "%s"
 
 let run (text : string) = 
     let ss = text.TrimEnd().Split("\n\n") 
@@ -92,8 +111,10 @@ let run (text : string) =
     let commandsInput = ss.[1]
     let stacks = parseStacks stacksInput
     let commands = parseCommands commandsInput
-    let stacks' = runCommands 0 stacks commands
-    stacks' |> tops |> (fun cs -> System.String(cs)) |> printfn "%s"
+    let stacks9000 = runCommands 0 runCommand9000 (stacks |> Array.copy) commands
+    let stacks9100 = runCommands 0 runCommand9100 (stacks |> Array.copy) commands
+    stacks9000 |> printTopCrates
+    stacks9100 |> printTopCrates
 
 "input"
 |> File.ReadAllText 
