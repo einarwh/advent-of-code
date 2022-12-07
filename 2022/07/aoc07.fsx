@@ -148,17 +148,15 @@ let run root =
     |> List.sum
     |> printfn "Sum of small dirs: %d"
     let total = 70000000L
+    let needed = 30000000L
     let used = match root with | Dir (_, size, _) -> size
     let free =  total - used 
-    let needed = 30000000L
     let missing = needed - free
-    let largeEnough = dirSizes |> List.filter (fun s -> s >= missing)
-    let bestChoice = largeEnough |> List.rev |> List.head
-    printfn "total: %d" total
-    printfn "used: %d" used
-    printfn "free: %d" free
-    printfn "missing: %d" missing
-    printfn "best choice: %d" bestChoice
+    dirSizes
+    |> List.filter (fun s -> s >= missing)
+    |> List.rev 
+    |> List.head
+    |> printfn "Size of dir to delete: %d"
 
 "input"
 |> File.ReadAllLines 
