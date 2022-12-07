@@ -62,6 +62,26 @@ init _ =
 
 type Msg = Tick
 
+takeAmount : Int -> Crates -> Stack -> (Crates, Stack) 
+takeAmount amount taken stack =
+    if amount > 0 then 
+        case stack of 
+            [] -> (taken, stack) 
+            top :: rest -> 
+                takeAmount (amount - 1) (top :: taken) rest 
+    else 
+        (taken, stack)
+
+let moveAmount9000 (amount : int) (sourceIndex : int) (targetIndex : int) (stacks : Stacks) : Stacks = 
+    match takeAmount amount stacks.[sourceIndex] with 
+    | (taken, stack) -> 
+        stacks.[sourceIndex] <- stack 
+        stacks.[targetIndex] <- (taken @ stacks.[targetIndex])
+        stacks
+
+let moveAmount : Bool -> Int -> Int -> Int -> Stacks -> Stacks
+    case takeAmount amount (Di)
+
 updateModel : Model -> Model
 updateModel model =
   let

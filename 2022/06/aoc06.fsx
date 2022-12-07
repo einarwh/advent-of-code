@@ -6,9 +6,8 @@ let isMarker count cs =
 
 let findMarker count = 
     Seq.windowed count 
-    >> Seq.mapi (fun i cs -> if isMarker count cs then Some (i + count) else None)
-    >> Seq.choose id
-    >> Seq.head 
+    >> Seq.findIndex (isMarker count)
+    >> (+) count 
 
 let run cs = 
     cs |> findMarker 4 |> printfn "%d"
