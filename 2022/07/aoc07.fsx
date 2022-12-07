@@ -111,10 +111,6 @@ and consumeChildDirectories (lines : Line list) : (FileSystemEntry list * Line l
         | h :: _ -> failwith <| sprintf "Unexpected line: %A" h
     consume [] lines
 
-let getSize dir = 
-    match dir with 
-    | Dir (_, size, _) -> size
-
 let rec getFileSystemEntrySize (entry : FileSystemEntry) = 
     match entry with 
     | FileEntry (_, size) -> 
