@@ -71,13 +71,6 @@ tryReadCrate index str =
     " " -> Nothing 
     s -> Just s
 
-readAt : Int -> String -> Maybe String 
-readAt index str = 
-  case str |> String.slice index (index + 1) of 
-    "" -> Nothing 
-    " " -> Nothing 
-    s -> Just s
-
 toStackIndex : Int -> Int 
 toStackIndex stackId = 
   1 + 4 * (stackId - 1)
@@ -122,7 +115,6 @@ parseCommands s =
 init : () -> (Model, Cmd Msg)
 init _ =
   let 
-    sampleOld = "    [D]    \n[N] [C]    \n[Z] [M] [P]\n 1   2   3 \n\nmove 1 from 2 to 1\nmove 3 from 1 to 3\nmove 2 from 2 to 1\nmove 1 from 1 to 2"
     sample = """    [D]    
 [N] [C]    
 [Z] [M] [P]
@@ -649,12 +641,6 @@ move 10 from 6 to 1
     parsedStacks = parseStacks stacksStr
     parsedCommands = parseCommands commandsStr
 
-    -- stacks = 
-    --     Dict.empty 
-    --     |> Dict.insert 1 ["N","Z"]
-    --     |> Dict.insert 2 ["D","C","M"]
-    --     |> Dict.insert 3 ["P"]
-
     model = { stacks = parsedStacks
             , tallestStackSeen = 0
             , commands = parsedCommands
@@ -760,8 +746,6 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
   if model.paused || List.isEmpty model.commands then Sub.none 
   else Time.every model.delay (\_ -> Tick)
-
-  -- Time.every delay (\_ -> Tick)
 
 -- VIEW
 
