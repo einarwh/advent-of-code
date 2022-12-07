@@ -1,3 +1,6 @@
+// Advent of Code 2022. 
+// Day 6: Tuning Trouble.
+// dotnet fsi aoc06.fsx
 
 open System.IO
 
