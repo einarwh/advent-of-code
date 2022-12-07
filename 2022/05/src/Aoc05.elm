@@ -42,6 +42,7 @@ type alias Command =
 type alias Model = 
   { stacks : Stacks
   , commands: List Command
+  , keepOrder : Bool
   , counter : Int 
   , debug : String }
 
@@ -50,9 +51,22 @@ init _ =
   let 
     sample = ""
     input = "" 
+
+    stacks = 
+        Dict.empty 
+        |> Dict.insert 1 ['N','Z']
+        |> Dict.insert 2 ['D','C','M']
+        |> Dict.insert 3 ['P']
+
+    commands = 
+        [ { amount = 1, source = 2, target = 1 }
+        , { amount = 3, source = 1, target = 3 } 
+        , { amount = 2, source = 2, target = 1 } 
+        , { amount = 1, source = 1, target = 2 } ]
     
-    model = { stacks = Dict.empty
+    model = { stacks = stacks
             , commands = []
+            , keepOrder = false
             , counter = 0
             , debug = "..."}
   in 
@@ -72,15 +86,17 @@ takeAmount amount taken stack =
     else 
         (taken, stack)
 
-let moveAmount9000 (amount : int) (sourceIndex : int) (targetIndex : int) (stacks : Stacks) : Stacks = 
-    match takeAmount amount stacks.[sourceIndex] with 
-    | (taken, stack) -> 
-        stacks.[sourceIndex] <- stack 
-        stacks.[targetIndex] <- (taken @ stacks.[targetIndex])
-        stacks
+moveAmount : Bool -> Int -> Int -> Int -> Stacks -> Stacks
+moveAmount keepOrder amount source target stacks = 
+    case takeAmount amount [] (Dict.get source stacks |> Maybe.withDefault []) of 
+        (taken, stack) -> 
+            stacks 
+            |> Dict.update source (Maybe.map (\old -> stack))
+            |> Dict.update target (Maybe.map (\old -> (if keepOrder then taken |> List.reverse else taken) ++ old))
 
-let moveAmount : Bool -> Int -> Int -> Int -> Stacks -> Stacks
-    case takeAmount amount (Di)
+runCommand : Bool -> Command -> Stacks -> Stacks 
+runCommand keepOrder command stacks = 
+    moveAmount keepOrder command.amount command.source command.target stacks
 
 updateModel : Model -> Model
 updateModel model =
