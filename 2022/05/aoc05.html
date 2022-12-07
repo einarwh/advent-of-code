@@ -5219,6 +5219,51 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Aoc05$defaultDelay = 1000;
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $elm$core$String$words = _String_words;
+var $author$project$Aoc05$parseCommand = function (s) {
+	var nums = A2(
+		$elm$core$List$filterMap,
+		$elm$core$String$toInt,
+		$elm$core$String$words(s));
+	if ((nums.b && nums.b.b) && nums.b.b.b) {
+		var amount = nums.a;
+		var _v1 = nums.b;
+		var source = _v1.a;
+		var _v2 = _v1.b;
+		var target = _v2.a;
+		return $elm$core$Maybe$Just(
+			{amount: amount, source: source, target: target});
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Aoc05$parseCommands = function (s) {
+	return A2(
+		$elm$core$List$filterMap,
+		$author$project$Aoc05$parseCommand,
+		A2($elm$core$String$split, '\n', s));
+};
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $elm$core$Dict$Black = {$: 'Black'};
@@ -5330,48 +5375,115 @@ var $elm$core$Dict$insert = F3(
 			return x;
 		}
 	});
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $elm$core$Dict$fromList = function (assocs) {
+	return A3(
+		$elm$core$List$foldl,
+		F2(
+			function (_v0, dict) {
+				var key = _v0.a;
+				var value = _v0.b;
+				return A3($elm$core$Dict$insert, key, value, dict);
+			}),
+		$elm$core$Dict$empty,
+		assocs);
+};
+var $author$project$Aoc05$toStackIndex = function (stackId) {
+	return 1 + (4 * (stackId - 1));
+};
+var $author$project$Aoc05$tryReadCrate = F2(
+	function (index, str) {
+		var _v0 = A3($elm$core$String$slice, index, index + 1, str);
+		switch (_v0) {
+			case '':
+				return $elm$core$Maybe$Nothing;
+			case ' ':
+				return $elm$core$Maybe$Nothing;
+			default:
+				var s = _v0;
+				return $elm$core$Maybe$Just(s);
+		}
+	});
+var $author$project$Aoc05$initStack = F2(
+	function (crateLines, stackId) {
+		var stackIndex = $author$project$Aoc05$toStackIndex(stackId);
+		var stack = $elm$core$List$reverse(
+			A2(
+				$elm$core$List$filterMap,
+				$author$project$Aoc05$tryReadCrate(stackIndex),
+				crateLines));
+		return _Utils_Tuple2(stackId, stack);
+	});
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Aoc05$parseStackIdLine = function (s) {
+	return A2(
+		$elm$core$List$map,
+		$elm$core$Maybe$withDefault(0),
+		A2(
+			$elm$core$List$map,
+			$elm$core$String$toInt,
+			$elm$core$String$words(s)));
+};
+var $author$project$Aoc05$parseStacks = function (s) {
+	var lines = A2($elm$core$String$split, '\n', s);
+	var _v0 = $elm$core$List$reverse(lines);
+	if (!_v0.b) {
+		return $elm$core$Dict$empty;
+	} else {
+		var stackIdLine = _v0.a;
+		var crateLines = _v0.b;
+		var stackIds = $author$project$Aoc05$parseStackIdLine(stackIdLine);
+		var stacks = A2(
+			$elm$core$List$map,
+			$author$project$Aoc05$initStack(crateLines),
+			stackIds);
+		return $elm$core$Dict$fromList(stacks);
+	}
+};
+var $author$project$Aoc05$splitInput = function (input) {
+	var _v0 = A2($elm$core$String$split, '\n\n', input);
+	if (_v0.b && _v0.b.b) {
+		var a = _v0.a;
+		var _v1 = _v0.b;
+		var b = _v1.a;
+		return _Utils_Tuple2(a, b);
+	} else {
+		return _Utils_Tuple2('', '');
+	}
+};
+var $elm$core$String$trimRight = _String_trimRight;
 var $author$project$Aoc05$init = function (_v0) {
-	var stacks = A3(
-		$elm$core$Dict$insert,
-		3,
-		_List_fromArray(
-			[
-				_Utils_chr('P')
-			]),
-		A3(
-			$elm$core$Dict$insert,
-			2,
-			_List_fromArray(
-				[
-					_Utils_chr('D'),
-					_Utils_chr('C'),
-					_Utils_chr('M')
-				]),
-			A3(
-				$elm$core$Dict$insert,
-				1,
-				_List_fromArray(
-					[
-						_Utils_chr('N'),
-						_Utils_chr('Z')
-					]),
-				$elm$core$Dict$empty)));
-	var sample = '';
-	var input = '';
-	var commands = _List_fromArray(
-		[
-			{amount: 1, source: 2, target: 1},
-			{amount: 3, source: 1, target: 3},
-			{amount: 2, source: 2, target: 1},
-			{amount: 1, source: 1, target: 2}
-		]);
-	var model = {commands: commands, counter: 0, debug: '...', keepOrder: false, stacks: stacks};
+	var sampleOld = '    [D]    \n[N] [C]    \n[Z] [M] [P]\n 1   2   3 \n\nmove 1 from 2 to 1\nmove 3 from 1 to 3\nmove 2 from 2 to 1\nmove 1 from 1 to 2';
+	var sample = '    [D]    \n[N] [C]    \n[Z] [M] [P]\n 1   2   3 \n\nmove 1 from 2 to 1\nmove 3 from 1 to 3\nmove 2 from 2 to 1\nmove 1 from 1 to 2';
+	var input = '            [J]             [B] [W]\n            [T]     [W] [F] [R] [Z]\n        [Q] [M]     [J] [R] [W] [H]\n    [F] [L] [P]     [R] [N] [Z] [G]\n[F] [M] [S] [Q]     [M] [P] [S] [C]\n[L] [V] [R] [V] [W] [P] [C] [P] [J]\n[M] [Z] [V] [S] [S] [V] [Q] [H] [M]\n[W] [B] [H] [F] [L] [F] [J] [V] [B]\n 1   2   3   4   5   6   7   8   9 \n\nmove 3 from 5 to 7\nmove 2 from 8 to 9\nmove 4 from 3 to 5\nmove 2 from 1 to 7\nmove 1 from 3 to 6\nmove 2 from 1 to 7\nmove 1 from 8 to 7\nmove 4 from 2 to 8\nmove 10 from 9 to 1\nmove 6 from 6 to 2\nmove 1 from 6 to 7\nmove 9 from 8 to 6\nmove 4 from 2 to 4\nmove 2 from 4 to 1\nmove 6 from 1 to 6\nmove 1 from 3 to 2\nmove 2 from 1 to 4\nmove 2 from 4 to 3\nmove 2 from 1 to 3\nmove 4 from 3 to 1\nmove 15 from 7 to 9\nmove 4 from 5 to 9\nmove 13 from 9 to 4\nmove 10 from 4 to 8\nmove 1 from 7 to 4\nmove 6 from 9 to 5\nmove 11 from 6 to 7\nmove 4 from 5 to 7\nmove 3 from 8 to 7\nmove 4 from 2 to 4\nmove 1 from 5 to 1\nmove 5 from 8 to 4\nmove 1 from 5 to 4\nmove 10 from 7 to 1\nmove 8 from 7 to 9\nmove 12 from 1 to 9\nmove 8 from 9 to 1\nmove 2 from 6 to 9\nmove 2 from 8 to 4\nmove 1 from 6 to 9\nmove 13 from 4 to 2\nmove 13 from 4 to 2\nmove 1 from 6 to 1\nmove 1 from 6 to 4\nmove 1 from 4 to 5\nmove 14 from 1 to 8\nmove 1 from 5 to 4\nmove 13 from 9 to 5\nmove 9 from 8 to 2\nmove 8 from 2 to 1\nmove 5 from 8 to 2\nmove 5 from 1 to 6\nmove 3 from 1 to 3\nmove 1 from 4 to 8\nmove 9 from 5 to 9\nmove 18 from 2 to 8\nmove 3 from 3 to 5\nmove 2 from 6 to 4\nmove 14 from 2 to 7\nmove 1 from 4 to 2\nmove 1 from 6 to 9\nmove 1 from 2 to 5\nmove 1 from 6 to 2\nmove 1 from 4 to 6\nmove 6 from 8 to 1\nmove 2 from 6 to 9\nmove 5 from 5 to 3\nmove 1 from 7 to 8\nmove 10 from 9 to 7\nmove 13 from 8 to 5\nmove 5 from 5 to 2\nmove 6 from 5 to 7\nmove 1 from 8 to 5\nmove 5 from 5 to 9\nmove 5 from 9 to 7\nmove 4 from 3 to 8\nmove 6 from 1 to 6\nmove 4 from 2 to 4\nmove 3 from 7 to 5\nmove 2 from 2 to 9\nmove 1 from 3 to 7\nmove 29 from 7 to 9\nmove 4 from 5 to 2\nmove 5 from 6 to 4\nmove 3 from 7 to 9\nmove 3 from 8 to 6\nmove 1 from 2 to 6\nmove 3 from 2 to 5\nmove 1 from 8 to 4\nmove 1 from 5 to 9\nmove 8 from 4 to 9\nmove 15 from 9 to 2\nmove 1 from 5 to 1\nmove 10 from 9 to 4\nmove 5 from 4 to 5\nmove 5 from 5 to 4\nmove 1 from 1 to 9\nmove 1 from 4 to 3\nmove 8 from 2 to 4\nmove 7 from 2 to 7\nmove 1 from 3 to 8\nmove 1 from 5 to 6\nmove 4 from 7 to 3\nmove 1 from 8 to 2\nmove 7 from 4 to 7\nmove 11 from 9 to 7\nmove 5 from 4 to 2\nmove 3 from 9 to 6\nmove 3 from 3 to 8\nmove 4 from 2 to 4\nmove 5 from 9 to 5\nmove 1 from 2 to 1\nmove 3 from 8 to 5\nmove 2 from 9 to 1\nmove 1 from 2 to 5\nmove 2 from 9 to 6\nmove 3 from 7 to 5\nmove 7 from 4 to 1\nmove 4 from 4 to 9\nmove 3 from 7 to 2\nmove 3 from 1 to 9\nmove 1 from 2 to 3\nmove 2 from 7 to 9\nmove 6 from 5 to 4\nmove 6 from 4 to 3\nmove 5 from 5 to 1\nmove 6 from 7 to 8\nmove 1 from 5 to 1\nmove 2 from 9 to 4\nmove 1 from 4 to 3\nmove 10 from 6 to 4\nmove 2 from 2 to 1\nmove 6 from 4 to 1\nmove 5 from 8 to 3\nmove 1 from 8 to 2\nmove 7 from 3 to 9\nmove 1 from 6 to 9\nmove 2 from 7 to 3\nmove 20 from 1 to 6\nmove 7 from 3 to 8\nmove 2 from 9 to 6\nmove 1 from 2 to 3\nmove 2 from 3 to 6\nmove 1 from 1 to 4\nmove 6 from 4 to 7\nmove 5 from 8 to 3\nmove 22 from 6 to 4\nmove 2 from 9 to 7\nmove 3 from 3 to 4\nmove 6 from 4 to 2\nmove 11 from 9 to 3\nmove 9 from 3 to 7\nmove 5 from 4 to 2\nmove 5 from 7 to 2\nmove 5 from 7 to 6\nmove 10 from 2 to 4\nmove 3 from 2 to 1\nmove 1 from 6 to 3\nmove 1 from 1 to 7\nmove 17 from 4 to 1\nmove 1 from 8 to 4\nmove 2 from 7 to 5\nmove 3 from 2 to 5\nmove 3 from 3 to 8\nmove 4 from 5 to 1\nmove 3 from 3 to 7\nmove 1 from 4 to 5\nmove 21 from 1 to 5\nmove 3 from 8 to 3\nmove 4 from 7 to 5\nmove 1 from 1 to 7\nmove 1 from 6 to 3\nmove 4 from 4 to 1\nmove 1 from 8 to 1\nmove 3 from 4 to 9\nmove 5 from 1 to 8\nmove 3 from 9 to 3\nmove 5 from 6 to 1\nmove 5 from 1 to 4\nmove 6 from 3 to 2\nmove 1 from 3 to 2\nmove 3 from 8 to 1\nmove 7 from 2 to 1\nmove 10 from 5 to 2\nmove 12 from 5 to 7\nmove 2 from 8 to 3\nmove 5 from 5 to 8\nmove 8 from 1 to 6\nmove 5 from 4 to 5\nmove 3 from 8 to 6\nmove 1 from 8 to 3\nmove 6 from 6 to 7\nmove 2 from 3 to 8\nmove 3 from 2 to 1\nmove 6 from 2 to 9\nmove 2 from 8 to 4\nmove 1 from 3 to 9\nmove 1 from 8 to 6\nmove 1 from 6 to 9\nmove 7 from 9 to 5\nmove 1 from 9 to 7\nmove 1 from 4 to 6\nmove 2 from 6 to 5\nmove 1 from 4 to 1\nmove 1 from 2 to 7\nmove 5 from 1 to 2\nmove 10 from 7 to 4\nmove 12 from 5 to 7\nmove 6 from 4 to 8\nmove 2 from 5 to 6\nmove 1 from 8 to 9\nmove 1 from 9 to 5\nmove 30 from 7 to 9\nmove 4 from 8 to 4\nmove 1 from 8 to 7\nmove 2 from 1 to 4\nmove 6 from 6 to 3\nmove 1 from 4 to 1\nmove 1 from 1 to 2\nmove 8 from 4 to 8\nmove 1 from 4 to 5\nmove 2 from 5 to 6\nmove 2 from 9 to 8\nmove 3 from 2 to 1\nmove 4 from 3 to 2\nmove 1 from 6 to 4\nmove 1 from 7 to 1\nmove 2 from 8 to 2\nmove 1 from 9 to 2\nmove 2 from 3 to 2\nmove 1 from 4 to 2\nmove 4 from 9 to 6\nmove 3 from 6 to 4\nmove 21 from 9 to 8\nmove 13 from 2 to 7\nmove 9 from 8 to 5\nmove 3 from 1 to 4\nmove 14 from 7 to 2\nmove 5 from 8 to 9\nmove 1 from 1 to 2\nmove 7 from 8 to 6\nmove 2 from 8 to 2\nmove 8 from 6 to 9\nmove 1 from 4 to 5\nmove 5 from 8 to 2\nmove 4 from 5 to 9\nmove 9 from 9 to 6\nmove 2 from 7 to 6\nmove 1 from 8 to 7\nmove 9 from 6 to 4\nmove 1 from 6 to 5\nmove 1 from 7 to 3\nmove 1 from 4 to 7\nmove 1 from 7 to 2\nmove 9 from 2 to 3\nmove 8 from 4 to 1\nmove 8 from 9 to 2\nmove 2 from 6 to 5\nmove 4 from 5 to 2\nmove 2 from 9 to 5\nmove 1 from 4 to 9\nmove 10 from 3 to 7\nmove 1 from 9 to 2\nmove 1 from 5 to 3\nmove 7 from 2 to 8\nmove 7 from 1 to 5\nmove 1 from 1 to 2\nmove 2 from 8 to 2\nmove 1 from 3 to 5\nmove 2 from 8 to 6\nmove 2 from 8 to 9\nmove 2 from 4 to 6\nmove 3 from 2 to 8\nmove 3 from 6 to 7\nmove 7 from 5 to 8\nmove 7 from 2 to 7\nmove 1 from 6 to 8\nmove 5 from 2 to 7\nmove 6 from 8 to 3\nmove 2 from 7 to 1\nmove 7 from 2 to 5\nmove 1 from 3 to 5\nmove 1 from 1 to 5\nmove 2 from 9 to 7\nmove 4 from 3 to 7\nmove 2 from 4 to 6\nmove 1 from 1 to 6\nmove 1 from 2 to 4\nmove 16 from 5 to 6\nmove 1 from 4 to 9\nmove 19 from 6 to 1\nmove 1 from 3 to 5\nmove 1 from 9 to 1\nmove 1 from 8 to 5\nmove 5 from 8 to 3\nmove 5 from 7 to 2\nmove 3 from 2 to 9\nmove 5 from 1 to 7\nmove 2 from 5 to 1\nmove 3 from 9 to 4\nmove 4 from 1 to 9\nmove 2 from 2 to 8\nmove 2 from 8 to 6\nmove 1 from 6 to 9\nmove 4 from 3 to 8\nmove 4 from 8 to 3\nmove 2 from 3 to 8\nmove 1 from 8 to 2\nmove 1 from 9 to 7\nmove 10 from 1 to 7\nmove 26 from 7 to 6\nmove 3 from 9 to 3\nmove 1 from 4 to 6\nmove 2 from 1 to 4\nmove 1 from 1 to 6\nmove 1 from 9 to 3\nmove 1 from 2 to 3\nmove 4 from 4 to 9\nmove 10 from 7 to 8\nmove 3 from 7 to 4\nmove 4 from 9 to 4\nmove 4 from 4 to 7\nmove 4 from 3 to 9\nmove 5 from 7 to 5\nmove 3 from 5 to 1\nmove 3 from 9 to 8\nmove 3 from 1 to 5\nmove 2 from 3 to 5\nmove 7 from 8 to 1\nmove 7 from 8 to 9\nmove 4 from 6 to 3\nmove 3 from 3 to 6\nmove 1 from 3 to 4\nmove 2 from 4 to 1\nmove 1 from 9 to 6\nmove 4 from 1 to 3\nmove 3 from 5 to 1\nmove 1 from 5 to 2\nmove 6 from 1 to 2\nmove 6 from 2 to 7\nmove 2 from 7 to 4\nmove 1 from 2 to 6\nmove 1 from 1 to 4\nmove 3 from 5 to 7\nmove 6 from 7 to 4\nmove 1 from 9 to 3\nmove 1 from 3 to 6\nmove 4 from 4 to 3\nmove 9 from 6 to 1\nmove 10 from 1 to 6\nmove 7 from 4 to 5\nmove 28 from 6 to 4\nmove 3 from 6 to 7\nmove 3 from 3 to 8\nmove 4 from 5 to 7\nmove 1 from 8 to 4\nmove 18 from 4 to 7\nmove 8 from 7 to 6\nmove 6 from 4 to 1\nmove 2 from 5 to 4\nmove 8 from 6 to 1\nmove 2 from 8 to 9\nmove 1 from 5 to 3\nmove 1 from 9 to 1\nmove 5 from 9 to 2\nmove 2 from 9 to 3\nmove 1 from 2 to 5\nmove 2 from 1 to 5\nmove 6 from 7 to 5\nmove 1 from 6 to 4\nmove 6 from 5 to 9\nmove 2 from 4 to 1\nmove 8 from 1 to 8\nmove 4 from 9 to 7\nmove 1 from 5 to 6\nmove 1 from 1 to 6\nmove 2 from 1 to 2\nmove 1 from 9 to 7\nmove 3 from 2 to 4\nmove 2 from 8 to 3\nmove 5 from 8 to 2\nmove 4 from 2 to 5\nmove 1 from 8 to 9\nmove 12 from 3 to 2\nmove 2 from 6 to 2\nmove 12 from 2 to 4\nmove 6 from 2 to 3\nmove 4 from 1 to 9\nmove 8 from 4 to 7\nmove 3 from 3 to 4\nmove 1 from 5 to 4\nmove 5 from 9 to 6\nmove 3 from 5 to 8\nmove 1 from 9 to 1\nmove 2 from 8 to 5\nmove 3 from 5 to 6\nmove 1 from 8 to 4\nmove 4 from 7 to 8\nmove 1 from 1 to 3\nmove 2 from 8 to 3\nmove 7 from 6 to 7\nmove 1 from 3 to 7\nmove 2 from 8 to 6\nmove 22 from 7 to 8\nmove 6 from 4 to 8\nmove 5 from 8 to 6\nmove 5 from 6 to 2\nmove 4 from 2 to 3\nmove 6 from 8 to 5\nmove 4 from 4 to 7\nmove 1 from 3 to 7\nmove 4 from 4 to 5\nmove 1 from 5 to 4\nmove 2 from 6 to 5\nmove 9 from 5 to 6\nmove 10 from 6 to 7\nmove 1 from 2 to 1\nmove 3 from 4 to 8\nmove 16 from 7 to 9\nmove 1 from 7 to 8\nmove 1 from 1 to 8\nmove 1 from 8 to 3\nmove 2 from 7 to 4\nmove 15 from 8 to 1\nmove 1 from 8 to 1\nmove 4 from 8 to 4\nmove 7 from 9 to 7\nmove 3 from 5 to 9\nmove 10 from 9 to 6\nmove 2 from 9 to 2\nmove 7 from 7 to 4\nmove 9 from 3 to 2\nmove 8 from 2 to 7\nmove 1 from 8 to 4\nmove 3 from 2 to 1\nmove 9 from 7 to 1\nmove 9 from 4 to 1\nmove 2 from 7 to 5\nmove 1 from 5 to 4\nmove 1 from 5 to 2\nmove 6 from 1 to 3\nmove 16 from 1 to 2\nmove 9 from 2 to 1\nmove 5 from 6 to 9\nmove 2 from 1 to 9\nmove 1 from 2 to 5\nmove 4 from 4 to 8\nmove 2 from 8 to 2\nmove 2 from 2 to 3\nmove 17 from 1 to 2\nmove 2 from 1 to 9\nmove 13 from 2 to 8\nmove 1 from 2 to 4\nmove 11 from 8 to 3\nmove 3 from 3 to 4\nmove 3 from 9 to 2\nmove 1 from 5 to 2\nmove 1 from 9 to 3\nmove 3 from 4 to 3\nmove 1 from 4 to 9\nmove 3 from 3 to 4\nmove 1 from 8 to 7\nmove 7 from 2 to 9\nmove 3 from 1 to 7\nmove 3 from 2 to 8\nmove 3 from 7 to 9\nmove 10 from 3 to 5\nmove 3 from 6 to 9\nmove 8 from 9 to 4\nmove 1 from 2 to 1\nmove 1 from 7 to 9\nmove 2 from 2 to 3\nmove 4 from 4 to 8\nmove 1 from 6 to 2\nmove 7 from 5 to 3\nmove 1 from 5 to 2\nmove 9 from 8 to 9\nmove 12 from 3 to 8\nmove 1 from 1 to 9\nmove 9 from 8 to 6\nmove 1 from 5 to 7\nmove 1 from 5 to 4\nmove 2 from 2 to 9\nmove 1 from 2 to 6\nmove 2 from 4 to 3\nmove 9 from 4 to 8\nmove 6 from 3 to 6\nmove 12 from 6 to 2\nmove 2 from 6 to 7\nmove 8 from 8 to 3\nmove 5 from 8 to 7\nmove 3 from 6 to 5\nmove 6 from 3 to 7\nmove 6 from 7 to 6\nmove 1 from 4 to 9\nmove 4 from 6 to 5\nmove 20 from 9 to 6\nmove 4 from 9 to 8\nmove 2 from 8 to 7\nmove 4 from 6 to 4\nmove 10 from 6 to 1\n';
+	var _v1 = $author$project$Aoc05$splitInput(
+		$elm$core$String$trimRight(input));
+	var stacksStr = _v1.a;
+	var commandsStr = _v1.b;
+	var parsedCommands = $author$project$Aoc05$parseCommands(commandsStr);
+	var parsedStacks = $author$project$Aoc05$parseStacks(stacksStr);
+	var model = {
+		commands: parsedCommands,
+		counter: 0,
+		debug: '',
+		delay: $author$project$Aoc05$defaultDelay,
+		keepOrder: false,
+		lastCommandText: 'press play to start',
+		paused: true,
+		stacks: parsedStacks,
+		tallestStackSeen: 0,
+		totalCommands: $elm$core$List$length(parsedCommands)
+	};
 	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 };
 var $author$project$Aoc05$Tick = {$: 'Tick'};
-var $author$project$Aoc05$delay = 1000;
 var $elm$time$Time$Every = F2(
 	function (a, b) {
 		return {$: 'Every', a: a, b: b};
@@ -5686,12 +5798,43 @@ var $elm$core$List$isEmpty = function (xs) {
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc05$subscriptions = function (model) {
-	return $elm$core$List$isEmpty(model.commands) ? $elm$core$Platform$Sub$none : A2(
+	return (model.paused || $elm$core$List$isEmpty(model.commands)) ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		$author$project$Aoc05$delay,
+		model.delay,
 		function (_v0) {
 			return $author$project$Aoc05$Tick;
 		});
+};
+var $elm$core$Basics$not = _Basics_not;
+var $elm$core$List$maximum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$Dict$values = function (dict) {
+	return A3(
+		$elm$core$Dict$foldr,
+		F3(
+			function (key, value, valueList) {
+				return A2($elm$core$List$cons, value, valueList);
+			}),
+		_List_Nil,
+		dict);
+};
+var $author$project$Aoc05$getTallestStack = function (stacks) {
+	return A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		$elm$core$List$maximum(
+			A2(
+				$elm$core$List$map,
+				$elm$core$List$length,
+				$elm$core$Dict$values(stacks))));
 };
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
@@ -6099,15 +6242,6 @@ var $elm$core$Dict$update = F3(
 			return A2($elm$core$Dict$remove, targetKey, dictionary);
 		}
 	});
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
 var $author$project$Aoc05$moveAmount = F5(
 	function (keepOrder, amount, source, target, stacks) {
 		var _v0 = A3(
@@ -6143,7 +6277,26 @@ var $author$project$Aoc05$runCommand = F3(
 		return A5($author$project$Aoc05$moveAmount, keepOrder, command.amount, command.source, command.target, stacks);
 	});
 var $author$project$Aoc05$toCommandText = function (cmd) {
-	return 'move ' + ($elm$core$String$fromInt(cmd.amount) + (' from ' + ($elm$core$String$fromInt(cmd.source) + (' to ' + $elm$core$String$fromInt(cmd.target)))));
+	return 'moved ' + ($elm$core$String$fromInt(cmd.amount) + (' from ' + ($elm$core$String$fromInt(cmd.source) + (' to ' + $elm$core$String$fromInt(cmd.target)))));
+};
+var $elm$core$String$concat = function (strings) {
+	return A2($elm$core$String$join, '', strings);
+};
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Aoc05$toTopCrateText = function (stacks) {
+	return $elm$core$String$concat(
+		A2(
+			$elm$core$List$filterMap,
+			$elm$core$List$head,
+			$elm$core$Dict$values(stacks)));
 };
 var $author$project$Aoc05$updateModel = function (model) {
 	var _v0 = model.commands;
@@ -6154,25 +6307,57 @@ var $author$project$Aoc05$updateModel = function (model) {
 		var restCmds = _v0.b;
 		var updatedStacks = A3($author$project$Aoc05$runCommand, model.keepOrder, cmd, model.stacks);
 		var updatedCounter = model.counter + 1;
-		var debugText = $author$project$Aoc05$toCommandText(cmd);
+		var tallestStack = $author$project$Aoc05$getTallestStack(updatedStacks);
+		var updatedTallestStack = (_Utils_cmp(tallestStack, model.tallestStackSeen) > 0) ? tallestStack : model.tallestStackSeen;
+		var lastCommandText = (_Utils_cmp(updatedCounter, model.totalCommands) < 0) ? $author$project$Aoc05$toCommandText(cmd) : $author$project$Aoc05$toTopCrateText(updatedStacks);
+		var debugText = (_Utils_cmp(tallestStack, model.tallestStackSeen) > 0) ? ('Tallest: ' + ($elm$core$String$fromInt(updatedTallestStack) + (' at cmd ' + $elm$core$String$fromInt(updatedCounter)))) : model.debug;
 		return _Utils_update(
 			model,
-			{commands: restCmds, counter: updatedCounter, debug: debugText, stacks: updatedStacks});
+			{commands: restCmds, counter: updatedCounter, debug: debugText, lastCommandText: lastCommandText, stacks: updatedStacks, tallestStackSeen: updatedTallestStack});
 	}
 };
 var $author$project$Aoc05$update = F2(
 	function (msg, model) {
-		if (msg.$ === 'Tick') {
-			return _Utils_Tuple2(
-				$author$project$Aoc05$updateModel(model),
-				$elm$core$Platform$Cmd$none);
-		} else {
-			return _Utils_Tuple2(
-				$author$project$Aoc05$updateModel(model),
-				$elm$core$Platform$Cmd$none);
+		switch (msg.$) {
+			case 'Tick':
+				return _Utils_Tuple2(
+					$author$project$Aoc05$updateModel(model),
+					$elm$core$Platform$Cmd$none);
+			case 'Step':
+				return _Utils_Tuple2(
+					$author$project$Aoc05$updateModel(model),
+					$elm$core$Platform$Cmd$none);
+			case 'TogglePlay':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{paused: !model.paused}),
+					$elm$core$Platform$Cmd$none);
+			case 'Faster':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{delay: model.delay / 2}),
+					$elm$core$Platform$Cmd$none);
+			case 'Slower':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{delay: model.delay * 2}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{keepOrder: !model.keepOrder}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
+var $author$project$Aoc05$Faster = {$: 'Faster'};
+var $author$project$Aoc05$Slower = {$: 'Slower'};
 var $author$project$Aoc05$Step = {$: 'Step'};
+var $author$project$Aoc05$ToggleMachine = {$: 'ToggleMachine'};
+var $author$project$Aoc05$TogglePlay = {$: 'TogglePlay'};
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -6225,10 +6410,9 @@ var $elm$core$List$concatMap = F2(
 			A2($elm$core$List$map, f, list));
 	});
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
-var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
-var $author$project$Aoc05$crateSize = 20;
+var $author$project$Aoc05$crateSize = 10;
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
 var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
@@ -6238,9 +6422,9 @@ var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
 var $author$project$Aoc05$toCrateRect = F3(
 	function (yMax, stackId, crateNo) {
 		var w = $author$project$Aoc05$crateSize;
-		var xVal = ((1 + stackId) * 2) * w;
+		var xVal = (stackId * 2) * w;
 		var h = $author$project$Aoc05$crateSize;
-		var yVal = (1 + crateNo) * h;
+		var yVal = ((1 + crateNo) * h) + ($author$project$Aoc05$crateSize * 2);
 		return A2(
 			$elm$svg$Svg$rect,
 			_List_fromArray(
@@ -6254,24 +6438,21 @@ var $author$project$Aoc05$toCrateRect = F3(
 					$elm$svg$Svg$Attributes$height(
 					$elm$core$String$fromInt(h)),
 					$elm$svg$Svg$Attributes$stroke('black'),
-					$elm$svg$Svg$Attributes$fill('none')
+					$elm$svg$Svg$Attributes$fill('lightgrey')
 				]),
 			_List_Nil);
 	});
 var $elm$svg$Svg$Attributes$fontFamily = _VirtualDom_attribute('font-family');
-var $elm$core$String$cons = _String_cons;
-var $elm$core$String$fromChar = function (_char) {
-	return A2($elm$core$String$cons, _char, '');
-};
+var $elm$svg$Svg$Attributes$fontSize = _VirtualDom_attribute('font-size');
 var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
 var $author$project$Aoc05$toCrateText = F4(
 	function (yMax, stackId, crateNo, crate) {
-		var yOffset = 18;
-		var xOffset = 4;
+		var yOffset = 8;
+		var xOffset = 2;
 		var w = $author$project$Aoc05$crateSize;
-		var xVal = xOffset + (((1 + stackId) * 2) * w);
+		var xVal = xOffset + ((stackId * 2) * w);
 		var h = $author$project$Aoc05$crateSize;
-		var yVal = ((1 + crateNo) * h) - yOffset;
+		var yVal = (((1 + crateNo) * h) - yOffset) + ($author$project$Aoc05$crateSize * 2);
 		return A2(
 			$elm$svg$Svg$text_,
 			_List_fromArray(
@@ -6280,12 +6461,12 @@ var $author$project$Aoc05$toCrateText = F4(
 					$elm$core$String$fromInt(xVal)),
 					$elm$svg$Svg$Attributes$y(
 					$elm$core$String$fromInt(yMax - yVal)),
+					$elm$svg$Svg$Attributes$fontSize('9px'),
 					$elm$svg$Svg$Attributes$fontFamily('monospace')
 				]),
 			_List_fromArray(
 				[
-					$elm$svg$Svg$text(
-					$elm$core$String$fromChar(crate))
+					$elm$svg$Svg$text(crate)
 				]));
 	});
 var $author$project$Aoc05$toCrateSvgElements = F4(
@@ -6296,38 +6477,64 @@ var $author$project$Aoc05$toCrateSvgElements = F4(
 				A4($author$project$Aoc05$toCrateText, yMax, stackId, crateNo, crate)
 			]);
 	});
+var $author$project$Aoc05$toStackIdText = F2(
+	function (yMax, stackId) {
+		var yVal = $author$project$Aoc05$crateSize;
+		var yOffset = 8;
+		var xOffset = 2;
+		var w = $author$project$Aoc05$crateSize;
+		var xVal = xOffset + ((stackId * 2) * w);
+		var h = $author$project$Aoc05$crateSize;
+		return A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x(
+					$elm$core$String$fromInt(xVal)),
+					$elm$svg$Svg$Attributes$y(
+					$elm$core$String$fromInt(yMax - yVal)),
+					$elm$svg$Svg$Attributes$fontSize('9px'),
+					$elm$svg$Svg$Attributes$fontFamily('monospace')
+				]),
+			_List_fromArray(
+				[
+					$elm$svg$Svg$text(
+					$elm$core$String$fromInt(stackId))
+				]));
+	});
 var $author$project$Aoc05$toStackSvgElements = F2(
 	function (yMax, _v0) {
 		var stackId = _v0.a;
 		var stack = _v0.b;
+		var labelElement = A2($author$project$Aoc05$toStackIdText, yMax, stackId);
 		var crateElements = $elm$core$List$concat(
 			A2(
 				$elm$core$List$indexedMap,
 				A2($author$project$Aoc05$toCrateSvgElements, yMax, stackId),
-				stack));
-		return crateElements;
+				$elm$core$List$reverse(stack)));
+		return A2($elm$core$List$cons, labelElement, crateElements);
 	});
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $author$project$Aoc05$toSvg = function (stacks) {
+	var yMax = 500;
 	var lst = A2(
 		$elm$core$List$concatMap,
-		$author$project$Aoc05$toStackSvgElements(400),
+		$author$project$Aoc05$toStackSvgElements(yMax),
 		$elm$core$Dict$toList(stacks));
 	return A2(
 		$elm$svg$Svg$svg,
 		_List_fromArray(
 			[
-				$elm$svg$Svg$Attributes$viewBox('0 0 400 400'),
-				$elm$svg$Svg$Attributes$width('400'),
-				$elm$svg$Svg$Attributes$height('400'),
-				$elm$svg$Svg$Attributes$style('background-color:lightgrey')
+				$elm$svg$Svg$Attributes$viewBox('0 0 210 500'),
+				$elm$svg$Svg$Attributes$width('210'),
+				$elm$svg$Svg$Attributes$height('500')
 			]),
 		lst);
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $author$project$Aoc05$view = function (model) {
-	var tickStr = 'commands: ' + $elm$core$String$fromInt(model.counter);
 	var s = $author$project$Aoc05$toSvg(model.stacks);
+	var commandsStr = 'commands: ' + ($elm$core$String$fromInt(model.counter) + (' of ' + $elm$core$String$fromInt(model.totalCommands)));
 	return A2(
 		$elm$html$Html$table,
 		_List_Nil,
@@ -6395,14 +6602,14 @@ var $author$project$Aoc05$view = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(tickStr)
+										$elm$html$Html$text(commandsStr)
 									])),
 								A2(
 								$elm$html$Html$div,
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(model.debug)
+										$elm$html$Html$text(model.lastCommandText)
 									]))
 							]))
 					])),
@@ -6413,18 +6620,66 @@ var $author$project$Aoc05$view = function (model) {
 					[
 						A2(
 						$elm$html$Html$td,
-						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center')
+							]),
 						_List_fromArray(
 							[
 								A2(
 								$elm$html$Html$button,
 								_List_fromArray(
 									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
 										$elm$html$Html$Events$onClick($author$project$Aoc05$Step)
 									]),
 								_List_fromArray(
 									[
 										$elm$svg$Svg$text('Step')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick($author$project$Aoc05$Slower)
+									]),
+								_List_fromArray(
+									[
+										$elm$svg$Svg$text('Slower')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick($author$project$Aoc05$TogglePlay)
+									]),
+								_List_fromArray(
+									[
+										model.paused ? $elm$svg$Svg$text('Play') : $elm$svg$Svg$text('Pause')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick($author$project$Aoc05$Faster)
+									]),
+								_List_fromArray(
+									[
+										$elm$svg$Svg$text('Faster')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick($author$project$Aoc05$ToggleMachine)
+									]),
+								_List_fromArray(
+									[
+										model.keepOrder ? $elm$svg$Svg$text('CM9000') : $elm$svg$Svg$text('CM9100')
 									]))
 							]))
 					]))

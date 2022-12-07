@@ -10,11 +10,11 @@ import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Time
 
-delay : Float
-delay = 1000
+defaultDelay : Float
+defaultDelay = 1000
 
 crateSize : Int 
-crateSize = 20
+crateSize = 10
 
 -- MAIN
 
@@ -27,7 +27,7 @@ main =
 
 -- MODEL
 
-type alias Crate = Char 
+type alias Crate = String 
 
 type alias Crates = List Crate 
 
@@ -44,40 +44,633 @@ type alias Command =
 
 type alias Model = 
   { stacks : Stacks
-  , commands: List Command
+  , tallestStackSeen : Int 
+  , commands : List Command
+  , lastCommandText : String
+  , totalCommands : Int
+  , delay : Float
+  , paused : Bool  
   , keepOrder : Bool
   , counter : Int 
   , debug : String }
 
+splitInput : String -> (String, String)
+splitInput input = 
+  case input |> String.split "\n\n" of 
+    a::b::_ -> (a, b)
+    _ -> ("", "")
+
+parseStackIdLine : String -> List Int 
+parseStackIdLine s = 
+  s |> String.words |> List.map (String.toInt) |> List.map (Maybe.withDefault 0)
+
+tryReadCrate : Int -> String -> Maybe String 
+tryReadCrate index str = 
+  case str |> String.slice index (index + 1) of 
+    "" -> Nothing 
+    " " -> Nothing 
+    s -> Just s
+
+readAt : Int -> String -> Maybe String 
+readAt index str = 
+  case str |> String.slice index (index + 1) of 
+    "" -> Nothing 
+    " " -> Nothing 
+    s -> Just s
+
+toStackIndex : Int -> Int 
+toStackIndex stackId = 
+  1 + 4 * (stackId - 1)
+
+initStack : List String -> Int -> (Int, Stack)
+initStack crateLines stackId = 
+  let 
+    stackIndex = toStackIndex stackId 
+    stack = crateLines |> List.filterMap (tryReadCrate stackIndex) |> List.reverse
+  in 
+    (stackId, stack)
+
+parseStacks : String -> Stacks
+parseStacks s = 
+  let 
+    lines = s |> String.split "\n"
+  in 
+    case List.reverse lines of 
+      [] -> 
+        Dict.empty 
+      stackIdLine :: crateLines -> 
+        let
+          stackIds = parseStackIdLine stackIdLine
+          stacks = stackIds |> List.map (initStack crateLines)
+        in         
+          Dict.fromList stacks
+
+parseCommand : String -> Maybe Command 
+parseCommand s = 
+  let 
+    nums = s |> String.words |> List.filterMap String.toInt 
+  in 
+    case nums of 
+      amount::source::target::_ -> Just {amount=amount, source=source, target=target}
+      _ -> Nothing
+     
+
+parseCommands : String -> List Command
+parseCommands s = 
+  s |> String.split "\n" |> List.filterMap parseCommand
+  
 init : () -> (Model, Cmd Msg)
 init _ =
   let 
-    sample = ""
-    input = "" 
+    sampleOld = "    [D]    \n[N] [C]    \n[Z] [M] [P]\n 1   2   3 \n\nmove 1 from 2 to 1\nmove 3 from 1 to 3\nmove 2 from 2 to 1\nmove 1 from 1 to 2"
+    sample = """    [D]    
+[N] [C]    
+[Z] [M] [P]
+ 1   2   3 
 
-    stacks = 
-        Dict.empty 
-        |> Dict.insert 1 ['N','Z']
-        |> Dict.insert 2 ['D','C','M']
-        |> Dict.insert 3 ['P']
+move 1 from 2 to 1
+move 3 from 1 to 3
+move 2 from 2 to 1
+move 1 from 1 to 2"""
+    input = """            [J]             [B] [W]
+            [T]     [W] [F] [R] [Z]
+        [Q] [M]     [J] [R] [W] [H]
+    [F] [L] [P]     [R] [N] [Z] [G]
+[F] [M] [S] [Q]     [M] [P] [S] [C]
+[L] [V] [R] [V] [W] [P] [C] [P] [J]
+[M] [Z] [V] [S] [S] [V] [Q] [H] [M]
+[W] [B] [H] [F] [L] [F] [J] [V] [B]
+ 1   2   3   4   5   6   7   8   9 
 
-    commands = 
-        [ { amount = 1, source = 2, target = 1 }
-        , { amount = 3, source = 1, target = 3 } 
-        , { amount = 2, source = 2, target = 1 } 
-        , { amount = 1, source = 1, target = 2 } ]
-    
-    model = { stacks = stacks
-            , commands = commands
+move 3 from 5 to 7
+move 2 from 8 to 9
+move 4 from 3 to 5
+move 2 from 1 to 7
+move 1 from 3 to 6
+move 2 from 1 to 7
+move 1 from 8 to 7
+move 4 from 2 to 8
+move 10 from 9 to 1
+move 6 from 6 to 2
+move 1 from 6 to 7
+move 9 from 8 to 6
+move 4 from 2 to 4
+move 2 from 4 to 1
+move 6 from 1 to 6
+move 1 from 3 to 2
+move 2 from 1 to 4
+move 2 from 4 to 3
+move 2 from 1 to 3
+move 4 from 3 to 1
+move 15 from 7 to 9
+move 4 from 5 to 9
+move 13 from 9 to 4
+move 10 from 4 to 8
+move 1 from 7 to 4
+move 6 from 9 to 5
+move 11 from 6 to 7
+move 4 from 5 to 7
+move 3 from 8 to 7
+move 4 from 2 to 4
+move 1 from 5 to 1
+move 5 from 8 to 4
+move 1 from 5 to 4
+move 10 from 7 to 1
+move 8 from 7 to 9
+move 12 from 1 to 9
+move 8 from 9 to 1
+move 2 from 6 to 9
+move 2 from 8 to 4
+move 1 from 6 to 9
+move 13 from 4 to 2
+move 13 from 4 to 2
+move 1 from 6 to 1
+move 1 from 6 to 4
+move 1 from 4 to 5
+move 14 from 1 to 8
+move 1 from 5 to 4
+move 13 from 9 to 5
+move 9 from 8 to 2
+move 8 from 2 to 1
+move 5 from 8 to 2
+move 5 from 1 to 6
+move 3 from 1 to 3
+move 1 from 4 to 8
+move 9 from 5 to 9
+move 18 from 2 to 8
+move 3 from 3 to 5
+move 2 from 6 to 4
+move 14 from 2 to 7
+move 1 from 4 to 2
+move 1 from 6 to 9
+move 1 from 2 to 5
+move 1 from 6 to 2
+move 1 from 4 to 6
+move 6 from 8 to 1
+move 2 from 6 to 9
+move 5 from 5 to 3
+move 1 from 7 to 8
+move 10 from 9 to 7
+move 13 from 8 to 5
+move 5 from 5 to 2
+move 6 from 5 to 7
+move 1 from 8 to 5
+move 5 from 5 to 9
+move 5 from 9 to 7
+move 4 from 3 to 8
+move 6 from 1 to 6
+move 4 from 2 to 4
+move 3 from 7 to 5
+move 2 from 2 to 9
+move 1 from 3 to 7
+move 29 from 7 to 9
+move 4 from 5 to 2
+move 5 from 6 to 4
+move 3 from 7 to 9
+move 3 from 8 to 6
+move 1 from 2 to 6
+move 3 from 2 to 5
+move 1 from 8 to 4
+move 1 from 5 to 9
+move 8 from 4 to 9
+move 15 from 9 to 2
+move 1 from 5 to 1
+move 10 from 9 to 4
+move 5 from 4 to 5
+move 5 from 5 to 4
+move 1 from 1 to 9
+move 1 from 4 to 3
+move 8 from 2 to 4
+move 7 from 2 to 7
+move 1 from 3 to 8
+move 1 from 5 to 6
+move 4 from 7 to 3
+move 1 from 8 to 2
+move 7 from 4 to 7
+move 11 from 9 to 7
+move 5 from 4 to 2
+move 3 from 9 to 6
+move 3 from 3 to 8
+move 4 from 2 to 4
+move 5 from 9 to 5
+move 1 from 2 to 1
+move 3 from 8 to 5
+move 2 from 9 to 1
+move 1 from 2 to 5
+move 2 from 9 to 6
+move 3 from 7 to 5
+move 7 from 4 to 1
+move 4 from 4 to 9
+move 3 from 7 to 2
+move 3 from 1 to 9
+move 1 from 2 to 3
+move 2 from 7 to 9
+move 6 from 5 to 4
+move 6 from 4 to 3
+move 5 from 5 to 1
+move 6 from 7 to 8
+move 1 from 5 to 1
+move 2 from 9 to 4
+move 1 from 4 to 3
+move 10 from 6 to 4
+move 2 from 2 to 1
+move 6 from 4 to 1
+move 5 from 8 to 3
+move 1 from 8 to 2
+move 7 from 3 to 9
+move 1 from 6 to 9
+move 2 from 7 to 3
+move 20 from 1 to 6
+move 7 from 3 to 8
+move 2 from 9 to 6
+move 1 from 2 to 3
+move 2 from 3 to 6
+move 1 from 1 to 4
+move 6 from 4 to 7
+move 5 from 8 to 3
+move 22 from 6 to 4
+move 2 from 9 to 7
+move 3 from 3 to 4
+move 6 from 4 to 2
+move 11 from 9 to 3
+move 9 from 3 to 7
+move 5 from 4 to 2
+move 5 from 7 to 2
+move 5 from 7 to 6
+move 10 from 2 to 4
+move 3 from 2 to 1
+move 1 from 6 to 3
+move 1 from 1 to 7
+move 17 from 4 to 1
+move 1 from 8 to 4
+move 2 from 7 to 5
+move 3 from 2 to 5
+move 3 from 3 to 8
+move 4 from 5 to 1
+move 3 from 3 to 7
+move 1 from 4 to 5
+move 21 from 1 to 5
+move 3 from 8 to 3
+move 4 from 7 to 5
+move 1 from 1 to 7
+move 1 from 6 to 3
+move 4 from 4 to 1
+move 1 from 8 to 1
+move 3 from 4 to 9
+move 5 from 1 to 8
+move 3 from 9 to 3
+move 5 from 6 to 1
+move 5 from 1 to 4
+move 6 from 3 to 2
+move 1 from 3 to 2
+move 3 from 8 to 1
+move 7 from 2 to 1
+move 10 from 5 to 2
+move 12 from 5 to 7
+move 2 from 8 to 3
+move 5 from 5 to 8
+move 8 from 1 to 6
+move 5 from 4 to 5
+move 3 from 8 to 6
+move 1 from 8 to 3
+move 6 from 6 to 7
+move 2 from 3 to 8
+move 3 from 2 to 1
+move 6 from 2 to 9
+move 2 from 8 to 4
+move 1 from 3 to 9
+move 1 from 8 to 6
+move 1 from 6 to 9
+move 7 from 9 to 5
+move 1 from 9 to 7
+move 1 from 4 to 6
+move 2 from 6 to 5
+move 1 from 4 to 1
+move 1 from 2 to 7
+move 5 from 1 to 2
+move 10 from 7 to 4
+move 12 from 5 to 7
+move 6 from 4 to 8
+move 2 from 5 to 6
+move 1 from 8 to 9
+move 1 from 9 to 5
+move 30 from 7 to 9
+move 4 from 8 to 4
+move 1 from 8 to 7
+move 2 from 1 to 4
+move 6 from 6 to 3
+move 1 from 4 to 1
+move 1 from 1 to 2
+move 8 from 4 to 8
+move 1 from 4 to 5
+move 2 from 5 to 6
+move 2 from 9 to 8
+move 3 from 2 to 1
+move 4 from 3 to 2
+move 1 from 6 to 4
+move 1 from 7 to 1
+move 2 from 8 to 2
+move 1 from 9 to 2
+move 2 from 3 to 2
+move 1 from 4 to 2
+move 4 from 9 to 6
+move 3 from 6 to 4
+move 21 from 9 to 8
+move 13 from 2 to 7
+move 9 from 8 to 5
+move 3 from 1 to 4
+move 14 from 7 to 2
+move 5 from 8 to 9
+move 1 from 1 to 2
+move 7 from 8 to 6
+move 2 from 8 to 2
+move 8 from 6 to 9
+move 1 from 4 to 5
+move 5 from 8 to 2
+move 4 from 5 to 9
+move 9 from 9 to 6
+move 2 from 7 to 6
+move 1 from 8 to 7
+move 9 from 6 to 4
+move 1 from 6 to 5
+move 1 from 7 to 3
+move 1 from 4 to 7
+move 1 from 7 to 2
+move 9 from 2 to 3
+move 8 from 4 to 1
+move 8 from 9 to 2
+move 2 from 6 to 5
+move 4 from 5 to 2
+move 2 from 9 to 5
+move 1 from 4 to 9
+move 10 from 3 to 7
+move 1 from 9 to 2
+move 1 from 5 to 3
+move 7 from 2 to 8
+move 7 from 1 to 5
+move 1 from 1 to 2
+move 2 from 8 to 2
+move 1 from 3 to 5
+move 2 from 8 to 6
+move 2 from 8 to 9
+move 2 from 4 to 6
+move 3 from 2 to 8
+move 3 from 6 to 7
+move 7 from 5 to 8
+move 7 from 2 to 7
+move 1 from 6 to 8
+move 5 from 2 to 7
+move 6 from 8 to 3
+move 2 from 7 to 1
+move 7 from 2 to 5
+move 1 from 3 to 5
+move 1 from 1 to 5
+move 2 from 9 to 7
+move 4 from 3 to 7
+move 2 from 4 to 6
+move 1 from 1 to 6
+move 1 from 2 to 4
+move 16 from 5 to 6
+move 1 from 4 to 9
+move 19 from 6 to 1
+move 1 from 3 to 5
+move 1 from 9 to 1
+move 1 from 8 to 5
+move 5 from 8 to 3
+move 5 from 7 to 2
+move 3 from 2 to 9
+move 5 from 1 to 7
+move 2 from 5 to 1
+move 3 from 9 to 4
+move 4 from 1 to 9
+move 2 from 2 to 8
+move 2 from 8 to 6
+move 1 from 6 to 9
+move 4 from 3 to 8
+move 4 from 8 to 3
+move 2 from 3 to 8
+move 1 from 8 to 2
+move 1 from 9 to 7
+move 10 from 1 to 7
+move 26 from 7 to 6
+move 3 from 9 to 3
+move 1 from 4 to 6
+move 2 from 1 to 4
+move 1 from 1 to 6
+move 1 from 9 to 3
+move 1 from 2 to 3
+move 4 from 4 to 9
+move 10 from 7 to 8
+move 3 from 7 to 4
+move 4 from 9 to 4
+move 4 from 4 to 7
+move 4 from 3 to 9
+move 5 from 7 to 5
+move 3 from 5 to 1
+move 3 from 9 to 8
+move 3 from 1 to 5
+move 2 from 3 to 5
+move 7 from 8 to 1
+move 7 from 8 to 9
+move 4 from 6 to 3
+move 3 from 3 to 6
+move 1 from 3 to 4
+move 2 from 4 to 1
+move 1 from 9 to 6
+move 4 from 1 to 3
+move 3 from 5 to 1
+move 1 from 5 to 2
+move 6 from 1 to 2
+move 6 from 2 to 7
+move 2 from 7 to 4
+move 1 from 2 to 6
+move 1 from 1 to 4
+move 3 from 5 to 7
+move 6 from 7 to 4
+move 1 from 9 to 3
+move 1 from 3 to 6
+move 4 from 4 to 3
+move 9 from 6 to 1
+move 10 from 1 to 6
+move 7 from 4 to 5
+move 28 from 6 to 4
+move 3 from 6 to 7
+move 3 from 3 to 8
+move 4 from 5 to 7
+move 1 from 8 to 4
+move 18 from 4 to 7
+move 8 from 7 to 6
+move 6 from 4 to 1
+move 2 from 5 to 4
+move 8 from 6 to 1
+move 2 from 8 to 9
+move 1 from 5 to 3
+move 1 from 9 to 1
+move 5 from 9 to 2
+move 2 from 9 to 3
+move 1 from 2 to 5
+move 2 from 1 to 5
+move 6 from 7 to 5
+move 1 from 6 to 4
+move 6 from 5 to 9
+move 2 from 4 to 1
+move 8 from 1 to 8
+move 4 from 9 to 7
+move 1 from 5 to 6
+move 1 from 1 to 6
+move 2 from 1 to 2
+move 1 from 9 to 7
+move 3 from 2 to 4
+move 2 from 8 to 3
+move 5 from 8 to 2
+move 4 from 2 to 5
+move 1 from 8 to 9
+move 12 from 3 to 2
+move 2 from 6 to 2
+move 12 from 2 to 4
+move 6 from 2 to 3
+move 4 from 1 to 9
+move 8 from 4 to 7
+move 3 from 3 to 4
+move 1 from 5 to 4
+move 5 from 9 to 6
+move 3 from 5 to 8
+move 1 from 9 to 1
+move 2 from 8 to 5
+move 3 from 5 to 6
+move 1 from 8 to 4
+move 4 from 7 to 8
+move 1 from 1 to 3
+move 2 from 8 to 3
+move 7 from 6 to 7
+move 1 from 3 to 7
+move 2 from 8 to 6
+move 22 from 7 to 8
+move 6 from 4 to 8
+move 5 from 8 to 6
+move 5 from 6 to 2
+move 4 from 2 to 3
+move 6 from 8 to 5
+move 4 from 4 to 7
+move 1 from 3 to 7
+move 4 from 4 to 5
+move 1 from 5 to 4
+move 2 from 6 to 5
+move 9 from 5 to 6
+move 10 from 6 to 7
+move 1 from 2 to 1
+move 3 from 4 to 8
+move 16 from 7 to 9
+move 1 from 7 to 8
+move 1 from 1 to 8
+move 1 from 8 to 3
+move 2 from 7 to 4
+move 15 from 8 to 1
+move 1 from 8 to 1
+move 4 from 8 to 4
+move 7 from 9 to 7
+move 3 from 5 to 9
+move 10 from 9 to 6
+move 2 from 9 to 2
+move 7 from 7 to 4
+move 9 from 3 to 2
+move 8 from 2 to 7
+move 1 from 8 to 4
+move 3 from 2 to 1
+move 9 from 7 to 1
+move 9 from 4 to 1
+move 2 from 7 to 5
+move 1 from 5 to 4
+move 1 from 5 to 2
+move 6 from 1 to 3
+move 16 from 1 to 2
+move 9 from 2 to 1
+move 5 from 6 to 9
+move 2 from 1 to 9
+move 1 from 2 to 5
+move 4 from 4 to 8
+move 2 from 8 to 2
+move 2 from 2 to 3
+move 17 from 1 to 2
+move 2 from 1 to 9
+move 13 from 2 to 8
+move 1 from 2 to 4
+move 11 from 8 to 3
+move 3 from 3 to 4
+move 3 from 9 to 2
+move 1 from 5 to 2
+move 1 from 9 to 3
+move 3 from 4 to 3
+move 1 from 4 to 9
+move 3 from 3 to 4
+move 1 from 8 to 7
+move 7 from 2 to 9
+move 3 from 1 to 7
+move 3 from 2 to 8
+move 3 from 7 to 9
+move 10 from 3 to 5
+move 3 from 6 to 9
+move 8 from 9 to 4
+move 1 from 2 to 1
+move 1 from 7 to 9
+move 2 from 2 to 3
+move 4 from 4 to 8
+move 1 from 6 to 2
+move 7 from 5 to 3
+move 1 from 5 to 2
+move 9 from 8 to 9
+move 12 from 3 to 8
+move 1 from 1 to 9
+move 9 from 8 to 6
+move 1 from 5 to 7
+move 1 from 5 to 4
+move 2 from 2 to 9
+move 1 from 2 to 6
+move 2 from 4 to 3
+move 9 from 4 to 8
+move 6 from 3 to 6
+move 12 from 6 to 2
+move 2 from 6 to 7
+move 8 from 8 to 3
+move 5 from 8 to 7
+move 3 from 6 to 5
+move 6 from 3 to 7
+move 6 from 7 to 6
+move 1 from 4 to 9
+move 4 from 6 to 5
+move 20 from 9 to 6
+move 4 from 9 to 8
+move 2 from 8 to 7
+move 4 from 6 to 4
+move 10 from 6 to 1
+""" 
+    (stacksStr, commandsStr) = input |> String.trimRight |> splitInput
+
+    parsedStacks = parseStacks stacksStr
+    parsedCommands = parseCommands commandsStr
+
+    -- stacks = 
+    --     Dict.empty 
+    --     |> Dict.insert 1 ["N","Z"]
+    --     |> Dict.insert 2 ["D","C","M"]
+    --     |> Dict.insert 3 ["P"]
+
+    model = { stacks = parsedStacks
+            , tallestStackSeen = 0
+            , commands = parsedCommands
+            , lastCommandText = "press play to start"
+            , totalCommands = List.length parsedCommands
+            , delay = defaultDelay
+            , paused = True
             , keepOrder = False
             , counter = 0
-            , debug = "..."}
+            , debug = "" }
   in 
     (model, Cmd.none)
 
 -- UPDATE
 
-type Msg = Tick | Step 
+type Msg = Tick | Step | TogglePlay | Faster | Slower | ToggleMachine
 
 takeAmount : Int -> Crates -> Stack -> (Crates, Stack) 
 takeAmount amount taken stack =
@@ -103,7 +696,15 @@ runCommand keepOrder command stacks =
 
 toCommandText : Command -> String 
 toCommandText cmd = 
-  "move " ++ String.fromInt cmd.amount ++ " from " ++ String.fromInt cmd.source ++ " to " ++ String.fromInt cmd.target
+  "moved " ++ String.fromInt cmd.amount ++ " from " ++ String.fromInt cmd.source ++ " to " ++ String.fromInt cmd.target
+
+getTallestStack : Stacks -> Int 
+getTallestStack stacks = 
+  stacks |> Dict.values |> List.map (List.length) |> List.maximum |> Maybe.withDefault 0 
+
+toTopCrateText : Stacks -> String 
+toTopCrateText stacks = 
+  stacks |> Dict.values |> List.filterMap (List.head) |> String.concat 
 
 updateModel : Model -> Model
 updateModel model =
@@ -113,9 +714,29 @@ updateModel model =
       let 
         updatedStacks = runCommand model.keepOrder cmd model.stacks
         updatedCounter = model.counter + 1 
-        debugText = toCommandText cmd
+        lastCommandText = 
+          if updatedCounter < model.totalCommands then 
+            toCommandText cmd
+          else 
+            toTopCrateText updatedStacks
+        tallestStack = updatedStacks |> getTallestStack
+        updatedTallestStack = 
+          if tallestStack > model.tallestStackSeen then 
+            tallestStack 
+          else 
+            model.tallestStackSeen
+        debugText = 
+          if tallestStack > model.tallestStackSeen then 
+            "Tallest: " ++ String.fromInt updatedTallestStack ++ " at cmd " ++ String.fromInt updatedCounter
+          else 
+            model.debug
       in 
-        { model | counter = updatedCounter, stacks = updatedStacks, commands = restCmds, debug = debugText }
+        { model | counter = updatedCounter
+        , stacks = updatedStacks
+        , tallestStackSeen = updatedTallestStack
+        , commands = restCmds
+        , lastCommandText = lastCommandText
+        , debug = debugText }
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -124,13 +745,21 @@ update msg model =
       (updateModel model, Cmd.none)
     Step ->
       (updateModel model, Cmd.none)
+    TogglePlay -> 
+      ({model | paused = not model.paused }, Cmd.none)
+    Faster -> 
+      ({model | delay = model.delay / 2 }, Cmd.none)
+    Slower -> 
+      ({model | delay = model.delay * 2 }, Cmd.none)
+    ToggleMachine -> 
+      ({model | keepOrder = not model.keepOrder }, Cmd.none)
 
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  if List.isEmpty model.commands then Sub.none 
-  else Time.every delay (\_ -> Tick)
+  if model.paused || List.isEmpty model.commands then Sub.none 
+  else Time.every model.delay (\_ -> Tick)
 
   -- Time.every delay (\_ -> Tick)
 
@@ -141,8 +770,8 @@ toCrateRect yMax stackId crateNo =
   let 
     w = crateSize
     h = crateSize
-    xVal = (1 + stackId) * 2 * w
-    yVal = (1 + crateNo) * h
+    xVal = stackId * 2 * w
+    yVal = (1 + crateNo) * h + crateSize * 2
   in
     rect
       [ x (String.fromInt xVal)
@@ -150,7 +779,7 @@ toCrateRect yMax stackId crateNo =
       , width (String.fromInt w) 
       , height (String.fromInt h)
       , stroke "black"
-      , fill "none" ]
+      , fill "lightgrey" ]
       []
 
 toCrateText : Int -> Int -> Int -> Crate -> Html Msg 
@@ -158,16 +787,34 @@ toCrateText yMax stackId crateNo crate =
   let 
     w = crateSize
     h = crateSize
-    xOffset = 4
-    yOffset = 18
-    xVal = xOffset + (1 + stackId) * 2 * w
-    yVal = (1 + crateNo) * h - yOffset
+    xOffset = 2
+    yOffset = 8
+    xVal = xOffset + stackId * 2 * w
+    yVal = (1 + crateNo) * h - yOffset + crateSize * 2
   in
     text_
       [ x (String.fromInt xVal)
       , y (String.fromInt (yMax - yVal))
+      , fontSize "9px"
       , fontFamily "monospace" ]
-      [ text (String.fromChar crate) ]
+      [ text crate ]
+
+toStackIdText : Int -> Int -> Html Msg 
+toStackIdText yMax stackId = 
+  let 
+    w = crateSize
+    h = crateSize
+    xOffset = 2
+    yOffset = 8
+    xVal = xOffset + stackId * 2 * w
+    yVal = crateSize
+  in
+    text_
+      [ x (String.fromInt xVal)
+      , y (String.fromInt (yMax - yVal))
+      , fontSize "9px"
+      , fontFamily "monospace" ]
+      [ text (String.fromInt stackId) ]
 
 toCrateSvgElements : Int -> Int -> Int -> Crate -> List (Html Msg)
 toCrateSvgElements yMax stackId crateNo crate = 
@@ -178,28 +825,32 @@ toStackSvgElements : Int -> (Int, Stack) -> List (Html Msg)
 toStackSvgElements yMax (stackId, stack) =
   let 
     crateElements = 
-      stack |> List.indexedMap (toCrateSvgElements yMax stackId)
-            |> List.concat
+      stack 
+      |> List.reverse
+      |> List.indexedMap (toCrateSvgElements yMax stackId)
+      |> List.concat
+    labelElement = toStackIdText yMax stackId
   in 
-    crateElements
+    labelElement :: crateElements
 
 toSvg : Stacks -> Html Msg 
 toSvg stacks = 
   let 
-    lst = stacks |> Dict.toList |> List.concatMap (toStackSvgElements 400)
+    yMax = 500
+    lst = stacks |> Dict.toList |> List.concatMap (toStackSvgElements yMax)
   in 
     svg
-      [ viewBox "0 0 400 400"
-      , width "400"
-      , height "400"
-      , Svg.Attributes.style "background-color:lightgrey" ]
+      [ viewBox "0 0 210 500"
+      , width "210"
+      , height "500" ]
+--      , Svg.Attributes.style "background-color:lightblue" ]
       lst
 
 view : Model -> Html Msg
 view model =
   let
     s = toSvg model.stacks
-    tickStr = "commands: " ++ String.fromInt model.counter
+    commandsStr = "commands: " ++ String.fromInt model.counter ++ " of " ++ String.fromInt model.totalCommands
   in 
     Html.table 
       []
@@ -221,11 +872,27 @@ view model =
               , Html.Attributes.style "font-size" "20px"
               , Html.Attributes.style "padding" "20px"] 
               [ Html.div [ Html.Attributes.align "center" ] [ s ] 
-              , Html.div [] [ Html.text tickStr ]
-              , Html.div [] [ Html.text model.debug ]
+              , Html.div [] [ Html.text commandsStr ]
+              , Html.div [] [ Html.text model.lastCommandText ]
+              -- , Html.div [] [ Html.text model.debug ]
               ] ] 
       , Html.tr 
           []
           [ Html.td 
-              []
-              [ Html.button [ onClick Step ] [ text "Step" ] ] ] ]
+              [ Html.Attributes.align "center" ]
+              [ Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Step ] 
+                [ text "Step" ]
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Slower ] 
+                [ text "Slower" ]
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick TogglePlay ] 
+                [ if model.paused then text "Play" else text "Pause" ] 
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Faster ] 
+                [ text "Faster" ]
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick ToggleMachine ] 
+                [ if model.keepOrder then text "CM9000" else text "CM9100" ] 
+            ] ] ]
