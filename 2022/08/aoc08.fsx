@@ -41,11 +41,6 @@ let part1 (grid : int[,]) =
     |> Seq.length 
     |> printfn "Visible: %d"
 
-let countVisible0 predicate trees = 
-    trees 
-    |> List.tryFindIndex predicate
-    |> Option.defaultValue (List.length trees)
-
 let countVisible (t : int) (selector : int -> int) (treeIndexes : int list) = 
     treeIndexes 
     |> List.tryFindIndex (fun (i : int) -> t <= selector i)
@@ -71,13 +66,11 @@ let countVisibleEast grid x y t =
     [(x + 1) .. (xMax - 1)] |> countVisible t (fun i -> Array2D.get grid y i)
 
 let getScenicScore (grid : int[,]) (y: int) (x : int) (t : int) : int =
-    let result = 
-        [ countVisibleNorth grid x y t 
-          countVisibleSouth grid x y t 
-          countVisibleWest grid x y t 
-          countVisibleEast grid x y t ]
-        |> List.fold (*) 1
-    result
+    [ countVisibleNorth grid x y t 
+      countVisibleSouth grid x y t 
+      countVisibleWest grid x y t 
+      countVisibleEast grid x y t ]
+    |> List.fold (*) 1
 
 let part2 (grid : int[,]) = 
     grid 
