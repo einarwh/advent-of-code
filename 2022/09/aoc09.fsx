@@ -72,6 +72,7 @@ let updateRope (dir : Direction) (rope : Pos list) : Pos list =
     match rope with 
     | [] -> [] 
     | head :: tail -> 
+        let (x, y) = head
         let h' = (head |> updateHead dir)
         h' :: fn h' tail
 
