@@ -7,11 +7,7 @@ open System.Text.RegularExpressions
 
 type Direction = U | L | D | R
 
-type Motion = (Direction * int) 
-
 type Pos = (int * int)
-
-type Rope = Pos list 
 
 let toDirection s =  
     match s with 
@@ -25,7 +21,7 @@ let toDirections motion =
     match motion with 
     | (d, s) -> [1 .. s] |> List.map (fun _ -> d)
 
-let tryParseMotion (s : string) : Motion option = 
+let tryParseMotion (s : string) = 
     let pattern = "^(U|L|D|R) (\d+)$"
     let m = Regex.Match(s, pattern)
     if m.Success then
