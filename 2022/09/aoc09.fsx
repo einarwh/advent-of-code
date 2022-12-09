@@ -42,7 +42,7 @@ let updateHead (d : Direction) (x : int, y : int) : Pos =
     | D -> (x, y-1)
     | R -> (x+1, y)
 
-let toTailMove (hx, hy) (tx, ty) : Pos = 
+let toKnotMove (hx, hy) (tx, ty) : Pos = 
     match (hx - tx, hy - ty) with 
     | (-2,  2) -> (-1,  1)
     | (-1,  2) -> (-1,  1)
@@ -63,7 +63,7 @@ let toTailMove (hx, hy) (tx, ty) : Pos =
     | _ -> (0, 0)
 
 let updateKnot (hx, hy) (tx, ty) : Pos = 
-    match toTailMove (hx, hy) (tx, ty)  with 
+    match toKnotMove (hx, hy) (tx, ty)  with 
     | (dx, dy) -> (tx + dx, ty + dy)
 
 let updateRope (dir : Direction) (rope : Pos list) : Pos list = 
