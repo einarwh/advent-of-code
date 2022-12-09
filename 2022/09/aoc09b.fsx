@@ -45,63 +45,41 @@ let updateHead (d : Direction) (x : int, y : int) : Pos =
 let toTailMove (hx, hy) (tx, ty) : Pos = 
     match (hx - tx, hy - ty) with 
     | (-2,  2) -> (-1,  1)
-
     | (-1,  2) -> (-1,  1)
     | ( 0,  2) -> ( 0,  1)
     | ( 1,  2) -> ( 1,  1)
-    
     | ( 2,  2) -> ( 1,  1)
-
     | ( 2,  1) -> ( 1,  1)
     | ( 2,  0) -> ( 1,  0)
     | ( 2, -1) -> ( 1, -1)
-    
     | ( 2, -2) -> ( 1, -1)
-    
     | ( 1, -2) -> ( 1, -1)
     | ( 0, -2) -> ( 0, -1)
     | (-1, -2) -> (-1, -1)
-    
     | (-2, -2) -> (-1, -1)
-
     | (-2, -1) -> (-1, -1)
     | (-2,  0) -> (-1,  0)
     | (-2,  1) -> (-1,  1)
-    
     | _ -> (0, 0)
 
-let updateTail (hx, hy) (tx, ty) : Pos = 
+let updateKnot (hx, hy) (tx, ty) : Pos = 
     match toTailMove (hx, hy) (tx, ty)  with 
     | (dx, dy) -> (tx + dx, ty + dy)
-
-let part1 (dirs : Direction list) = 
-    let rec fn (headPos : Pos) (tailPos : Pos) (visited : Set<Pos>) (dirs : Direction list) : Set<Pos> = 
-        match dirs with 
-        | [] -> 
-            visited
-        | d :: rest -> 
-            let (headPos' : Pos) = headPos |> updateHead d
-            let (tailPos' : Pos) = tailPos |> updateTail headPos' 
-            let (visited' : Set<Pos>) = visited |> Set.add tailPos'
-            fn headPos' tailPos' visited' rest 
-    let startPos = (0, 0)
-    let positions = fn startPos startPos Set.empty dirs
-    positions |> Set.count
 
 let updateRope (dir : Direction) (rope : Pos list) : Pos list = 
     let rec fn (prev : Pos) (rope : Pos list) = 
         match rope with 
         | [] -> []
         | knot :: rest -> 
-            let knot = updateTail prev knot
-            knot :: fn knot rest
+            let knot' = updateKnot prev knot
+            knot' :: fn knot' rest
     match rope with 
     | [] -> [] 
     | head :: tail -> 
         let h' = (head |> updateHead dir)
         h' :: fn h' tail
 
-let part2 (dirs : Direction list) = 
+let moveRope (ropeLength : int) (dirs : Direction list) = 
     let rec fn (step : int) (rope : Pos list) (visited : Set<Pos>) (dirs : Direction list) : Set<Pos> = 
         match dirs with 
         | [] -> 
@@ -109,15 +87,15 @@ let part2 (dirs : Direction list) =
         | d :: rest -> 
             let rope' = rope |> updateRope d 
             let lastPos = rope' |> List.rev |> List.head 
-            let (visited' : Set<Pos>) = visited |> Set.add lastPos
+            let visited' = visited |> Set.add lastPos
             fn (step + 1) rope' visited' rest 
-    let startRope = [1 .. 10] |> List.map (fun _ -> (0, 0))
+    let startRope = [1 .. ropeLength] |> List.map (fun _ -> (0, 0))
     let positions = fn 1 startRope Set.empty dirs
     positions |> Set.count
 
 let run dirs = 
-    dirs |> part1 |> printfn "Visited: %d"
-    dirs |> part2 |> printfn "Visited: %d"
+    dirs |> moveRope 2 |> printfn "Visited: %d"
+    dirs |> moveRope 10 |> printfn "Visited: %d"
 
 "input"
 |> File.ReadAllLines
