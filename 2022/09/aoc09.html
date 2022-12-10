@@ -5347,11 +5347,11 @@ var $author$project$Aoc09$init = function (_v0) {
 	var head = origin;
 	var directions = A2($elm$core$List$concatMap, $author$project$Aoc09$toDirections, motions);
 	var model = {
-		counter: 0,
 		debug: '..',
 		delay: $author$project$Aoc09$defaultDelay,
 		directions: directions,
 		follow: true,
+		moves: 0,
 		paused: true,
 		rope: _Utils_Tuple2(head, tail),
 		visited: $elm$core$Set$empty
@@ -5994,7 +5994,7 @@ var $author$project$Aoc09$updateModel = function (model) {
 		var d = _v0.a;
 		var remainingDirections = _v0.b;
 		var updatedRope = A2($author$project$Aoc09$updateRope, d, model.rope);
-		var updatedCounter = model.counter + 1;
+		var updatedMoves = model.moves + 1;
 		var lastDirectionText = $author$project$Aoc09$toDirectionText(d);
 		var _v1 = updatedRope;
 		var updatedHead = _v1.a;
@@ -6007,7 +6007,7 @@ var $author$project$Aoc09$updateModel = function (model) {
 		var updatedVisited = A2($elm$core$Set$insert, lastKnot, model.visited);
 		return _Utils_update(
 			model,
-			{counter: updatedCounter, debug: lastDirectionText, directions: remainingDirections, rope: updatedRope, visited: updatedVisited});
+			{debug: lastDirectionText, directions: remainingDirections, moves: updatedMoves, rope: updatedRope, visited: updatedVisited});
 	}
 };
 var $author$project$Aoc09$update = F2(
@@ -6260,7 +6260,7 @@ var $author$project$Aoc09$view = function (model) {
 	var visitedStr = 'visited: ' + $elm$core$String$fromInt(
 		$elm$core$Set$size(model.visited));
 	var s = model.follow ? $author$project$Aoc09$toLocalSvg(model) : $author$project$Aoc09$toGlobalSvg(model);
-	var counterStr = 'counter: ' + $elm$core$String$fromInt(model.counter);
+	var movesStr = 'moves: ' + $elm$core$String$fromInt(model.moves);
 	var _v0 = model.rope;
 	var head = _v0.a;
 	var tail = _v0.b;
@@ -6333,7 +6333,7 @@ var $author$project$Aoc09$view = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(counterStr)
+										$elm$html$Html$text(movesStr)
 									])),
 								A2(
 								$elm$html$Html$div,

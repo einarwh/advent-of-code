@@ -59,11 +59,11 @@ let toKnotMove (hx, hy) (tx, ty) : Pos =
     | _ -> (0, 0)
 
 let updateKnot (hx, hy) (tx, ty) : Pos = 
-    match toKnotMove (hx, hy) (tx, ty)  with 
+    match toKnotMove (hx, hy) (tx, ty) with 
     | (dx, dy) -> (tx + dx, ty + dy)
 
 let updateRope (dir : Direction) (rope : Pos list) : Pos list = 
-    let rec fn (prev : Pos) (rope : Pos list) = 
+    let rec fn prev rope = 
         match rope with 
         | [] -> []
         | knot :: rest -> 
@@ -72,12 +72,11 @@ let updateRope (dir : Direction) (rope : Pos list) : Pos list =
     match rope with 
     | [] -> [] 
     | head :: tail -> 
-        let (x, y) = head
         let h' = (head |> updateHead dir)
         h' :: fn h' tail
 
 let moveRope (ropeLength : int) (dirs : Direction list) = 
-    let rec fn (step : int) (rope : Pos list) (visited : Set<Pos>) (dirs : Direction list) : Set<Pos> = 
+    let rec fn step rope visited dirs = 
         match dirs with 
         | [] -> 
             visited
