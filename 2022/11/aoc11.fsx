@@ -2,26 +2,32 @@
 // Day 10: Cathode-Ray Tube.
 // dotnet fsi aoc09.fsx
 
+open System
 open System.IO
-open System.Numerics
 open System.Text.RegularExpressions
 
 type BinaryOperand =
-    | Number of BigInteger 
+    | Number of int64 
     | Old
 
-type BinaryOperation = 
-    | Add of (BinaryOperand * BinaryOperand)
-    | Multiply of (BinaryOperand * BinaryOperand)
+type Operation = int64 -> int64
 
 type Monkey = 
     { Number : int 
-      Items : BigInteger list 
-      Operation : BinaryOperation
-      Divisor : BigInteger 
+      Items : int64 list 
+      Operation : Operation
+      Divisor : int64 
       TrueMonkey : int 
       FalseMonkey : int
-      Inspections : int }
+      Inspections : int64 }
+
+let double = fun (x : int64) -> x + x
+
+let square = fun (x : int64) -> x * x
+
+let multiplyBy n = fun (x : int64) -> x * n
+
+let increaseBy n = fun (x : int64) -> x + n
 
 let parseMonkeyNumberLine (s : string) : int = 
     let m = Regex.Match(s.Trim(), "^Monkey (\d+):$")
@@ -30,42 +36,38 @@ let parseMonkeyNumberLine (s : string) : int =
     else 
         failwith "invalid monkey number line"
 
-let parseStartingItemsLine (s : string) : BigInteger list = 
+let parseStartingItemsLine (s : string) : int64 list = 
     let m = Regex.Match(s.Trim(), "^Starting items: (.+)$")
     if m.Success then
         let str = m.Groups.[1].Value
-        str.Split(", ") |> Array.toList |> List.map (int >> BigInteger)
+        str.Split(", ") |> Array.toList |> List.map (int >> int64)
     else 
         failwith "invalid starting items line"
 
 let toBinaryOperand a = 
     if a = "old" then Old 
-    else a |> int |> BigInteger |> Number 
+    else a |> int64 |> Number 
 
-let parseBinaryOperation (s : string) : BinaryOperation =
+let parseOperation (s : string) : Operation =
     match s.Split(" ") with 
-    | [|a; b; c|] -> 
-        match b with 
-        | "+" -> 
-            Add (toBinaryOperand a, toBinaryOperand c)
-        | "*" -> 
-            Multiply (toBinaryOperand a, toBinaryOperand c)
-        | _ -> 
-            failwith "invalid binary operation"
+    | [|"old"; "+"; "old"|] -> double
+    | [|"old"; "+"; n|] -> n |> int64 |> increaseBy
+    | [|"old"; "*"; "old"|] -> square
+    | [|"old"; "*"; n|] -> n |> int64 |> multiplyBy
     | _ -> failwith "invalid binary operation"
 
-let parseOperationLine (s : string) : BinaryOperation = 
+let parseOperationLine (s : string) : Operation = 
     let m = Regex.Match(s.Trim(), "^Operation: new = (.+)$")
     if m.Success then
         let str = m.Groups.[1].Value
-        parseBinaryOperation str 
+        parseOperation str 
     else 
         failwith "invalid starting items line"
 
-let parseTestLine (s : string) : BigInteger = 
+let parseTestLine (s : string) : int64 = 
     let m = Regex.Match(s.Trim(), "^Test: divisible by (\d+)$")
     if m.Success then
-        m.Groups.[1].Value |> int |> BigInteger
+        m.Groups.[1].Value |> int64
     else 
         failwith "invalid starting items line"
 
@@ -95,59 +97,34 @@ let parseMonkey (s : string) =
           Inspections = 0 }
     | _ -> failwith "unable to parse monkey"
 
-let evaluateOperand (old : BigInteger) operand = 
+let evaluateOperand (old : int64) operand = 
     match operand with 
     | Old -> old 
-    | Number (n : BigInteger) -> n
+    | Number (n : int64) -> n
 
-let applyOperation operation (item: BigInteger) : BigInteger = 
-    match operation with 
-    | Add (a, b) -> 
-        let op1 = (evaluateOperand item a)
-        let op2 = (evaluateOperand item b)
-        let result = (evaluateOperand item a) + (evaluateOperand item b)
-        // if b = Old then 
-        //     printfn "    Worry level increases with itself to %d." result
-        // else 
-        //     printfn "    Worry level increates with %d to %d" op2 result
-        result
-    | Multiply (a, b) -> 
-        let op1 = (evaluateOperand item a)
-        let op2 = (evaluateOperand item b)
-        let result = (evaluateOperand item a) * (evaluateOperand item b)
-        // if b = Old then 
-        //     printfn "    Worry level is multiplied by itself to %d." result
-        // else 
-        //     printfn "    Worry level is multiplied by %d to %d" op2 result
-        result
+let applyOperation operation (item: int64) : int64 = 
+    operation item 
 
-let reduceWorry (relief: bool) (item : BigInteger) : BigInteger = 
-    if relief then 
-        BigInteger.Divide(item, BigInteger 3)
-    else 
-        item 
-
-let determineTargetMonkeyNumber (level : BigInteger) (monkey : Monkey) = 
-    let (_, remainder) = BigInteger.DivRem(level, monkey.Divisor)
-    if remainder = BigInteger 0 then 
+let determineTargetMonkeyNumber (level : int64) (monkey : Monkey) = 
+    let remainder = level % monkey.Divisor
+    if remainder = 0 then 
         // printfn "    Current worry level is divisible by %d." monkey.Divisor
         monkey.TrueMonkey 
     else 
         // printfn "    Current worry level is not divisible by %d." monkey.Divisor
         monkey.FalseMonkey
     
-let turn (relief : bool) (monkey : Monkey) (monkeys : Monkey array) = 
+let turn (relief : int64 -> int64) (monkey : Monkey) (monkeys : Monkey array) = 
     let rec fn (monkey : Monkey) (monkeys : Monkey array) : Monkey = 
         match monkey.Items with 
         | [] -> monkey
-        | (item : BigInteger) :: restItems -> 
-            // printfn "  Monkey inspects an item with worry level %d" item
-            let updatedItem = item |> applyOperation monkey.Operation |> reduceWorry relief 
+        | (item : int64) :: restItems -> 
+            let updatedItem = item |> applyOperation monkey.Operation |> relief  
             let targetMonkeyNumber = determineTargetMonkeyNumber updatedItem monkey
             let targetMonkey = monkeys.[targetMonkeyNumber]
             let updatedTargetMonkey = { targetMonkey with Items = targetMonkey.Items @ [ updatedItem ] }
             Array.set monkeys targetMonkeyNumber updatedTargetMonkey
-            let updatedMonkey = { monkey with Items = restItems; Inspections = monkey.Inspections + 1 }
+            let updatedMonkey = { monkey with Items = restItems; Inspections = monkey.Inspections + 1L }
             Array.set monkeys updatedMonkey.Number updatedMonkey
             fn updatedMonkey monkeys
     fn monkey monkeys |> ignore 
@@ -159,35 +136,29 @@ let printMonkeyStatus monkey =
 let printInspectionStatus monkey =  
     printfn "Monkey %d: inspected items %d times." monkey.Number monkey.Inspections
 
-let round (relief : bool) (monkeys : Monkey array) = 
+let round (relief : int64 -> int64) (monkeys : Monkey array) = 
     let rec fn (monkeyNumber : int) (monkeys : Monkey array) = 
         if monkeyNumber < Array.length monkeys then 
-            // printfn "Monkey %d:" monkeyNumber
             let monkey = monkeys.[monkeyNumber]
             turn relief monkey monkeys
             fn (monkeyNumber + 1) monkeys
             // printfn ""
     fn 0 monkeys
 
-let rec runRounds i n relief monkeys = 
-    if i <= n then
-        if i % 100 = 0 then 
-            printfn ". %d" i
-        else 
-            printf "."
-        if i % 1000 = 0 then 
-            monkeys |> Array.iter printInspectionStatus
-
-        round relief monkeys 
-        runRounds (i + 1) n relief monkeys
+let rec runRounds n relief monkeys = 
+    let rec loop (i : int) = 
+        if i <= n then
+            round relief monkeys 
+            loop (i + 1)
+    loop 1
 
 let toMonkeyBusiness lst = 
     match lst with 
     | a :: b :: _ -> a * b 
     | _ -> failwith "failed to calculate monkey business"
 
-let part1 (monkeys : Monkey array) =
-    runRounds 1 20 true monkeys
+let solve (rounds : int) (relief : int64 -> int64) (monkeys : Monkey array) =
+    runRounds rounds relief monkeys
     monkeys 
     |> Array.toList 
     |> List.map (fun m -> m.Inspections)
@@ -195,20 +166,20 @@ let part1 (monkeys : Monkey array) =
     |> toMonkeyBusiness
     |> printfn "%d"
 
+let part1 (monkeys : Monkey array) =
+    let relief = fun item -> item / 3L 
+    solve 20 relief monkeys
+
 let part2 (monkeys : Monkey array) =
-    runRounds 1 10000 false monkeys
-    monkeys 
-    |> Array.toList 
-    |> List.map (fun m -> m.Inspections)
-    |> List.sortDescending 
-    |> toMonkeyBusiness
-    |> printfn "%d"
+    let divisor = monkeys |> Array.map (fun m -> m.Divisor) |> Array.fold (*) 1L
+    let relief = fun item -> item % divisor 
+    solve 10000 relief monkeys
 
 let run (monkeys : Monkey array) = 
     monkeys |> Array.copy |> part1 
     monkeys |> Array.copy |> part2
 
-"sample"
+"input"
 |> File.ReadAllText 
 |> (fun s -> s.TrimEnd().Split("\n\n"))
 |> Array.map parseMonkey
