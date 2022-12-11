@@ -50,14 +50,14 @@ let toBinaryOperand a =
 
 let parseOperation (s : string) : Operation =
     match s.Split(" ") with 
-    | [|"old"; "+"; "old"|] -> double
-    | [|"old"; "+"; n|] -> n |> int64 |> increaseBy
-    | [|"old"; "*"; "old"|] -> square
-    | [|"old"; "*"; n|] -> n |> int64 |> multiplyBy
+    | [|"+"; "old"|] -> double
+    | [|"+"; n|] -> n |> int64 |> increaseBy
+    | [|"*"; "old"|] -> square
+    | [|"*"; n|] -> n |> int64 |> multiplyBy
     | _ -> failwith "invalid binary operation"
 
 let parseOperationLine (s : string) : Operation = 
-    let m = Regex.Match(s.Trim(), "^Operation: new = (.+)$")
+    let m = Regex.Match(s.Trim(), "^Operation: new = old (.+)$")
     if m.Success then
         let str = m.Groups.[1].Value
         parseOperation str 
