@@ -1,6 +1,6 @@
 // Advent of Code 2022. 
-// Day 10: Cathode-Ray Tube.
-// dotnet fsi aoc09.fsx
+// Day 11: Monkey in the Middle.
+// dotnet fsi aoc11.fsx
 
 open System.IO
 open System.Text.RegularExpressions
