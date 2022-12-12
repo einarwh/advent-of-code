@@ -5,8 +5,6 @@
 open System.IO
 open System.Text.RegularExpressions
 
-type BinaryOperand = Number of int64 | Old
-
 type Operation = int64 -> int64
 
 type Monkey = 
