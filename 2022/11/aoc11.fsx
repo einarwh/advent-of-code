@@ -2,13 +2,10 @@
 // Day 10: Cathode-Ray Tube.
 // dotnet fsi aoc09.fsx
 
-open System
 open System.IO
 open System.Text.RegularExpressions
 
-type BinaryOperand =
-    | Number of int64 
-    | Old
+type BinaryOperand = Number of int64 | Old
 
 type Operation = int64 -> int64
 
@@ -43,10 +40,6 @@ let parseStartingItemsLine (s : string) : int64 list =
         str.Split(", ") |> Array.toList |> List.map (int >> int64)
     else 
         failwith "invalid starting items line"
-
-let toBinaryOperand a = 
-    if a = "old" then Old 
-    else a |> int64 |> Number 
 
 let parseOperation (s : string) : Operation =
     match s.Split(" ") with 
@@ -97,21 +90,13 @@ let parseMonkey (s : string) =
           Inspections = 0 }
     | _ -> failwith "unable to parse monkey"
 
-let evaluateOperand (old : int64) operand = 
-    match operand with 
-    | Old -> old 
-    | Number (n : int64) -> n
-
 let applyOperation operation (item: int64) : int64 = 
     operation item 
 
 let determineTargetMonkeyNumber (level : int64) (monkey : Monkey) = 
-    let remainder = level % monkey.Divisor
-    if remainder = 0 then 
-        // printfn "    Current worry level is divisible by %d." monkey.Divisor
+    if level % monkey.Divisor = 0 then 
         monkey.TrueMonkey 
     else 
-        // printfn "    Current worry level is not divisible by %d." monkey.Divisor
         monkey.FalseMonkey
     
 let turn (relief : int64 -> int64) (monkey : Monkey) (monkeys : Monkey array) = 
@@ -129,20 +114,12 @@ let turn (relief : int64 -> int64) (monkey : Monkey) (monkeys : Monkey array) =
             fn updatedMonkey monkeys
     fn monkey monkeys |> ignore 
 
-let printMonkeyStatus monkey =  
-    let itemsStr = monkey.Items |> List.map string |> String.concat ", "
-    printfn "Monkey %d: %s" monkey.Number itemsStr
-
-let printInspectionStatus monkey =  
-    printfn "Monkey %d: inspected items %d times." monkey.Number monkey.Inspections
-
 let round (relief : int64 -> int64) (monkeys : Monkey array) = 
     let rec fn (monkeyNumber : int) (monkeys : Monkey array) = 
         if monkeyNumber < Array.length monkeys then 
             let monkey = monkeys.[monkeyNumber]
             turn relief monkey monkeys
             fn (monkeyNumber + 1) monkeys
-            // printfn ""
     fn 0 monkeys
 
 let rec runRounds n relief monkeys = 
