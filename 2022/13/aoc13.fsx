@@ -77,6 +77,7 @@ let rec compareItems (item1 : Item, item2 : Item) : Compared =
         compareItems (L lst, L [ N n ])
 and compareLists (lst1 : Item list, lst2 : Item list) = 
     match (lst1, lst2) with 
+    | ([], []) -> EQ
     | ([], _) -> LT 
     | (_, []) -> GT 
     | (h1 :: t1, h2 :: t2) -> 
