@@ -2265,6 +2265,20 @@ toHeadCircle (x, y) = toKnotCircle "#50C878" (x, y)
 toTailCircle : Pos -> Html Msg 
 toTailCircle (x, y) = toKnotCircle "#5F8575" (x, y)
 
+toVisitedRect : Pos -> Html Msg 
+toVisitedRect (x1, y1) = 
+  let 
+    xVal = x1
+    yVal = -y1 
+  in
+    rect
+      [ x (String.fromInt xVal)
+      , y (String.fromInt yVal)
+      , width (String.fromFloat 1.0)
+      , height (String.fromFloat 1.0)
+      , fill "black" ]
+      []
+
 findCenter : List Pos -> Pos 
 findCenter wholeRope =
   let 
@@ -2277,7 +2291,6 @@ findCenter wholeRope =
 toLocalSvg : Model -> Html Msg 
 toLocalSvg model = 
   let 
-    yMax = 500
     (head, tail) = model.rope
     (cx, cy) = findCenter (head :: tail)
     size = 20
@@ -2299,15 +2312,14 @@ toLocalSvg model =
 toGlobalSvg : Model -> Html Msg 
 toGlobalSvg model = 
   let 
-    yMax = 500
     (head, tail) = model.rope
-    lst = (tail |> List.map toTailCircle) ++ [ toHeadCircle head ]
+    lst = model.visited |> Set.toList |> List.map toVisitedRect
   in 
     svg
-      [ viewBox "-250 -250 500 500"
+      [ viewBox "-260 -260 520 520"
       , width "400"
-      , height "400"
-      , Svg.Attributes.style "background-color:lightblue" ]
+      , height "400" ]
+--      , Svg.Attributes.style "background-color:lightblue" ]
       lst
 
 view : Model -> Html Msg
@@ -2357,10 +2369,10 @@ view model =
                 [ if model.paused then text "Play" else text "Pause" ] 
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Faster ] 
-                [ text "Faster" ] ] ]
-              -- , Html.button 
-              --   [ Html.Attributes.style "width" "80px", onClick ToggleZoom ] 
-              --   [ if model.follow then text "Full" else text "Zoom" ] ] ]
+                [ text "Faster" ]
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick ToggleZoom ] 
+                [ if model.follow then text "Area" else text "Rope" ] ] ]
       , Html.tr 
           []
           [ Html.td 
