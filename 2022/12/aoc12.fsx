@@ -1,5 +1,5 @@
 // Advent of Code 2022. 
-// Day 12: Monkey in the Middle.
+// Day 12: Hill Climbing Algorithm.
 // dotnet fsi aoc12.fsx
 
 open System.IO
@@ -19,6 +19,15 @@ let findCharPos (ch : char) (lists : char list list) : Pos =
 let findStartPos = findCharPos 'S'
 
 let findEndPos = findCharPos 'E'
+
+let findCharPositions (ch : char) (lists : char list list) : Pos list = 
+    let fn (y : int) (chars : char list) : Pos list = 
+        chars 
+        |> List.mapi (fun ix c -> if c = ch then Some (ix, y) else None)
+        |> List.choose id
+    lists 
+    |> List.mapi (fun iy lst -> fn iy lst)
+    |> List.concat
 
 let toElevation (ch : char) : char = 
     match ch with 
@@ -50,9 +59,9 @@ let solve (startPos : Pos) (endPos : Pos) (lists : char list list) =
     let matrix = array2D lists
     let rec fn (distance : int) (positions : Set<Pos>) (visited : Set<Pos>) = 
         if Set.contains endPos visited then 
-            distance - 1
+            Some (distance - 1)
         else if Set.count positions = 0 then 
-            failwith "Didn't find end position!"
+            None
         else 
             let nextPositions = 
                 positions
@@ -66,14 +75,19 @@ let solve (startPos : Pos) (endPos : Pos) (lists : char list list) =
 let part1 lists = 
     let startPos = lists |> findStartPos
     let endPos = lists |> findEndPos
-    let distance = solve startPos endPos lists
-    distance |> printfn "Distance: %A"
+    match solve startPos endPos lists with 
+    | Some distance -> distance |> printfn "Distance: %A"
+    | None -> printfn "Failed to find a solution."
 
 let part2 lists = 
     let startPos = lists |> findStartPos
+    let aPositions = lists |> findCharPositions 'a'
+    let startPositions = startPos :: aPositions
     let endPos = lists |> findEndPos
-    let distance = solve startPos endPos lists
-    distance |> printfn "Distance: %A"
+    let distances = 
+        startPositions
+        |> List.choose (fun p -> solve p endPos lists)
+    distances |> List.min |> printfn "Distance: %A"
 
 let run lists =
     lists |> part1 
