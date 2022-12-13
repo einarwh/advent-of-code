@@ -6069,6 +6069,7 @@ var $author$project$Aoc09$Shorter = {$: 'Shorter'};
 var $author$project$Aoc09$Slower = {$: 'Slower'};
 var $author$project$Aoc09$Step = {$: 'Step'};
 var $author$project$Aoc09$TogglePlay = {$: 'TogglePlay'};
+var $author$project$Aoc09$ToggleZoom = {$: 'ToggleZoom'};
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -6129,14 +6130,72 @@ var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
-var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$core$String$fromFloat = _String_fromNumber;
+var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
+var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
+var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
+var $author$project$Aoc09$toVisitedRect = function (_v0) {
+	var x1 = _v0.a;
+	var y1 = _v0.b;
+	var yVal = -y1;
+	var xVal = x1;
+	return A2(
+		$elm$svg$Svg$rect,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$x(
+				$elm$core$String$fromInt(xVal)),
+				$elm$svg$Svg$Attributes$y(
+				$elm$core$String$fromInt(yVal)),
+				$elm$svg$Svg$Attributes$width(
+				$elm$core$String$fromFloat(1.0)),
+				$elm$svg$Svg$Attributes$height(
+				$elm$core$String$fromFloat(1.0)),
+				$elm$svg$Svg$Attributes$fill('black')
+			]),
+		_List_Nil);
+};
+var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
+var $author$project$Aoc09$toGlobalSvg = function (model) {
+	var lst = A2(
+		$elm$core$List$map,
+		$author$project$Aoc09$toVisitedRect,
+		$elm$core$Set$toList(model.visited));
+	var _v0 = model.rope;
+	var head = _v0.a;
+	var tail = _v0.b;
+	return A2(
+		$elm$svg$Svg$svg,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$viewBox('-260 -260 520 520'),
+				$elm$svg$Svg$Attributes$width('400'),
+				$elm$svg$Svg$Attributes$height('400')
+			]),
+		lst);
+};
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $elm$core$List$sum = function (numbers) {
+	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
+};
+var $author$project$Aoc09$findCenter = function (wholeRope) {
+	var ySum = $elm$core$List$sum(
+		A2($elm$core$List$map, $elm$core$Tuple$second, wholeRope));
+	var xSum = $elm$core$List$sum(
+		A2($elm$core$List$map, $elm$core$Tuple$first, wholeRope));
+	var len = $elm$core$List$length(wholeRope);
+	return _Utils_Tuple2((xSum / len) | 0, (ySum / len) | 0);
+};
 var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
 var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
 var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
-var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
-var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
 var $author$project$Aoc09$toKnotCircle = F2(
 	function (color, _v0) {
@@ -6174,47 +6233,7 @@ var $author$project$Aoc09$toTailCircle = function (_v0) {
 		'#5F8575',
 		_Utils_Tuple2(x, y));
 };
-var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
-var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
-var $author$project$Aoc09$toGlobalSvg = function (model) {
-	var yMax = 500;
-	var _v0 = model.rope;
-	var head = _v0.a;
-	var tail = _v0.b;
-	var lst = _Utils_ap(
-		A2($elm$core$List$map, $author$project$Aoc09$toTailCircle, tail),
-		_List_fromArray(
-			[
-				$author$project$Aoc09$toHeadCircle(head)
-			]));
-	return A2(
-		$elm$svg$Svg$svg,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$viewBox('-250 -250 500 500'),
-				$elm$svg$Svg$Attributes$width('400'),
-				$elm$svg$Svg$Attributes$height('400'),
-				$elm$svg$Svg$Attributes$style('background-color:lightblue')
-			]),
-		lst);
-};
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
-var $elm$core$List$sum = function (numbers) {
-	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
-};
-var $author$project$Aoc09$findCenter = function (wholeRope) {
-	var ySum = $elm$core$List$sum(
-		A2($elm$core$List$map, $elm$core$Tuple$second, wholeRope));
-	var xSum = $elm$core$List$sum(
-		A2($elm$core$List$map, $elm$core$Tuple$first, wholeRope));
-	var len = $elm$core$List$length(wholeRope);
-	return _Utils_Tuple2((xSum / len) | 0, (ySum / len) | 0);
-};
 var $author$project$Aoc09$toLocalSvg = function (model) {
-	var yMax = 500;
 	var vb = $elm$core$String$fromInt;
 	var size = 20;
 	var halfSize = (size / 2) | 0;
@@ -6400,6 +6419,17 @@ var $author$project$Aoc09$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$svg$Svg$text('Faster')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick($author$project$Aoc09$ToggleZoom)
+									]),
+								_List_fromArray(
+									[
+										model.follow ? $elm$svg$Svg$text('Area') : $elm$svg$Svg$text('Rope')
 									]))
 							]))
 					])),
