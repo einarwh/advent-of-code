@@ -46,7 +46,7 @@ type alias Model =
   , delay : Float
   , paused : Bool
   , follow : Bool 
-  , counter : Int 
+  , moves : Int 
   , debug : String }
 
 tryParseDir : String -> Maybe Direction
@@ -2107,7 +2107,7 @@ D 5"""
             , delay = defaultDelay
             , paused = True
             , follow = True
-            , counter = 0  
+            , moves = 0  
             , debug = ".." }
   in 
     (model, Cmd.none)
@@ -2182,7 +2182,7 @@ updateModel model =
       let 
         updatedRope = updateRope d model.rope 
         (updatedHead, updatedTail) = updatedRope 
-        updatedCounter = model.counter + 1
+        updatedMoves = model.moves + 1
         lastDirectionText = toDirectionText d
         lastKnot = updatedTail |> List.reverse |> List.head |> Maybe.withDefault updatedHead
         updatedVisited = model.visited |> Set.insert lastKnot
@@ -2190,7 +2190,7 @@ updateModel model =
         { model | rope = updatedRope
         , directions = remainingDirections
         , visited = updatedVisited
-        , counter = updatedCounter
+        , moves = updatedMoves
         , debug = lastDirectionText  }
 
 shrinkRope : Rope -> Rope  
@@ -2326,7 +2326,7 @@ view : Model -> Html Msg
 view model =
   let
     s = if model.follow then toLocalSvg model else toGlobalSvg model
-    counterStr = "counter: " ++ String.fromInt model.counter
+    movesStr = "moves: " ++ String.fromInt model.moves
     visitedStr = "visited: " ++ String.fromInt (Set.size model.visited)
     (head, tail) = model.rope 
     ropeLengthStr = "length: " ++ String.fromInt (1 + List.length tail)
@@ -2351,7 +2351,7 @@ view model =
               , Html.Attributes.style "font-size" "20px"
               , Html.Attributes.style "padding" "20px"] 
               [ Html.div [ Html.Attributes.align "center" ] [ s ] 
-              , Html.div [] [ Html.text counterStr ]
+              , Html.div [] [ Html.text movesStr ]
               , Html.div [] [ Html.text visitedStr ]
               ] ] 
       , Html.tr 
