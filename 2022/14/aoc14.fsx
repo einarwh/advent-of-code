@@ -6,8 +6,6 @@ open System.IO
 
 type Pos = (int * int)
 
-type Line = (Pos * Pos)
-
 let toPos (s : string) = 
     match s.Split(",") with 
     | [|a;b|] -> (int a, int b)
@@ -33,14 +31,14 @@ let parseLine (s : string) =
 let findBottom (rocks : Set<Pos>) : int = 
     rocks |> Set.toList |> List.map snd |> List.max
 
-let pourSand (bottomless : bool) (floor : int) (rocks : Set<Pos>) = 
+let pourSand (floor : bool) (bottom : int) (rocks : Set<Pos>) = 
     let rec tryFindPosition (pos : Pos) (occupied : Set<Pos>) : Pos option = 
         match pos with 
         | (x, y) ->
-            if bottomless && y = floor then None
+            if y = bottom && not floor then None
             else 
                 let candidates = 
-                    if y = floor && not bottomless then 
+                    if y = bottom + 1 && floor then 
                         []
                     else 
                         [ (x, y + 1); (x - 1, y + 1); (x + 1, y + 1) ]
@@ -66,18 +64,15 @@ let pourSand (bottomless : bool) (floor : int) (rocks : Set<Pos>) =
             occupied
     let occupied = pour rocks 
     let sand = Set.difference occupied rocks 
-    let xs = sand |> Set.toList |> List.map fst
-    xs |> List.min |> printfn "min x: %d"
-    xs |> List.max |> printfn "max x: %d"
     Set.count sand
 
 let part1 (rocks : Set<Pos>) = 
     let bottom = findBottom rocks 
-    pourSand true bottom rocks |> printfn "Sand: %d"
+    pourSand false bottom rocks |> printfn "Sand: %d"
 
 let part2 (rocks : Set<Pos>) = 
     let bottom = findBottom rocks 
-    pourSand false (bottom + 1) rocks |> printfn "Sand: %d"
+    pourSand true bottom rocks |> printfn "Sand: %d"
 
 let run (lines : string list) = 
     let rocks = 
