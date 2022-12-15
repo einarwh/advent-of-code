@@ -64,6 +64,10 @@ let pourSand (floor : bool) (bottom : int) (rocks : Set<Pos>) =
             occupied
     let occupied = pour rocks 
     let sand = Set.difference occupied rocks 
+    let xs = sand |> Set.toList |> List.map fst
+    printfn "x  %d -> %d" (xs |> List.min) (xs |> List.max)
+    let ys = sand |> Set.toList |> List.map snd
+    printfn "y  %d -> %d" (ys |> List.min) (ys |> List.max)
     Set.count sand
 
 let part1 (rocks : Set<Pos>) = 
