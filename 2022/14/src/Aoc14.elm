@@ -84,8 +84,8 @@ parseLine s =
   |> List.concatMap toPositions
   |> Set.fromList 
 
-init : () -> (Model, Cmd Msg)
-init _ =
+initModel : () -> Model 
+initModel _ = 
   let 
     sample = """498,4 -> 498,6 -> 496,6
 503,4 -> 502,4 -> 502,9 -> 494,9"""
@@ -228,11 +228,15 @@ init _ =
             , paused = True
             , debug = ".." }
   in 
-    (model, Cmd.none)
+    model
+
+init : () -> (Model, Cmd Msg)
+init _ =
+  (initModel(), Cmd.none)
 
 -- UPDATE
 
-type Msg = Tick | Step | TogglePlay | Faster | Slower | ToggleInstant
+type Msg = Tick | Step | TogglePlay | Faster | Slower | ToggleInstant | ToggleFloor
 
 tryFind : (a -> Bool) -> List a -> Maybe a
 tryFind pred lst = 
@@ -335,6 +339,8 @@ update msg model =
       ({model | delay = model.delay * 2 }, Cmd.none)
     ToggleInstant -> 
       ({model | instant = not model.instant }, Cmd.none)
+    ToggleFloor -> 
+      ({model | hasFloor = not model.hasFloor }, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -388,6 +394,13 @@ toGrainElements path =
 toSvg : Model -> Html Msg 
 toSvg model = 
   let 
+    floorElements = 
+      if model.hasFloor then 
+        List.range 300 700
+        |> List.map (\x -> (x, model.bottomRock + 2))
+        |> List.map toRockElement
+      else 
+        []
     rockElements = model.rocks |> Set.toList |> List.map toRockElement
     sandElements = model.sand |> Set.toList |> List.map toSandElement
     grainElements = model.sandPath |> toGrainElements
@@ -397,7 +410,7 @@ toSvg model =
       , width "800"
       , height "340" 
       ]
-      (rockElements ++ sandElements ++ grainElements)
+      (floorElements ++ rockElements ++ sandElements ++ grainElements)
 
 viewHtml : Model -> Html Msg
 viewHtml model =
@@ -451,6 +464,9 @@ viewHtml model =
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick ToggleInstant ] 
                 [ if model.instant then text "Stepwise" else text "Instant" ] 
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick ToggleFloor ] 
+                [ if model.hasFloor then text "Void" else text "Floor" ] 
                 ] ] ] 
 
 view : Model -> Browser.Document Msg
