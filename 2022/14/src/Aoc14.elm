@@ -42,6 +42,7 @@ type alias Model =
   , sand : Set Pos 
   , sandPath : Path 
   , hasFloor : Bool
+  , instant : Bool
   , done : Bool
   , delay : Float
   , paused : Bool
@@ -221,6 +222,7 @@ init _ =
             , sandPath = Fixed []
             , sand = Set.empty
             , hasFloor = False
+            , instant = False
             , done = False
             , delay = defaultDelay
             , paused = True
@@ -230,7 +232,7 @@ init _ =
 
 -- UPDATE
 
-type Msg = Tick | Step | TogglePlay | Faster | Slower 
+type Msg = Tick | Step | TogglePlay | Faster | Slower | ToggleInstant
 
 tryFind : (a -> Bool) -> List a -> Maybe a
 tryFind pred lst = 
@@ -285,11 +287,27 @@ updateModel model =
     Endless (h :: t) -> 
       { model | sandPath = Endless (t ++ [h]), debug = "Endless (h :: t)" }
     Fixed [] -> 
-      let 
-        occupied = Set.union model.rocks model.sand
-        sandPath = findSandPath model.hasFloor model.bottomRock occupied 
-      in 
-        { model | sandPath = sandPath, debug = "Fixed []" }
+      if model.instant then
+        let 
+          occupied = Set.union model.rocks model.sand
+          sandPath = findSandPath model.hasFloor model.bottomRock occupied 
+        in 
+          case sandPath of 
+            Endless _ -> model
+            Fixed lst ->
+              case lst |> List.reverse |> List.head of 
+                Nothing -> model 
+                Just last -> 
+                  let
+                    sand = Set.insert last model.sand
+                  in
+                    { model | sandPath = Fixed [], sand = sand, debug = "Fixed [last]" }
+      else 
+        let 
+          occupied = Set.union model.rocks model.sand
+          sandPath = findSandPath model.hasFloor model.bottomRock occupied 
+        in 
+          { model | sandPath = sandPath, debug = "Fixed []" }
     Fixed [ last ] -> 
       let
         sand = Set.insert last model.sand
@@ -315,6 +333,8 @@ update msg model =
       ({model | delay = model.delay / 2 }, Cmd.none)
     Slower -> 
       ({model | delay = model.delay * 2 }, Cmd.none)
+    ToggleInstant -> 
+      ({model | instant = not model.instant }, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -373,9 +393,9 @@ toSvg model =
     grainElements = model.sandPath |> toGrainElements
   in 
     svg
-      [ viewBox "300 0 400 160"
+      [ viewBox "300 0 400 170"
       , width "800"
-      , height "320" 
+      , height "340" 
       ]
       (rockElements ++ sandElements ++ grainElements)
 
@@ -427,7 +447,11 @@ viewHtml model =
                 [ if model.paused then text "Play" else text "Pause" ] 
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Faster ] 
-                [ text "Faster" ] ] ] ] 
+                [ text "Faster" ] 
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick ToggleInstant ] 
+                [ if model.instant then text "Stepwise" else text "Instant" ] 
+                ] ] ] 
 
 view : Model -> Browser.Document Msg
 view model = 

@@ -5516,6 +5516,7 @@ var $author$project$Aoc14$init = function (_v0) {
 		delay: $author$project$Aoc14$defaultDelay,
 		done: false,
 		hasFloor: false,
+		instant: false,
 		paused: true,
 		rocks: rocks,
 		sand: $elm$core$Set$empty,
@@ -5952,6 +5953,15 @@ var $author$project$Aoc14$findSandPath = F3(
 		var startPos = _Utils_Tuple2(500, 0);
 		return A5($author$project$Aoc14$buildSandPath, hasFloor, bottomRock, startPos, _List_Nil, occupied);
 	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
 var $elm$core$Dict$union = F2(
 	function (t1, t2) {
 		return A3($elm$core$Dict$foldl, $elm$core$Dict$insert, t2, t1);
@@ -5987,23 +5997,48 @@ var $author$project$Aoc14$updateModel = function (model) {
 		}
 	} else {
 		if (!_v0.a.b) {
-			var occupied = A2($elm$core$Set$union, model.rocks, model.sand);
-			var sandPath = A3($author$project$Aoc14$findSandPath, model.hasFloor, model.bottomRock, occupied);
-			return _Utils_update(
-				model,
-				{debug: 'Fixed []', sandPath: sandPath});
+			if (model.instant) {
+				var occupied = A2($elm$core$Set$union, model.rocks, model.sand);
+				var sandPath = A3($author$project$Aoc14$findSandPath, model.hasFloor, model.bottomRock, occupied);
+				if (sandPath.$ === 'Endless') {
+					return model;
+				} else {
+					var lst = sandPath.a;
+					var _v3 = $elm$core$List$head(
+						$elm$core$List$reverse(lst));
+					if (_v3.$ === 'Nothing') {
+						return model;
+					} else {
+						var last = _v3.a;
+						var sand = A2($elm$core$Set$insert, last, model.sand);
+						return _Utils_update(
+							model,
+							{
+								debug: 'Fixed [last]',
+								sand: sand,
+								sandPath: $author$project$Aoc14$Fixed(_List_Nil)
+							});
+					}
+				}
+			} else {
+				var occupied = A2($elm$core$Set$union, model.rocks, model.sand);
+				var sandPath = A3($author$project$Aoc14$findSandPath, model.hasFloor, model.bottomRock, occupied);
+				return _Utils_update(
+					model,
+					{debug: 'Fixed []', sandPath: sandPath});
+			}
 		} else {
 			if (!_v0.a.b.b) {
-				var _v2 = _v0.a;
-				var last = _v2.a;
+				var _v4 = _v0.a;
+				var last = _v4.a;
 				var sandPath = $author$project$Aoc14$Fixed(_List_Nil);
 				var sand = A2($elm$core$Set$insert, last, model.sand);
 				return _Utils_update(
 					model,
 					{debug: 'Fixed [last]', sand: sand, sandPath: sandPath});
 			} else {
-				var _v3 = _v0.a;
-				var t = _v3.b;
+				var _v5 = _v0.a;
+				var t = _v5.b;
 				var sandPath = $author$project$Aoc14$Fixed(t);
 				return _Utils_update(
 					model,
@@ -6035,17 +6070,24 @@ var $author$project$Aoc14$update = F2(
 						model,
 						{delay: model.delay / 2}),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'Slower':
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{delay: model.delay * 2}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{instant: !model.instant}),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Aoc14$Faster = {$: 'Faster'};
 var $author$project$Aoc14$Slower = {$: 'Slower'};
 var $author$project$Aoc14$Step = {$: 'Step'};
+var $author$project$Aoc14$ToggleInstant = {$: 'ToggleInstant'};
 var $author$project$Aoc14$TogglePlay = {$: 'TogglePlay'};
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -6200,9 +6242,9 @@ var $author$project$Aoc14$toSvg = function (model) {
 		$elm$svg$Svg$svg,
 		_List_fromArray(
 			[
-				$elm$svg$Svg$Attributes$viewBox('300 0 400 160'),
+				$elm$svg$Svg$Attributes$viewBox('300 0 400 170'),
 				$elm$svg$Svg$Attributes$width('800'),
-				$elm$svg$Svg$Attributes$height('320')
+				$elm$svg$Svg$Attributes$height('340')
 			]),
 		_Utils_ap(
 			rockElements,
@@ -6345,6 +6387,17 @@ var $author$project$Aoc14$viewHtml = function (model) {
 								_List_fromArray(
 									[
 										$elm$svg$Svg$text('Faster')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick($author$project$Aoc14$ToggleInstant)
+									]),
+								_List_fromArray(
+									[
+										model.instant ? $elm$svg$Svg$text('Stepwise') : $elm$svg$Svg$text('Instant')
 									]))
 							]))
 					]))
