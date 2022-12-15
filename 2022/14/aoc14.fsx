@@ -30,8 +30,51 @@ let parseLine (s : string) =
     |> List.collect toPositions
     |> Set.ofList
 
-"sample"
+let findBottom (rocks : Set<Pos>) : int = 
+    rocks |> Set.toList |> List.map snd |> List.max
+
+let pourSandUntilVoid (rocks : Set<Pos>) = 
+    let bottom = findBottom rocks 
+    let rec tryFindPosition (pos : Pos) (occupied : Set<Pos>) : Pos option = 
+        match pos with 
+        | (x, y) ->
+            if y = bottom then None
+            else 
+                let candidates = [ (x, y + 1); (x - 1, y + 1); (x + 1, y + 1) ]
+                let maybe = candidates |> List.tryFind (fun c -> not <| Set.contains c occupied) 
+                match maybe with 
+                | Some nextPos -> 
+                    tryFindPosition nextPos occupied
+                | None -> 
+                    Some pos 
+    let rec pourSand (occupied : Set<Pos>) = 
+        let startPos = (500, 0)
+        match tryFindPosition startPos occupied with 
+        | Some pos -> 
+            if pos = startPos then 
+                failwith "never reached the bottomless pit"
+            else 
+                let occupied' = occupied |> Set.add pos 
+                if Set.count occupied = Set.count occupied' then 
+                    failwith "shouldn't happen"
+                else 
+                    occupied' |> pourSand
+        | None -> 
+            occupied
+    let occupied = pourSand rocks 
+    let sand = Set.difference occupied rocks 
+    Set.count sand
+
+let run (lines : string list) = 
+    let rocks = 
+        lines
+        |> List.map parseLine
+        |> List.map (Set.toList)
+        |> List.concat
+        |> Set.ofList
+    pourSandUntilVoid rocks |> printfn "Sand: %d"
+
+"input"
 |> File.ReadAllLines
 |> Array.toList 
-|> List.map parseLine
-|> printfn "%A"
+|> run 
