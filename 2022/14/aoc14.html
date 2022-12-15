@@ -6088,10 +6088,16 @@ var $author$project$Aoc14$update = F2(
 						{instant: !model.instant}),
 					$elm$core$Platform$Cmd$none);
 			default:
+				var paused = true;
+				var m = $author$project$Aoc14$initModel(_Utils_Tuple0);
+				var instant = model.instant;
+				var hasFloor = !model.hasFloor;
+				var done = model.done;
+				var delay = model.delay;
 				return _Utils_Tuple2(
 					_Utils_update(
-						model,
-						{hasFloor: !model.hasFloor}),
+						m,
+						{delay: delay, done: done, hasFloor: hasFloor, instant: instant, paused: paused}),
 					$elm$core$Platform$Cmd$none);
 		}
 	});

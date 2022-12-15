@@ -340,7 +340,15 @@ update msg model =
     ToggleInstant -> 
       ({model | instant = not model.instant }, Cmd.none)
     ToggleFloor -> 
-      ({model | hasFloor = not model.hasFloor }, Cmd.none)
+      let 
+        hasFloor = not model.hasFloor 
+        instant = model.instant
+        done = model.done 
+        delay = model.delay
+        paused = True 
+        m = initModel()
+      in 
+        ({m | hasFloor = hasFloor, instant = instant, done = done, delay = delay, paused = paused }, Cmd.none)
 
 -- SUBSCRIPTIONS
 
