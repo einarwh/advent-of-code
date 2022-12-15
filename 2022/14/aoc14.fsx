@@ -33,37 +33,51 @@ let parseLine (s : string) =
 let findBottom (rocks : Set<Pos>) : int = 
     rocks |> Set.toList |> List.map snd |> List.max
 
-let pourSandUntilVoid (rocks : Set<Pos>) = 
-    let bottom = findBottom rocks 
+let pourSand (bottomless : bool) (floor : int) (rocks : Set<Pos>) = 
     let rec tryFindPosition (pos : Pos) (occupied : Set<Pos>) : Pos option = 
         match pos with 
         | (x, y) ->
-            if y = bottom then None
+            if bottomless && y = floor then None
             else 
-                let candidates = [ (x, y + 1); (x - 1, y + 1); (x + 1, y + 1) ]
+                let candidates = 
+                    if y = floor && not bottomless then 
+                        []
+                    else 
+                        [ (x, y + 1); (x - 1, y + 1); (x + 1, y + 1) ]
                 let maybe = candidates |> List.tryFind (fun c -> not <| Set.contains c occupied) 
                 match maybe with 
                 | Some nextPos -> 
                     tryFindPosition nextPos occupied
                 | None -> 
                     Some pos 
-    let rec pourSand (occupied : Set<Pos>) = 
+    let rec pour (occupied : Set<Pos>) = 
         let startPos = (500, 0)
         match tryFindPosition startPos occupied with 
         | Some pos -> 
             if pos = startPos then 
-                failwith "never reached the bottomless pit"
+                occupied |> Set.add pos
             else 
                 let occupied' = occupied |> Set.add pos 
                 if Set.count occupied = Set.count occupied' then 
-                    failwith "shouldn't happen"
+                    occupied
                 else 
-                    occupied' |> pourSand
+                    occupied' |> pour
         | None -> 
             occupied
-    let occupied = pourSand rocks 
+    let occupied = pour rocks 
     let sand = Set.difference occupied rocks 
+    let xs = sand |> Set.toList |> List.map fst
+    xs |> List.min |> printfn "min x: %d"
+    xs |> List.max |> printfn "max x: %d"
     Set.count sand
+
+let part1 (rocks : Set<Pos>) = 
+    let bottom = findBottom rocks 
+    pourSand true bottom rocks |> printfn "Sand: %d"
+
+let part2 (rocks : Set<Pos>) = 
+    let bottom = findBottom rocks 
+    pourSand false (bottom + 1) rocks |> printfn "Sand: %d"
 
 let run (lines : string list) = 
     let rocks = 
@@ -72,7 +86,8 @@ let run (lines : string list) =
         |> List.map (Set.toList)
         |> List.concat
         |> Set.ofList
-    pourSandUntilVoid rocks |> printfn "Sand: %d"
+    rocks |> part1 
+    rocks |> part2 
 
 "input"
 |> File.ReadAllLines
