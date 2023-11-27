@@ -1,3 +1,6 @@
+# Advent of Code 2022. Day 1: Calorie Counting.
+# tclsh aoc01.tcl
+
 set fp [open "input" r]
 set file_data [read $fp]
 close $fp
