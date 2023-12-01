@@ -31,7 +31,7 @@
 } def  
 
 % Returns true if P is a substring of S
-/startswith {                   % S P
+/starts-with {                   % S P
     dup length                  % S P Lp
     3 -1 roll                   % P Lp S
     dup length                  % P Lp S Ls
@@ -50,47 +50,47 @@
 } def 
 
 /find-digit-as-word {           % S
-    dup (one) startswith        % S ? 
+    dup (one) starts-with       % S ? 
     {
         pop 1                   % 1
     }
     {                           % S
-        dup (two) startswith
+        dup (two) starts-with
         {
             pop 2 
         }
         {
-            dup (three) startswith 
+            dup (three) starts-with 
             {
                 pop 3 
             } 
             {
-                dup (four) startswith 
+                dup (four) starts-with 
                 {
                     pop 4 
                 } 
                 {
-                    dup (five) startswith 
+                    dup (five) starts-with 
                     {
                         pop 5 
                     } 
                     {
-                        dup (six) startswith 
+                        dup (six) starts-with 
                         {
                             pop 6 
                         } 
                         {
-                            dup (seven) startswith 
+                            dup (seven) starts-with 
                             {
                                 pop 7
                             }
                             {
-                                dup (eight) startswith 
+                                dup (eight) starts-with 
                                 {
                                     pop 8
                                 }
                                 {
-                                    dup (nine) startswith 
+                                    dup (nine) starts-with 
                                     {
                                         pop 9
                                     } 
