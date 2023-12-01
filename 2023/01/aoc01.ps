@@ -2,59 +2,59 @@
 % gs -DNOSAFER aoc01.ps
 
 /read-input
-{                           % fn
-    [                       % fn [
-    exch                    % [ fn 
-    (r) file                % [ F
+{                                   % fn
+    [                               % fn [
+    exch                            % [ fn 
+    (r) file                        % [ F
     {
-        dup                 % [ .. F F
-        80 string           % [ ... F F buf
-        readline            % [ ... F (s) 
+        dup                         % [ .. F F
+        80 string                   % [ ... F F buf
+        readline                    % [ ... F (s) 
         {
-            exch            % [ ... (s) F
+            exch                    % [ ... (s) F
         }
         {
-            exch            % [ ... (s) F 
-            closefile       % [ ... (s) 
-            ]               % [ ... (s) ] 
+            exch                    % [ ... (s) F 
+            closefile               % [ ... (s) 
+            ]                       % [ ... (s) ] 
             exit
         } ifelse 
-    } loop                  % Rs
+    } loop                          % Rs
 } def 
 
 % Returns non-zero if there is a digit, zero otherwise. 
-/find-digit-as-number {         % S 
-    0 get                       % C
-    (0) 0 get sub               % n
-    dup                         % n n 
-    10 ge { pop 0 } if          % n | 0
+/find-digit-as-number {             % S 
+    0 get                           % C
+    (0) 0 get sub                   % n
+    dup                             % n n 
+    10 ge { pop 0 } if              % n | 0
 } def  
 
 % Returns true if P is a substring of S
-/starts-with {                   % S P
-    dup length                  % S P Lp
-    3 -1 roll                   % P Lp S
-    dup length                  % P Lp S Ls
-    2 index                     % P Lp S Ls Lp 
-    ge                          % P Lp S (Ls>=Lp?)
+/starts-with {                      % S P
+    dup length                      % S P Lp
+    3 -1 roll                       % P Lp S
+    dup length                      % P Lp S Ls
+    2 index                         % P Lp S Ls Lp 
+    ge                              % P Lp S (Ls>=Lp?)
     {
-        exch                    % P S Lp
-        0 exch                  % P S 0 Lp
-        getinterval             % P S'
-        eq                      % ?
+        exch                        % P S Lp
+        0 exch                      % P S 0 Lp
+        getinterval                 % P S'
+        eq                          % ?
     }
-    {                           % P Lp S
-        pop pop pop             % 
-        false                   % F
+    {                               % P Lp S
+        pop pop pop                 % 
+        false                       % F
     } ifelse
 } def 
 
-/find-digit-as-word {           % S
-    dup (one) starts-with       % S ? 
+/find-digit-as-word {               % S
+    dup (one) starts-with           % S ? 
     {
-        pop 1                   % 1
+        pop 1                       % 1
     }
-    {                           % S
+    {                               % S
         dup (two) starts-with
         {
             pop 2 
@@ -126,19 +126,19 @@
     filter-array 
 } def 
 
-/headless {                      % S 
-    dup length 1 sub             % S count
-    1 exch                       % S 1 count 
-    getinterval                  % S'
+/headless {                         % S 
+    dup length 1 sub                % S count
+    1 exch                          % S 1 count 
+    getinterval                     % S'
 } def 
 
-/substrings {                    % S 
-    [ exch                       % [ S
-    dup length 1 sub             % [ S L
-    {                            % [ S 
-        dup headless             % [ S S'
+/substrings {                       % S 
+    [ exch                          % [ S
+    dup length 1 sub                % [ S L
+    {                               % [ S 
+        dup headless                % [ S S'
     } repeat 
-    ]                            % [ S ... ]
+    ]                               % [ S ... ]
 } def 
 
 /find-digits-2 {                    % S 
