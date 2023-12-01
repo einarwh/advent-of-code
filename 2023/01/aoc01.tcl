@@ -8,8 +8,8 @@ close $fp
 proc toNumber {numbers} {
     set result 0
     if {[llength $numbers] > 0} {
-        set tens [lindex $lst 0]
-        set ones [lindex $lst [expr [llength $lst] - 1]]
+        set tens [lindex $numbers 0]
+        set ones [lindex $numbers [expr [llength $numbers] - 1]]
         set result [expr [expr $tens * 10] + $ones]
     }
     return $result
