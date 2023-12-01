@@ -2,7 +2,7 @@
 # tclsh aoc01.tcl
 
 set fp [open "input" r]
-set file_data [read $fp]
+set fileData [read $fp]
 close $fp
 
 proc toNumber {numbers} {
@@ -56,7 +56,7 @@ proc getScore2 {line} {
     return [toNumber $numbers]
 }
 
-set data [split $file_data "\n"]
+set data [split $fileData "\n"]
 set total1 0
 set total2 0
 foreach line $data {
