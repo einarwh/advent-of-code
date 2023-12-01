@@ -18,6 +18,14 @@ let toNum (nums : int seq) : int =
 let parseLine (line : string) : int =
     line |> Seq.choose tryParseInt |> toNum
 
+let rec tokenize (line : string) : int list = 
+    if line.Length = 0 then 
+        []
+    else
+        let ch = line[0]
+        printfn "%A" ch
+        []
+
 let part1 filename = 
     filename 
     |> File.ReadAllLines
@@ -26,7 +34,15 @@ let part1 filename =
     |> List.map parseLine
     |> List.sum
 
-let run filename = 
-    part1 filename |> printfn "%d"
+let part2 filename = 
+    filename 
+    |> File.ReadAllLines
+    |> Array.toList
+    |> List.filter (fun line -> line <> String.Empty)
+    |> List.map tokenize
 
-run "input"
+let run filename = 
+    //part1 filename |> printfn "%d"
+    part2 filename |> printfn "%A"
+
+run "sample2"
