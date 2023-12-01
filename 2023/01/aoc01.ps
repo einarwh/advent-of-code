@@ -1,5 +1,5 @@
-% Advent of Code 2023. Day 1: Trebuchet?! (part B).
-% gs -DNOSAFER aoc01b.ps
+% Advent of Code 2023. Day 1: Trebuchet?!
+% gs -DNOSAFER aoc01.ps
 
 /read-input
 {                           % fn
@@ -120,16 +120,6 @@
 } def 
 
 /find-digits-1 {
-    [ exch 
-    {
-        (0) 0 get sub
-        dup 
-        10 ge { pop } if 
-    } forall
-    ]
-} def 
-
-/find-digits-1a {
     { (0) 0 get sub }
     map-array
     { 10 lt }
@@ -209,7 +199,7 @@ filter-array
 dup 
 
 % Part 1
-{ find-digits-1a to-number }
+{ find-digits-1 to-number }
 map-array
 sum-array
 
@@ -219,7 +209,3 @@ exch
 { find-digits-2 to-number }
 map-array
 sum-array
-
-%{ find-digits-2 to-number }
-%map-array
-%sum-array
