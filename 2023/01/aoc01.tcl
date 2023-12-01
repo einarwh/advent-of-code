@@ -5,20 +5,11 @@ set fp [open "input" r]
 set file_data [read $fp]
 close $fp
 
-proc first {lst} {
-    return [lindex $lst 0]
-}
-
-proc last {lst} {
-    set len [llength $lst]
-    return [lindex $lst [expr $len - 1]]
-}
-
 proc toNumber {numbers} {
     set result 0
     if {[llength $numbers] > 0} {
-        set tens [first $numbers]
-        set ones [last $numbers]
+        set tens [lindex $lst 0]
+        set ones [lindex $lst [expr [llength $lst] - 1]]
         set result [expr [expr $tens * 10] + $ones]
     }
     return $result
