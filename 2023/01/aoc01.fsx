@@ -49,12 +49,11 @@ let rec subStrings (str : string) =
 let numberFinder2 = subStrings >> List.choose tryFindNum
 
 let calculate numberFinder = 
-    List.map (numberFinder >> toNum) >> List.sum
+    Array.sumBy (numberFinder >> toNum)
 
 let readLines = 
     File.ReadAllLines
-    >> Array.toList
-    >> List.filter (fun line -> line <> String.Empty)
+    >> Array.filter (fun line -> line <> String.Empty)
 
 let run fileName = 
     let lines = readLines fileName
