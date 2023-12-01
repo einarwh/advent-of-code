@@ -20,8 +20,7 @@ let numberFinder1 = Seq.choose tryParseInt >> Seq.toList
 let tryFindNum (line : string) : int option = 
     let ch = line[0]
     if Char.IsDigit ch then 
-        let n = Char.GetNumericValue ch |> int
-        Some n
+        Some (Char.GetNumericValue ch |> int)
     elif line.StartsWith("one") then 
         Some 1
     elif line.StartsWith("two") then 
@@ -43,14 +42,11 @@ let tryFindNum (line : string) : int option =
     else 
         None
 
-let rec numberFinder2 (line : string) : int list = 
-    if line.Length = 0 then 
-        []
-    else
-        let next = line.Substring(1)
-        match tryFindNum line with 
-        | Some n -> n :: numberFinder2 next
-        | None -> numberFinder2 next
+let rec subStrings (str : string) = 
+    if str = "" then []
+    else str :: subStrings (str.Substring(1))
+
+let numberFinder2 = subStrings >> List.choose tryFindNum
 
 let calculate numberFinder = 
     List.map (numberFinder >> toNum) >> List.sum
