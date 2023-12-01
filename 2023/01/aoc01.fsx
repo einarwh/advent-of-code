@@ -52,16 +52,13 @@ let rec numberFinder2 (line : string) : int list =
         | Some n -> n :: numberFinder2 next
         | None -> numberFinder2 next
 
-let calculate numberFinder lines = 
-    lines
-    |> List.map (numberFinder >> toNum)
-    |> List.sum
+let calculate numberFinder = 
+    List.map (numberFinder >> toNum) >> List.sum
 
-let readLines fileName = 
-    fileName 
-    |> File.ReadAllLines
-    |> Array.toList
-    |> List.filter (fun line -> line <> String.Empty)
+let readLines = 
+    File.ReadAllLines
+    >> Array.toList
+    >> List.filter (fun line -> line <> String.Empty)
 
 let run fileName = 
     let lines = readLines fileName
