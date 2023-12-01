@@ -45,4 +45,4 @@ let run filename =
     //part1 filename |> printfn "%d"
     part2 filename |> printfn "%A"
 
-run "sample2"
+run "sample3"
