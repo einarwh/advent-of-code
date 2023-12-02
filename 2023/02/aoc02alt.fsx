@@ -10,8 +10,7 @@ let getCount (m : Match) : int =
 
 let readColor (color : string) (s : string) : int  = 
     let pattern = sprintf "(\d+) %s" color
-    let matches = Regex.Matches(s, pattern)
-    matches |> Seq.map getCount |> Seq.max
+    Regex.Matches(s, pattern) |> Seq.map getCount |> Seq.max
 
 let readReds = readColor "red"
 
