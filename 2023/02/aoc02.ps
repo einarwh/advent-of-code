@@ -1,0 +1,207 @@
+% Advent of Code 2023. Day 2: Cube Conundrum
+% gs -DNOSAFER aoc02.ps
+
+/read-input
+{                                       % fn
+    [                                   % fn [
+    exch                                % [ fn 
+    (r) file                            % [ F
+    {   
+        dup                             % [ .. F F
+        160 string                      % [ ... F F buf
+        readline                        % [ ... F (s) 
+        {   
+            exch                        % [ ... (s) F
+        }   
+        {   
+            exch                        % [ ... (s) F 
+            closefile                   % [ ... (s) 
+            ]                           % [ ... (s) ] 
+            exit    
+        } ifelse    
+    } loop                              % Rs
+} def 
+
+/map-array {                            % A {op} %%% {op} is operation to be called for each element in A
+    [ 3 1 roll                          % [ A {op}
+    exch                                % [ {op} A
+    {                                   % [ {op} e
+        1 index                         % [ {op} e {op}
+        exec                            % [ {op} r %%% r is result of executing {op} on e
+        exch                            % [ r {op}
+    } forall                            % [ ... {op}
+    pop                                 % [ ...
+    ]                                   % [ r1 r2 ... ]
+} def
+
+/filter-array {                         % A {p} %%% {p} is predicate to be called for each element in A
+    [ 3 1 roll                          % [ A {p}
+    exch                                % [ {p} A
+    {                                   % [ {p} e
+        2 copy                          % [ {p} e {p} e
+        exch                            % [ {p} e e {p}
+        exec                            % [ {p} e include?
+        {                               % [ {p} e %%% yes, keep e
+            exch                        % [ e {p}
+        }
+        {                               % [ {p} e %%% no, reject e
+            pop                         % [ {p}
+        } ifelse                        % [ e? {p}
+    } forall                            % [ ... {p}
+    pop                                 % [ ...
+    ]                                   % [ e... ]
+} def 
+
+/flatten-array {                        % A[B] %%% A is an array containing arrays.
+    [ exch                              % [ A[B] 
+    {                                   % [ B 
+        {} forall                       % [ ... 
+    } forall                            % [ ...
+    ]                                   % [ ... ]
+} def 
+
+/flatmap-array {
+    map-array flatten-array
+} def 
+
+/sum-array {
+    0 exch 
+    { add } forall 
+} def 
+
+/split-string {                         % (s=string) (z=sep) 
+    [                                   % s z [ 
+    3 1 roll                            % [ s z  
+    {                                   % [ s z
+        search                          % [ s'=rest (h=head z)? found?
+        {                               % [ s' z h (yes, found)
+            3 1 roll                    % [ h s' z  
+        }       
+        {                               % [ s  (not found)
+            exit                        % [ s
+        } ifelse        
+    } loop      
+    ]                                   % [ .. ]
+} def 
+
+/find-max-number {                      % N %%% An array of numbers, length at least 1. 
+    dup 0 get                           % N m
+    exch                                % m N 
+    {                                   % m n 
+        2 copy                          % m n m n 
+        lt                              % m n m<n?
+        {                               % m n %%% replace m with n
+            exch pop                    % n 
+        }  
+        {                               % m n %%% keep m
+            pop
+        } ifelse                        % m'
+    } forall 
+} def 
+
+/count-color {                          % S C
+    search                              % S C ???
+    {                                   % _ _ D (found)
+        3 1 roll                        % D _ _ 
+        pop pop                         % D 
+        cvi
+    }
+    {                                   % S
+        pop 0                           % 0
+    } ifelse 
+} def 
+
+/count-red { (red) count-color } def 
+
+/count-green { (green) count-color } def 
+
+/count-blue { (blue) count-color } def 
+
+% S: String
+% Example: (1 green, 3 red, 6 blue; 3 green, 6 red)
+/get-samples {                          % S 
+    (; ) split-string
+    { (, ) split-string }
+    flatmap-array 
+} def 
+
+% Ss: Samples 
+% Example: [(1 green) (3 red) (6 blue) (3 green) (6 red)]
+/is-possible {                              % Ss
+    dup { count-red } map-array             % Ss Ns
+    find-max-number                         % Ss n
+    12                                      % Ss n 12 
+    le                                      % Ss ? 
+    {
+        dup { count-green } map-array       % Ss Ns 
+        find-max-number                     % Ss n
+        13                                  % Ss n 13
+        le                                  % Ss ? 
+        {
+            dup { count-blue } map-array    % Ss Ns
+            find-max-number                 % Ss n
+            14                              % Ss n 14
+            le                              % Ss ? 
+            exch pop                        % Ss ?
+        }
+        {
+            pop false                       % F
+        } ifelse 
+    }
+    {
+        pop false                           % F
+    } ifelse
+} def 
+
+% S : string
+% Example: (Game 14)
+/get-game-id {                              % S (string)
+    ( ) split-string                        % [_ D]
+    aload pop                               % _ D
+    exch pop                                % D
+    cvi                                     % n
+} def 
+
+/check-possible {                           % S (string)
+    (: ) split-string                       % [ G R ]
+    aload pop                               % G R 
+    get-samples                             % G Ss
+    is-possible                             % G ?
+    {
+        get-game-id
+    }
+    {
+        pop 0
+    } ifelse
+} def
+
+/calc-power {                               % S (string)
+    (: ) split-string                       % [ G R ]
+    1 get                                   % R
+    get-samples                             % Ss
+    dup { count-red } map-array             % Ss Ns
+    find-max-number                         % Ss r
+    exch                                    % r Ss
+    dup { count-green } map-array           % r Ss Ns
+    find-max-number                         % r Ss g
+    exch                                    % r g Ss
+    { count-blue } map-array                % r g Ns
+    find-max-number                         % r g b 
+    mul mul                                 % p    
+} def  
+
+/run {
+    read-input
+    { length 0 ne }
+    filter-array
+    dup 
+    { check-possible }
+    map-array 
+    sum-array
+    exch 
+    { calc-power }
+    map-array 
+    sum-array
+} def 
+
+(input) run 
