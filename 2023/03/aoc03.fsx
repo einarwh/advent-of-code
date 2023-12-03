@@ -43,8 +43,8 @@ let overlapping (box1 : Box) (box2 : Box) : bool =
     box1.xMax >= box2.xMin && box2.xMax >= box1.xMin &&  
     box1.yMax >= box2.yMin && box2.yMax >= box1.yMin 
 
-let checkNumber (symbolBoxes : Box list) (numberBox, _) : bool = 
-    symbolBoxes |> List.exists (overlapping numberBox)
+let checkNumber (symBoxList : (Box * string) list) (numberBox, _) : bool = 
+    symBoxList |> List.map fst |> List.exists (overlapping numberBox)
 
 let gearRatio (numBoxList : (Box * string) list) (symbolBox, _) : int = 
     let parts = 
@@ -61,10 +61,9 @@ let run fileName =
     let lines = readLines fileName |> Array.toList
     let parseWith parser = List.mapi parser >> List.collect id 
     let symbolsAndBoxes = lines |> parseWith parseSymbolsAtLine
-    let symbolBoxes = symbolsAndBoxes |> List.map fst
     let numbersAndBoxes = lines |> parseWith parseNumbersAtLine
     numbersAndBoxes
-    |> List.filter (checkNumber symbolBoxes)
+    |> List.filter (checkNumber symbolsAndBoxes)
     |> List.map (snd >> int)
     |> List.sum 
     |> printfn "%d" 
