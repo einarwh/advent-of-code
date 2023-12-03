@@ -1,5 +1,5 @@
 // Advent of Code 2023. Day 3: Gear Ratios
-// dotnet fsi aoc02.fsx
+// dotnet fsi aoc03.fsx
 
 open System
 open System.IO
@@ -55,6 +55,13 @@ let readLines =
 let checkNumber (symbolBoxes : Box list) (numberBox, _) : bool = 
     symbolBoxes |> List.exists (overlapping numberBox)
 
+let gearRatio (numBoxList : (Box * string) list) (symbolBox, _) : int64 = 
+    let parts = 
+        numBoxList |> List.filter (fun (box, num) -> overlapping box symbolBox)
+    match parts with 
+    | [(_, str1); (_, str2)] -> (int64 str1) * (int64 str2) 
+    | _ -> 0 
+
 let run fileName = 
     let lines = readLines fileName
     let symbolsAndBoxes = 
@@ -73,6 +80,12 @@ let run fileName =
         numbersAndBoxes
         |> List.filter (checkNumber symbolBoxes)
         |> List.map (snd >> int)    
-    partNumbers |> List.sum |> printfn "%d" 
+    partNumbers 
+    |> List.sum 
+    |> printfn "%d" 
+    symbolsAndBoxes 
+    |> List.map (gearRatio numbersAndBoxes)
+    |> List.sum
+    |> printfn "%d"
 
 "input" |> run 
