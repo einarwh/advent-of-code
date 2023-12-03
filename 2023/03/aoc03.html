@@ -5552,7 +5552,7 @@ var $author$project$Aoc03$init = function (_v0) {
 			return bt.box;
 		},
 		boxedNonParts);
-	var model = {counter: 0, debug: '...', gearBoxes: gearBoxes, gearRatio: gearRatio, lines: lines, nonGearBoxes: nonGearBoxes, nonPartBoxes: nonPartBoxes, numberBoxes: numberBoxes, partBoxes: partBoxes, partSum: partSum, symbolBoxes: symbolBoxes};
+	var model = {counter: 0, debug: '...', gearBoxes: gearBoxes, gearRatio: gearRatio, lines: lines, nonGearBoxes: nonGearBoxes, nonPartBoxes: nonPartBoxes, partBoxes: partBoxes, partSum: partSum};
 	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -5664,13 +5664,11 @@ var $author$project$Aoc03$toColoredBox = F2(
 	});
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $author$project$Aoc03$toSvg = function (model) {
-	var symbolBoxes = model.symbolBoxes;
 	var partBoxes = model.partBoxes;
 	var partRects = A2(
 		$elm$core$List$map,
 		$author$project$Aoc03$toColoredBox('lightgreen'),
 		partBoxes);
-	var numberBoxes = model.numberBoxes;
 	var nonPartBoxes = model.nonPartBoxes;
 	var nonPartRects = A2(
 		$elm$core$List$map,

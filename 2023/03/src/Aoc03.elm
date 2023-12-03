@@ -45,10 +45,8 @@ type alias PosedString =
 
 type alias Model = 
   { lines : List String
-  , numberBoxes : List Box 
   , partBoxes : List Box 
   , nonPartBoxes : List Box 
-  , symbolBoxes : List Box 
   , gearBoxes : List Box 
   , nonGearBoxes : List Box 
   , partSum : Int 
@@ -94,14 +92,6 @@ parseSymbolsWithBox : Int -> String -> List BoxedString
 parseSymbolsWithBox y line = 
   line |> parseSymbols |> List.map (\(x, s) -> { box = toSymbolBox { x = x, y = y }, val = s })
 
---let checkNumber (symbolBoxes : Box list) (numberBox, _) : bool = 
---    symbolBoxes |> List.exists (overlapping numberBox)
-
--- let overlapping (box1 : Box) (box2 : Box) : bool = 
---     box1.xMax >= box2.xMin && box2.xMax >= box1.xMin &&  
---     box1.yMax >= box2.yMin && box2.yMax >= box1.yMin 
-
-
 overlapping : Box -> Box -> Bool 
 overlapping box1 box2 = 
   box1.xMax >= box2.xMin && box2.xMax >= box1.xMin && 
@@ -110,13 +100,6 @@ overlapping box1 box2 =
 isPartNumber : List Box -> BoxedString -> Bool 
 isPartNumber symbolBoxes { box, val } = 
   symbolBoxes |> List.any (overlapping box)
-
--- let gearRatio (numBoxList : (Box * string) list) (symbolBox, _) : int64 = 
---     let parts = 
---         numBoxList |> List.filter (fun (box, num) -> overlapping box symbolBox)
---     match parts with 
---     | [(_, str1); (_, str2)] -> (int64 str1) * (int64 str2) 
---     | _ -> 0 
 
 isGearPart : List BoxedString -> BoxedString -> Bool
 isGearPart boxedParts boxedSymbol = 
@@ -337,10 +320,8 @@ init _ =
         |> List.sum 
 
     model = { lines = lines
-            , symbolBoxes = symbolBoxes
             , gearBoxes = gearBoxes
             , nonGearBoxes = nonGearBoxes
-            , numberBoxes = numberBoxes
             , partBoxes = partBoxes
             , nonPartBoxes = nonPartBoxes
             , partSum = partSum 
@@ -412,12 +393,10 @@ lineToCharBox y line =
 toSvg : Model -> Html Msg 
 toSvg model = 
   let 
-    numberBoxes = model.numberBoxes
     partBoxes = model.partBoxes
     nonPartBoxes = model.nonPartBoxes
     gearBoxes = model.gearBoxes
     nonGearBoxes = model.nonGearBoxes
-    symbolBoxes = model.symbolBoxes
     lines = model.lines
     partRects = partBoxes |> List.map (toColoredBox "lightgreen")
     nonPartRects = nonPartBoxes |> List.map (toColoredBox "pink")
