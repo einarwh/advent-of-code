@@ -34,15 +34,8 @@ type alias StackId = Int
 
 type alias Stacks = Dict StackId Stack 
 
-type alias Command =
-    { amount : Int 
-    , source : StackId
-    , target : StackId }
-
 type alias Model = 
   { stacks : Stacks
-  , tallestStackSeen : Int 
-  , keepOrder : Bool
   , counter : Int 
   , debug : String }
 
@@ -89,21 +82,7 @@ parseStacks s =
           stacks = stackIds |> List.map (initStack crateLines)
         in         
           Dict.fromList stacks
-
-parseCommand : String -> Maybe Command 
-parseCommand s = 
-  let 
-    nums = s |> String.words |> List.filterMap String.toInt 
-  in 
-    case nums of 
-      amount::source::target::_ -> Just {amount=amount, source=source, target=target}
-      _ -> Nothing
-     
-
-parseCommands : String -> List Command
-parseCommands s = 
-  s |> String.split "\n" |> List.filterMap parseCommand
-  
+       
 init : () -> (Model, Cmd Msg)
 init _ =
   let 
@@ -119,11 +98,8 @@ move 1 from 1 to 2"""
     (stacksStr, commandsStr) = sample |> String.trimRight |> splitInput
 
     parsedStacks = parseStacks stacksStr
-    parsedCommands = parseCommands commandsStr
 
     model = { stacks = parsedStacks
-            , tallestStackSeen = 0
-            , keepOrder = False
             , counter = 0
             , debug = "" }
   in 
@@ -142,26 +118,6 @@ takeAmount amount taken stack =
                 takeAmount (amount - 1) (top :: taken) rest 
     else 
         (taken, stack)
-
-moveAmount : Bool -> Int -> Int -> Int -> Stacks -> Stacks
-moveAmount keepOrder amount source target stacks = 
-    case takeAmount amount [] (Dict.get source stacks |> Maybe.withDefault []) of 
-        (taken, stack) -> 
-            stacks 
-            |> Dict.update source (Maybe.map (\old -> stack))
-            |> Dict.update target (Maybe.map (\old -> (if keepOrder then taken |> List.reverse else taken) ++ old))
-
-runCommand : Bool -> Command -> Stacks -> Stacks 
-runCommand keepOrder command stacks = 
-    moveAmount keepOrder command.amount command.source command.target stacks
-
-toCommandText : Command -> String 
-toCommandText cmd = 
-  "moved " ++ String.fromInt cmd.amount ++ " from " ++ String.fromInt cmd.source ++ " to " ++ String.fromInt cmd.target
-
-getTallestStack : Stacks -> Int 
-getTallestStack stacks = 
-  stacks |> Dict.values |> List.map (List.length) |> List.maximum |> Maybe.withDefault 0 
 
 toTopCrateText : Stacks -> String 
 toTopCrateText stacks = 

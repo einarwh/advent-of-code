@@ -5175,48 +5175,6 @@ var $elm$core$Task$perform = F2(
 var $elm$browser$Browser$element = _Browser_element;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $elm$core$List$maybeCons = F3(
-	function (f, mx, xs) {
-		var _v0 = f(mx);
-		if (_v0.$ === 'Just') {
-			var x = _v0.a;
-			return A2($elm$core$List$cons, x, xs);
-		} else {
-			return xs;
-		}
-	});
-var $elm$core$List$filterMap = F2(
-	function (f, xs) {
-		return A3(
-			$elm$core$List$foldr,
-			$elm$core$List$maybeCons(f),
-			_List_Nil,
-			xs);
-	});
-var $elm$core$String$words = _String_words;
-var $author$project$Aoc03$parseCommand = function (s) {
-	var nums = A2(
-		$elm$core$List$filterMap,
-		$elm$core$String$toInt,
-		$elm$core$String$words(s));
-	if ((nums.b && nums.b.b) && nums.b.b.b) {
-		var amount = nums.a;
-		var _v1 = nums.b;
-		var source = _v1.a;
-		var _v2 = _v1.b;
-		var target = _v2.a;
-		return $elm$core$Maybe$Just(
-			{amount: amount, source: source, target: target});
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $author$project$Aoc03$parseCommands = function (s) {
-	return A2(
-		$elm$core$List$filterMap,
-		$author$project$Aoc03$parseCommand,
-		A2($elm$core$String$split, '\n', s));
-};
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $elm$core$Dict$Black = {$: 'Black'};
@@ -5340,6 +5298,24 @@ var $elm$core$Dict$fromList = function (assocs) {
 		$elm$core$Dict$empty,
 		assocs);
 };
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
 var $author$project$Aoc03$toStackIndex = function (stackId) {
 	return 1 + (4 * (stackId - 1));
 };
@@ -5375,6 +5351,7 @@ var $elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
+var $elm$core$String$words = _String_words;
 var $author$project$Aoc03$parseStackIdLine = function (s) {
 	return A2(
 		$elm$core$List$map,
@@ -5418,9 +5395,8 @@ var $author$project$Aoc03$init = function (_v0) {
 		$elm$core$String$trimRight(sample));
 	var stacksStr = _v1.a;
 	var commandsStr = _v1.b;
-	var parsedCommands = $author$project$Aoc03$parseCommands(commandsStr);
 	var parsedStacks = $author$project$Aoc03$parseStacks(stacksStr);
-	var model = {counter: 0, debug: '', keepOrder: false, stacks: parsedStacks, tallestStackSeen: 0};
+	var model = {counter: 0, debug: '', keepOrder: false, stacks: parsedStacks};
 	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
