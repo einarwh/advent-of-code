@@ -5595,16 +5595,15 @@ var $elm$core$String$fromChar = function (_char) {
 var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
-var $author$project$Aoc03$unitHeight = 9;
-var $author$project$Aoc03$unitWidth = 9;
+var $author$project$Aoc03$unitSize = 9;
 var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
 var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
 var $author$project$Aoc03$toCharText = F3(
 	function (yPos, xPos, ch) {
 		var yOffset = 8;
-		var yVal = yOffset + (yPos * $author$project$Aoc03$unitHeight);
+		var yVal = yOffset + (yPos * $author$project$Aoc03$unitSize);
 		var xOffset = 2;
-		var xVal = xOffset + (xPos * $author$project$Aoc03$unitWidth);
+		var xVal = xOffset + (xPos * $author$project$Aoc03$unitSize);
 		return A2(
 			$elm$svg$Svg$text_,
 			_List_fromArray(
@@ -5638,14 +5637,14 @@ var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var $elm$svg$Svg$Attributes$opacity = _VirtualDom_attribute('opacity');
 var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
-var $author$project$Aoc03$toColoredBox = F3(
-	function (yMax, fillColor, box) {
-		var yVal = $author$project$Aoc03$unitHeight * box.yMin;
-		var yDiff = box.yMax - box.yMin;
-		var xVal = $author$project$Aoc03$unitWidth * box.xMin;
+var $author$project$Aoc03$toColoredBox = F2(
+	function (fillColor, box) {
+		var yVal = $author$project$Aoc03$unitSize * box.yMin;
+		var yDiff = (box.yMax - box.yMin) + 1;
+		var xVal = $author$project$Aoc03$unitSize * box.xMin;
 		var xDiff = (box.xMax - box.xMin) + 1;
-		var w = $author$project$Aoc03$unitWidth * xDiff;
-		var h = $author$project$Aoc03$unitHeight * (1 + yDiff);
+		var w = $author$project$Aoc03$unitSize * xDiff;
+		var h = $author$project$Aoc03$unitSize * yDiff;
 		return A2(
 			$elm$svg$Svg$rect,
 			_List_fromArray(
@@ -5665,29 +5664,28 @@ var $author$project$Aoc03$toColoredBox = F3(
 	});
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $author$project$Aoc03$toSvg = function (model) {
-	var yMax = 500;
 	var symbolBoxes = model.symbolBoxes;
 	var partBoxes = model.partBoxes;
 	var partRects = A2(
 		$elm$core$List$map,
-		A2($author$project$Aoc03$toColoredBox, yMax, 'lightgreen'),
+		$author$project$Aoc03$toColoredBox('lightgreen'),
 		partBoxes);
 	var numberBoxes = model.numberBoxes;
 	var nonPartBoxes = model.nonPartBoxes;
 	var nonPartRects = A2(
 		$elm$core$List$map,
-		A2($author$project$Aoc03$toColoredBox, yMax, 'pink'),
+		$author$project$Aoc03$toColoredBox('pink'),
 		nonPartBoxes);
 	var nonGearBoxes = model.nonGearBoxes;
 	var nonGearRects = A2(
 		$elm$core$List$map,
-		A2($author$project$Aoc03$toColoredBox, yMax, 'lightblue'),
+		$author$project$Aoc03$toColoredBox('lightblue'),
 		nonGearBoxes);
 	var lines = model.lines;
 	var gearBoxes = model.gearBoxes;
 	var gearRects = A2(
 		$elm$core$List$map,
-		A2($author$project$Aoc03$toColoredBox, yMax, 'plum'),
+		$author$project$Aoc03$toColoredBox('plum'),
 		gearBoxes);
 	var charTexts = $elm$core$List$concat(
 		A2($elm$core$List$indexedMap, $author$project$Aoc03$lineToCharBox, lines));

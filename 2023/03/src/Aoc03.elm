@@ -11,15 +11,8 @@ import Svg.Attributes exposing (..)
 import Time
 import Regex
 
-crateSize : Int 
-crateSize = 10
-
-unitWidth : Int 
-unitWidth = 9
-
-unitHeight : Int 
-unitHeight = 9
-
+unitSize : Int 
+unitSize = 9
 
 -- MAIN
 
@@ -382,26 +375,25 @@ toCharText yPos xPos ch =
   let 
     xOffset = 2
     yOffset = 8
-    xVal = xOffset + xPos * unitWidth
-    yVal = yOffset + yPos * unitHeight
+    xVal = xOffset + xPos * unitSize
+    yVal = yOffset + yPos * unitSize
   in
     text_
       [ x (String.fromInt xVal)
       , y (String.fromInt yVal)
-    --   , fill "red"
       , fontSize "9px"
       , fontFamily "monospace" ]
       [ text (String.fromChar ch) ]
 
-toColoredBox : Int -> String -> Box -> Html Msg 
-toColoredBox yMax fillColor box = 
+toColoredBox : String -> Box -> Html Msg 
+toColoredBox fillColor box = 
   let 
     xDiff = box.xMax - box.xMin + 1
-    yDiff = box.yMax - box.yMin 
-    w = unitWidth * xDiff 
-    h = unitHeight * (1 + yDiff)
-    xVal = unitWidth * box.xMin
-    yVal = unitHeight * box.yMin
+    yDiff = box.yMax - box.yMin + 1
+    w = unitSize * xDiff 
+    h = unitSize * yDiff
+    xVal = unitSize * box.xMin
+    yVal = unitSize * box.yMin
   in
     rect
       [ x (String.fromInt xVal)
@@ -427,11 +419,10 @@ toSvg model =
     nonGearBoxes = model.nonGearBoxes
     symbolBoxes = model.symbolBoxes
     lines = model.lines
-    yMax = 500
-    partRects = partBoxes |> List.map (toColoredBox yMax "lightgreen")
-    nonPartRects = nonPartBoxes |> List.map (toColoredBox yMax "pink")
-    gearRects = gearBoxes |> List.map (toColoredBox yMax "plum")
-    nonGearRects = nonGearBoxes |> List.map (toColoredBox yMax "lightblue")
+    partRects = partBoxes |> List.map (toColoredBox "lightgreen")
+    nonPartRects = nonPartBoxes |> List.map (toColoredBox "pink")
+    gearRects = gearBoxes |> List.map (toColoredBox "plum")
+    nonGearRects = nonGearBoxes |> List.map (toColoredBox "lightblue")
     charTexts = lines |> List.indexedMap lineToCharBox |> List.concat
     lst = partRects ++ nonPartRects ++ gearRects ++ nonGearRects ++ charTexts
   in 
