@@ -24,6 +24,25 @@ main =
 
 -- MODEL
 
+type alias SymbolBox = 
+    { xMin : Int 
+    , xMax : Int 
+    , yMin : Int 
+    , yMax : Int }
+
+type alias Pos = 
+    { x : Int
+    , y : Int }
+
+type alias SymbolPos = 
+    { x : Int
+    , y : Int }
+
+type alias NumberBox = 
+    { xStart : Int
+    , xEnd : Int 
+    , y : Int }
+
 type alias Crate = String 
 
 type alias Crates = List Crate 
@@ -86,7 +105,21 @@ parseStacks s =
 init : () -> (Model, Cmd Msg)
 init _ =
   let 
-    sample = """    [D]    
+    sample = """467..114..
+...*......
+..35..633.
+......#...
+617*......
+.....+.58.
+..592.....
+......755.
+...$.*....
+.664.598.."""
+
+    lines = sample |> String.split "\n"
+    debugStr = lines |> List.length |> String.fromInt
+
+    cratesample = """    [D]    
 [N] [C]    
 [Z] [M] [P]
  1   2   3 
@@ -95,13 +128,13 @@ move 1 from 2 to 1
 move 3 from 1 to 3
 move 2 from 2 to 1
 move 1 from 1 to 2"""
-    (stacksStr, commandsStr) = sample |> String.trimRight |> splitInput
+    (stacksStr, commandsStr) = cratesample |> String.trimRight |> splitInput
 
     parsedStacks = parseStacks stacksStr
 
     model = { stacks = parsedStacks
             , counter = 0
-            , debug = "" }
+            , debug = debugStr }
   in 
     (model, Cmd.none)
 

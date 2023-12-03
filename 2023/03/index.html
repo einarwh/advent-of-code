@@ -5390,13 +5390,17 @@ var $author$project$Aoc03$splitInput = function (input) {
 };
 var $elm$core$String$trimRight = _String_trimRight;
 var $author$project$Aoc03$init = function (_v0) {
-	var sample = '    [D]    \n[N] [C]    \n[Z] [M] [P]\n 1   2   3 \n\nmove 1 from 2 to 1\nmove 3 from 1 to 3\nmove 2 from 2 to 1\nmove 1 from 1 to 2';
+	var sample = '467..114..\n...*......\n..35..633.\n......#...\n617*......\n.....+.58.\n..592.....\n......755.\n...$.*....\n.664.598..';
+	var lines = A2($elm$core$String$split, '\n', sample);
+	var debugStr = $elm$core$String$fromInt(
+		$elm$core$List$length(lines));
+	var cratesample = '    [D]    \n[N] [C]    \n[Z] [M] [P]\n 1   2   3 \n\nmove 1 from 2 to 1\nmove 3 from 1 to 3\nmove 2 from 2 to 1\nmove 1 from 1 to 2';
 	var _v1 = $author$project$Aoc03$splitInput(
-		$elm$core$String$trimRight(sample));
+		$elm$core$String$trimRight(cratesample));
 	var stacksStr = _v1.a;
 	var commandsStr = _v1.b;
 	var parsedStacks = $author$project$Aoc03$parseStacks(stacksStr);
-	var model = {counter: 0, debug: '', keepOrder: false, stacks: parsedStacks};
+	var model = {counter: 0, debug: debugStr, stacks: parsedStacks};
 	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;

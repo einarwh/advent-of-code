@@ -1,4 +1,4 @@
-// Advent of Code 2023. Day 1: Cube Conundrum
+// Advent of Code 2023. Day 2: Cube Conundrum
 // dotnet fsi aoc02.fsx
 
 open System
