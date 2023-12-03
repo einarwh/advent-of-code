@@ -5414,7 +5414,7 @@ var $author$project$Aoc03$init = function (_v0) {
 			return bt.box;
 		},
 		boxedNumbers);
-	var model = {counter: 0, data: sample, debug: debugStr, numberBoxes: numberBoxes, symbolBoxes: symbolBoxes};
+	var model = {counter: 0, data: sample, debug: debugStr, lines: lines, numberBoxes: numberBoxes, symbolBoxes: symbolBoxes};
 	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -5448,24 +5448,65 @@ var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
-var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
+var $elm$svg$Svg$Attributes$fontFamily = _VirtualDom_attribute('font-family');
+var $elm$svg$Svg$Attributes$fontSize = _VirtualDom_attribute('font-size');
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
+var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
+var $author$project$Aoc03$unitHeight = 13;
+var $author$project$Aoc03$unitWidth = 13;
+var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
+var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
+var $author$project$Aoc03$toCharText = F3(
+	function (yPos, xPos, ch) {
+		var yOffset = 11;
+		var yVal = yOffset + (yPos * $author$project$Aoc03$unitHeight);
+		var xOffset = 2;
+		var xVal = xOffset + (xPos * $author$project$Aoc03$unitWidth);
+		return A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x(
+					$elm$core$String$fromInt(xVal)),
+					$elm$svg$Svg$Attributes$y(
+					$elm$core$String$fromInt(yVal)),
+					$elm$svg$Svg$Attributes$fontSize('12px'),
+					$elm$svg$Svg$Attributes$fontFamily('monospace')
+				]),
+			_List_fromArray(
+				[
+					$elm$svg$Svg$text(
+					$elm$core$String$fromChar(ch))
+				]));
+	});
+var $elm$core$String$foldr = _String_foldr;
+var $elm$core$String$toList = function (string) {
+	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
+};
+var $author$project$Aoc03$lineToCharBox = F2(
+	function (y, line) {
+		return A2(
+			$elm$core$List$indexedMap,
+			$author$project$Aoc03$toCharText(y),
+			$elm$core$String$toList(line));
+	});
+var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var $elm$svg$Svg$Attributes$opacity = _VirtualDom_attribute('opacity');
 var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
-var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
-var $author$project$Aoc03$unitHeight = 10;
-var $author$project$Aoc03$unitWidth = 10;
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
-var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
-var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
 var $author$project$Aoc03$toColoredBox = F3(
 	function (yMax, fillColor, box) {
 		var yVal = $author$project$Aoc03$unitHeight * box.yMin;
 		var yDiff = box.yMax - box.yMin;
 		var xVal = $author$project$Aoc03$unitWidth * box.xMin;
-		var xDiff = box.xMax - box.xMin;
+		var xDiff = (box.xMax - box.xMin) + 1;
 		var w = $author$project$Aoc03$unitWidth * xDiff;
 		var h = $author$project$Aoc03$unitHeight * (1 + yDiff);
 		return A2(
@@ -5480,69 +5521,44 @@ var $author$project$Aoc03$toColoredBox = F3(
 					$elm$core$String$fromInt(w)),
 					$elm$svg$Svg$Attributes$height(
 					$elm$core$String$fromInt(h)),
-					$elm$svg$Svg$Attributes$stroke('black'),
 					$elm$svg$Svg$Attributes$opacity('0.6'),
 					$elm$svg$Svg$Attributes$fill(fillColor)
 				]),
 			_List_Nil);
 	});
-var $elm$svg$Svg$Attributes$fontFamily = _VirtualDom_attribute('font-family');
-var $elm$svg$Svg$Attributes$fontSize = _VirtualDom_attribute('font-size');
-var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
-var $author$project$Aoc03$toLineText = F3(
-	function (yMax, i, line) {
-		var yVal = 10 * (i + 1);
-		var xVal = 40;
-		return A2(
-			$elm$svg$Svg$text_,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$x(
-					$elm$core$String$fromInt(0)),
-					$elm$svg$Svg$Attributes$y(
-					$elm$core$String$fromInt(yVal)),
-					$elm$svg$Svg$Attributes$fontSize('12px'),
-					$elm$svg$Svg$Attributes$fontFamily('monospace')
-				]),
-			_List_fromArray(
-				[
-					$elm$svg$Svg$text(line)
-				]));
-	});
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
-var $author$project$Aoc03$toSvgX = F3(
-	function (numberBoxes, symbolBoxes, data) {
-		var yMax = 500;
-		var symbolRects = A2(
-			$elm$core$List$map,
-			A2($author$project$Aoc03$toColoredBox, yMax, 'lightgreen'),
-			symbolBoxes);
-		var numberRects = A2(
-			$elm$core$List$map,
-			A2($author$project$Aoc03$toColoredBox, yMax, 'pink'),
-			numberBoxes);
-		var dataText = A2(
-			$elm$core$List$indexedMap,
-			$author$project$Aoc03$toLineText(yMax),
-			A2($elm$core$String$split, '\n', data));
-		var lst = _Utils_ap(
-			numberRects,
-			_Utils_ap(symbolRects, dataText));
-		return A2(
-			$elm$svg$Svg$svg,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$viewBox('0 0 210 500'),
-					$elm$svg$Svg$Attributes$width('210'),
-					$elm$svg$Svg$Attributes$height('500'),
-					$elm$svg$Svg$Attributes$style('background-color:lightblue')
-				]),
-			lst);
-	});
+var $author$project$Aoc03$toSvg = function (model) {
+	var yMax = 500;
+	var symbolBoxes = model.symbolBoxes;
+	var symbolRects = A2(
+		$elm$core$List$map,
+		A2($author$project$Aoc03$toColoredBox, yMax, 'lightblue'),
+		symbolBoxes);
+	var numberBoxes = model.numberBoxes;
+	var numberRects = A2(
+		$elm$core$List$map,
+		A2($author$project$Aoc03$toColoredBox, yMax, 'lightgreen'),
+		numberBoxes);
+	var lines = model.lines;
+	var charTexts = $elm$core$List$concat(
+		A2($elm$core$List$indexedMap, $author$project$Aoc03$lineToCharBox, lines));
+	var lst = _Utils_ap(
+		numberRects,
+		_Utils_ap(symbolRects, charTexts));
+	return A2(
+		$elm$svg$Svg$svg,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$viewBox('0 0 210 500'),
+				$elm$svg$Svg$Attributes$width('210'),
+				$elm$svg$Svg$Attributes$height('500'),
+				$elm$svg$Svg$Attributes$style('border-color:lightblue')
+			]),
+		lst);
+};
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $author$project$Aoc03$view = function (model) {
-	var s = A3($author$project$Aoc03$toSvgX, model.numberBoxes, model.symbolBoxes, model.data);
+	var s = $author$project$Aoc03$toSvg(model);
 	return A2(
 		$elm$html$Html$table,
 		_List_Nil,

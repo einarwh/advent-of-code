@@ -15,10 +15,10 @@ crateSize : Int
 crateSize = 10
 
 unitWidth : Int 
-unitWidth = 10
+unitWidth = 13
 
 unitHeight : Int 
-unitHeight = 10
+unitHeight = 13
 
 
 -- MAIN
@@ -62,6 +62,7 @@ type alias Stacks = Dict StackId Stack
 
 type alias Model = 
   { data : String
+  , lines : List String
   , numberBoxes : List Box 
   , symbolBoxes : List Box 
   , counter : Int 
@@ -141,6 +142,7 @@ init _ =
         |> String.concat 
 
     model = { data = sample
+            , lines = lines
             , symbolBoxes = symbolBoxes
             , numberBoxes = numberBoxes
             , counter = 0
@@ -168,23 +170,27 @@ subscriptions model = Sub.none
 
 -- VIEW
 
-toLineText : Int -> Int -> String -> Html Msg 
-toLineText yMax i line = 
+toCharText : Int -> Int -> Char -> Html Msg 
+toCharText yPos xPos ch = 
   let 
-    xVal = 40
-    yVal = 10 * (i + 1) 
+    xOffset = 2
+    yOffset = 11
+    xVal = xOffset + xPos * unitWidth
+    yVal = yOffset + yPos * unitHeight
   in
     text_
-      [ x (String.fromInt 0)
+      [ x (String.fromInt xVal)
       , y (String.fromInt yVal)
+    --   , fill "red"
       , fontSize "12px"
       , fontFamily "monospace" ]
-      [ text line ]
+      [ text (String.fromChar ch) ]
+
 
 toColoredBox : Int -> String -> Box -> Html Msg 
 toColoredBox yMax fillColor box = 
   let 
-    xDiff = box.xMax - box.xMin 
+    xDiff = box.xMax - box.xMin + 1
     yDiff = box.yMax - box.yMin 
     w = unitWidth * xDiff 
     h = unitHeight * (1 + yDiff)
@@ -196,32 +202,38 @@ toColoredBox yMax fillColor box =
       , y (String.fromInt yVal)
       , width (String.fromInt w) 
       , height (String.fromInt h)
-      , stroke "black"
+    --   , stroke "black"
       , opacity "0.6"
       , fill fillColor ]
       []
 
-toSvgX : List Box -> List Box -> String -> Html Msg 
-toSvgX numberBoxes symbolBoxes data = 
+lineToCharBox : Int -> String -> List (Html Msg)
+lineToCharBox y line =  
+    line |> String.toList |> List.indexedMap (toCharText y)
+
+toSvg : Model -> Html Msg 
+toSvg model = 
   let 
+    numberBoxes = model.numberBoxes
+    symbolBoxes = model.symbolBoxes
+    lines = model.lines
     yMax = 500
-    numberRects = numberBoxes |> List.map (toColoredBox yMax "pink")
-    symbolRects = symbolBoxes |> List.map (toColoredBox yMax "lightgreen")
-    --texts = [ "467..114..", "...*......", "..35..633." ] |> List.indexedMap (toLineText yMax)
-    dataText = data |> String.split "\n" |> List.indexedMap (toLineText yMax)
-    lst = numberRects ++ symbolRects ++ dataText
+    numberRects = numberBoxes |> List.map (toColoredBox yMax "lightgreen")
+    symbolRects = symbolBoxes |> List.map (toColoredBox yMax "lightblue")
+    charTexts = lines |> List.indexedMap lineToCharBox |> List.concat
+    lst = numberRects ++ symbolRects ++ charTexts
   in 
     svg
       [ viewBox "0 0 210 500"
       , width "210"
       , height "500" 
-      , Svg.Attributes.style "background-color:lightblue" ]
+      , Svg.Attributes.style "border-color:lightblue" ]
       lst
 
 view : Model -> Html Msg
 view model =
   let
-    s = toSvgX model.numberBoxes model.symbolBoxes model.data
+    s = toSvg model
   in 
     Html.table 
       []
