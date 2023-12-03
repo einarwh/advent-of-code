@@ -4384,6 +4384,107 @@ function _Browser_load(url)
 		}
 	}));
 }
+
+
+// CREATE
+
+var _Regex_never = /.^/;
+
+var _Regex_fromStringWith = F2(function(options, string)
+{
+	var flags = 'g';
+	if (options.multiline) { flags += 'm'; }
+	if (options.caseInsensitive) { flags += 'i'; }
+
+	try
+	{
+		return $elm$core$Maybe$Just(new RegExp(string, flags));
+	}
+	catch(error)
+	{
+		return $elm$core$Maybe$Nothing;
+	}
+});
+
+
+// USE
+
+var _Regex_contains = F2(function(re, string)
+{
+	return string.match(re) !== null;
+});
+
+
+var _Regex_findAtMost = F3(function(n, re, str)
+{
+	var out = [];
+	var number = 0;
+	var string = str;
+	var lastIndex = re.lastIndex;
+	var prevLastIndex = -1;
+	var result;
+	while (number++ < n && (result = re.exec(string)))
+	{
+		if (prevLastIndex == re.lastIndex) break;
+		var i = result.length - 1;
+		var subs = new Array(i);
+		while (i > 0)
+		{
+			var submatch = result[i];
+			subs[--i] = submatch
+				? $elm$core$Maybe$Just(submatch)
+				: $elm$core$Maybe$Nothing;
+		}
+		out.push(A4($elm$regex$Regex$Match, result[0], result.index, number, _List_fromArray(subs)));
+		prevLastIndex = re.lastIndex;
+	}
+	re.lastIndex = lastIndex;
+	return _List_fromArray(out);
+});
+
+
+var _Regex_replaceAtMost = F4(function(n, re, replacer, string)
+{
+	var count = 0;
+	function jsReplacer(match)
+	{
+		if (count++ >= n)
+		{
+			return match;
+		}
+		var i = arguments.length - 3;
+		var submatches = new Array(i);
+		while (i > 0)
+		{
+			var submatch = arguments[i];
+			submatches[--i] = submatch
+				? $elm$core$Maybe$Just(submatch)
+				: $elm$core$Maybe$Nothing;
+		}
+		return replacer(A4($elm$regex$Regex$Match, match, arguments[arguments.length - 2], count, _List_fromArray(submatches)));
+	}
+	return string.replace(re, jsReplacer);
+});
+
+var _Regex_splitAtMost = F3(function(n, re, str)
+{
+	var string = str;
+	var out = [];
+	var start = re.lastIndex;
+	var restoreLastIndex = re.lastIndex;
+	while (n--)
+	{
+		var result = re.exec(string);
+		if (!result) break;
+		out.push(string.slice(start, result.index));
+		start = re.lastIndex;
+	}
+	out.push(string.slice(start));
+	re.lastIndex = restoreLastIndex;
+	return _List_fromArray(out);
+});
+
+var _Regex_infinity = Infinity;
 var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
@@ -5173,8 +5274,85 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$core$String$concat = function (strings) {
+	return A2($elm$core$String$join, '', strings);
+};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $elm$regex$Regex$Match = F4(
+	function (match, index, number, submatches) {
+		return {index: index, match: match, number: number, submatches: submatches};
+	});
+var $elm$regex$Regex$find = _Regex_findAtMost(_Regex_infinity);
+var $elm$regex$Regex$fromStringWith = _Regex_fromStringWith;
+var $elm$regex$Regex$fromString = function (string) {
+	return A2(
+		$elm$regex$Regex$fromStringWith,
+		{caseInsensitive: false, multiline: false},
+		string);
+};
+var $elm$regex$Regex$never = _Regex_never;
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Aoc03$parseNumbers = function (line) {
+	var numberRegex = A2(
+		$elm$core$Maybe$withDefault,
+		$elm$regex$Regex$never,
+		$elm$regex$Regex$fromString('[0-9]+'));
+	var matches = A2($elm$regex$Regex$find, numberRegex, line);
+	return A2(
+		$elm$core$List$map,
+		function (m) {
+			return _Utils_Tuple2(m.index, m.match);
+		},
+		matches);
+};
+var $author$project$Aoc03$toNumberBox = F2(
+	function (_v0, s) {
+		var x = _v0.x;
+		var y = _v0.y;
+		return {
+			xMax: (x + $elm$core$String$length(s)) - 1,
+			xMin: x,
+			yMax: y,
+			yMin: y
+		};
+	});
+var $author$project$Aoc03$parseNumbersWithBox = F2(
+	function (y, line) {
+		return A2(
+			$elm$core$List$map,
+			function (_v0) {
+				var x = _v0.a;
+				var s = _v0.b;
+				return {
+					box: A2(
+						$author$project$Aoc03$toNumberBox,
+						{x: x, y: y},
+						s),
+					val: s
+				};
+			},
+			$author$project$Aoc03$parseNumbers(line));
+	});
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $elm$core$Dict$Black = {$: 'Black'};
@@ -5342,15 +5520,6 @@ var $author$project$Aoc03$initStack = F2(
 				crateLines));
 		return _Utils_Tuple2(stackId, stack);
 	});
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
 var $elm$core$String$words = _String_words;
 var $author$project$Aoc03$parseStackIdLine = function (s) {
 	return A2(
@@ -5377,6 +5546,39 @@ var $author$project$Aoc03$parseStacks = function (s) {
 		return $elm$core$Dict$fromList(stacks);
 	}
 };
+var $author$project$Aoc03$parseSymbols = function (line) {
+	var symbolRegex = A2(
+		$elm$core$Maybe$withDefault,
+		$elm$regex$Regex$never,
+		$elm$regex$Regex$fromString('[^\\d\\.]'));
+	var matches = A2($elm$regex$Regex$find, symbolRegex, line);
+	return A2(
+		$elm$core$List$map,
+		function (m) {
+			return _Utils_Tuple2(m.index, m.match);
+		},
+		matches);
+};
+var $author$project$Aoc03$toSymbolBox = function (_v0) {
+	var x = _v0.x;
+	var y = _v0.y;
+	return {xMax: x + 1, xMin: x - 1, yMax: y + 1, yMin: y - 1};
+};
+var $author$project$Aoc03$parseSymbolsWithBox = F2(
+	function (y, line) {
+		return A2(
+			$elm$core$List$map,
+			function (_v0) {
+				var x = _v0.a;
+				var s = _v0.b;
+				return {
+					box: $author$project$Aoc03$toSymbolBox(
+						{x: x, y: y}),
+					val: s
+				};
+			},
+			$author$project$Aoc03$parseSymbols(line));
+	});
 var $author$project$Aoc03$splitInput = function (input) {
 	var _v0 = A2($elm$core$String$split, '\n\n', input);
 	if (_v0.b && _v0.b.b) {
@@ -5392,15 +5594,38 @@ var $elm$core$String$trimRight = _String_trimRight;
 var $author$project$Aoc03$init = function (_v0) {
 	var sample = '467..114..\n...*......\n..35..633.\n......#...\n617*......\n.....+.58.\n..592.....\n......755.\n...$.*....\n.664.598..';
 	var lines = A2($elm$core$String$split, '\n', sample);
-	var debugStr = $elm$core$String$fromInt(
-		$elm$core$List$length(lines));
+	var debugStr = $elm$core$String$concat(
+		A2(
+			$elm$core$List$map,
+			function (_v2) {
+				var a = _v2.a;
+				var b = _v2.b;
+				return b;
+			},
+			$author$project$Aoc03$parseSymbols('617*......')));
 	var cratesample = '    [D]    \n[N] [C]    \n[Z] [M] [P]\n 1   2   3 \n\nmove 1 from 2 to 1\nmove 3 from 1 to 3\nmove 2 from 2 to 1\nmove 1 from 1 to 2';
+	var boxedSymbols = $elm$core$List$concat(
+		A2($elm$core$List$indexedMap, $author$project$Aoc03$parseSymbolsWithBox, lines));
+	var symbolBoxes = A2(
+		$elm$core$List$map,
+		function (bt) {
+			return bt.box;
+		},
+		boxedSymbols);
+	var boxedNumbers = $elm$core$List$concat(
+		A2($elm$core$List$indexedMap, $author$project$Aoc03$parseNumbersWithBox, lines));
+	var numberBoxes = A2(
+		$elm$core$List$map,
+		function (bt) {
+			return bt.box;
+		},
+		boxedNumbers);
 	var _v1 = $author$project$Aoc03$splitInput(
 		$elm$core$String$trimRight(cratesample));
 	var stacksStr = _v1.a;
 	var commandsStr = _v1.b;
 	var parsedStacks = $author$project$Aoc03$parseStacks(stacksStr);
-	var model = {counter: 0, debug: debugStr, stacks: parsedStacks};
+	var model = {counter: 0, data: sample, debug: debugStr, numberBoxes: numberBoxes, stacks: parsedStacks, symbolBoxes: symbolBoxes};
 	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -5433,39 +5658,27 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
-};
-var $elm$core$List$concatMap = F2(
-	function (f, list) {
-		return $elm$core$List$concat(
-			A2($elm$core$List$map, f, list));
-	});
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
-var $author$project$Aoc03$crateSize = 10;
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$svg$Svg$Attributes$opacity = _VirtualDom_attribute('opacity');
 var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
 var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $author$project$Aoc03$unitHeight = 10;
+var $author$project$Aoc03$unitWidth = 10;
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
 var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
-var $author$project$Aoc03$toCrateRect = F3(
-	function (yMax, stackId, crateNo) {
-		var w = $author$project$Aoc03$crateSize;
-		var xVal = (stackId * 2) * w;
-		var h = $author$project$Aoc03$crateSize;
-		var yVal = ((1 + crateNo) * h) + ($author$project$Aoc03$crateSize * 2);
+var $author$project$Aoc03$toColoredBox = F3(
+	function (yMax, fillColor, box) {
+		var yVal = $author$project$Aoc03$unitHeight * box.yMin;
+		var yDiff = box.yMax - box.yMin;
+		var xVal = $author$project$Aoc03$unitWidth * box.xMin;
+		var xDiff = box.xMax - box.xMin;
+		var w = $author$project$Aoc03$unitWidth * xDiff;
+		var h = $author$project$Aoc03$unitHeight * (1 + yDiff);
 		return A2(
 			$elm$svg$Svg$rect,
 			_List_fromArray(
@@ -5479,7 +5692,8 @@ var $author$project$Aoc03$toCrateRect = F3(
 					$elm$svg$Svg$Attributes$height(
 					$elm$core$String$fromInt(h)),
 					$elm$svg$Svg$Attributes$stroke('black'),
-					$elm$svg$Svg$Attributes$fill('lightgrey')
+					$elm$svg$Svg$Attributes$opacity('0.6'),
+					$elm$svg$Svg$Attributes$fill(fillColor)
 				]),
 			_List_Nil);
 	});
@@ -5487,96 +5701,60 @@ var $elm$svg$Svg$Attributes$fontFamily = _VirtualDom_attribute('font-family');
 var $elm$svg$Svg$Attributes$fontSize = _VirtualDom_attribute('font-size');
 var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
-var $author$project$Aoc03$toCrateText = F4(
-	function (yMax, stackId, crateNo, crate) {
-		var yOffset = 8;
-		var xOffset = 2;
-		var w = $author$project$Aoc03$crateSize;
-		var xVal = xOffset + ((stackId * 2) * w);
-		var h = $author$project$Aoc03$crateSize;
-		var yVal = (((1 + crateNo) * h) - yOffset) + ($author$project$Aoc03$crateSize * 2);
+var $author$project$Aoc03$toLineText = F3(
+	function (yMax, i, line) {
+		var yVal = 20 * (i + 1);
+		var xVal = 40;
 		return A2(
 			$elm$svg$Svg$text_,
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$x(
-					$elm$core$String$fromInt(xVal)),
+					$elm$core$String$fromInt(40)),
 					$elm$svg$Svg$Attributes$y(
-					$elm$core$String$fromInt(yMax - yVal)),
+					$elm$core$String$fromInt(40)),
 					$elm$svg$Svg$Attributes$fontSize('9px'),
 					$elm$svg$Svg$Attributes$fontFamily('monospace')
 				]),
 			_List_fromArray(
 				[
-					$elm$svg$Svg$text(crate)
+					$elm$svg$Svg$text(line)
 				]));
-	});
-var $author$project$Aoc03$toCrateSvgElements = F4(
-	function (yMax, stackId, crateNo, crate) {
-		return _List_fromArray(
-			[
-				A3($author$project$Aoc03$toCrateRect, yMax, stackId, crateNo),
-				A4($author$project$Aoc03$toCrateText, yMax, stackId, crateNo, crate)
-			]);
-	});
-var $author$project$Aoc03$toStackIdText = F2(
-	function (yMax, stackId) {
-		var yVal = $author$project$Aoc03$crateSize;
-		var yOffset = 8;
-		var xOffset = 2;
-		var w = $author$project$Aoc03$crateSize;
-		var xVal = xOffset + ((stackId * 2) * w);
-		var h = $author$project$Aoc03$crateSize;
-		return A2(
-			$elm$svg$Svg$text_,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$x(
-					$elm$core$String$fromInt(xVal)),
-					$elm$svg$Svg$Attributes$y(
-					$elm$core$String$fromInt(yMax - yVal)),
-					$elm$svg$Svg$Attributes$fontSize('9px'),
-					$elm$svg$Svg$Attributes$fontFamily('monospace')
-				]),
-			_List_fromArray(
-				[
-					$elm$svg$Svg$text(
-					$elm$core$String$fromInt(stackId))
-				]));
-	});
-var $author$project$Aoc03$toStackSvgElements = F2(
-	function (yMax, _v0) {
-		var stackId = _v0.a;
-		var stack = _v0.b;
-		var labelElement = A2($author$project$Aoc03$toStackIdText, yMax, stackId);
-		var crateElements = $elm$core$List$concat(
-			A2(
-				$elm$core$List$indexedMap,
-				A2($author$project$Aoc03$toCrateSvgElements, yMax, stackId),
-				$elm$core$List$reverse(stack)));
-		return A2($elm$core$List$cons, labelElement, crateElements);
 	});
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
-var $author$project$Aoc03$toSvg = function (stacks) {
-	var yMax = 500;
-	var lst = A2(
-		$elm$core$List$concatMap,
-		$author$project$Aoc03$toStackSvgElements(yMax),
-		$elm$core$Dict$toList(stacks));
-	return A2(
-		$elm$svg$Svg$svg,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$viewBox('0 0 210 500'),
-				$elm$svg$Svg$Attributes$width('210'),
-				$elm$svg$Svg$Attributes$height('500'),
-				$elm$svg$Svg$Attributes$style('background-color:lightblue')
-			]),
-		lst);
-};
+var $author$project$Aoc03$toSvgX = F2(
+	function (numberBoxes, symbolBoxes) {
+		var yMax = 500;
+		var texts = A2(
+			$elm$core$List$indexedMap,
+			$author$project$Aoc03$toLineText(yMax),
+			_List_fromArray(
+				['467..114..', '...*......', '..35..633.']));
+		var symbolRects = A2(
+			$elm$core$List$map,
+			A2($author$project$Aoc03$toColoredBox, yMax, 'lightgreen'),
+			symbolBoxes);
+		var numberRects = A2(
+			$elm$core$List$map,
+			A2($author$project$Aoc03$toColoredBox, yMax, 'pink'),
+			numberBoxes);
+		var lst = _Utils_ap(
+			numberRects,
+			_Utils_ap(symbolRects, texts));
+		return A2(
+			$elm$svg$Svg$svg,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$viewBox('0 0 210 500'),
+					$elm$svg$Svg$Attributes$width('210'),
+					$elm$svg$Svg$Attributes$height('500'),
+					$elm$svg$Svg$Attributes$style('background-color:lightblue')
+				]),
+			lst);
+	});
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $author$project$Aoc03$view = function (model) {
-	var s = $author$project$Aoc03$toSvg(model.stacks);
+	var s = A2($author$project$Aoc03$toSvgX, model.numberBoxes, model.symbolBoxes);
 	return A2(
 		$elm$html$Html$table,
 		_List_Nil,
