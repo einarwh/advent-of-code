@@ -15,10 +15,10 @@ crateSize : Int
 crateSize = 10
 
 unitWidth : Int 
-unitWidth = 10
+unitWidth = 9
 
 unitHeight : Int 
-unitHeight = 10
+unitHeight = 9
 
 
 -- MAIN
@@ -381,7 +381,7 @@ toCharText : Int -> Int -> Char -> Html Msg
 toCharText yPos xPos ch = 
   let 
     xOffset = 2
-    yOffset = 9
+    yOffset = 8
     xVal = xOffset + xPos * unitWidth
     yVal = yOffset + yPos * unitHeight
   in
@@ -436,10 +436,10 @@ toSvg model =
     lst = partRects ++ nonPartRects ++ gearRects ++ nonGearRects ++ charTexts
   in 
     svg
-      [ viewBox "0 0 1400 1400"
-      , width "1400"
-      , height "1400" ]
-    --   , Svg.Attributes.style "background-color:purple" ]
+      [ viewBox "0 0 1260 1260"
+      , width "1260"
+      , height "1260" ]
+      -- , Svg.Attributes.style "background-color:purple" ]
       lst
 
 view : Model -> Html Msg
