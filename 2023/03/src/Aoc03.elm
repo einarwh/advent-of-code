@@ -10,9 +10,6 @@ import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Time
 
-defaultDelay : Float
-defaultDelay = 1000
-
 crateSize : Int 
 crateSize = 10
 
@@ -45,11 +42,6 @@ type alias Command =
 type alias Model = 
   { stacks : Stacks
   , tallestStackSeen : Int 
-  , commands : List Command
-  , lastCommandText : String
-  , totalCommands : Int
-  , delay : Float
-  , paused : Bool  
   , keepOrder : Bool
   , counter : Int 
   , debug : String }
@@ -131,11 +123,6 @@ move 1 from 1 to 2"""
 
     model = { stacks = parsedStacks
             , tallestStackSeen = 0
-            , commands = parsedCommands
-            , lastCommandText = "press play to start"
-            , totalCommands = List.length parsedCommands
-            , delay = defaultDelay
-            , paused = True
             , keepOrder = False
             , counter = 0
             , debug = "" }
@@ -144,7 +131,7 @@ move 1 from 1 to 2"""
 
 -- UPDATE
 
-type Msg = Tick | Step | TogglePlay | Faster | Slower | ToggleMachine
+type Msg = Tick 
 
 takeAmount : Int -> Crates -> Stack -> (Crates, Stack) 
 takeAmount amount taken stack =
@@ -181,59 +168,18 @@ toTopCrateText stacks =
   stacks |> Dict.values |> List.filterMap (List.head) |> String.concat 
 
 updateModel : Model -> Model
-updateModel model =
-  case model.commands of 
-    [] -> model 
-    cmd :: restCmds -> 
-      let 
-        updatedStacks = runCommand model.keepOrder cmd model.stacks
-        updatedCounter = model.counter + 1 
-        lastCommandText = 
-          if updatedCounter < model.totalCommands then 
-            toCommandText cmd
-          else 
-            toTopCrateText updatedStacks
-        tallestStack = updatedStacks |> getTallestStack
-        updatedTallestStack = 
-          if tallestStack > model.tallestStackSeen then 
-            tallestStack 
-          else 
-            model.tallestStackSeen
-        debugText = 
-          if tallestStack > model.tallestStackSeen then 
-            "Tallest: " ++ String.fromInt updatedTallestStack ++ " at cmd " ++ String.fromInt updatedCounter
-          else 
-            model.debug
-      in 
-        { model | counter = updatedCounter
-        , stacks = updatedStacks
-        , tallestStackSeen = updatedTallestStack
-        , commands = restCmds
-        , lastCommandText = lastCommandText
-        , debug = debugText }
+updateModel model = model
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Tick ->
       (updateModel model, Cmd.none)
-    Step ->
-      (updateModel model, Cmd.none)
-    TogglePlay -> 
-      ({model | paused = not model.paused }, Cmd.none)
-    Faster -> 
-      ({model | delay = model.delay / 2 }, Cmd.none)
-    Slower -> 
-      ({model | delay = model.delay * 2 }, Cmd.none)
-    ToggleMachine -> 
-      ({model | keepOrder = not model.keepOrder }, Cmd.none)
 
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
-  if model.paused || List.isEmpty model.commands then Sub.none 
-  else Time.every model.delay (\_ -> Tick)
+subscriptions model = Sub.none
 
 -- VIEW
 
@@ -314,15 +260,14 @@ toSvg stacks =
     svg
       [ viewBox "0 0 210 500"
       , width "210"
-      , height "500" ]
---      , Svg.Attributes.style "background-color:lightblue" ]
+      , height "500" 
+      , Svg.Attributes.style "background-color:lightblue" ]
       lst
 
 view : Model -> Html Msg
 view model =
   let
     s = toSvg model.stacks
-    commandsStr = "commands: " ++ String.fromInt model.counter ++ " of " ++ String.fromInt model.totalCommands
   in 
     Html.table 
       []
@@ -344,7 +289,7 @@ view model =
               , Html.Attributes.style "font-size" "20px"
               , Html.Attributes.style "padding" "20px"] 
               [ Html.div [ Html.Attributes.align "center" ] [ s ] 
-              , Html.div [] [ Html.text commandsStr ]
-              , Html.div [] [ Html.text model.lastCommandText ]
-              -- , Html.div [] [ Html.text model.debug ]
+              , Html.div [] [ Html.text "." ]
+              , Html.div [] [ Html.text "." ]
+              , Html.div [] [ Html.text model.debug ]
               ] ] ]
