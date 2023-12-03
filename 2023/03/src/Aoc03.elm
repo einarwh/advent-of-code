@@ -61,56 +61,11 @@ type alias StackId = Int
 type alias Stacks = Dict StackId Stack 
 
 type alias Model = 
-  { stacks : Stacks
-  , data : String
+  { data : String
   , numberBoxes : List Box 
   , symbolBoxes : List Box 
   , counter : Int 
   , debug : String }
-
-splitInput : String -> (String, String)
-splitInput input = 
-  case input |> String.split "\n\n" of 
-    a::b::_ -> (a, b)
-    _ -> ("", "")
-
-parseStackIdLine : String -> List Int 
-parseStackIdLine s = 
-  s |> String.words |> List.map (String.toInt) |> List.map (Maybe.withDefault 0)
-
-tryReadCrate : Int -> String -> Maybe String 
-tryReadCrate index str = 
-  case str |> String.slice index (index + 1) of 
-    "" -> Nothing 
-    " " -> Nothing 
-    s -> Just s
-
-toStackIndex : Int -> Int 
-toStackIndex stackId = 
-  1 + 4 * (stackId - 1)
-
-initStack : List String -> Int -> (Int, Stack)
-initStack crateLines stackId = 
-  let 
-    stackIndex = toStackIndex stackId 
-    stack = crateLines |> List.filterMap (tryReadCrate stackIndex) |> List.reverse
-  in 
-    (stackId, stack)
-
-parseStacks : String -> Stacks
-parseStacks s = 
-  let 
-    lines = s |> String.split "\n"
-  in 
-    case List.reverse lines of 
-      [] -> 
-        Dict.empty 
-      stackIdLine :: crateLines -> 
-        let
-          stackIds = parseStackIdLine stackIdLine
-          stacks = stackIds |> List.map (initStack crateLines)
-        in         
-          Dict.fromList stacks
 
 parseNumbers : String -> List (Int, String) 
 parseNumbers line = 
@@ -185,21 +140,7 @@ init _ =
         |> List.map (\(a, b) -> b)
         |> String.concat 
 
-    cratesample = """    [D]    
-[N] [C]    
-[Z] [M] [P]
- 1   2   3 
-
-move 1 from 2 to 1
-move 3 from 1 to 3
-move 2 from 2 to 1
-move 1 from 1 to 2"""
-    (stacksStr, commandsStr) = cratesample |> String.trimRight |> splitInput
-
-    parsedStacks = parseStacks stacksStr
-
-    model = { stacks = parsedStacks
-            , data = sample
+    model = { data = sample
             , symbolBoxes = symbolBoxes
             , numberBoxes = numberBoxes
             , counter = 0
@@ -210,20 +151,6 @@ move 1 from 1 to 2"""
 -- UPDATE
 
 type Msg = Tick 
-
-takeAmount : Int -> Crates -> Stack -> (Crates, Stack) 
-takeAmount amount taken stack =
-    if amount > 0 then 
-        case stack of 
-            [] -> (taken, stack) 
-            top :: rest -> 
-                takeAmount (amount - 1) (top :: taken) rest 
-    else 
-        (taken, stack)
-
-toTopCrateText : Stacks -> String 
-toTopCrateText stacks = 
-  stacks |> Dict.values |> List.filterMap (List.head) |> String.concat 
 
 updateModel : Model -> Model
 updateModel model = model
@@ -241,84 +168,16 @@ subscriptions model = Sub.none
 
 -- VIEW
 
-toCrateRect : Int -> Int -> Int -> Html Msg 
-toCrateRect yMax stackId crateNo = 
-  let 
-    w = crateSize
-    h = crateSize
-    xVal = stackId * 2 * w
-    yVal = (1 + crateNo) * h + crateSize * 2
-  in
-    rect
-      [ x (String.fromInt xVal)
-      , y (String.fromInt (yMax - yVal))
-      , width (String.fromInt w) 
-      , height (String.fromInt h)
-      , stroke "black"
-      , fill "lightgrey" ]
-      []
-
-toCrateText : Int -> Int -> Int -> Crate -> Html Msg 
-toCrateText yMax stackId crateNo crate = 
-  let 
-    w = crateSize
-    h = crateSize
-    xOffset = 2
-    yOffset = 8
-    xVal = xOffset + stackId * 2 * w
-    yVal = (1 + crateNo) * h - yOffset + crateSize * 2
-  in
-    text_
-      [ x (String.fromInt xVal)
-      , y (String.fromInt (yMax - yVal))
-      , fontSize "9px"
-      , fontFamily "monospace" ]
-      [ text crate ]
-
-toStackIdText : Int -> Int -> Html Msg 
-toStackIdText yMax stackId = 
-  let 
-    w = crateSize
-    h = crateSize
-    xOffset = 2
-    yOffset = 8
-    xVal = xOffset + stackId * 2 * w
-    yVal = crateSize
-  in
-    text_
-      [ x (String.fromInt xVal)
-      , y (String.fromInt (yMax - yVal))
-      , fontSize "9px"
-      , fontFamily "monospace" ]
-      [ text (String.fromInt stackId) ]
-
-toCrateSvgElements : Int -> Int -> Int -> Crate -> List (Html Msg)
-toCrateSvgElements yMax stackId crateNo crate = 
-  [ toCrateRect yMax stackId crateNo
-  , toCrateText yMax stackId crateNo crate ]
-
-toStackSvgElements : Int -> (Int, Stack) -> List (Html Msg)
-toStackSvgElements yMax (stackId, stack) =
-  let 
-    crateElements = 
-      stack 
-      |> List.reverse
-      |> List.indexedMap (toCrateSvgElements yMax stackId)
-      |> List.concat
-    labelElement = toStackIdText yMax stackId
-  in 
-    labelElement :: crateElements
-
 toLineText : Int -> Int -> String -> Html Msg 
 toLineText yMax i line = 
   let 
     xVal = 40
-    yVal = 20 * (i + 1) 
+    yVal = 10 * (i + 1) 
   in
     text_
-      [ x (String.fromInt 40)
-      , y (String.fromInt 40)
-      , fontSize "9px"
+      [ x (String.fromInt 0)
+      , y (String.fromInt yVal)
+      , fontSize "12px"
       , fontFamily "monospace" ]
       [ text line ]
 
@@ -334,7 +193,7 @@ toColoredBox yMax fillColor box =
   in
     rect
       [ x (String.fromInt xVal)
-      , y (String.fromInt (yMax - yVal))
+      , y (String.fromInt yVal)
       , width (String.fromInt w) 
       , height (String.fromInt h)
       , stroke "black"
@@ -342,27 +201,15 @@ toColoredBox yMax fillColor box =
       , fill fillColor ]
       []
 
-toSvgX : List Box -> List Box -> Html Msg 
-toSvgX numberBoxes symbolBoxes = 
+toSvgX : List Box -> List Box -> String -> Html Msg 
+toSvgX numberBoxes symbolBoxes data = 
   let 
     yMax = 500
     numberRects = numberBoxes |> List.map (toColoredBox yMax "pink")
     symbolRects = symbolBoxes |> List.map (toColoredBox yMax "lightgreen")
-    texts = [ "467..114..", "...*......", "..35..633." ] |> List.indexedMap (toLineText yMax)
-    lst = numberRects ++ symbolRects ++ texts
-  in 
-    svg
-      [ viewBox "0 0 210 500"
-      , width "210"
-      , height "500" 
-      , Svg.Attributes.style "background-color:lightblue" ]
-      lst
-
-toSvg : Stacks -> Html Msg 
-toSvg stacks = 
-  let 
-    yMax = 500
-    lst = stacks |> Dict.toList |> List.concatMap (toStackSvgElements yMax)
+    --texts = [ "467..114..", "...*......", "..35..633." ] |> List.indexedMap (toLineText yMax)
+    dataText = data |> String.split "\n" |> List.indexedMap (toLineText yMax)
+    lst = numberRects ++ symbolRects ++ dataText
   in 
     svg
       [ viewBox "0 0 210 500"
@@ -374,7 +221,7 @@ toSvg stacks =
 view : Model -> Html Msg
 view model =
   let
-    s = toSvgX model.numberBoxes model.symbolBoxes
+    s = toSvgX model.numberBoxes model.symbolBoxes model.data
   in 
     Html.table 
       []

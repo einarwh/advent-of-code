@@ -5353,199 +5353,6 @@ var $author$project$Aoc03$parseNumbersWithBox = F2(
 			},
 			$author$project$Aoc03$parseNumbers(line));
 	});
-var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
-var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
-var $elm$core$Dict$Black = {$: 'Black'};
-var $elm$core$Dict$RBNode_elm_builtin = F5(
-	function (a, b, c, d, e) {
-		return {$: 'RBNode_elm_builtin', a: a, b: b, c: c, d: d, e: e};
-	});
-var $elm$core$Dict$Red = {$: 'Red'};
-var $elm$core$Dict$balance = F5(
-	function (color, key, value, left, right) {
-		if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Red')) {
-			var _v1 = right.a;
-			var rK = right.b;
-			var rV = right.c;
-			var rLeft = right.d;
-			var rRight = right.e;
-			if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
-				var _v3 = left.a;
-				var lK = left.b;
-				var lV = left.c;
-				var lLeft = left.d;
-				var lRight = left.e;
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Red,
-					key,
-					value,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, lK, lV, lLeft, lRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rLeft, rRight));
-			} else {
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					color,
-					rK,
-					rV,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, left, rLeft),
-					rRight);
-			}
-		} else {
-			if ((((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_elm_builtin')) && (left.d.a.$ === 'Red')) {
-				var _v5 = left.a;
-				var lK = left.b;
-				var lV = left.c;
-				var _v6 = left.d;
-				var _v7 = _v6.a;
-				var llK = _v6.b;
-				var llV = _v6.c;
-				var llLeft = _v6.d;
-				var llRight = _v6.e;
-				var lRight = left.e;
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Red,
-					lK,
-					lV,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, key, value, lRight, right));
-			} else {
-				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
-			}
-		}
-	});
-var $elm$core$Basics$compare = _Utils_compare;
-var $elm$core$Dict$insertHelp = F3(
-	function (key, value, dict) {
-		if (dict.$ === 'RBEmpty_elm_builtin') {
-			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
-		} else {
-			var nColor = dict.a;
-			var nKey = dict.b;
-			var nValue = dict.c;
-			var nLeft = dict.d;
-			var nRight = dict.e;
-			var _v1 = A2($elm$core$Basics$compare, key, nKey);
-			switch (_v1.$) {
-				case 'LT':
-					return A5(
-						$elm$core$Dict$balance,
-						nColor,
-						nKey,
-						nValue,
-						A3($elm$core$Dict$insertHelp, key, value, nLeft),
-						nRight);
-				case 'EQ':
-					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
-				default:
-					return A5(
-						$elm$core$Dict$balance,
-						nColor,
-						nKey,
-						nValue,
-						nLeft,
-						A3($elm$core$Dict$insertHelp, key, value, nRight));
-			}
-		}
-	});
-var $elm$core$Dict$insert = F3(
-	function (key, value, dict) {
-		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
-		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
-			var _v1 = _v0.a;
-			var k = _v0.b;
-			var v = _v0.c;
-			var l = _v0.d;
-			var r = _v0.e;
-			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
-		} else {
-			var x = _v0;
-			return x;
-		}
-	});
-var $elm$core$Dict$fromList = function (assocs) {
-	return A3(
-		$elm$core$List$foldl,
-		F2(
-			function (_v0, dict) {
-				var key = _v0.a;
-				var value = _v0.b;
-				return A3($elm$core$Dict$insert, key, value, dict);
-			}),
-		$elm$core$Dict$empty,
-		assocs);
-};
-var $elm$core$List$maybeCons = F3(
-	function (f, mx, xs) {
-		var _v0 = f(mx);
-		if (_v0.$ === 'Just') {
-			var x = _v0.a;
-			return A2($elm$core$List$cons, x, xs);
-		} else {
-			return xs;
-		}
-	});
-var $elm$core$List$filterMap = F2(
-	function (f, xs) {
-		return A3(
-			$elm$core$List$foldr,
-			$elm$core$List$maybeCons(f),
-			_List_Nil,
-			xs);
-	});
-var $author$project$Aoc03$toStackIndex = function (stackId) {
-	return 1 + (4 * (stackId - 1));
-};
-var $author$project$Aoc03$tryReadCrate = F2(
-	function (index, str) {
-		var _v0 = A3($elm$core$String$slice, index, index + 1, str);
-		switch (_v0) {
-			case '':
-				return $elm$core$Maybe$Nothing;
-			case ' ':
-				return $elm$core$Maybe$Nothing;
-			default:
-				var s = _v0;
-				return $elm$core$Maybe$Just(s);
-		}
-	});
-var $author$project$Aoc03$initStack = F2(
-	function (crateLines, stackId) {
-		var stackIndex = $author$project$Aoc03$toStackIndex(stackId);
-		var stack = $elm$core$List$reverse(
-			A2(
-				$elm$core$List$filterMap,
-				$author$project$Aoc03$tryReadCrate(stackIndex),
-				crateLines));
-		return _Utils_Tuple2(stackId, stack);
-	});
-var $elm$core$String$words = _String_words;
-var $author$project$Aoc03$parseStackIdLine = function (s) {
-	return A2(
-		$elm$core$List$map,
-		$elm$core$Maybe$withDefault(0),
-		A2(
-			$elm$core$List$map,
-			$elm$core$String$toInt,
-			$elm$core$String$words(s)));
-};
-var $author$project$Aoc03$parseStacks = function (s) {
-	var lines = A2($elm$core$String$split, '\n', s);
-	var _v0 = $elm$core$List$reverse(lines);
-	if (!_v0.b) {
-		return $elm$core$Dict$empty;
-	} else {
-		var stackIdLine = _v0.a;
-		var crateLines = _v0.b;
-		var stackIds = $author$project$Aoc03$parseStackIdLine(stackIdLine);
-		var stacks = A2(
-			$elm$core$List$map,
-			$author$project$Aoc03$initStack(crateLines),
-			stackIds);
-		return $elm$core$Dict$fromList(stacks);
-	}
-};
 var $author$project$Aoc03$parseSymbols = function (line) {
 	var symbolRegex = A2(
 		$elm$core$Maybe$withDefault,
@@ -5579,31 +5386,18 @@ var $author$project$Aoc03$parseSymbolsWithBox = F2(
 			},
 			$author$project$Aoc03$parseSymbols(line));
 	});
-var $author$project$Aoc03$splitInput = function (input) {
-	var _v0 = A2($elm$core$String$split, '\n\n', input);
-	if (_v0.b && _v0.b.b) {
-		var a = _v0.a;
-		var _v1 = _v0.b;
-		var b = _v1.a;
-		return _Utils_Tuple2(a, b);
-	} else {
-		return _Utils_Tuple2('', '');
-	}
-};
-var $elm$core$String$trimRight = _String_trimRight;
 var $author$project$Aoc03$init = function (_v0) {
 	var sample = '467..114..\n...*......\n..35..633.\n......#...\n617*......\n.....+.58.\n..592.....\n......755.\n...$.*....\n.664.598..';
 	var lines = A2($elm$core$String$split, '\n', sample);
 	var debugStr = $elm$core$String$concat(
 		A2(
 			$elm$core$List$map,
-			function (_v2) {
-				var a = _v2.a;
-				var b = _v2.b;
+			function (_v1) {
+				var a = _v1.a;
+				var b = _v1.b;
 				return b;
 			},
 			$author$project$Aoc03$parseSymbols('617*......')));
-	var cratesample = '    [D]    \n[N] [C]    \n[Z] [M] [P]\n 1   2   3 \n\nmove 1 from 2 to 1\nmove 3 from 1 to 3\nmove 2 from 2 to 1\nmove 1 from 1 to 2';
 	var boxedSymbols = $elm$core$List$concat(
 		A2($elm$core$List$indexedMap, $author$project$Aoc03$parseSymbolsWithBox, lines));
 	var symbolBoxes = A2(
@@ -5620,12 +5414,7 @@ var $author$project$Aoc03$init = function (_v0) {
 			return bt.box;
 		},
 		boxedNumbers);
-	var _v1 = $author$project$Aoc03$splitInput(
-		$elm$core$String$trimRight(cratesample));
-	var stacksStr = _v1.a;
-	var commandsStr = _v1.b;
-	var parsedStacks = $author$project$Aoc03$parseStacks(stacksStr);
-	var model = {counter: 0, data: sample, debug: debugStr, numberBoxes: numberBoxes, stacks: parsedStacks, symbolBoxes: symbolBoxes};
+	var model = {counter: 0, data: sample, debug: debugStr, numberBoxes: numberBoxes, symbolBoxes: symbolBoxes};
 	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -5686,7 +5475,7 @@ var $author$project$Aoc03$toColoredBox = F3(
 					$elm$svg$Svg$Attributes$x(
 					$elm$core$String$fromInt(xVal)),
 					$elm$svg$Svg$Attributes$y(
-					$elm$core$String$fromInt(yMax - yVal)),
+					$elm$core$String$fromInt(yVal)),
 					$elm$svg$Svg$Attributes$width(
 					$elm$core$String$fromInt(w)),
 					$elm$svg$Svg$Attributes$height(
@@ -5703,17 +5492,17 @@ var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
 var $author$project$Aoc03$toLineText = F3(
 	function (yMax, i, line) {
-		var yVal = 20 * (i + 1);
+		var yVal = 10 * (i + 1);
 		var xVal = 40;
 		return A2(
 			$elm$svg$Svg$text_,
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$x(
-					$elm$core$String$fromInt(40)),
+					$elm$core$String$fromInt(0)),
 					$elm$svg$Svg$Attributes$y(
-					$elm$core$String$fromInt(40)),
-					$elm$svg$Svg$Attributes$fontSize('9px'),
+					$elm$core$String$fromInt(yVal)),
+					$elm$svg$Svg$Attributes$fontSize('12px'),
 					$elm$svg$Svg$Attributes$fontFamily('monospace')
 				]),
 			_List_fromArray(
@@ -5722,14 +5511,9 @@ var $author$project$Aoc03$toLineText = F3(
 				]));
 	});
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
-var $author$project$Aoc03$toSvgX = F2(
-	function (numberBoxes, symbolBoxes) {
+var $author$project$Aoc03$toSvgX = F3(
+	function (numberBoxes, symbolBoxes, data) {
 		var yMax = 500;
-		var texts = A2(
-			$elm$core$List$indexedMap,
-			$author$project$Aoc03$toLineText(yMax),
-			_List_fromArray(
-				['467..114..', '...*......', '..35..633.']));
 		var symbolRects = A2(
 			$elm$core$List$map,
 			A2($author$project$Aoc03$toColoredBox, yMax, 'lightgreen'),
@@ -5738,9 +5522,13 @@ var $author$project$Aoc03$toSvgX = F2(
 			$elm$core$List$map,
 			A2($author$project$Aoc03$toColoredBox, yMax, 'pink'),
 			numberBoxes);
+		var dataText = A2(
+			$elm$core$List$indexedMap,
+			$author$project$Aoc03$toLineText(yMax),
+			A2($elm$core$String$split, '\n', data));
 		var lst = _Utils_ap(
 			numberRects,
-			_Utils_ap(symbolRects, texts));
+			_Utils_ap(symbolRects, dataText));
 		return A2(
 			$elm$svg$Svg$svg,
 			_List_fromArray(
@@ -5754,7 +5542,7 @@ var $author$project$Aoc03$toSvgX = F2(
 	});
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $author$project$Aoc03$view = function (model) {
-	var s = A2($author$project$Aoc03$toSvgX, model.numberBoxes, model.symbolBoxes);
+	var s = A3($author$project$Aoc03$toSvgX, model.numberBoxes, model.symbolBoxes, model.data);
 	return A2(
 		$elm$html$Html$table,
 		_List_Nil,
