@@ -29,18 +29,14 @@ let parse pattern line =
     |> Seq.map (fun m -> (m.Index, m.Value))
     |> Seq.toList
 
-let parseNumbers = parse "\d+"
-
-let parseSymbols = parse "[^\d\.]"
-
 let parseSymbolsAtLine (y : int) (line : string) = 
     line
-    |> parseSymbols
+    |> parse "[^\d\.]"
     |> List.map (fun (x, s) -> (toSymbolBox (x, y), s))
 
 let parseNumbersAtLine (y : int) (line : string) = 
     line
-    |> parseNumbers
+    |> parse "\d+"
     |> List.map (fun (x, s) -> (toNumberBox ((x, y), s), s))
 
 let overlapping (box1 : Box) (box2 : Box) : bool = 
