@@ -12,7 +12,6 @@ let isNonEmpty (s : string) = s.Length > 0
 
 let parseCard (line : string) : int = 
     let s1 = split ": " line 
-    let cardNo = s1[0] |> substring ("Card ".Length) |> int
     let s2 = split " | " s1[1]
     let winning = s2[0] |> split " " |> Array.filter isNonEmpty |> Array.map int 
     let numbers = s2[1] |> split " " |> Array.filter isNonEmpty |> Array.map int  
