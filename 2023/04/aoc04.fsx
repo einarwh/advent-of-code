@@ -4,24 +4,29 @@
 open System
 open System.IO
 
+type Card = { Number : int; Wins : int }
+
 let split (sep : string) (s : string) = s.Split(sep)
 
 let trim (s : string) = s.Trim()
 
+let substring from (s : string) = s.Substring(from)
+
 let isNonEmpty (s : string) = s.Length > 0  
 
-let parseLine (line : string) : int list = 
+let parseCard (line : string) : Card = 
     let s1 = split ": " line 
+    let cardNo = s1[0] |> substring ("Card ".Length) |> int
     let s2 = split " | " s1[1]
-    let ws = s2[0]
-    let cs = s2[1]
-    let winning = ws |> split " " |> Array.filter isNonEmpty |> Array.map int 
-    let cards = cs |> split " " |> Array.filter isNonEmpty |> Array.map int  
-    let found = Set.intersect (Set.ofArray winning) (Set.ofArray cards) |> Set.toList 
-    found
+    let winning = s2[0] |> split " " |> Array.filter isNonEmpty |> Array.map int 
+    let numbers = s2[1] |> split " " |> Array.filter isNonEmpty |> Array.map int  
+    let found = 
+        Set.intersect (Set.ofArray winning) (Set.ofArray numbers) 
+        |> Set.count
+    { Number = cardNo; Wins = found }
 
-let calculate (cards : int list) : int = 
-    match List.length cards with 
+let calculate (card : Card) : int = 
+    match card.Wins with 
     | 0 -> 0 
     | n -> pown 2 (n - 1)
 
@@ -31,8 +36,8 @@ let readLines =
 
 let run fileName = 
     let lines = readLines fileName |> Array.toList
-    lines 
-    |> List.map parseLine 
+    let cards = lines |> List.map parseCard
+    cards 
     |> List.sumBy calculate 
     |> printfn "%d"
 
