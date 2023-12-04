@@ -3,6 +3,7 @@
 
 open System
 open System.IO
+open System.Text.RegularExpressions
 
 let split (sep : string) (s : string) = s.Split(sep)
 
@@ -10,12 +11,20 @@ let substring from (s : string) = s.Substring(from)
 
 let isNonEmpty (s : string) = s.Length > 0  
 
+let rec findDuplicates lst = 
+    match lst with 
+    | [] -> []
+    | h :: t -> 
+        let lst' = findDuplicates t
+        if List.contains h t then h :: lst' else lst'
+
 let parseCard (line : string) : int = 
-    let s1 = split ": " line 
-    let s2 = split " | " s1[1]
-    let winning = s2[0] |> split " " |> Array.filter isNonEmpty |> Array.map int 
-    let numbers = s2[1] |> split " " |> Array.filter isNonEmpty |> Array.map int  
-    Set.intersect (Set.ofArray winning) (Set.ofArray numbers) |> Set.count
+    Regex.Matches(line, "\d+") 
+    |> Seq.map (fun m -> m.Value)
+    |> Seq.tail 
+    |> Seq.toList
+    |> findDuplicates
+    |> List.length 
 
 let calculatePoints (wins : int) : int = 
     match wins with 
