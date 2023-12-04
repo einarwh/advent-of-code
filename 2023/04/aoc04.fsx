@@ -16,17 +16,14 @@ let parseCard (line : string) : int =
     let s2 = split " | " s1[1]
     let winning = s2[0] |> split " " |> Array.filter isNonEmpty |> Array.map int 
     let numbers = s2[1] |> split " " |> Array.filter isNonEmpty |> Array.map int  
-    let found = 
-        Set.intersect (Set.ofArray winning) (Set.ofArray numbers) 
-        |> Set.count
-    found
+    Set.intersect (Set.ofArray winning) (Set.ofArray numbers) |> Set.count
 
 let calculatePoints (wins : int) : int = 
     match wins with 
     | 0 -> 0 
     | n -> pown 2 (n - 1)
 
-let calculateCards (cardLimit : int) (cardIndex : int) (cardsWon : int) = 
+let listCards (cardLimit : int) (cardIndex : int) (cardsWon : int) = 
     if cardsWon = 0 then []
     else 
         let startIndex = cardIndex + 1
@@ -39,7 +36,7 @@ let rec clone count lst result =
     if count = 0 then result 
     else clone (count - 1) lst (lst @ result)
 
-let rec calc (cardIndex : int) (carry : int list) (winnings : int list list) = 
+let rec calculateCards (cardIndex : int) (carry : int list) (winnings : int list list) = 
     match winnings with 
     | [] -> [] 
     | current :: t -> 
@@ -47,7 +44,7 @@ let rec calc (cardIndex : int) (carry : int list) (winnings : int list list) =
         let matchCount = matches |> List.length 
         let cloned = clone matchCount current current
         let carry' = rest @ cloned
-        (1 + matchCount) :: calc (cardIndex + 1) carry' t
+        (1 + matchCount) :: calculateCards (cardIndex + 1) carry' t
 
 let readLines = 
     File.ReadAllLines
@@ -61,8 +58,8 @@ let run fileName =
     |> printfn "%d"
     let limit = winsList |> List.length
     winsList 
-    |> List.mapi (calculateCards limit)
-    |> calc 0 [] 
+    |> List.mapi (listCards limit)
+    |> calculateCards 0 [] 
     |> List.sum 
     |> printfn "%d"
 
