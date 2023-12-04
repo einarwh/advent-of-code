@@ -5,20 +5,11 @@ open System
 open System.IO
 open System.Text.RegularExpressions
 
-let split (sep : string) (s : string) = s.Split(sep)
-
-let substring from (s : string) = s.Substring(from)
-
-let isNonEmpty (s : string) = s.Length > 0  
-
-let rec findDuplicates lst = 
-    match lst with 
-    | [] -> []
-    | h :: t -> 
-        let lst' = findDuplicates t
-        if List.contains h t then h :: lst' else lst'
-
 let parseCard (line : string) : int = 
+    let folder (seen, dups) x = 
+        if List.contains x seen then (seen, x :: dups) else (x :: seen, dups)
+    let findDuplicates lst = 
+        lst |> List.fold folder ([], []) |> snd
     Regex.Matches(line, "\d+") 
     |> Seq.map (fun m -> m.Value)
     |> Seq.tail 
