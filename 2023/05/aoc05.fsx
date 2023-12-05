@@ -32,8 +32,8 @@ let rec seedSequences input =
         sq :: seedSequences rest 
     | _ -> failwith "Wrong"
 
-let readChunks line = 
-    let text = File.ReadAllText line 
+let readChunks fileName = 
+    let text = File.ReadAllText fileName 
     text.TrimEnd().Split("\n\n") |> Array.toList 
 
 let run fileName = 
