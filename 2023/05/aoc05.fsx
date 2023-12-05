@@ -18,8 +18,7 @@ let parseMappingLine (s : string) =
     | _ -> failwith "Wrong"
     
 let parseMap (s : string) = 
-    let lines = s.Split("\n") |> Array.toList 
-    match lines with 
+    match s.Split("\n") |> Array.toList with 
     | [] -> failwith "Nothing"
     | _ :: mappings -> 
         let functions = mappings |> List.map parseMappingLine
@@ -35,12 +34,10 @@ let rec seedSequences input =
 
 let readChunks line = 
     let text = File.ReadAllText line 
-    text.TrimEnd().Split("\n\n") 
-    |> Array.toList 
+    text.TrimEnd().Split("\n\n") |> Array.toList 
 
 let run fileName = 
-    let chunks = readChunks fileName
-    match chunks with 
+    match readChunks fileName with 
     | [] -> failwith "Nothing"
     | seedChunk :: rest -> 
         let seeds = seedChunk |> parseNumbers
