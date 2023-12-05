@@ -13,11 +13,8 @@ let parseMappingLine (s : string) =
     match parseNumbers s with 
     | [dst; src; range] -> 
         fun next n ->
-            let ix = n - src 
-            if ix >= 0 && ix < range then 
-                dst + ix 
-            else 
-                next n 
+            let i = n - src 
+            if i >= 0 && i < range then dst + i else next n 
     | _ -> failwith "Wrong"
     
 let parseMap (s : string) = 
@@ -28,15 +25,13 @@ let parseMap (s : string) =
         let functions = mappings |> List.map parseMappingLine
         List.foldBack (fun fn next -> fn next) functions id 
 
-let rec seedRanges input = 
+let rec seedSequences input = 
     match input with 
     | [] -> []
     | init::range::rest ->
-        (init, range) :: seedRanges rest 
+        let sq = seq { for i in init .. (init + range - 1L) -> i }
+        sq :: seedSequences rest 
     | _ -> failwith "Wrong"
-
-let rangeToSeq (start, count) = 
-    seq { for i in start .. (start + count - 1L) -> i }
 
 let readChunks line = 
     let text = File.ReadAllText line 
@@ -52,8 +47,7 @@ let run fileName =
         let fn = rest |> List.map parseMap |> List.reduce (>>)
         seeds |> List.map fn |> List.min |> printfn "%d"
         seeds
-        |> seedRanges 
-        |> List.map rangeToSeq
+        |> seedSequences 
         |> List.map (Seq.map fn >> Seq.min)
         |> List.min
         |> printfn "%d"
