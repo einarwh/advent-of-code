@@ -10,11 +10,9 @@ let parse (s : string) : string list =
     |> Seq.map (fun m -> m.Value)
     |> Seq.toList
 
-let parseDoubles (s : string) = 
-    s |> parse |> List.map double
+let parseDoubles = parse >> List.map double
 
-let parseDouble (s : string) = 
-    s |> parse |> String.concat "" |> double
+let parseDouble = parse >> String.concat "" >> double
 
 let solve (duration : double, record : double) = 
     let b = duration 
@@ -44,7 +42,7 @@ let run fileName =
     | _ -> failwith "Wrong"
     match lines |> List.map parseDouble with 
     | [time; distance] -> 
-        solve (time, distance) |> printfn "%A"
+        solve (time, distance) |> printfn "%d"
     | _ -> failwith "Wrong"
 
 "input" |> run 
