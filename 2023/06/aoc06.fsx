@@ -19,7 +19,7 @@ let solve (time : double, distance : double) =
     let r1 = (time - v) / 2.
     let r2 = (time + v) / 2.
     let first = r1 |> ceil
-    let offset1 = if r1 = first then 1. else 0.
+    let offset1 = if r1 = first then - 1. else 0.
     let last = r2 |> floor 
     let offset2 = if r2 = last then - 1. else 0.
     last - first + 1. + offset1 + offset2 |> int
