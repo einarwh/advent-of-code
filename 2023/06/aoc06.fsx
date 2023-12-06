@@ -5,16 +5,33 @@ open System
 open System.IO
 open System.Text.RegularExpressions
 
-let parseNumbers (s : string) : int list =
+let parseNumberStrings (s : string) : string list =
     Regex.Matches(s, "\d+") 
-    |> Seq.map (fun m -> int m.Value)
+    |> Seq.map (fun m -> m.Value)
     |> Seq.toList
+
+let parseNumbers (s : string) = 
+    s |> parseNumberStrings |> List.map int
+
+let parseDoubles (s : string) = 
+    s |> parseNumberStrings |> List.map double
+
 
 let strategies (duration : int) : int list = 
     [0 .. duration] |> List.map (fun i -> i * (duration - i))
 
 let winners (record, attempts) = 
     attempts |> List.filter (fun a -> a > record) |> List.length
+
+let solve (duration : double) (record : double) = 
+    let b = duration 
+    let c = record 
+    let v = Math.Sqrt(b * b - 4. * c)
+    let r1 = (b - v) / 2.
+    let r2 = (b + v) / 2.
+    let first = r1 |> Math.Ceiling |> int
+    let last = r2 |> Math.Floor |> int
+    last - first + 1
 
 let readLines = 
     File.ReadAllLines
@@ -30,6 +47,13 @@ let run fileName =
         |> List.map winners
         |> List.reduce (*)
         |> printfn "%d"
+    | _ -> failwith "Wrong"
+    match lines |> List.map parseNumberStrings with 
+    | [durationStrings; distanceStrings] -> 
+        let toDouble = String.concat "" >> double
+        let duration = durationStrings |> toDouble
+        let distance = distanceStrings |> toDouble
+        solve duration distance |> printfn "%A"
     | _ -> failwith "Wrong"
 
 "input" |> run 
