@@ -14,12 +14,10 @@ let parseDoubles = parse >> List.map double
 
 let parseDouble = parse >> String.concat "" >> double
 
-let solve (duration : double, record : double) = 
-    let b = duration 
-    let c = record 
-    let v = Math.Sqrt(b * b - 4. * c)
-    let r1 = (b - v) / 2.
-    let r2 = (b + v) / 2.
+let solve (time : double, distance : double) = 
+    let v = Math.Sqrt(time * time - 4. * distance)
+    let r1 = (time - v) / 2.
+    let r2 = (time + v) / 2.
     let firstRounded = r1 |> Math.Ceiling
     let first = if r1 = firstRounded then int r1 + 1 else int firstRounded
     let lastRounded = r2 |> Math.Floor 
