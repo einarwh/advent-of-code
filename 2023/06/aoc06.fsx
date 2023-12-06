@@ -16,13 +16,9 @@ let parseDouble = parse >> String.concat "" >> double
 
 let solve (time : double, distance : double) = 
     let v = sqrt(time * time - 4. * distance)
-    let r1 = (time - v) / 2.
-    let r2 = (time + v) / 2.
-    let first = r1 |> ceil
-    let offset1 = if r1 = first then - 1. else 0.
-    let last = r2 |> floor 
-    let offset2 = if r2 = last then - 1. else 0.
-    last - first + 1. + offset1 + offset2 |> int
+    let first = (time - v) / 2. |> floor
+    let last = (time + v) / 2. |> ceil 
+    last - first - 1. |> int
 
 let readLines = 
     File.ReadAllLines >> Array.filter ((<>) String.Empty) >> Array.toList
