@@ -5,17 +5,16 @@ open System
 open System.IO
 open System.Text.RegularExpressions
 
-let parseNumberStrings (s : string) : string list =
+let parse (s : string) : string list =
     Regex.Matches(s, "\d+") 
     |> Seq.map (fun m -> m.Value)
     |> Seq.toList
 
 let parseNumbers (s : string) = 
-    s |> parseNumberStrings |> List.map int
+    s |> parse |> List.map int
 
-let parseDoubles (s : string) = 
-    s |> parseNumberStrings |> List.map double
-
+let parseDouble (s : string) = 
+    s |> parse |> String.concat "" |> double
 
 let strategies (duration : int) : int list = 
     [0 .. duration] |> List.map (fun i -> i * (duration - i))
@@ -40,20 +39,17 @@ let readLines =
 let run fileName = 
     let lines = readLines fileName |> Array.toList
     match lines |> List.map parseNumbers with 
-    | [durations; distances] -> 
-        durations 
+    | [times; distances] -> 
+        times 
         |> List.map strategies 
         |> List.zip distances
         |> List.map winners
         |> List.reduce (*)
         |> printfn "%d"
     | _ -> failwith "Wrong"
-    match lines |> List.map parseNumberStrings with 
-    | [durationStrings; distanceStrings] -> 
-        let toDouble = String.concat "" >> double
-        let duration = durationStrings |> toDouble
-        let distance = distanceStrings |> toDouble
-        solve duration distance |> printfn "%A"
+    match lines |> List.map parseDouble with 
+    | [time; distance] -> 
+        solve time distance |> printfn "%A"
     | _ -> failwith "Wrong"
 
 "input" |> run 
