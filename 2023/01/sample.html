@@ -1,0 +1,316 @@
+<html>
+    <head>
+        <script src="html.js"></script>
+        <script>
+            function rotateRight(arr) {
+                arr.unshift(arr.pop());
+            }
+            function rotateLeft(arr) {
+                arr.push(arr.shift());
+            }
+            html.meta.commands["pre"] = function(elt, env) {
+                console.log(env.stack);
+            }
+            // header = head (of string, array)
+            html.meta.commands["header"] = function(elt, env) {
+                let top = env.stack.pop();
+                if (typeof top === 'string' || top instanceof String) {
+                    env.stack.push(Array.from(top)[0]);
+                }
+                else if (top instanceof Array) {
+                    env.stack.push(top.shift());
+                }
+            }
+            // footer = tail (of string, array)
+            html.meta.commands["footer"] = function(elt, env) {
+                let top = env.stack.pop();
+                if (typeof top === 'string' || top instanceof String) {
+                    env.stack.push(top.substring(1));
+                }
+                else if (top instanceof Array) {
+                    top.shift();
+                    env.stack.push(top);
+                }
+            }
+            // span = length (of string, array)
+            html.meta.commands["span"] = function(elt, env) {
+                let top = env.stack.pop();
+                if (typeof top === 'string' || top instanceof String) {
+                    env.stack.push(top.length);
+                }
+                else if (top instanceof Array) {
+                    env.stack.push(top.length);
+                }
+            }
+            // q (roll)
+            html.meta.commands["q"] = function(elt, env) {
+                let j = env.stack.pop();
+                let n = env.stack.pop();
+                const arr = [];
+                for (let i = 0; i < n; i++) {
+                    arr.unshift(env.stack.pop());
+                }
+                while (j > 0) {
+                    rotateRight(arr);
+                    j--;
+                }
+                while (j < 0) {
+                    rotateLeft(arr);
+                    j++;
+                }
+                while (arr.length > 0) {
+                    env.stack.push(arr.shift());
+                }
+            }
+            // sup "swap" (exch)
+            html.meta.commands["sup"] = function(elt, env) {
+                let a = env.stack.pop();
+                let b = env.stack.pop();
+                env.stack.push(a);
+                env.stack.push(b);
+            }
+            // script: convert number to string 
+            html.meta.commands["script"] = function(elt, env) {
+                let n = env.stack.pop();
+                env.stack.push(n.toString());
+            }
+            // noscript: convert string to number 
+            html.meta.commands["noscript"] = function(elt, env) {
+                let s = env.stack.pop();
+                env.stack.push(Number(s));
+            }
+            // noframes: is the stack empty? 
+            html.meta.commands["noframes"] = function(elt, env) {
+                env.stack.push(env.stack.length == 0);
+            }
+            // abbr: substring
+                html.meta.commands["abbr"] = function(elt, env) {
+                let count = env.stack.pop();
+                let start = env.stack.pop();
+                let stop = start + count;
+                let str = env.stack.pop();
+                env.stack.push(str.substring(start, stop));
+            }
+        </script>
+    </head>
+    <body>
+        <main>
+            <!-- Is the argument (top of the stack) one of the digits [1 - 9]? -->
+            <dfn id="isdigit">
+                <dt></dt>
+                <data value="0"></data>
+                <big></big>
+                <sup></sup>
+                <data value="10"></data>
+                <small></small>
+                <sup></sup>
+                <b></b>    
+            </dfn>
+            <!-- Get calibration number for the string argument (top of the stack)-->
+            <dfn id="calibration">
+                <data value="0"></data>
+                <var title="tens"></var>
+                <data value="0"></data>
+                <var title="ones"></var>
+                <dt id="loop-calibration-1"></dt>
+                <header></header>
+                <sup></sup>
+                <footer></footer>
+                <dt></dt>
+                <span></span>
+                <data value="0"></data>
+                <big></big>
+                <i>
+                    <a href="#loop-calibration-1"></a>
+                </i>
+                <del></del>
+                <!-- [ p q r 3 s t u 8 v w x ] -->
+                <a href="javascript:isdigit()" id="loop-calibration-2">
+                    <dt></dt>
+                </a>
+                <i>
+                    <cite>ones</cite>
+                    <data value="0"></data>
+                    <em></em>
+                    <i>
+                        <dt></dt>
+                        <var title="ones"></var>
+                    </i>
+                    <dt></dt>
+                    <var title="tens"></var>
+                </i>
+                <del></del>
+                <noframes></noframes>
+                <bdi></bdi>
+                <i>
+                    <a href="#loop-calibration-2"></a>
+                </i>
+                <cite>ones</cite><noscript></noscript>
+                <cite>tens</cite><noscript></noscript>
+                <data value="10"></data>
+                <ul></ul>
+                <dd></dd>
+            </dfn>
+            <dfn id="findDigit">
+                <!-- String on top of stack. -->
+                <dt></dt>
+                <header></header>
+                <noscript></noscript>
+                <a href="javascript:isdigit()" id="loop-calibration-2">
+                    <dt></dt>
+                </a>
+                <pre></pre>
+                <i>
+                    <sup></sup>
+                    <del></del>
+                    <rt></rt>
+                </i>
+                <del></del>
+                <!-- Get 3 chars -->
+                <dt></dt>
+                <data value="0"></data>
+                <data value="3"></data>
+                <abbr></abbr>
+                <!-- Check one -->
+                <dt></dt>
+                <s>one</s>
+                <em></em>
+                <i>
+                    <del></del>
+                    <data value="1"></data>
+                </i>
+                <!-- Check two -->
+                <dt></dt>
+                <s>two</s>
+                <em></em>
+                <i>
+                    <del></del>
+                    <data value="2"></data>
+                </i>
+                <!-- Check six -->
+                <dt></dt>
+                <s>six</s>
+                <em></em>
+                <i>
+                    <del></del>
+                    <data value="6"></data>
+                </i>
+                <!-- No more 3 chars -->
+                <del></del>
+                <!-- Get 4 chars -->
+                <dt></dt>
+                <data value="0"></data>
+                <data value="4"></data>
+                <abbr></abbr>
+                <!-- Check four -->
+                <dt></dt>
+                <s>four</s>
+                <em></em>
+                <i>
+                    <del></del>
+                    <data value="4"></data>
+                </i>
+                <!-- Check five -->
+                <dt></dt>
+                <s>five</s>
+                <em></em>
+                <i>
+                    <del></del>
+                    <data value="5"></data>
+                </i>
+                <!-- Check nine -->
+                <dt></dt>
+                <s>four</s>
+                <em></em>
+                <i>
+                    <del></del>
+                    <data value="9"></data>
+                </i>
+                
+                <s>predone</s><output></output><del></del>
+                <pre></pre>
+                <s>done</s><output></output><del></del>
+
+            </dfn>
+            <dfn id="calibrationPart2">
+                <data value="0"></data>
+                <var title="tens"></var>
+                <data value="0"></data>
+                <var title="ones"></var>
+                <dt id="loop-calib-part2-1"></dt>
+
+                <header></header>
+                <sup></sup>
+                <footer></footer>
+                <dt></dt>
+                <span></span>
+                <data value="0"></data>
+                <big></big>
+                <i>
+                    <a href="#loop-calib-part2-1"></a>
+                </i>
+                <del></del>
+                <!-- [ p q r 3 s t u 8 v w x ] -->
+                <a href="javascript:isdigit()" id="loop-calibration-2">
+                    <dt></dt>
+                </a>
+                <i>
+                    <cite>ones</cite>
+                    <data value="0"></data>
+                    <em></em>
+                    <i>
+                        <dt></dt>
+                        <var title="ones"></var>
+                    </i>
+                    <dt></dt>
+                    <var title="tens"></var>
+                </i>
+                <del></del>
+                <noframes></noframes>
+                <bdi></bdi>
+                <i>
+                    <a href="#loop-calibration-2"></a>
+                </i>
+                <cite>ones</cite><noscript></noscript>
+                <cite>tens</cite><noscript></noscript>
+                <data value="10"></data>
+                <ul></ul>
+                <dd></dd>
+            </dfn>
+
+
+            <data value="0"></data>
+            <ol>
+                <li><s>1abc2</s></li>
+                <li><s>pqr3stu8vwx</s></li>
+                <li><s>a1b2c3d4e5f</s></li>
+                <li><s>treb7uchet</s></li>
+            </ol>
+            <dt id="loop-input"></dt>
+            <header></header>
+            <var title="line"></var>
+            <a href="javascript:calibration()">
+                <cite>line</cite>
+            </a>
+            <data value="3"></data>
+            <data value="-1"></data>
+            <q></q>
+            <dd></dd>
+            <sup></sup>
+            <dt></dt>
+            <span></span>
+            <data value="0"></data>
+            <big></big>
+            <i>
+                <a href="#loop-input"></a>
+            </i>
+            <del></del>
+            <output></output>
+            <a href="javascript:findDigit()">
+                <s>nine1nine</s>
+            </a>
+            <pre></pre>
+
+          </main>
+    </body>    
+</html>
