@@ -9,7 +9,7 @@
                 arr.push(arr.shift());
             }
             html.meta.commands["pre"] = function(elt, env) {
-                console.log(env.stack);
+                console.log(env.stack.slice());
             }
             // header = head (of string, array)
             html.meta.commands["header"] = function(elt, env) {
@@ -18,7 +18,7 @@
                     env.stack.push(Array.from(top)[0]);
                 }
                 else if (top instanceof Array) {
-                    env.stack.push(top.shift());
+                    env.stack.push(top[0]);
                 }
             }
             // footer = tail (of string, array)
@@ -28,8 +28,8 @@
                     env.stack.push(top.substring(1));
                 }
                 else if (top instanceof Array) {
-                    top.shift();
-                    env.stack.push(top);
+                    let arr = top.slice(1);
+                    env.stack.push(arr);
                 }
             }
             // span = length (of string, array)
@@ -83,7 +83,14 @@
             html.meta.commands["noframes"] = function(elt, env) {
                 env.stack.push(env.stack.length == 0);
             }
-
+            // abbr: substring
+                html.meta.commands["abbr"] = function(elt, env) {
+                let count = env.stack.pop();
+                let start = env.stack.pop();
+                let stop = start + count;
+                let str = env.stack.pop();
+                env.stack.push(str.substring(start, stop));
+            }
         </script>
     </head>
     <body>
@@ -137,6 +144,161 @@
                 <bdi></bdi>
                 <i>
                     <a href="#loop-calibration-2"></a>
+                </i>
+                <cite>ones</cite><noscript></noscript>
+                <cite>tens</cite><noscript></noscript>
+                <data value="10"></data>
+                <ul></ul>
+                <dd></dd>
+            </dfn>
+            <dfn id="findDigit">
+                <!-- String on top of stack. -->
+                <dt></dt>
+                <header></header>
+                <noscript></noscript>
+                <a href="javascript:isdigit()" id="loop-calibration-2">
+                    <dt></dt>
+                </a>
+                <i>
+                    <sup></sup>
+                    <del></del>
+                    <rt></rt>
+                </i>
+                <del></del>
+                <!-- Get 3 chars -->
+                <dt></dt>
+                <data value="0"></data>
+                <data value="3"></data>
+                <abbr></abbr>
+                <!-- Check one -->
+                <dt></dt>
+                <s>one</s>
+                <em></em>
+                <i>
+                    <del></del>
+                    <data value="1"></data>
+                    <rt></rt>
+                </i>
+                <!-- Check two -->
+                <dt></dt>
+                <s>two</s>
+                <em></em>
+                <i>
+                    <del></del>
+                    <data value="2"></data>
+                    <rt></rt>
+                </i>
+                <!-- Check six -->
+                <dt></dt>
+                <s>six</s>
+                <em></em>
+                <i>
+                    <del></del>
+                    <data value="6"></data>
+                    <rt></rt>
+                </i>
+                <!-- No more 3 chars -->
+                <del></del>
+                <!-- Get 4 chars -->
+                <dt></dt>
+                <data value="0"></data>
+                <data value="4"></data>
+                <abbr></abbr>
+                <!-- Check four -->
+                <dt></dt>
+                <s>four</s>
+                <em></em>
+                <i>
+                    <del></del>
+                    <data value="4"></data>
+                    <rt></rt>
+                </i>
+                <!-- Check five -->
+                <dt></dt>
+                <s>five</s>
+                <em></em>
+                <i>
+                    <del></del>
+                    <data value="5"></data>
+                    <rt></rt>
+                </i>
+                <!-- Check nine -->
+                <dt></dt>
+                <s>nine</s>
+                <em></em>
+                <i>
+                    <del></del>
+                    <data value="9"></data>
+                    <rt></rt>
+                </i>
+                <!-- No more 4 chars -->
+                <del></del>
+                <!-- Get 5 chars -->
+                <dt></dt>
+                <data value="0"></data>
+                <data value="5"></data>
+                <abbr></abbr>
+                <!-- Check three -->
+                <dt></dt>
+                <s>three</s>
+                <em></em>
+                <i>
+                    <del></del>
+                    <data value="3"></data>
+                    <rt></rt>
+                </i>
+                <!-- Check seven -->
+                <dt></dt>
+                <s>seven</s>
+                <em></em>
+                <i>
+                    <del></del>
+                    <data value="7"></data>
+                    <rt></rt>
+                </i>
+                <!-- Check eight -->
+                <dt></dt>
+                <s>eight</s>
+                <em></em>
+                <i>
+                    <del></del>
+                    <data value="8"></data>
+                    <rt></rt>
+                </i>
+                <del></del>
+                <del></del>
+                <data value="0"></data>
+            </dfn>
+            <dfn id="calibrationPart2">
+                <data value="0"></data>
+                <var title="tens"></var>
+                <data value="0"></data>
+                <var title="ones"></var>
+                <a href="javascript:findDigit()" id="loop-calib-part2">
+                    <dt></dt>
+                </a>
+                <dt></dt>
+                <data value="0"></data>
+                <big></big>
+                <i>
+                    <cite>tens</cite>
+                    <data value="0"></data>
+                    <em></em>
+                    <i>
+                        <dt></dt>
+                        <var title="tens"></var>
+                    </i>
+                    <var title="ones"></var>
+                    <data value="0"></data>
+                </i>
+                <del></del>
+                <footer></footer>
+                <dt></dt>
+                <span></span>
+                <data value="0"></data>
+                <big></big>
+                <i>
+                    <a href="#loop-calib-part2"></a>
                 </i>
                 <cite>ones</cite><noscript></noscript>
                 <cite>tens</cite><noscript></noscript>
@@ -1148,8 +1310,15 @@
                 <li><s>twoggvcnfmtrseven4dx</li></s>
                 <li><s>ssevenhcltwoseven2cxrmxxcr</li></s>
                             </ol>
-            <dt id="loop-input"></dt>
+            <dt></dt>
+            <data value="3"></data>
+            <data value="1"></data>
+            <q></q>
+            <dt id="loop-part1"></dt>
             <header></header>
+            <sup></sup>
+            <footer></footer>
+            <sup></sup>
             <var title="line"></var>
             <a href="javascript:calibration()">
                 <cite>line</cite>
@@ -1164,7 +1333,36 @@
             <data value="0"></data>
             <big></big>
             <i>
-                <a href="#loop-input"></a>
+                <a href="#loop-part1"></a>
+            </i>
+            <del></del>
+            <output></output><del></del>
+            <!-- Part 2 -->
+            <!-- <a href="javascript:findDigit()">
+                <s>nine1nine</s>
+            </a> -->
+            <data value="0"></data>
+            <sup></sup>
+            <dt id="loop-part2"></dt>
+            <header></header>
+            <sup></sup>
+            <footer></footer>
+            <sup></sup>
+            <var title="line"></var>
+            <a href="javascript:calibrationPart2()">
+                <cite>line</cite>
+            </a>
+            <data value="3"></data>
+            <data value="-1"></data>
+            <q></q>
+            <dd></dd>
+            <sup></sup>
+            <dt></dt>
+            <span></span>
+            <data value="0"></data>
+            <big></big>
+            <i>
+                <a href="#loop-part2"></a>
             </i>
             <del></del>
             <output></output>
