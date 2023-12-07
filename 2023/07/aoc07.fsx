@@ -3,7 +3,6 @@
 
 open System
 open System.IO
-open System.Text.RegularExpressions
 
 let parseLine (line : string) : (string * int64) = 
     match line.Split(" ") with 
@@ -27,9 +26,8 @@ let rateHandType (hand : string) =
     | [2;1;1;1] -> 1
     | _ -> 0
 
-let rateCard (card : char) : int =
+let rateCard1 (card : char) : int =
     match card with 
-    | '1' -> 1
     | '2' -> 2
     | '3' -> 3
     | '4' -> 4
@@ -49,7 +47,7 @@ let compareByHandType (hand1 : string) (hand2 : string) =
     rateHandType hand1 - rateHandType hand2 
 
 let compareByStrongestCard (hand1 : string) (hand2 : string) = 
-    Seq.zip (Seq.map rateCard hand1) (Seq.map rateCard hand2) 
+    Seq.zip (Seq.map rateCard1 hand1) (Seq.map rateCard1 hand2) 
     |> Seq.map (fun (a, b) -> (a - b)) 
     |> Seq.tryFind (fun n -> n <> 0)
     |> Option.defaultValue 0
