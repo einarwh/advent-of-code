@@ -1,21 +1,20 @@
-// Advent of Code 2023. 
+// Advent of Code 2023. Day 7: Camel Cards
 // dotnet fsi aoc07.fsx
 
 open System
 open System.IO
 
-let parseLine (line : string) : (string * int64) = 
+let parseLine (line : string) : (string * int) = 
     match line.Split(" ") with 
-    | [|card;bid|] ->
-        (card, int64 bid)
+    | [|card;bid|] -> (card, int bid)
     | _ -> failwith "Wrong"
 
 let rateHand1 (hand : string) = 
     let lst = 
         hand 
         |> Seq.toList
-        |> List.groupBy id
-        |> List.map (snd >> List.length)
+        |> List.countBy id
+        |> List.map snd
         |> List.sortDescending
     match lst with 
     | [5] -> 6
@@ -32,8 +31,8 @@ let rateHand2 (hand : string) =
     let lst = 
         rest 
         |> Seq.toList
-        |> List.groupBy id
-        |> List.map (snd >> List.length)
+        |> List.countBy id
+        |> List.map snd
         |> List.sortDescending
     let improved = 
         match lst with 
@@ -100,16 +99,17 @@ let readLines =
     File.ReadAllLines
     >> Array.filter (fun line -> line <> String.Empty)
 
-let runWith comparer parsedLines = 
+let runWith handRater cardRater parsedLines = 
+    let comparer = compareHands handRater cardRater
     parsedLines 
     |> List.sortWith (fun (h1,_) (h2,_) -> comparer h1 h2)
     |> List.map snd
-    |> List.mapi (fun i bid -> (int64 i + 1L) * bid)
+    |> List.mapi (fun i bid -> (i + 1) * bid)
     |> List.sum
 
 let run fileName = 
     let parsed = readLines fileName |> Array.toList |> List.map parseLine
-    parsed |> runWith (compareHands rateHand1 rateCard1) |> printfn "%d"
-    parsed |> runWith (compareHands rateHand2 rateCard2) |> printfn "%d"
+    parsed |> runWith rateHand1 rateCard1 |> printfn "%d"
+    parsed |> runWith rateHand2 rateCard2 |> printfn "%d"
 
 "input" |> run 
