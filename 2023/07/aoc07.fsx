@@ -12,8 +12,8 @@ let parseLine (line : string) : (string * int) =
 let countCards = 
     List.countBy id >> List.map snd >> List.sortDescending
 
-let rateHand1 (hand : string) = 
-    match hand |> Seq.toList |> countCards with 
+let rateCardCounts cardCounts = 
+    match cardCounts with 
     | [5] -> 6
     | [4;1] -> 5
     | [3;2] -> 4
@@ -22,21 +22,17 @@ let rateHand1 (hand : string) =
     | [2;1;1;1] -> 1
     | _ -> 0
 
+let rateHand1 (hand : string) = 
+    hand |> Seq.toList |> countCards |> rateCardCounts
+
 let rateHand2 (hand : string) = 
     let (jokers, rest) = hand |> Seq.toList |> List.partition ((=) 'J')
     let jokerCount = jokers |> List.length
-    let improvedHand = 
+    let improved = 
         match countCards rest with 
         | h :: t -> (h + jokerCount) :: t
         | _ -> [5]
-    match improvedHand with 
-    | [5] -> 6
-    | [4;1] -> 5
-    | [3;2] -> 4
-    | [3;1;1] -> 3
-    | [2;2;1] -> 2
-    | [2;1;1;1] -> 1
-    | _ -> 0
+    improved |> rateCardCounts
 
 let rateCard1 (card : char) : int =
     match card with 
