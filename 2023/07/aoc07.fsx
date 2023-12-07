@@ -70,8 +70,7 @@ let compareHands handRater cardRater hand1 hand2 =
     | n -> n
 
 let readLines = 
-    File.ReadAllLines
-    >> Array.filter (fun line -> line <> String.Empty)
+    File.ReadAllLines >> Array.filter ((<>) String.Empty)
 
 let runWith handRater cardRater parsedLines = 
     let comparer = compareHands handRater cardRater
