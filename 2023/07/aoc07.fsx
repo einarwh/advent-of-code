@@ -4,7 +4,7 @@
 open System
 open System.IO
 
-let parseLine (line : string) : (string * int) = 
+let parseLine (line : string) = 
     match line.Split(" ") with 
     | [|card;bid|] -> (card, int bid)
     | _ -> failwith "Wrong"
@@ -22,19 +22,18 @@ let rateCardCounts cardCounts =
     | [2;1;1;1] -> 1
     | _ -> 0
 
-let rateHand1 (hand : string) = 
+let rateHand hand = 
     hand |> Seq.toList |> countCards |> rateCardCounts
 
-let rateHand2 (hand : string) = 
+let rateHandJoker hand = 
     let (jokers, rest) = hand |> Seq.toList |> List.partition ((=) 'J')
-    let jokerCount = jokers |> List.length
     let improved = 
         match countCards rest with 
-        | h :: t -> (h + jokerCount) :: t
+        | h :: t -> (h + List.length jokers) :: t
         | _ -> [5]
     improved |> rateCardCounts
 
-let rateCard1 (card : char) : int =
+let rateCard card =
     match card with 
     | '2' -> 2
     | '3' -> 3
@@ -51,33 +50,21 @@ let rateCard1 (card : char) : int =
     | 'A' -> 14
     | _ -> failwith "Wrong"
 
-let rateCard2 (card : char) : int =
+let rateCardJoker card =
     match card with 
     | 'J' -> 1
-    | '2' -> 2
-    | '3' -> 3
-    | '4' -> 4
-    | '5' -> 5
-    | '6' -> 6
-    | '7' -> 7
-    | '8' -> 8
-    | '9' -> 9
-    | 'T' -> 10
-    | 'Q' -> 12
-    | 'K' -> 13
-    | 'A' -> 14
-    | _ -> failwith "Wrong"
+    | _ -> rateCard card
 
-let compareByHandType handRater (hand1 : string) (hand2 : string) = 
+let compareByHandType handRater hand1 hand2 = 
     handRater hand1 - handRater hand2 
 
-let compareByStrongestCard cardRater (hand1 : string) (hand2 : string) = 
+let compareByStrongestCard cardRater hand1 hand2 = 
     Seq.zip (Seq.map cardRater hand1) (Seq.map cardRater hand2) 
     |> Seq.map (fun (a, b) -> (a - b)) 
     |> Seq.tryFind (fun n -> n <> 0)
     |> Option.defaultValue 0
 
-let compareHands handRater cardRater (hand1 : string) (hand2 : string) =
+let compareHands handRater cardRater hand1 hand2 =
     match compareByHandType handRater hand1 hand2 with 
     | 0 -> compareByStrongestCard cardRater hand1 hand2 
     | n -> n
@@ -96,7 +83,7 @@ let runWith handRater cardRater parsedLines =
 
 let run fileName = 
     let parsed = readLines fileName |> Array.toList |> List.map parseLine
-    parsed |> runWith rateHand1 rateCard1 |> printfn "%d"
-    parsed |> runWith rateHand2 rateCard2 |> printfn "%d"
+    parsed |> runWith rateHand rateCard |> printfn "%d"
+    parsed |> runWith rateHandJoker rateCardJoker |> printfn "%d"
 
 "input" |> run 
