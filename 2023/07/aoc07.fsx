@@ -27,7 +27,7 @@ let rateHand1 (hand : string) =
     | _ -> 0
 
 let rateHand2 (hand : string) = 
-    let (jokers, rest) = hand |> Seq.toList |> List.partition (fun ch -> ch = 'J')
+    let (jokers, rest) = hand |> Seq.toList |> List.partition ((=) 'J')
     let jokerCount = jokers |> List.length
     let lst = 
         rest 
@@ -38,7 +38,7 @@ let rateHand2 (hand : string) =
     let improved = 
         match lst with 
         | h :: t -> (h + jokerCount) :: t
-        | _ -> lst
+        | _ -> [5]
     match improved with 
     | [5] -> 6
     | [4;1] -> 5
@@ -82,8 +82,8 @@ let rateCard2 (card : char) : int =
     | 'A' -> 14
     | _ -> failwith "Wrong"
 
-let compareByHandType handTypeRater (hand1 : string) (hand2 : string) = 
-    handTypeRater hand1 - handTypeRater hand2 
+let compareByHandType handRater (hand1 : string) (hand2 : string) = 
+    handRater hand1 - handRater hand2 
 
 let compareByStrongestCard cardRater (hand1 : string) (hand2 : string) = 
     Seq.zip (Seq.map cardRater hand1) (Seq.map cardRater hand2) 
