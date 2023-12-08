@@ -1,4 +1,4 @@
-// Advent of Code 2023. 
+// Advent of Code 2023. Day 8: Haunted Wasteland
 // dotnet fsi aoc08.fsx
 
 open System
@@ -13,26 +13,38 @@ let parse (s : string) =
 let readLines = 
     File.ReadAllLines >> Array.filter ((<>) String.Empty)
 
-let solve (instructions : string) (map : Map<string, string*string>) = 
+let solve (map : Map<string, string*string>) (instructions : string) stopCheck start = 
     let rec loop steps pos = 
-        if pos = "ZZZ" then steps
+        if stopCheck pos then steps
         else 
             let (left, right) = map[pos]
             let next = 
-                let insNo = steps % String.length instructions
-                match instructions[insNo] with 
+                let i = steps % String.length instructions
+                match instructions[i] with 
                 | 'R' -> right 
                 | 'L' -> left 
                 | _ -> failwith "Wrong"
             loop (steps + 1) next 
-    loop 0 "AAA"
+    loop 0 start
+
+let lcm x y =
+    let rec gcd (x : int64) (y : int64) = 
+        if y = 0 then abs x else gcd y (x % y)
+    x * y / (gcd x y)
 
 let run fileName = 
     let lines = readLines fileName |> Array.toList
     match lines with 
     | h :: t -> 
         let map = t |> List.map parse |> Map.ofList
-        solve h map |> printfn "%d"
+        solve map h ((=) "ZZZ") "AAA" |> printfn "%d"
+        let isStartNode (s : string) = s.EndsWith('A')
+        let isEndNode (s : string) = s.EndsWith('Z')
+        map.Keys 
+        |> Seq.filter isStartNode
+        |> Seq.map (int64 << solve map h isEndNode)
+        |> Seq.reduce lcm
+        |> printfn "%d"
     | _ -> failwith "Wrong"
 
 "input" |> run 
