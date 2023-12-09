@@ -10,18 +10,18 @@ let parseLine (s : string) =
 let differences = 
     List.pairwise >> List.map (fun (a, b) -> (b - a)) 
 
-let rec calculate p numbers = 
+let rec back p numbers = 
     match numbers with 
     | [] -> []
     | n :: t -> 
         let d = n - p
-        d :: calculate d t
+        d :: back d t
 
 let histories numbers = 
     let rec loop numbers firsts lasts = 
         if List.forall (fun n -> n = 0L) numbers then 
             let forwards = List.sum lasts
-            let backwards = firsts |> calculate 0L |> List.last
+            let backwards = firsts |> back 0L |> List.last
             (forwards, backwards)
         else 
             let next = differences numbers 
