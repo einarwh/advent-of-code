@@ -6,11 +6,6 @@ open System.IO
 open System.Text.RegularExpressions
 open FSharp.Collections 
 
-module Array2D =
-    let inc array (index1, index2) =
-        let n = Array2D.get array index1 index2 
-        Array2D.set array index1 index2 (n + 1)
-
 type Claim = {
     Id : int 
     XOffset : int
@@ -33,6 +28,10 @@ let parseClaim (s : string) : Claim =
 let readLines = 
     File.ReadAllLines >> Array.filter ((<>) String.Empty)
 
+let increment array (index1, index2) =
+    let n = Array2D.get array index1 index2 
+    Array2D.set array index1 index2 (n + 1)
+
 let rec applyClaims square (claims : Claim list) = 
     let rec loop claims = 
         match claims with 
@@ -41,17 +40,35 @@ let rec applyClaims square (claims : Claim list) =
             let xs = [c.XOffset .. c.XOffset + c.Width - 1]
             let ys = [c.YOffset .. c.YOffset + c.Height - 1]
             [for y in ys do for x in xs do yield (x,y)]
-            |> List.iter (Array2D.inc square)
+            |> List.iter (increment square)
             loop rest
     loop claims
+
+let toSequence (a:'a[,]) : seq<'a> =
+    seq { for i in 0 .. a.GetLength(0)-1 do
+          for j in 0 .. a.GetLength(1)-1 do yield a.[i,j] }
+
+let noOverlap square (c : Claim) = 
+    let xs = [c.XOffset .. c.XOffset + c.Width - 1]
+    let ys = [c.YOffset .. c.YOffset + c.Height - 1]
+    [for y in ys do for x in xs do yield (x,y)]
+    |> List.map (fun (x, y) -> Array2D.get square x y)
+    |> List.forall ((=) 1)
 
 let run fileName = 
     let lines = readLines fileName |> Array.toList
     let claims = lines |> List.map parseClaim
-    claims |> printfn "%A"
-    let square = Array2D.create 10 10 0
+    let square = Array2D.create 1000 1000 0
     claims |> applyClaims square
-    printfn "%A" square
-    "."
+    square 
+    |> toSequence 
+    |> Seq.filter ((<) 1) 
+    |> Seq.length 
+    |> printfn "%d"
+    claims 
+    |> List.filter (noOverlap square) 
+    |> List.head
+    |> (fun c -> c.Id)
+    |> printfn "%A"
 
-"sample" |> run 
+"input" |> run 
