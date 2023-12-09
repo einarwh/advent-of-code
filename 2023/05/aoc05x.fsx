@@ -21,18 +21,33 @@ let parseMappingLine2 (s : string) =
     let nonEmptyRange (startIndex, endIndex) = endIndex >= startIndex
     match parseNumbers s with 
     | [dst; src; range] -> 
-        fun next (inputStart, inputEnd) ->
+        fun (next : (int64*int64 -> (int64*int64) list)) (inputStart, inputEnd) ->
+            printfn "calling splitting function"
             let filterStart = src
             let filterEnd = src + range - 1L
             let delta = dst - src
-            let moved = 
-                [ (filterStart + delta, inputEnd + delta) ]
-                |> List.filter nonEmptyRange
-            let unmoved = 
-                [ (inputStart, filterStart - 1L); (inputEnd + 1L, filterEnd)]
-                |> List.filter nonEmptyRange
-            let nextResults = unmoved |> List.collect next
-            moved @ nextResults
+            let intersectStart = (max inputStart filterStart)
+            let intersectEnd = (min inputEnd filterEnd)
+            printfn "input: (%A, %A)" inputStart inputEnd
+            printfn "filter: (%A, %A)" filterStart filterEnd
+            printfn "intersect: (%A, %A)" intersectStart intersectEnd
+            printfn "delta = %d" delta
+            if inputEnd < filterStart then 
+                printfn "Nothing to do."
+                next (inputStart, inputEnd)
+            else 
+                printfn "Split stuff."
+                let moved = 
+                    [ (intersectStart + delta, intersectEnd + delta) ]
+                    |> List.filter nonEmptyRange
+                let unmoved = 
+                    [ (inputStart, intersectStart - 1L); (intersectEnd + 1L, inputEnd)]
+                    |> List.filter nonEmptyRange
+                let nextResults = unmoved |> List.collect next
+                let res = moved @ nextResults
+                printfn "moved = %A" moved
+                printfn "unmoved = %A" unmoved
+                res
     | _ -> failwith "Wrong"
     
 let parseMap (s : string) = 
@@ -70,16 +85,22 @@ let run fileName =
         let fn = rest |> List.map parseMap |> List.reduce (>>)
         seeds |> List.map fn |> List.min |> printfn "%d"
         // Part 2
-        let fn2 = rest |> List.map parseMap2 |> List.reduce (>>)
-        let ranges = seeds |> seedRanges 
-        let flop = ranges |> fn2 
-        let firsts = flop |> List.map fst 
-        printfn "%A" firsts
-        printfn "."
+        // let fn2 = rest |> List.map parseMap2 |> List.reduce (>>)
+        // let ranges = seeds |> seedRanges 
+        // let flop = ranges |> fn2 
+        // let firsts = flop |> List.map fst 
+        // printfn "%A" firsts
+        // printfn "."
+        let fn = parseMap2 "50 98 2\n52 50 48"
+        // let r = (79L, 79L + 14L - 1L)
+        // printfn "r = %A" r
+        // (79L, 79L + 14L - 1L) |> fn (fun x -> [x]) |> printfn "%A" 
+        [(90L, 100L)] |> fn |> printfn "%A" 
+        "."
         // seeds
         // |> seedRanges 
         // |> List.map (Seq.map fn >> Seq.min)
         // |> List.min
         // |> printfn "%d"
     
-"input" |> run 
+"sample" |> run 
