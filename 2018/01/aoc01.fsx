@@ -7,9 +7,18 @@ open System.IO
 let readLines = 
     File.ReadAllLines >> Array.filter ((<>) String.Empty)
 
-let run fileName = 
-    let lines = readLines fileName |> Array.toList
-    let changes = lines |> List.map int
-    changes |> List.sum |> printfn "%d"
+let rec solve seen current index (changes : int array) = 
+    if List.contains current seen then current 
+    else 
+        let seen' = current :: seen 
+        let next = current + changes[index] 
+        let ix = (index + 1) % changes.Length
+        solve seen' next ix changes
 
-"input" |> run 
+let run fileName = 
+    let lines = readLines fileName
+    let changes = lines |> Array.map int
+    changes |> Array.sum |> printfn "%d"
+    changes |> solve [] 0 0 |> printfn "%d"
+
+"sample3" |> run 
