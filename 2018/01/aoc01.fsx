@@ -7,11 +7,10 @@ open System.IO
 let readLines = 
     File.ReadAllLines >> Array.filter ((<>) String.Empty)
 
-// Slow, runs in approx 10 minutes.
 let rec solve seen current index (changes : int array) = 
-    if List.contains current seen then current 
+    if Set.contains current seen then current 
     else 
-        let seen' = current :: seen 
+        let seen' = Set.add current seen
         let next = current + changes[index] 
         let ix = (index + 1) % changes.Length
         solve seen' next ix changes
@@ -19,10 +18,7 @@ let rec solve seen current index (changes : int array) =
 let run fileName = 
     let lines = readLines fileName
     let changes = lines |> Array.map int
-    let startTime = DateTime.Now
     changes |> Array.sum |> printfn "%d"
-    changes |> solve [] 0 0 |> printfn "%d"
-    let seconds = int (DateTime.Now - startTime).TotalSeconds
-    printfn "%d seconds" seconds
+    changes |> solve Set.empty 0 0 |> printfn "%d"
 
 "input" |> run 
