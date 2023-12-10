@@ -27,21 +27,27 @@ main =
 type alias Model = 
   { lines : List String
   , field : Array2D Char
+  , startPos : (Int, Int)
   , loop : List (Int, Int)
   , steps : Int 
-  , inside : Int
+  , insideTiles : List (Int, Int)
+  , insideCount : Int
   , debug : String }
 
-findStartPos : Array2D Char -> List (Int, Int) -> Maybe (Int, Int)
-findStartPos field indexes =
+findStartPosHelper : Array2D Char -> List (Int, Int) -> Maybe (Int, Int)
+findStartPosHelper field indexes =
   case indexes of 
     [] -> Just (7, 7) 
     (x, y) :: rest -> 
       case Array2D.get y x field of 
         Just ch -> 
           if ch == 'S' then Just (x, y) 
-          else findStartPos field rest
+          else findStartPosHelper field rest
         Nothing -> Just (x, y)
+
+findStartPos : Array2D Char -> Maybe (Int, Int)
+findStartPos field =
+  findStartPosHelper field (getIndexes field)
 
 northPipes = ['S','|', 'L', 'J']
 westPipes = ['S','-', 'J', '7']
@@ -95,17 +101,11 @@ findLoopHelper field (x, y) prev positions =
             _ -> [(List.length conns, List.length filtered)]
     Nothing -> [(3, 3)]
 
-findLoop field = 
-  let 
-    indexes = getIndexes field 
-  in 
-    case findStartPos field indexes of 
-      Just startPos -> 
-        case findConnections field startPos of 
-          [a, b] -> 
-            findLoopHelper field a startPos [startPos]
-          _ -> [(1, 1)]
-      Nothing -> [(2, 2)]
+findLoop startPos field = 
+  case findConnections field startPos of 
+    [a, b] -> 
+      findLoopHelper field a startPos [startPos]
+    _ -> [(1, 1)]
 
 justLoop : List (Int, Int) -> Array2D Char -> Array2D Char -> Array2D Char
 justLoop tiles field loopField = 
@@ -147,6 +147,38 @@ countInside : String -> Int
 countInside s = 
   countInsideHelper False 0 (String.toList s)
 
+findInsideHelper : Int -> Bool -> Maybe Char -> List Int -> List Char -> List Int 
+findInsideHelper ix inside maybeWallChar found remaining = 
+  case remaining of 
+    [] -> found 
+    h :: t -> 
+      case h of 
+        '|' -> 
+          findInsideHelper (ix + 1) (not inside) Nothing found t 
+        '-' -> 
+          findInsideHelper (ix + 1) inside maybeWallChar found t 
+        'F' -> 
+          findInsideHelper (ix + 1) inside (Just h) found t 
+        'L' -> 
+          findInsideHelper (ix + 1) inside (Just h) found t 
+        '7' -> 
+          case maybeWallChar of
+            Just 'L' -> findInsideHelper (ix + 1) (not inside) Nothing found t
+            _ -> findInsideHelper (ix + 1) inside Nothing found t
+        'J' -> 
+          case maybeWallChar of
+            Just 'F' -> findInsideHelper (ix + 1) (not inside) Nothing found t
+            _ -> findInsideHelper (ix + 1) inside Nothing found t
+        _ -> 
+          if inside then 
+            findInsideHelper (ix + 1) inside maybeWallChar (ix :: found) t
+          else 
+            findInsideHelper (ix + 1) inside maybeWallChar found t
+
+findInside : String -> List Int
+findInside s = 
+  findInsideHelper 0 False Nothing [] (String.toList s)
+
 toOffset : (Int, Int) -> (Int, Int) -> (Int, Int)
 toOffset (xStart, yStart) (x, y) = 
   (x - xStart, y - yStart)
@@ -161,24 +193,24 @@ chooseReplacement aOff bOff =
   else if aOff == ( 0,  1) && bOff == ( 1,  0) then 'F' -- S, E
   else 'S'
 
-replaceStart : Array2D Char -> Array2D Char
-replaceStart field = 
-  let 
-    indexes = getIndexes field 
+findReplacement : (Int, Int) -> Array2D Char -> Char
+findReplacement startPos field = 
+  case findConnections field startPos of 
+    [a, b] -> 
+      let
+        aOff = toOffset startPos a
+        bOff = toOffset startPos b 
+      in 
+        chooseReplacement aOff bOff
+    _ -> 'S'
+
+replaceStart : (Int, Int) -> Array2D Char -> Array2D Char
+replaceStart startPos field = 
+  let
+    pipe = findReplacement startPos field 
+    (xStart, yStart) = startPos
   in 
-    case findStartPos field indexes of 
-      Just startPos ->
-        case findConnections field startPos of 
-          [a, b] -> 
-            let
-              aOff = toOffset startPos a
-              bOff = toOffset startPos b 
-              pipe = chooseReplacement aOff bOff
-              (xStart, yStart) = startPos
-            in 
-              Array2D.set yStart xStart pipe field
-          _ -> field
-      Nothing -> field
+    Array2D.set yStart xStart pipe field
 
 init : () -> (Model, Cmd Msg)
 init _ =
@@ -338,12 +370,13 @@ LJ--|J7.LJFJ7|7FJ---L77LLF7J7.FJ7F7L77.J.FLF-FJJ.FL.F--FJ.F-FF7J|7FFJFF|-7|JLL--
 
     field = lines |> List.map (String.toList) |> Array2D.fromList
 
-    loop = findLoop field
+    startPos = findStartPos field |> Maybe.withDefault (0, 0)
+    loop = findLoop startPos field
 
     rowCount = Array2D.rows field  
     colCount = Array2D.columns field 
     emptyField = Array2D.repeat rowCount colCount ' '
-    fieldWithoutS = replaceStart field 
+    fieldWithoutS = replaceStart startPos field 
     loopField = justLoop loop fieldWithoutS emptyField
 
     plainLines = 
@@ -352,19 +385,29 @@ LJ--|J7.LJFJ7|7FJ---L77LLF7J7.FJ7F7L77.J.FLF-FJJ.FL.F--FJ.F-FF7J|7FFJFF|-7|JLL--
       |> List.map (Array.toList)
       |> List.map (String.fromList)
 
+    replacement = findReplacement startPos field 
+    linesWithoutS = 
+      lines 
+      |> List.map (String.replace "S" (String.fromList [replacement]))
+
+    insideTiles = 
+      plainLines 
+      |> List.indexedMap (\y line -> findInside line |> List.map (\x -> (x, y)))
+      |> List.concat
+
     moddedLines = plainLines |> List.map (shrinkLine)
-    inside = moddedLines |> List.map countInside |> List.sum
+    insideCount = moddedLines |> List.map countInside |> List.sum
 
-    -- debugText = indexes |> List.length |> String.fromInt
-    -- debugText = "width (xs) = " ++ String.fromInt width ++ ", height (ys) = " ++ String.fromInt height
-    -- debugText = startText
-    debugText = "loop length: " ++ (loop |> List.length |> String.fromInt)
+    -- debugText = "insideTiles length: " ++ (insideTiles |> List.length |> String.fromInt)
+    debugText = ""
 
-    model = { lines = lines 
+    model = { lines = linesWithoutS 
             , field = emptyField
+            , startPos = startPos
             , loop = loop
             , steps = (loop |> List.length) // 2
-            , inside = inside 
+            , insideTiles = insideTiles
+            , insideCount = insideCount
             , debug = debugText }
   in 
     (model, Cmd.none)
@@ -420,8 +463,24 @@ toColoredBox fillColor (xStart, yStart) =
       , width (String.fromInt unitSize) 
       , height (String.fromInt unitSize)
     --   , stroke "black"
-      , opacity "0.6"
+      , opacity "0.8"
       , fill fillColor ]
+      []
+
+toOutlineBox : (Int, Int) -> Html Msg 
+toOutlineBox (xStart, yStart) = 
+  let 
+    xVal = unitSize * xStart
+    yVal = unitSize * yStart
+  in
+    rect
+      [ x (String.fromInt xVal)
+      , y (String.fromInt yVal)
+      , width (String.fromInt unitSize) 
+      , height (String.fromInt unitSize)
+      , stroke "black"
+      , fill "None"
+      , opacity "0.8" ]
       []
 
 toSvg : Model -> Html Msg 
@@ -429,13 +488,15 @@ toSvg model =
   let 
     lines = model.lines
     loop = model.loop
-    loopBoxes = loop |> List.map (toColoredBox "lightgreen")
+    loopBoxes = loop |> List.map (toColoredBox "palegreen")
+    insideBoxes = model.insideTiles |> List.map (toColoredBox "deepskyblue")
     charTexts = lines |> List.indexedMap lineToCharTexts |> List.concat
+    startBox = model.startPos |> toOutlineBox
     numberOfLines = lines |> List.length
     numberOfChars = lines |> List.head |> Maybe.map (String.length) |> Maybe.withDefault 0
     svgWidth = (unitSize * numberOfChars) |> String.fromInt
     svgHeight = (unitSize * numberOfLines) |> String.fromInt
-    elements = loopBoxes ++ charTexts
+    elements = insideBoxes ++ loopBoxes ++ charTexts ++ [startBox]
   in 
     svg
       [ viewBox ("0 0 " ++ svgWidth ++ svgHeight)
@@ -470,6 +531,6 @@ view model =
               , Html.Attributes.style "padding" "20px"] 
               [ Html.div [ Html.Attributes.align "center" ] [ s ] 
               , Html.div [] [ Html.text <| String.fromInt model.steps ]
-              , Html.div [] [ Html.text <| String.fromInt model.inside ]
-              , Html.div [] [ Html.text "." ]
+              , Html.div [] [ Html.text <| String.fromInt model.insideCount ]
+              , Html.div [] [ Html.text model.debug ]
               ] ] ]

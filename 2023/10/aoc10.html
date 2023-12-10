@@ -5213,6 +5213,17 @@ var $elm$browser$Browser$element = _Browser_element;
 var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
 	return array2d.columns;
 };
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc10$countInsideHelper = F3(
 	function (inside, count, chars) {
@@ -5273,6 +5284,155 @@ var $elm$core$List$filterMap = F2(
 			_List_Nil,
 			xs);
 	});
+var $author$project$Aoc10$findInsideHelper = F5(
+	function (ix, inside, maybeWallChar, found, remaining) {
+		findInsideHelper:
+		while (true) {
+			if (!remaining.b) {
+				return found;
+			} else {
+				var h = remaining.a;
+				var t = remaining.b;
+				switch (h.valueOf()) {
+					case '|':
+						var $temp$ix = ix + 1,
+							$temp$inside = !inside,
+							$temp$maybeWallChar = $elm$core$Maybe$Nothing,
+							$temp$found = found,
+							$temp$remaining = t;
+						ix = $temp$ix;
+						inside = $temp$inside;
+						maybeWallChar = $temp$maybeWallChar;
+						found = $temp$found;
+						remaining = $temp$remaining;
+						continue findInsideHelper;
+					case '-':
+						var $temp$ix = ix + 1,
+							$temp$inside = inside,
+							$temp$maybeWallChar = maybeWallChar,
+							$temp$found = found,
+							$temp$remaining = t;
+						ix = $temp$ix;
+						inside = $temp$inside;
+						maybeWallChar = $temp$maybeWallChar;
+						found = $temp$found;
+						remaining = $temp$remaining;
+						continue findInsideHelper;
+					case 'F':
+						var $temp$ix = ix + 1,
+							$temp$inside = inside,
+							$temp$maybeWallChar = $elm$core$Maybe$Just(h),
+							$temp$found = found,
+							$temp$remaining = t;
+						ix = $temp$ix;
+						inside = $temp$inside;
+						maybeWallChar = $temp$maybeWallChar;
+						found = $temp$found;
+						remaining = $temp$remaining;
+						continue findInsideHelper;
+					case 'L':
+						var $temp$ix = ix + 1,
+							$temp$inside = inside,
+							$temp$maybeWallChar = $elm$core$Maybe$Just(h),
+							$temp$found = found,
+							$temp$remaining = t;
+						ix = $temp$ix;
+						inside = $temp$inside;
+						maybeWallChar = $temp$maybeWallChar;
+						found = $temp$found;
+						remaining = $temp$remaining;
+						continue findInsideHelper;
+					case '7':
+						if ((maybeWallChar.$ === 'Just') && ('L' === maybeWallChar.a.valueOf())) {
+							var $temp$ix = ix + 1,
+								$temp$inside = !inside,
+								$temp$maybeWallChar = $elm$core$Maybe$Nothing,
+								$temp$found = found,
+								$temp$remaining = t;
+							ix = $temp$ix;
+							inside = $temp$inside;
+							maybeWallChar = $temp$maybeWallChar;
+							found = $temp$found;
+							remaining = $temp$remaining;
+							continue findInsideHelper;
+						} else {
+							var $temp$ix = ix + 1,
+								$temp$inside = inside,
+								$temp$maybeWallChar = $elm$core$Maybe$Nothing,
+								$temp$found = found,
+								$temp$remaining = t;
+							ix = $temp$ix;
+							inside = $temp$inside;
+							maybeWallChar = $temp$maybeWallChar;
+							found = $temp$found;
+							remaining = $temp$remaining;
+							continue findInsideHelper;
+						}
+					case 'J':
+						if ((maybeWallChar.$ === 'Just') && ('F' === maybeWallChar.a.valueOf())) {
+							var $temp$ix = ix + 1,
+								$temp$inside = !inside,
+								$temp$maybeWallChar = $elm$core$Maybe$Nothing,
+								$temp$found = found,
+								$temp$remaining = t;
+							ix = $temp$ix;
+							inside = $temp$inside;
+							maybeWallChar = $temp$maybeWallChar;
+							found = $temp$found;
+							remaining = $temp$remaining;
+							continue findInsideHelper;
+						} else {
+							var $temp$ix = ix + 1,
+								$temp$inside = inside,
+								$temp$maybeWallChar = $elm$core$Maybe$Nothing,
+								$temp$found = found,
+								$temp$remaining = t;
+							ix = $temp$ix;
+							inside = $temp$inside;
+							maybeWallChar = $temp$maybeWallChar;
+							found = $temp$found;
+							remaining = $temp$remaining;
+							continue findInsideHelper;
+						}
+					default:
+						if (inside) {
+							var $temp$ix = ix + 1,
+								$temp$inside = inside,
+								$temp$maybeWallChar = maybeWallChar,
+								$temp$found = A2($elm$core$List$cons, ix, found),
+								$temp$remaining = t;
+							ix = $temp$ix;
+							inside = $temp$inside;
+							maybeWallChar = $temp$maybeWallChar;
+							found = $temp$found;
+							remaining = $temp$remaining;
+							continue findInsideHelper;
+						} else {
+							var $temp$ix = ix + 1,
+								$temp$inside = inside,
+								$temp$maybeWallChar = maybeWallChar,
+								$temp$found = found,
+								$temp$remaining = t;
+							ix = $temp$ix;
+							inside = $temp$inside;
+							maybeWallChar = $temp$maybeWallChar;
+							found = $temp$found;
+							remaining = $temp$remaining;
+							continue findInsideHelper;
+						}
+				}
+			}
+		}
+	});
+var $author$project$Aoc10$findInside = function (s) {
+	return A5(
+		$author$project$Aoc10$findInsideHelper,
+		0,
+		false,
+		$elm$core$Maybe$Nothing,
+		_List_Nil,
+		$elm$core$String$toList(s));
+};
 var $elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
 		if (maybeValue.$ === 'Just') {
@@ -5522,9 +5682,83 @@ var $author$project$Aoc10$findLoopHelper = F4(
 			}
 		}
 	});
-var $author$project$Aoc10$findStartPos = F2(
+var $author$project$Aoc10$findLoop = F2(
+	function (startPos, field) {
+		var _v0 = A2($author$project$Aoc10$findConnections, field, startPos);
+		if ((_v0.b && _v0.b.b) && (!_v0.b.b.b)) {
+			var a = _v0.a;
+			var _v1 = _v0.b;
+			var b = _v1.a;
+			return A4(
+				$author$project$Aoc10$findLoopHelper,
+				field,
+				a,
+				startPos,
+				_List_fromArray(
+					[startPos]));
+		} else {
+			return _List_fromArray(
+				[
+					_Utils_Tuple2(1, 1)
+				]);
+		}
+	});
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $author$project$Aoc10$chooseReplacement = F2(
+	function (aOff, bOff) {
+		return (_Utils_eq(
+			aOff,
+			_Utils_Tuple2(0, -1)) && _Utils_eq(
+			bOff,
+			_Utils_Tuple2(-1, 0))) ? _Utils_chr('J') : ((_Utils_eq(
+			aOff,
+			_Utils_Tuple2(0, -1)) && _Utils_eq(
+			bOff,
+			_Utils_Tuple2(0, 1))) ? _Utils_chr('|') : ((_Utils_eq(
+			aOff,
+			_Utils_Tuple2(0, -1)) && _Utils_eq(
+			bOff,
+			_Utils_Tuple2(1, 0))) ? _Utils_chr('L') : ((_Utils_eq(
+			aOff,
+			_Utils_Tuple2(-1, 0)) && _Utils_eq(
+			bOff,
+			_Utils_Tuple2(0, 1))) ? _Utils_chr('7') : ((_Utils_eq(
+			aOff,
+			_Utils_Tuple2(-1, 0)) && _Utils_eq(
+			bOff,
+			_Utils_Tuple2(1, 0))) ? _Utils_chr('-') : ((_Utils_eq(
+			aOff,
+			_Utils_Tuple2(0, 1)) && _Utils_eq(
+			bOff,
+			_Utils_Tuple2(1, 0))) ? _Utils_chr('F') : _Utils_chr('S'))))));
+	});
+var $author$project$Aoc10$toOffset = F2(
+	function (_v0, _v1) {
+		var xStart = _v0.a;
+		var yStart = _v0.b;
+		var x = _v1.a;
+		var y = _v1.b;
+		return _Utils_Tuple2(x - xStart, y - yStart);
+	});
+var $author$project$Aoc10$findReplacement = F2(
+	function (startPos, field) {
+		var _v0 = A2($author$project$Aoc10$findConnections, field, startPos);
+		if ((_v0.b && _v0.b.b) && (!_v0.b.b.b)) {
+			var a = _v0.a;
+			var _v1 = _v0.b;
+			var b = _v1.a;
+			var bOff = A2($author$project$Aoc10$toOffset, startPos, b);
+			var aOff = A2($author$project$Aoc10$toOffset, startPos, a);
+			return A2($author$project$Aoc10$chooseReplacement, aOff, bOff);
+		} else {
+			return _Utils_chr('S');
+		}
+	});
+var $author$project$Aoc10$findStartPosHelper = F2(
 	function (field, indexes) {
-		findStartPos:
+		findStartPosHelper:
 		while (true) {
 			if (!indexes.b) {
 				return $elm$core$Maybe$Just(
@@ -5547,7 +5781,7 @@ var $author$project$Aoc10$findStartPos = F2(
 							$temp$indexes = rest;
 						field = $temp$field;
 						indexes = $temp$indexes;
-						continue findStartPos;
+						continue findStartPosHelper;
 					}
 				} else {
 					return $elm$core$Maybe$Just(
@@ -5556,17 +5790,6 @@ var $author$project$Aoc10$findStartPos = F2(
 			}
 		}
 	});
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
-};
 var $elm$core$List$concatMap = F2(
 	function (f, list) {
 		return $elm$core$List$concat(
@@ -5594,35 +5817,11 @@ var $author$project$Aoc10$getIndexes = function (field) {
 		},
 		A2($elm$core$List$range, 0, height - 1));
 };
-var $author$project$Aoc10$findLoop = function (field) {
-	var indexes = $author$project$Aoc10$getIndexes(field);
-	var _v0 = A2($author$project$Aoc10$findStartPos, field, indexes);
-	if (_v0.$ === 'Just') {
-		var startPos = _v0.a;
-		var _v1 = A2($author$project$Aoc10$findConnections, field, startPos);
-		if ((_v1.b && _v1.b.b) && (!_v1.b.b.b)) {
-			var a = _v1.a;
-			var _v2 = _v1.b;
-			var b = _v2.a;
-			return A4(
-				$author$project$Aoc10$findLoopHelper,
-				field,
-				a,
-				startPos,
-				_List_fromArray(
-					[startPos]));
-		} else {
-			return _List_fromArray(
-				[
-					_Utils_Tuple2(1, 1)
-				]);
-		}
-	} else {
-		return _List_fromArray(
-			[
-				_Utils_Tuple2(2, 2)
-			]);
-	}
+var $author$project$Aoc10$findStartPos = function (field) {
+	return A2(
+		$author$project$Aoc10$findStartPosHelper,
+		field,
+		$author$project$Aoc10$getIndexes(field));
 };
 var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
 var $elm$core$Array$foldl = F3(
@@ -5648,9 +5847,6 @@ var $elm$core$Array$foldl = F3(
 var $elm$core$Array$isEmpty = function (_v0) {
 	var len = _v0.a;
 	return !len;
-};
-var $elm$core$Basics$negate = function (n) {
-	return -n;
 };
 var $tortus$elm_array_2d$Array2D$ArrayHelpers$minRowLength = function (array) {
 	return $elm$core$Array$isEmpty(array) ? 0 : A3(
@@ -6103,72 +6299,20 @@ var $tortus$elm_array_2d$Array2D$repeat = F3(
 			data: A2($elm$core$Array$repeat, numRows, row)
 		};
 	});
-var $author$project$Aoc10$chooseReplacement = F2(
-	function (aOff, bOff) {
-		return (_Utils_eq(
-			aOff,
-			_Utils_Tuple2(0, -1)) && _Utils_eq(
-			bOff,
-			_Utils_Tuple2(-1, 0))) ? _Utils_chr('J') : ((_Utils_eq(
-			aOff,
-			_Utils_Tuple2(0, -1)) && _Utils_eq(
-			bOff,
-			_Utils_Tuple2(0, 1))) ? _Utils_chr('|') : ((_Utils_eq(
-			aOff,
-			_Utils_Tuple2(0, -1)) && _Utils_eq(
-			bOff,
-			_Utils_Tuple2(1, 0))) ? _Utils_chr('L') : ((_Utils_eq(
-			aOff,
-			_Utils_Tuple2(-1, 0)) && _Utils_eq(
-			bOff,
-			_Utils_Tuple2(0, 1))) ? _Utils_chr('7') : ((_Utils_eq(
-			aOff,
-			_Utils_Tuple2(-1, 0)) && _Utils_eq(
-			bOff,
-			_Utils_Tuple2(1, 0))) ? _Utils_chr('-') : ((_Utils_eq(
-			aOff,
-			_Utils_Tuple2(0, 1)) && _Utils_eq(
-			bOff,
-			_Utils_Tuple2(1, 0))) ? _Utils_chr('F') : _Utils_chr('S'))))));
-	});
-var $author$project$Aoc10$toOffset = F2(
-	function (_v0, _v1) {
-		var xStart = _v0.a;
-		var yStart = _v0.b;
-		var x = _v1.a;
-		var y = _v1.b;
-		return _Utils_Tuple2(x - xStart, y - yStart);
-	});
-var $author$project$Aoc10$replaceStart = function (field) {
-	var indexes = $author$project$Aoc10$getIndexes(field);
-	var _v0 = A2($author$project$Aoc10$findStartPos, field, indexes);
-	if (_v0.$ === 'Just') {
-		var startPos = _v0.a;
-		var _v1 = A2($author$project$Aoc10$findConnections, field, startPos);
-		if ((_v1.b && _v1.b.b) && (!_v1.b.b.b)) {
-			var a = _v1.a;
-			var _v2 = _v1.b;
-			var b = _v2.a;
-			var bOff = A2($author$project$Aoc10$toOffset, startPos, b);
-			var aOff = A2($author$project$Aoc10$toOffset, startPos, a);
-			var pipe = A2($author$project$Aoc10$chooseReplacement, aOff, bOff);
-			var _v3 = startPos;
-			var xStart = _v3.a;
-			var yStart = _v3.b;
-			return A4($tortus$elm_array_2d$Array2D$set, yStart, xStart, pipe, field);
-		} else {
-			return field;
-		}
-	} else {
-		return field;
-	}
-};
 var $elm$core$String$replace = F3(
 	function (before, after, string) {
 		return A2(
 			$elm$core$String$join,
 			after,
 			A2($elm$core$String$split, before, string));
+	});
+var $author$project$Aoc10$replaceStart = F2(
+	function (startPos, field) {
+		var pipe = A2($author$project$Aoc10$findReplacement, startPos, field);
+		var _v0 = startPos;
+		var xStart = _v0.a;
+		var yStart = _v0.b;
+		return A4($tortus$elm_array_2d$Array2D$set, yStart, xStart, pipe, field);
 	});
 var $author$project$Aoc10$shrinkLine = function (line) {
 	return A3(
@@ -6198,11 +6342,24 @@ var $author$project$Aoc10$init = function (_v0) {
 	var lines = A2($elm$core$String$split, '\n', input);
 	var field = $tortus$elm_array_2d$Array2D$fromList(
 		A2($elm$core$List$map, $elm$core$String$toList, lines));
-	var fieldWithoutS = $author$project$Aoc10$replaceStart(field);
-	var loop = $author$project$Aoc10$findLoop(field);
 	var rowCount = $tortus$elm_array_2d$Array2D$rows(field);
-	var debugText = 'loop length: ' + $elm$core$String$fromInt(
-		$elm$core$List$length(loop));
+	var startPos = A2(
+		$elm$core$Maybe$withDefault,
+		_Utils_Tuple2(0, 0),
+		$author$project$Aoc10$findStartPos(field));
+	var fieldWithoutS = A2($author$project$Aoc10$replaceStart, startPos, field);
+	var loop = A2($author$project$Aoc10$findLoop, startPos, field);
+	var replacement = A2($author$project$Aoc10$findReplacement, startPos, field);
+	var linesWithoutS = A2(
+		$elm$core$List$map,
+		A2(
+			$elm$core$String$replace,
+			'S',
+			$elm$core$String$fromList(
+				_List_fromArray(
+					[replacement]))),
+		lines);
+	var debugText = '';
 	var colCount = $tortus$elm_array_2d$Array2D$columns(field);
 	var emptyField = A3(
 		$tortus$elm_array_2d$Array2D$repeat,
@@ -6222,15 +6379,30 @@ var $author$project$Aoc10$init = function (_v0) {
 					return A2($tortus$elm_array_2d$Array2D$getRow, rowNo, loopField);
 				},
 				A2($elm$core$List$range, 0, rowCount))));
+	var insideTiles = $elm$core$List$concat(
+		A2(
+			$elm$core$List$indexedMap,
+			F2(
+				function (y, line) {
+					return A2(
+						$elm$core$List$map,
+						function (x) {
+							return _Utils_Tuple2(x, y);
+						},
+						$author$project$Aoc10$findInside(line));
+				}),
+			plainLines));
 	var moddedLines = A2($elm$core$List$map, $author$project$Aoc10$shrinkLine, plainLines);
-	var inside = $elm$core$List$sum(
+	var insideCount = $elm$core$List$sum(
 		A2($elm$core$List$map, $author$project$Aoc10$countInside, moddedLines));
 	var model = {
 		debug: debugText,
 		field: emptyField,
-		inside: inside,
-		lines: lines,
+		insideCount: insideCount,
+		insideTiles: insideTiles,
+		lines: linesWithoutS,
 		loop: loop,
+		startPos: startPos,
 		steps: ($elm$core$List$length(loop) / 2) | 0
 	};
 	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
@@ -6340,17 +6512,42 @@ var $author$project$Aoc10$toColoredBox = F2(
 					$elm$core$String$fromInt($author$project$Aoc10$unitSize)),
 					$elm$svg$Svg$Attributes$height(
 					$elm$core$String$fromInt($author$project$Aoc10$unitSize)),
-					$elm$svg$Svg$Attributes$opacity('0.6'),
+					$elm$svg$Svg$Attributes$opacity('0.8'),
 					$elm$svg$Svg$Attributes$fill(fillColor)
 				]),
 			_List_Nil);
 	});
+var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $author$project$Aoc10$toOutlineBox = function (_v0) {
+	var xStart = _v0.a;
+	var yStart = _v0.b;
+	var yVal = $author$project$Aoc10$unitSize * yStart;
+	var xVal = $author$project$Aoc10$unitSize * xStart;
+	return A2(
+		$elm$svg$Svg$rect,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$x(
+				$elm$core$String$fromInt(xVal)),
+				$elm$svg$Svg$Attributes$y(
+				$elm$core$String$fromInt(yVal)),
+				$elm$svg$Svg$Attributes$width(
+				$elm$core$String$fromInt($author$project$Aoc10$unitSize)),
+				$elm$svg$Svg$Attributes$height(
+				$elm$core$String$fromInt($author$project$Aoc10$unitSize)),
+				$elm$svg$Svg$Attributes$stroke('black'),
+				$elm$svg$Svg$Attributes$fill('None'),
+				$elm$svg$Svg$Attributes$opacity('0.8')
+			]),
+		_List_Nil);
+};
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $author$project$Aoc10$toSvg = function (model) {
+	var startBox = $author$project$Aoc10$toOutlineBox(model.startPos);
 	var loop = model.loop;
 	var loopBoxes = A2(
 		$elm$core$List$map,
-		$author$project$Aoc10$toColoredBox('lightgreen'),
+		$author$project$Aoc10$toColoredBox('palegreen'),
 		loop);
 	var lines = model.lines;
 	var numberOfChars = A2(
@@ -6363,9 +6560,20 @@ var $author$project$Aoc10$toSvg = function (model) {
 	var svgWidth = $elm$core$String$fromInt($author$project$Aoc10$unitSize * numberOfChars);
 	var numberOfLines = $elm$core$List$length(lines);
 	var svgHeight = $elm$core$String$fromInt($author$project$Aoc10$unitSize * numberOfLines);
+	var insideBoxes = A2(
+		$elm$core$List$map,
+		$author$project$Aoc10$toColoredBox('deepskyblue'),
+		model.insideTiles);
 	var charTexts = $elm$core$List$concat(
 		A2($elm$core$List$indexedMap, $author$project$Aoc10$lineToCharTexts, lines));
-	var elements = _Utils_ap(loopBoxes, charTexts);
+	var elements = _Utils_ap(
+		insideBoxes,
+		_Utils_ap(
+			loopBoxes,
+			_Utils_ap(
+				charTexts,
+				_List_fromArray(
+					[startBox]))));
 	return A2(
 		$elm$svg$Svg$svg,
 		_List_fromArray(
@@ -6455,14 +6663,14 @@ var $author$project$Aoc10$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										$elm$core$String$fromInt(model.inside))
+										$elm$core$String$fromInt(model.insideCount))
 									])),
 								A2(
 								$elm$html$Html$div,
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('.')
+										$elm$html$Html$text(model.debug)
 									]))
 							]))
 					]))
