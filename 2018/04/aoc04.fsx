@@ -72,22 +72,10 @@ let part1 shifts =
 
 let part2 shifts = 
     shifts 
-    |> List.filter (fun g -> g.Total > 0)
-    |> List.map (fun g -> g.Guard, g.Minutes |> List.countBy id |> List.maxBy snd |> fst)
-    |> List.sortByDescending (fun (gn, minute) -> minute)
-    |> List.iter (fun sh -> printfn "%A" sh)
-    let sleepy = 
-        shifts 
-        |> List.filter (fun g -> g.Total > 0)
-        |> List.maxBy (fun g -> g.Minutes |> List.countBy id |> List.maxBy snd)
-    let guardNumber = sleepy.Guard
-    // printfn "sleepy 2 %A" sleepy
-    let minute = 
-        sleepy.Minutes 
-        |> List.countBy id 
-        |> List.maxBy snd
-        |> fst
-    guardNumber * minute 
+    |> List.map (fun g -> g.Guard, g.Minutes |> List.countBy id |> List.maxBy snd)
+    |> List.sortByDescending (fun (_, (_, count)) -> count)
+    |> List.head 
+    |> fun (gn, (m, _)) -> gn * m
 
 let run fileName = 
     let lines = readLines fileName |> Array.toList |> List.sort
@@ -95,10 +83,9 @@ let run fileName =
     let shifts = 
         chunked 
         |> List.map toShift 
-        // |> List.filter (fun g -> g.Total > 0)
-    // shifts |> List.iter (fun sh -> printfn "%A" sh)
+        |> List.filter (fun g -> g.Total > 0)
     let combined = shifts |> combineAll
     combined |> part1 |> printfn "%d"
     combined |> part2 |> printfn "%A"
 
-"sample" |> run 
+"input" |> run 
