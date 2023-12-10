@@ -3,7 +3,6 @@
 
 open System
 open System.IO
-open System.Text.RegularExpressions
 
 module Array2D = 
     let tryGet (a : 'a[,]) index1 index2 = 
@@ -35,15 +34,11 @@ let findStartPos (field : char[,]) =
 
 let findConnections (field : char[,]) (x, y) = 
     let current = Array2D.get field y x
+    let tryConnect pos pipes p = if List.contains p pipes then Some pos else None
     let check (x, y) sourcePipes targetPipes =
         if List.contains current sourcePipes then 
-            let maybe = Array2D.tryGet field y x
-            match maybe with 
-            | Some ch -> 
-                if List.contains ch targetPipes then 
-                    Some (x, y) 
-                else None
-            | None -> None
+            Array2D.tryGet field y x
+            |> Option.bind (tryConnect (x, y) targetPipes)
         else None
     [ check (x, y - 1) northPipes southPipes
       check (x - 1, y) westPipes eastPipes 
