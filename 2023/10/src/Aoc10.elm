@@ -120,33 +120,6 @@ justLoop tiles field loopField =
             justLoop rest field updated
         Nothing -> loopField
 
-shrinkLine : String -> String 
-shrinkLine line = 
-  line 
-  |> String.replace "-" ""
-  |> String.replace "LJ" ""
-  |> String.replace "L7" "|"
-  |> String.replace "FJ" "|"
-  |> String.replace "F7" ""
-
-countInsideHelper : Bool -> Int -> List Char -> Int 
-countInsideHelper inside count chars = 
-  case chars of 
-    [] -> count 
-    h :: t -> 
-      case h of 
-        '|' -> 
-          countInsideHelper (not inside) count t 
-        _ -> 
-          let 
-            inc = if inside then 1 else 0 
-          in 
-            countInsideHelper inside (count + inc) t  
-
-countInside : String -> Int 
-countInside s = 
-  countInsideHelper False 0 (String.toList s)
-
 findInsideHelper : Int -> Bool -> Maybe Char -> List Int -> List Char -> List Int 
 findInsideHelper ix inside maybeWallChar found remaining = 
   case remaining of 
@@ -395,10 +368,7 @@ LJ--|J7.LJFJ7|7FJ---L77LLF7J7.FJ7F7L77.J.FLF-FJJ.FL.F--FJ.F-FF7J|7FFJFF|-7|JLL--
       |> List.indexedMap (\y line -> findInside line |> List.map (\x -> (x, y)))
       |> List.concat
 
-    moddedLines = plainLines |> List.map (shrinkLine)
-    insideCount = moddedLines |> List.map countInside |> List.sum
-
-    -- debugText = "insideTiles length: " ++ (insideTiles |> List.length |> String.fromInt)
+    -- debugText = "insideTiles: " ++ (insideTiles |> List.length |> String.fromInt)
     debugText = ""
 
     model = { lines = linesWithoutS 
@@ -407,7 +377,7 @@ LJ--|J7.LJFJ7|7FJ---L77LLF7J7.FJ7F7L77.J.FLF-FJJ.FL.F--FJ.F-FF7J|7FFJFF|-7|JLL--
             , loop = loop
             , steps = (loop |> List.length) // 2
             , insideTiles = insideTiles
-            , insideCount = insideCount
+            , insideCount = insideTiles |> List.length
             , debug = debugText }
   in 
     (model, Cmd.none)
