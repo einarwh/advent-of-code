@@ -87,12 +87,8 @@ let countInside (s : string) =
             match h with 
             | '|' -> 
                 fn (ix + 1) (not inside) count t 
-            | '-' -> 
-                fn (ix + 1) inside count t 
             | _ ->
                 let inc = if inside then 1 else 0
-                // if inc > 0 then 
-                //     printfn "inc at ix %d" ix
                 fn (ix + 1) inside (count + inc) t  
     fn 0 false 0 (s |> Seq.toList) 
 
@@ -111,17 +107,16 @@ let replaceS field =
             | (-1,  0), ( 0,  1) -> '7' // W, S
             | (-1,  0), ( 1,  0) -> '-' // W, E
             | ( 0,  1), ( 1,  0) -> 'F' // S, E
-            | _ -> failwith "ooh"
+            | _ -> failwith "booh"
         let (xStart, yStart) = startPos
         Array2D.set field yStart xStart pipe
-    | _ -> failwith "boo"
+    | _ -> failwith "baah"
 
 let replace (oldValue : string) (newValue : string) (s : string) = 
     s.Replace(oldValue, newValue)
 
 let readLines = 
-    File.ReadAllLines
-    >> Array.filter (fun line -> line <> String.Empty)
+    File.ReadAllLines >> Array.filter ((<>) String.Empty)
 
 let run fileName = 
     let lines = readLines fileName |> Array.toList
@@ -131,27 +126,17 @@ let run fileName =
     lines |> List.mapi (updateField field) |> ignore
     let loop = findLoop field 
     loop |> List.length |> (fun tiles -> tiles / 2) |> printfn "%d"
-    // Part 2
-    // Replace S.
     replaceS field
-    // printfn "%A" field
-    // printfn "%A" loop
     let wallField = Array2D.create height width ' '
-
     updateWallField wallField field loop 
-    let lstlst = Array2D.toList wallField 
-    let strings = 
-        lstlst 
-        |> List.map (List.toArray >> String)
-        |> List.map (replace "-" "")
-        |> List.map (replace "LJ" "")
-        |> List.map (replace "L7" "|")
-        |> List.map (replace "FJ" "|")
-        |> List.map (replace "F7" "")
-    // strings |> printfn "%A"
-    strings  
-    |> List.map countInside
-    |> List.sum
-    |> printfn "%A"
+    Array2D.toList wallField  
+    |> List.map (List.toArray >> String)
+    |> List.map (replace "-" "")
+    |> List.map (replace "LJ" "")
+    |> List.map (replace "L7" "|")
+    |> List.map (replace "FJ" "|")
+    |> List.map (replace "F7" "")
+    |> List.sumBy countInside
+    |> printfn "%d"
 
 "input" |> run 
