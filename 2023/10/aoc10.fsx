@@ -80,17 +80,17 @@ let findLoop (field : char[,]) =
     | _ -> failwith "oof"
 
 let countInside (s : string) = 
-    let rec fn ix inside count lst =
+    let rec fn inside count lst =
         match lst with 
         | [] -> count 
         | h :: t -> 
             match h with 
             | '|' -> 
-                fn (ix + 1) (not inside) count t 
+                fn (not inside) count t 
             | _ ->
                 let inc = if inside then 1 else 0
-                fn (ix + 1) inside (count + inc) t  
-    fn 0 false 0 (s |> Seq.toList) 
+                fn inside (count + inc) t  
+    fn false 0 (s |> Seq.toList) 
 
 let replaceS field = 
     let startPos = findStartPos field
