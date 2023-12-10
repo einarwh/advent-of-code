@@ -41,7 +41,7 @@ let toShift (lines : string list) : Shift =
             |> List.collect (fun (a, b) -> [ a .. b ])
         let total = 
             ranges 
-            |> List.map (fun (a, b) -> b - a)
+            |> List.map (fun (a, b) -> b - a + 1)
             |> List.sum 
         { Guard = guard; Total = total; Minutes = minutes }
     | _ -> failwith "oof"
@@ -60,20 +60,45 @@ let combineAll (shifts : Shift list) =
     |> List.groupBy (fun shift -> shift.Guard)
     |> List.map combine
 
-let run fileName = 
-    let lines = readLines fileName |> Array.toList |> List.sort
-    // lines |> List.iter (fun s -> printfn "%s" s)
-    let chunked = chunk lines
-    // chunked |> printfn "%A"
-    let shifts = chunked |> List.map toShift 
-    let combined = shifts |> combineAll
-    let sleepy = combined |> List.maxBy (fun g -> g.Total)
+let part1 shifts = 
+    let sleepy = shifts |> List.maxBy (fun g -> g.Total)
     let guardNumber = sleepy.Guard
     let minute = 
         sleepy.Minutes 
         |> List.countBy id 
         |> List.maxBy snd
         |> fst
-    guardNumber * minute |> printfn "%d"
+    guardNumber * minute 
 
-"input" |> run 
+let part2 shifts = 
+    shifts 
+    |> List.filter (fun g -> g.Total > 0)
+    |> List.map (fun g -> g.Guard, g.Minutes |> List.countBy id |> List.maxBy snd |> fst)
+    |> List.sortByDescending (fun (gn, minute) -> minute)
+    |> List.iter (fun sh -> printfn "%A" sh)
+    let sleepy = 
+        shifts 
+        |> List.filter (fun g -> g.Total > 0)
+        |> List.maxBy (fun g -> g.Minutes |> List.countBy id |> List.maxBy snd)
+    let guardNumber = sleepy.Guard
+    // printfn "sleepy 2 %A" sleepy
+    let minute = 
+        sleepy.Minutes 
+        |> List.countBy id 
+        |> List.maxBy snd
+        |> fst
+    guardNumber * minute 
+
+let run fileName = 
+    let lines = readLines fileName |> Array.toList |> List.sort
+    let chunked = chunk lines
+    let shifts = 
+        chunked 
+        |> List.map toShift 
+        // |> List.filter (fun g -> g.Total > 0)
+    // shifts |> List.iter (fun sh -> printfn "%A" sh)
+    let combined = shifts |> combineAll
+    combined |> part1 |> printfn "%d"
+    combined |> part2 |> printfn "%A"
+
+"sample" |> run 
