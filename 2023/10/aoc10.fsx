@@ -1,4 +1,4 @@
-// Advent of Code 2023. 
+// Advent of Code 2023. Day 10: Pipe Maze
 // dotnet fsi aoc10.fsx
 
 open System
