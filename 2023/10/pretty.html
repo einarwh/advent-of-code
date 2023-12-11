@@ -6455,11 +6455,35 @@ var $author$project$Aoc10Pretty$toColoredBox = F2(
 				]),
 			_List_Nil);
 	});
+var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
+var $author$project$Aoc10Pretty$toOutlineBox = function (_v0) {
+	var xStart = _v0.a;
+	var yStart = _v0.b;
+	var yVal = $author$project$Aoc10Pretty$unitSize * yStart;
+	var xVal = $author$project$Aoc10Pretty$unitSize * xStart;
+	return A2(
+		$elm$svg$Svg$rect,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$x(
+				$elm$core$String$fromInt(xVal)),
+				$elm$svg$Svg$Attributes$y(
+				$elm$core$String$fromInt(yVal)),
+				$elm$svg$Svg$Attributes$width(
+				$elm$core$String$fromInt($author$project$Aoc10Pretty$unitSize)),
+				$elm$svg$Svg$Attributes$height(
+				$elm$core$String$fromInt($author$project$Aoc10Pretty$unitSize)),
+				$elm$svg$Svg$Attributes$stroke('red'),
+				$elm$svg$Svg$Attributes$strokeWidth('2'),
+				$elm$svg$Svg$Attributes$fill('None'),
+				$elm$svg$Svg$Attributes$opacity('0.8')
+			]),
+		_List_Nil);
+};
 var $elm$svg$Svg$line = $elm$svg$Svg$trustedNode('line');
 var $author$project$Aoc10Pretty$pipeColor = 'darkslategrey';
 var $author$project$Aoc10Pretty$pipeStrokeWidth = '2';
-var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
-var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
 var $elm$svg$Svg$Attributes$x1 = _VirtualDom_attribute('x1');
 var $elm$svg$Svg$Attributes$x2 = _VirtualDom_attribute('x2');
 var $elm$svg$Svg$Attributes$y1 = _VirtualDom_attribute('y1');
@@ -6486,8 +6510,8 @@ var $author$project$Aoc10Pretty$toHorizontalPipe = F2(
 				]),
 			_List_Nil);
 	});
-var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
-var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
+var $elm$svg$Svg$Attributes$points = _VirtualDom_attribute('points');
+var $elm$svg$Svg$polyline = $elm$svg$Svg$trustedNode('polyline');
 var $author$project$Aoc10Pretty$toNorthEastPipe = F2(
 	function (yPos, xPos) {
 		var yNorth = yPos * $author$project$Aoc10Pretty$unitSize;
@@ -6497,12 +6521,12 @@ var $author$project$Aoc10Pretty$toNorthEastPipe = F2(
 		var northPt = $elm$core$String$fromInt(xCenter) + (',' + $elm$core$String$fromInt(yNorth));
 		var eastPt = $elm$core$String$fromInt(xEast) + (',' + $elm$core$String$fromInt(yCenter));
 		var centerPt = $elm$core$String$fromInt(xCenter) + (',' + $elm$core$String$fromInt(yCenter));
-		var str = 'M ' + (northPt + ('Q ' + (centerPt + (', ' + eastPt))));
+		var pts = northPt + (' ' + (centerPt + (' ' + eastPt)));
 		return A2(
-			$elm$svg$Svg$path,
+			$elm$svg$Svg$polyline,
 			_List_fromArray(
 				[
-					$elm$svg$Svg$Attributes$d(str),
+					$elm$svg$Svg$Attributes$points(pts),
 					$elm$svg$Svg$Attributes$fill('none'),
 					$elm$svg$Svg$Attributes$strokeWidth($author$project$Aoc10Pretty$pipeStrokeWidth),
 					$elm$svg$Svg$Attributes$stroke($author$project$Aoc10Pretty$pipeColor)
@@ -6518,12 +6542,12 @@ var $author$project$Aoc10Pretty$toNorthWestPipe = F2(
 		var westPt = $elm$core$String$fromInt(xWest) + (',' + $elm$core$String$fromInt(yCenter));
 		var northPt = $elm$core$String$fromInt(xCenter) + (',' + $elm$core$String$fromInt(yNorth));
 		var centerPt = $elm$core$String$fromInt(xCenter) + (',' + $elm$core$String$fromInt(yCenter));
-		var str = 'M ' + (northPt + ('Q ' + (centerPt + (', ' + westPt))));
+		var pts = northPt + (' ' + (centerPt + (' ' + westPt)));
 		return A2(
-			$elm$svg$Svg$path,
+			$elm$svg$Svg$polyline,
 			_List_fromArray(
 				[
-					$elm$svg$Svg$Attributes$d(str),
+					$elm$svg$Svg$Attributes$points(pts),
 					$elm$svg$Svg$Attributes$fill('none'),
 					$elm$svg$Svg$Attributes$strokeWidth($author$project$Aoc10Pretty$pipeStrokeWidth),
 					$elm$svg$Svg$Attributes$stroke($author$project$Aoc10Pretty$pipeColor)
@@ -6536,15 +6560,15 @@ var $author$project$Aoc10Pretty$toSouthEastPipe = F2(
 		var yCenter = (yPos * $author$project$Aoc10Pretty$unitSize) + (($author$project$Aoc10Pretty$unitSize / 2) | 0);
 		var xEast = (xPos + 1) * $author$project$Aoc10Pretty$unitSize;
 		var xCenter = (xPos * $author$project$Aoc10Pretty$unitSize) + (($author$project$Aoc10Pretty$unitSize / 2) | 0);
-		var southPt = $elm$core$String$fromInt(xCenter) + (' ' + $elm$core$String$fromInt(ySouth));
-		var eastPt = $elm$core$String$fromInt(xEast) + (' ' + $elm$core$String$fromInt(yCenter));
-		var centerPt = $elm$core$String$fromInt(xCenter) + (' ' + $elm$core$String$fromInt(yCenter));
-		var str = 'M ' + (southPt + ('Q ' + (centerPt + (', ' + eastPt))));
+		var southPt = $elm$core$String$fromInt(xCenter) + (',' + $elm$core$String$fromInt(ySouth));
+		var eastPt = $elm$core$String$fromInt(xEast) + (',' + $elm$core$String$fromInt(yCenter));
+		var centerPt = $elm$core$String$fromInt(xCenter) + (',' + $elm$core$String$fromInt(yCenter));
+		var pts = southPt + (' ' + (centerPt + (' ' + eastPt)));
 		return A2(
-			$elm$svg$Svg$path,
+			$elm$svg$Svg$polyline,
 			_List_fromArray(
 				[
-					$elm$svg$Svg$Attributes$d(str),
+					$elm$svg$Svg$Attributes$points(pts),
 					$elm$svg$Svg$Attributes$fill('none'),
 					$elm$svg$Svg$Attributes$strokeWidth($author$project$Aoc10Pretty$pipeStrokeWidth),
 					$elm$svg$Svg$Attributes$stroke($author$project$Aoc10Pretty$pipeColor)
@@ -6560,12 +6584,12 @@ var $author$project$Aoc10Pretty$toSouthWestPipe = F2(
 		var westPt = $elm$core$String$fromInt(xWest) + (',' + $elm$core$String$fromInt(yCenter));
 		var southPt = $elm$core$String$fromInt(xCenter) + (',' + $elm$core$String$fromInt(ySouth));
 		var centerPt = $elm$core$String$fromInt(xCenter) + (',' + $elm$core$String$fromInt(yCenter));
-		var str = 'M ' + (southPt + ('Q ' + (centerPt + (', ' + westPt))));
+		var pts = southPt + (' ' + (centerPt + (' ' + westPt)));
 		return A2(
-			$elm$svg$Svg$path,
+			$elm$svg$Svg$polyline,
 			_List_fromArray(
 				[
-					$elm$svg$Svg$Attributes$d(str),
+					$elm$svg$Svg$Attributes$points(pts),
 					$elm$svg$Svg$Attributes$fill('none'),
 					$elm$svg$Svg$Attributes$strokeWidth($author$project$Aoc10Pretty$pipeStrokeWidth),
 					$elm$svg$Svg$Attributes$stroke($author$project$Aoc10Pretty$pipeColor)
@@ -6629,36 +6653,9 @@ var $author$project$Aoc10Pretty$toPipeShapes = F2(
 				$author$project$Aoc10Pretty$toPipeShape(y),
 				$elm$core$String$toList(line)));
 	});
-var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
-var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
-var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
-var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
-var $author$project$Aoc10Pretty$toStartOutline = function (_v0) {
-	var xPos = _v0.a;
-	var yPos = _v0.b;
-	var yCenter = (yPos * $author$project$Aoc10Pretty$unitSize) + (($author$project$Aoc10Pretty$unitSize / 2) | 0);
-	var xCenter = (xPos * $author$project$Aoc10Pretty$unitSize) + (($author$project$Aoc10Pretty$unitSize / 2) | 0);
-	var radius = ((3 * $author$project$Aoc10Pretty$unitSize) / 4) | 0;
-	return A2(
-		$elm$svg$Svg$circle,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$cx(
-				$elm$core$String$fromInt(xCenter)),
-				$elm$svg$Svg$Attributes$cy(
-				$elm$core$String$fromInt(yCenter)),
-				$elm$svg$Svg$Attributes$r(
-				$elm$core$String$fromInt(radius)),
-				$elm$svg$Svg$Attributes$strokeWidth($author$project$Aoc10Pretty$pipeStrokeWidth),
-				$elm$svg$Svg$Attributes$stroke('red'),
-				$elm$svg$Svg$Attributes$fill('None'),
-				$elm$svg$Svg$Attributes$opacity('0.8')
-			]),
-		_List_Nil);
-};
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $author$project$Aoc10Pretty$toSvg = function (model) {
-	var startOutline = $author$project$Aoc10Pretty$toStartOutline(model.startPos);
+	var startBox = $author$project$Aoc10Pretty$toOutlineBox(model.startPos);
 	var loop = model.loop;
 	var loopBoxes = A2(
 		$elm$core$List$map,
@@ -6688,7 +6685,7 @@ var $author$project$Aoc10Pretty$toSvg = function (model) {
 			_Utils_ap(
 				pipeShapes,
 				_List_fromArray(
-					[startOutline]))));
+					[startBox]))));
 	var charTexts = $elm$core$List$concat(
 		A2($elm$core$List$indexedMap, $author$project$Aoc10Pretty$lineToCharTexts, lines));
 	return A2(

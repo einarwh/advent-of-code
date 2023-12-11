@@ -13,6 +13,10 @@ import Array2D exposing (Array2D)
 unitSize : Int 
 unitSize = 9
 
+pipeColor = "darkslategrey"
+
+pipeStrokeWidth = "2"
+
 -- MAIN
 
 main =
@@ -414,8 +418,8 @@ toVerticalPipe yPos xPos =
       , x2 (String.fromInt xCenter)
       , y1 (String.fromInt yTop)
       , y2 (String.fromInt yBot)
-      , strokeWidth "3"
-      , stroke "purple" ]
+      , strokeWidth pipeStrokeWidth
+      , stroke pipeColor ]
       []
 
 toHorizontalPipe : Int -> Int -> Html Msg 
@@ -430,8 +434,8 @@ toHorizontalPipe yPos xPos =
       , x2 (String.fromInt xRight)
       , y1 (String.fromInt yCenter)
       , y2 (String.fromInt yCenter)
-      , strokeWidth "3"
-      , stroke "purple" ]
+      , strokeWidth pipeStrokeWidth
+      , stroke pipeColor ]
       []
 
 toSouthEastPipe : Int -> Int -> Html Msg 
@@ -449,8 +453,8 @@ toSouthEastPipe yPos xPos =
     polyline
       [ points pts 
       , fill "none"
-      , strokeWidth "3"
-      , stroke "purple" ]
+      , strokeWidth pipeStrokeWidth
+      , stroke pipeColor ]
       []
 
 toSouthWestPipe : Int -> Int -> Html Msg 
@@ -468,8 +472,8 @@ toSouthWestPipe yPos xPos =
     polyline
       [ points pts 
       , fill "none"
-      , strokeWidth "3"
-      , stroke "purple" ]
+      , strokeWidth pipeStrokeWidth
+      , stroke pipeColor ]
       []
 
 toNorthEastPipe : Int -> Int -> Html Msg 
@@ -487,8 +491,8 @@ toNorthEastPipe yPos xPos =
     polyline
       [ points pts 
       , fill "none"
-      , strokeWidth "3"
-      , stroke "purple" ]
+      , strokeWidth pipeStrokeWidth
+      , stroke pipeColor ]
       []
 
 toNorthWestPipe : Int -> Int -> Html Msg 
@@ -506,8 +510,8 @@ toNorthWestPipe yPos xPos =
     polyline
       [ points pts 
       , fill "none"
-      , strokeWidth "3"
-      , stroke "purple" ]
+      , strokeWidth pipeStrokeWidth
+      , stroke pipeColor ]
       []
 
 toPipeShape : Int -> Int -> Char -> Maybe (Html Msg) 
@@ -571,7 +575,7 @@ toOutlineBox (xStart, yStart) =
       , y (String.fromInt yVal)
       , width (String.fromInt unitSize) 
       , height (String.fromInt unitSize)
-      , stroke "black"
+      , stroke "red"
       , strokeWidth "2"
       , fill "None"
       , opacity "0.8" ]
