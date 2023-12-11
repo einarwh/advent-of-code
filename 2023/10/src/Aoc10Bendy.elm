@@ -10,14 +10,10 @@ import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Array2D exposing (Array2D)
 
-unitSize : Int 
-unitSize = 8
-
 inputname = "input"
-
 pipeColor = "darkslategrey"
-
-pipeStrokeWidth = "2"
+pipeStrokeWidth = "1"
+unitSize = 4
 
 -- MAIN
 
@@ -636,8 +632,8 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "40px"
-              , Html.Attributes.style "padding" "20px"]
+              , Html.Attributes.style "font-size" "36px"
+              , Html.Attributes.style "padding" "16px"]
               [ Html.div [] [Html.text "Advent of Code 2023" ]
               , Html.div [] [Html.text "Day 10: Pipe Maze" ]] ]
       , Html.tr 
@@ -646,8 +642,8 @@ view model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "20px"
-              , Html.Attributes.style "padding" "20px"] 
+              , Html.Attributes.style "font-size" "24px"
+              , Html.Attributes.style "padding" "16px"] 
               [ Html.div [ Html.Attributes.align "center" ] [ s ] 
               , Html.div [] [ Html.text <| String.fromInt model.steps ]
               , Html.div [] [ Html.text <| String.fromInt model.insideCount ]
