@@ -44,13 +44,31 @@ let rec expandRows rows =
         else 
             row :: expandRows rest
 
+let findGalaxies (lines : string list) =
+    let rowCount = lines |> List.length 
+    let colCount = lines |> List.head |> Seq.length 
+    [ for y in 0 .. rowCount - 1 do 
+        for x in 0 .. colCount - 1 do 
+            if lines[y][x] = '#' then yield (x, y) ]
+
+let rec findPairs galaxies = 
+    match galaxies with 
+    | [] -> []
+    | h :: t -> 
+        let pairs = t |> List.map (fun g -> (h, g)) 
+        pairs @ findPairs t 
+
+let findDistance ((x1, y1), (x2, y2)) = 
+    abs (x2 - x1) + abs (y2 - y1)
+    
 let run fileName = 
     let lines = readLines fileName |> Array.toList
-    let expanded = lines |> expandColumns |> expandRows
-    lines
-    |> List.iter (fun s -> printfn "%s" s)
-    expanded
-    |> List.iter (fun s -> printfn "%s" s)
-    printfn ","
+    lines 
+    |> expandColumns 
+    |> expandRows
+    |> findGalaxies 
+    |> findPairs 
+    |> List.sumBy findDistance 
+    |> printfn "%A"
 
-"sample" |> run 
+"input" |> run 
