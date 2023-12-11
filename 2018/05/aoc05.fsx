@@ -22,8 +22,18 @@ let reduce (s : string) =
         else loop shrunk 
     s |> Seq.toList |> loop |> List.toArray |> String
 
+let remove (s : string) (lc, uc) = 
+    s.Replace(String [|lc|], "").Replace(String [|uc|], "")
+
+let shortest (s : string) = 
+    List.zip [ 'a' .. 'z' ] [ 'A' .. 'Z' ] 
+    |> List.map (remove s >> reduce)
+    |> List.sortBy (String.length)
+    |> List.head 
+
 let run fileName = 
     let txt = readText fileName 
     txt |> reduce |> String.length |> printfn "%d"
+    txt |> shortest |> String.length |> printfn "%d" 
     
 "input" |> run 
