@@ -1,5 +1,5 @@
 // Advent of Code 2018. Day 3: No Matter How You Slice It
-// dotnet fsi aoc02.fsx
+// dotnet fsi aoc03.fsx
 
 open System
 open System.IO

@@ -1,5 +1,5 @@
 // Advent of Code 2018. Day 4: Repose Record
-// dotnet fsi aoc02.fsx
+// dotnet fsi aoc04.fsx
 
 open System
 open System.IO
