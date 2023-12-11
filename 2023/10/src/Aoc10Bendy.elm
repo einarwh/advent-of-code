@@ -558,26 +558,8 @@ toColoredBox fillColor (xStart, yStart) =
       , y (String.fromInt yVal)
       , width (String.fromInt unitSize) 
       , height (String.fromInt unitSize)
-    --   , stroke "black"
       , opacity "0.8"
       , fill fillColor ]
-      []
-
-toOutlineBox : (Int, Int) -> Html Msg 
-toOutlineBox (xStart, yStart) = 
-  let 
-    xVal = unitSize * xStart
-    yVal = unitSize * yStart
-  in
-    rect
-      [ x (String.fromInt xVal)
-      , y (String.fromInt yVal)
-      , width (String.fromInt unitSize) 
-      , height (String.fromInt unitSize)
-      , stroke "red"
-      , strokeWidth pipeStrokeWidth
-      , fill "None"
-      , opacity "0.8" ]
       []
 
 toStartOutline : (Int, Int) -> Html Msg 

@@ -562,7 +562,6 @@ toColoredBox fillColor (xStart, yStart) =
       , y (String.fromInt yVal)
       , width (String.fromInt unitSize) 
       , height (String.fromInt unitSize)
-    --   , stroke "black"
       , opacity "0.8"
       , fill fillColor ]
       []
@@ -578,8 +577,8 @@ toOutlineBox (xStart, yStart) =
       , y (String.fromInt yVal)
       , width (String.fromInt unitSize) 
       , height (String.fromInt unitSize)
+      , strokeWidth pipeStrokeWidth
       , stroke "red"
-      , strokeWidth "2"
       , fill "None"
       , opacity "0.8" ]
       []
