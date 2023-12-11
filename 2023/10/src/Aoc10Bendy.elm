@@ -1,4 +1,4 @@
-module Aoc10 exposing (..)
+module Aoc10Bendy exposing (..)
 
 import Browser
 import Html exposing (Html)
@@ -12,6 +12,10 @@ import Array2D exposing (Array2D)
 
 unitSize : Int 
 unitSize = 9
+
+pipeColor = "darkslategrey"
+
+pipeStrokeWidth = "2"
 
 -- MAIN
 
@@ -402,6 +406,129 @@ subscriptions model = Sub.none
 
 -- VIEW
 
+toVerticalPipe : Int -> Int -> Html Msg 
+toVerticalPipe yPos xPos = 
+  let 
+    xCenter = xPos * unitSize + unitSize // 2
+    yTop = yPos * unitSize 
+    yBot = (yPos + 1) * unitSize
+  in
+    line
+      [ x1 (String.fromInt xCenter)
+      , x2 (String.fromInt xCenter)
+      , y1 (String.fromInt yTop)
+      , y2 (String.fromInt yBot)
+      , strokeWidth pipeStrokeWidth
+      , stroke pipeColor ]
+      []
+
+toHorizontalPipe : Int -> Int -> Html Msg 
+toHorizontalPipe yPos xPos = 
+  let 
+    yCenter = yPos * unitSize + unitSize // 2
+    xLeft = xPos * unitSize 
+    xRight = (xPos + 1) * unitSize
+  in
+    line
+      [ x1 (String.fromInt xLeft)
+      , x2 (String.fromInt xRight)
+      , y1 (String.fromInt yCenter)
+      , y2 (String.fromInt yCenter)
+      , strokeWidth pipeStrokeWidth
+      , stroke pipeColor ]
+      []
+
+toSouthEastPipe : Int -> Int -> Html Msg 
+toSouthEastPipe yPos xPos = 
+  let 
+    xCenter = xPos * unitSize + unitSize // 2
+    yCenter = yPos * unitSize + unitSize // 2
+    ySouth = (yPos + 1) * unitSize
+    xEast = (xPos + 1) * unitSize 
+    southPt = (String.fromInt xCenter) ++ " " ++ (String.fromInt ySouth) 
+    centerPt = (String.fromInt xCenter) ++ " " ++ (String.fromInt yCenter)
+    eastPt = (String.fromInt xEast) ++ " " ++ (String.fromInt yCenter)
+    str = "M " ++ southPt ++ "Q " ++ centerPt ++ ", " ++ eastPt 
+  in
+    Svg.path
+      [ d str 
+      , fill "none"
+      , strokeWidth pipeStrokeWidth
+      , stroke pipeColor ]
+      []
+
+toSouthWestPipe : Int -> Int -> Html Msg 
+toSouthWestPipe yPos xPos = 
+  let 
+    xCenter = xPos * unitSize + unitSize // 2
+    yCenter = yPos * unitSize + unitSize // 2
+    ySouth = (yPos + 1) * unitSize
+    xWest = xPos * unitSize 
+    southPt = (String.fromInt xCenter) ++ "," ++ (String.fromInt ySouth) 
+    centerPt = (String.fromInt xCenter) ++ "," ++ (String.fromInt yCenter)
+    westPt = (String.fromInt xWest) ++ "," ++ (String.fromInt yCenter)
+    str = "M " ++ southPt ++ "Q " ++ centerPt ++ ", " ++ westPt 
+  in
+    Svg.path
+      [ d str 
+      , fill "none"
+      , strokeWidth pipeStrokeWidth
+      , stroke pipeColor ]
+      []
+
+toNorthEastPipe : Int -> Int -> Html Msg 
+toNorthEastPipe yPos xPos = 
+  let 
+    xCenter = xPos * unitSize + unitSize // 2
+    yCenter = yPos * unitSize + unitSize // 2
+    yNorth = yPos * unitSize
+    xEast = (xPos + 1) * unitSize 
+    northPt = (String.fromInt xCenter) ++ "," ++ (String.fromInt yNorth) 
+    centerPt = (String.fromInt xCenter) ++ "," ++ (String.fromInt yCenter)
+    eastPt = (String.fromInt xEast) ++ "," ++ (String.fromInt yCenter)
+    str = "M " ++ northPt ++ "Q " ++ centerPt ++ ", " ++ eastPt 
+  in
+    Svg.path
+      [ d str 
+      , fill "none"
+      , strokeWidth pipeStrokeWidth
+      , stroke pipeColor ]
+      []
+
+toNorthWestPipe : Int -> Int -> Html Msg 
+toNorthWestPipe yPos xPos = 
+  let 
+    xCenter = xPos * unitSize + unitSize // 2
+    yCenter = yPos * unitSize + unitSize // 2
+    yNorth = yPos * unitSize
+    xWest = xPos * unitSize 
+    northPt = (String.fromInt xCenter) ++ "," ++ (String.fromInt yNorth) 
+    centerPt = (String.fromInt xCenter) ++ "," ++ (String.fromInt yCenter)
+    westPt = (String.fromInt xWest) ++ "," ++ (String.fromInt yCenter)
+    str = "M " ++ northPt ++ "Q " ++ centerPt ++ ", " ++ westPt 
+  in
+    Svg.path
+      [ d str 
+      , fill "none"
+      , strokeWidth pipeStrokeWidth
+      , stroke pipeColor ]
+      []
+
+toPipeShape : Int -> Int -> Char -> Maybe (Html Msg) 
+toPipeShape yPos xPos ch = 
+  case ch of 
+    '|' -> Just <| toVerticalPipe yPos xPos 
+    '-' -> Just <| toHorizontalPipe yPos xPos 
+    'F' -> Just <| toSouthEastPipe yPos xPos 
+    '7' -> Just <| toSouthWestPipe yPos xPos 
+    'L' -> Just <| toNorthEastPipe yPos xPos 
+    'J' -> Just <| toNorthWestPipe yPos xPos 
+    _ -> Nothing 
+
+toPipeShapes : Int -> String -> List (Html Msg)
+toPipeShapes y line = 
+  line |> String.toList |> List.indexedMap (toPipeShape y) |> List.filterMap identity
+
 toCharText : Int -> Int -> Char -> Html Msg 
 toCharText yPos xPos ch = 
   let 
@@ -432,6 +559,7 @@ toColoredBox fillColor (xStart, yStart) =
       , y (String.fromInt yVal)
       , width (String.fromInt unitSize) 
       , height (String.fromInt unitSize)
+    --   , stroke "black"
       , opacity "0.8"
       , fill fillColor ]
       []
@@ -448,9 +576,26 @@ toOutlineBox (xStart, yStart) =
       , width (String.fromInt unitSize) 
       , height (String.fromInt unitSize)
       , stroke "red"
-      , strokeWidth "1"
+      , strokeWidth pipeStrokeWidth
       , fill "None"
-      , opacity "1" ]
+      , opacity "0.8" ]
+      []
+
+toStartOutline : (Int, Int) -> Html Msg 
+toStartOutline (xPos, yPos) = 
+  let 
+    xCenter = xPos * unitSize + unitSize // 2
+    yCenter = yPos * unitSize + unitSize // 2
+    radius = 3 * unitSize // 4
+  in
+    circle
+      [ cx (String.fromInt xCenter)
+      , cy (String.fromInt yCenter)
+      , r (String.fromInt radius) 
+      , strokeWidth pipeStrokeWidth
+      , stroke "red"
+      , fill "None"
+      , opacity "0.8" ]
       []
 
 toSvg : Model -> Html Msg 
@@ -461,12 +606,13 @@ toSvg model =
     loopBoxes = loop |> List.map (toColoredBox "palegreen")
     insideBoxes = model.insideTiles |> List.map (toColoredBox "deepskyblue")
     charTexts = lines |> List.indexedMap lineToCharTexts |> List.concat
-    startBox = model.startPos |> toOutlineBox
+    pipeShapes = lines |> List.indexedMap toPipeShapes |> List.concat
+    startOutline = model.startPos |> toStartOutline
     numberOfLines = lines |> List.length
     numberOfChars = lines |> List.head |> Maybe.map (String.length) |> Maybe.withDefault 0
     svgWidth = (unitSize * numberOfChars) |> String.fromInt
     svgHeight = (unitSize * numberOfLines) |> String.fromInt
-    elements = insideBoxes ++ loopBoxes ++ charTexts ++ [startBox]
+    elements = insideBoxes ++ loopBoxes ++ pipeShapes ++ [startOutline]
   in 
     svg
       [ viewBox ("0 0 " ++ svgWidth ++ svgHeight)
