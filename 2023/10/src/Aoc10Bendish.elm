@@ -11,7 +11,7 @@ import Svg.Attributes exposing (..)
 import Array2D exposing (Array2D)
 
 unitSize : Int 
-unitSize = 9
+unitSize = 8
 
 inputname = "input"
 

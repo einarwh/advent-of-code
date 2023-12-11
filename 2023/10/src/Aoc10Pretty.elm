@@ -11,7 +11,9 @@ import Svg.Attributes exposing (..)
 import Array2D exposing (Array2D)
 
 unitSize : Int 
-unitSize = 9
+unitSize = 8
+
+inputname = "input"
 
 pipeColor = "darkslategrey"
 
@@ -343,7 +345,8 @@ J.|7-F7.LLJL|.77LL-JL-J7F-JLL7|.F7LJ7FL-J.FL|.|-.7.F|F-7.-7JJ|FL||-||.|7|-7-JJ|L
 LJ--|J7.LJFJ7|7FJ---L77LLF7J7.FJ7F7L77.J.FLF-FJJ.FL.F--FJ.F-FF7J|7FFJFF|-7|JLL--7J-J7|7LF7LLF---7F7--F7F-JL-.|7LF|7F|--.FJ.FJ|7F|-L77|L7FL-J
 |JL-JJ-|.FJ-LL7LF7-F-JL--LJL|---|JLJJJ.|-JLLJ|J.FJ.FLLJJLJ-J|L-.LF-J-LJLLJ-7.L--L..LLJ-.LJJFJ---JL7J.LFJLF-J7.|-JJLJ.|J-JJ|L7J|.|.LL-7.|J.-J"""
 
-    lines = input |> String.split "\n"
+    data = if inputname == "sample" then sample else input 
+    lines = data |> String.split "\n"
 
     field = lines |> List.map (String.toList) |> Array2D.fromList
 
