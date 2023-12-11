@@ -7,6 +7,11 @@ open System.IO
 let readLines = 
     File.ReadAllLines >> Array.filter ((<>) String.Empty)
 
+let findEmptyRows rows = 
+    rows 
+    |> List.mapi (fun i row -> if Seq.forall ((=) '.') row then Some (int64 i) else None)
+    |> List.choose id 
+
 let findEmptyColumns rows  =
     let getColumn rows i = 
         rows
@@ -16,40 +21,15 @@ let findEmptyColumns rows  =
     let indexes = [0 .. columnCount - 1]
     indexes 
     |> List.map (getColumn rows)
-    |> List.mapi (fun i col -> if isEmptyColumn col then Some i else None)
+    |> List.mapi (fun i col -> if isEmptyColumn col then Some (int64 i) else None)
     |> List.choose id 
-
-let expandColumns rows = 
-    let rec insertAt ix (row : char list) = 
-        match row with 
-        | [] -> []
-        | h :: t -> 
-            let rest = if ix = 0 then row else insertAt (ix - 1) t 
-            h :: rest    
-    let rec expandRow indexes (row : char list) = 
-        match indexes with 
-        | [] -> row 
-        | ix :: rest -> expandRow rest (insertAt ix row)
-    let emptyColumns = findEmptyColumns rows 
-    let adjusted = emptyColumns |> List.mapi (fun i ix -> i + ix)
-    rows 
-    |> List.map (Seq.toList >> expandRow adjusted >> List.toArray >> String)
-
-let rec expandRows rows = 
-    match rows with 
-    | [] -> []
-    | row :: rest ->
-        if row |> Seq.forall ((=) '.') then 
-            row :: row :: expandRows rest 
-        else 
-            row :: expandRows rest
 
 let findGalaxies (lines : string list) =
     let rowCount = lines |> List.length 
     let colCount = lines |> List.head |> Seq.length 
     [ for y in 0 .. rowCount - 1 do 
         for x in 0 .. colCount - 1 do 
-            if lines[y][x] = '#' then yield (x, y) ]
+            if lines[y][x] = '#' then yield (int64 x, int64 y) ]
 
 let rec findPairs galaxies = 
     match galaxies with 
@@ -58,17 +38,26 @@ let rec findPairs galaxies =
         let pairs = t |> List.map (fun g -> (h, g)) 
         pairs @ findPairs t 
 
-let findDistance ((x1, y1), (x2, y2)) = 
-    abs (x2 - x1) + abs (y2 - y1)
+let findDistance (expansion : int64) emptyRows emptyColumns ((x1, y1), (x2, y2)) = 
+    let xStart = min x1 x2 
+    let xStop = max x1 x2
+    let yStart = min y1 y2 
+    let yStop = max y1 y2 
+    let isBetween start stop n = start <= n && n <= stop 
+    let xExpansions = emptyColumns |> List.filter (isBetween xStart xStop) |> List.length |> int64
+    let yExpansions = emptyRows |> List.filter (isBetween yStart yStop) |> List.length |> int64
+    let xExpansion = (expansion - 1L) * xExpansions
+    let yExpansion = (expansion - 1L) * yExpansions
+    xStop - xStart + xExpansion + yStop - yStart + yExpansion
     
 let run fileName = 
-    let lines = readLines fileName |> Array.toList
-    lines 
-    |> expandColumns 
-    |> expandRows
+    let rows = readLines fileName |> Array.toList
+    let emptyRows = findEmptyRows rows 
+    let emptyColumns = findEmptyColumns rows 
+    rows 
     |> findGalaxies 
     |> findPairs 
-    |> List.sumBy findDistance 
-    |> printfn "%A"
+    |> List.sumBy (findDistance 1000000 emptyRows emptyColumns)
+    |> printfn "%d"
 
 "input" |> run 
