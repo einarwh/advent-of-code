@@ -13,9 +13,7 @@ let findEmptyRows rows =
     |> List.choose id 
 
 let findEmptyColumns rows  =
-    let getColumn rows i = 
-        rows
-        |> List.map (Seq.item i)
+    let getColumn rows i = rows |> List.map (Seq.item i)
     let isEmptyColumn = Seq.forall ((=) '.')
     let columnCount = rows |> List.head |> String.length
     let indexes = [0 .. columnCount - 1]
@@ -26,7 +24,7 @@ let findEmptyColumns rows  =
 
 let findGalaxies (lines : string list) =
     let rowCount = lines |> List.length 
-    let colCount = lines |> List.head |> Seq.length 
+    let colCount = lines |> List.head |> String.length 
     [ for y in 0 .. rowCount - 1 do 
         for x in 0 .. colCount - 1 do 
             if lines[y][x] = '#' then yield (int64 x, int64 y) ]
