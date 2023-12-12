@@ -4,8 +4,6 @@
 open System
 open System.IO
 
-let toStr = List.toArray >> String
-
 let parseLine (s : string) =
     let parts = s.Split(" ")
     let springs = parts[0]
@@ -58,26 +56,27 @@ let rec findPossible (springs : char list) (damaged : int) =
             p1 @ p2
         | _ -> failwith "oof"
 
-let rec loop pattern (springs : char list) : int =
-    match pattern with
-    | [] ->
-        if List.contains '#' springs then 0 else 1 
-    | dmg :: remaining ->
-        let possibles = findPossible springs dmg
-        possibles 
-        |> List.map (fun (possible : char list) -> loop remaining possible)
-        |> List.sum 
-
-let debugSolve i (springs : char list, pattern : int list) =
-    let startTime = DateTime.Now 
-    let result = 
-        loop pattern springs
-    let elapsedSeconds = (DateTime.Now - startTime).TotalSeconds |> int 
-    printfn "Line %d has %d permutations (%d seconds)" (i + 1) result elapsedSeconds
-    result 
+let rec loop (pattern : int list) (springs : char list) (cache : Map<int list * char list, int64>) : (Map<int list * char list, int64> * int64) =
+    if Map.containsKey (pattern, springs) cache then 
+        let cached = cache[(pattern, springs)]
+        (cache, cached)
+    else 
+        let updatedCache, rs = 
+            match pattern with
+            | [] -> 
+                let res = if List.contains '#' springs then 0L else 1L 
+                (cache |> Map.add (pattern, springs) res, res)
+            | dmg :: remaining ->
+                let possibles : char list list = findPossible springs dmg
+                let folder (cache : Map<int list * char list, int64>, acc) (possible : char list) = 
+                    let (cache', results) = loop remaining possible cache 
+                    (cache', results + acc)
+                let (cache, acc) = possibles |> List.fold folder (cache, 0) 
+                (cache |> Map.add (pattern, springs) acc, acc)
+        (updatedCache, rs)
 
 let solve (springs : char list, pattern : int list) =
-    loop pattern springs
+    loop pattern springs Map.empty |> snd
 
 let unfold n (springs, pattern) = 
     let unfoldedSprings = 
@@ -90,14 +89,12 @@ let run fileName =
     let lines = readLines fileName |> Array.toList
     lines
     |> List.map parseLine
-    |> List.map solve
-    |> List.sum
-    |> printfn "%A"
-    // lines
-    // |> List.map parseLine
-    // |> List.map (unfold 5)
-    // |> List.mapi debugSolve
-    // |> List.sum
-    // |> printfn "%A"
+    |> List.sumBy solve
+    |> printfn "%d"
+    lines
+    |> List.map parseLine
+    |> List.map (unfold 5)
+    |> List.sumBy solve
+    |> printfn "%d"
 
 "input" |> run
