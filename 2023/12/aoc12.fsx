@@ -13,20 +13,16 @@ let parseLine (s : string) =
 let readLines =
     File.ReadAllLines >> Array.filter ((<>) String.Empty)
 
-let rec tryConsume (springs : char list) (damaged : int) =
-    if damaged = 0 then
-        Some springs
+let rec tryConsume springs damaged =
+    if damaged = 0 then Some springs
     else
         match springs with
         | [] -> None
         | '.' :: _ -> None
-        | '#' :: rest ->
+        | _ :: rest ->
             tryConsume rest (damaged - 1)
-        | '?' :: rest ->
-            tryConsume rest (damaged - 1)
-        | _ -> failwith "no"
 
-let consume (springs : char list) (damaged : int) =
+let consume springs damaged =
     match tryConsume springs damaged with
     | Some s ->
         match s with
@@ -35,7 +31,7 @@ let consume (springs : char list) (damaged : int) =
         | _ :: r -> [ r ]
     | None -> []
 
-let rec findPossible (springs : char list) (damaged : int) =
+let rec findPossible springs damaged =
     if damaged = 0 then [ springs ]
     else
         match springs with
@@ -43,46 +39,36 @@ let rec findPossible (springs : char list) (damaged : int) =
         | '.' :: rest ->
             findPossible rest damaged
         | '#' :: _ ->
-            match tryConsume springs damaged with
-            | Some s ->
-                match s with
-                | [] -> [ s ]
-                | '#' :: _ -> []
-                | _ :: r -> [ r ]
-            | None -> []
+            consume springs damaged
         | '?' :: rest ->
             let p1 = findPossible rest damaged // ? as '.'
             let p2 = consume springs damaged // ? as '#'
             p1 @ p2
         | _ -> failwith "oof"
 
-let rec loop (pattern : int list) (springs : char list) (cache : Map<int list * char list, int64>) : (Map<int list * char list, int64> * int64) =
-    if Map.containsKey (pattern, springs) cache then 
-        let cached = cache[(pattern, springs)]
-        (cache, cached)
+let rec loop cache (springs, pattern) =
+    if Map.containsKey (springs, pattern) cache then 
+        (cache, cache[(springs, pattern)])
     else 
-        let updatedCache, rs = 
-            match pattern with
-            | [] -> 
-                let res = if List.contains '#' springs then 0L else 1L 
-                (cache |> Map.add (pattern, springs) res, res)
-            | dmg :: remaining ->
-                let possibles : char list list = findPossible springs dmg
-                let folder (cache : Map<int list * char list, int64>, acc) (possible : char list) = 
-                    let (cache', results) = loop remaining possible cache 
-                    (cache', results + acc)
-                let (cache, acc) = possibles |> List.fold folder (cache, 0) 
-                (cache |> Map.add (pattern, springs) acc, acc)
-        (updatedCache, rs)
+        match pattern with
+        | [] -> 
+            let res = if List.contains '#' springs then 0L else 1L 
+            (cache |> Map.add (springs, pattern) res, res)
+        | dmg :: remaining ->
+            let folder (cache, acc) possible = 
+                let (cache', results) = loop cache (possible, remaining) 
+                (cache', results + acc)
+            let (cache, acc) = findPossible springs dmg |> List.fold folder (cache, 0) 
+            (cache |> Map.add (springs, pattern) acc, acc)
 
 let solve (springs : char list, pattern : int list) =
-    loop pattern springs Map.empty |> snd
+    loop Map.empty (springs, pattern) |> snd
 
 let unfold n (springs, pattern) = 
     let unfoldedSprings = 
-        [0 .. n - 1] |> List.map (fun _ -> springs) |> List.reduce (fun a b -> a @ ['?'] @ b) 
+        springs |> List.replicate n |> List.reduce (fun a b -> a @ ['?'] @ b) 
     let unfoldedPattern = 
-        [0 .. n - 1] |> List.collect (fun _ -> pattern)
+        pattern |> List.replicate n |> List.concat 
     (unfoldedSprings, unfoldedPattern)
 
 let run fileName =
