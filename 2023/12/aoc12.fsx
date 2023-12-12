@@ -61,8 +61,8 @@ let rec loop cache (springs, pattern) =
             let (cache, acc) = findPossible springs dmg |> List.fold folder (cache, 0) 
             (cache |> Map.add (springs, pattern) acc, acc)
 
-let solve (springs : char list, pattern : int list) =
-    loop Map.empty (springs, pattern) |> snd
+let solve record =
+    loop Map.empty record |> snd
 
 let unfold n (springs, pattern) = 
     let unfoldedSprings = 
@@ -74,13 +74,10 @@ let unfold n (springs, pattern) =
 let run fileName =
     let lines = readLines fileName |> Array.toList
     lines
-    |> List.map parseLine
-    |> List.sumBy solve
+    |> List.sumBy (parseLine >> solve)
     |> printfn "%d"
     lines
-    |> List.map parseLine
-    |> List.map (unfold 5)
-    |> List.sumBy solve
+    |> List.sumBy (parseLine >> unfold 5 >> solve)
     |> printfn "%d"
 
 "input" |> run
