@@ -57,14 +57,21 @@ let findIntersectionPoints lst =
         path1 |> List.collect (findForSegment path2)
     | _ -> failwith "oof"
 
-let run fileName =
-    let lines = readLines fileName |> Array.toList 
-    lines 
-    |> List.map (parseLine >> List.map toOffset >> toLineSegments) 
-    |> findIntersectionPoints
+let solve1 intersectionPoints = 
+    intersectionPoints
     |> List.map (fun (a, b) -> abs a + abs b)
     |> List.sort 
     |> List.head 
     |> printfn "%d"
+
+let solve2 intersectionPoints offsets = 
+    printfn "."
+
+let run fileName =
+    let lines = readLines fileName |> Array.toList 
+    let offsets = lines |> List.map (parseLine >> List.map toOffset)
+    let intersectionPoints = offsets |> List.map toLineSegments |> findIntersectionPoints
+    solve1 intersectionPoints 
+    solve2 intersectionPoints offsets
 
 "input" |> run
