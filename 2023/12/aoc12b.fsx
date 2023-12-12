@@ -58,7 +58,7 @@ let rec findPossible (springs : char list) (damaged : int) =
             p1 @ p2
         | _ -> failwith "oof"
 
-let rec loopy (pattern : int list) (springs : char list) (cache : Map<int list * char list, int>) : (Map<int list * char list, int> * int) =
+let rec loopy (pattern : int list) (springs : char list) (cache : Map<int list * char list, int64>) : (Map<int list * char list, int64> * int64) =
     if Map.containsKey (pattern, springs) cache then 
         let cached = cache[(pattern, springs)]
         (cache, cached)
@@ -66,15 +66,15 @@ let rec loopy (pattern : int list) (springs : char list) (cache : Map<int list *
         let updatedCache, rs = 
             match pattern with
             | [] -> 
-                let res = if List.contains '#' springs then 0 else 1 
+                let res = if List.contains '#' springs then 0L else 1L 
                 (cache |> Map.add (pattern, springs) res, res)
             | dmg :: remaining ->
                 let possibles : char list list = findPossible springs dmg
-                let folder (cache : Map<int list * char list, int>, acc) (possible : char list) = 
+                let folder (cache : Map<int list * char list, int64>, acc) (possible : char list) = 
                     let (cache', results) = loopy remaining possible cache 
                     (cache', results + acc)
                 let (cache, acc) = possibles |> List.fold folder (cache, 0) 
-                cache, acc 
+                (cache |> Map.add (pattern, springs) acc, acc)
         (updatedCache, rs)
 
 let rec loop pattern (springs : char list) : int =
@@ -95,7 +95,7 @@ let debugSolve i (springs : char list, pattern : int list) =
     result 
 
 let solve (springs : char list, pattern : int list) =
-    loop pattern springs 
+    loopy pattern springs Map.empty |> snd
 
 let unfold n (springs, pattern) = 
     let unfoldedSprings = 
@@ -108,14 +108,12 @@ let run fileName =
     let lines = readLines fileName |> Array.toList
     lines
     |> List.map parseLine
-    |> List.map solve
-    |> List.sum 
-    |> printfn "%A"
+    |> List.sumBy solve
+    |> printfn "%d"
     lines
     |> List.map parseLine
     |> List.map (unfold 5)
-    |> List.mapi debugSolve
-    |> List.sum
-    |> printfn "%A"
+    |> List.sumBy solve
+    |> printfn "%d"
 
 "input" |> run
