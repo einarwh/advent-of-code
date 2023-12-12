@@ -46,20 +46,21 @@ let rec findPossible springs damaged =
             p1 @ p2
         | _ -> failwith "oof"
 
-let rec loop cache (springs, pattern) =
-    if Map.containsKey (springs, pattern) cache then 
-        (cache, cache[(springs, pattern)])
+let rec loop cache record =
+    if Map.containsKey record cache then 
+        (cache, cache[record])
     else 
+        let (springs, pattern) = record
         match pattern with
         | [] -> 
             let res = if List.contains '#' springs then 0L else 1L 
-            (cache |> Map.add (springs, pattern) res, res)
+            (cache |> Map.add record res, res)
         | dmg :: remaining ->
             let folder (cache, acc) possible = 
                 let (cache, results) = loop cache (possible, remaining) 
                 (cache, results + acc)
             let (cache, acc) = findPossible springs dmg |> List.fold folder (cache, 0) 
-            (cache |> Map.add (springs, pattern) acc, acc)
+            (cache |> Map.add record acc, acc)
 
 let solve record =
     loop Map.empty record |> snd
