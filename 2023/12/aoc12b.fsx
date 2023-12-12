@@ -58,6 +58,25 @@ let rec findPossible (springs : char list) (damaged : int) =
             p1 @ p2
         | _ -> failwith "oof"
 
+let rec loopy (pattern : int list) (springs : char list) (cache : Map<int list * char list, int>) : (Map<int list * char list, int> * int) =
+    if Map.containsKey (pattern, springs) cache then 
+        let cached = cache[(pattern, springs)]
+        (cache, cached)
+    else 
+        let updatedCache, rs = 
+            match pattern with
+            | [] -> 
+                let res = if List.contains '#' springs then 0 else 1 
+                (cache |> Map.add (pattern, springs) res, res)
+            | dmg :: remaining ->
+                let possibles : char list list = findPossible springs dmg
+                let folder (cache : Map<int list * char list, int>, acc) (possible : char list) = 
+                    let (cache', results) = loopy remaining possible cache 
+                    (cache', results + acc)
+                let (cache, acc) = possibles |> List.fold folder (cache, 0) 
+                cache, acc 
+        (updatedCache, rs)
+
 let rec loop pattern (springs : char list) : int =
     match pattern with
     | [] ->
@@ -70,14 +89,13 @@ let rec loop pattern (springs : char list) : int =
 
 let debugSolve i (springs : char list, pattern : int list) =
     let startTime = DateTime.Now 
-    let result = 
-        loop pattern springs
+    let (_, result) = loopy pattern springs Map.empty
     let elapsedSeconds = (DateTime.Now - startTime).TotalSeconds |> int 
     printfn "Line %d has %d permutations (%d seconds)" (i + 1) result elapsedSeconds
     result 
 
 let solve (springs : char list, pattern : int list) =
-    loop pattern springs
+    loop pattern springs 
 
 let unfold n (springs, pattern) = 
     let unfoldedSprings = 
@@ -91,13 +109,13 @@ let run fileName =
     lines
     |> List.map parseLine
     |> List.map solve
+    |> List.sum 
+    |> printfn "%A"
+    lines
+    |> List.map parseLine
+    |> List.map (unfold 5)
+    |> List.mapi debugSolve
     |> List.sum
     |> printfn "%A"
-    // lines
-    // |> List.map parseLine
-    // |> List.map (unfold 5)
-    // |> List.mapi debugSolve
-    // |> List.sum
-    // |> printfn "%A"
 
 "input" |> run
