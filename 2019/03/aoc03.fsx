@@ -18,29 +18,43 @@ let toOffset (dir, dist) =
     | 'D' -> (0, -dist)
     | _ -> failwith <| sprintf "unmatched %c" dir 
 
+let standardizeLineSegment ((x1, y1), (x2, y2)) = 
+    if (x1, y1) < (x2, y2) then 
+        (x1, y1), (x2, y2)
+    else 
+        (x2, y2), (x1, y1)
+
+let toPositions offsets = 
+    let rec loop (x0, y0) offsets = 
+        match offsets with 
+        | [] -> []
+        | (x, y) :: t -> 
+            let pos = (x + x0, y + y0)
+            pos :: loop pos t 
+    loop (0, 0) offsets
+
 let toLineSegments (offsets : (int * int) list) = 
-    let folder ((x1, y1), lst) (x2, y2) = 
-        let pos = (x1 + x2, y1 + y2)
-        (pos, (x1, y1) :: lst)
     offsets 
-    |> List.fold folder ((0, 0), []) 
-    |> snd 
+    |> toPositions 
     |> List.rev
     |> List.pairwise
+    |> List.map standardizeLineSegment
 
 let tryFindIntersection ((ax1, ay1), (ax2, ay2)) ((bx1, by1), (bx2, by2)) = 
-    if ax1 = ax2 then // Vertical 
-        if (bx1 <= ax1 && ax1 <= bx2) && (ay1 <= )
+    if (bx1 = bx2) && (ay1 = ay2) && (ax1 <= bx1 && bx1 <= ax2) && (by1 <= ay1 && ay1 <= by2) then 
+        Some (bx1, ay1)
+    elif (ax1 = ax2) && (by1 = by2) && (bx1 <= ax1 && ax1 <= bx2) && (ay1 <= by1 && by1 <= ay2) then 
+        Some (ax1, by1)
+    else 
+        None
 
+let findForSegment path segment = 
+    path |> List.choose (tryFindIntersection segment)
 
-let findForSegment path (x1, y1), (x2, y2) = 
-
-
-let findIntersectionPoints lst = 
+let findIntersectionPoints lst =
     match lst with
     | [path1; path2] -> 
-        printfn "find intersection points %A %A" path1 path2
-        []
+        path1 |> List.collect (findForSegment path2)
     | _ -> failwith "oof"
 
 let run fileName =
@@ -48,6 +62,9 @@ let run fileName =
     lines 
     |> List.map (parseLine >> List.map toOffset >> toLineSegments) 
     |> findIntersectionPoints
-    |> printfn "%A"
+    |> List.map (fun (a, b) -> abs a + abs b)
+    |> List.sort 
+    |> List.head 
+    |> printfn "%d"
 
-"sample1" |> run
+"input" |> run
