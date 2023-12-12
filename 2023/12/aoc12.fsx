@@ -56,8 +56,8 @@ let rec loop cache (springs, pattern) =
             (cache |> Map.add (springs, pattern) res, res)
         | dmg :: remaining ->
             let folder (cache, acc) possible = 
-                let (cache', results) = loop cache (possible, remaining) 
-                (cache', results + acc)
+                let (cache, results) = loop cache (possible, remaining) 
+                (cache, results + acc)
             let (cache, acc) = findPossible springs dmg |> List.fold folder (cache, 0) 
             (cache |> Map.add (springs, pattern) acc, acc)
 
