@@ -13,23 +13,18 @@ let parseLine (s : string) =
 let readLines =
     File.ReadAllLines >> Array.filter ((<>) String.Empty)
 
-let rec tryConsume springs damaged =
-    if damaged = 0 then Some springs
-    else
+let rec consume springs damaged =
+    if damaged = 0 then 
         match springs with
-        | [] -> None
-        | '.' :: _ -> None
-        | _ :: rest ->
-            tryConsume rest (damaged - 1)
-
-let consume springs damaged =
-    match tryConsume springs damaged with
-    | Some s ->
-        match s with
-        | [] -> [ s ]
+        | [] -> [ springs ]
         | '#' :: _ -> []
         | _ :: r -> [ r ]
-    | None -> []
+    else
+        match springs with
+        | [] -> []
+        | '.' :: _ -> []
+        | _ :: rest ->
+            consume rest (damaged - 1)
 
 let rec findPossible springs damaged =
     if damaged = 0 then [ springs ]
