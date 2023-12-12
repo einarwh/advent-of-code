@@ -25,18 +25,17 @@ let standardizeLineSegment ((x1, y1), (x2, y2)) =
         (x2, y2), (x1, y1)
 
 let toPositions offsets = 
-    let rec loop (x0, y0) offsets = 
+    let rec loop (x0, y0) offsets result = 
         match offsets with 
-        | [] -> []
+        | [] -> result
         | (x, y) :: t -> 
             let pos = (x + x0, y + y0)
-            pos :: loop pos t 
-    loop (0, 0) offsets
+            loop pos t (pos :: result)
+    loop (0, 0) offsets [] |> List.rev 
 
 let toLineSegments (offsets : (int * int) list) = 
     offsets 
     |> toPositions 
-    |> List.rev
     |> List.pairwise
     |> List.map standardizeLineSegment
 
@@ -64,14 +63,31 @@ let solve1 intersectionPoints =
     |> List.head 
     |> printfn "%d"
 
-let solve2 intersectionPoints offsets = 
-    printfn "."
+let toSingleOffsets offset = 
+    match offset with 
+    | (dist, 0) when dist < 0 -> List.replicate (-dist) (-1, 0)
+    | (dist, 0) -> List.replicate dist (1, 0)
+    | (0, dist) when dist < 0 -> List.replicate (-dist) (0, -1)
+    | (0, dist) -> List.replicate dist (0, 1)
+    | _ -> failwith "oof"
+
+let getSteps path1 path2 point = 
+    let indexOf = List.findIndex ((=) point)
+    indexOf path1 + indexOf path2 + 2
+
+let solve2 intersectionPoints offsetsList =
+    let positionsList = offsetsList |> List.map (List.collect toSingleOffsets >> toPositions)
+    match positionsList with 
+    | [path1; path2] -> 
+        let steps = intersectionPoints |> List.map (getSteps path1 path2) |> List.sort |> List.head
+        steps |> printfn "%d"
+    | _ -> failwith "oof"
 
 let run fileName =
     let lines = readLines fileName |> Array.toList 
-    let offsets = lines |> List.map (parseLine >> List.map toOffset)
-    let intersectionPoints = offsets |> List.map toLineSegments |> findIntersectionPoints
+    let offsetsList = lines |> List.map (parseLine >> List.map toOffset)
+    let intersectionPoints = offsetsList |> List.map toLineSegments |> findIntersectionPoints
     solve1 intersectionPoints 
-    solve2 intersectionPoints offsets
+    solve2 intersectionPoints offsetsList
 
 "input" |> run
