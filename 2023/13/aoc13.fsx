@@ -37,7 +37,7 @@ let countSymmetries (pattern : string) =
     let vertical = cols |> findSymmetry |> List.sum 
     horizontal + vertical 
 
-let rec toggleChar (chars : char list) index = 
+let rec toggleChar chars index = 
     match chars with
     | [] -> []
     | old :: t -> 
@@ -50,12 +50,12 @@ let rec toggleChar (chars : char list) index =
             else old 
         ch :: toggleChar t (index - 1)
         
-let createLineVariations (line : string) = 
+let createLineVariations line = 
     let chars = Seq.toList line 
     [0 .. String.length line - 1] 
     |> List.map (toggleChar chars >> List.toArray >> String)
 
-let rec toVariations lines : string list list = 
+let rec toVariations lines = 
     match lines with 
     | [] -> []
     | line :: rest -> 
@@ -64,7 +64,7 @@ let rec toVariations lines : string list list =
         let more = rest |> toVariations |> List.map (fun v -> line :: v) 
         these @ more 
 
-let tryFindAlternativeSymmetry (lines : string list) = 
+let tryFindAlternativeSymmetry lines = 
     let originalSymmetries = lines |> findSymmetry 
     let alternativeSymmetries = 
         lines 
