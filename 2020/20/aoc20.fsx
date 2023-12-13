@@ -37,13 +37,35 @@ let isUnique (lookup : Map<string, int>) side =
 let isCornerTile lookup (_, sides) = 
     let uniqueSides = (sides |> List.filter (isUnique lookup) |> List.length)
     4 = uniqueSides
-    
+
+let rotateCcw lines = 
+    let len = lines |> List.head |> String.length
+    [0 .. len - 1]
+    |> List.map (fun i -> lines |> List.map (fun r -> r[len - 1 - i]) |> List.toArray |> String)
+
+let flipHorizontal lines = 
+    lines |> List.rev 
+
+let flipVertical lines = 
+    lines |> List.map String.rev 
+
 let run fileName =
     let chunks = readChunks fileName
+    let chunk0 = chunks |> List.head 
+    let chunk0List = chunk0.Split("\n") |> Array.toList
+    printfn "original:"
+    chunk0List |> List.iter (printfn "%A")
+    printfn "rotate ccw:"
+    chunk0List |> rotateCcw |> List.iter (printfn "%A")
+    printfn "flip horizontal:"
+    chunk0List |> flipHorizontal |> List.iter (printfn "%A")
+    printfn "flip vertical:"
+    chunk0List |> flipVertical |> List.iter (printfn "%A")
+
     let tiles = chunks |> List.map parseChunk
     let lookup = tiles |> List.collect snd |> List.countBy id |> Map.ofList
     let cornerTilesNumbers = 
         tiles |> List.filter (isCornerTile lookup) |> List.map (fst >> int64)
     cornerTilesNumbers |> List.reduce (*) |> printfn "%d"
 
-"input" |> run
+"sample" |> run
