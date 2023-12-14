@@ -50,9 +50,11 @@ let rec tiltRowEast intervals rowIndex ary =
             |> List.map (fun colIndex -> Array2D.get ary rowIndex colIndex) 
             |> List.filter ((=) '.')
             |> List.length
-        [ start .. start + spaces - 1 ]
+        let spaceRange = [ start .. start + spaces - 1 ]
+        let rockRange = [ start + spaces .. stop ]
+        spaceRange
         |> List.iter (fun colIndex -> Array2D.set ary rowIndex colIndex '.')
-        [ start + spaces .. stop ] 
+        rockRange
         |> List.iter (fun colIndex -> Array2D.set ary rowIndex colIndex 'O')
         tiltRowEast rest rowIndex ary
 
