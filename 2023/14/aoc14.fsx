@@ -16,24 +16,34 @@ let rollNorthStep (s1, s2) =
     let s2' = rolled |> List.map snd |> List.toArray |> String
     (s1', s2')
 
-let rec tiltNorth (lines : string list) : string list = 
-    let folder (upper : string) (acc : string list) : string list = 
-        match acc with 
-        | [] -> [ upper ]
-        | lower :: rest -> 
-            let (upper', lower') = rollNorthStep (upper, lower)
-            upper' :: lower' :: rest 
-    List.foldBack folder lines []
+let rec rollNorth (lines : string list) : string list = 
+    match lines with 
+    | a :: b :: rest -> 
+        let (a', b') = rollNorthStep (a, b)
+        a' :: rollNorth (b' :: rest)
+    | _ -> lines 
 
+let rec tiltNorth (current : string list) : string list = 
+    let tilted = rollNorth current 
+    if tilted = current then current else tiltNorth tilted 
+
+let countRocks (line : string) : int = 
+    line |> Seq.filter ((=) 'O') |> Seq.length 
+
+let calculateLoad (lines : string list) = 
+    let len = lines |> List.length 
+    lines |> List.mapi (fun i line -> (len - i) * countRocks line) |> List.sum
+    
 let run fileName =
-    let upper = "O....#...."
-    let lower = "O.OO#....#"
-    rollNorthStep (upper, lower) |> printfn "%A"
+    // let upper = "O....#...."
+    // let lower = "O.OO#....#"
+    // rollNorthStep (upper, lower) |> printfn "%A"
     let lines = readLines fileName |> Array.toList
-    printfn "original"
-    lines |> List.iter (printfn "%A")
+    // printfn "original"
+    // lines |> List.iter (printfn "%A")
     let tilted = lines |> tiltNorth
-    printfn "tilted"
-    tilted |> List.iter (printfn "%A")
+    // printfn "tilted"
+    // tilted |> List.iter (printfn "%A")
+    tilted |> calculateLoad |> printfn "%d"
 
-"sample" |> run
+"input" |> run
