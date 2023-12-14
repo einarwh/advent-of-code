@@ -86,7 +86,9 @@ let solve limit lines =
                 let preceding = List.length seen - interval
                 let sequence = seen |> List.rev |> List.skip preceding
                 let ix = (limit - preceding) % (interval)
-                let load = sequence |> List.item ix |> calculateLoad
+                let chosen = sequence |> List.item ix 
+                chosen |> List.iter (printfn "%A")
+                let load = chosen |> calculateLoad
                 Some load
             else 
                 loop (n + 1) (current :: seen) (cycle current) 
@@ -101,4 +103,4 @@ let run fileName =
     | None -> printfn "?"
     | Some load -> printfn "%d" load 
 
-"input" |> run
+"sample" |> run
