@@ -85,20 +85,6 @@ let tiltWest = tilt rollWest
 
 let cycle = tiltNorth >> tiltWest >> tiltSouth >> tiltEast
 
-let solve limit lines = 
-    let rec loop n seen current = 
-        if n >= limit then 
-            (n, -1, seen) 
-        else 
-            if List.contains current seen then 
-                let ix = List.findIndex ((=) current) seen 
-                (n, ix, current :: seen) 
-            else 
-                let seen' = current :: seen
-                let next = cycle current 
-                loop (n + 1) seen' next 
-    loop 0 [] lines 
-
 let countRocks (line : string) : int = 
     line |> Seq.filter ((=) 'O') |> Seq.length 
 
@@ -106,43 +92,33 @@ let calculateLoad (lines : string list) =
     let len = lines |> List.length 
     lines |> List.mapi (fun i line -> (len - i) * countRocks line) |> List.sum
     
-let printPattern (i : int) (pattern : string list) = 
-    printfn "%d" i
-    pattern |> List.iter (printfn "%A")
+let solve limit lines = 
+    let rec loop n seen current = 
+        if n >= limit then 
+            None
+        else 
+            if List.contains current seen then 
+                let interval = 1 + List.findIndex ((=) current) seen 
+                let preceding = List.length seen - interval
+                let sequence = seen |> List.rev |> List.skip preceding
+                Some (preceding, interval, sequence)
+            else 
+                let seen' = current :: seen
+                let next = cycle current 
+                loop (n + 1) seen' next 
+    loop 0 [] lines 
 
 let run fileName =
     let lines = readLines fileName |> Array.toList
 
-    printfn "tilted north"
     let tiltedNorth = lines |> tiltNorth
-    // tiltedNorth |> calculateLoad |> printfn "%d"
-    // tiltedNorth |> List.iter (printfn "%A")
+    tiltedNorth |> calculateLoad |> printfn "%d"
 
-    printfn "tilted south"
-    let tiltedSouth = lines |> tiltSouth
-    // tiltedSouth |> List.iter (printfn "%A")
-    // tiltedSouth |> calculateLoad |> printfn "%d"
+    let limit = 1000000000
+    match solve limit lines with 
+    | None -> printfn "?"
+    | Some (preceding, interval, sequence) -> 
+        let ix = (limit - preceding) % (interval)
+        sequence |> List.item ix |> calculateLoad |> printfn "%d"
 
-    printfn "tilted east"
-    let tiltedEast = lines |> tiltEast
-    // tiltedEast |> List.iter (printfn "%A")
-    // tiltedEast |> calculateLoad |> printfn "%d"
-    
-    printfn "tilted west"
-    let tiltedWest = lines |> tiltWest
-    // tiltedWest |> List.iter (printfn "%A")
-    // tiltedWest |> calculateLoad |> printfn "%d"
-
-    printfn "cycle 1"
-    let cycle1 = lines |> cycle 
-    // cycle1 |> List.iter (printfn "%A")
-
-    let foo = solve 1000 lines 
-    foo |> printfn "%A"
-    let (lastIndex, firstIndex, seen) = foo 
-    printfn "last index: %d" lastIndex 
-    printfn "first index: %d" firstIndex 
-    seen |> List.iteri (printPattern)
-
-
-"sample" |> run
+"input" |> run
