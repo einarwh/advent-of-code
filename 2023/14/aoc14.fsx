@@ -94,31 +94,27 @@ let calculateLoad (lines : string list) =
     
 let solve limit lines = 
     let rec loop n seen current = 
-        if n >= limit then 
+        if n > limit then 
             None
         else 
             if List.contains current seen then 
                 let interval = 1 + List.findIndex ((=) current) seen 
                 let preceding = List.length seen - interval
                 let sequence = seen |> List.rev |> List.skip preceding
-                Some (preceding, interval, sequence)
+                let ix = (limit - preceding) % (interval)
+                let load = sequence |> List.item ix |> calculateLoad
+                Some load
             else 
-                let seen' = current :: seen
-                let next = cycle current 
-                loop (n + 1) seen' next 
+                loop (n + 1) (current :: seen) (cycle current) 
     loop 0 [] lines 
 
 let run fileName =
     let lines = readLines fileName |> Array.toList
-
     let tiltedNorth = lines |> tiltNorth
     tiltedNorth |> calculateLoad |> printfn "%d"
-
     let limit = 1000000000
     match solve limit lines with 
     | None -> printfn "?"
-    | Some (preceding, interval, sequence) -> 
-        let ix = (limit - preceding) % (interval)
-        sequence |> List.item ix |> calculateLoad |> printfn "%d"
+    | Some load -> printfn "%d" load 
 
 "input" |> run
