@@ -1,5 +1,5 @@
-// Advent of Code 2023. Day 13: Point of Incidence
-// dotnet fsi aoc13.fsx
+// Advent of Code 2023. Day 14: Parabolic Reflector Dish
+// dotnet fsi aoc14.fsx
 
 open System
 open System.IO
@@ -35,15 +35,8 @@ let calculateLoad (lines : string list) =
     lines |> List.mapi (fun i line -> (len - i) * countRocks line) |> List.sum
     
 let run fileName =
-    // let upper = "O....#...."
-    // let lower = "O.OO#....#"
-    // rollNorthStep (upper, lower) |> printfn "%A"
     let lines = readLines fileName |> Array.toList
-    // printfn "original"
-    // lines |> List.iter (printfn "%A")
     let tilted = lines |> tiltNorth
-    // printfn "tilted"
-    // tilted |> List.iter (printfn "%A")
     tilted |> calculateLoad |> printfn "%d"
 
 "input" |> run
