@@ -4,6 +4,42 @@
 open System
 open System.IO
 
+[<AutoOpen>]
+module Types =
+
+    type Tile = {
+        Number : int 
+        Lines : char list list
+    }
+
+module Tile = 
+
+    let sideLength (tile : Tile) = tile.Lines |> List.head |> List.length 
+
+    let rotateCcw (tile : Tile) = 
+        let rot (lines : char list list) = 
+            let lastIndex = (lines |> List.head |> List.length) - 1
+            [0 .. lastIndex]
+            |> List.map (fun i -> lines |> List.map (fun r -> r[lastIndex - i]))
+        { tile with Lines = rot tile.Lines }
+
+    let flipHorizontal (tile : Tile) = 
+        { tile with Lines = tile.Lines |> List.rev }
+
+    let flipVertical (tile : Tile) = 
+        { tile with Lines = tile.Lines |> List.map (List.rev) }
+
+    let north (tile : Tile) = tile.Lines |> List.head
+
+    let south (tile : Tile) = tile.Lines |> List.last
+
+    let west (tile : Tile) = 
+        tile.Lines |> List.map (List.item 0)
+
+    let east (tile : Tile) = 
+        let lastIndex = (tile |> sideLength) - 1
+        tile.Lines |> List.map (List.item lastIndex)
+
 module String = 
 
     let rev = Seq.toList >> List.rev >> List.toArray >> String
@@ -97,7 +133,35 @@ let run fileName =
     let innerTiles = 
         tiles |> List.filter (isInnerTile lookup)
 
-    let imageMap = placeTiles dim tiles
+    let tile = {
+        Number = 2311
+        Lines = [
+            ['.';'.';'#';'#';'.';'#';'.';'.';'#';'.']
+            ['#';'#';'.';'.';'#';'.';'.';'.';'.';'.']
+            ['#';'.';'.';'.';'#';'#';'.';'.';'#';'.']
+            ['#';'#';'#';'#';'.';'#';'.';'.';'.';'#']
+            ['#';'#';'.';'#';'#';'.';'#';'#';'#';'.']
+            ['#';'#';'.';'.';'.';'#';'.';'#';'#';'#']
+            ['.';'#';'.';'#';'.';'#';'.';'.';'#';'#']
+            ['.';'.';'#';'.';'.';'.';'.';'#';'.';'.']
+            ['#';'#';'#';'.';'.';'.';'#';'.';'#';'.']
+            ['.';'.';'#';'#';'#';'.';'.';'#';'#';'#']
+        ]
+    }
+
+    printfn "tile %A" tile 
+
+    printfn "rotated %A" (Tile.rotateCcw tile)
+
+    printfn "north: %A" (Tile.north tile)
+
+    printfn "west: %A" (Tile.west tile)
+
+    printfn "south: %A" (Tile.south tile)
+
+    printfn "east: %A" (Tile.east tile)
+
+    // let imageMap = placeTiles dim tiles
     printfn "%A" cornerTiles 
     let firstCornerTile = cornerTiles |> List.head 
     let cornerTilesNumbers = 
