@@ -14,9 +14,14 @@ module Types =
 
 module Tile = 
 
+    let rec private times n fn = 
+        if n > 0 then fn >> times (n - 1) fn
+        else id 
+
     let create number lines = { Number = number; Lines = lines }
 
-    let sideLength (tile : Tile) = tile.Lines |> List.head |> List.length 
+    let sideLength (tile : Tile) = 
+        tile.Lines |> List.head |> List.length 
 
     let rotateCcw (tile : Tile) = 
         let rot (lines : char list list) = 
@@ -50,9 +55,14 @@ module Tile =
         let r = s |> List.map (List.rev)
         s @ r 
 
-module String = 
-
-    let rev = Seq.toList >> List.rev >> List.toArray >> String
+    let rotations (tile : Tile) = 
+        let n = tile 
+        let w = n |> rotateCcw
+        let s = w |> rotateCcw 
+        let e = s |> rotateCcw
+        let basic = [ n; w; s; e ]
+        let flipped = basic |> List.map flipHorizontal 
+        basic @ flipped
 
 let readChunks fileName = 
     let text = File.ReadAllText fileName 
@@ -65,83 +75,117 @@ let parseTileNumber (s : string) =
 let parseChunk (chunk : string) = 
     match chunk.Split("\n") |> Array.toList with 
     | h :: rows ->
-        let top = List.head rows 
-        let bot = List.last rows 
-        let lastIndex = String.length top - 1
-        let getColumn ix =  List.map (fun (r : string) -> r[ix]) >> List.toArray >> String
-        let left = rows |> getColumn 0 
-        let right = rows |> getColumn lastIndex
-        let lst = [top; left; bot; right]
-        let mirrored = lst |> List.map String.rev 
-        let combined = lst @ mirrored 
-        (parseTileNumber h, combined)
+        let number = parseTileNumber h 
+        let lines = rows |> List.map (Seq.toList)
+        Tile.create number lines 
     | _ -> failwith "oof"
 
-let isUnique (lookup : Map<string, int>) side =
+let isUnique lookup side =
     1 = Map.find side lookup
 
 let countUnique lookup = 
     List.filter (isUnique lookup) >> List.length
 
-let isEdgeTile lookup (_, sides) = 
-    2 = countUnique lookup sides 
+let isEdgeTile lookup tile = 
+    2 = countUnique lookup (Tile.sidePermutations tile)
 
-let isCornerTile lookup (_, sides) = 
-    4 = countUnique lookup sides 
+let isCornerTile lookup tile = 
+    4 = countUnique lookup (Tile.sidePermutations tile) 
 
-let isInnerTile lookup (_, sides) = 
-    0 = countUnique lookup sides
+let isInnerTile lookup tile = 
+    0 = countUnique lookup (Tile.sidePermutations tile)
 
 let rotateCcw lines = 
     let len = lines |> List.head |> String.length
     [0 .. len - 1]
     |> List.map (fun i -> lines |> List.map (fun r -> r[len - 1 - i]) |> List.toArray |> String)
 
-let flipHorizontal lines = 
-    lines |> List.rev 
 
-let flipVertical lines = 
-    lines |> List.map String.rev 
+let toCornerNW lookup tile = 
+    let rec loop tile = 
+        if tile |> Tile.west |> isUnique lookup && tile |> Tile.north |> isUnique lookup then 
+            tile 
+        else 
+            tile |> Tile.rotateCcw |> loop 
+    if isCornerTile lookup tile then loop tile else tile 
 
-let rec times n fn = 
-    if n > 0 then fn >> times (n - 1) fn
-    else id 
+let findTile (target : char list) (selector : Tile -> char list) (candidates : Tile list) = 
+    let rec loop remaining used = 
+        match remaining with 
+        | [] -> failwith "Not found?" 
+        | tile :: rest -> 
+            let maybe = Tile.rotations tile |> List.tryFind (fun t -> target = selector t)
+            match maybe with 
+            | Some t -> (t, (List.rev used) @ rest)
+            | None -> loop rest (tile :: used)
+    loop candidates []
 
-let rotations lines = 
-    [ 0 .. 3 ] |> List.map (fun i -> lines |> times i rotateCcw) 
+let rec placeTiles (dim : int) (prev : int * int) (pos : int * int) (lookup : Map<char list, int>) (cornerTiles : Tile list) (edgeTiles : Tile list) (innerTiles : Tile list) (map : Map<int * int, Tile>) = 
+    let lastIndex = dim - 1
+    match pos with 
+    | (0, 0) -> // NW corner 
+        let tile = cornerTiles |> List.head |> toCornerNW lookup
+        let map = map |> Map.add pos tile 
+        placeTiles dim pos (1, 0) lookup (cornerTiles |> List.tail) edgeTiles innerTiles map
+    | (x, 0) when x = dim - 1 -> // NE corner 
+        let prevTile = map |> Map.find prev 
+        let target = prevTile |> Tile.east 
+        let (tile, restTiles) = findTile target Tile.west cornerTiles 
+        let map = map |> Map.add pos tile 
+        placeTiles dim pos (0, 1) lookup restTiles edgeTiles innerTiles map 
+    | (0, y) when y = dim - 1 -> // SW corner 
+        let prevTile = map |> Map.find prev 
+        let target = prevTile |> Tile.east 
+        let (tile, restTiles) = findTile target Tile.west cornerTiles 
+        let map = map |> Map.add pos tile 
+        placeTiles dim pos (1, y) lookup restTiles edgeTiles innerTiles map 
+    | (x, y) when x = dim - 1 && y = dim - 1 -> 
+        let prevTile = map |> Map.find prev 
+        let target = prevTile |> Tile.east 
+        let (tile, restTiles) = findTile target Tile.west cornerTiles 
+        let map = map |> Map.add pos tile 
+        // Done!
+        map
+    | (x, 0) -> // N edge 
+        let prevTile = map |> Map.find prev 
+        let target = prevTile |> Tile.east 
+        let (tile, restTiles) = findTile target Tile.west edgeTiles 
+        let map = map |> Map.add pos tile 
+        placeTiles dim pos (x + 1, 0) lookup cornerTiles restTiles innerTiles map 
+    | (0, y) -> // W edge 
+        let prevTile = map |> Map.find prev 
+        let target = prevTile |> Tile.east 
+        let (tile, restTiles) = findTile target Tile.west edgeTiles 
+        let map = map |> Map.add pos tile 
+        placeTiles dim pos (1, y) lookup cornerTiles restTiles innerTiles map 
+    | (x, y) when x = dim - 1 -> // E edge 
+        let prevTile = map |> Map.find prev 
+        let target = prevTile |> Tile.east 
+        let (tile, restTiles) = findTile target Tile.west edgeTiles 
+        let map = map |> Map.add pos tile 
+        placeTiles dim pos (0, y + 1) lookup cornerTiles restTiles innerTiles map 
+    
 
-let placeTiles (dim : int) = ()
+
+
 
 let run fileName =
     let chunks = readChunks fileName
-    let chunk0 = chunks |> List.head 
-    let chunk0List = chunk0.Split("\n") |> Array.toList
-    let headless = chunk0List |> List.tail
-    printfn "original:"
-    headless |> List.iter (printfn "%A")
-    printfn "rotate ccw:"
-    headless |> rotateCcw |> List.iter (printfn "%A")
-    printfn "flip horizontal:"
-    headless |> flipHorizontal |> List.iter (printfn "%A")
-    printfn "flip vertical:"
-    headless |> flipVertical |> List.iter (printfn "%A")
-
-    printfn "...."
-    headless |> rotations |> List.iter (fun r -> printfn ">>>"; r |> List.iter (printfn "%A"))
-
     let tiles = chunks |> List.map parseChunk
-    let lookup = tiles |> List.collect snd |> List.countBy id |> Map.ofList
-    lookup |> Map.toList |> List.iter (printfn "%A")
-    let foo = tiles |> List.map (fun (t, sides) -> (t, sides |> List.filter (isUnique lookup) |> List.length))
-    foo |> List.iter (printfn "%A")
-    let dimensions = tiles |> List.length |> float |> sqrt |> int
-    printfn "dim %d" dimensions
+    let lookup = tiles |> List.collect (Tile.sidePermutations) |> List.countBy id |> Map.ofList
     let cornerTiles = 
         tiles |> List.filter (isCornerTile lookup)
     let edgeTiles = 
         tiles |> List.filter (isEdgeTile lookup)
     let innerTiles = 
         tiles |> List.filter (isInnerTile lookup)
+    let numberOfTiles = tiles |> List.length
+    let dim = numberOfTiles |> float |> sqrt |> int
+
+    printfn "dim: %d" dim
+    printfn "corner tiles: %A" (cornerTiles |> List.length)
+    printfn "edge tiles: %A" (edgeTiles |> List.length)
+    printfn "inner tiles: %A" (innerTiles |> List.length)
 
     let tile = {
         Number = 2311
@@ -172,10 +216,10 @@ let run fileName =
     printfn "east: %A" (Tile.east tile)
 
     // let imageMap = placeTiles dim tiles
-    printfn "%A" cornerTiles 
-    let firstCornerTile = cornerTiles |> List.head 
-    let cornerTilesNumbers = 
-        tiles |> List.filter (isCornerTile lookup) |> List.map (fst >> int64)
-    cornerTilesNumbers |> List.reduce (*) |> printfn "%d"
+    // printfn "%A" cornerTiles 
+    // let firstCornerTile = cornerTiles |> List.head 
+    // let cornerTilesNumbers = 
+    //     tiles |> List.filter (isCornerTile lookup) |> List.map (fst >> int64)
+    // cornerTilesNumbers |> List.reduce (*) |> printfn "%d"
 
 "sample" |> run
