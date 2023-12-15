@@ -36,6 +36,8 @@ let part1 (input : string) =
     input.Split(",") |> Array.sumBy getHash
 
 let executeOp (hashmap : Lens list array) (op : Op) = 
+    let contains label = 
+        List.exists (fun (l, _) -> l = label)
     let remove label = 
         List.filter (fun (l, _) -> l <> label)
     let replace label focal = 
@@ -49,7 +51,7 @@ let executeOp (hashmap : Lens list array) (op : Op) =
     | Insert (label, focal) -> 
         let hash = getHash label 
         let lenses = hashmap[hash]
-        if List.exists (fun (l, _) -> l = label) lenses then 
+        if lenses |> contains label then 
             hashmap[hash] <- lenses |> replace label focal
         else 
             hashmap[hash] <- lenses |> append label focal

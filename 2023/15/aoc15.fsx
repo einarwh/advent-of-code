@@ -34,22 +34,28 @@ let part1 (input : string) =
     input.Split(",") |> Array.sumBy getHash
 
 let executeOp hashmap op = 
+    let contains label = 
+        List.exists (fun (l, _) -> l = label)
+    let remove label = 
+        List.filter (fun (l, _) -> l <> label)
+    let replace label focal = 
+        List.map (fun (l, f) -> if l = label then (l, focal) else (l, f))
+    let append label focal = 
+        (@) [label, focal]
     match op with 
     | Remove label -> 
         let remove maybe = 
-            maybe |> Option.map (fun lenses -> lenses |> List.filter (fun (l, _) -> l <> label))
+            maybe |> Option.map (remove label)
         let hash = getHash label 
         hashmap |> Map.change hash remove
     | Insert (label, focal) -> 
         let insert maybe = 
             match maybe with 
             | Some lenses ->
-                if List.exists (fun (l, _) -> l = label) lenses then 
-                    lenses 
-                    |> List.map (fun (l, f) -> if l = label then (l, focal) else (l, f))
-                    |> Some 
+                if lenses |> contains label then 
+                    lenses |> replace label focal |> Some
                 else 
-                    Some (lenses @ [label, focal])
+                    lenses |> append label focal |> Some 
             | None -> Some [label, focal]
         let hash = getHash label 
         hashmap |> Map.change hash insert 
