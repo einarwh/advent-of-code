@@ -4,6 +4,7 @@
 open System
 open System.IO
 
+
 type Op = 
     | Insert of (string * int)
     | Remove of string
@@ -19,15 +20,14 @@ let parseOp (s : string) =
     else 
         let ss = s.Split("=")
         let label = ss[0] 
-        let lens = int ss[1]
-        Insert (label, lens)
+        let focal = int ss[1]
+        Insert (label, focal)
 
 let parseAllOps (s : string) = 
     s.Split(",") |> Array.toList |> List.map parseOp
 
 let getHash s = 
-    let folder current ch  = 
-        ((current + int ch) * 17) % 256
+    let folder current ch = ((current + int ch) * 17) % 256
     s |> Seq.toList |> List.fold folder 0
 
 let part1 (input : string) = 
