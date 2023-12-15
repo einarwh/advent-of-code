@@ -49,21 +49,39 @@ let flipHorizontal lines =
 let flipVertical lines = 
     lines |> List.map String.rev 
 
+let rec times n fn = 
+    if n > 0 then fn >> times (n - 1) fn
+    else id 
+
+let rotations lines = 
+    [ 0 .. 3 ] |> List.map (fun i -> lines |> times i rotateCcw) 
+
 let run fileName =
     let chunks = readChunks fileName
     let chunk0 = chunks |> List.head 
     let chunk0List = chunk0.Split("\n") |> Array.toList
+    let headless = chunk0List |> List.tail
     printfn "original:"
-    chunk0List |> List.iter (printfn "%A")
+    headless |> List.iter (printfn "%A")
     printfn "rotate ccw:"
-    chunk0List |> rotateCcw |> List.iter (printfn "%A")
+    headless |> rotateCcw |> List.iter (printfn "%A")
     printfn "flip horizontal:"
-    chunk0List |> flipHorizontal |> List.iter (printfn "%A")
+    headless |> flipHorizontal |> List.iter (printfn "%A")
     printfn "flip vertical:"
-    chunk0List |> flipVertical |> List.iter (printfn "%A")
+    headless |> flipVertical |> List.iter (printfn "%A")
+
+    printfn "...."
+    headless |> rotations |> List.iter (fun r -> printfn ">>>"; r |> List.iter (printfn "%A"))
 
     let tiles = chunks |> List.map parseChunk
     let lookup = tiles |> List.collect snd |> List.countBy id |> Map.ofList
+    lookup |> Map.toList |> List.iter (printfn "%A")
+    let foo = tiles |> List.map (fun (t, sides) -> (t, sides |> List.filter (isUnique lookup) |> List.length))
+    foo |> List.iter (printfn "%A")
+    let cornerTiles = 
+        tiles |> List.filter (isCornerTile lookup)
+    printfn "%A" cornerTiles 
+    let firstCornerTile = cornerTiles |> List.head 
     let cornerTilesNumbers = 
         tiles |> List.filter (isCornerTile lookup) |> List.map (fst >> int64)
     cornerTilesNumbers |> List.reduce (*) |> printfn "%d"
