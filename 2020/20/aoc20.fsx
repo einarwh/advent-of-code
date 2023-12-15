@@ -14,6 +14,8 @@ module Types =
 
 module Tile = 
 
+    let create number lines = { Number = number; Lines = lines }
+
     let sideLength (tile : Tile) = tile.Lines |> List.head |> List.length 
 
     let rotateCcw (tile : Tile) = 
