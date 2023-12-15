@@ -40,6 +40,14 @@ module Tile =
         let lastIndex = (tile |> sideLength) - 1
         tile.Lines |> List.map (List.item lastIndex)
 
+    let sides (tile : Tile) = 
+        [ north tile; west tile; south tile; east tile ]
+
+    let sidePermutations (tile : Tile) = 
+        let s = sides tile
+        let r = s |> List.map (List.rev)
+        s @ r 
+
 module String = 
 
     let rev = Seq.toList >> List.rev >> List.toArray >> String
