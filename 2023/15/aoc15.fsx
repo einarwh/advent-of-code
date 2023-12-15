@@ -25,7 +25,7 @@ let parseOp (s : string) =
 let parseAllOps (s : string) = 
     s.Split(",") |> Array.toList |> List.map parseOp
 
-let getHash (s : string) : int = 
+let getHash s = 
     let folder current ch  = 
         ((current + int ch) * 17) % 256
     s |> Seq.toList |> List.fold folder 0
@@ -33,10 +33,10 @@ let getHash (s : string) : int =
 let part1 (input : string) = 
     input.Split(",") |> Array.sumBy getHash
 
-let executeOp (hashmap : Map<int, (string * int) list>) (op : Op) = 
+let executeOp hashmap op = 
     match op with 
     | Remove label -> 
-        let remove (maybe : (string * int) list option) = 
+        let remove maybe = 
             maybe |> Option.map (fun lenses -> lenses |> List.filter (fun (l, _) -> l <> label))
         let hash = getHash label 
         hashmap |> Map.change hash remove
@@ -54,14 +54,14 @@ let executeOp (hashmap : Map<int, (string * int) list>) (op : Op) =
         let hash = getHash label 
         hashmap |> Map.change hash insert 
 
-let rec execute (ops : Op list) (hashmap : Map<int, (string * int) list>) : Map<int, (string * int) list> = 
+let rec execute ops hashmap = 
     match ops with 
     | [] -> hashmap 
     | op :: rest -> 
         (executeOp hashmap op) |> execute rest 
 
-let part2 (input : string) = 
-    let calculate (boxNo : int, lenses : (string * int) list) = 
+let part2 input = 
+    let calculate (boxNo, lenses) = 
         lenses |> List.map snd |> List.mapi (fun i focal -> (boxNo + 1) * (i + 1) * focal)
     let ops = input |> parseAllOps 
     Map.empty 
@@ -74,6 +74,5 @@ let run fileName =
     let input = readText fileName
     input |> part1 |> printfn "%d"
     input |> part2 |> printfn "%d"
-    "."
     
 "input" |> run
