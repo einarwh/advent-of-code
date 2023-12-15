@@ -34,9 +34,17 @@ let parseChunk (chunk : string) =
 let isUnique (lookup : Map<string, int>) side =
     1 = Map.find side lookup
 
+let countUnique lookup = 
+    List.filter (isUnique lookup) >> List.length
+
+let isEdgeTile lookup (_, sides) = 
+    2 = countUnique lookup sides 
+
 let isCornerTile lookup (_, sides) = 
-    let uniqueSides = (sides |> List.filter (isUnique lookup) |> List.length)
-    4 = uniqueSides
+    4 = countUnique lookup sides 
+
+let isInnerTile lookup (_, sides) = 
+    0 = countUnique lookup sides
 
 let rotateCcw lines = 
     let len = lines |> List.head |> String.length
@@ -55,6 +63,8 @@ let rec times n fn =
 
 let rotations lines = 
     [ 0 .. 3 ] |> List.map (fun i -> lines |> times i rotateCcw) 
+
+let placeTiles (dim : int) = ()
 
 let run fileName =
     let chunks = readChunks fileName
@@ -78,8 +88,16 @@ let run fileName =
     lookup |> Map.toList |> List.iter (printfn "%A")
     let foo = tiles |> List.map (fun (t, sides) -> (t, sides |> List.filter (isUnique lookup) |> List.length))
     foo |> List.iter (printfn "%A")
+    let dimensions = tiles |> List.length |> float |> sqrt |> int
+    printfn "dim %d" dimensions
     let cornerTiles = 
         tiles |> List.filter (isCornerTile lookup)
+    let edgeTiles = 
+        tiles |> List.filter (isEdgeTile lookup)
+    let innerTiles = 
+        tiles |> List.filter (isInnerTile lookup)
+
+    let imageMap = placeTiles dim tiles
     printfn "%A" cornerTiles 
     let firstCornerTile = cornerTiles |> List.head 
     let cornerTilesNumbers = 
