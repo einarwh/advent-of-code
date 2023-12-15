@@ -120,54 +120,30 @@ let findTile (target : char list) (selector : Tile -> char list) (candidates : T
             | None -> loop rest (tile :: used)
     loop candidates []
 
-let rec placeTiles (dim : int) (prev : int * int) (pos : int * int) (lookup : Map<char list, int>) (cornerTiles : Tile list) (edgeTiles : Tile list) (innerTiles : Tile list) (map : Map<int * int, Tile>) = 
+let chooseStartTile lookup (tiles : Tile list) = 
+    let cornerTiles = tiles |> List.filter (isCornerTile lookup)
+    let tile = cornerTiles |> List.head 
+    let nw = tile |> toCornerNW lookup
+    let rest = tiles |> List.filter (fun t -> t.Number <> nw.Number)
+    (nw, rest)
+
+let rec simplePlaceTiles (dim : int) (prevTile : Tile) (pos : int * int) (lookup : Map<char list, int>) (tiles : Tile list) (map : Map<int * int, Tile>) = 
     let lastIndex = dim - 1
     match pos with 
     | (0, 0) -> // NW corner 
-        let tile = cornerTiles |> List.head |> toCornerNW lookup
+        let (startTile, restTiles) = chooseStartTile lookup tiles 
+        let map = map |> Map.add pos startTile
+        simplePlaceTiles dim startTile (1, 0) lookup restTiles map
+    | (x, y) -> 
+        let prevSelector = if x = 0 then Tile.south else Tile.east 
+        let nextSelector = if x = 0 then Tile.north else Tile.west 
+        let nextPos = if x = lastIndex then (0, y + 1) else (x + 1, y)
+        let target = prevTile |> prevSelector 
+        let (tile, restTiles) = findTile target nextSelector tiles
         let map = map |> Map.add pos tile 
-        placeTiles dim pos (1, 0) lookup (cornerTiles |> List.tail) edgeTiles innerTiles map
-    | (x, 0) when x = dim - 1 -> // NE corner 
-        let prevTile = map |> Map.find prev 
-        let target = prevTile |> Tile.east 
-        let (tile, restTiles) = findTile target Tile.west cornerTiles 
-        let map = map |> Map.add pos tile 
-        placeTiles dim pos (0, 1) lookup restTiles edgeTiles innerTiles map 
-    | (0, y) when y = dim - 1 -> // SW corner 
-        let prevTile = map |> Map.find prev 
-        let target = prevTile |> Tile.east 
-        let (tile, restTiles) = findTile target Tile.west cornerTiles 
-        let map = map |> Map.add pos tile 
-        placeTiles dim pos (1, y) lookup restTiles edgeTiles innerTiles map 
-    | (x, y) when x = dim - 1 && y = dim - 1 -> 
-        let prevTile = map |> Map.find prev 
-        let target = prevTile |> Tile.east 
-        let (tile, restTiles) = findTile target Tile.west cornerTiles 
-        let map = map |> Map.add pos tile 
-        // Done!
-        map
-    | (x, 0) -> // N edge 
-        let prevTile = map |> Map.find prev 
-        let target = prevTile |> Tile.east 
-        let (tile, restTiles) = findTile target Tile.west edgeTiles 
-        let map = map |> Map.add pos tile 
-        placeTiles dim pos (x + 1, 0) lookup cornerTiles restTiles innerTiles map 
-    | (0, y) -> // W edge 
-        let prevTile = map |> Map.find prev 
-        let target = prevTile |> Tile.east 
-        let (tile, restTiles) = findTile target Tile.west edgeTiles 
-        let map = map |> Map.add pos tile 
-        placeTiles dim pos (1, y) lookup cornerTiles restTiles innerTiles map 
-    | (x, y) when x = dim - 1 -> // E edge 
-        let prevTile = map |> Map.find prev 
-        let target = prevTile |> Tile.east 
-        let (tile, restTiles) = findTile target Tile.west edgeTiles 
-        let map = map |> Map.add pos tile 
-        placeTiles dim pos (0, y + 1) lookup cornerTiles restTiles innerTiles map 
-    
-
-
-
+        if (x = lastIndex && y = lastIndex) then map 
+        else 
+            simplePlaceTiles dim tile nextPos lookup restTiles map 
 
 let run fileName =
     let chunks = readChunks fileName
