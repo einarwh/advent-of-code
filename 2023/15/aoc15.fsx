@@ -1,9 +1,7 @@
 // Advent of Code 2023. Day 15: Lens Library
 // dotnet fsi aoc15.fsx
 
-open System
 open System.IO
-
 
 type Op = 
     | Insert of (string * int)
@@ -44,10 +42,9 @@ let executeOp hashmap op =
         (@) [label, focal]
     match op with 
     | Remove label -> 
-        let remove maybe = 
-            maybe |> Option.map (remove label)
+        let tryRemove = Option.map (remove label)
         let hash = getHash label 
-        hashmap |> Map.change hash remove
+        hashmap |> Map.change hash tryRemove
     | Insert (label, focal) -> 
         let insert maybe = 
             match maybe with 
