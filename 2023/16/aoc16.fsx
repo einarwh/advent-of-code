@@ -29,13 +29,9 @@ let rec reflect pos dir grid seen =
     else 
         let seen = seen |> Set.add (pos, dir)
         match Array2D.get grid y x with
-        | '|' when dir = N || dir = S ->
-            reflect (step dir pos) dir grid seen
-        | '|' ->
+        | '|' when dir = W || dir = E ->
             seen |> reflect (step N pos) N grid |> reflect (step S pos) S grid 
-        | '-' when dir = W || dir = E ->
-            reflect (step dir pos) dir grid seen
-        | '-' ->
+        | '-' when dir = N || dir = S ->
             seen |> reflect (step W pos) W grid |> reflect (step E pos) E grid
         | '/' ->
             let dir =
