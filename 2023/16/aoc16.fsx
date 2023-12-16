@@ -13,7 +13,7 @@ module Array2D =
 let readLines =
     File.ReadAllLines >> Array.filter ((<>) String.Empty)
 
-let next dir (x, y) =
+let step dir (x, y) =
     match dir with
     | N -> (x, y - 1)
     | W -> (x - 1, y)
@@ -30,13 +30,13 @@ let rec reflect pos dir grid seen =
         let seen = seen |> Set.add (pos, dir)
         match Array2D.get grid y x with
         | '|' when dir = N || dir = S ->
-            reflect (next dir pos) dir grid seen
+            reflect (step dir pos) dir grid seen
         | '|' ->
-            seen |> reflect (next N pos) N grid |> reflect (next S pos) S grid 
+            seen |> reflect (step N pos) N grid |> reflect (step S pos) S grid 
         | '-' when dir = W || dir = E ->
-            reflect (next dir pos) dir grid seen
+            reflect (step dir pos) dir grid seen
         | '-' ->
-            seen |> reflect (next W pos) W grid |> reflect (next E pos) E grid
+            seen |> reflect (step W pos) W grid |> reflect (step E pos) E grid
         | '/' ->
             let dir =
                 match dir with
@@ -44,7 +44,7 @@ let rec reflect pos dir grid seen =
                 | W -> S
                 | S -> W
                 | E -> N
-            reflect (next dir pos) dir grid seen
+            reflect (step dir pos) dir grid seen
         | '\\' ->
             let dir =
                 match dir with
@@ -52,9 +52,9 @@ let rec reflect pos dir grid seen =
                 | W -> N
                 | S -> E
                 | E -> S
-            reflect (next dir pos) dir grid seen
+            reflect (step dir pos) dir grid seen
         | _ ->
-            reflect (next dir pos) dir grid seen
+            reflect (step dir pos) dir grid seen
 
 let findBest grid dir startPositions = 
     startPositions 
