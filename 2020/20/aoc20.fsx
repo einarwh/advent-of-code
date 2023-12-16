@@ -115,7 +115,6 @@ let toCornerNW lookup tile =
     if isCornerTile lookup tile then loop tile else tile 
 
 let findTile (target : char list) (selector : Tile -> char list) (candidates : Tile list) = 
-    printfn "findTile, target: %A" (target |> List.toArray |> String)
     let rec loop remaining used = 
         match remaining with 
         | [] -> failwith "Not found?" 
@@ -126,10 +125,6 @@ let findTile (target : char list) (selector : Tile -> char list) (candidates : T
             | [] -> loop rest (tile :: used)
             | [t] -> (t, (List.rev used) @ rest) 
             | _ -> failwith "too many matches..."
-            // let maybe = Tile.rotations tile |> List.tryFind (fun t -> target = selector t)
-            // match maybe with 
-            // | Some t -> (t, (List.rev used) @ rest)
-            // | None -> loop rest (tile :: used)
     loop candidates []
 
 let chooseStartTile lookup (tiles : Tile list) = 
@@ -144,7 +139,7 @@ let placeTiles (lookup : Map<char list, int>) (tiles : Tile list) =
     let dim = numberOfTiles |> float |> sqrt |> int
     let lastIndex = dim - 1
     let rec loop (x, y) tiles map = 
-        printfn "placeTiles loop %A" (x, y)
+        // printfn "placeTiles loop %A" (x, y)
         let prevSelector = if x = 0 then Tile.south else Tile.east 
         let nextSelector = if x = 0 then Tile.north else Tile.west 
         let nextPos = if x = lastIndex then (0, y + 1) else (x + 1, y)
@@ -153,15 +148,15 @@ let placeTiles (lookup : Map<char list, int>) (tiles : Tile list) =
         let target = prevTile |> prevSelector 
         let (tile, restTiles) = findTile target nextSelector tiles
         let map = map |> Map.add (x, y) tile 
-        printfn "Placed tile %d at %A" tile.Number (x, y)
+        // printfn "Placed tile %d at %A" tile.Number (x, y)
         Tile.print tile 
         if (x = lastIndex && y = lastIndex) then map 
         else 
             loop nextPos restTiles map 
     let (startTile, restTiles) = chooseStartTile lookup tiles 
     let map = Map.empty |> Map.add (0, 0) startTile
-    printfn "Placed tile %d at %A" startTile.Number (0, 0)
-    Tile.print startTile 
+    // printfn "Placed tile %d at %A" startTile.Number (0, 0)
+    // Tile.print startTile 
     loop (1, 0) restTiles map
 
 let run fileName =
