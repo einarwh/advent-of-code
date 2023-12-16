@@ -7,78 +7,61 @@ open System.IO
 type Dir = N | W | S | E
 
 module Array2D =
-
     let getRowCount (ary : 'a[,]) = ary.GetLength(0)
-
     let getColumnCount (ary : 'a[,]) = ary.GetLength(1)
 
 let readLines =
     File.ReadAllLines >> Array.filter ((<>) String.Empty)
 
-let continueInDir dir (x, y) =
+let next dir (x, y) =
     match dir with
     | N -> (x, y - 1)
     | W -> (x - 1, y)
     | S -> (x, y + 1)
     | E -> (x + 1, y)
 
-let rec reflect (pos : int*int) (dir : Dir) (grid : char[,]) seen =
+let rec reflect pos dir grid seen =
     let (x, y) = pos
     let xLimit = Array2D.getColumnCount grid
     let yLimit = Array2D.getRowCount grid
-    if Set.contains (pos, dir) seen then
+    if x < 0 || x >= xLimit || y < 0 || y >= yLimit || Set.contains (pos, dir) seen then
         seen
-    elif x >= 0 && x < xLimit && y >= 0 && y < yLimit then
+    else 
         let seen = seen |> Set.add (pos, dir)
-        let ch = Array2D.get grid y x
-        match ch with
-        | '.' ->
-            let nextPos = continueInDir dir pos
-            reflect nextPos dir grid seen
+        match Array2D.get grid y x with
         | '|' when dir = N || dir = S ->
-            let nextPos = continueInDir dir pos
-            reflect nextPos dir grid seen
+            reflect (next dir pos) dir grid seen
         | '|' ->
-            let northPos = continueInDir N pos
-            let southPos = continueInDir S pos
-            seen |> reflect northPos N grid |> reflect southPos S grid 
+            seen |> reflect (next N pos) N grid |> reflect (next S pos) S grid 
         | '-' when dir = W || dir = E ->
-            let nextPos = continueInDir dir pos
-            reflect nextPos dir grid seen
+            reflect (next dir pos) dir grid seen
         | '-' ->
-            let westPos = continueInDir W pos
-            let eastPos = continueInDir E pos
-            seen |> reflect westPos W grid |> reflect eastPos E grid
+            seen |> reflect (next W pos) W grid |> reflect (next E pos) E grid
         | '/' ->
-            let newDir =
+            let dir =
                 match dir with
                 | N -> E
                 | W -> S
                 | S -> W
                 | E -> N
-            let nextPos = continueInDir newDir pos
-            reflect nextPos newDir grid seen
+            reflect (next dir pos) dir grid seen
         | '\\' ->
-            let newDir =
+            let dir =
                 match dir with
                 | N -> W
                 | W -> N
                 | S -> E
                 | E -> S
-            let nextPos = continueInDir newDir pos
-            reflect nextPos newDir grid seen
-        | _ -> failwith <| sprintf "%c?" ch
-    else
-        seen
+            reflect (next dir pos) dir grid seen
+        | _ ->
+            reflect (next dir pos) dir grid seen
 
 let findBest grid dir startPositions = 
     startPositions 
     |> List.map (fun pos -> reflect pos dir grid Set.empty)
-    |> List.map (Set.map fst)
-    |> List.map Set.count
-    |> List.sortDescending
-    |> List.head 
-
+    |> List.map (Set.map fst >> Set.count)
+    |> List.max
+ 
 let solve grid = 
     let xLimit = Array2D.getColumnCount grid
     let yLimit = Array2D.getRowCount grid
@@ -90,9 +73,8 @@ let solve grid =
     let west = wStarts |> findBest grid E 
     let south = sStarts |> findBest grid N 
     let east = eStarts |> findBest grid W
-    let candidates = [ north; west; south; east ]
-    candidates |> List.sortDescending |> List.head 
-
+    [ north; west; south; east ] |> List.max 
+    
 let run fileName =
     let lines = readLines fileName
     let grid = array2D lines
