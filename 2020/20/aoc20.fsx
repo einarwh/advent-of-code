@@ -61,8 +61,13 @@ module Tile =
         let s = w |> rotateCcw 
         let e = s |> rotateCcw
         let basic = [ n; w; s; e ]
-        let flipped = basic |> List.map flipHorizontal 
+        let flipped = basic |> List.map flipVertical 
         basic @ flipped
+
+    let print (tile : Tile) = 
+        tile.Lines
+        |> List.map (List.toArray >> String)
+        |> List.iter (printfn "%s")
 
 let readChunks fileName = 
     let text = File.ReadAllText fileName 
@@ -110,14 +115,21 @@ let toCornerNW lookup tile =
     if isCornerTile lookup tile then loop tile else tile 
 
 let findTile (target : char list) (selector : Tile -> char list) (candidates : Tile list) = 
+    printfn "findTile, target: %A" (target |> List.toArray |> String)
     let rec loop remaining used = 
         match remaining with 
         | [] -> failwith "Not found?" 
         | tile :: rest -> 
-            let maybe = Tile.rotations tile |> List.tryFind (fun t -> target = selector t)
-            match maybe with 
-            | Some t -> (t, (List.rev used) @ rest)
-            | None -> loop rest (tile :: used)
+            let rotations = tile |> Tile.rotations
+            let matches = rotations |> List.filter (fun t -> target = selector t)
+            match matches with 
+            | [] -> loop rest (tile :: used)
+            | [t] -> (t, (List.rev used) @ rest) 
+            | _ -> failwith "too many matches..."
+            // let maybe = Tile.rotations tile |> List.tryFind (fun t -> target = selector t)
+            // match maybe with 
+            // | Some t -> (t, (List.rev used) @ rest)
+            // | None -> loop rest (tile :: used)
     loop candidates []
 
 let chooseStartTile lookup (tiles : Tile list) = 
@@ -127,23 +139,30 @@ let chooseStartTile lookup (tiles : Tile list) =
     let rest = tiles |> List.filter (fun t -> t.Number <> nw.Number)
     (nw, rest)
 
-let rec simplePlaceTiles (dim : int) (prevTile : Tile) (pos : int * int) (lookup : Map<char list, int>) (tiles : Tile list) (map : Map<int * int, Tile>) = 
+let placeTiles (lookup : Map<char list, int>) (tiles : Tile list) = 
+    let numberOfTiles = tiles |> List.length
+    let dim = numberOfTiles |> float |> sqrt |> int
     let lastIndex = dim - 1
-    match pos with 
-    | (0, 0) -> // NW corner 
-        let (startTile, restTiles) = chooseStartTile lookup tiles 
-        let map = map |> Map.add pos startTile
-        simplePlaceTiles dim startTile (1, 0) lookup restTiles map
-    | (x, y) -> 
+    let rec loop (x, y) tiles map = 
+        printfn "placeTiles loop %A" (x, y)
         let prevSelector = if x = 0 then Tile.south else Tile.east 
         let nextSelector = if x = 0 then Tile.north else Tile.west 
         let nextPos = if x = lastIndex then (0, y + 1) else (x + 1, y)
+        let prevPos = if x = 0 then (0, y - 1) else (x - 1, y)
+        let prevTile = Map.find prevPos map
         let target = prevTile |> prevSelector 
         let (tile, restTiles) = findTile target nextSelector tiles
-        let map = map |> Map.add pos tile 
+        let map = map |> Map.add (x, y) tile 
+        printfn "Placed tile %d at %A" tile.Number (x, y)
+        Tile.print tile 
         if (x = lastIndex && y = lastIndex) then map 
         else 
-            simplePlaceTiles dim tile nextPos lookup restTiles map 
+            loop nextPos restTiles map 
+    let (startTile, restTiles) = chooseStartTile lookup tiles 
+    let map = Map.empty |> Map.add (0, 0) startTile
+    printfn "Placed tile %d at %A" startTile.Number (0, 0)
+    Tile.print startTile 
+    loop (1, 0) restTiles map
 
 let run fileName =
     let chunks = readChunks fileName
@@ -179,17 +198,20 @@ let run fileName =
         ]
     }
 
-    printfn "tile %A" tile 
+    let imageMap = placeTiles lookup tiles 
+    printfn "%A" imageMap
 
-    printfn "rotated %A" (Tile.rotateCcw tile)
+    // printfn "tile %A" tile 
 
-    printfn "north: %A" (Tile.north tile)
+    // printfn "rotated %A" (Tile.rotateCcw tile)
 
-    printfn "west: %A" (Tile.west tile)
+    // printfn "north: %A" (Tile.north tile)
 
-    printfn "south: %A" (Tile.south tile)
+    // printfn "west: %A" (Tile.west tile)
 
-    printfn "east: %A" (Tile.east tile)
+    // printfn "south: %A" (Tile.south tile)
+
+    // printfn "east: %A" (Tile.east tile)
 
     // let imageMap = placeTiles dim tiles
     // printfn "%A" cornerTiles 
