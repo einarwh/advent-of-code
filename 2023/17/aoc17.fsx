@@ -48,7 +48,7 @@ let move dir pos =
 let readLines : string -> string array =
     File.ReadAllLines >> Array.filter ((<>) String.Empty)
 
-let tryMove (dir : Dir) (path, heat) (map : int[,]) (visited : Set<Path>) (queue : PriorityQueue<PathWithHeat, Heat>) =  
+let tryMove (dir : Dir) (path, heat) (map : int[,]) (visited, queue : PriorityQueue<PathWithHeat, Heat>) =  
     let yMax = (map |> Array2D.getRowCount) - 1
     let xMax = (map |> Array2D.getColumnCount) - 1
     let (x, y) = move dir path.pos 
@@ -72,7 +72,7 @@ let tryMove (dir : Dir) (path, heat) (map : int[,]) (visited : Set<Path>) (queue
 let solve1 (map : int[,]) = 
     let yMax = (map |> Array2D.getRowCount) - 1 
     let xMax = (map |> Array2D.getColumnCount) - 1 
-    let rec loop (queue : PriorityQueue<PathWithHeat, int>) visited : int option = 
+    let rec loop (visited, queue : PriorityQueue<PathWithHeat, Heat>) = 
         if queue.Count = 0 then None 
         else 
             let (path, heat) = queue.Dequeue()
@@ -80,14 +80,15 @@ let solve1 (map : int[,]) =
             | (x, y) when x = xMax && y = yMax -> 
                 Some heat
             | _ -> 
-                let (v, q) = 
+                let maybeContinue (v, q) = 
                     if path.steps < 3 then 
-                        tryMove path.dir (path, heat) map visited queue
-                    else (visited, queue)
-                let (v, q) = tryMove (turnLeft path.dir) (path, heat) map v q
-                let (v, q) = tryMove (turnRight path.dir) (path, heat) map v q
-                loop q v
-                            
+                        (v, q) |> tryMove path.dir (path, heat) map
+                    else (v, q)
+                (visited, queue) 
+                |> maybeContinue 
+                |> tryMove (turnLeft path.dir) (path, heat) map
+                |> tryMove (turnRight path.dir) (path, heat) map
+                |> loop
     let queue = PriorityQueue<PathWithHeat, Heat>()
     let visited = Set.empty 
     let path = {
@@ -96,7 +97,44 @@ let solve1 (map : int[,]) =
         steps = 0
     }
     queue.Enqueue((path, 0), 0);
-    match loop queue visited with 
+    match loop (visited, queue) with 
+    | Some heat -> heat 
+    | None -> failwith "?"
+
+let solve2 (map : int[,]) = 
+    let yMax = (map |> Array2D.getRowCount) - 1 
+    let xMax = (map |> Array2D.getColumnCount) - 1 
+    let rec loop (visited, queue : PriorityQueue<PathWithHeat, Heat>) = 
+        if queue.Count = 0 then None 
+        else 
+            let (path, heat) = queue.Dequeue()
+            match path.pos with 
+            | (x, y) when x = xMax && y = yMax && path.steps >= 4 -> 
+                Some heat
+            | _ -> 
+                let checkMaximum (v, q) = 
+                    if path.steps < 10 then 
+                        (v, q) |> tryMove path.dir (path, heat) map 
+                    else (v, q)
+                let checkMinimum (v, q) = 
+                    if path.steps >= 4 then 
+                        (v, q) 
+                        |> tryMove (turnLeft path.dir) (path, heat) map 
+                        |> tryMove (turnRight path.dir) (path, heat) map 
+                    else (v, q)
+                (visited, queue)
+                |> checkMaximum 
+                |> checkMinimum
+                |> loop
+    let queue = PriorityQueue<PathWithHeat, Heat>()
+    let visited = Set.empty 
+    let path = {
+        pos = (0, 0)
+        dir = E 
+        steps = 0
+    }
+    queue.Enqueue((path, 0), 0);
+    match loop (visited, queue) with 
     | Some heat -> heat 
     | None -> failwith "?"
 
@@ -105,5 +143,6 @@ let run fileName =
     let lines = readLines fileName |> Array.toList |> List.map (Seq.toList >> List.map charAsInt)
     let map = lines |> array2D
     solve1 map |> printfn "%A"
+    solve2 map |> printfn "%A"
 
 "input" |> run
