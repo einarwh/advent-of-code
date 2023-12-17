@@ -33,15 +33,14 @@ let turnRight dir =
     | S -> W 
     | W -> N
 
-let move dir pos = 
-    let (x, y) = pos
+let move dir (x, y) = 
     match dir with 
     | N -> (x, y - 1)
     | W -> (x - 1, y)
     | S -> (x, y + 1)
     | E -> (x + 1, y)
 
-let readLines : string -> string array =
+let readLines =
     File.ReadAllLines >> Array.filter ((<>) String.Empty)
 
 let tryMove dir (path, heat) map (visited, queue : PQ) =  
