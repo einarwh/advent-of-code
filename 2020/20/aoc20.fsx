@@ -1,7 +1,6 @@
 // Advent of Code 2020. Day 20: Jurassic Jigsaw
 // dotnet fsi aoc20.fsx
 
-open System
 open System.IO
 
 [<AutoOpen>]
@@ -122,14 +121,14 @@ let toCornerNW lookup tile =
 let findTile (target : char list) (selector : Tile -> char list) (candidates : Tile list) = 
     let rec loop remaining used = 
         match remaining with 
-        | [] -> failwith "Not found?" 
+        | [] -> failwith "not found?" 
         | tile :: rest -> 
             let rotations = tile |> Tile.rotations
             let matches = rotations |> List.filter (fun t -> target = selector t)
             match matches with 
             | [] -> loop rest (tile :: used)
             | [t] -> (t, (List.rev used) @ rest) 
-            | _ -> failwith "too many matches..."
+            | _ -> failwith "too many matches!"
     loop candidates []
 
 let chooseStartTile lookup (tiles : Tile list) = 
