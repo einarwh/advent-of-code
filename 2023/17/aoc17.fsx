@@ -17,7 +17,7 @@ type Path = {
     steps : int 
 }
 
-type Key = (Path * int)
+type PQ = PriorityQueue<Path * int, int>
 
 let turnLeft dir = 
     match dir with 
@@ -44,7 +44,7 @@ let move dir pos =
 let readLines : string -> string array =
     File.ReadAllLines >> Array.filter ((<>) String.Empty)
 
-let tryMove (dir : Dir) (path, heat) (map : int[,]) (visited, queue : PriorityQueue<Key, int>) =  
+let tryMove dir (path, heat) map (visited, queue : PQ) =  
     let yMax = (map |> Array2D.getRowCount) - 1
     let xMax = (map |> Array2D.getColumnCount) - 1
     let (x, y) = move dir path.pos 
@@ -65,10 +65,10 @@ let tryMove (dir : Dir) (path, heat) (map : int[,]) (visited, queue : PriorityQu
             queue.Enqueue((next, h), h)
             (visited, queue)
 
-let solve minSteps maxSteps (map : int[,]) = 
+let solve minSteps maxSteps map = 
     let yMax = (map |> Array2D.getRowCount) - 1 
     let xMax = (map |> Array2D.getColumnCount) - 1 
-    let rec loop (visited, queue : PriorityQueue<Key, int>) = 
+    let rec loop (visited, queue : PQ) = 
         if queue.Count = 0 then None 
         else 
             let (path, heat) = queue.Dequeue()
@@ -90,7 +90,7 @@ let solve minSteps maxSteps (map : int[,]) =
                 |> checkMaxSteps 
                 |> checkMinSteps
                 |> loop
-    let queue = PriorityQueue<Key, int>()
+    let queue = PQ()
     let visited = Set.empty 
     let path = {
         pos = (0, 0)
