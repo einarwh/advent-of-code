@@ -222,6 +222,9 @@ let findSeaMonsters (lines : char list list) =
         | _ -> positions
     loop 0 lines []
 
+let countPounds (lines : char list list) = 
+    lines |> List.map (fun line -> line |> List.filter ((=) '#') |> List.length) |> List.sum
+
 let run fileName =
     let chunks = readChunks fileName
     let tiles = chunks |> List.map parseChunk
@@ -256,24 +259,16 @@ let run fileName =
         ]
     }
 
-    printfn "---" 
-
-    tile |> Tile.print
-
-    printfn "---" 
-
-    tile |> Tile.borderless |> Tile.print
-
-    printfn "---" 
-
     let imageMap = placeTiles lookup tiles 
-    printfn "%A" imageMap
 
-    printfn "combine map"
     let combined = combineMap imageMap
-    combined |> toString |> printfn "%s"
 
-    combined |> findSeaMonsters |> printfn "%A"
+    let seaMonsterPositions = combined |> findSeaMonsters
+
+    let pounds = countPounds combined
+    printfn "pounds %d" pounds 
+    let roughness = pounds - 15 * List.length seaMonsterPositions
+    printfn "roughness %d" roughness 
     ()
 
 
