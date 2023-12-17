@@ -136,8 +136,8 @@ toSvg model =
     svg
       [ viewBox ("0 0 " ++ svgWidth ++ svgHeight)
       , width svgWidth
-      , height svgHeight ]
-      -- , Svg.Attributes.style "background-color:lightblue" ]
+      , height svgHeight 
+      , Svg.Attributes.style "background-color:lightblue" ]
       elements
 
 view : Model -> Html Msg

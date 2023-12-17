@@ -5216,6 +5216,7 @@ var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $author$project$Aoc20$unitSize = 9;
@@ -5232,7 +5233,8 @@ var $author$project$Aoc20$toSvg = function (model) {
 			[
 				$elm$svg$Svg$Attributes$viewBox('0 0 ' + (svgWidth + svgHeight)),
 				$elm$svg$Svg$Attributes$width(svgWidth),
-				$elm$svg$Svg$Attributes$height(svgHeight)
+				$elm$svg$Svg$Attributes$height(svgHeight),
+				$elm$svg$Svg$Attributes$style('background-color:lightblue')
 			]),
 		elements);
 };
