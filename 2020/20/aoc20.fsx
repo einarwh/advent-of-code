@@ -30,10 +30,6 @@ let rotationsForLines (lines : char list list) =
 
 module Tile = 
 
-    let rec private times n fn = 
-        if n > 0 then fn >> times (n - 1) fn
-        else id 
-
     let create number lines = { Number = number; Lines = lines }
 
     let sideLength (tile : Tile) = 
