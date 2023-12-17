@@ -12,6 +12,23 @@ module Types =
         Lines : char list list
     }
 
+let rotateLinesCcw (lines : char list list) = 
+    let lastIndex = (lines |> List.head |> List.length) - 1
+    [0 .. lastIndex]
+    |> List.map (fun i -> lines |> List.map (fun r -> r[lastIndex - i]))
+
+let flipLinesVertical (lines : char list list) = 
+    lines |> List.map (List.rev)
+
+let rotationsForLines (lines : char list list) = 
+    let n = lines 
+    let w = n |> rotateLinesCcw
+    let s = w |> rotateLinesCcw 
+    let e = s |> rotateLinesCcw
+    let basic = [ n; w; s; e ]
+    let flipped = basic |> List.map flipLinesVertical 
+    basic @ flipped
+
 module Tile = 
 
     let rec private times n fn = 
@@ -24,11 +41,7 @@ module Tile =
         tile.Lines |> List.head |> List.length 
 
     let rotateCcw (tile : Tile) = 
-        let rot (lines : char list list) = 
-            let lastIndex = (lines |> List.head |> List.length) - 1
-            [0 .. lastIndex]
-            |> List.map (fun i -> lines |> List.map (fun r -> r[lastIndex - i]))
-        { tile with Lines = rot tile.Lines }
+        { tile with Lines = rotateLinesCcw tile.Lines }
 
     let flipHorizontal (tile : Tile) = 
         { tile with Lines = tile.Lines |> List.rev }
@@ -70,6 +83,8 @@ module Tile =
             |> List.tail
             |> List.map (fun line -> line[.. line.Length - 2] |> List.tail)
         { tile with Lines = lines } 
+
+    let number (tile : Tile) = tile.Number
 
     let lines (tile : Tile) = tile.Lines
 
@@ -154,7 +169,6 @@ let placeTiles (lookup : Map<char list, int>) (tiles : Tile list) =
     let dim = numberOfTiles |> float |> sqrt |> int
     let lastIndex = dim - 1
     let rec loop (x, y) tiles map = 
-        // printfn "placeTiles loop %A" (x, y)
         let prevSelector = if x = 0 then Tile.south else Tile.east 
         let nextSelector = if x = 0 then Tile.north else Tile.west 
         let nextPos = if x = lastIndex then (0, y + 1) else (x + 1, y)
@@ -163,8 +177,6 @@ let placeTiles (lookup : Map<char list, int>) (tiles : Tile list) =
         let target = prevTile |> prevSelector 
         let (tile, restTiles) = findTile target nextSelector tiles
         let map = map |> Map.add (x, y) tile 
-        // printfn "Placed tile %d at %A" tile.Number (x, y)
-        Tile.print tile 
         if (x = lastIndex && y = lastIndex) then map 
         else 
             loop nextPos restTiles map 
@@ -225,70 +237,35 @@ let findSeaMonsters (lines : char list list) =
 let countPounds (lines : char list list) = 
     lines |> List.map (fun line -> line |> List.filter ((=) '#') |> List.length) |> List.sum
 
+let solvePart1 (tiles : Tile list) = 
+    let lookup = tiles |> List.collect (Tile.sidePermutations) |> List.countBy id |> Map.ofList
+    tiles 
+    |> List.filter (isCornerTile lookup)
+    |> List.map (Tile.number >> int64)
+    |> List.reduce (*)
+
+let solvePart2 (tiles : Tile list) = 
+    let lookup = tiles |> List.collect (Tile.sidePermutations) |> List.countBy id |> Map.ofList
+    let imageMap = placeTiles lookup tiles 
+    let lines = combineMap imageMap
+    let pounds = countPounds lines
+    let rec loop permutations = 
+        match permutations with 
+        | [] -> failwith "alas no sea monsters"
+        | lines :: rest -> 
+            let seaMonsterPositions = lines |> findSeaMonsters
+            if seaMonsterPositions |> List.length > 0 then 
+                let roughness = pounds - 15 * List.length seaMonsterPositions
+                roughness
+            else loop rest 
+    
+    let permutations = rotationsForLines lines 
+    loop permutations
+
 let run fileName =
     let chunks = readChunks fileName
     let tiles = chunks |> List.map parseChunk
-    let lookup = tiles |> List.collect (Tile.sidePermutations) |> List.countBy id |> Map.ofList
-    let cornerTiles = 
-        tiles |> List.filter (isCornerTile lookup)
-    let edgeTiles = 
-        tiles |> List.filter (isEdgeTile lookup)
-    let innerTiles = 
-        tiles |> List.filter (isInnerTile lookup)
-    let numberOfTiles = tiles |> List.length
-    let dim = numberOfTiles |> float |> sqrt |> int
+    tiles |> solvePart1 |> printfn "%d"
+    tiles |> solvePart2 |> printfn "%d" 
 
-    printfn "dim: %d" dim
-    printfn "corner tiles: %A" (cornerTiles |> List.length)
-    printfn "edge tiles: %A" (edgeTiles |> List.length)
-    printfn "inner tiles: %A" (innerTiles |> List.length)
-
-    let tile = {
-        Number = 2311
-        Lines = [
-            ['.';'.';'#';'#';'.';'#';'.';'.';'#';'.']
-            ['#';'#';'.';'.';'#';'.';'.';'.';'.';'.']
-            ['#';'.';'.';'.';'#';'#';'.';'.';'#';'.']
-            ['#';'#';'#';'#';'.';'#';'.';'.';'.';'#']
-            ['#';'#';'.';'#';'#';'.';'#';'#';'#';'.']
-            ['#';'#';'.';'.';'.';'#';'.';'#';'#';'#']
-            ['.';'#';'.';'#';'.';'#';'.';'.';'#';'#']
-            ['.';'.';'#';'.';'.';'.';'.';'#';'.';'.']
-            ['#';'#';'#';'.';'.';'.';'#';'.';'#';'.']
-            ['.';'.';'#';'#';'#';'.';'.';'#';'#';'#']
-        ]
-    }
-
-    let imageMap = placeTiles lookup tiles 
-
-    let combined = combineMap imageMap
-
-    let seaMonsterPositions = combined |> findSeaMonsters
-
-    let pounds = countPounds combined
-    printfn "pounds %d" pounds 
-    let roughness = pounds - 15 * List.length seaMonsterPositions
-    printfn "roughness %d" roughness 
-    ()
-
-
-    // printfn "tile %A" tile 
-
-    // printfn "rotated %A" (Tile.rotateCcw tile)
-
-    // printfn "north: %A" (Tile.north tile)
-
-    // printfn "west: %A" (Tile.west tile)
-
-    // printfn "south: %A" (Tile.south tile)
-
-    // printfn "east: %A" (Tile.east tile)
-
-    // let imageMap = placeTiles dim tiles
-    // printfn "%A" cornerTiles 
-    // let firstCornerTile = cornerTiles |> List.head 
-    // let cornerTilesNumbers = 
-    //     tiles |> List.filter (isCornerTile lookup) |> List.map (fst >> int64)
-    // cornerTilesNumbers |> List.reduce (*) |> printfn "%d"
-
-"sample" |> run
+"input" |> run
