@@ -175,12 +175,8 @@ let placeTiles (lookup : Map<char list, int>) (tiles : Tile list) =
     loop (1, 0) restTiles map
 
 let combineTiles (tiles : Tile list) =
-    printfn "combine %d tiles" (List.length tiles)
-
     let linesOfTiles = tiles |> List.map (Tile.lines >> borderless)
-    printfn "combine %d linesOfTiles" (List.length linesOfTiles)
     let rowCount = linesOfTiles |> List.head |> List.length 
-    printfn "rowCount is %d" rowCount
     [ 0 .. rowCount - 1 ]
     |> List.map (fun rowIndex -> linesOfTiles |> List.map (List.item rowIndex) |> List.concat)
 
@@ -189,7 +185,42 @@ let combineMap (imageMap : Map<int * int, Tile>) =
     let range = [ 0 .. dim - 1 ]
     range 
     |> List.collect (fun y -> range |> List.map (fun x -> Map.find (x, y) imageMap) |> combineTiles)
-    |> printfn "%A"
+
+let toString (lines : char list list) = 
+    lines |> List.map (List.toArray >> String) |> String.concat "\n"
+
+//                  # 
+//#    ##    ##    ###
+// #  #  #  #  #  #   
+
+let checkPattern (indexes : int list) (chars : char list) = 
+    indexes |> List.forall (fun ix -> chars[ix] = '#')
+
+let rec findMonsters (top : char list) (mid : char list) (low: char list) = 
+    let monsterLength = 20
+    let pat1 = [18]
+    let pat2 = [0;5;6;11;12;17;18;19]
+    let pat3 = [1;4;7;10;13;16]
+    let rec loop (ix : int) (top : char list) (mid : char list) (low : char list) found = 
+        if top.Length >= monsterLength then 
+            let found = 
+                if checkPattern pat1 top && checkPattern pat2 mid && checkPattern pat3 low then 
+                    ix :: found 
+                else found 
+            loop (ix + 1) (List.tail top) (List.tail mid) (List.tail low) found 
+        else 
+            found 
+    loop 0 top mid low []
+
+let findSeaMonsters (lines : char list list) = 
+    let rec loop (y : int) (lines : char list list) positions = 
+        match lines with 
+        | a :: b :: c :: rest -> 
+            let xs = findMonsters a b c 
+            let ps = xs |> List.map (fun x -> (x, y))
+            loop (y + 1) (b :: c :: rest) (ps @ positions)
+        | _ -> positions
+    loop 0 lines []
 
 let run fileName =
     let chunks = readChunks fileName
@@ -239,8 +270,11 @@ let run fileName =
     printfn "%A" imageMap
 
     printfn "combine map"
-    combineMap imageMap |> ignore
-    "."
+    let combined = combineMap imageMap
+    combined |> toString |> printfn "%s"
+
+    combined |> findSeaMonsters |> printfn "%A"
+    ()
 
 
     // printfn "tile %A" tile 
