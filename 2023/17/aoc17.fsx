@@ -101,7 +101,7 @@ let solve minSteps maxSteps map =
 
 let run fileName =
     let charAsInt ch = Char.GetNumericValue(ch) |> int
-    let lines = readLines fileName |> Array.toList |> List.map (Seq.toList >> List.map charAsInt)
+    let lines = readLines fileName |> Array.map (Seq.toArray >> Array.map charAsInt)
     let map = lines |> array2D
     solve 0 3 map |> printfn "%A"
     solve 4 10 map |> printfn "%A"
