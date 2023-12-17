@@ -9,19 +9,15 @@ module Array2D =
     let getRowCount (ary : 'a[,]) = ary.GetLength(0)
     let getColumnCount (ary : 'a[,]) = ary.GetLength(1)
 
-type Heat = int
-
-type Pos = (int * int)
-
 type Dir = N | W | S | E
 
 type Path = {
-    pos : Pos 
+    pos : (int * int) 
     dir : Dir 
     steps : int 
 }
 
-type PathWithHeat = (Path * Heat)
+type Key = (Path * int)
 
 let turnLeft dir = 
     match dir with 
@@ -48,7 +44,7 @@ let move dir pos =
 let readLines : string -> string array =
     File.ReadAllLines >> Array.filter ((<>) String.Empty)
 
-let tryMove (dir : Dir) (path, heat) (map : int[,]) (visited, queue : PriorityQueue<PathWithHeat, Heat>) =  
+let tryMove (dir : Dir) (path, heat) (map : int[,]) (visited, queue : PriorityQueue<Key, int>) =  
     let yMax = (map |> Array2D.getRowCount) - 1
     let xMax = (map |> Array2D.getColumnCount) - 1
     let (x, y) = move dir path.pos 
@@ -72,7 +68,7 @@ let tryMove (dir : Dir) (path, heat) (map : int[,]) (visited, queue : PriorityQu
 let solve1 (map : int[,]) = 
     let yMax = (map |> Array2D.getRowCount) - 1 
     let xMax = (map |> Array2D.getColumnCount) - 1 
-    let rec loop (visited, queue : PriorityQueue<PathWithHeat, Heat>) = 
+    let rec loop (visited, queue : PriorityQueue<Key, int>) = 
         if queue.Count = 0 then None 
         else 
             let (path, heat) = queue.Dequeue()
@@ -89,7 +85,7 @@ let solve1 (map : int[,]) =
                 |> tryMove (turnLeft path.dir) (path, heat) map
                 |> tryMove (turnRight path.dir) (path, heat) map
                 |> loop
-    let queue = PriorityQueue<PathWithHeat, Heat>()
+    let queue = PriorityQueue<Key, int>()
     let visited = Set.empty 
     let path = {
         pos = (0, 0)
@@ -104,7 +100,7 @@ let solve1 (map : int[,]) =
 let solve2 (map : int[,]) = 
     let yMax = (map |> Array2D.getRowCount) - 1 
     let xMax = (map |> Array2D.getColumnCount) - 1 
-    let rec loop (visited, queue : PriorityQueue<PathWithHeat, Heat>) = 
+    let rec loop (visited, queue : PriorityQueue<Key, int>) = 
         if queue.Count = 0 then None 
         else 
             let (path, heat) = queue.Dequeue()
@@ -126,7 +122,7 @@ let solve2 (map : int[,]) =
                 |> checkMaximum 
                 |> checkMinimum
                 |> loop
-    let queue = PriorityQueue<PathWithHeat, Heat>()
+    let queue = PriorityQueue<Key, int>()
     let visited = Set.empty 
     let path = {
         pos = (0, 0)
