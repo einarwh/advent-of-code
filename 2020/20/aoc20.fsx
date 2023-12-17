@@ -77,21 +77,9 @@ module Tile =
         let flipped = basic |> List.map flipVertical 
         basic @ flipped
 
-    let borderless (tile : Tile) = 
-        let lines = 
-            tile.Lines[.. tile.Lines.Length - 2] 
-            |> List.tail
-            |> List.map (fun line -> line[.. line.Length - 2] |> List.tail)
-        { tile with Lines = lines } 
-
     let number (tile : Tile) = tile.Number
 
     let lines (tile : Tile) = tile.Lines
-
-    let print (tile : Tile) = 
-        tile.Lines
-        |> List.map (List.toArray >> String)
-        |> List.iter (printfn "%s")
 
 let readChunks fileName = 
     let text = File.ReadAllText fileName 
@@ -109,7 +97,6 @@ let parseChunk (chunk : string) =
         Tile.create number lines 
     | _ -> failwith "oof"
 
-
 let borderless (lines : char list list) = 
     lines[.. lines.Length - 2] 
     |> List.tail
@@ -121,20 +108,8 @@ let isUnique lookup side =
 let countUnique lookup = 
     List.filter (isUnique lookup) >> List.length
 
-let isEdgeTile lookup tile = 
-    2 = countUnique lookup (Tile.sidePermutations tile)
-
 let isCornerTile lookup tile = 
     4 = countUnique lookup (Tile.sidePermutations tile) 
-
-let isInnerTile lookup tile = 
-    0 = countUnique lookup (Tile.sidePermutations tile)
-
-let rotateCcw lines = 
-    let len = lines |> List.head |> String.length
-    [0 .. len - 1]
-    |> List.map (fun i -> lines |> List.map (fun r -> r[len - 1 - i]) |> List.toArray |> String)
-
 
 let toCornerNW lookup tile = 
     let rec loop tile = 
@@ -182,8 +157,6 @@ let placeTiles (lookup : Map<char list, int>) (tiles : Tile list) =
             loop nextPos restTiles map 
     let (startTile, restTiles) = chooseStartTile lookup tiles 
     let map = Map.empty |> Map.add (0, 0) startTile
-    // printfn "Placed tile %d at %A" startTile.Number (0, 0)
-    // Tile.print startTile 
     loop (1, 0) restTiles map
 
 let combineTiles (tiles : Tile list) =
@@ -197,13 +170,6 @@ let combineMap (imageMap : Map<int * int, Tile>) =
     let range = [ 0 .. dim - 1 ]
     range 
     |> List.collect (fun y -> range |> List.map (fun x -> Map.find (x, y) imageMap) |> combineTiles)
-
-let toString (lines : char list list) = 
-    lines |> List.map (List.toArray >> String) |> String.concat "\n"
-
-//                  # 
-//#    ##    ##    ###
-// #  #  #  #  #  #   
 
 let checkPattern (indexes : int list) (chars : char list) = 
     indexes |> List.forall (fun ix -> chars[ix] = '#')
@@ -258,7 +224,6 @@ let solvePart2 (tiles : Tile list) =
                 let roughness = pounds - 15 * List.length seaMonsterPositions
                 roughness
             else loop rest 
-    
     let permutations = rotationsForLines lines 
     loop permutations
 
