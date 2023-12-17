@@ -64,6 +64,15 @@ module Tile =
         let flipped = basic |> List.map flipVertical 
         basic @ flipped
 
+    let borderless (tile : Tile) = 
+        let lines = 
+            tile.Lines[.. tile.Lines.Length - 2] 
+            |> List.tail
+            |> List.map (fun line -> line[.. line.Length - 2] |> List.tail)
+        { tile with Lines = lines } 
+
+    let lines (tile : Tile) = tile.Lines
+
     let print (tile : Tile) = 
         tile.Lines
         |> List.map (List.toArray >> String)
@@ -84,6 +93,12 @@ let parseChunk (chunk : string) =
         let lines = rows |> List.map (Seq.toList)
         Tile.create number lines 
     | _ -> failwith "oof"
+
+
+let borderless (lines : char list list) = 
+    lines[.. lines.Length - 2] 
+    |> List.tail
+    |> List.map (fun line -> line[.. line.Length - 2] |> List.tail)
 
 let isUnique lookup side =
     1 = Map.find side lookup
@@ -159,6 +174,23 @@ let placeTiles (lookup : Map<char list, int>) (tiles : Tile list) =
     // Tile.print startTile 
     loop (1, 0) restTiles map
 
+let combineTiles (tiles : Tile list) =
+    printfn "combine %d tiles" (List.length tiles)
+
+    let linesOfTiles = tiles |> List.map (Tile.lines >> borderless)
+    printfn "combine %d linesOfTiles" (List.length linesOfTiles)
+    let rowCount = linesOfTiles |> List.head |> List.length 
+    printfn "rowCount is %d" rowCount
+    [ 0 .. rowCount - 1 ]
+    |> List.map (fun rowIndex -> linesOfTiles |> List.map (List.item rowIndex) |> List.concat)
+
+let combineMap (imageMap : Map<int * int, Tile>) = 
+    let dim = imageMap |> Map.count |> float |> sqrt |> int
+    let range = [ 0 .. dim - 1 ]
+    range 
+    |> List.collect (fun y -> range |> List.map (fun x -> Map.find (x, y) imageMap) |> combineTiles)
+    |> printfn "%A"
+
 let run fileName =
     let chunks = readChunks fileName
     let tiles = chunks |> List.map parseChunk
@@ -193,8 +225,23 @@ let run fileName =
         ]
     }
 
+    printfn "---" 
+
+    tile |> Tile.print
+
+    printfn "---" 
+
+    tile |> Tile.borderless |> Tile.print
+
+    printfn "---" 
+
     let imageMap = placeTiles lookup tiles 
     printfn "%A" imageMap
+
+    printfn "combine map"
+    combineMap imageMap |> ignore
+    "."
+
 
     // printfn "tile %A" tile 
 
