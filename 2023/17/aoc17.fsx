@@ -74,16 +74,15 @@ let solve minSteps maxSteps map =
             | (x, y) when x = xMax && y = yMax && path.steps >= minSteps -> 
                 Some heat
             | _ -> 
-                let maybeContinue (v, q) = 
+                let maybeContinue = 
                     if path.steps < maxSteps then 
-                        (v, q) |> tryMove path.dir (path, heat) map 
-                    else (v, q)
-                let maybeTurn (v, q) = 
+                       tryMove path.dir (path, heat) map 
+                    else id
+                let maybeTurn = 
                     if path.steps >= minSteps then 
-                        (v, q) 
-                        |> tryMove (turnLeft path.dir) (path, heat) map 
-                        |> tryMove (turnRight path.dir) (path, heat) map 
-                    else (v, q)
+                        tryMove (turnLeft path.dir) (path, heat) map 
+                        >> tryMove (turnRight path.dir) (path, heat) map 
+                    else id
                 (visited, queue)
                 |> maybeContinue 
                 |> maybeTurn
