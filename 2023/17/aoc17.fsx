@@ -1,4 +1,4 @@
-// Advent of Code 2023. Day 17: The Floor Will Be Lava
+// Advent of Code 2023. Day 17: Clumsy Crucible
 // dotnet fsi aoc17.fsx
 
 open System
@@ -56,13 +56,12 @@ let tryMove dir (path, heat) map (visited, queue : PQ) =
             dir = dir 
             steps = steps + 1
         }
-        if Set.contains next visited then 
+        if visited |> Set.contains next then 
             (visited, queue) 
         else
-            let visited = visited |> Set.add next
             let h = heat + Array2D.get map y x 
             queue.Enqueue((next, h), h)
-            (visited, queue)
+            (visited |> Set.add next, queue)
 
 let solve minSteps maxSteps map = 
     let yMax = (map |> Array2D.getRowCount) - 1 
@@ -75,29 +74,28 @@ let solve minSteps maxSteps map =
             | (x, y) when x = xMax && y = yMax && path.steps >= minSteps -> 
                 Some heat
             | _ -> 
-                let checkMaxSteps (v, q) = 
+                let maybeContinue (v, q) = 
                     if path.steps < maxSteps then 
                         (v, q) |> tryMove path.dir (path, heat) map 
                     else (v, q)
-                let checkMinSteps (v, q) = 
+                let maybeTurn (v, q) = 
                     if path.steps >= minSteps then 
                         (v, q) 
                         |> tryMove (turnLeft path.dir) (path, heat) map 
                         |> tryMove (turnRight path.dir) (path, heat) map 
                     else (v, q)
                 (visited, queue)
-                |> checkMaxSteps 
-                |> checkMinSteps
+                |> maybeContinue 
+                |> maybeTurn
                 |> loop
     let queue = PQ()
-    let visited = Set.empty 
     let path = {
         pos = (0, 0)
         dir = E 
         steps = 0
     }
     queue.Enqueue((path, 0), 0);
-    match loop (visited, queue) with 
+    match loop (Set.empty, queue) with 
     | Some heat -> heat 
     | None -> failwith "?"
 
