@@ -4,147 +4,158 @@
 open System
 open System.IO
 
-type Direction = (int64 * int64)
+type Direction = U | D | L | R 
 
-type Pos = (int64 * int64)
+type Pos = { x : int64; y : int64 }
+
+type Vector = { start : Pos; stop : Pos }
 
 type Instruction = {
     dir : Direction
-    meters : int64 
+    meters : int64
 }
 
-let parseDirection (s : string) = 
-    match s[0] with 
-    | 'U' -> (0L, -1L)
-    | 'D' -> (0L, 1L)
-    | 'L' -> (-1L, 0L) 
-    | 'R' -> (1L, 0L) 
+let parseDirection (s : string) =
+    match s[0] with
+    | 'U' -> U
+    | 'D' -> D
+    | 'L' -> L
+    | 'R' -> R
     | _ -> failwith <| sprintf "%s?" s
 
-let directionFromNumber (n : int) = 
-    match n with 
-    | 0 -> (1L, 0L)
-    | 1 -> (0L, 1L)
-    | 2 -> (-1L, 0L) 
-    | 3 -> (0L, -1L) 
-    | _ -> failwith <| sprintf "%d?" n 
+let directionFromNumber (n : int) =
+    match n with
+    | 0 -> R 
+    | 1 -> D
+    | 2 -> L
+    | 3 -> U
+    | _ -> failwith <| sprintf "%d?" n
 
-let parseMeters = int64 
+let parseMeters = int64
 
-let parseHexCode (s : string) = 
+let parseHexCode (s : string) =
     let code = s.Substring(2, 5)
     let meters = Convert.ToInt32(code, 16)
     let dir = s.Substring(7, 1) |> int |> directionFromNumber
     { dir = dir
       meters = meters }
 
-let parseInstruction (s : string) = 
+let parseInstruction (s : string) =
     let parts = s.Split(" ")
     { dir = parseDirection parts[0]
       meters = parseMeters parts[1] }
 
-let parseLine (s : string) = 
+let parseLine (s : string) =
     let parts = s.Split(" ")
     parseHexCode parts[2]
 
-let move (xStart, yStart) (xStep, yStep) meters =
-    [ 1L .. meters ]
-    |> List.map (fun m -> (xStart + xStep * m, yStart + yStep * m))
+let toStep dir = 
+    match dir with 
+    | U -> (0L, -1L)
+    | D -> (0L, 1L)
+    | L -> (-1L, 0L)
+    | R -> (1L, 0L)
 
-let digLagoon instructions = 
-    let startPos = (0L, 0L)
-    let rec loop instructions current positions = 
-        match instructions with 
+let move pos dir meters =
+    let (xStep, yStep) = toStep dir 
+    [ 1L .. meters ]
+    |> List.map (fun m -> { x = pos.x + xStep * m; y = pos.y + yStep * m })
+
+let getNextPos pos dir meters = 
+    let (xStep, yStep) = toStep dir 
+    { x = pos.x + xStep * meters
+      y = pos.y + yStep * meters }
+
+let digLagoon instructions =
+    let startPos = { x = 0L; y = 0L }
+    let rec loop instructions current positions =
+        match instructions with
         | [] -> positions
-        | h :: t -> 
+        | h :: t ->
             if List.contains startPos positions then failwith "oh hey"
-            let nextPositions = move current h.dir h.meters 
-            let next = nextPositions |> List.last 
+            let nextPositions = move current h.dir h.meters
+            let next = nextPositions |> List.last
             loop t next (positions @ nextPositions)
     loop instructions startPos []
 
-let getNeighbours (x : int64, y : int64) = 
-    [ (x - 1L, y - 1L)
-      (x, y - 1L) 
-      (x + 1L, y - 1L)
-      (x - 1L, y)
-      (x + 1L, y)
-      (x - 1L, y + 1L)
-      (x, y + 1L)
-      (x + 1L, y + 1L) ]
+let toVectors instructions = 
+    let rec loop pos (instructions : Instruction list) vectors = 
+        match instructions with 
+        | [] -> vectors |> List.rev
+        | h :: t -> 
+            let nextPos = getNextPos pos h.dir h.meters
+            let v = { start = pos; stop = nextPos }
+            loop nextPos t (v :: vectors)
+    let startPos = { x = 0; y = 0 }
+    loop startPos instructions [] 
 
-let fill positions = 
+let toPositions instructions = 
+    let rec loop pos (instructions : Instruction list) positions = 
+        match instructions with 
+        | [] -> positions |> List.rev
+        | h :: t -> 
+            let next = getNextPos pos h.dir h.meters
+            loop next t (next :: positions)
+    let startPos = { x = 0; y = 0 }
+    loop startPos instructions [ startPos ] 
+
+let getNeighbours (pos : Pos) =
+    [ { x = pos.x - 1L; y = pos.y - 1L }
+      { x = pos.x; y = pos.y - 1L }
+      { x = pos.x + 1L; y = pos.y - 1L }
+      { x = pos.x - 1L; y = pos.y }
+      { x = pos.x + 1L; y = pos.y }
+      { x = pos.x - 1L; y = pos.y + 1L }
+      { x = pos.x; y = pos.y + 1L }
+      { x = pos.x + 1L; y = pos.y + 1L } ]
+
+let fill positions =
     let wallSet = positions |> Set.ofList
-    let rec loop (queue : Pos list) (visited : Set<Pos>) = 
-        match queue with 
-        | [] -> visited 
-        | (x, y) :: rest -> 
-            if Set.contains (x, y) visited then
-                loop rest visited 
-            else 
-                let visited = visited |> Set.add (x, y)
-                let neighbours = (x, y) |> getNeighbours |> List.filter (fun p -> not (Set.contains p wallSet))
+    let rec loop (queue : Pos list) (visited : Set<Pos>) =
+        match queue with
+        | [] -> visited
+        | pos :: rest ->
+            if Set.contains pos visited then
+                loop rest visited
+            else
+                let visited = visited |> Set.add pos
+                let neighbours = pos |> getNeighbours |> List.filter (fun p -> not (Set.contains p wallSet))
                 let queue = queue @ neighbours
                 loop queue visited
-    let xStart = positions |> List.map fst |> List.min
-    let yStart = positions |> List.choose (fun (x, y) -> if x = xStart then Some y else None) |> List.min
-    let startPos = (xStart+1L, yStart+1L)
+    let xStart = positions |> List.map (fun pos -> pos.x) |> List.min
+    let yStart = positions |> List.choose (fun pos -> if pos.x = xStart then Some pos.y else None) |> List.min
+    let startPos = { x = xStart+1L; y = yStart+1L }
     loop [ startPos ] Set.empty
 
-let getVolume (positions : Pos list) = 
-    let wallCount = positions |> List.length 
-    let fillCount = positions |> fill |> Set.count 
+let getVolume (positions : Pos list) =
+    let wallCount = positions |> List.length
+    let fillCount = positions |> fill |> Set.count
     wallCount + fillCount
 
 let readLines =
     File.ReadAllLines >> Array.filter ((<>) String.Empty)
 
+let determinant (p1 : Pos, p2 : Pos) =
+    p1.x * p2.y - p2.x * p1.y
+
+let shoelaceArea positions = 
+    positions |> List.pairwise |> List.map determinant |> List.sum |> (fun s -> s / 2L)
+
+let solve instructions = 
+    let positions = instructions |> toPositions
+    let area = shoelaceArea positions
+    let perimeter = instructions |> List.sumBy (fun x -> x.meters) 
+    area + perimeter / 2L + 1L 
+
 let part1 lines = 
-    let instructions = lines |> List.map parseInstruction
-    let lagoon = instructions |> digLagoon
-    lagoon |> getVolume 
+    lines |> List.map parseInstruction |> solve 
 
-let part2 lines = 
-    let instructions = lines |> List.map parseLine
-    let lagoon = instructions |> digLagoon
-    lagoon |> getVolume 
-
-let rec gcd (x : int64) (y : int64) = 
-    if y = 0 then abs x else gcd y (x % y)
-
-
-let factors n = 
-    let rec f n x a = 
-        if x = n then
-            x::a
-        elif n % x = 0 then 
-            f (n/x) x (x::a)
-        else
-            f n (x+1) a
-    f n 2 []
-
-let lst = 
-  [ 461937
-    56407
-    356671
-    863240
-    367720
-    266681
-    577262
-    829975
-    112010
-    829975
-    491645
-    686074
-    5411
-    500254 ]
+let part2 lines =
+    lines |> List.map parseLine |> solve
 
 let run fileName =
-    let lines = readLines fileName |> Array.toList 
+    let lines = readLines fileName |> Array.toList
     lines |> part1 |> printfn "%d"
-    // lines |> part2 |> printfn "%d"
-    lst |> List.map factors |> List.zip lst |> List.iter (printfn "%A")
-    // factors 461937 |> printfn "%A" 
-    gcd 461937 5411 |> printfn "%d"
+    lines |> part2 |> printfn "%d"
 
-"sample" |> run
+"input" |> run

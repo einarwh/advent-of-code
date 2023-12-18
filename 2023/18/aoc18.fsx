@@ -4,82 +4,95 @@
 open System
 open System.IO
 
+type Direction = U | D | L | R 
+
+type Pos = { x : int64; y : int64 }
+
+type Vector = { start : Pos; stop : Pos }
+
 type Instruction = {
-    dir : (int * int)
-    meters : int 
+    dir : Direction
+    meters : int64
 }
 
-let parseDirection (s : string) = 
-    match s[0] with 
-    | 'U' -> (0, -1)
-    | 'D' -> (0, 1)
-    | 'L' -> (-1, 0) 
-    | 'R' -> (1, 0) 
+let directionFromString (s : string) =
+    match s[0] with
+    | 'U' -> U
+    | 'D' -> D
+    | 'L' -> L
+    | 'R' -> R
     | _ -> failwith <| sprintf "%s?" s
 
-let parseMeters = int 
+let directionFromNumber (n : int) =
+    match n with
+    | 0 -> R 
+    | 1 -> D
+    | 2 -> L
+    | 3 -> U
+    | _ -> failwith <| sprintf "%d?" n
 
-let parseInstruction (s : string) = 
+let parseHexCode (s : string) =
+    let code = s.Substring(2, 5)
+    let meters = Convert.ToInt32(code, 16)
+    let dir = s.Substring(7, 1) |> int |> directionFromNumber
+    { dir = dir
+      meters = meters }
+
+let parseInstruction (s : string) =
     let parts = s.Split(" ")
-    { dir = parseDirection parts[0]
-      meters = parseMeters parts[1] }
+    { dir = directionFromString parts[0]
+      meters = int parts[1] }
 
-let move (xStart, yStart) (xStep, yStep) meters =
-    [ 1 .. meters ]
-    |> List.map (fun m -> (xStart + xStep * m, yStart + yStep * m))
+let parseLine (s : string) =
+    let parts = s.Split(" ")
+    parseHexCode parts[2]
 
-let digLagoon instructions = 
-    let startPos = (0, 0)
-    let rec loop instructions current positions = 
+let toStep dir = 
+    match dir with 
+    | U -> (0L, -1L)
+    | D -> (0L, 1L)
+    | L -> (-1L, 0L)
+    | R -> (1L, 0L)
+
+let getNextPos pos dir meters = 
+    let (xStep, yStep) = toStep dir 
+    { x = pos.x + xStep * meters
+      y = pos.y + yStep * meters }
+
+let toPositions instructions = 
+    let rec loop pos (instructions : Instruction list) positions = 
         match instructions with 
-        | [] -> positions
+        | [] -> positions |> List.rev
         | h :: t -> 
-            if List.contains startPos positions then failwith "oh hey"
-            let nextPositions = move current h.dir h.meters 
-            let next = nextPositions |> List.last 
-            loop t next (positions @ nextPositions)
-    loop instructions startPos []
-
-let getNeighbours (x, y) = 
-    [ (x - 1, y - 1)
-      (x, y - 1) 
-      (x + 1, y - 1)
-      (x - 1, y)
-      (x + 1, y)
-      (x - 1, y + 1)
-      (x, y + 1)
-      (x + 1, y + 1) ]
-
-let fill positions = 
-    let wallSet = positions |> Set.ofList
-    let rec loop (queue : (int*int) list) (visited : Set<int*int>) = 
-        match queue with 
-        | [] -> visited 
-        | (x, y) :: rest -> 
-            if Set.contains (x, y) visited then
-                loop rest visited 
-            else 
-                let visited = visited |> Set.add (x, y)
-                let neighbours = (x, y) |> getNeighbours |> List.filter (fun p -> not (Set.contains p wallSet))
-                let queue = queue @ neighbours
-                loop queue visited
-    let xStart = positions |> List.map fst |> List.min
-    let yStart = positions |> List.choose (fun (x, y) -> if x = xStart then Some y else None) |> List.min
-    let startPos = (xStart+1, yStart+1)
-    loop [ startPos ] Set.empty
-
-let getVolume (positions : (int * int) list) = 
-    let wallCount = positions |> List.length 
-    let fillCount = positions |> fill |> Set.count 
-    wallCount + fillCount
+            let next = getNextPos pos h.dir h.meters
+            loop next t (next :: positions)
+    let startPos = { x = 0; y = 0 }
+    loop startPos instructions [ startPos ] 
 
 let readLines =
     File.ReadAllLines >> Array.filter ((<>) String.Empty)
 
+let determinant (p1 : Pos, p2 : Pos) =
+    p1.x * p2.y - p2.x * p1.y
+
+let shoelaceArea positions = 
+    positions |> List.pairwise |> List.map determinant |> List.sum |> (fun s -> s / 2L)
+
+let solve instructions = 
+    let positions = instructions |> toPositions
+    let area = shoelaceArea positions
+    let perimeter = instructions |> List.sumBy (fun x -> x.meters) 
+    area + perimeter / 2L + 1L 
+
+let part1 lines = 
+    lines |> List.map parseInstruction |> solve 
+
+let part2 lines =
+    lines |> List.map parseLine |> solve
+
 let run fileName =
-    let lines = readLines fileName |> Array.toList 
-    let instructions = lines |> List.map parseInstruction
-    let lagoon = instructions |> digLagoon
-    lagoon |> getVolume |> printfn "%d"
+    let lines = readLines fileName |> Array.toList
+    lines |> part1 |> printfn "%d"
+    lines |> part2 |> printfn "%d"
 
 "input" |> run
