@@ -17,12 +17,10 @@ let parseDirection (s : string) =
     | 'R' -> (1, 0) 
     | _ -> failwith <| sprintf "%s?" s
 
-let parseMeters = int 
-
 let parseInstruction (s : string) = 
     let parts = s.Split(" ")
     { dir = parseDirection parts[0]
-      meters = parseMeters parts[1] }
+      meters = int parts[1] }
 
 let move (xStart, yStart) (xStep, yStep) meters =
     [ 1 .. meters ]
