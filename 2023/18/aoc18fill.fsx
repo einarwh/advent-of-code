@@ -50,7 +50,7 @@ let getNeighbours (x, y) =
 
 let fill positions = 
     let wallSet = positions |> Set.ofList
-    let rec loop (queue : (int*int) list) (visited : Set<int*int>) = 
+    let rec loop queue visited = 
         match queue with 
         | [] -> visited 
         | (x, y) :: rest -> 
@@ -66,7 +66,7 @@ let fill positions =
     let startPos = (xStart+1, yStart+1)
     loop [ startPos ] Set.empty
 
-let getVolume (positions : (int * int) list) = 
+let getVolume positions = 
     let wallCount = positions |> List.length 
     let fillCount = positions |> fill |> Set.count 
     wallCount + fillCount
