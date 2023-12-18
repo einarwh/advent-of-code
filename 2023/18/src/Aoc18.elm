@@ -1,16 +1,12 @@
 module Aoc18 exposing (..)
 
 import Browser
--- import Browser.Events exposing (onMouseMove)
 import Html exposing (Html)
 import Html.Attributes
--- import Html.Events
 import Html.Events.Extra.Mouse exposing (..)
 import Svg exposing (..)
 import Svg.Events
-import Json.Decode as Decode exposing (..)
 import Svg.Attributes exposing (..)
-import Array2D exposing (Array2D)
 import Set exposing (Set)
 import Time 
 
