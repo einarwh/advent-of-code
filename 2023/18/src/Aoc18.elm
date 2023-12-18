@@ -38,7 +38,8 @@ type alias Basin =
   { startPoint : Position 
   , trench : Set Position
   , explorationPoints : List Position
-  , filledPoints : Set Position }
+  , filledPoints : Set Position
+  , cubicMeters : Int }
 
 type alias Model = 
   { basin : Basin
@@ -94,6 +95,16 @@ adjustLagoon positions =
   in 
     positions |> List.map (\(x, y) -> (x + xOffset, y + yOffset))
 
+findStartPosition : List Position -> Position
+findStartPosition positions =
+  let 
+    xs = positions |> List.map Tuple.first 
+    ys = positions |> List.map Tuple.second 
+    xStart = xs |> List.minimum |> Maybe.withDefault 0
+    yStart = ys |> List.minimum |> Maybe.withDefault 0
+  in 
+    (xStart + 1, yStart + 1)
+
 init : () -> (Model, Cmd Msg)
 init _ =
   let 
@@ -120,12 +131,16 @@ U 2 (#7a21e3)"""
 
     instructions = lines |> List.map parseLine
 
-    trench = instructions |> digLagoon |> adjustLagoon |> Set.fromList
+    positions = instructions |> digLagoon |> adjustLagoon
+    trench = positions |> Set.fromList
 
-    basin = { startPoint = (0, 0) 
+    startPoint = findStartPosition positions
+
+    basin = { startPoint = startPoint 
             , trench = trench
-            , explorationPoints = []
-            , filledPoints = Set.empty }
+            , explorationPoints = [ startPoint ]
+            , filledPoints = Set.empty
+            , cubicMeters = 0 }
 
     debugText = instructions |> List.length |> String.fromInt 
 
@@ -160,18 +175,26 @@ updateBasin basin =
     let 
       trench = basin.trench
       explorationSet = basin.explorationPoints |> Set.fromList 
-      filledPoints : Set Position
       filledPoints = explorationSet |> Set.union basin.filledPoints
       addedPoints = basin.filledPoints |> Set.diff filledPoints |> Set.toList
       exploreNext = addedPoints |> List.concatMap findNeighbourPositions |> Set.fromList |> Set.toList |> List.filter (isFreeSpace trench)
+      cubicMeters = Set.size trench + Set.size filledPoints
     in 
       { startPoint = basin.startPoint 
       , trench = trench
       , explorationPoints = exploreNext
-      , filledPoints = filledPoints }
+      , filledPoints = filledPoints
+      , cubicMeters = cubicMeters }
+
+-- type alias Basin = 
+--   { startPoint : Position 
+--   , trench : Set Position
+--   , explorationPoints : List Position
+--   , filledPoints : Set Position }
 
 updateModel : Model -> Model
-updateModel model = { model | basin = updateBasin model.basin }
+updateModel model = 
+  { model | basin = updateBasin model.basin }
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -269,10 +292,8 @@ view model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "24px"
-              , Html.Attributes.style "padding" "16px"] 
+              , Html.Attributes.style "font-size" "36px"
+              , Html.Attributes.style "padding" "24px"] 
               [ Html.div [ Html.Attributes.align "center" ] [ s ] 
-              , Html.div [] [ Html.text <| model.debug ]
-              , Html.div [] [ Html.text <| model.debug ]
-              , Html.div [] [ Html.text model.debug ]
+              , Html.div [] [ Html.text <| (String.fromInt model.basin.cubicMeters) ++ " m³"]
               ] ] ]

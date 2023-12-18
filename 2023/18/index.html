@@ -5323,6 +5323,19 @@ var $elm$core$Set$Set_elm_builtin = function (a) {
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $elm$core$Set$empty = $elm$core$Set$Set_elm_builtin($elm$core$Dict$empty);
+var $author$project$Aoc18$findStartPosition = function (positions) {
+	var ys = A2($elm$core$List$map, $elm$core$Tuple$second, positions);
+	var yStart = A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		$elm$core$List$minimum(ys));
+	var xs = A2($elm$core$List$map, $elm$core$Tuple$first, positions);
+	var xStart = A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		$elm$core$List$minimum(xs));
+	return _Utils_Tuple2(xStart + 1, yStart + 1);
+};
 var $elm$core$Dict$Black = {$: 'Black'};
 var $elm$core$Dict$RBNode_elm_builtin = F5(
 	function (a, b, c, d, e) {
@@ -5495,13 +5508,16 @@ var $author$project$Aoc18$init = function (_v0) {
 	var instructions = A2($elm$core$List$map, $author$project$Aoc18$parseLine, lines);
 	var debugText = $elm$core$String$fromInt(
 		$elm$core$List$length(instructions));
-	var trench = $elm$core$Set$fromList(
-		$author$project$Aoc18$adjustLagoon(
-			$author$project$Aoc18$digLagoon(instructions)));
+	var positions = $author$project$Aoc18$adjustLagoon(
+		$author$project$Aoc18$digLagoon(instructions));
+	var startPoint = $author$project$Aoc18$findStartPosition(positions);
+	var trench = $elm$core$Set$fromList(positions);
 	var basin = {
-		explorationPoints: _List_Nil,
+		cubicMeters: 0,
+		explorationPoints: _List_fromArray(
+			[startPoint]),
 		filledPoints: $elm$core$Set$empty,
-		startPoint: _Utils_Tuple2(0, 0),
+		startPoint: startPoint,
 		trench: trench
 	};
 	var model = {basin: basin, debug: debugText};
@@ -6273,6 +6289,30 @@ var $author$project$Aoc18$isFreeSpace = F2(
 	function (trench, pos) {
 		return !A2($author$project$Aoc18$isTrenchPoint, trench, pos);
 	});
+var $elm$core$Dict$sizeHelp = F2(
+	function (n, dict) {
+		sizeHelp:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return n;
+			} else {
+				var left = dict.d;
+				var right = dict.e;
+				var $temp$n = A2($elm$core$Dict$sizeHelp, n + 1, right),
+					$temp$dict = left;
+				n = $temp$n;
+				dict = $temp$dict;
+				continue sizeHelp;
+			}
+		}
+	});
+var $elm$core$Dict$size = function (dict) {
+	return A2($elm$core$Dict$sizeHelp, 0, dict);
+};
+var $elm$core$Set$size = function (_v0) {
+	var dict = _v0.a;
+	return $elm$core$Dict$size(dict);
+};
 var $elm$core$Dict$union = F2(
 	function (t1, t2) {
 		return A3($elm$core$Dict$foldl, $elm$core$Dict$insert, t2, t1);
@@ -6291,6 +6331,7 @@ var $author$project$Aoc18$updateBasin = function (basin) {
 		var trench = basin.trench;
 		var explorationSet = $elm$core$Set$fromList(basin.explorationPoints);
 		var filledPoints = A2($elm$core$Set$union, basin.filledPoints, explorationSet);
+		var cubicMeters = $elm$core$Set$size(trench) + $elm$core$Set$size(filledPoints);
 		var addedPoints = $elm$core$Set$toList(
 			A2($elm$core$Set$diff, filledPoints, basin.filledPoints));
 		var exploreNext = A2(
@@ -6299,7 +6340,7 @@ var $author$project$Aoc18$updateBasin = function (basin) {
 			$elm$core$Set$toList(
 				$elm$core$Set$fromList(
 					A2($elm$core$List$concatMap, $author$project$Aoc18$findNeighbourPositions, addedPoints))));
-		return {explorationPoints: exploreNext, filledPoints: filledPoints, startPoint: basin.startPoint, trench: trench};
+		return {cubicMeters: cubicMeters, explorationPoints: exploreNext, filledPoints: filledPoints, startPoint: basin.startPoint, trench: trench};
 	}
 };
 var $author$project$Aoc18$updateModel = function (model) {
@@ -6490,8 +6531,8 @@ var $author$project$Aoc18$view = function (model) {
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '24px'),
-								A2($elm$html$Html$Attributes$style, 'padding', '16px')
+								A2($elm$html$Html$Attributes$style, 'font-size', '36px'),
+								A2($elm$html$Html$Attributes$style, 'padding', '24px')
 							]),
 						_List_fromArray(
 							[
@@ -6508,21 +6549,8 @@ var $author$project$Aoc18$view = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(model.debug)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(model.debug)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(model.debug)
+										$elm$html$Html$text(
+										$elm$core$String$fromInt(model.basin.cubicMeters) + ' m³')
 									]))
 							]))
 					]))
