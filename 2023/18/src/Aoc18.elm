@@ -6,6 +6,11 @@ import Html.Attributes
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Array2D exposing (Array2D)
+import Set exposing (Set)
+import Time 
+
+delay : Float
+delay = 500
 
 inputname : String
 inputname = "sample"
@@ -21,10 +26,6 @@ main =
 
 -- MODEL
 
-type alias Model = 
-  { positions : List Position
-  , debug : String }
-
 type alias Position = (Int, Int)
 
 type alias Direction = (Int, Int)
@@ -32,6 +33,16 @@ type alias Direction = (Int, Int)
 type alias Instruction = 
   { dir : Direction
   , meters : Int }
+
+type alias Basin = 
+  { startPoint : Position 
+  , trench : Set Position
+  , explorationPoints : List Position
+  , filledPoints : Set Position }
+
+type alias Model = 
+  { basin : Basin
+  , debug : String }
 
 toDirection : String -> Maybe Direction 
 toDirection s = 
@@ -109,11 +120,16 @@ U 2 (#7a21e3)"""
 
     instructions = lines |> List.map parseLine
 
-    positions = instructions |> digLagoon |> adjustLagoon
+    trench = instructions |> digLagoon |> adjustLagoon |> Set.fromList
+
+    basin = { startPoint = (0, 0) 
+            , trench = trench
+            , explorationPoints = []
+            , filledPoints = Set.empty }
 
     debugText = instructions |> List.length |> String.fromInt 
 
-    model = { positions = positions 
+    model = { basin = basin 
             , debug = debugText }
   in 
     (model, Cmd.none)
@@ -123,25 +139,58 @@ U 2 (#7a21e3)"""
 type Msg = 
   Tick 
 
+findNeighbourPositions : Position -> List Position 
+findNeighbourPositions pos = 
+  case pos of 
+    (x, y) -> [ (x-1, y-1), (x, y-1), (x+1, y-1), (x-1, y), (x+1, y), (x-1, y+1), (x, y+1), (x+1, y+1) ]
+
+isTrenchPoint : Set Position -> Position -> Bool
+isTrenchPoint trench pos = 
+  Set.member pos trench 
+
+isFreeSpace : Set Position -> Position -> Bool 
+isFreeSpace trench pos =
+  isTrenchPoint trench pos |> not
+
+updateBasin : Basin -> Basin 
+updateBasin basin =
+  if List.isEmpty basin.explorationPoints then 
+    basin 
+  else 
+    let 
+      trench = basin.trench
+      explorationSet = basin.explorationPoints |> Set.fromList 
+      filledPoints : Set Position
+      filledPoints = explorationSet |> Set.union basin.filledPoints
+      addedPoints = basin.filledPoints |> Set.diff filledPoints |> Set.toList
+      exploreNext = addedPoints |> List.concatMap findNeighbourPositions |> Set.fromList |> Set.toList |> List.filter (isFreeSpace trench)
+    in 
+      { startPoint = basin.startPoint 
+      , trench = trench
+      , explorationPoints = exploreNext
+      , filledPoints = filledPoints }
+
 updateModel : Model -> Model
-updateModel model = model
+updateModel model = { model | basin = updateBasin model.basin }
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Tick ->
-      (model, Cmd.none)
+      (updateModel model, Cmd.none)
 
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
-subscriptions model = Sub.none
+subscriptions model =
+  Time.every delay (\_ -> Tick)
 
 -- VIEW
 
-findDimensions : List Position -> (Int, Int) 
-findDimensions positions = 
+findDimensions : Set Position -> (Int, Int) 
+findDimensions trench = 
   let 
+    positions = trench |> Set.toList
     xs = positions |> List.map (Tuple.first)
     ys = positions |> List.map (Tuple.second)
     xMax = xs |> List.maximum |> Maybe.withDefault 123
@@ -149,8 +198,8 @@ findDimensions positions =
   in 
     (xMax + 1, yMax + 1)
 
-toTrenchBox : Int -> Int -> Int -> Html Msg 
-toTrenchBox unitSize yPos xPos = 
+toTrenchBox : Int -> (Int, Int) -> Html Msg 
+toTrenchBox unitSize (xPos, yPos) = 
   let 
     xVal = unitSize * xPos
     yVal = unitSize * yPos
@@ -163,18 +212,32 @@ toTrenchBox unitSize yPos xPos =
       , fill "black" ]
       []
 
+toFilledBox : Int -> (Int, Int) -> Html Msg 
+toFilledBox unitSize (xPos, yPos) = 
+  let 
+    xVal = unitSize * xPos
+    yVal = unitSize * yPos
+  in
+    rect
+      [ x (String.fromInt xVal)
+      , y (String.fromInt yVal)
+      , width (String.fromInt unitSize) 
+      , height (String.fromInt unitSize)
+      , fill "lightblue" ]
+      []
 
 toSvg : Model -> Html Msg 
 toSvg model = 
   let 
-    (widthInUnits, heightInUnits) = findDimensions model.positions
+    (widthInUnits, heightInUnits) = findDimensions model.basin.trench
     maxUnits = Basics.max widthInUnits heightInUnits
     maxDim = 500
     unitSize = maxDim // maxUnits
     svgWidth = (unitSize * widthInUnits) |> String.fromInt
     svgHeight = (unitSize * heightInUnits) |> String.fromInt
-    trenchBoxes = model.positions |> List.map (\(x, y) -> toTrenchBox unitSize y x)
-    elements = trenchBoxes
+    trenchBoxes = model.basin.trench |> Set.toList |> List.map (toTrenchBox unitSize)
+    filledBoxes = model.basin.filledPoints |> Set.toList |> List.map (toFilledBox unitSize)
+    elements = trenchBoxes ++ filledBoxes
     -- elements = insideBoxes ++ loopBoxes ++ pipeShapes ++ [startOutline]
   in 
     svg
