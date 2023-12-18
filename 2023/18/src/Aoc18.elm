@@ -10,9 +10,6 @@ import Array2D exposing (Array2D)
 inputname : String
 inputname = "sample"
 
-unitSize : Int
-unitSize = 8
-
 -- MAIN
 
 main =
@@ -25,9 +22,7 @@ main =
 -- MODEL
 
 type alias Model = 
-  { grid : Array2D Char
-  , lines : List String
-  , startArrows : List (Int, Int)
+  { positions : List Position
   , debug : String }
 
 type alias Position = (Int, Int)
@@ -76,6 +71,18 @@ digLagoon : List Instruction -> List Position
 digLagoon instructions = 
   digLagoonLoop (0, 0) [] instructions 
 
+adjustLagoon : List Position -> List Position
+adjustLagoon positions = 
+  let 
+    xs = positions |> List.map (Tuple.first)
+    ys = positions |> List.map (Tuple.second)
+    xMin = xs |> List.minimum |> Maybe.withDefault 0
+    yMin = ys |> List.minimum |> Maybe.withDefault 0
+    xOffset = 0 - xMin 
+    yOffset = 0 - yMin 
+  in 
+    positions |> List.map (\(x, y) -> (x + xOffset, y + yOffset))
+
 init : () -> (Model, Cmd Msg)
 init _ =
   let 
@@ -102,13 +109,11 @@ U 2 (#7a21e3)"""
 
     instructions = lines |> List.map parseLine
 
-    grid = lines |> List.map (String.toList) |> Array2D.fromList
+    positions = instructions |> digLagoon |> adjustLagoon
 
     debugText = instructions |> List.length |> String.fromInt 
 
-    model = { grid = grid 
-            , lines = lines 
-            , startArrows = []
+    model = { positions = positions 
             , debug = debugText }
   in 
     (model, Cmd.none)
@@ -117,8 +122,6 @@ U 2 (#7a21e3)"""
 
 type Msg = 
   Tick 
-  | EnterBox (Int, Int) 
-  | LeaveBox (Int, Int) 
 
 updateModel : Model -> Model
 updateModel model = model
@@ -128,16 +131,6 @@ update msg model =
   case msg of
     Tick ->
       (model, Cmd.none)
-    EnterBox boxPos ->
-      let
-          arrows = boxPos :: model.startArrows
-      in
-        ({ model | startArrows = arrows, debug = "enter box" }, Cmd.none)
-    LeaveBox boxPos ->
-      let
-          arrows = model.startArrows |> List.filter (\pos -> pos /= boxPos)
-      in
-        ({ model | startArrows = arrows, debug = "leave box" }, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -145,20 +138,50 @@ subscriptions : Model -> Sub Msg
 subscriptions model = Sub.none
 
 -- VIEW
-    
+
+findDimensions : List Position -> (Int, Int) 
+findDimensions positions = 
+  let 
+    xs = positions |> List.map (Tuple.first)
+    ys = positions |> List.map (Tuple.second)
+    xMax = xs |> List.maximum |> Maybe.withDefault 123
+    yMax = ys |> List.maximum |> Maybe.withDefault 123
+  in 
+    (xMax + 1, yMax + 1)
+
+toTrenchBox : Int -> Int -> Int -> Html Msg 
+toTrenchBox unitSize yPos xPos = 
+  let 
+    xVal = unitSize * xPos
+    yVal = unitSize * yPos
+  in
+    rect
+      [ x (String.fromInt xVal)
+      , y (String.fromInt yVal)
+      , width (String.fromInt unitSize) 
+      , height (String.fromInt unitSize)
+      , fill "black" ]
+      []
+
+
 toSvg : Model -> Html Msg 
 toSvg model = 
   let 
-    svgWidth = (unitSize * 100) |> String.fromInt
-    svgHeight = (unitSize * 100) |> String.fromInt
-    elements = []
+    (widthInUnits, heightInUnits) = findDimensions model.positions
+    maxUnits = Basics.max widthInUnits heightInUnits
+    maxDim = 500
+    unitSize = maxDim // maxUnits
+    svgWidth = (unitSize * widthInUnits) |> String.fromInt
+    svgHeight = (unitSize * heightInUnits) |> String.fromInt
+    trenchBoxes = model.positions |> List.map (\(x, y) -> toTrenchBox unitSize y x)
+    elements = trenchBoxes
     -- elements = insideBoxes ++ loopBoxes ++ pipeShapes ++ [startOutline]
   in 
     svg
       [ viewBox ("0 0 " ++ svgWidth ++ svgHeight)
       , width svgWidth
       , height svgHeight
-      , Svg.Attributes.style "background-color:lightblue" ]
+      , Svg.Attributes.style "background-color:white" ]
       elements
 
 view : Model -> Html Msg
