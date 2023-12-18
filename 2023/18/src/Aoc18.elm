@@ -40,6 +40,7 @@ type alias Basin =
   , trench : Set Position
   , explorationPoints : List Position
   , filledPoints : Set Position
+  , fillInside : Bool
   , widthInUnits : Int 
   , heightInUnits : Int
   , cubicMeters : Int }
@@ -856,6 +857,7 @@ U 2 (#7a21e3)"""
             , trench = trench
             , explorationPoints = [ startPoint ]
             , filledPoints = Set.empty
+            , fillInside = True
             , widthInUnits = widthInUnits
             , heightInUnits = heightInUnits
             , cubicMeters = 0 }
@@ -913,6 +915,7 @@ updateBasin basin =
       , trench = trench
       , explorationPoints = exploreNext
       , filledPoints = filledPoints
+      , fillInside = basin.fillInside
       , widthInUnits = basin.widthInUnits
       , heightInUnits = basin.heightInUnits
       , cubicMeters = cubicMeters }
@@ -920,6 +923,10 @@ updateBasin basin =
 updateModel : Model -> Model
 updateModel model = 
   { model | basin = updateBasin model.basin }
+
+isStartPointInsideTrench : Set Position -> Position -> Bool
+isStartPointInsideTrench trench (x, yStart) = 
+  True
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -934,13 +941,18 @@ update msg model =
         basin = model.basin
         replacement = 
           if model.running then 
+            -- Stop and reset.
             { basin | filledPoints = Set.empty, cubicMeters = 0 } 
           else 
+            -- Setup for start.
             let 
               startPoint = model.mousePoint
               explorationPoints = [ model.mousePoint ]
+              fillInside = isStartPointInsideTrench basin.trench startPoint
+              -- TODO : Check if start point is inside or outside, set fill color as appropriate.
+              -- Just go north until y = 0 and count trench crossings.
             in 
-              { basin | startPoint = startPoint, explorationPoints = explorationPoints }
+              { basin | startPoint = startPoint, explorationPoints = explorationPoints, fillInside = fillInside }
       in 
         ({ model | running = (not model.running), basin = replacement }, Cmd.none)
     MouseMove (x, y) -> 
@@ -974,8 +986,8 @@ toTrenchBox unitSize (xPos, yPos) =
       , fill "black" ]
       []
 
-toFilledBox : Int -> (Int, Int) -> Html Msg 
-toFilledBox unitSize (xPos, yPos) = 
+toFilledBox : String -> Int -> (Int, Int) -> Html Msg 
+toFilledBox fillColor unitSize (xPos, yPos) = 
   let 
     xVal = unitSize * xPos
     yVal = unitSize * yPos
@@ -985,7 +997,7 @@ toFilledBox unitSize (xPos, yPos) =
       , y (String.fromInt yVal)
       , width (String.fromInt unitSize) 
       , height (String.fromInt unitSize)
-      , fill "lightblue" ]
+      , fill fillColor ]
       []
 
 toSvg : Model -> Html Msg 
@@ -994,7 +1006,8 @@ toSvg model =
     svgWidth = (model.unitSize * model.basin.widthInUnits) |> String.fromInt
     svgHeight = (model.unitSize * model.basin.heightInUnits) |> String.fromInt
     trenchBoxes = model.basin.trench |> Set.toList |> List.map (toTrenchBox model.unitSize)
-    filledBoxes = model.basin.filledPoints |> Set.toList |> List.map (toFilledBox model.unitSize)
+    fillColor = if model.basin.fillInside then "lightblue" else "pink"
+    filledBoxes = model.basin.filledPoints |> Set.toList |> List.map (toFilledBox fillColor model.unitSize)
     elements = trenchBoxes ++ filledBoxes
   in 
     svg

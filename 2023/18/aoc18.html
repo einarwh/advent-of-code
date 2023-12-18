@@ -5572,6 +5572,7 @@ var $author$project$Aoc18$init = function (_v0) {
 		cubicMeters: 0,
 		explorationPoints: _List_fromArray(
 			[startPoint]),
+		fillInside: true,
 		filledPoints: $elm$core$Set$empty,
 		heightInUnits: heightInUnits,
 		startPoint: startPoint,
@@ -5897,6 +5898,12 @@ var $author$project$Aoc18$subscriptions = function (model) {
 			return $author$project$Aoc18$Tick;
 		});
 };
+var $author$project$Aoc18$isStartPointInsideTrench = F2(
+	function (trench, _v0) {
+		var x = _v0.a;
+		var yStart = _v0.b;
+		return true;
+	});
 var $elm$core$Basics$not = _Basics_not;
 var $elm$core$Basics$round = _Basics_round;
 var $elm$core$List$append = F2(
@@ -6411,7 +6418,7 @@ var $author$project$Aoc18$updateBasin = function (basin) {
 				$elm$core$Set$toList(
 					$elm$core$Set$fromList(
 						A2($elm$core$List$concatMap, $author$project$Aoc18$findNeighbourPositions, addedPoints)))));
-		return {cubicMeters: cubicMeters, explorationPoints: exploreNext, filledPoints: filledPoints, heightInUnits: basin.heightInUnits, startPoint: basin.startPoint, trench: trench, widthInUnits: basin.widthInUnits};
+		return {cubicMeters: cubicMeters, explorationPoints: exploreNext, fillInside: basin.fillInside, filledPoints: filledPoints, heightInUnits: basin.heightInUnits, startPoint: basin.startPoint, trench: trench, widthInUnits: basin.widthInUnits};
 	}
 };
 var $author$project$Aoc18$updateModel = function (model) {
@@ -6437,11 +6444,12 @@ var $author$project$Aoc18$update = F2(
 							{cubicMeters: 0, filledPoints: $elm$core$Set$empty});
 					} else {
 						var startPoint = model.mousePoint;
+						var fillInside = A2($author$project$Aoc18$isStartPointInsideTrench, basin.trench, startPoint);
 						var explorationPoints = _List_fromArray(
 							[model.mousePoint]);
 						return _Utils_update(
 							basin,
-							{explorationPoints: explorationPoints, startPoint: startPoint});
+							{explorationPoints: explorationPoints, fillInside: fillInside, startPoint: startPoint});
 					}
 				}();
 				return _Utils_Tuple2(
@@ -6623,8 +6631,8 @@ var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
 var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
-var $author$project$Aoc18$toFilledBox = F2(
-	function (unitSize, _v0) {
+var $author$project$Aoc18$toFilledBox = F3(
+	function (fillColor, unitSize, _v0) {
 		var xPos = _v0.a;
 		var yPos = _v0.b;
 		var yVal = unitSize * yPos;
@@ -6641,7 +6649,7 @@ var $author$project$Aoc18$toFilledBox = F2(
 					$elm$core$String$fromInt(unitSize)),
 					$elm$svg$Svg$Attributes$height(
 					$elm$core$String$fromInt(unitSize)),
-					$elm$svg$Svg$Attributes$fill('lightblue')
+					$elm$svg$Svg$Attributes$fill(fillColor)
 				]),
 			_List_Nil);
 	});
@@ -6675,9 +6683,10 @@ var $author$project$Aoc18$toSvg = function (model) {
 		$elm$core$Set$toList(model.basin.trench));
 	var svgWidth = $elm$core$String$fromInt(model.unitSize * model.basin.widthInUnits);
 	var svgHeight = $elm$core$String$fromInt(model.unitSize * model.basin.heightInUnits);
+	var fillColor = model.basin.fillInside ? 'lightblue' : 'pink';
 	var filledBoxes = A2(
 		$elm$core$List$map,
-		$author$project$Aoc18$toFilledBox(model.unitSize),
+		A2($author$project$Aoc18$toFilledBox, fillColor, model.unitSize),
 		$elm$core$Set$toList(model.basin.filledPoints));
 	var elements = _Utils_ap(trenchBoxes, filledBoxes);
 	return A2(
