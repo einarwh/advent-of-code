@@ -1,9 +1,14 @@
 module Aoc18 exposing (..)
 
 import Browser
+-- import Browser.Events exposing (onMouseMove)
 import Html exposing (Html)
 import Html.Attributes
+-- import Html.Events
+import Html.Events.Extra.Mouse exposing (..)
 import Svg exposing (..)
+import Svg.Events
+import Json.Decode as Decode exposing (..)
 import Svg.Attributes exposing (..)
 import Array2D exposing (Array2D)
 import Set exposing (Set)
@@ -39,11 +44,19 @@ type alias Basin =
   , trench : Set Position
   , explorationPoints : List Position
   , filledPoints : Set Position
+  , widthInUnits : Int 
+  , heightInUnits : Int
   , cubicMeters : Int }
 
 type alias Model = 
   { basin : Basin
+  , mousePoint : Position
+  , unitSize : Int 
+  , running : Bool
+  , debugPoint : String  
   , debug : String }
+
+type Msg = Click | Tick | MouseMove (Float, Float)
 
 toDirection : String -> Maybe Direction 
 toDirection s = 
@@ -104,6 +117,17 @@ findStartPosition positions =
     yStart = positions |> List.filterMap (\(x, y) -> if x == xStart then Just y else Nothing) |> List.minimum |> Maybe.withDefault 0
   in 
     (xStart + 1, yStart + 1)
+
+findDimensions : Set Position -> (Int, Int) 
+findDimensions trench = 
+  let 
+    positions = trench |> Set.toList
+    xs = positions |> List.map (Tuple.first)
+    ys = positions |> List.map (Tuple.second)
+    xMax = xs |> List.maximum |> Maybe.withDefault 123
+    yMax = ys |> List.maximum |> Maybe.withDefault 123
+  in 
+    (xMax + 1, yMax + 1)
 
 init : () -> (Model, Cmd Msg)
 init _ =
@@ -827,24 +851,31 @@ U 2 (#7a21e3)"""
 
     (xStart, yStart) = startPoint
 
+    (widthInUnits, heightInUnits) = findDimensions trench
+    maxUnits = Basics.max widthInUnits heightInUnits
+    maxDim = 800
+    unitSize = maxDim // maxUnits
+
     basin = { startPoint = startPoint 
             , trench = trench
             , explorationPoints = [ startPoint ]
             , filledPoints = Set.empty
+            , widthInUnits = widthInUnits
+            , heightInUnits = heightInUnits
             , cubicMeters = 0 }
 
-    -- debugText = "(" ++ String.fromInt xStart ++ ", " ++ String.fromInt yStart ++ ")"
-    debugText = ""
+    debugText = "(" ++ String.fromInt xStart ++ ", " ++ String.fromInt yStart ++ ")"
 
     model = { basin = basin 
+            , mousePoint = startPoint
+            , running = False
+            , unitSize = unitSize
+            , debugPoint = ""
             , debug = debugText }
   in 
     (model, Cmd.none)
 
 -- UPDATE
-
-type Msg = 
-  Tick 
 
 findNeighbourPositions : Position -> List Position 
 findNeighbourPositions pos = 
@@ -859,6 +890,10 @@ isFreeSpace : Set Position -> Position -> Bool
 isFreeSpace trench pos =
   isTrenchPoint trench pos |> not
 
+isWithinBounds : Int -> Int -> Position -> Bool 
+isWithinBounds width height (x, y) =
+  x >= 0 && x < width && y >= 0 && y < height
+
 updateBasin : Basin -> Basin 
 updateBasin basin =
   if List.isEmpty basin.explorationPoints then 
@@ -869,20 +904,22 @@ updateBasin basin =
       explorationSet = basin.explorationPoints |> Set.fromList 
       filledPoints = explorationSet |> Set.union basin.filledPoints
       addedPoints = basin.filledPoints |> Set.diff filledPoints |> Set.toList
-      exploreNext = addedPoints |> List.concatMap findNeighbourPositions |> Set.fromList |> Set.toList |> List.filter (isFreeSpace trench)
+      exploreNext = 
+        addedPoints 
+        |> List.concatMap findNeighbourPositions 
+        |> Set.fromList 
+        |> Set.toList 
+        |> List.filter (isWithinBounds basin.widthInUnits basin.heightInUnits)
+        |> List.filter (isFreeSpace trench)
       cubicMeters = Set.size trench + Set.size filledPoints
     in 
       { startPoint = basin.startPoint 
       , trench = trench
       , explorationPoints = exploreNext
       , filledPoints = filledPoints
+      , widthInUnits = basin.widthInUnits
+      , heightInUnits = basin.heightInUnits
       , cubicMeters = cubicMeters }
-
--- type alias Basin = 
---   { startPoint : Position 
---   , trench : Set Position
---   , explorationPoints : List Position
---   , filledPoints : Set Position }
 
 updateModel : Model -> Model
 updateModel model = 
@@ -892,7 +929,32 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Tick ->
-      (updateModel model, Cmd.none)
+      if model.running then 
+        (updateModel model, Cmd.none)
+      else
+        (model, Cmd.none)
+    Click ->
+      let 
+        basin = model.basin
+        replacement = 
+          if model.running then 
+            { basin | filledPoints = Set.empty, cubicMeters = 0 } 
+          else 
+            let 
+              startPoint = model.mousePoint
+              explorationPoints = [ model.mousePoint ]
+            in 
+              { basin | startPoint = startPoint, explorationPoints = explorationPoints }
+      in 
+        ({ model | running = (not model.running), basin = replacement }, Cmd.none)
+    MouseMove (x, y) -> 
+      let 
+        xInt = round (x / toFloat model.unitSize)
+        yInt = round (y / toFloat model.unitSize)
+        mousePoint = (xInt, yInt)
+        txt = "(" ++ String.fromInt xInt ++ ", " ++ String.fromInt yInt ++ ")"
+      in 
+        ({ model | debugPoint = txt, mousePoint = mousePoint }, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -901,17 +963,6 @@ subscriptions model =
   Time.every delay (\_ -> Tick)
 
 -- VIEW
-
-findDimensions : Set Position -> (Int, Int) 
-findDimensions trench = 
-  let 
-    positions = trench |> Set.toList
-    xs = positions |> List.map (Tuple.first)
-    ys = positions |> List.map (Tuple.second)
-    xMax = xs |> List.maximum |> Maybe.withDefault 123
-    yMax = ys |> List.maximum |> Maybe.withDefault 123
-  in 
-    (xMax + 1, yMax + 1)
 
 toTrenchBox : Int -> (Int, Int) -> Html Msg 
 toTrenchBox unitSize (xPos, yPos) = 
@@ -944,21 +995,18 @@ toFilledBox unitSize (xPos, yPos) =
 toSvg : Model -> Html Msg 
 toSvg model = 
   let 
-    (widthInUnits, heightInUnits) = findDimensions model.basin.trench
-    maxUnits = Basics.max widthInUnits heightInUnits
-    maxDim = 500
-    unitSize = maxDim // maxUnits
-    svgWidth = (unitSize * widthInUnits) |> String.fromInt
-    svgHeight = (unitSize * heightInUnits) |> String.fromInt
-    trenchBoxes = model.basin.trench |> Set.toList |> List.map (toTrenchBox unitSize)
-    filledBoxes = model.basin.filledPoints |> Set.toList |> List.map (toFilledBox unitSize)
+    svgWidth = (model.unitSize * model.basin.widthInUnits) |> String.fromInt
+    svgHeight = (model.unitSize * model.basin.heightInUnits) |> String.fromInt
+    trenchBoxes = model.basin.trench |> Set.toList |> List.map (toTrenchBox model.unitSize)
+    filledBoxes = model.basin.filledPoints |> Set.toList |> List.map (toFilledBox model.unitSize)
     elements = trenchBoxes ++ filledBoxes
-    -- elements = insideBoxes ++ loopBoxes ++ pipeShapes ++ [startOutline]
   in 
     svg
       [ viewBox ("0 0 " ++ svgWidth ++ svgHeight)
       , width svgWidth
       , height svgHeight
+      , Svg.Events.onClick Click
+      , onMove (.offsetPos >> MouseMove)
       , Svg.Attributes.style "background-color:white" ]
       elements
 
@@ -987,6 +1035,7 @@ view model =
               , Html.Attributes.style "font-size" "36px"
               , Html.Attributes.style "padding" "24px"] 
               [ Html.div [ Html.Attributes.align "center" ] [ s ] 
-              , Html.div [] [ Html.text <| (String.fromInt model.basin.cubicMeters) ++ " m³"]
-              , Html.div [] [ Html.text <| model.debug ]
+              , Html.div [] [ Html.text <| if model.basin.cubicMeters > 0 then (String.fromInt model.basin.cubicMeters) ++ " m³" else "Click to start!" ]
+              , Html.div [] [ Html.text <| "" ]
+              , Html.div [] [ Html.text <| "" ]
               ] ] ]
