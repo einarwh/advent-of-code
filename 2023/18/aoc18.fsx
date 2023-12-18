@@ -4,12 +4,9 @@
 open System
 open System.IO
 
-type Direction = (int * int)
-
 type Instruction = {
-    dir : Direction
+    dir : (int * int)
     meters : int 
-    color : string 
 }
 
 let parseDirection (s : string) = 
@@ -22,19 +19,16 @@ let parseDirection (s : string) =
 
 let parseMeters = int 
 
-let parseColor = id 
-
 let parseInstruction (s : string) = 
     let parts = s.Split(" ")
     { dir = parseDirection parts[0]
-      meters = parseMeters parts[1]
-      color = parseColor parts[2] }
+      meters = parseMeters parts[1] }
 
 let move (xStart, yStart) (xStep, yStep) meters =
     [ 1 .. meters ]
     |> List.map (fun m -> (xStart + xStep * m, yStart + yStep * m))
 
-let digLagoon (instructions : Instruction list) = 
+let digLagoon instructions = 
     let startPos = (0, 0)
     let rec loop instructions current positions = 
         match instructions with 
@@ -42,12 +36,42 @@ let digLagoon (instructions : Instruction list) =
         | h :: t -> 
             if List.contains startPos positions then failwith "oh hey"
             let nextPositions = move current h.dir h.meters 
-            printfn "curr: %A" current
-            printfn "step %d in dir %A" h.meters h.dir
-            printfn "next: %A" nextPositions
             let next = nextPositions |> List.last 
             loop t next (positions @ nextPositions)
     loop instructions startPos []
+
+let getNeighbours (x, y) = 
+    [ (x - 1, y - 1)
+      (x, y - 1) 
+      (x + 1, y - 1)
+      (x - 1, y)
+      (x + 1, y)
+      (x - 1, y + 1)
+      (x, y + 1)
+      (x + 1, y + 1) ]
+
+let fill positions = 
+    let wallSet = positions |> Set.ofList
+    let rec loop (queue : (int*int) list) (visited : Set<int*int>) = 
+        match queue with 
+        | [] -> visited 
+        | (x, y) :: rest -> 
+            if Set.contains (x, y) visited then
+                loop rest visited 
+            else 
+                let visited = visited |> Set.add (x, y)
+                let neighbours = (x, y) |> getNeighbours |> List.filter (fun p -> not (Set.contains p wallSet))
+                let queue = queue @ neighbours
+                loop queue visited
+    let xStart = positions |> List.map fst |> List.min
+    let yStart = positions |> List.choose (fun (x, y) -> if x = xStart then Some y else None) |> List.min
+    let startPos = (xStart+1, yStart+1)
+    loop [ startPos ] Set.empty
+
+let getVolume (positions : (int * int) list) = 
+    let wallCount = positions |> List.length 
+    let fillCount = positions |> fill |> Set.count 
+    wallCount + fillCount
 
 let readLines =
     File.ReadAllLines >> Array.filter ((<>) String.Empty)
@@ -56,8 +80,6 @@ let run fileName =
     let lines = readLines fileName |> Array.toList 
     let instructions = lines |> List.map parseInstruction
     let lagoon = instructions |> digLagoon
-    lagoon |> List.length |> printfn "%d"
-    lagoon |> printfn "%A"
-    ()
+    lagoon |> getVolume |> printfn "%d"
 
-"sample" |> run
+"input" |> run
