@@ -1,5 +1,5 @@
 // Advent of Code 2023. Day 19: Aplenty
-// dotnet fsi aoc19.fsx
+// dotnet fsi aoc19a.fsx
 
 open System
 open System.IO
@@ -16,11 +16,6 @@ type Rule =
     | Cond of (Part -> bool) * string 
     | Goto of string
 
-type Workflow = {
-    label : string 
-    categorize : Part -> string 
-}
-
 let parseSelector (s : string) = 
     match s with 
     | "x" -> fun r -> r.x
@@ -29,41 +24,36 @@ let parseSelector (s : string) =
     | "s" -> fun r -> r.s
     | _ -> failwith <| sprintf "%s?" s
 
-let parseCheck target (s : string) : Part -> (Part -> string) -> string = 
+let parseCheck target (s : string) = 
     let pattern = "^(\w+)(.)(\d+)$"
     let m = Regex.Match(s, pattern)
     if m.Success then
         let selector = m.Groups[1].Value |> parseSelector
         let compStr = m.Groups[2].Value 
         let limit = m.Groups[3].Value |> int
-        if compStr = "<" then 
-            fun r n -> if selector r < limit then target else fn r
-        else 
-            fun r n -> if selector r > limit then target else fn r
+        let check = 
+            if compStr = "<" then fun r -> selector r < limit 
+            else fun r -> selector r > limit 
+        Cond (check, target)
     else 
         failwith <| sprintf "%s?" s
 
-let parseCond (s : string) : (Part -> string) -> Part -> string = 
+let parseCond (s : string) = 
     let ss = s.Split(':')
     parseCheck ss[1] ss[0]
 
-let parseGoto (s : string) : Part -> (Part -> string) -> string = 
-    fun _ _ -> s
-
-let parseFunction (s : string) = 
+let parseRule (s : string) = 
     if s.Contains(':') then parseCond s else Goto s 
 
-let parseWorkflow (s : string) : Part -> string = 
+let parseWorkflow (s : string) = 
     let pattern = "^(\w+)\{(.+)\}$"
     let m = Regex.Match(s, pattern)
     if m.Success then
         let label = m.Groups[1].Value 
         let rulesStr = m.Groups[2].Value 
         let strs = rulesStr.Split(",")
-        let fns = strs |> Array.toList |> List.map parseRule
-        let folder = 
-        let fn = List.foldBack folder fns id 
-        (label, { label = label; categorize = rules })
+        let rules = strs |> Array.toList |> List.map parseRule
+        (label, rules)
     else 
         failwith <| sprintf "%s?" s 
 
@@ -88,7 +78,7 @@ let parsePart (s : string) =
 let parseParts (s : string) = 
     s.Split("\n") |> Array.toList |> List.map parsePart 
 
-let runWorkflow workflow part = 
+let runWorkflow wf part = 
     let rec loop rules = 
         match rules with 
         | [] -> failwith "?"
@@ -96,7 +86,7 @@ let runWorkflow workflow part =
             match r with 
             | Cond (check, target) -> if check part then target else loop rest 
             | Goto target -> target
-    loop workflow.rules
+    loop wf
 
 let runWorkflows workflows part = 
     let rec loop current = 
