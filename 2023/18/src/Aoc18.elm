@@ -38,7 +38,7 @@ type alias Instruction =
 type alias Basin = 
   { startPoint : Position 
   , trench : Set Position
-  , explorationPoints : List Position
+  , explorationPoints : Set Position
   , filledPoints : Set Position
   , fillInside : Bool
   , widthInUnits : Int 
@@ -855,7 +855,7 @@ U 2 (#7a21e3)"""
 
     basin = { startPoint = startPoint 
             , trench = trench
-            , explorationPoints = [ startPoint ]
+            , explorationPoints = Set.empty |> Set.insert startPoint
             , filledPoints = Set.empty
             , fillInside = True
             , widthInUnits = widthInUnits
@@ -894,21 +894,20 @@ isWithinBounds width height (x, y) =
 
 updateBasin : Basin -> Basin 
 updateBasin basin =
-  if List.isEmpty basin.explorationPoints then 
+  if Set.isEmpty basin.explorationPoints then 
     basin 
   else 
     let 
       trench = basin.trench
-      explorationSet = basin.explorationPoints |> Set.fromList 
+      explorationSet = basin.explorationPoints 
       filledPoints = explorationSet |> Set.union basin.filledPoints
       addedPoints = basin.filledPoints |> Set.diff filledPoints |> Set.toList
       exploreNext = 
         addedPoints 
         |> List.concatMap findNeighbourPositions 
         |> Set.fromList 
-        |> Set.toList 
-        |> List.filter (isWithinBounds basin.widthInUnits basin.heightInUnits)
-        |> List.filter (isFreeSpace trench)
+        |> Set.filter (isWithinBounds basin.widthInUnits basin.heightInUnits)
+        |> Set.filter (isFreeSpace trench)
       cubicMeters = if basin.fillInside then Set.size trench + Set.size filledPoints else Set.size filledPoints
     in 
       { startPoint = basin.startPoint 
@@ -1007,7 +1006,7 @@ update msg model =
                   findNeighbourPointInsideTrench basin.trench model.mousePoint
                 else 
                   model.mousePoint
-              explorationPoints = [ startPoint ]
+              explorationPoints = Set.empty |> Set.insert startPoint
               fillInside = isStartPointInsideTrench basin.trench startPoint
               -- TODO : Check if start point is inside or outside, set fill color as appropriate.
               -- Just go north until y = 0 and count trench crossings.

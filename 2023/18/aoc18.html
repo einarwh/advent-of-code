@@ -5570,8 +5570,7 @@ var $author$project$Aoc18$init = function (_v0) {
 	var heightInUnits = _v2.b;
 	var basin = {
 		cubicMeters: 0,
-		explorationPoints: _List_fromArray(
-			[startPoint]),
+		explorationPoints: A2($elm$core$Set$insert, startPoint, $elm$core$Set$empty),
 		fillInside: true,
 		filledPoints: $elm$core$Set$empty,
 		heightInUnits: heightInUnits,
@@ -6475,6 +6474,29 @@ var $elm$core$Set$diff = F2(
 		return $elm$core$Set$Set_elm_builtin(
 			A2($elm$core$Dict$diff, dict1, dict2));
 	});
+var $elm$core$Dict$filter = F2(
+	function (isGood, dict) {
+		return A3(
+			$elm$core$Dict$foldl,
+			F3(
+				function (k, v, d) {
+					return A2(isGood, k, v) ? A3($elm$core$Dict$insert, k, v, d) : d;
+				}),
+			$elm$core$Dict$empty,
+			dict);
+	});
+var $elm$core$Set$filter = F2(
+	function (isGood, _v0) {
+		var dict = _v0.a;
+		return $elm$core$Set$Set_elm_builtin(
+			A2(
+				$elm$core$Dict$filter,
+				F2(
+					function (key, _v1) {
+						return isGood(key);
+					}),
+				dict));
+	});
 var $author$project$Aoc18$findNeighbourPositions = function (pos) {
 	var x = pos.a;
 	var y = pos.b;
@@ -6490,12 +6512,16 @@ var $author$project$Aoc18$findNeighbourPositions = function (pos) {
 			_Utils_Tuple2(x + 1, y + 1)
 		]);
 };
-var $elm$core$List$isEmpty = function (xs) {
-	if (!xs.b) {
+var $elm$core$Dict$isEmpty = function (dict) {
+	if (dict.$ === 'RBEmpty_elm_builtin') {
 		return true;
 	} else {
 		return false;
 	}
+};
+var $elm$core$Set$isEmpty = function (_v0) {
+	var dict = _v0.a;
+	return $elm$core$Dict$isEmpty(dict);
 };
 var $author$project$Aoc18$isTrenchPoint = F2(
 	function (trench, pos) {
@@ -6548,24 +6574,23 @@ var $elm$core$Set$union = F2(
 			A2($elm$core$Dict$union, dict1, dict2));
 	});
 var $author$project$Aoc18$updateBasin = function (basin) {
-	if ($elm$core$List$isEmpty(basin.explorationPoints)) {
+	if ($elm$core$Set$isEmpty(basin.explorationPoints)) {
 		return basin;
 	} else {
 		var trench = basin.trench;
-		var explorationSet = $elm$core$Set$fromList(basin.explorationPoints);
+		var explorationSet = basin.explorationPoints;
 		var filledPoints = A2($elm$core$Set$union, basin.filledPoints, explorationSet);
 		var cubicMeters = basin.fillInside ? ($elm$core$Set$size(trench) + $elm$core$Set$size(filledPoints)) : $elm$core$Set$size(filledPoints);
 		var addedPoints = $elm$core$Set$toList(
 			A2($elm$core$Set$diff, filledPoints, basin.filledPoints));
 		var exploreNext = A2(
-			$elm$core$List$filter,
+			$elm$core$Set$filter,
 			$author$project$Aoc18$isFreeSpace(trench),
 			A2(
-				$elm$core$List$filter,
+				$elm$core$Set$filter,
 				A2($author$project$Aoc18$isWithinBounds, basin.widthInUnits, basin.heightInUnits),
-				$elm$core$Set$toList(
-					$elm$core$Set$fromList(
-						A2($elm$core$List$concatMap, $author$project$Aoc18$findNeighbourPositions, addedPoints)))));
+				$elm$core$Set$fromList(
+					A2($elm$core$List$concatMap, $author$project$Aoc18$findNeighbourPositions, addedPoints))));
 		return {cubicMeters: cubicMeters, explorationPoints: exploreNext, fillInside: basin.fillInside, filledPoints: filledPoints, heightInUnits: basin.heightInUnits, startPoint: basin.startPoint, trench: trench, widthInUnits: basin.widthInUnits};
 	}
 };
@@ -6593,8 +6618,7 @@ var $author$project$Aoc18$update = F2(
 					} else {
 						var startPoint = A2($elm$core$Set$member, model.mousePoint, basin.trench) ? A2($author$project$Aoc18$findNeighbourPointInsideTrench, basin.trench, model.mousePoint) : model.mousePoint;
 						var fillInside = A2($author$project$Aoc18$isStartPointInsideTrench, basin.trench, startPoint);
-						var explorationPoints = _List_fromArray(
-							[startPoint]);
+						var explorationPoints = A2($elm$core$Set$insert, startPoint, $elm$core$Set$empty);
 						return _Utils_update(
 							basin,
 							{explorationPoints: explorationPoints, fillInside: fillInside, startPoint: startPoint});
