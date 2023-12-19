@@ -30,13 +30,6 @@ type Category = X | M | A | S
 
 type Comparison = GreaterThan | LessThan
 
-type SplitInfo = {  
-    category : Category
-    leftRange : Range 
-    rightRange : Range 
-    label : Label
-}
-
 type Rule = 
     | Check of (Category * Comparison * int * Label)
     | Next of Label
@@ -60,12 +53,11 @@ let parseCheck target (s : string) =
     else 
         failwith <| sprintf "%s?" s
 
-let parseCond (s : string) = 
-    let ss = s.Split(':')
-    parseCheck ss[1] ss[0]
-
 let parseRule (s : string) = 
-    if s.Contains(':') then parseCond s else Next s 
+    if s.Contains(':') then 
+        let ss = s.Split(':')
+        parseCheck ss[1] ss[0]
+    else Next s 
 
 let parseWorkflow (s : string) = 
     let pattern = "^(\w+)\{(.+)\}$"
@@ -131,9 +123,7 @@ let runWorkflows (workflows : Map<Label, Rule list>) part =
         | _ -> loop next 
     loop "in"
 
-let part1 workflowInput partsInput = 
-    let workflows = parseWorkflows workflowInput
-    let parts = parseParts partsInput
+let part1 workflows parts = 
     parts |> List.sumBy (runWorkflows workflows) |> printfn "%d"
 
 let combineRanges range1 range2 = 
@@ -195,9 +185,8 @@ let calculatePossibilities (bounds : Bounds) =
     |> List.map countRange
     |> List.reduce (*)
 
-let part2 workflowInput = 
-    let map = parseWorkflows workflowInput
-    let boundsList = findBounds map
+let part2 workflows  = 
+    let boundsList = findBounds workflows
     boundsList |> List.sumBy calculatePossibilities |> printfn "%d"
 
 let readChunks fileName = 
@@ -207,9 +196,11 @@ let readChunks fileName =
 let run fileName =
     let chunks = readChunks fileName
     match chunks with 
-    | [workflowInput; partsInput] -> 
-        part1 workflowInput partsInput
-        part2 workflowInput
+    | [ workflowInput; partsInput ] -> 
+        let workflows = parseWorkflows workflowInput
+        let parts = parseParts partsInput
+        part1 workflows parts
+        part2 workflows
     | _ -> failwith "?" 
 
 "input" |> run
