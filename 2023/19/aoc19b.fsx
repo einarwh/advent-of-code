@@ -32,8 +32,6 @@ type Step =
     | Split of SplitInfo
     | Next of Label
 
-type Workflow = Step list 
-
 let combineRanges range1 range2 = 
     { minimum = max range1.minimum range2.minimum
       maximum = min range1.maximum range2.maximum }
