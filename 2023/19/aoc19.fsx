@@ -58,14 +58,14 @@ let parseWorkflow (s : string) =
         let rulesStr = m.Groups[2].Value 
         let strs = rulesStr.Split(",")
         let rules = strs |> Array.toList |> List.map parseRule
-        Some (label, { label = label; rules = rules })
+        (label, { label = label; rules = rules })
     else 
-        None 
+        failwith <| sprintf "%s?" s 
 
 let parseWorkflows (s : string) = 
     s.Split("\n") 
     |> Array.toList 
-    |> List.choose parseWorkflow 
+    |> List.map parseWorkflow 
     |> Map.ofList
 
 let parsePart (s : string) = 
@@ -76,12 +76,12 @@ let parsePart (s : string) =
         let m = int (result.Groups[2].Value) 
         let a = int (result.Groups[3].Value) 
         let s = int (result.Groups[4].Value)
-        Some { x = x; m = m; a = a; s = s }
+        { x = x; m = m; a = a; s = s }
     else 
-        None 
+        failwith <| sprintf "%s?" s 
 
 let parseParts (s : string) = 
-    s.Split("\n") |> Array.toList |> List.choose parsePart 
+    s.Split("\n") |> Array.toList |> List.map parsePart 
 
 let runWorkflow workflow part = 
     let rec loop rules = 
@@ -89,9 +89,7 @@ let runWorkflow workflow part =
         | [] -> failwith "?"
         | r :: rest ->
             match r with 
-            | Cond (check, target) -> 
-                if check part then target 
-                else loop rest 
+            | Cond (check, target) -> if check part then target else loop rest 
             | Goto target -> target
     loop workflow.rules
 
