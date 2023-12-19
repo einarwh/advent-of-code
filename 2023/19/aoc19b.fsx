@@ -5,42 +5,74 @@ open System
 open System.IO
 open System.Text.RegularExpressions
 
-type Part = {
-    x : int
-    m : int
-    a : int
-    s : int
+type Range = {
+    minimum : int 
+    maximum : int
+}
+
+type Bounds = {
+    xRange : Range
+    mRange : Range
+    aRange : Range
+    sRange : Range
 }
 
 type Label = string
 
-type Category = string
+type Category = X | M | A | S 
 
-type Constraint = 
-    | Over of (int * Category)
-    | Under of (int * Category)
+type SplitInfo = {  
+    category : Category
+    leftRange : Range 
+    rightRange : Range 
+    label : Label
+}
 
 type Step = 
-    | Split of (Constraint * Label)
+    | Split of SplitInfo
     | Next of Label
 
-type Workflow = {
-    label : string 
-    rules : Step list 
-}
+type Workflow = Step list 
+
+let combineRanges range1 range2 = 
+    { minimum = max range1.minimum range2.minimum
+      maximum = min range1.maximum range2.maximum }
+
+let updateBounds (category : Category) (range : Range) (bounds : Bounds) = 
+    match category with 
+    | X -> { bounds with xRange = combineRanges range bounds.xRange }
+    | M -> { bounds with mRange = combineRanges range bounds.mRange }
+    | A -> { bounds with aRange = combineRanges range bounds.aRange }
+    | S -> { bounds with sRange = combineRanges range bounds.sRange }
+
+let parseCategory (s : string) = 
+    match s with 
+    | "x" -> X
+    | "m" -> M
+    | "a" -> A
+    | "s" -> S
+    | _ -> failwith <| sprintf "%s?" s
 
 let parseConstraint (s : string) = 
     let parse target (s : string) = 
         let pattern = "^(\w+)(.)(\d+)$"
         let m = Regex.Match(s, pattern)
         if m.Success then
-            let category = m.Groups[1].Value 
+            let category = m.Groups[1].Value |> parseCategory
             let compStr = m.Groups[2].Value 
             let limit = m.Groups[3].Value |> int
-            let c = 
-                if compStr = "<" then Under (limit, category)
-                else Over (limit, category) 
-            Split (c, target)
+            let (left, right) = 
+                if compStr = "<" then 
+                    ({ minimum = 1; maximum = limit - 1 }, { minimum = limit; maximum = 4000 })
+                else 
+                    ({ minimum = limit + 1; maximum = 4000 }, { minimum = 1; maximum = limit })
+            let info = {  
+                category = category
+                leftRange = left  
+                rightRange = right  
+                label = target
+            }
+            Split info
         else 
             failwith <| sprintf "%s?" s
     let ss = s.Split(':')
@@ -49,7 +81,7 @@ let parseConstraint (s : string) =
 let parseRule (s : string) : Step = 
     if s.Contains(':') then parseConstraint s else Next s 
 
-let parseWorkflow (s : string) = 
+let parseWorkflow (s : string) : (Label * Step list) = 
     let pattern = "^(\w+)\{(.+)\}$"
     let m = Regex.Match(s, pattern)
     if m.Success then
@@ -57,61 +89,69 @@ let parseWorkflow (s : string) =
         let rulesStr = m.Groups[2].Value 
         let strs = rulesStr.Split(",")
         let rules = strs |> Array.toList |> List.map parseRule
-        (label, { label = label; rules = rules })
+        (label, rules)
     else 
         failwith <| sprintf "%s?" s 
 
-let parseWorkflows (s : string) = 
+let parseWorkflows (s : string) : Map<Label, Step list> = 
     s.Split("\n") 
     |> Array.toList 
     |> List.map parseWorkflow 
     |> Map.ofList
 
-let parsePart (s : string) = 
-    let pattern = "^\{x=(\d+),m=(\d+),a=(\d+),s=(\d+)\}$"
-    let result = Regex.Match(s, pattern)
-    if result.Success then
-        let x = int (result.Groups[1].Value)
-        let m = int (result.Groups[2].Value) 
-        let a = int (result.Groups[3].Value) 
-        let s = int (result.Groups[4].Value)
-        { x = x; m = m; a = a; s = s }
-    else 
-        failwith <| sprintf "%s?" s 
-
-let parseParts (s : string) = 
-    s.Split("\n") |> Array.toList |> List.map parsePart 
-
-let runWorkflow workflow part = 
-    let rec loop steps = 
+let findBounds (workflows : Map<Label, Step list>) = 
+    let rec loop (steps : Step list) (bounds : Bounds) = 
         match steps with 
         | [] -> failwith "?"
-        | r :: rest ->
-            match r with 
-            | Cond (check, target) -> if check part then target else loop rest 
-            | Goto target -> target
-    loop workflow.rules
-
-let tryWorkflows workflows = 
-    let rec loop current = 
-        let wf = Map.find current workflows
-        let next = runWorkflow wf part 
-        match next with 
-        | "A" -> part.x + part.m + part.a + part.s
-        | "R" -> 0 
-        | _ -> loop next 
-    loop "in"
+        | step :: rest -> 
+            match step with 
+            | Split info -> 
+                let leftBounds = bounds |> updateBounds info.category info.leftRange
+                let leftResult = 
+                    match info.label with 
+                    | "A" -> [ leftBounds ]
+                    | "R" -> []
+                    | _ -> 
+                        let leftSteps = Map.find info.label workflows 
+                        loop leftSteps leftBounds 
+                let rightBounds = bounds |> updateBounds info.category info.rightRange
+                let rightResult = loop rest rightBounds
+                leftResult @ rightResult
+            | Next label -> 
+                match label with 
+                | "A" -> [ bounds ]
+                | "R" -> [] 
+                | _ -> 
+                    let steps = Map.find label workflows
+                    loop steps bounds 
+    let initialSteps = Map.find "in" workflows
+    let defaultRange = { minimum = 1; maximum = 4000 }
+    let initialBounds = {
+        xRange = defaultRange
+        mRange = defaultRange
+        aRange = defaultRange
+        sRange = defaultRange
+    }
+    loop initialSteps initialBounds
 
 let readChunks fileName = 
     let text = File.ReadAllText fileName 
     text.TrimEnd().Split("\n\n") |> Array.toList 
+
+let calculatePossibilities (bounds : Bounds) = 
+    let countRange { minimum = low; maximum = high } = 
+        int64 high - int64 low + 1L
+    [ bounds.xRange; bounds.mRange; bounds.aRange; bounds.sRange ]
+    |> List.map countRange
+    |> List.reduce (*)
 
 let run fileName =
     let chunks = readChunks fileName
     match chunks with 
     | [s1; s2] -> 
         let workflows = parseWorkflows s1
-        ()
+        let boundsList = findBounds workflows
+        boundsList |> List.sumBy calculatePossibilities |> printfn "%d"
     | _ -> failwith "?" 
 
 "input" |> run
