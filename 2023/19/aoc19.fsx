@@ -12,26 +12,24 @@ type Part = {
     s : int
 }
 
-type Label = string 
-
 type Rule = 
-    | Cond of (Part -> bool) * Label 
-    | Goto of Label
+    | Cond of (Part -> bool) * string 
+    | Goto of string
 
 type Workflow = {
-    label : Label 
+    label : string 
     rules : Rule list 
 }
 
-let parseSelector (s : string) : Part -> int = 
+let parseSelector (s : string) = 
     match s with 
-    | "x" -> fun (r : Part) -> r.x
-    | "m" -> fun (r : Part) -> r.m
-    | "a" -> fun (r : Part) -> r.a
-    | "s" -> fun (r : Part) -> r.s
+    | "x" -> fun r -> r.x
+    | "m" -> fun r -> r.m
+    | "a" -> fun r -> r.a
+    | "s" -> fun r -> r.s
     | _ -> failwith <| sprintf "%s?" s
 
-let parseCheck (target : string) (s : string) = 
+let parseCheck target (s : string) = 
     let pattern = "^(\w+)(.)(\d+)$"
     let m = Regex.Match(s, pattern)
     if m.Success then
@@ -49,13 +47,9 @@ let parseCond (s : string) =
     let ss = s.Split(':')
     parseCheck ss[1] ss[0]
 
-let parseGoto (s : string) = 
-    Goto s
-
 let parseRule (s : string) = 
-    if s.Contains(':') then parseCond s else parseGoto s 
+    if s.Contains(':') then parseCond s else Goto s 
 
-// px{a<2006:qkq,m>2090:A,rfg}
 let parseWorkflow (s : string) = 
     let pattern = "^(\w+)\{(.+)\}$"
     let m = Regex.Match(s, pattern)
@@ -68,13 +62,13 @@ let parseWorkflow (s : string) =
     else 
         None 
 
-let parseWorkflows (s : string) : Map<Label, Workflow> = 
+let parseWorkflows (s : string) = 
     s.Split("\n") 
     |> Array.toList 
     |> List.choose parseWorkflow 
     |> Map.ofList
 
-let parsePart (s : string) : Part option= 
+let parsePart (s : string) = 
     let pattern = "^\{x=(\d+),m=(\d+),a=(\d+),s=(\d+)\}$"
     let result = Regex.Match(s, pattern)
     if result.Success then
@@ -86,10 +80,10 @@ let parsePart (s : string) : Part option=
     else 
         None 
 
-let parseParts (s : string) : Part list = 
+let parseParts (s : string) = 
     s.Split("\n") |> Array.toList |> List.choose parsePart 
 
-let runWorkflow (workflow : Workflow) (part : Part) = 
+let runWorkflow workflow part = 
     let rec loop rules = 
         match rules with 
         | [] -> failwith "?"
@@ -101,7 +95,7 @@ let runWorkflow (workflow : Workflow) (part : Part) =
             | Goto target -> target
     loop workflow.rules
 
-let runWorkflows (workflows : Map<Label, Workflow>) (part : Part) : int = 
+let runWorkflows workflows part = 
     let rec loop current = 
         let wf = Map.find current workflows
         let next = runWorkflow wf part 
@@ -119,8 +113,8 @@ let run fileName =
     let chunks = readChunks fileName
     match chunks with 
     | [s1; s2] -> 
-        let workflows : Map<Label, Workflow> = parseWorkflows s1
-        let parts : Part list = parseParts s2
+        let workflows = parseWorkflows s1
+        let parts = parseParts s2
         parts |> List.sumBy (runWorkflows workflows) |> printfn "%d"
     | _ -> failwith "?" 
 
