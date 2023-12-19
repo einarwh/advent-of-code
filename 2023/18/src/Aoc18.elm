@@ -924,9 +924,64 @@ updateModel : Model -> Model
 updateModel model = 
   { model | basin = updateBasin model.basin }
 
+countTrenchCrossings : Set Position -> Position -> Int -> Int -> Int 
+countTrenchCrossings trench (x, y) alongside crossings = 
+  if y < 0 then 
+    crossings 
+  else 
+    let 
+      pos = (x, y)
+      left = (x - 1, y)
+      right = (x + 1, y)
+      next = (x, y - 1)
+    in 
+      if Set.member pos trench then 
+        -- Check left and right.
+        if Set.member left trench && Set.member right trench then 
+          -- Regular crossing. Increase and continue.
+          countTrenchCrossings trench next 0 (crossings + 1)
+        else if Set.member left trench then 
+          -- Either beginning or ending of passing alongside wall. 
+          if alongside < 0 then 
+            -- Already passing alongside wall, ended in no crossing.
+            countTrenchCrossings trench next 0 crossings 
+          else if alongside > 0 then 
+            -- Already passing alongside wall, ended in an crossing.
+            countTrenchCrossings trench next 0 (crossings + 1) 
+          else 
+            -- Start passing alongside wall. Started left, expect right for crossing.
+            countTrenchCrossings trench next -1 crossings 
+        else if Set.member right trench then 
+          -- Either beginning or ending of passing alongside wall. 
+          if alongside < 0 then 
+            -- Already passing alongside wall, ended in a crossing! 
+            countTrenchCrossings trench next 0 (crossings + 1) 
+          else if alongside > 0 then 
+            -- Already passing alongside wall, ended in no crossing.
+            countTrenchCrossings trench next 0 crossings
+          else 
+            -- Start passing alongside wall. Started left, expect right for crossing.
+            countTrenchCrossings trench next 1 crossings 
+        else
+          -- Must be passing alongside wall. Keep going.
+          countTrenchCrossings trench next alongside crossings 
+      else 
+        -- Just empty space. Keep going.
+        countTrenchCrossings trench next 0 crossings
+
 isStartPointInsideTrench : Set Position -> Position -> Bool
-isStartPointInsideTrench trench (x, yStart) = 
-  True
+isStartPointInsideTrench trench (x, y) = 
+  let 
+    crossings = countTrenchCrossings trench (x, y) 0 0
+  in 
+    1 == modBy 2 crossings 
+
+findNeighbourPointInsideTrench : Set Position -> Position -> Position
+findNeighbourPointInsideTrench trench (x, y) = 
+  let 
+    candidates = [ (x, y - 1), (x, y + 1), (x - 1, y), (x + 1, y) ]
+  in 
+    candidates |> List.filter (isStartPointInsideTrench trench) |> List.head |> Maybe.withDefault (x, y)
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -946,8 +1001,13 @@ update msg model =
           else 
             -- Setup for start.
             let 
-              startPoint = model.mousePoint
-              explorationPoints = [ model.mousePoint ]
+              startPoint = 
+                if Set.member model.mousePoint basin.trench then 
+                  -- Find neighbour that is inside the trench!
+                  findNeighbourPointInsideTrench basin.trench model.mousePoint
+                else 
+                  model.mousePoint
+              explorationPoints = [ startPoint ]
               fillInside = isStartPointInsideTrench basin.trench startPoint
               -- TODO : Check if start point is inside or outside, set fill color as appropriate.
               -- Just go north until y = 0 and count trench crossings.
@@ -983,7 +1043,7 @@ toTrenchBox unitSize (xPos, yPos) =
       , y (String.fromInt yVal)
       , width (String.fromInt unitSize) 
       , height (String.fromInt unitSize)
-      , fill "black" ]
+      , fill "red" ]
       []
 
 toFilledBox : String -> Int -> (Int, Int) -> Html Msg 
@@ -1006,7 +1066,7 @@ toSvg model =
     svgWidth = (model.unitSize * model.basin.widthInUnits) |> String.fromInt
     svgHeight = (model.unitSize * model.basin.heightInUnits) |> String.fromInt
     trenchBoxes = model.basin.trench |> Set.toList |> List.map (toTrenchBox model.unitSize)
-    fillColor = if model.basin.fillInside then "lightblue" else "pink"
+    fillColor = if model.basin.fillInside then "orange" else "gainsboro"
     filledBoxes = model.basin.filledPoints |> Set.toList |> List.map (toFilledBox fillColor model.unitSize)
     elements = trenchBoxes ++ filledBoxes
   in 

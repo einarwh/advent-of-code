@@ -5898,11 +5898,184 @@ var $author$project$Aoc18$subscriptions = function (model) {
 			return $author$project$Aoc18$Tick;
 		});
 };
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$Dict$member = F2(
+	function (key, dict) {
+		var _v0 = A2($elm$core$Dict$get, key, dict);
+		if (_v0.$ === 'Just') {
+			return true;
+		} else {
+			return false;
+		}
+	});
+var $elm$core$Set$member = F2(
+	function (key, _v0) {
+		var dict = _v0.a;
+		return A2($elm$core$Dict$member, key, dict);
+	});
+var $author$project$Aoc18$countTrenchCrossings = F4(
+	function (trench, _v0, alongside, crossings) {
+		countTrenchCrossings:
+		while (true) {
+			var x = _v0.a;
+			var y = _v0.b;
+			if (y < 0) {
+				return crossings;
+			} else {
+				var right = _Utils_Tuple2(x + 1, y);
+				var pos = _Utils_Tuple2(x, y);
+				var next = _Utils_Tuple2(x, y - 1);
+				var left = _Utils_Tuple2(x - 1, y);
+				if (A2($elm$core$Set$member, pos, trench)) {
+					if (A2($elm$core$Set$member, left, trench) && A2($elm$core$Set$member, right, trench)) {
+						var $temp$trench = trench,
+							$temp$_v0 = next,
+							$temp$alongside = 0,
+							$temp$crossings = crossings + 1;
+						trench = $temp$trench;
+						_v0 = $temp$_v0;
+						alongside = $temp$alongside;
+						crossings = $temp$crossings;
+						continue countTrenchCrossings;
+					} else {
+						if (A2($elm$core$Set$member, left, trench)) {
+							if (alongside < 0) {
+								var $temp$trench = trench,
+									$temp$_v0 = next,
+									$temp$alongside = 0,
+									$temp$crossings = crossings;
+								trench = $temp$trench;
+								_v0 = $temp$_v0;
+								alongside = $temp$alongside;
+								crossings = $temp$crossings;
+								continue countTrenchCrossings;
+							} else {
+								if (alongside > 0) {
+									var $temp$trench = trench,
+										$temp$_v0 = next,
+										$temp$alongside = 0,
+										$temp$crossings = crossings + 1;
+									trench = $temp$trench;
+									_v0 = $temp$_v0;
+									alongside = $temp$alongside;
+									crossings = $temp$crossings;
+									continue countTrenchCrossings;
+								} else {
+									var $temp$trench = trench,
+										$temp$_v0 = next,
+										$temp$alongside = -1,
+										$temp$crossings = crossings;
+									trench = $temp$trench;
+									_v0 = $temp$_v0;
+									alongside = $temp$alongside;
+									crossings = $temp$crossings;
+									continue countTrenchCrossings;
+								}
+							}
+						} else {
+							if (A2($elm$core$Set$member, right, trench)) {
+								if (alongside < 0) {
+									var $temp$trench = trench,
+										$temp$_v0 = next,
+										$temp$alongside = 0,
+										$temp$crossings = crossings + 1;
+									trench = $temp$trench;
+									_v0 = $temp$_v0;
+									alongside = $temp$alongside;
+									crossings = $temp$crossings;
+									continue countTrenchCrossings;
+								} else {
+									if (alongside > 0) {
+										var $temp$trench = trench,
+											$temp$_v0 = next,
+											$temp$alongside = 0,
+											$temp$crossings = crossings;
+										trench = $temp$trench;
+										_v0 = $temp$_v0;
+										alongside = $temp$alongside;
+										crossings = $temp$crossings;
+										continue countTrenchCrossings;
+									} else {
+										var $temp$trench = trench,
+											$temp$_v0 = next,
+											$temp$alongside = 1,
+											$temp$crossings = crossings;
+										trench = $temp$trench;
+										_v0 = $temp$_v0;
+										alongside = $temp$alongside;
+										crossings = $temp$crossings;
+										continue countTrenchCrossings;
+									}
+								}
+							} else {
+								var $temp$trench = trench,
+									$temp$_v0 = next,
+									$temp$alongside = alongside,
+									$temp$crossings = crossings;
+								trench = $temp$trench;
+								_v0 = $temp$_v0;
+								alongside = $temp$alongside;
+								crossings = $temp$crossings;
+								continue countTrenchCrossings;
+							}
+						}
+					}
+				} else {
+					var $temp$trench = trench,
+						$temp$_v0 = next,
+						$temp$alongside = 0,
+						$temp$crossings = crossings;
+					trench = $temp$trench;
+					_v0 = $temp$_v0;
+					alongside = $temp$alongside;
+					crossings = $temp$crossings;
+					continue countTrenchCrossings;
+				}
+			}
+		}
+	});
+var $elm$core$Basics$modBy = _Basics_modBy;
 var $author$project$Aoc18$isStartPointInsideTrench = F2(
 	function (trench, _v0) {
 		var x = _v0.a;
-		var yStart = _v0.b;
-		return true;
+		var y = _v0.b;
+		var crossings = A4(
+			$author$project$Aoc18$countTrenchCrossings,
+			trench,
+			_Utils_Tuple2(x, y),
+			0,
+			0);
+		return 1 === A2($elm$core$Basics$modBy, 2, crossings);
+	});
+var $author$project$Aoc18$findNeighbourPointInsideTrench = F2(
+	function (trench, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var candidates = _List_fromArray(
+			[
+				_Utils_Tuple2(x, y - 1),
+				_Utils_Tuple2(x, y + 1),
+				_Utils_Tuple2(x - 1, y),
+				_Utils_Tuple2(x + 1, y)
+			]);
+		return A2(
+			$elm$core$Maybe$withDefault,
+			_Utils_Tuple2(x, y),
+			$elm$core$List$head(
+				A2(
+					$elm$core$List$filter,
+					$author$project$Aoc18$isStartPointInsideTrench(trench),
+					candidates)));
 	});
 var $elm$core$Basics$not = _Basics_not;
 var $elm$core$Basics$round = _Basics_round;
@@ -6302,17 +6475,6 @@ var $elm$core$Set$diff = F2(
 		return $elm$core$Set$Set_elm_builtin(
 			A2($elm$core$Dict$diff, dict1, dict2));
 	});
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
 var $author$project$Aoc18$findNeighbourPositions = function (pos) {
 	var x = pos.a;
 	var y = pos.b;
@@ -6335,20 +6497,6 @@ var $elm$core$List$isEmpty = function (xs) {
 		return false;
 	}
 };
-var $elm$core$Dict$member = F2(
-	function (key, dict) {
-		var _v0 = A2($elm$core$Dict$get, key, dict);
-		if (_v0.$ === 'Just') {
-			return true;
-		} else {
-			return false;
-		}
-	});
-var $elm$core$Set$member = F2(
-	function (key, _v0) {
-		var dict = _v0.a;
-		return A2($elm$core$Dict$member, key, dict);
-	});
 var $author$project$Aoc18$isTrenchPoint = F2(
 	function (trench, pos) {
 		return A2($elm$core$Set$member, pos, trench);
@@ -6443,10 +6591,10 @@ var $author$project$Aoc18$update = F2(
 							basin,
 							{cubicMeters: 0, filledPoints: $elm$core$Set$empty});
 					} else {
-						var startPoint = model.mousePoint;
+						var startPoint = A2($elm$core$Set$member, model.mousePoint, basin.trench) ? A2($author$project$Aoc18$findNeighbourPointInsideTrench, basin.trench, model.mousePoint) : model.mousePoint;
 						var fillInside = A2($author$project$Aoc18$isStartPointInsideTrench, basin.trench, startPoint);
 						var explorationPoints = _List_fromArray(
-							[model.mousePoint]);
+							[startPoint]);
 						return _Utils_update(
 							basin,
 							{explorationPoints: explorationPoints, fillInside: fillInside, startPoint: startPoint});
@@ -6671,7 +6819,7 @@ var $author$project$Aoc18$toTrenchBox = F2(
 					$elm$core$String$fromInt(unitSize)),
 					$elm$svg$Svg$Attributes$height(
 					$elm$core$String$fromInt(unitSize)),
-					$elm$svg$Svg$Attributes$fill('black')
+					$elm$svg$Svg$Attributes$fill('red')
 				]),
 			_List_Nil);
 	});
@@ -6683,7 +6831,7 @@ var $author$project$Aoc18$toSvg = function (model) {
 		$elm$core$Set$toList(model.basin.trench));
 	var svgWidth = $elm$core$String$fromInt(model.unitSize * model.basin.widthInUnits);
 	var svgHeight = $elm$core$String$fromInt(model.unitSize * model.basin.heightInUnits);
-	var fillColor = model.basin.fillInside ? 'lightblue' : 'pink';
+	var fillColor = model.basin.fillInside ? 'orange' : 'gainsboro';
 	var filledBoxes = A2(
 		$elm$core$List$map,
 		A2($author$project$Aoc18$toFilledBox, fillColor, model.unitSize),
