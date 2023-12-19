@@ -78,28 +78,28 @@ let parseConstraint (s : string) =
     let ss = s.Split(':')
     parse ss[1] ss[0]
 
-let parseRule (s : string) : Step = 
+let parseStep (s : string) : Step = 
     if s.Contains(':') then parseConstraint s else Next s 
 
-let parseWorkflow (s : string) : (Label * Step list) = 
+let parseStepWorkflow (s : string) : (Label * Step list) = 
     let pattern = "^(\w+)\{(.+)\}$"
     let m = Regex.Match(s, pattern)
     if m.Success then
         let label = m.Groups[1].Value 
         let rulesStr = m.Groups[2].Value 
         let strs = rulesStr.Split(",")
-        let rules = strs |> Array.toList |> List.map parseRule
+        let rules = strs |> Array.toList |> List.map parseStep
         (label, rules)
     else 
         failwith <| sprintf "%s?" s 
 
-let parseWorkflows (s : string) : Map<Label, Step list> = 
+let parseStepsMap (s : string) : Map<Label, Step list> = 
     s.Split("\n") 
     |> Array.toList 
-    |> List.map parseWorkflow 
+    |> List.map parseStepWorkflow 
     |> Map.ofList
 
-let findBounds (workflows : Map<Label, Step list>) = 
+let findBounds (stepsMap : Map<Label, Step list>) = 
     let rec loop (steps : Step list) (bounds : Bounds) = 
         match steps with 
         | [] -> failwith "?"
@@ -112,7 +112,7 @@ let findBounds (workflows : Map<Label, Step list>) =
                     | "A" -> [ leftBounds ]
                     | "R" -> []
                     | _ -> 
-                        let leftSteps = Map.find info.label workflows 
+                        let leftSteps = Map.find info.label stepsMap 
                         loop leftSteps leftBounds 
                 let rightBounds = bounds |> updateBounds info.category info.rightRange
                 let rightResult = loop rest rightBounds
@@ -122,9 +122,9 @@ let findBounds (workflows : Map<Label, Step list>) =
                 | "A" -> [ bounds ]
                 | "R" -> [] 
                 | _ -> 
-                    let steps = Map.find label workflows
+                    let steps = Map.find label stepsMap
                     loop steps bounds 
-    let initialSteps = Map.find "in" workflows
+    let initialSteps = Map.find "in" stepsMap
     let defaultRange = { minimum = 1; maximum = 4000 }
     let initialBounds = {
         xRange = defaultRange
@@ -149,8 +149,8 @@ let run fileName =
     let chunks = readChunks fileName
     match chunks with 
     | [s1; s2] -> 
-        let workflows = parseWorkflows s1
-        let boundsList = findBounds workflows
+        let map = parseStepsMap s1
+        let boundsList = findBounds map
         boundsList |> List.sumBy calculatePossibilities |> printfn "%d"
     | _ -> failwith "?" 
 
