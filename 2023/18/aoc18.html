@@ -6554,7 +6554,7 @@ var $author$project$Aoc18$updateBasin = function (basin) {
 		var trench = basin.trench;
 		var explorationSet = $elm$core$Set$fromList(basin.explorationPoints);
 		var filledPoints = A2($elm$core$Set$union, basin.filledPoints, explorationSet);
-		var cubicMeters = $elm$core$Set$size(trench) + $elm$core$Set$size(filledPoints);
+		var cubicMeters = basin.fillInside ? ($elm$core$Set$size(trench) + $elm$core$Set$size(filledPoints)) : $elm$core$Set$size(filledPoints);
 		var addedPoints = $elm$core$Set$toList(
 			A2($elm$core$Set$diff, filledPoints, basin.filledPoints));
 		var exploreNext = A2(

@@ -909,7 +909,7 @@ updateBasin basin =
         |> Set.toList 
         |> List.filter (isWithinBounds basin.widthInUnits basin.heightInUnits)
         |> List.filter (isFreeSpace trench)
-      cubicMeters = Set.size trench + Set.size filledPoints
+      cubicMeters = if basin.fillInside then Set.size trench + Set.size filledPoints else Set.size filledPoints
     in 
       { startPoint = basin.startPoint 
       , trench = trench
