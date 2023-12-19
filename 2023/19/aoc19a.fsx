@@ -102,13 +102,16 @@ let readChunks fileName =
     let text = File.ReadAllText fileName 
     text.TrimEnd().Split("\n\n") |> Array.toList 
 
+let part1 workflowInput partsInput = 
+    let workflows = parseWorkflows workflowInput
+    let parts = parseParts partsInput
+    parts |> List.sumBy (runWorkflows workflows) |> printfn "%d"
+
 let run fileName =
     let chunks = readChunks fileName
     match chunks with 
-    | [s1; s2] -> 
-        let workflows = parseWorkflows s1
-        let parts = parseParts s2
-        parts |> List.sumBy (runWorkflows workflows) |> printfn "%d"
+    | [workflowInput; partsInput] -> 
+        part1 workflowInput partsInput
     | _ -> failwith "?" 
 
 "input" |> run

@@ -143,13 +143,16 @@ let calculatePossibilities (bounds : Bounds) =
     |> List.map countRange
     |> List.reduce (*)
 
+let part2 workflowInput = 
+    let map = parseStepsMap workflowInput
+    let boundsList = findBounds map
+    boundsList |> List.sumBy calculatePossibilities |> printfn "%d"
+
 let run fileName =
     let chunks = readChunks fileName
     match chunks with 
-    | [s1; s2] -> 
-        let map = parseStepsMap s1
-        let boundsList = findBounds map
-        boundsList |> List.sumBy calculatePossibilities |> printfn "%d"
+    | [workflowInput; partsInput] -> 
+        part2 workflowInput
     | _ -> failwith "?" 
 
 "input" |> run
