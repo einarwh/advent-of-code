@@ -62,9 +62,7 @@ let parseWorkflow (s : string) =
     let m = Regex.Match(s, "^(\w+)\{(.+)\}$")
     if m.Success then
         let label = m.Groups[1].Value 
-        let rulesStr = m.Groups[2].Value 
-        let strs = rulesStr.Split(",")
-        let rules = strs |> Array.toList |> List.map parseRule
+        let rules = m.Groups[2].Value.Split(",") |> Array.toList |> List.map parseRule
         (label, rules)
     else 
         failwith <| sprintf "%s?" s 
