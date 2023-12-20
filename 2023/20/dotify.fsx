@@ -38,7 +38,7 @@ let run inFile outFile =
     let edges = lines |> Array.map parseLine
     let conjs = edges |> Array.choose (fun (k, src, _) -> if k = Conjunction then Some src else None)
     let conjLines = conjs |> Array.map toConjunctionLine
-    let edgeLines = edges |> Array.map (toEdgeLine)
+    let edgeLines = edges |> Array.map toEdgeLine
     let before = [| 
         "digraph {"
         "    node [ shape = circle ]"

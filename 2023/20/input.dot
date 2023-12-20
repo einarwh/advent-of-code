@@ -26,8 +26,8 @@ digraph {
     dh -> { sz qb }
     lx -> rx
     sz -> qb
-    dt -> {np rd }
-    qb -> {bf kf hd nl pm lb }
+    dt -> { np rd }
+    qb -> { bf kf hd nl pm lb }
     tk -> zr
     nn -> { nj gs vr }
     ph -> { dj rd }
