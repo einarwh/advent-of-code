@@ -1,5 +1,6 @@
-// Advent of Code 2023. Day 20: ?
-// dotnet fsi aoc20.fsx
+// Advent of Code 2023. Day 20: Pulse Propagation.
+// Convert input file into dot format for rendering with graphviz.
+// dotnet fsi dotify.fsx <inputfile> <outputfile?>
 
 open System
 open System.IO
