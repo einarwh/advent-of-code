@@ -1,4 +1,4 @@
-// Advent of Code 2023. Day 20: ?
+// Advent of Code 2023. Day 20: Pulse Propagation.
 // dotnet fsi aoc20.fsx
 
 open System
@@ -8,42 +8,61 @@ type Pulse = High | Low
 
 type Label = string 
 
-[<AutoOpen>]
-module ModuleTypes =
+type FlipFlopState = On | Off 
 
-    type FlipFlopState = On | Off 
+type ConjunctionMemory = Map<Label, Pulse>
 
-    type FlipFlop = {
-        label : Label 
-        state : FlipFlopState
-    }
+type FlipFlop = {
+    label : Label 
+    inputs : Label list 
+    outputs : Label list 
+    state : FlipFlopState
+}
 
-    type ConjunctionState = Map<Label, Pulse>
+type Conjunction = {
+    label : string 
+    inputs : Label list 
+    outputs : Label list 
+    memory : ConjunctionMemory
+}
 
-    type Conjunction = {
-        label : Label 
-        state : ConjunctionState 
-        inputs : Label list 
-        outputs : Label list 
-    }
+type Broadcaster = {
+    input : Label
+    outputs : Label list 
+}
 
-    type Broadcaster = Broadcaster 
+type Button = {
+    output : Label 
+}
 
+type Module = 
+    | FlipFlopModule of FlipFlop
+    | ConjunctionModule of Conjunction
+    | BroadcasterModule of Broadcaster
+    | ButtonModule of Button
 
 module FlipFlop = 
 
-    let receive (flipFlop : FlipFlop) (pulse : Pulse) = 
-        match pulse with 
-        | High -> (flipFlop, [])
+    let receive (flipFlop : FlipFlop) (inPulse : Pulse) : (FlipFlop * Pulse option) = 
+        match inPulse with 
+        | High -> (flipFlop, None)
         | Low -> 
             match flipFlop.state with 
-            | On -> ({ flipFlop with state = Off }, Low)
-            | Off -> ({ flipFlop with state = On }, High)
+            | On -> ({ flipFlop with state = Off }, Some Low)
+            | Off -> ({ flipFlop with state = On }, Some High)
 
 module Conjunction = 
 
-    let receive (conjunction : Conjunction) (sender : Label) (pulse : Pulse) = 
-        let state = conjunction.state |> Map.add 
+    let receive (conjunction : Conjunction) (sender : Label) (inPulse : Pulse) = 
+        let memory = conjunction.memory |> Map.add sender inPulse 
+        let outPulse = if memory |> Map.forall (fun _ p -> p = High) then Low else High 
+        let conj = { conjunction with memory = memory }
+        (conj, outPulse)
+
+module Broadcaster = 
+
+    let receive (broadcaster : Broadcaster) (inPulse : Pulse) = 
+        (broadcaster, inPulse)
 
 
 let readLines =
