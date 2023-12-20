@@ -45,10 +45,13 @@ let run inFile outFile =
         "    button [ shape = point ]"
         "    broadcaster [ shape = diamond ]"
     |]
+    let buttonEdge = [|
+        "    button -> broadcaster"
+    |]
     let after = [|
         "}"
     |]
-    let lines = [ before; conjLines; edgeLines; after ] |> Array.concat 
+    let lines = [ before; conjLines; buttonEdge; edgeLines; after ] |> Array.concat 
     File.WriteAllLines(outFile, lines)
 
 
