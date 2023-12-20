@@ -1,0 +1,13 @@
+digraph {
+    node [ shape = circle ]
+    button [ shape = point ]
+    broadcaster [ shape = diamond ]
+    inv [ shape = box ]
+    con [ shape = box ]
+    button -> broadcaster
+    broadcaster -> a
+    a -> { inv con }
+    inv -> b
+    b -> con
+    con -> output
+}
