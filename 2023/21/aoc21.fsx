@@ -4,15 +4,10 @@
 open System
 open System.IO
 
-let parseSpace (y : int) (s : string) = 
-    s |> Seq.toList 
-      |> List.mapi (fun x ch -> if ch <> '#' then Some (x, y) else None)
-      |> List.choose id
-
-let parseStart (y : int) (s : string) = 
-    s |> Seq.toList 
-      |> List.mapi (fun x ch -> if ch = 'S' then Some (x, y) else None)
-      |> List.choose id
+let parseLine (pred : char -> bool) (y : int) = 
+    Seq.toList 
+    >> List.mapi (fun x ch -> if pred ch then Some (x, y) else None)
+    >> List.choose id
 
 let getNeighbours (x, y) = 
     [ (x, y - 1) 
@@ -20,10 +15,13 @@ let getNeighbours (x, y) =
       (x + 1, y)
       (x, y + 1) ]
 
-let fill (start : int * int) (steps : int) (space : Set<int*int>) = 
-    let rec loop (queue : ((int*int) * int) list) (visited : Set<(int*int) * int>)= 
+let fill start steps space = 
+    let rec loop queue visited = 
         match queue with 
-        | [] -> visited 
+        | [] -> 
+            visited 
+            |> Set.toList 
+            |> List.choose (fun (pos, steps) -> if steps = 0 then Some pos else None)
         | ((x, y), steps) :: rest -> 
             if Set.contains ((x, y), steps) visited then
                 loop rest visited 
@@ -39,18 +37,16 @@ let fill (start : int * int) (steps : int) (space : Set<int*int>) =
                         |> List.map (fun p -> (p, steps - 1))
                     let queue = queue @ neighbours
                     loop queue visited
-    let visited = loop [ (start, steps) ] (Set.empty)
-    visited 
-    |> Set.toList 
-    |> List.choose (fun (pos, steps) -> if steps = 0 then Some pos else None)
+    loop [ (start, steps) ] (Set.empty)
 
 let readLines =
     File.ReadAllLines >> Array.filter ((<>) String.Empty)
 
 let run fileName =
     let lines = readLines fileName |> Array.toList
-    let space = lines |> List.mapi parseSpace |> List.concat |> Set.ofList
-    let start = lines |> List.mapi parseStart |> List.concat |> List.head
+    let parse p = List.mapi (parseLine p) >> List.concat 
+    let space = lines |> parse ((<>) '#') |> Set.ofList
+    let start = lines |> parse ((=) 'S') |> List.head
     let steps = 64
     let result = fill start steps space 
     result |> List.length |> printfn "%d" 
