@@ -340,15 +340,15 @@
     getinterval             % A''=A[i,L-1] A'           
 } def 
 
-% A => [ A ix more? ]
-/iter-state {               % A 
-    dup length              % L A 
-    0                       % 0 L A
-    exch                    % L 0 A
-    1 index                 % 0 L 0 A 
-    gt                      % L>0 0 A
-    3 array                 % A' L>0 0 A 
-    astore                  % A' 
+% A => [ more? ix A ]
+/iter-state {               % A  
+    dup length              % A L  
+    0                       % A L 0 
+    exch                    % A 0 L 
+    1 index                 % A 0 L 0  
+    gt                      % A 0 L>0? 
+    3 array                 % A 0 L>0? A' 
+    astore                  % A' % [ L>0? 0 A ]
 } def 
 
 /next-state {               % I 
