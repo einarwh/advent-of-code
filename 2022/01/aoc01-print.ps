@@ -445,10 +445,10 @@
 } def
 
 % A => A' 
-/merge-sort {               % A % A
-    dup length              % A L % L A
-    1                       % A L 1 % 1 L A
-    gt                      % A L>1? % L>1? A
+/merge-sort {               % A 
+    dup length              % A L 
+    1                       % A L 1 
+    gt                      % A L>1? 
     {                       % A %%% (L>1)
         dup length          % A L 
         2 idiv              % A L/2 
