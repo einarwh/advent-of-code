@@ -79,6 +79,21 @@
     pop                                 % B
 } def 
 
+/exists-array {                         % A {p} %%% {p} is predicate to be called for each element in A
+    false 3 1 roll                      % F A {p} %%% Assume F
+    exch                                % F {p} A
+    {                                   % F {p} e
+        1 index                         % F {p} e {p}
+        exec                            % F {p} satisfied?
+        {                               % F {p} yes! %%% terminate with true
+            exch pop                    % {p} %%% dropped default false
+            true exch                   % T {p}
+            exit                        % T {p} - out of loop
+        } if                            % 
+    } forall                            % B {p}
+    pop                                 % B
+} def 
+
 /sum-array {
     0 exch 
     { add } forall 
@@ -154,31 +169,11 @@
 } def
 
 /graceful-increment {                   % n 
-    % (-- ascent --\n) print 
-    % pstack
-
-    % (-- dup --\n) print 
     dup                                 % n n
-    % pstack
-
-    % (-- 1 ge --\n) print 
     1 ge                                % n (n>=1?)
-    % pstack
-
-    % (-- exch --\n) print 
     exch                                % (n>=1?) n
-    % pstack
-
-    % (-- 3 le --\n) print 
     3 le                                % (n>=1?) (n<=3?)
-    % pstack
-
-    % (-- and --\n) print 
     and                                 % B
-    % pstack
-
-    % (-- done --\n) print 
-
 } def
 
 /graceful-decrement {                   % n 
@@ -206,13 +201,60 @@
     or                                  % B
 } def 
 
+/drop-item {                            % A ix 
+    [ 3 1 roll                          % [ A ix 
+    exch                                % [ ix A 
+    0 exch                              % [ ix 0 A
+    {                                   % [ ix i e
+        3 copy pop                      % [ ix i e ix i 
+        eq                              % [ ix i e ?
+        {                               % [ ix i e %%% drop this item
+            pop                         % [ ix i
+        }
+        {                               % [ ix i e %%% keep this item
+            3 1 roll                    % [ e ix i
+        } ifelse 
+        1 add                           % [ ... ix (i+1)
+    } forall
+    pop pop                             % [ ...
+    ]                                   % A'
+} def 
+
+/permute {                              % A         
+    [ exch                              % [ A
+    dup length 1 sub 0 1                % [ A L-1 0 1 
+    3 -1 roll                           % [ A 0 1 L-1
+    {                                   % [ A i 
+        1 index exch                    % [ A A i 
+        drop-item                       % [ A A'
+        exch                            % [ A' A
+    } for
+    ]
+} def 
+
 /run {
     % Read
     read-input
     { length 0 ne } filter-array
     { parse-numbers } map-array 
+    
+    % Part 1
+    dup 
     { pairwise { diff } map-array } map-array
     { is-safe } filter-array 
+    length 
+
+    % Part 2 
+    exch
+    { 
+        permute 
+        { pairwise { diff } map-array }
+        map-array
+        { is-safe }
+        exists-array
+    }
+    map-array
+    {} filter-array
     length 
 } def 
 
