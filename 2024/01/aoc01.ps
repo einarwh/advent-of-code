@@ -1,297 +1,284 @@
-% Advent of Code 2024. Day 01: Historian Hysteria
-% gs -DNOSAFER aoc01.ps
+    % Advent of Code 2024. Day 01: Historian Hysteria
+    % gs -DNOSAFER aoc01.ps
 
-/read-input
-{                                       % fn
-    [                                   % fn [
-    exch                                % [ fn 
-    (r) file                            % [ F
-    {   
-        dup                             % [ .. F F
-        160 string                      % [ ... F F buf
-        readline                        % [ ... F (s) 
+    /read-input
+    {                                       % fn
+        [                                   % fn [
+        exch                                % [ fn 
+        (r) file                            % [ F
         {   
-            exch                        % [ ... (s) F
-        }   
-        {   
-            exch                        % [ ... (s) F 
-            closefile                   % [ ... (s) 
-            ]                           % [ ... (s) ] 
-            exit    
-        } ifelse    
-    } loop                              % Rs
-} def 
+            dup                             % [ .. F F
+            160 string                      % [ ... F F buf
+            readline                        % [ ... F (s) 
+            {   
+                exch                        % [ ... (s) F
+            }   
+            {   
+                exch                        % [ ... (s) F 
+                closefile                   % [ ... (s) 
+                ]                           % [ ... (s) ] 
+                exit    
+            } ifelse    
+        } loop                              % Rs
+    } def 
 
-/split-at {                             % i A 
-    2 copy                              % i A i A 
-    0 exch                              % i 0 A i A 
-    getinterval                         % A'=A[0,i-1] i A
-    3 1 roll                            % i A A' 
-    1 index length                      % L i A A'
-    1 index                             % i L i A A'
-    sub                                 % c i A A'
-    getinterval                         % A''=A[i,L-1] A'           
-} def 
+    /split-at {                             % i A 
+        2 copy                              % i A i A 
+        0 exch                              % i 0 A i A 
+        getinterval                         % A'=A[0,i-1] i A
+        3 1 roll                            % i A A' 
+        1 index length                      % L i A A'
+        1 index                             % i L i A A'
+        sub                                 % c i A A'
+        getinterval                         % A''=A[i,L-1] A'           
+    } def 
 
-% A => [ more? ix A ]
-/iter-state {                           % A  
-    dup length                          % A L  
-    0                                   % A L 0 
-    exch                                % A 0 L 
-    1 index                             % A 0 L 0  
-    gt                                  % A 0 L>0? 
-    3 array                             % A 0 L>0? A' 
-    astore                              % A' % [ L>0? 0 A ]
-} def 
+    % A => [ more? ix A ]
+    /iter-state {                           % A  
+        dup length                          % A L  
+        0                                   % A L 0 
+        exch                                % A 0 L 
+        1 index                             % A 0 L 0  
+        gt                                  % A 0 L>0? 
+        3 array                             % A 0 L>0? A' 
+        astore                              % A' % [ L>0? 0 A ]
+    } def 
 
-/next-state {                           % I 
-    dup                                 % I I 
-    aload pop                           % ? i A I
-    {                                   % i A I (true)
-        1 add                           % i+1 A I 
-        1 index length                  % L i+1 A I
-        1 index                         % i+1 L i+1 A I 
-        gt                              % L>i+1? i+1 A I
-        3 array astore                  % I' I 
-        exch pop                        % I'
-    }
-    {                                   % i A I (false)
-        pop pop                         % I 
-    } ifelse
-} def
+    /next-state {                           % I 
+        dup                                 % I I 
+        aload pop                           % ? i A I
+        {                                   % i A I (true)
+            1 add                           % i+1 A I 
+            1 index length                  % L i+1 A I
+            1 index                         % i+1 L i+1 A I 
+            gt                              % L>i+1? i+1 A I
+            3 array astore                  % I' I 
+            exch pop                        % I'
+        }
+        {                                   % i A I (false)
+            pop pop                         % I 
+        } ifelse
+    } def
 
-% I1 I2 => a I1' I2
-/choose-next                            % I1 I2 
-{
-    dup                                 % I1 I1 I2
-    aload pop                           % more1? i1 A1 I1 I2
-    {                                   % i1 A1 I1 I2 (i1 in range)
-        get                             % a1 I1 I2 
-        2 index                         % I2 a1 I1 I2 
-        aload pop                       % more2? i2 A2 a1 I1 I2 
-        {                               % i2 A2 a1 I1 I2 (i2 in range)
-            get                         % a2 a1 I1 I2 
-            2 copy                      % a2 a1 a2 a1 I1 I2 
-            lt                          % a1<a2? a2 a1 I1 I2 
-            {                           % a2 a1 (a1 < a2) I1 I2 
-                pop                     % a1 I1 I2 
-                exch                    % I1 a1 I2 
-                next-state              % I1' a1 I2 
-                exch                    % a1 I1' I2 
+    % I1 I2 => a I1' I2
+    /choose-next                            % I1 I2 
+    {
+        dup                                 % I1 I1 I2
+        aload pop                           % more1? i1 A1 I1 I2
+        {                                   % i1 A1 I1 I2 (i1 in range)
+            get                             % a1 I1 I2 
+            2 index                         % I2 a1 I1 I2 
+            aload pop                       % more2? i2 A2 a1 I1 I2 
+            {                               % i2 A2 a1 I1 I2 (i2 in range)
+                get                         % a2 a1 I1 I2 
+                2 copy                      % a2 a1 a2 a1 I1 I2 
+                lt                          % a1<a2? a2 a1 I1 I2 
+                {                           % a2 a1 (a1 < a2) I1 I2 
+                    pop                     % a1 I1 I2 
+                    exch                    % I1 a1 I2 
+                    next-state              % I1' a1 I2 
+                    exch                    % a1 I1' I2 
+                }
+                {                           % a2 a1 (a2 < a1)
+                    exch pop                % a2 I1 I2
+                    3 -1 roll               % I2 a2 I1 
+                    next-state              % I2' a2 I1 
+                    3 1 roll                % a2 I1 I2'
+                } ifelse                    % a I1 I2
             }
-            {                           % a2 a1 (a2 < a1)
-                exch pop                % a2 I1 I2
-                3 -1 roll               % I2 a2 I1 
-                next-state              % I2' a2 I1 
-                3 1 roll                % a2 I1 I2'
-            } ifelse                    % a I1 I2
-        }
-        {                               % i2 A2 a1 I1 I2 (i2 out of range)
-            pop pop                     % a1 I1 I2 
-            exch                        % I1 a1 I2 
-            next-state                  % I1' a1 I2 
-            exch                        % a1 I1' I2 
-        } ifelse                        % a I1 I2
-    } 
-    {                                   % i1 A1 I1 I2 (i1 out of range, i2 must be in range)
-        pop pop                         % I1 I2 
-        1 index                         % I2 I1 I2 
-        aload pop                       % more2? i2 A2 I1 I2 
-        {                               % i2 A2 I1 I2 (i2 in range)
-            get                         % a2 I1 I2 
-            3 -1 roll                   % I2 a2 I1 
-            next-state                  % I2' a2 I1 
-            3 1 roll                    % a2 I1 I2'
-        }
-        {                               % I2 A2 I1 I2 (i2 out of range)
-            (out of range\n) print
-            pop pop "err"
-        } ifelse                        % a I1 I2 
-    } ifelse                            % a I1 I2 
-} def
+            {                               % i2 A2 a1 I1 I2 (i2 out of range)
+                pop pop                     % a1 I1 I2 
+                exch                        % I1 a1 I2 
+                next-state                  % I1' a1 I2 
+                exch                        % a1 I1' I2 
+            } ifelse                        % a I1 I2
+        } 
+        {                                   % i1 A1 I1 I2 (i1 out of range, i2 must be in range)
+            pop pop                         % I1 I2 
+            1 index                         % I2 I1 I2 
+            aload pop                       % more2? i2 A2 I1 I2 
+            {                               % i2 A2 I1 I2 (i2 in range)
+                get                         % a2 I1 I2 
+                3 -1 roll                   % I2 a2 I1 
+                next-state                  % I2' a2 I1 
+                3 1 roll                    % a2 I1 I2'
+            }
+            {                               % I2 A2 I1 I2 (i2 out of range)
+                (out of range\n) print
+                pop pop "err"
+            } ifelse                        % a I1 I2 
+        } ifelse                            % a I1 I2 
+    } def
 
-/merge {                                % A2 A1  
-    2 copy                              % A2 A1 A2 A1 
-    length                              % A2 A1 A2 L1 
-    exch                                % A2 A1 L1 A2 
-    length                              % A2 A1 L1 L2 
-    add                                 % A2 A1 L 
-    array                               % A2 A1 A 
-    3 1 roll                            % A A2 A1 
-    iter-state                          % A A2 I1 
-    exch                                % A I1 A 
-    iter-state                          % A I1 I2 
-    2 index                             % A I1 I2 A  
-    length                              % A I1 I2 L 
-    1 sub                               % A I1 I2 L-1 
-    0 exch                              % A I1 I2 j=0 L-1 
-    1 exch                              % A I1 I2 j k=1 L-1 
-    {                                   % A I1 I2 i 
-        3 1 roll                        % A i I1 I2  
-        choose-next                     % A i I1 I2 a  
-        4 index                         % A i I1 I2 a A  
-        5 -1 roll                       % A I1 I2 a A i  
-        3 -1 roll                       % A I1 I2 A i a 
-        put                             % A I1 I2 
-    } for                               % A I1 I2  
-    pop pop                             % A 
-} def
+    /merge {                                % A2 A1  
+        2 copy                              % A2 A1 A2 A1 
+        length                              % A2 A1 A2 L1 
+        exch                                % A2 A1 L1 A2 
+        length                              % A2 A1 L1 L2 
+        add                                 % A2 A1 L 
+        array                               % A2 A1 A 
+        3 1 roll                            % A A2 A1 
+        iter-state                          % A A2 I1 
+        exch                                % A I1 A 
+        iter-state                          % A I1 I2 
+        2 index                             % A I1 I2 A  
+        length                              % A I1 I2 L 
+        1 sub                               % A I1 I2 L-1 
+        0 exch                              % A I1 I2 j=0 L-1 
+        1 exch                              % A I1 I2 j k=1 L-1 
+        {                                   % A I1 I2 i 
+            3 1 roll                        % A i I1 I2  
+            choose-next                     % A i I1 I2 a  
+            4 index                         % A i I1 I2 a A  
+            5 -1 roll                       % A I1 I2 a A i  
+            3 -1 roll                       % A I1 I2 A i a 
+            put                             % A I1 I2 
+        } for                               % A I1 I2  
+        pop pop                             % A 
+    } def
 
-% A => A' 
-/merge-sort {                           % A 
-    dup length                          % A L 
-    1                                   % A L 1 
-    gt                                  % A L>1? 
-    {                                   % A %%% (L>1)
-        dup length                      % A L 
-        2 idiv                          % A L/2 
-        split-at                        % A2 A1
-        merge-sort                      % A2 A1'
-        exch                            % A1' A2
-        merge-sort                      % A1' A2'
-        merge                           % A' 
-    } if                                % A'
-} def 
+    % A => A' 
+    /merge-sort {                           % A 
+        dup length                          % A L 
+        1                                   % A L 1 
+        gt                                  % A L>1? 
+        {                                   % A %%% (L>1)
+            dup length                      % A L 
+            2 idiv                          % A L/2 
+            split-at                        % A2 A1
+            merge-sort                      % A2 A1'
+            exch                            % A1' A2
+            merge-sort                      % A1' A2'
+            merge                           % A' 
+        } if                                % A'
+    } def 
 
-/map-array {                            % A {op} %%% {op} is operation to be called for each element in A
-    [ 3 1 roll                          % [ A {op}
-    exch                                % [ {op} A
-    {                                   % [ {op} e
-        1 index                         % [ {op} e {op}
-        exec                            % [ {op} r %%% r is result of executing {op} on e
-        exch                            % [ r {op}
-    } forall                            % [ ... {op}
-    pop                                 % [ ...
-    ]                                   % [ r1 r2 ... ]
-} def
+    /map-array {                            % A {op} %%% {op} is operation to be called for each element in A
+        [ 3 1 roll                          % [ A {op}
+        exch                                % [ {op} A
+        {                                   % [ {op} e
+            1 index                         % [ {op} e {op}
+            exec                            % [ {op} r %%% r is result of executing {op} on e
+            exch                            % [ r {op}
+        } forall                            % [ ... {op}
+        pop                                 % [ ...
+        ]                                   % [ r1 r2 ... ]
+    } def
 
-/filter-array {                         % A {p} %%% {p} is predicate to be called for each element in A
-    [ 3 1 roll                          % [ A {p}
-    exch                                % [ {p} A
-    {                                   % [ {p} e
-        2 copy                          % [ {p} e {p} e
-        exch                            % [ {p} e e {p}
-        exec                            % [ {p} e include?
-        {                               % [ {p} e %%% yes, keep e
-            exch                        % [ e {p}
-        }
-        {                               % [ {p} e %%% no, reject e
-            pop                         % [ {p}
-        } ifelse                        % [ e? {p}
-    } forall                            % [ ... {p}
-    pop                                 % [ ...
-    ]                                   % [ e... ]
-} def 
+    /filter-array {                         % A {p} %%% {p} is predicate to be called for each element in A
+        [ 3 1 roll                          % [ A {p}
+        exch                                % [ {p} A
+        {                                   % [ {p} e
+            2 copy                          % [ {p} e {p} e
+            exch                            % [ {p} e e {p}
+            exec                            % [ {p} e include?
+            {                               % [ {p} e %%% yes, keep e
+                exch                        % [ e {p}
+            }
+            {                               % [ {p} e %%% no, reject e
+                pop                         % [ {p}
+            } ifelse                        % [ e? {p}
+        } forall                            % [ ... {p}
+        pop                                 % [ ...
+        ]                                   % [ e... ]
+    } def 
 
-/flatten-array {                        % A[B] %%% A is an array containing arrays.
-    [ exch                              % [ A[B] 
-    {                                   % [ B 
-        {} forall                       % [ ... 
-    } forall                            % [ ...
-    ]                                   % [ ... ]
-} def 
+    /sum-array {
+        0 exch 
+        { add } forall 
+    } def 
 
-/flatmap-array {
-    map-array flatten-array
-} def 
+    /zip {                                  % A1 A2                 
+        [ 3 1 roll                          % [ A1 A2               
+        dup length                          % [ A1 A2 L2            
+        2 index length                      % [ A1 A2 L2 L1         
+        min                                 % [ A1 A2 L             
+        1 sub                               % [ A1 A2 L-1           
+        0 exch                              % [ A1 A2 0 L-1         
+        1 exch                              % [ A1 A2 0 1 L-1       
+        {                                   % [ ... A1 A2 i         
+            3 copy                          % [ ... A1 A2 i A1 A2 i 
+            get                             % [ ... A1 A2 i A1 a2   
+            3 1 roll                        % [ ... A1 A2 a2 i A1   
+            exch                            % [ ... A1 A2 a2 A1 i   
+            get                             % [ ... A1 A2 a2 a1     
+            exch                            % [ ... A1 A2 a1 a2     
+            [ 3 1 roll ]                    % [ ... A1 A2 [a2 a1]   
+            3 1 roll                        % [ ... [a2 a1] A1 A2   
+        } for 
+        pop pop                             % [ ...
+        ]
+    } def
 
-/sum-array {
-    0 exch 
-    { add } forall 
-} def 
+    /split-string {                         % (s=string) (z=sep) 
+        [                                   % s z [ 
+        3 1 roll                            % [ s z  
+        {                                   % [ s z
+            search                          % [ s'=rest (h=head z)? found?
+            {                               % [ s' z h (yes, found)
+                3 1 roll                    % [ h s' z  
+            }       
+            {                               % [ s  (not found)
+                exit                        % [ s
+            } ifelse        
+        } loop      
+        ]                                   % [ .. ]
+    } def 
 
-/zip {                                  % A1 A2                 
-    [ 3 1 roll                          % [ A1 A2               
-    dup length                          % [ A1 A2 L2            
-    2 index length                      % [ A1 A2 L2 L1         
-    min                                 % [ A1 A2 L             
-    1 sub                               % [ A1 A2 L-1           
-    0 exch                              % [ A1 A2 0 L-1         
-    1 exch                              % [ A1 A2 0 1 L-1       
-    {                                   % [ ... A1 A2 i         
-        3 copy                          % [ ... A1 A2 i A1 A2 i 
-        get                             % [ ... A1 A2 i A1 a2   
-        3 1 roll                        % [ ... A1 A2 a2 i A1   
-        exch                            % [ ... A1 A2 a2 A1 i   
-        get                             % [ ... A1 A2 a2 a1     
-        exch                            % [ ... A1 A2 a1 a2     
-        [ 3 1 roll ]                    % [ ... A1 A2 [a2 a1]   
-        3 1 roll                        % [ ... [a2 a1] A1 A2   
-    } for 
-    pop pop                             % [ ...
-    ]
-} def
+    /parse-numbers {                        % S (string)
+        ( ) split-string                    % A (with potentially empty strings)
+        { length 0 ne }                     % A predicate
+        filter-array                        % A (without any empty strings)
+        { cvi }                             % A projection
+        map-array                           % A (with numbers)
+    } def
 
-/split-string {                         % (s=string) (z=sep) 
-    [                                   % s z [ 
-    3 1 roll                            % [ s z  
-    {                                   % [ s z
-        search                          % [ s'=rest (h=head z)? found?
-        {                               % [ s' z h (yes, found)
-            3 1 roll                    % [ h s' z  
-        }       
-        {                               % [ s  (not found)
-            exit                        % [ s
-        } ifelse        
-    } loop      
-    ]                                   % [ .. ]
-} def 
+    /fst {                                  % A (array)
+        0 get                               % A[0]
+    } def 
 
-/parse-numbers {                        % S (string)
-    ( ) split-string                    % A (with potentially empty strings)
-    { length 0 ne }                     % A predicate
-    filter-array                        % A (without any empty strings)
-    { cvi }                             % A projection
-    map-array                           % A (with numbers)
-} def
+    /snd {                                  % A (array)
+        1 get                               % A[1]
+    } def 
 
-/fst {                                  % A (array)
-    0 get                               % A[0]
-} def 
+    /count-occurrences {                    % n A
+        exch                                % A n 
+        [ exch                              % A [ n 
+        /eq cvx                             % A [ n eq
+        ] cvx                               % A { n eq }
+        filter-array                        % A' 
+        length                              % L
+    } def 
 
-/snd {                                  % A (array)
-    1 get                               % A[1]
-} def 
+    /run {
+        % Read
+        read-input
+        { length 0 ne } filter-array
+        { parse-numbers } map-array 
+        dup 
 
-/count-occurrences {                    % n A
-    % pstack
-    exch                                % A n 
-    [ exch                              % A [ n 
-    /eq cvx                             % A [ n eq
-    ] cvx                               % A { n eq }
-    filter-array                        % A' 
-    length                              % L
-} def 
+        % Part 1
+        dup 
+        { snd } map-array 
+        merge-sort 
+        exch 
+        { fst } map-array 
+        merge-sort
+        zip
+        { dup 0 get exch 1 get sub abs }
+        map-array 
+        sum-array 
+        exch 
 
-/run {
-    % Read
-    read-input
-    { length 0 ne } filter-array
-    { parse-numbers } map-array 
-    dup 
+        % Part 2 
+        dup 
+        { snd } map-array 
+        exch 
+        { fst } map-array 
+        exch
+        [ exch /dup cvx exch /count-occurrences cvx /mul cvx ] cvx 
+        map-array
+        sum-array 
+    } def 
 
-    % Part 1
-    dup 
-    { snd } map-array 
-    merge-sort 
-    exch 
-    { fst } map-array 
-    merge-sort
-    zip
-    { dup 0 get exch 1 get sub abs }
-    map-array 
-    sum-array 
-    exch 
-
-    % Part 2 
-    dup 
-    { snd } map-array 
-    exch 
-    { fst } map-array 
-    exch
-    [ exch /dup cvx exch /count-occurrences cvx /mul cvx ] cvx 
-    map-array
-    sum-array 
-} def 
-
-(input) run 
+    (input) run 
