@@ -4,25 +4,25 @@
 open System
 open System.IO
 
-let parseReport (s : string) : int list = 
+let parseReport (s : string) = 
     s.Split() |> Array.toList |> List.map int  
 
-let isSafe (report : int list) : bool = 
+let isSafe report = 
     let diffs = report |> List.pairwise |> List.map (fun (a, b) -> a - b)
     let safeIncreasing = diffs |> List.forall (fun d -> d >= 1 && d <= 3)
     let safeDecreasing = diffs |> List.forall (fun d -> d >= -3 && d <= -1)
     safeIncreasing || safeDecreasing
 
-let permute (report : int list) : int list list = 
+let permute report = 
     let len = report |> List.length 
-    let indexes = [0 .. len - 1]
     let indexedReport = report |> List.indexed
-    indexes |> List.map (fun i -> indexedReport |> List.choose (fun (ix, n) -> if i = ix then None else Some n))
+    let keepDifferent i (ix, n) = if i = ix then None else Some n
+    [0 .. len - 1] |> List.map (fun i -> indexedReport |> List.choose (keepDifferent i))
 
-let isSafeWithDampener (report : int list) : bool = 
-    report |> permute |> List.exists isSafe
+let isSafeWithDampener = 
+    permute >> List.exists isSafe
 
-let isSafeLenient (report : int list) : bool = 
+let isSafeLenient report = 
     isSafe report || isSafeWithDampener report 
 
 let readLines = 
