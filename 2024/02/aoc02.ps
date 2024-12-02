@@ -94,34 +94,7 @@
     pop                                 % B
 } def 
 
-/sum-array {
-    0 exch 
-    { add } forall 
-} def 
-
-/zip {                                  % A1 A2                 
-    [ 3 1 roll                          % [ A1 A2               
-    dup length                          % [ A1 A2 L2            
-    2 index length                      % [ A1 A2 L2 L1         
-    min                                 % [ A1 A2 L             
-    1 sub                               % [ A1 A2 L-1           
-    0 exch                              % [ A1 A2 0 L-1         
-    1 exch                              % [ A1 A2 0 1 L-1       
-    {                                   % [ ... A1 A2 i         
-        3 copy                          % [ ... A1 A2 i A1 A2 i 
-        get                             % [ ... A1 A2 i A1 a2   
-        3 1 roll                        % [ ... A1 A2 a2 i A1   
-        exch                            % [ ... A1 A2 a2 A1 i   
-        get                             % [ ... A1 A2 a2 a1     
-        exch                            % [ ... A1 A2 a1 a2     
-        [ 3 1 roll ]                    % [ ... A1 A2 [a2 a1]   
-        3 1 roll                        % [ ... [a2 a1] A1 A2   
-    } for 
-    pop pop                             % [ ...
-    ]
-} def
-
-/pairwise {                             % A 
+/pairwise-array {                       % A 
     [ exch 
     dup length 2 sub 0 1
     3 -1 roll
@@ -240,7 +213,7 @@
     
     % Part 1
     dup 
-    { pairwise { diff } map-array } map-array
+    { pairwise-array { diff } map-array } map-array
     { is-safe } filter-array 
     length 
 
@@ -248,10 +221,8 @@
     exch
     { 
         permute 
-        { pairwise { diff } map-array }
-        map-array
-        { is-safe }
-        exists-array
+        { pairwise-array { diff } map-array } map-array
+        { is-safe } exists-array
     }
     map-array
     {} filter-array
