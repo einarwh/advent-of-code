@@ -153,16 +153,67 @@
     sub                                 % n - m
 } def
 
+/graceful-increment {                   % n 
+    % (-- ascent --\n) print 
+    % pstack
+
+    % (-- dup --\n) print 
+    dup                                 % n n
+    % pstack
+
+    % (-- 1 ge --\n) print 
+    1 ge                                % n (n>=1?)
+    % pstack
+
+    % (-- exch --\n) print 
+    exch                                % (n>=1?) n
+    % pstack
+
+    % (-- 3 le --\n) print 
+    3 le                                % (n>=1?) (n<=3?)
+    % pstack
+
+    % (-- and --\n) print 
+    and                                 % B
+    % pstack
+
+    % (-- done --\n) print 
+
+} def
+
+/graceful-decrement {                   % n 
+    dup                                 % n n
+    -1 le                               % n (n<=-1?)
+    exch                                % (n<=-1?) n
+    -3 ge                               % (n<=-1?) (n>=-3?)
+    and                                 % B
+} def
+
+/graceful-ascent {                      % A
+    { graceful-increment }
+    forall-array 
+} def 
+
+/graceful-descent {                     % A
+    { graceful-decrement }
+    forall-array 
+} def 
+
+/is-safe {                              % A 
+    dup                                 % A A
+    graceful-ascent exch                % B A 
+    graceful-descent                    % B B
+    or                                  % B
+} def 
+
 /run {
     % Read
     read-input
     { length 0 ne } filter-array
     { parse-numbers } map-array 
     { pairwise { diff } map-array } map-array
-
-    % [7 6 4 2 1] pairwise
-    % { diff } map-array
-    
+    { is-safe } filter-array 
+    length 
 } def 
 
-(sample) run 
+(input) run 
