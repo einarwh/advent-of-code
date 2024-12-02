@@ -90,6 +90,24 @@
     ]
 } def
 
+/pairwise {                             % A 
+    [ exch 
+    dup length 2 sub 0 1
+    3 -1 roll
+    {
+        1 index exch
+        [ 3 1 roll 
+        2 copy 
+        1 add 
+        get
+        3 1 roll
+        get exch ]
+        exch 
+    } for
+    pop 
+    ]
+} def 
+
 /split-string {                         % (s=string) (z=sep) 
     [                                   % s z [ 
     3 1 roll                            % [ s z  
@@ -113,12 +131,71 @@
     map-array                           % A (with numbers)
 } def
 
+/diff {                                 % A [n m]
+    dup 0 get exch                      % A n 
+    1 get                               % m n
+    sub                                 % n - m
+} def
+
 /run {
     % Read
     read-input
     { length 0 ne } filter-array
     { parse-numbers } map-array 
-    
+
+    [7 6 4 2 1] pairwise
+    % [ exch 
+    % dup length 2 sub 0 1
+    % 3 -1 roll
+    % (-- before loop --\n) print
+    % pstack
+    % {
+    %     (-- loop --\n) print
+    %     pstack
+
+    %     1 index exch
+    %     (-- after 1 index exch \n) print
+    %     pstack 
+
+    %     [ 3 1 roll 
+    %     (-- after [ 3 1 roll \n) print
+    %     pstack 
+
+    %     2 copy 
+    %     (-- after 2 copy \n) print
+    %     pstack 
+
+    %     1 add 
+    %     (-- after 1 add \n) print
+    %     pstack 
+
+    %     get
+    %     (-- after get \n) print
+    %     pstack
+
+    %     3 1 roll
+    %     (-- after 3 1 roll \n) print
+    %     pstack
+
+    %     get exch ]
+    %     (-- after get exch ] \n) print
+    %     pstack
+
+    %     exch 
+    %     (-- after exch \n) print
+    %     pstack
+
+    %     (-- \n) print
+    % } for
+    % pop 
+    % ]
+
+    pstack
+    % 0 1 5 {}
+    % j k l proc for
+
+    [5 3] diff
+
 } def 
 
 (sample) run 
