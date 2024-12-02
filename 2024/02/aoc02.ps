@@ -22,17 +22,6 @@
     } loop                              % Rs
 } def 
 
-/split-at {                             % i A 
-    2 copy                              % i A i A 
-    0 exch                              % i 0 A i A 
-    getinterval                         % A'=A[0,i-1] i A
-    3 1 roll                            % i A A' 
-    1 index length                      % L i A A'
-    1 index                             % i L i A A'
-    sub                                 % c i A A'
-    getinterval                         % A''=A[i,L-1] A'           
-} def 
-
 /map-array {                            % A {op} %%% {op} is operation to be called for each element in A
     [ 3 1 roll                          % [ A {op}
     exch                                % [ {op} A
