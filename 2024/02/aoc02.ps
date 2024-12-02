@@ -1,0 +1,124 @@
+% Advent of Code 2024. Day 02: Red-Nosed Reports
+% gs -DNOSAFER aoc02.ps
+
+/read-input
+{                                       % fn
+    [                                   % fn [
+    exch                                % [ fn 
+    (r) file                            % [ F
+    {   
+        dup                             % [ .. F F
+        160 string                      % [ ... F F buf
+        readline                        % [ ... F (s) 
+        {   
+            exch                        % [ ... (s) F
+        }   
+        {   
+            exch                        % [ ... (s) F 
+            closefile                   % [ ... (s) 
+            ]                           % [ ... (s) ] 
+            exit    
+        } ifelse    
+    } loop                              % Rs
+} def 
+
+/split-at {                             % i A 
+    2 copy                              % i A i A 
+    0 exch                              % i 0 A i A 
+    getinterval                         % A'=A[0,i-1] i A
+    3 1 roll                            % i A A' 
+    1 index length                      % L i A A'
+    1 index                             % i L i A A'
+    sub                                 % c i A A'
+    getinterval                         % A''=A[i,L-1] A'           
+} def 
+
+/map-array {                            % A {op} %%% {op} is operation to be called for each element in A
+    [ 3 1 roll                          % [ A {op}
+    exch                                % [ {op} A
+    {                                   % [ {op} e
+        1 index                         % [ {op} e {op}
+        exec                            % [ {op} r %%% r is result of executing {op} on e
+        exch                            % [ r {op}
+    } forall                            % [ ... {op}
+    pop                                 % [ ...
+    ]                                   % [ r1 r2 ... ]
+} def
+
+/filter-array {                         % A {p} %%% {p} is predicate to be called for each element in A
+    [ 3 1 roll                          % [ A {p}
+    exch                                % [ {p} A
+    {                                   % [ {p} e
+        2 copy                          % [ {p} e {p} e
+        exch                            % [ {p} e e {p}
+        exec                            % [ {p} e include?
+        {                               % [ {p} e %%% yes, keep e
+            exch                        % [ e {p}
+        }
+        {                               % [ {p} e %%% no, reject e
+            pop                         % [ {p}
+        } ifelse                        % [ e? {p}
+    } forall                            % [ ... {p}
+    pop                                 % [ ...
+    ]                                   % [ e... ]
+} def 
+
+/sum-array {
+    0 exch 
+    { add } forall 
+} def 
+
+/zip {                                  % A1 A2                 
+    [ 3 1 roll                          % [ A1 A2               
+    dup length                          % [ A1 A2 L2            
+    2 index length                      % [ A1 A2 L2 L1         
+    min                                 % [ A1 A2 L             
+    1 sub                               % [ A1 A2 L-1           
+    0 exch                              % [ A1 A2 0 L-1         
+    1 exch                              % [ A1 A2 0 1 L-1       
+    {                                   % [ ... A1 A2 i         
+        3 copy                          % [ ... A1 A2 i A1 A2 i 
+        get                             % [ ... A1 A2 i A1 a2   
+        3 1 roll                        % [ ... A1 A2 a2 i A1   
+        exch                            % [ ... A1 A2 a2 A1 i   
+        get                             % [ ... A1 A2 a2 a1     
+        exch                            % [ ... A1 A2 a1 a2     
+        [ 3 1 roll ]                    % [ ... A1 A2 [a2 a1]   
+        3 1 roll                        % [ ... [a2 a1] A1 A2   
+    } for 
+    pop pop                             % [ ...
+    ]
+} def
+
+/split-string {                         % (s=string) (z=sep) 
+    [                                   % s z [ 
+    3 1 roll                            % [ s z  
+    {                                   % [ s z
+        search                          % [ s'=rest (h=head z)? found?
+        {                               % [ s' z h (yes, found)
+            3 1 roll                    % [ h s' z  
+        }       
+        {                               % [ s  (not found)
+            exit                        % [ s
+        } ifelse        
+    } loop      
+    ]                                   % [ .. ]
+} def 
+
+/parse-numbers {                        % S (string)
+    ( ) split-string                    % A (with potentially empty strings)
+    { length 0 ne }                     % A predicate
+    filter-array                        % A (without any empty strings)
+    { cvi }                             % A projection
+    map-array                           % A (with numbers)
+} def
+
+/run {
+    % Read
+    read-input
+    { length 0 ne } filter-array
+    { parse-numbers } map-array 
+    
+} def 
+
+(sample) run 
