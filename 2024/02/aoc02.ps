@@ -63,6 +63,22 @@
     ]                                   % [ e... ]
 } def 
 
+/forall-array {                         % A {p} %%% {p} is predicate to be called for each element in A
+    true 3 1 roll                       % T A {p} %%% Assume T
+    exch                                % T {p} A
+    {                                   % T {p} e
+        1 index                         % T {p} e {p}
+        exec                            % T {p} satisfied?
+        not                             % T {p} failed?
+        {                               % T {p} failed! %%% terminate with false
+            exch pop                    % {p} %%% dropped default true
+            false exch                  % F {p}
+            exit                        % F {p} - out of loop
+        } if                            % 
+    } forall                            % B {p}
+    pop                                 % B
+} def 
+
 /sum-array {
     0 exch 
     { add } forall 
@@ -142,60 +158,11 @@
     read-input
     { length 0 ne } filter-array
     { parse-numbers } map-array 
+    { pairwise { diff } map-array } map-array
 
-    [7 6 4 2 1] pairwise
-    % [ exch 
-    % dup length 2 sub 0 1
-    % 3 -1 roll
-    % (-- before loop --\n) print
-    % pstack
-    % {
-    %     (-- loop --\n) print
-    %     pstack
-
-    %     1 index exch
-    %     (-- after 1 index exch \n) print
-    %     pstack 
-
-    %     [ 3 1 roll 
-    %     (-- after [ 3 1 roll \n) print
-    %     pstack 
-
-    %     2 copy 
-    %     (-- after 2 copy \n) print
-    %     pstack 
-
-    %     1 add 
-    %     (-- after 1 add \n) print
-    %     pstack 
-
-    %     get
-    %     (-- after get \n) print
-    %     pstack
-
-    %     3 1 roll
-    %     (-- after 3 1 roll \n) print
-    %     pstack
-
-    %     get exch ]
-    %     (-- after get exch ] \n) print
-    %     pstack
-
-    %     exch 
-    %     (-- after exch \n) print
-    %     pstack
-
-    %     (-- \n) print
-    % } for
-    % pop 
-    % ]
-
-    pstack
-    % 0 1 5 {}
-    % j k l proc for
-
-    [5 3] diff
-
+    % [7 6 4 2 1] pairwise
+    % { diff } map-array
+    
 } def 
 
 (sample) run 
