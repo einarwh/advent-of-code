@@ -43,14 +43,13 @@ type alias Command =
     , target : StackId }
 
 type alias Model = 
-  { stacks : Stacks
-  , tallestStackSeen : Int 
-  , commands : List Command
+  { value : Int 
+  , memory : String
   , lastCommandText : String
-  , totalCommands : Int
+  , position : Int
   , delay : Float
   , paused : Bool  
-  , part2 : Bool 
+  , conditionals : Bool 
   , counter : Int 
   , debug : String }
 
@@ -641,14 +640,13 @@ move 10 from 6 to 1
     parsedStacks = parseStacks stacksStr
     parsedCommands = parseCommands commandsStr
 
-    model = { stacks = parsedStacks
-            , tallestStackSeen = 0
-            , commands = parsedCommands
+    model = { value = 0
+            , memory = ""
             , lastCommandText = "press play to start"
-            , totalCommands = List.length parsedCommands
+            , position = 0
             , delay = defaultDelay
             , paused = True
-            , part2 = False
+            , conditionals = False
             , counter = 0
             , debug = "" }
   in 
@@ -656,7 +654,7 @@ move 10 from 6 to 1
 
 -- UPDATE
 
-type Msg = Tick | Step | TogglePlay | Faster | Slower | TogglePart
+type Msg = Tick | Step | TogglePlay | Faster | Slower | ToggleConditionals
 
 takeAmount : Int -> Crates -> Stack -> (Crates, Stack) 
 takeAmount amount taken stack =
@@ -693,36 +691,22 @@ toTopCrateText stacks =
   stacks |> Dict.values |> List.filterMap (List.head) |> String.concat 
 
 updateModel : Model -> Model
-updateModel model =
-  case model.commands of 
-    [] -> model 
-    cmd :: restCmds -> 
-      let 
-        updatedStacks = runCommand cmd model.stacks
-        updatedCounter = model.counter + 1 
-        lastCommandText = 
-          if updatedCounter < model.totalCommands then 
-            toCommandText cmd
-          else 
-            toTopCrateText updatedStacks
-        tallestStack = updatedStacks |> getTallestStack
-        updatedTallestStack = 
-          if tallestStack > model.tallestStackSeen then 
-            tallestStack 
-          else 
-            model.tallestStackSeen
-        debugText = 
-          if tallestStack > model.tallestStackSeen then 
-            "Tallest: " ++ String.fromInt updatedTallestStack ++ " at cmd " ++ String.fromInt updatedCounter
-          else 
-            model.debug
-      in 
-        { model | counter = updatedCounter
-        , stacks = updatedStacks
-        , tallestStackSeen = updatedTallestStack
-        , commands = restCmds
-        , lastCommandText = lastCommandText
-        , debug = debugText }
+updateModel model = model
+  -- case model.commands of 
+  --   [] -> model 
+  --   cmd :: restCmds -> 
+  --     let 
+  --       updatedStacks = runCommand cmd model.stacks
+  --       updatedCounter = model.counter + 1 
+  --       value = 0
+  --       debugText = model.debug
+  --     in 
+  --       { model | counter = updatedCounter
+  --       , stacks = updatedStacks
+  --       , value = 0
+  --       , commands = restCmds
+  --       , lastCommandText = ""
+  --       , debug = debugText }
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -732,19 +716,27 @@ update msg model =
     Step ->
       (updateModel model, Cmd.none)
     TogglePlay -> 
-      ({model | paused = not model.paused }, Cmd.none)
+      let 
+        runningText = if model.conditionals then "running (with conditionals)" else "running (without conditionals)"
+      in 
+        ({model | paused = not model.paused, lastCommandText = if model.paused then runningText else "press play to resume" }, Cmd.none)
     Faster -> 
       ({model | delay = model.delay / 2 }, Cmd.none)
     Slower -> 
       ({model | delay = model.delay * 2 }, Cmd.none)
-    TogglePart -> 
-      ({model | part2 = not model.part2 }, Cmd.none)
+    ToggleConditionals -> 
+      let 
+        updatedConditionals = not model.conditionals
+        runningText = if updatedConditionals then "running (with conditionals)" else "running (without conditionals)"
+        cmdText = if model.paused then model.lastCommandText else runningText 
+      in 
+        ({model | conditionals = updatedConditionals, lastCommandText = cmdText  }, Cmd.none)
 
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  if model.paused || List.isEmpty model.commands then Sub.none 
+  if model.paused then Sub.none 
   else Time.every model.delay (\_ -> Tick)
 
 -- VIEW
@@ -833,8 +825,7 @@ toSvg stacks =
 view : Model -> Html Msg
 view model =
   let
-    s = toSvg model.stacks
-    commandsStr = "commands: " ++ String.fromInt model.counter ++ " of " ++ String.fromInt model.totalCommands
+    commandsStr = ""
   in 
     Html.table 
       []
@@ -855,7 +846,7 @@ view model =
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "20px"
               , Html.Attributes.style "padding" "20px"] 
-              [ Html.div [ Html.Attributes.align "center" ] [ s ] 
+              [ Html.div [ Html.Attributes.align "center" ] [ ] 
               , Html.div [] [ Html.text commandsStr ]
               , Html.div [] [ Html.text model.lastCommandText ]
               -- , Html.div [] [ Html.text model.debug ]
@@ -865,8 +856,8 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center" ]
               [ Html.button 
-                [ Html.Attributes.style "width" "80px", onClick TogglePart ] 
-                [ if model.part2 then text "Part1" else text "Part2" ]
+                [ Html.Attributes.style "width" "80px", onClick ToggleConditionals ] 
+                [ if model.conditionals then text "Disable" else text "Enable" ]
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Slower ] 
                 [ text "Slower" ]
