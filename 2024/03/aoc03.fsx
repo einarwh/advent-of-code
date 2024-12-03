@@ -5,22 +5,19 @@ open System
 open System.IO
 open System.Text.RegularExpressions
 
-type op = 
-    | Mul of (int * int)
-    | Do 
-    | Dont 
-
-let mul (m : Match) : op = 
-    let read (ix : int) = m.Groups.[ix].Value |> int
-    Mul (read 1, read 2)
+type op = Mul of (int * int) | Do | Dont 
 
 let toOp (m : Match) : op = 
     let name = m.Groups.[1].Value
-    printfn "%A" name
-    Do 
+    if name.StartsWith("don't") then Dont 
+    elif name.StartsWith("do") then Do 
+    else 
+        let values = m.Groups |> Seq.toList |> List.map (fun x -> x.Value)
+        let read (ix : int) = m.Groups.[ix].Value |> int
+        Mul(read 2, read 3)
 
 let parse (line : string) : op list = 
-    let pattern = "((mul)\((\d+)\,(\d+)\)|(do)\(\)|(don\'t)\(\))"
+    let pattern = "(mul\((\d+)\,(\d+)\)|do\(\)|don\'t\(\))"
     let matches = Regex.Matches(line, pattern)
     matches |> Seq.toList |> List.map toOp  
 
