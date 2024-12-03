@@ -21,12 +21,12 @@ let parse (line : string) : op list =
     let matches = Regex.Matches(line, pattern)
     matches |> Seq.toList |> List.map toOp  
 
-let rec calc1 (sum : int) (enabled : bool) (ops : op list) : int = 
+let rec calc1 (sum : int) (ops : op list) : int = 
     match ops with 
     | [] -> sum 
     | Mul (a, b) :: rest -> 
-        calc1 (if enabled then sum + a*b else sum) enabled rest 
-    | _ :: rest -> calc1 sum enabled rest 
+        calc1 (sum + a*b) rest 
+    | _ :: rest -> calc1 sum rest 
 
 let rec calc2 (sum : int) (enabled : bool) (ops : op list) : int = 
     match ops with 
@@ -41,7 +41,7 @@ let readLines =
 
 let run fileName = 
     let ops = File.ReadAllText fileName |> parse
-    calc1 0 true ops |> printfn "%d"
+    calc1 0 ops |> printfn "%d"
     calc2 0 true ops |> printfn "%d"
 
 run "input"
