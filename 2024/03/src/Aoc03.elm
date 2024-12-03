@@ -54,7 +54,8 @@ type alias Model =
   , position : Int
   , delay : Float
   , paused : Bool  
-  , conditionals : Bool 
+  , parseConditionals : Bool 
+  , performMultiplications : Bool 
   , counter : Int 
   , debug : String }
 
@@ -98,7 +99,8 @@ when(578,754)mul(12,923)# /+who();&'^mul(874,174))from()] mul(294+$$[when()where
             , position = 0
             , delay = defaultDelay
             , paused = True
-            , conditionals = False
+            , parseConditionals = False
+            , performMultiplications = True
             , counter = 0
             , debug = "" }
   in 
@@ -170,18 +172,22 @@ updateModelWith nxt model =
     Start -> 
       case nxt of 
         "m" -> 
-          -- Start scanning with new state AfterM.
-          let 
-            scanned = 
-              if String.isEmpty model.junk then 
-                model.scanned 
-              else 
-                List.append model.scanned [ Corrupted model.junk ]
-          in 
-            { model | state = AfterM, scanning = nxt, scanned = scanned, junk = "" }
+          if model.performMultiplications then 
+            -- Start scanning with new state AfterM.
+            let 
+              scanned = 
+                if String.isEmpty model.junk then 
+                  model.scanned 
+                else 
+                  List.append model.scanned [ Corrupted model.junk ]
+            in 
+              { model | state = AfterM, scanning = nxt, scanned = scanned, junk = "" }
+          else 
+            -- Keep adding to junk.
+            { model | junk = String.append model.junk nxt } 
         "d" ->
-          -- Start scanning with new state AfterD.
-          if model.conditionals then 
+          if model.parseConditionals then 
+            -- Start scanning with new state AfterD.
             let 
               scanned = 
                 if String.isEmpty model.junk then 
@@ -303,10 +309,10 @@ updateModelWith nxt model =
         ")" -> 
           let
             instr = String.append model.scanning ")"
-            conditionals = instr == "do()"
+            multiply = instr == "do()"
             scanned = List.append model.scanned [ Instruction instr ]
           in 
-            { model | state = Start, conditionals = conditionals, scanned = scanned, scanning = "", junk = "" }
+            { model | state = Start, performMultiplications = multiply, scanned = scanned, scanning = "", junk = "" }
         _ -> 
           updateReset nxt model 
 
@@ -333,7 +339,7 @@ update msg model =
       (updateModel model, Cmd.none)
     TogglePlay -> 
       let 
-        runningText = if model.conditionals then "running (with conditionals)" else "running (without conditionals)"
+        runningText = if model.parseConditionals then "running (with conditionals)" else "running (without conditionals)"
       in 
         ({model | paused = not model.paused, lastCommandText = if model.paused then runningText else "press play to resume" }, Cmd.none)
     Faster -> 
@@ -342,11 +348,11 @@ update msg model =
       ({model | delay = model.delay * 2 }, Cmd.none)
     ToggleConditionals -> 
       let 
-        updatedConditionals = not model.conditionals
-        runningText = if updatedConditionals then "running (with conditionals)" else "running (without conditionals)"
+        toggled = not model.parseConditionals
+        runningText = if toggled then "running (with conditionals)" else "running (without conditionals)"
         cmdText = if model.paused then model.lastCommandText else runningText 
       in 
-        ({model | conditionals = updatedConditionals, lastCommandText = cmdText  }, Cmd.none)
+        ({model | parseConditionals = toggled, lastCommandText = cmdText  }, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -378,8 +384,13 @@ view model =
     scannedElements = model.scanned |> List.map toScannedHtmlElement
     junkElements = if String.isEmpty model.junk then [] else [ toCorruptedHtmlElement model.junk ]
     scanningElements = if String.isEmpty model.scanning then [] else [ toInstructionHtmlElement model.scanning ]
-    unscannedElements = [ Html.text model.unscanned ]
-    textElements = List.concat [ scannedElements, junkElements, scanningElements, unscannedElements ]
+    firstUnscanned = String.left 1 model.unscanned
+    plainUnscanned = String.dropLeft 1 model.unscanned
+    nextElement = Html.span [ Html.Attributes.style "text-decoration-line" "overline underline"
+                             , Html.Attributes.style "text-decoration-thickness" "1px" ] 
+                             [ Html.text firstUnscanned ]
+    unscannedElements = [ Html.text plainUnscanned ]
+    textElements = List.concat [ scannedElements, junkElements, scanningElements, [ nextElement ], unscannedElements ]
     commandsStr = ""
   in 
     Html.table 
@@ -397,7 +408,7 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "padding" "20px" ]
+              , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Reset ] 
                 [ text "Reset" ]
@@ -417,12 +428,11 @@ view model =
       , Html.tr 
           []
           [ Html.td 
-              [ Html.Attributes.align "center"
-              , Html.Attributes.style "padding" "20px" ]
+              [ Html.Attributes.align "center" ]
               [ Html.input 
-                [ Html.Attributes.type_ "checkbox", onClick ToggleConditionals, Html.Attributes.checked model.conditionals ] 
+                [ Html.Attributes.type_ "checkbox", onClick ToggleConditionals, Html.Attributes.checked model.parseConditionals ] 
                 []
-              , Html.label [] [ Html.text "Parse conditionals" ]
+              , Html.label [] [ Html.text "Enable conditionals" ]
             ] ]
       , Html.tr 
           []
@@ -430,15 +440,25 @@ view model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "12px"
-              , Html.Attributes.style "padding" "20px"
+              , Html.Attributes.style "font-size" "24px"
               , Html.Attributes.style "width" "200px" ] 
-              [ Html.div [] [ Html.text model.lastCommandText ]
-              , Html.div [] [ Html.text (String.append "state: " (whichState model.state)) ]
-              , Html.div [] [ Html.text (String.append "junk: " model.junk) ]
-              , Html.div [] [ Html.text (String.append "scanning: " model.scanning) ]
-              , Html.div [] [ Html.text (String.append "sum: " (String.fromInt model.value)) ]
-              , Html.div [] [ Html.text "..." ]
-              , Html.div [ Html.Attributes.align "left" ] textElements
+              [ 
+              -- Html.div [] [ Html.text model.lastCommandText ]
+              -- , Html.div [] [ Html.text (String.append "state: " (whichState model.state)) ]
+              -- , Html.div [] [ Html.text (String.append "junk: " model.junk) ]
+              -- , Html.div [] [ Html.text (String.append "scanning: " model.scanning) ]
+                Html.div [] [ Html.text (String.fromInt model.value) ]
               , Html.div [] [ Html.text commandsStr ]
+              ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "background-color" "white" 
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "12px"
+              , Html.Attributes.style "padding" "10px"
+              , Html.Attributes.style "width" "200px" ] 
+              [ 
+                Html.div [ Html.Attributes.align "left" ] textElements
               ] ] ]
