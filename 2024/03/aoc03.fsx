@@ -1,4 +1,4 @@
-// Advent of Code 2024. Day 03
+// Advent of Code 2024. Day 03: Mull It Over
 // dotnet fsi aoc03.fsx
 
 open System
