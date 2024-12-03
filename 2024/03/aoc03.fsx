@@ -36,9 +36,6 @@ let rec calc2 (sum : int) (enabled : bool) (ops : op list) : int =
     | Mul (a, b) :: rest -> 
         calc2 (if enabled then sum + a*b else sum) enabled rest 
 
-let readLines = 
-    File.ReadAllText
-
 let run fileName = 
     let ops = File.ReadAllText fileName |> parse
     calc1 0 ops |> printfn "%d"
