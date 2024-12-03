@@ -11,7 +11,7 @@ import Svg.Attributes exposing (..)
 import Time
 
 defaultDelay : Float
-defaultDelay = 10
+defaultDelay = 1
 
 -- MAIN
 
