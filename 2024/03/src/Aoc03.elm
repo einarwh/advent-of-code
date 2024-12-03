@@ -24,7 +24,7 @@ main =
 
 -- MODEL
 
-type Segment = Corrupted String | Instruction String
+type Segment = Corrupted String | Instruction String | Disabled String 
 
 type ParseState = 
   Start 
@@ -172,7 +172,7 @@ updateModelWith nxt model =
     Start -> 
       case nxt of 
         "m" -> 
-          if model.performMultiplications then 
+          -- if model.performMultiplications then 
             -- Start scanning with new state AfterM.
             let 
               scanned = 
@@ -182,9 +182,9 @@ updateModelWith nxt model =
                   List.append model.scanned [ Corrupted model.junk ]
             in 
               { model | state = AfterM, scanning = nxt, scanned = scanned, junk = "" }
-          else 
-            -- Keep adding to junk.
-            { model | junk = String.append model.junk nxt } 
+          -- else 
+          --   -- Keep adding to junk.
+          --   { model | junk = String.append model.junk nxt } 
         "d" ->
           if model.parseConditionals then 
             -- Start scanning with new state AfterD.
@@ -255,8 +255,9 @@ updateModelWith nxt model =
           let
             instr = String.append model.scanning ")"
             multiplication = executeMultiply instr
-            value = model.value + executeMultiply instr
-            scanned = List.append model.scanned [ Instruction instr ]
+            value = if model.performMultiplications then model.value + multiplication else model.value 
+            segment = if model.performMultiplications then Instruction instr else Disabled instr 
+            scanned = List.append model.scanned [ segment ]
           in 
             { model | state = Start, value = value, scanned = scanned, scanning = "", junk = "", lastCommandText = String.fromInt multiplication }
         _ -> 
@@ -367,6 +368,11 @@ toInstructionHtmlElement : String -> Html Msg
 toInstructionHtmlElement s =  
   Html.span [ Html.Attributes.style "font-weight" "bold" ] [ Html.text s ]
 
+toDisabledHtmlElement : String -> Html Msg 
+toDisabledHtmlElement s =  
+  Html.span [ Html.Attributes.style "font-weight" "bold"
+            , Html.Attributes.style "text-decoration-line" "line-through" ] [ Html.text s ]
+
 toCorruptedHtmlElement : String -> Html Msg 
 toCorruptedHtmlElement s =  
   Html.text s 
@@ -376,6 +382,7 @@ toScannedHtmlElement segment =
   case segment of 
     Corrupted s -> toCorruptedHtmlElement s 
     Instruction s -> toInstructionHtmlElement s
+    Disabled s -> toDisabledHtmlElement s
 
 view : Model -> Html Msg
 view model =
