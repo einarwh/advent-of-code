@@ -8,10 +8,7 @@ module Array2D =
     let tryGet (a : 'a[,]) (x, y) = 
         let first = y >= 0 && y < a.GetLength(0)
         let second = x >= 0 && x < a.GetLength(1)
-        if first && second then 
-            Some <| Array2D.get a y x
-        else 
-            None 
+        if first && second then Some (Array2D.get a y x) else None
 
 let findXmas board xpos move = 
     let mpos = move xpos
@@ -59,13 +56,11 @@ let run fileName =
     let positions = [for x in [0..width-1] do for y in [0..height-1] -> (x, y)]
     // Part 1
     positions 
-    |> List.map (findXmasAllAround board)
-    |> List.sum 
+    |> List.sumBy (findXmasAllAround board)
     |> printfn "%d"
     // Part 2
     positions 
-    |> List.map (findMasX board)
-    |> List.sum 
+    |> List.sumBy (findMasX board)
     |> printfn "%d"
 
 run "input"
