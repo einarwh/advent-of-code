@@ -4,8 +4,6 @@ import Browser
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
-import Dict exposing (Dict)
-import Array exposing (Array)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Time
