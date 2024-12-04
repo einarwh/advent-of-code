@@ -24,6 +24,7 @@ type Report = Unchecked (List Int) | Safe (List Int) | Dampened (List Int, Int) 
 type alias Model = 
   { safeReports : Int 
   , useSample : Bool 
+  , useDampener : Bool 
   , reports : List Report
   , lastCommandText : String
   , counter : Int 
@@ -33,9 +34,12 @@ parseNumbers : String -> List Int
 parseNumbers line = 
   line |> String.split " " |> List.filterMap String.toInt
 
-checkReport : String -> Report 
-checkReport line = 
-  line |> parseNumbers |> Unsafe
+checkReport : Report -> Report 
+checkReport report = 
+  case report of 
+    Unchecked numbers -> 
+      report 
+    _ -> report 
 
 initReports : Bool -> List Report
 initReports useSample = 
@@ -1057,7 +1061,8 @@ init _ =
     model = { safeReports = 0
             , reports = reports
             , lastCommandText = "press play to start"
-            , useSample = False 
+            , useSample = False
+            , useDampener = False
             , counter = 0
             , debug = "" }
   in 
@@ -1065,17 +1070,28 @@ init _ =
 
 -- UPDATE
 
-type Msg = Clear | Solve | ToggleSample
+type Msg = Clear | Solve | ToggleDampener | ToggleSample
 
 updateClear : Model -> Model
 updateClear model = { model | safeReports = 0 } 
 
+countSafe : List Report -> Int 
+countSafe reports = 0
+
 updateSolve : Model -> Model
 updateSolve model = 
   let
-    found = 0
+    reports = model.reports |> List.map checkReport
+    found = countSafe reports 
   in
     { model | safeReports = found }
+
+updateToggleDampener : Model -> Model
+updateToggleDampener model = 
+  let
+    useDampener = not model.useDampener
+  in
+    { model | useDampener = useDampener } 
 
 updateToggleSample : Model -> Model
 updateToggleSample model = 
@@ -1091,6 +1107,8 @@ update msg model =
       (updateClear model, Cmd.none)
     Solve -> 
       (updateSolve model, Cmd.none)
+    ToggleDampener -> 
+      (updateToggleDampener model, Cmd.none)
     ToggleSample -> 
       (updateToggleSample model, Cmd.none)
 
@@ -1101,32 +1119,36 @@ subscriptions model = Sub.none
 
 -- VIEW
 
-toInstructionHtmlElement : String -> Html Msg 
-toInstructionHtmlElement s =  
-  Html.span [ Html.Attributes.style "font-weight" "bold" ] [ Html.text s ]
+toUncheckedHtmlElement : List Int -> List (Html Msg) 
+toUncheckedHtmlElement numbers =
+  [ numbers |> List.map String.fromInt |> String.join " " |> Html.text, Html.br [] [] ]
 
-toDisabledHtmlElement : String -> Html Msg 
-toDisabledHtmlElement s =  
-  Html.span [ Html.Attributes.style "font-weight" "bold"
-            , Html.Attributes.style "text-decoration-line" "line-through" ] [ Html.text s ]
+toUnsafeHtmlElement : List Int -> List (Html Msg) 
+toUnsafeHtmlElement numbers =
+  [ numbers |> List.map String.fromInt |> String.join " " |> Html.text, Html.br [] [] ]
 
-toCorruptedHtmlElement : String -> Html Msg 
-toCorruptedHtmlElement s =  
-  Html.text s 
+toSafeHtmlElement : List Int -> List (Html Msg) 
+toSafeHtmlElement numbers =
+  [ numbers |> List.map String.fromInt |> String.join " " |> Html.text, Html.br [] [] ]
 
-toScannedHtmlElement : Segment -> Html Msg 
-toScannedHtmlElement segment = 
-  case segment of 
-    Corrupted s -> toCorruptedHtmlElement s 
-    Instruction s -> toInstructionHtmlElement s
-    Disabled s -> toDisabledHtmlElement s
+toDampenedHtmlElement : Int -> List Int -> List (Html Msg) 
+toDampenedHtmlElement index numbers =
+  [ numbers |> List.map String.fromInt |> String.join " " |> Html.text, Html.br [] [] ]
+
+toReportHtmlElement : Report -> List (Html Msg)  
+toReportHtmlElement report = 
+  case report of 
+    Unchecked numbers -> toUncheckedHtmlElement numbers 
+    Unsafe numbers -> toUnsafeHtmlElement numbers
+    Safe numbers -> toSafeHtmlElement numbers
+    Dampened (numbers, index) -> toDampenedHtmlElement index numbers
 
 view : Model -> Html Msg
 view model =
   let
     commandsStr = ""
-    textFontSize = if model.useSample then "32px" else "12px"
-    elements = []
+    textFontSize = if model.useSample then "36px" else "14px"
+    elements = model.reports |> List.concatMap toReportHtmlElement
   in 
     Html.table 
       [ Html.Attributes.style "width" "1080px"]
@@ -1157,6 +1179,15 @@ view model =
       , Html.tr 
           []
           [ Html.td 
+              [ Html.Attributes.align "center" ]
+              [ Html.input 
+                [ Html.Attributes.type_ "checkbox", onClick ToggleDampener, Html.Attributes.checked model.useDampener ] 
+                []
+              , Html.label [] [ Html.text "Use dampener" ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
@@ -1173,7 +1204,7 @@ view model =
               , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" textFontSize
-              , Html.Attributes.style "padding" "10px"
+              , Html.Attributes.style "padding" "20px"
               , Html.Attributes.style "width" "200px" ] 
               [ 
                 Html.div [] elements
