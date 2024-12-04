@@ -27,16 +27,6 @@ let findXmas (board : char [,]) (xpos : Pos) (move : Pos -> Pos) =
         |> List.choose id
     if word = ['X'; 'M'; 'A'; 'S'] then 1 else 0
 
-let findMasX (board : char [,]) ((x, y) : Pos) = 
-    let nwse = [ Array2D.tryGet board (x-1, y+1)  
-                 Array2D.tryGet board (x, y) 
-                 Array2D.tryGet board (x+1, y-1) ] |> List.choose id 
-    let swne = [ Array2D.tryGet board (x-1, y-1)  
-                 Array2D.tryGet board (x, y) 
-                 Array2D.tryGet board (x+1, y+1) ] |> List.choose id 
-    let isMas word = word = ['M'; 'A'; 'S'] || word = ['S'; 'A'; 'M']
-    if isMas nwse && isMas swne then 1 else 0 
-
 let findXmasAllAround (board : char [,]) (x : int, y : int) = 
     let nn = findXmas board (x, y) (fun (x, y) -> (x, y-1))
     let nw = findXmas board (x, y) (fun (x, y) -> (x-1, y-1))
@@ -47,6 +37,16 @@ let findXmasAllAround (board : char [,]) (x : int, y : int) =
     let ee = findXmas board (x, y) (fun (x, y) -> (x+1, y))
     let ne = findXmas board (x, y) (fun (x, y) -> (x+1, y-1))
     [nn; nw; ww; sw; ss; se; ee; ne] |> List.sum
+
+let findMasX (board : char [,]) ((x, y) : Pos) = 
+    let nwse = [ Array2D.tryGet board (x-1, y+1)  
+                 Array2D.tryGet board (x, y) 
+                 Array2D.tryGet board (x+1, y-1) ] |> List.choose id 
+    let swne = [ Array2D.tryGet board (x-1, y-1)  
+                 Array2D.tryGet board (x, y) 
+                 Array2D.tryGet board (x+1, y+1) ] |> List.choose id 
+    let isMas word = word = ['M'; 'A'; 'S'] || word = ['S'; 'A'; 'M']
+    if isMas nwse && isMas swne then 1 else 0 
 
 let readLines = 
     File.ReadAllLines
