@@ -27,7 +27,17 @@ let findXmas (board : char [,]) (xpos : Pos) (move : Pos -> Pos) =
         |> List.choose id
     if word = ['X'; 'M'; 'A'; 'S'] then 1 else 0
 
-let findAllDirections (board : char [,]) (x : int, y : int) = 
+let findMasX (board : char [,]) ((x, y) : Pos) = 
+    let nwse = [ Array2D.tryGet board (x-1, y+1)  
+                 Array2D.tryGet board (x, y) 
+                 Array2D.tryGet board (x+1, y-1) ] |> List.choose id 
+    let swne = [ Array2D.tryGet board (x-1, y-1)  
+                 Array2D.tryGet board (x, y) 
+                 Array2D.tryGet board (x+1, y+1) ] |> List.choose id 
+    let isMas word = word = ['M'; 'A'; 'S'] || word = ['S'; 'A'; 'M']
+    if isMas nwse && isMas swne then 1 else 0 
+
+let findXmasAllAround (board : char [,]) (x : int, y : int) = 
     let nn = findXmas board (x, y) (fun (x, y) -> (x, y-1))
     let nw = findXmas board (x, y) (fun (x, y) -> (x-1, y-1))
     let ww = findXmas board (x, y) (fun (x, y) -> (x-1, y))
@@ -49,8 +59,14 @@ let run fileName =
     let height = lines |> List.length 
     let board = Array2D.init height width (fun y x -> lines.[y].[x])
     let positions = [for x in [0..width-1] do for y in [0..height-1] -> (x, y)]
+    // Part 1
     positions 
-    |> List.map (findAllDirections board)
+    |> List.map (findXmasAllAround board)
+    |> List.sum 
+    |> printfn "%d"
+    // Part 2
+    positions 
+    |> List.map (findMasX board)
     |> List.sum 
     |> printfn "%d"
 
