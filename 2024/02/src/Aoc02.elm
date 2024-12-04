@@ -34,11 +34,33 @@ parseNumbers : String -> List Int
 parseNumbers line = 
   line |> String.split " " |> List.filterMap String.toInt
 
+-- let isSafe report = 
+--     let diffs = report |> List.pairwise |> List.map (fun (a, b) -> a - b)
+--     let safeIncreasing = diffs |> List.forall (fun d -> d >= 1 && d <= 3)
+--     let safeDecreasing = diffs |> List.forall (fun d -> d >= -3 && d <= -1)
+--     safeIncreasing || safeDecreasing
+
+pairwise : List a -> List (a, a) 
+pairwise lst = 
+  case lst of 
+    x :: y :: rest -> 
+      (x, y) :: pairwise (y :: rest)
+    _ -> []
+
+isSafe : List Int -> Bool 
+isSafe numbers = 
+  let 
+    diffs = numbers |> pairwise |> List.map (\(a, b) -> a - b)
+    safeIncreasing = diffs |> List.all (\d -> d >= 1 && d <= 3)
+    safeDecreasing = diffs |> List.all (\d -> d >= -3 && d <= -1)
+  in 
+    safeIncreasing || safeDecreasing
+
 checkReport : Report -> Report 
 checkReport report = 
   case report of 
     Unchecked numbers -> 
-      report 
+      if isSafe numbers then Safe numbers else Unsafe numbers
     _ -> report 
 
 initReports : Bool -> List Report
@@ -1073,18 +1095,27 @@ init _ =
 type Msg = Clear | Solve | ToggleDampener | ToggleSample
 
 updateClear : Model -> Model
-updateClear model = { model | safeReports = 0 } 
+updateClear model = { model | reports = initReports model.useSample, safeReports = 0 } 
+
+countAsSafe : Report -> Int 
+countAsSafe report = 
+  case report of 
+    Safe _ -> 1 
+    Dampened _ -> 1 
+    Unchecked _ -> 0 
+    Unsafe _ -> 0
 
 countSafe : List Report -> Int 
-countSafe reports = 0
+countSafe reports = 
+  reports |> List.map countAsSafe |> List.sum 
 
 updateSolve : Model -> Model
 updateSolve model = 
   let
-    reports = model.reports |> List.map checkReport
+    reports = if model.useDampener then model.reports |> List.map checkReport else model.reports |> List.map checkReport
     found = countSafe reports 
   in
-    { model | safeReports = found }
+    { model | reports = reports, safeReports = found }
 
 updateToggleDampener : Model -> Model
 updateToggleDampener model = 
@@ -1125,11 +1156,21 @@ toUncheckedHtmlElement numbers =
 
 toUnsafeHtmlElement : List Int -> List (Html Msg) 
 toUnsafeHtmlElement numbers =
-  [ numbers |> List.map String.fromInt |> String.join " " |> Html.text, Html.br [] [] ]
+  let 
+    str = numbers |> List.map String.fromInt |> String.join " "
+    textElement = Html.text str 
+    spanElement = Html.span [ Html.Attributes.style "background-color" "#FAA0A0" ] [ textElement ]
+  in 
+    [ spanElement, Html.br [] [] ]
 
 toSafeHtmlElement : List Int -> List (Html Msg) 
 toSafeHtmlElement numbers =
-  [ numbers |> List.map String.fromInt |> String.join " " |> Html.text, Html.br [] [] ]
+  let 
+    str = numbers |> List.map String.fromInt |> String.join " "
+    textElement = Html.text str 
+    spanElement = Html.span [ Html.Attributes.style "background-color" "#AFE1AF" ] [ textElement ]
+  in 
+    [ spanElement, Html.br [] [] ]
 
 toDampenedHtmlElement : Int -> List Int -> List (Html Msg) 
 toDampenedHtmlElement index numbers =

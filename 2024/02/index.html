@@ -5229,27 +5229,127 @@ var $author$project$Aoc02$subscriptions = function (model) {
 var $author$project$Aoc02$updateClear = function (model) {
 	return _Utils_update(
 		model,
-		{safeReports: 0});
+		{
+			reports: $author$project$Aoc02$initReports(model.useSample),
+			safeReports: 0
+		});
+};
+var $author$project$Aoc02$Safe = function (a) {
+	return {$: 'Safe', a: a};
+};
+var $author$project$Aoc02$Unsafe = function (a) {
+	return {$: 'Unsafe', a: a};
+};
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $elm$core$Basics$not = _Basics_not;
+var $elm$core$List$all = F2(
+	function (isOkay, list) {
+		return !A2(
+			$elm$core$List$any,
+			A2($elm$core$Basics$composeL, $elm$core$Basics$not, isOkay),
+			list);
+	});
+var $elm$core$Basics$ge = _Utils_ge;
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $author$project$Aoc02$pairwise = function (lst) {
+	if (lst.b && lst.b.b) {
+		var x = lst.a;
+		var _v1 = lst.b;
+		var y = _v1.a;
+		var rest = _v1.b;
+		return A2(
+			$elm$core$List$cons,
+			_Utils_Tuple2(x, y),
+			$author$project$Aoc02$pairwise(
+				A2($elm$core$List$cons, y, rest)));
+	} else {
+		return _List_Nil;
+	}
+};
+var $author$project$Aoc02$isSafe = function (numbers) {
+	var diffs = A2(
+		$elm$core$List$map,
+		function (_v0) {
+			var a = _v0.a;
+			var b = _v0.b;
+			return a - b;
+		},
+		$author$project$Aoc02$pairwise(numbers));
+	var safeDecreasing = A2(
+		$elm$core$List$all,
+		function (d) {
+			return (_Utils_cmp(d, -3) > -1) && (_Utils_cmp(d, -1) < 1);
+		},
+		diffs);
+	var safeIncreasing = A2(
+		$elm$core$List$all,
+		function (d) {
+			return (d >= 1) && (d <= 3);
+		},
+		diffs);
+	return safeIncreasing || safeDecreasing;
 };
 var $author$project$Aoc02$checkReport = function (report) {
 	if (report.$ === 'Unchecked') {
 		var numbers = report.a;
-		return report;
+		return $author$project$Aoc02$isSafe(numbers) ? $author$project$Aoc02$Safe(numbers) : $author$project$Aoc02$Unsafe(numbers);
 	} else {
 		return report;
 	}
 };
+var $author$project$Aoc02$countAsSafe = function (report) {
+	switch (report.$) {
+		case 'Safe':
+			return 1;
+		case 'Dampened':
+			return 1;
+		case 'Unchecked':
+			return 0;
+		default:
+			return 0;
+	}
+};
+var $elm$core$List$sum = function (numbers) {
+	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
+};
 var $author$project$Aoc02$countSafe = function (reports) {
-	return 0;
+	return $elm$core$List$sum(
+		A2($elm$core$List$map, $author$project$Aoc02$countAsSafe, reports));
 };
 var $author$project$Aoc02$updateSolve = function (model) {
-	var reports = A2($elm$core$List$map, $author$project$Aoc02$checkReport, model.reports);
+	var reports = model.useDampener ? A2($elm$core$List$map, $author$project$Aoc02$checkReport, model.reports) : A2($elm$core$List$map, $author$project$Aoc02$checkReport, model.reports);
 	var found = $author$project$Aoc02$countSafe(reports);
 	return _Utils_update(
 		model,
-		{safeReports: found});
+		{reports: reports, safeReports: found});
 };
-var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc02$updateToggleDampener = function (model) {
 	var useDampener = !model.useDampener;
 	return _Utils_update(
@@ -5365,14 +5465,24 @@ var $author$project$Aoc02$toDampenedHtmlElement = F2(
 				A2($elm$html$Html$br, _List_Nil, _List_Nil)
 			]);
 	});
+var $elm$html$Html$span = _VirtualDom_node('span');
 var $author$project$Aoc02$toSafeHtmlElement = function (numbers) {
+	var str = A2(
+		$elm$core$String$join,
+		' ',
+		A2($elm$core$List$map, $elm$core$String$fromInt, numbers));
+	var textElement = $elm$html$Html$text(str);
+	var spanElement = A2(
+		$elm$html$Html$span,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'background-color', '#AFE1AF')
+			]),
+		_List_fromArray(
+			[textElement]));
 	return _List_fromArray(
 		[
-			$elm$html$Html$text(
-			A2(
-				$elm$core$String$join,
-				' ',
-				A2($elm$core$List$map, $elm$core$String$fromInt, numbers))),
+			spanElement,
 			A2($elm$html$Html$br, _List_Nil, _List_Nil)
 		]);
 };
@@ -5388,13 +5498,22 @@ var $author$project$Aoc02$toUncheckedHtmlElement = function (numbers) {
 		]);
 };
 var $author$project$Aoc02$toUnsafeHtmlElement = function (numbers) {
+	var str = A2(
+		$elm$core$String$join,
+		' ',
+		A2($elm$core$List$map, $elm$core$String$fromInt, numbers));
+	var textElement = $elm$html$Html$text(str);
+	var spanElement = A2(
+		$elm$html$Html$span,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'background-color', '#FAA0A0')
+			]),
+		_List_fromArray(
+			[textElement]));
 	return _List_fromArray(
 		[
-			$elm$html$Html$text(
-			A2(
-				$elm$core$String$join,
-				' ',
-				A2($elm$core$List$map, $elm$core$String$fromInt, numbers))),
+			spanElement,
 			A2($elm$html$Html$br, _List_Nil, _List_Nil)
 		]);
 };
