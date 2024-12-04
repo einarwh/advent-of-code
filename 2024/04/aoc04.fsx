@@ -13,9 +13,7 @@ module Array2D =
         else 
             None 
 
-type Pos = int * int 
-
-let findXmas (board : char [,]) (xpos : Pos) (move : Pos -> Pos) = 
+let findXmas board xpos move = 
     let mpos = move xpos
     let apos = move mpos 
     let spos = move apos 
@@ -27,18 +25,18 @@ let findXmas (board : char [,]) (xpos : Pos) (move : Pos -> Pos) =
         |> List.choose id
     if word = ['X'; 'M'; 'A'; 'S'] then 1 else 0
 
-let findXmasAllAround (board : char [,]) (x : int, y : int) = 
-    let nn = findXmas board (x, y) (fun (x, y) -> (x, y-1))
-    let nw = findXmas board (x, y) (fun (x, y) -> (x-1, y-1))
-    let ww = findXmas board (x, y) (fun (x, y) -> (x-1, y))
-    let sw = findXmas board (x, y) (fun (x, y) -> (x-1, y+1))
-    let ss = findXmas board (x, y) (fun (x, y) -> (x, y+1))
-    let se = findXmas board (x, y) (fun (x, y) -> (x+1, y+1))
-    let ee = findXmas board (x, y) (fun (x, y) -> (x+1, y))
-    let ne = findXmas board (x, y) (fun (x, y) -> (x+1, y-1))
+let findXmasAllAround board pos = 
+    let nn = findXmas board pos (fun (x, y) -> (x, y-1))
+    let nw = findXmas board pos (fun (x, y) -> (x-1, y-1))
+    let ww = findXmas board pos (fun (x, y) -> (x-1, y))
+    let sw = findXmas board pos (fun (x, y) -> (x-1, y+1))
+    let ss = findXmas board pos (fun (x, y) -> (x, y+1))
+    let se = findXmas board pos (fun (x, y) -> (x+1, y+1))
+    let ee = findXmas board pos (fun (x, y) -> (x+1, y))
+    let ne = findXmas board pos (fun (x, y) -> (x+1, y-1))
     [nn; nw; ww; sw; ss; se; ee; ne] |> List.sum
 
-let findMasX (board : char [,]) ((x, y) : Pos) = 
+let findMasX board (x, y) = 
     let nwse = [ Array2D.tryGet board (x-1, y+1)  
                  Array2D.tryGet board (x, y) 
                  Array2D.tryGet board (x+1, y-1) ] |> List.choose id 
