@@ -63,6 +63,48 @@ checkReport report =
       if isSafe numbers then Safe numbers else Unsafe numbers
     _ -> report 
 
+-- let permute report = 
+--     let len = report |> List.length 
+--     let indexedReport = report |> List.indexed
+--     let keepDifferent i (ix, n) = if i = ix then None else Some n
+--     [0 .. len - 1] |> List.map (fun i -> indexedReport |> List.choose (keepDifferent i))
+
+permute : List Int -> List (List Int)
+permute numbers = 
+  let 
+    len = numbers |> List.length 
+    indexes = List.range 0 (len - 1)
+    indexedNumbers = numbers |> List.indexedMap (\ix n -> (ix, n))
+    keepDifferent i (ix, n) = if i == ix then Nothing else Just n 
+  in 
+    indexes |> List.map (\i -> indexedNumbers |> List.filterMap (\(ix, n) -> if i == ix then Nothing else Just n)) 
+
+tryFindSafePermutation : Int -> List (List Int) -> Maybe Int 
+tryFindSafePermutation ix permutations = 
+  case permutations of 
+    [] -> Nothing 
+    p :: rest -> 
+      if isSafe p then 
+        Just ix 
+      else 
+        tryFindSafePermutation (ix + 1) rest
+
+checkReportWithDampener : Report -> Report 
+checkReportWithDampener report = 
+  case report of 
+    Unchecked numbers -> 
+      if isSafe numbers then 
+        Safe numbers 
+      else 
+        -- Create permutations.
+        let
+          permutations = permute numbers 
+        in 
+          case tryFindSafePermutation 0 permutations of 
+            Nothing -> Unsafe numbers 
+            Just ix -> Dampened (numbers, ix) 
+    _ -> report 
+
 initReports : Bool -> List Report
 initReports useSample = 
   let 
@@ -1112,7 +1154,11 @@ countSafe reports =
 updateSolve : Model -> Model
 updateSolve model = 
   let
-    reports = if model.useDampener then model.reports |> List.map checkReport else model.reports |> List.map checkReport
+    reports = 
+      if model.useDampener then 
+        model.reports |> List.map checkReportWithDampener
+      else 
+        model.reports |> List.map checkReport
     found = countSafe reports 
   in
     { model | reports = reports, safeReports = found }
@@ -1122,7 +1168,7 @@ updateToggleDampener model =
   let
     useDampener = not model.useDampener
   in
-    { model | useDampener = useDampener } 
+    { model | useDampener = useDampener, reports = initReports model.useSample, safeReports = 0 } 
 
 updateToggleSample : Model -> Model
 updateToggleSample model = 
@@ -1174,7 +1220,28 @@ toSafeHtmlElement numbers =
 
 toDampenedHtmlElement : Int -> List Int -> List (Html Msg) 
 toDampenedHtmlElement index numbers =
-  [ numbers |> List.map String.fromInt |> String.join " " |> Html.text, Html.br [] [] ]
+  let 
+    before = numbers |> List.take index
+    fromIndex = numbers |> List.drop index 
+    dropped = fromIndex |> List.take 1 
+    after = fromIndex |> List.drop 1 
+    strBefore = before |> List.map String.fromInt |> String.join " " 
+    textElementBefore = Html.text (String.append strBefore " ") 
+    spanElementBefore = Html.span [ Html.Attributes.style "background-color" "#AFE1AF" ] [ textElementBefore ]
+    strAfter = after |> List.map String.fromInt |> String.join " "
+    textElementAfter = Html.text (String.append " " strAfter) 
+    spanElementAfter = Html.span [ Html.Attributes.style "background-color" "#AFE1AF" ] [ textElementAfter ]
+    strDropped = dropped |> List.map String.fromInt |> String.join " "
+    textElementDropped = Html.text strDropped 
+    spanElementDropped = 
+      Html.span 
+        [ Html.Attributes.style "background-color" "#AFE1AF"
+        , Html.Attributes.style "color" "#808080"
+        , Html.Attributes.style "text-decoration-line" "line-through"] 
+        [ textElementDropped ]
+    breakElement = Html.br [] []
+  in 
+    [ spanElementBefore, spanElementDropped, spanElementAfter, breakElement ]
 
 toReportHtmlElement : Report -> List (Html Msg)  
 toReportHtmlElement report = 
