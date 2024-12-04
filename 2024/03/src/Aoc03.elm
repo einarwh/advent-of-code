@@ -50,31 +50,12 @@ type alias Model =
   , junk : String 
   , scanned : List Segment 
   , lastCommandText : String
-  , highlightFromPosition : Maybe Int
-  , position : Int
   , delay : Float
   , paused : Bool  
   , parseConditionals : Bool 
   , performMultiplications : Bool 
   , counter : Int 
   , debug : String }
-
-splitInput : String -> (String, String)
-splitInput input = 
-  case input |> String.split "\n\n" of 
-    a::b::_ -> (a, b)
-    _ -> ("", "")
-
-parseStackIdLine : String -> List Int 
-parseStackIdLine s = 
-  s |> String.words |> List.map (String.toInt) |> List.map (Maybe.withDefault 0)
-
-tryReadCrate : Int -> String -> Maybe String 
-tryReadCrate index str = 
-  case str |> String.slice index (index + 1) of 
-    "" -> Nothing 
-    " " -> Nothing 
-    s -> Just s
   
 init : () -> (Model, Cmd Msg)
 init _ =
@@ -95,8 +76,6 @@ when(578,754)mul(12,923)# /+who();&'^mul(874,174))from()] mul(294+$$[when()where
             , junk = ""
             , scanned = [] 
             , lastCommandText = "press play to start"
-            , highlightFromPosition = Nothing
-            , position = 0
             , delay = defaultDelay
             , paused = True
             , parseConditionals = False
