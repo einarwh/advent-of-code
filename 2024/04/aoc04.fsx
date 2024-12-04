@@ -1,4 +1,4 @@
-// Advent of Code 2024. Day 04: Ceres Search
+// Advent of Code 2024. Day 04: Ceres Search.
 // dotnet fsi aoc04.fsx
 
 open System
