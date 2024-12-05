@@ -16,8 +16,11 @@ let parseRule s =
 let parseUpdate s = 
     s |> split "," |> Array.toList |> List.map int 
 
+let findRule rules page nextPage = 
+    rules |> List.exists (fun (before, after) -> page = before && nextPage = after)
+
 let checkPage rules pagesAfter page = 
-    pagesAfter |> List.forall (fun p -> rules |> List.exists (fun (before, after) -> page = before && p = after))
+    pagesAfter |> List.forall (findRule rules page)
 
 let rec isSorted rules update = 
     match update with 
@@ -33,8 +36,7 @@ let part1 rules updates =
     updates |> List.filter (isSorted rules) |> List.sumBy middle
 
 let comparePages rules page1 page2 =
-    let foundRule = rules |> List.exists (fun (before, after) -> page1 = before && page2 = after)
-    if foundRule then -1 else 1
+    if findRule rules page1 page2 then -1 else 1 
 
 let part2 rules updates = 
     let unsorted = updates |> List.filter (fun update -> not <| isSorted rules update)
@@ -43,8 +45,9 @@ let part2 rules updates =
 
 let run fileName = 
     let text = File.ReadAllText fileName |> trim |> split "\n\n"
-    let rules = text.[0] |> split "\n" |> Array.toList |> List.choose parseRule  
-    let updates = text.[1] |> split "\n" |> Array.toList |> List.map parseUpdate
+    let toLines = split "\n" >> Array.toList
+    let rules = text.[0] |> toLines |> List.choose parseRule  
+    let updates = text.[1] |> toLines |> List.map parseUpdate
     part1 rules updates |> printfn "%d"
     part2 rules updates |> printfn "%d"
 
