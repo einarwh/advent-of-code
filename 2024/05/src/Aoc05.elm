@@ -1475,10 +1475,11 @@ init : () -> (Model, Cmd Msg)
 init _ =
   let 
     (rules, updates) = initUpdates False
+    rows = updates |> List.map Plain
     model = { sumOfMiddles = 0
             , rules = rules
             , updates = updates
-            , rows = []
+            , rows = rows
             , lastCommandText = "press play to start"
             , useSample = False
             , checkSorted = True
@@ -1506,8 +1507,9 @@ updateToggleSample model =
   let
     useSample = not model.useSample
     (rules, updates) = initUpdates useSample
+    rows = updates |> List.map Plain
   in
-    { model | useSample = useSample, rules = rules, updates = updates } 
+    { model | useSample = useSample, rules = rules, updates = updates, rows = rows } 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -1526,12 +1528,22 @@ subscriptions model = Sub.none
 
 -- VIEW
 
+toPlainHtmlElement : List Int -> List (Html Msg) 
+toPlainHtmlElement pages =
+  [ pages |> List.map String.fromInt |> String.join " " |> Html.text, Html.br [] [] ]
+
+toRowHtmlElement : Row -> List (Html Msg)  
+toRowHtmlElement row = 
+  case row of 
+    Highlighted pages -> toPlainHtmlElement pages 
+    Plain pages -> toPlainHtmlElement pages 
+
 view : Model -> Html Msg
 view model =
   let
     commandsStr = ""
     textFontSize = if model.useSample then "36px" else "14px"
-    elements = []
+    elements = model.rows |> List.concatMap toRowHtmlElement
   in 
     Html.table 
       [ Html.Attributes.style "width" "1080px"]

@@ -5173,6 +5173,9 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Aoc05$Plain = function (a) {
+	return {$: 'Plain', a: a};
+};
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
 		var _v0 = f(mx);
@@ -5246,7 +5249,8 @@ var $author$project$Aoc05$init = function (_v0) {
 	var _v1 = $author$project$Aoc05$initUpdates(false);
 	var rules = _v1.a;
 	var updates = _v1.b;
-	var model = {checkSorted: true, counter: 0, debug: '', lastCommandText: 'press play to start', rows: _List_Nil, rules: rules, sumOfMiddles: 0, updates: updates, useSample: false};
+	var rows = A2($elm$core$List$map, $author$project$Aoc05$Plain, updates);
+	var model = {checkSorted: true, counter: 0, debug: '', lastCommandText: 'press play to start', rows: rows, rules: rules, sumOfMiddles: 0, updates: updates, useSample: false};
 	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -5271,9 +5275,10 @@ var $author$project$Aoc05$updateToggleSample = function (model) {
 	var _v0 = $author$project$Aoc05$initUpdates(useSample);
 	var rules = _v0.a;
 	var updates = _v0.b;
+	var rows = A2($elm$core$List$map, $author$project$Aoc05$Plain, updates);
 	return _Utils_update(
 		model,
-		{rules: rules, updates: updates, useSample: useSample});
+		{rows: rows, rules: rules, updates: updates, useSample: useSample});
 };
 var $author$project$Aoc05$update = F2(
 	function (msg, model) {
@@ -5305,6 +5310,22 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$align = $elm$html$Html$Attributes$stringProperty('align');
 var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
@@ -5329,10 +5350,31 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$html$Html$br = _VirtualDom_node('br');
+var $author$project$Aoc05$toPlainHtmlElement = function (pages) {
+	return _List_fromArray(
+		[
+			$elm$html$Html$text(
+			A2(
+				$elm$core$String$join,
+				' ',
+				A2($elm$core$List$map, $elm$core$String$fromInt, pages))),
+			A2($elm$html$Html$br, _List_Nil, _List_Nil)
+		]);
+};
+var $author$project$Aoc05$toRowHtmlElement = function (row) {
+	if (row.$ === 'Highlighted') {
+		var pages = row.a;
+		return $author$project$Aoc05$toPlainHtmlElement(pages);
+	} else {
+		var pages = row.a;
+		return $author$project$Aoc05$toPlainHtmlElement(pages);
+	}
+};
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $author$project$Aoc05$view = function (model) {
 	var textFontSize = model.useSample ? '36px' : '14px';
-	var elements = _List_Nil;
+	var elements = A2($elm$core$List$concatMap, $author$project$Aoc05$toRowHtmlElement, model.rows);
 	var commandsStr = '';
 	return A2(
 		$elm$html$Html$table,
