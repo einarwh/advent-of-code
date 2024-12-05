@@ -48,7 +48,7 @@ let run fileName =
     let toLines = split "\n" >> Array.toList
     let rules = text.[0] |> toLines |> List.choose parseRule  
     let updates = text.[1] |> toLines |> List.map parseUpdate
-    part1 rules updates |> printfn "%d"
-    part2 rules updates |> printfn "%d"
+    updates |> part1 rules |> printfn "%d"
+    updates |> part2 rules |> printfn "%d"
 
 run "input"
