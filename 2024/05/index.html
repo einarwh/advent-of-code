@@ -5265,18 +5265,148 @@ var $author$project$Aoc05$updateClear = function (model) {
 	var rows = A2($elm$core$List$map, $author$project$Aoc05$Plain, updates);
 	return _Utils_update(
 		model,
-		{rows: rows, rules: rules, updates: updates});
+		{rows: rows, rules: rules, sumOfMiddles: 0, updates: updates});
+};
+var $author$project$Aoc05$Highlighted = function (a) {
+	return {$: 'Highlighted', a: a};
+};
+var $elm$core$List$drop = F2(
+	function (n, list) {
+		drop:
+		while (true) {
+			if (n <= 0) {
+				return list;
+			} else {
+				if (!list.b) {
+					return list;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs;
+					n = $temp$n;
+					list = $temp$list;
+					continue drop;
+				}
+			}
+		}
+	});
+var $author$project$Aoc05$findMiddle = function (update) {
+	var ix = ($elm$core$List$length(update) / 2) | 0;
+	var _v0 = A2($elm$core$List$drop, ix, update);
+	if (!_v0.b) {
+		return 0;
+	} else {
+		var h = _v0.a;
+		return h;
+	}
+};
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $elm$core$Basics$not = _Basics_not;
+var $elm$core$List$all = F2(
+	function (isOkay, list) {
+		return !A2(
+			$elm$core$List$any,
+			A2($elm$core$Basics$composeL, $elm$core$Basics$not, isOkay),
+			list);
+	});
+var $author$project$Aoc05$checkPage = F3(
+	function (rules, pagesAfter, page) {
+		return A2(
+			$elm$core$List$all,
+			function (p) {
+				return A2(
+					$elm$core$List$any,
+					function (_v0) {
+						var before = _v0.a;
+						var after = _v0.b;
+						return _Utils_eq(page, before) && _Utils_eq(p, after);
+					},
+					rules);
+			},
+			pagesAfter);
+	});
+var $author$project$Aoc05$isSorted = F2(
+	function (rules, update) {
+		if (!update.b) {
+			return true;
+		} else {
+			var page = update.a;
+			var pagesAfter = update.b;
+			return A3($author$project$Aoc05$checkPage, rules, pagesAfter, page) && A2($author$project$Aoc05$isSorted, rules, pagesAfter);
+		}
+	});
+var $elm$core$List$sum = function (numbers) {
+	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
 };
 var $author$project$Aoc05$updateSolveSorted = function (model) {
-	return model;
+	var rows = A2(
+		$elm$core$List$map,
+		function (u) {
+			return A2($author$project$Aoc05$isSorted, model.rules, u) ? $author$project$Aoc05$Highlighted(u) : $author$project$Aoc05$Plain(u);
+		},
+		model.updates);
+	var pickSorted = function (row) {
+		if (row.$ === 'Highlighted') {
+			var update = row.a;
+			return $elm$core$Maybe$Just(update);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	};
+	var sorted = A2($elm$core$List$filterMap, pickSorted, rows);
+	var sumOfMiddles = $elm$core$List$sum(
+		A2($elm$core$List$map, $author$project$Aoc05$findMiddle, sorted));
+	return _Utils_update(
+		model,
+		{rows: rows, sumOfMiddles: sumOfMiddles});
 };
 var $author$project$Aoc05$updateSolveUnsorted = function (model) {
+	var rows = A2(
+		$elm$core$List$map,
+		function (u) {
+			return A2($author$project$Aoc05$isSorted, model.rules, u) ? $author$project$Aoc05$Highlighted(u) : $author$project$Aoc05$Plain(u);
+		},
+		model.updates);
+	var pickSorted = function (row) {
+		if (row.$ === 'Highlighted') {
+			var update = row.a;
+			return $elm$core$Maybe$Just(update);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	};
+	var sorted = A2($elm$core$List$filterMap, pickSorted, rows);
 	return model;
 };
 var $author$project$Aoc05$updateSolve = function (model) {
 	return model.checkSorted ? $author$project$Aoc05$updateSolveSorted(model) : $author$project$Aoc05$updateSolveUnsorted(model);
 };
-var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc05$updateToggleSample = function (model) {
 	var useSample = !model.useSample;
 	var _v0 = $author$project$Aoc05$initUpdates(useSample);
@@ -5285,9 +5415,9 @@ var $author$project$Aoc05$updateToggleSample = function (model) {
 	var rows = A2($elm$core$List$map, $author$project$Aoc05$Plain, updates);
 	return _Utils_update(
 		model,
-		{rows: rows, rules: rules, updates: updates, useSample: useSample});
+		{rows: rows, rules: rules, sumOfMiddles: 0, updates: updates, useSample: useSample});
 };
-var $author$project$Aoc05$update = F2(
+var $author$project$Aoc05$updateModel = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 'Clear':
@@ -5358,6 +5488,27 @@ var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$br = _VirtualDom_node('br');
+var $elm$html$Html$span = _VirtualDom_node('span');
+var $author$project$Aoc05$toHighlightedHtmlElement = function (numbers) {
+	var str = A2(
+		$elm$core$String$join,
+		' ',
+		A2($elm$core$List$map, $elm$core$String$fromInt, numbers));
+	var textElement = $elm$html$Html$text(str);
+	var spanElement = A2(
+		$elm$html$Html$span,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'background-color', '#AFE1AF')
+			]),
+		_List_fromArray(
+			[textElement]));
+	return _List_fromArray(
+		[
+			spanElement,
+			A2($elm$html$Html$br, _List_Nil, _List_Nil)
+		]);
+};
 var $author$project$Aoc05$toPlainHtmlElement = function (pages) {
 	return _List_fromArray(
 		[
@@ -5372,7 +5523,7 @@ var $author$project$Aoc05$toPlainHtmlElement = function (pages) {
 var $author$project$Aoc05$toRowHtmlElement = function (row) {
 	if (row.$ === 'Highlighted') {
 		var pages = row.a;
-		return $author$project$Aoc05$toPlainHtmlElement(pages);
+		return $author$project$Aoc05$toHighlightedHtmlElement(pages);
 	} else {
 		var pages = row.a;
 		return $author$project$Aoc05$toPlainHtmlElement(pages);
@@ -5531,7 +5682,7 @@ var $author$project$Aoc05$view = function (model) {
 			]));
 };
 var $author$project$Aoc05$main = $elm$browser$Browser$element(
-	{init: $author$project$Aoc05$init, subscriptions: $author$project$Aoc05$subscriptions, update: $author$project$Aoc05$update, view: $author$project$Aoc05$view});
+	{init: $author$project$Aoc05$init, subscriptions: $author$project$Aoc05$subscriptions, update: $author$project$Aoc05$updateModel, view: $author$project$Aoc05$view});
 _Platform_export({'Aoc05':{'init':$author$project$Aoc05$main(
 	$elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));
 

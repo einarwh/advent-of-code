@@ -14,7 +14,7 @@ main =
   Browser.element
     { init = init
     , view = view
-    , update = update
+    , update = updateModel
     , subscriptions = subscriptions }
 
 -- MODEL
@@ -1498,13 +1498,54 @@ updateClear model =
     (rules, updates) = initUpdates model.useSample
     rows = updates |> List.map Plain
   in 
-    { model | rules = rules, updates = updates, rows = rows } 
+    { model | rules = rules, updates = updates, rows = rows, sumOfMiddles = 0 } 
+
+-- let checkPage rules pagesAfter page = 
+--     pagesAfter |> List.forall (fun p -> rules |> List.exists (fun (before, after) -> page = before && p = after))
+
+checkPage : List (Int, Int) -> List Int -> Int -> Bool 
+checkPage rules pagesAfter page = 
+  pagesAfter |> List.all (\p -> rules |> List.any (\(before, after) -> page == before && p == after))
+
+isSorted : List (Int, Int) -> List Int -> Bool
+isSorted rules update = 
+  case update of 
+    [] -> True 
+    page :: pagesAfter -> 
+      checkPage rules pagesAfter page && isSorted rules pagesAfter
+
+findMiddle update = 
+  let 
+    ix = (List.length update) // 2
+  in 
+    case update |> List.drop ix of 
+      [] -> 0 
+      h :: _ -> h
 
 updateSolveSorted : Model -> Model
-updateSolveSorted model = model 
+updateSolveSorted model = 
+  let 
+    rows = model.updates |> List.map (\u -> if isSorted model.rules u then Highlighted u else Plain u)
+    pickSorted row = 
+      case row of 
+        Highlighted update -> Just update 
+        Plain _ -> Nothing
+    sorted = rows |> List.filterMap pickSorted
+    sumOfMiddles = sorted |> List.map findMiddle |> List.sum 
+  in 
+    { model | rows = rows, sumOfMiddles = sumOfMiddles }
 
 updateSolveUnsorted : Model -> Model
-updateSolveUnsorted model = model 
+updateSolveUnsorted model =
+  let 
+    rows = model.updates |> List.map (\u -> if isSorted model.rules u then Highlighted u else Plain u)
+    pickSorted row = 
+      case row of 
+        Highlighted update -> Just update 
+        Plain _ -> Nothing
+    sorted = rows |> List.filterMap pickSorted
+  in 
+    model
 
 updateSolve : Model -> Model
 updateSolve model = 
@@ -1520,10 +1561,10 @@ updateToggleSample model =
     (rules, updates) = initUpdates useSample
     rows = updates |> List.map Plain
   in
-    { model | useSample = useSample, rules = rules, updates = updates, rows = rows } 
+    { model | useSample = useSample, rules = rules, updates = updates, rows = rows, sumOfMiddles = 0 } 
 
-update : Msg -> Model -> (Model, Cmd Msg)
-update msg model =
+updateModel : Msg -> Model -> (Model, Cmd Msg)
+updateModel msg model =
   case msg of
     Clear -> 
       (updateClear model, Cmd.none)
@@ -1543,10 +1584,19 @@ toPlainHtmlElement : List Int -> List (Html Msg)
 toPlainHtmlElement pages =
   [ pages |> List.map String.fromInt |> String.join " " |> Html.text, Html.br [] [] ]
 
+toHighlightedHtmlElement : List Int -> List (Html Msg) 
+toHighlightedHtmlElement numbers =
+  let 
+    str = numbers |> List.map String.fromInt |> String.join " "
+    textElement = Html.text str 
+    spanElement = Html.span [ Html.Attributes.style "background-color" "#AFE1AF" ] [ textElement ]
+  in 
+    [ spanElement, Html.br [] [] ]
+
 toRowHtmlElement : Row -> List (Html Msg)  
 toRowHtmlElement row = 
   case row of 
-    Highlighted pages -> toPlainHtmlElement pages 
+    Highlighted pages -> toHighlightedHtmlElement pages 
     Plain pages -> toPlainHtmlElement pages 
 
 view : Model -> Html Msg
