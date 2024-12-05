@@ -1,0 +1,145 @@
+% Advent of Code 2024. Day 02: Red-Nosed Reports
+% gs -DNOSAFER aoc02.ps
+
+/read-input
+{                                       % fn
+    [                                   % fn [
+    exch                                % [ fn 
+    (r) file                            % [ F
+    {   
+        dup                             % [ .. F F
+        80 string                       % [ ... F F buf
+        readline                        % [ ... F (s) 
+        {   
+            exch                        % [ ... (s) F
+        }   
+        {   
+            exch                        % [ ... (s) F 
+            closefile                   % [ ... (s) 
+            ]                           % [ ... (s) ] 
+            exit    
+        } ifelse    
+    } loop                              % Rs
+} def 
+
+/map-array {                            % A {op} %%% {op} is operation to be called for each element in A
+    [ 3 1 roll                          % [ A {op}
+    exch                                % [ {op} A
+    {                                   % [ {op} e
+        1 index                         % [ {op} e {op}
+        exec                            % [ {op} r %%% r is result of executing {op} on e
+        exch                            % [ r {op}
+    } forall                            % [ ... {op}
+    pop                                 % [ ...
+    ]                                   % [ r1 r2 ... ]
+} def
+
+/filter-array {                         % A {p} %%% {p} is predicate to be called for each element in A
+    [ 3 1 roll                          % [ A {p}
+    exch                                % [ {p} A
+    {                                   % [ {p} e
+        2 copy                          % [ {p} e {p} e
+        exch                            % [ {p} e e {p}
+        exec                            % [ {p} e include?
+        {                               % [ {p} e %%% yes, keep e
+            exch                        % [ e {p}
+        }
+        {                               % [ {p} e %%% no, reject e
+            pop                         % [ {p}
+        } ifelse                        % [ e? {p}
+    } forall                            % [ ... {p}
+    pop                                 % [ ...
+    ]                                   % [ e... ]
+} def 
+
+/forall-array {                         % A {p} %%% {p} is predicate to be called for each element in A
+    true 3 1 roll                       % T A {p} %%% Assume T
+    exch                                % T {p} A
+    {                                   % T {p} e
+        1 index                         % T {p} e {p}
+        exec                            % T {p} satisfied?
+        not                             % T {p} failed?
+        {                               % T {p} failed! %%% terminate with false
+            exch pop                    % {p} %%% dropped default true
+            false exch                  % F {p}
+            exit                        % F {p} - out of loop
+        } if                            % 
+    } forall                            % B {p}
+    pop                                 % B
+} def 
+
+/exists-array {                         % A {p} %%% {p} is predicate to be called for each element in A
+    false 3 1 roll                      % F A {p} %%% Assume F
+    exch                                % F {p} A
+    {                                   % F {p} e
+        1 index                         % F {p} e {p}
+        exec                            % F {p} satisfied?
+        {                               % F {p} yes! %%% terminate with true
+            exch pop                    % {p} %%% dropped default false
+            true exch                   % T {p}
+            exit                        % T {p} - out of loop
+        } if                            % 
+    } forall                            % B {p}
+    pop                                 % B
+} def 
+
+/split-string {                         % (s=string) (z=sep) 
+    [                                   % s z [ 
+    3 1 roll                            % [ s z  
+    {                                   % [ s z
+        search                          % [ s'=rest (h=head z)? found?
+        {                               % [ s' z h (yes, found)
+            3 1 roll                    % [ h s' z  
+        }       
+        {                               % [ s  (not found)
+            exit                        % [ s
+        } ifelse        
+    } loop      
+    ]                                   % [ .. ]
+} def 
+
+/parse-numbers {                        % S (string)
+    ( ) split-string                    % A (with potentially empty strings)
+    { length 0 ne }                     % A predicate
+    filter-array                        % A (without any empty strings)
+    { cvi }                             % A projection
+    map-array                           % A (with numbers)
+} def
+
+/parse-rule {                           % S, string with format (num1|num2)
+    (|) split-string                    % [ (num1) (num2) ]
+    { cvi } map-array                   % [ num1 num2 ]
+} def 
+
+/parse-update {                         % S, string with format (p1,p2,...,pn))
+    (,) split-string                    % [ (p1) (p2) ... (p3) ]
+    { cvi } map-array                   % [ p1 p2 ... p3 ]
+} def 
+
+% TODO: Flip stack comments.
+/split-array-on-empty-string {          % A[Strings]
+    [ [                                 % | | A[S]
+    3 -1 roll                           % A[S] | |
+    {                                   % S | |
+        dup length 0 eq                 % L=0? S (A?) | (G?) |
+        {                               % S (A?) | (G?) | (Empty line, close group)
+            pop                         % (A?) | (G?) | 
+            ]                           % G=[(A?)] (G?) |
+            [                           % | G (G?) | (Start new group)
+        } if 
+    } forall 
+    ] ]
+} def 
+
+/run {
+    read-input
+    split-array-on-empty-string
+    aload pop pop                       % R(S) U(S)
+    { parse-update } map-array          % R(S) U 
+    exch                                % U R(S)
+    { parse-rule } map-array            % U R 
+
+    % TODO: Not done. Probably won't be done. 
+} def 
+
+(sample) run 
