@@ -46,8 +46,13 @@ parseRules : String -> List (Int, Int)
 parseRules s =
   s |> String.split "\n" |> List.filterMap parseRule 
 
+parseUpdate : String -> List Int
+parseUpdate s =
+  s |> String.split "," |> List.filterMap String.toInt 
+
 parseUpdates : String -> List (List Int)
-parseUpdates s = []
+parseUpdates s =
+  s |> String.split "\n" |> List.map parseUpdate 
 
 initUpdates : Bool -> (List (Int, Int), List (List Int))
 initUpdates useSample = 
