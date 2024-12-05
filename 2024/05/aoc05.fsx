@@ -32,16 +32,16 @@ let middle lst =
     let ix = (List.length lst) / 2 
     List.item ix lst
 
-let part1 rules updates = 
-    updates |> List.filter (isSorted rules) |> List.sumBy middle
+let part1 rules = 
+    List.filter (isSorted rules) >> List.sumBy middle
 
 let comparePages rules page1 page2 =
     if findRule rules page1 page2 then -1 else 1 
 
-let part2 rules updates = 
-    let unsorted = updates |> List.filter (fun update -> not <| isSorted rules update)
-    let sorted = unsorted |> List.map (List.sortWith (comparePages rules))
-    sorted |> List.sumBy middle
+let part2 rules = 
+    List.filter (fun update -> not <| isSorted rules update)
+    >> List.map (List.sortWith (comparePages rules))
+    >> List.sumBy middle
 
 let run fileName = 
     let text = File.ReadAllText fileName |> trim |> split "\n\n"
