@@ -5371,7 +5371,7 @@ var $author$project$Aoc05$updateSolveSorted = function (model) {
 			return A2($author$project$Aoc05$isSorted, model.rules, u) ? $author$project$Aoc05$Highlighted(u) : $author$project$Aoc05$Plain(u);
 		},
 		model.updates);
-	var pickSorted = function (row) {
+	var pick = function (row) {
 		if (row.$ === 'Highlighted') {
 			var update = row.a;
 			return $elm$core$Maybe$Just(update);
@@ -5379,21 +5379,36 @@ var $author$project$Aoc05$updateSolveSorted = function (model) {
 			return $elm$core$Maybe$Nothing;
 		}
 	};
-	var sorted = A2($elm$core$List$filterMap, pickSorted, rows);
+	var sorted = A2($elm$core$List$filterMap, pick, rows);
 	var sumOfMiddles = $elm$core$List$sum(
 		A2($elm$core$List$map, $author$project$Aoc05$findMiddle, sorted));
 	return _Utils_update(
 		model,
 		{rows: rows, sumOfMiddles: sumOfMiddles});
 };
+var $author$project$Aoc05$comparePages = F3(
+	function (rules, page1, page2) {
+		var foundRule = A2(
+			$elm$core$List$any,
+			function (_v0) {
+				var before = _v0.a;
+				var after = _v0.b;
+				return _Utils_eq(page1, before) && _Utils_eq(page2, after);
+			},
+			rules);
+		return foundRule ? $elm$core$Basics$LT : $elm$core$Basics$GT;
+	});
+var $elm$core$List$sortWith = _List_sortWith;
 var $author$project$Aoc05$updateSolveUnsorted = function (model) {
-	var rows = A2(
-		$elm$core$List$map,
-		function (u) {
-			return A2($author$project$Aoc05$isSorted, model.rules, u) ? $author$project$Aoc05$Highlighted(u) : $author$project$Aoc05$Plain(u);
-		},
-		model.updates);
-	var pickSorted = function (row) {
+	var tag = function (u) {
+		return A2($author$project$Aoc05$isSorted, model.rules, u) ? $author$project$Aoc05$Plain(u) : $author$project$Aoc05$Highlighted(
+			A2(
+				$elm$core$List$sortWith,
+				$author$project$Aoc05$comparePages(model.rules),
+				u));
+	};
+	var rows = A2($elm$core$List$map, tag, model.updates);
+	var pick = function (row) {
 		if (row.$ === 'Highlighted') {
 			var update = row.a;
 			return $elm$core$Maybe$Just(update);
@@ -5401,11 +5416,12 @@ var $author$project$Aoc05$updateSolveUnsorted = function (model) {
 			return $elm$core$Maybe$Nothing;
 		}
 	};
-	var sorted = A2($elm$core$List$filterMap, pickSorted, rows);
-	return model;
-};
-var $author$project$Aoc05$updateSolve = function (model) {
-	return model.checkSorted ? $author$project$Aoc05$updateSolveSorted(model) : $author$project$Aoc05$updateSolveUnsorted(model);
+	var highlighted = A2($elm$core$List$filterMap, pick, rows);
+	var sumOfMiddles = $elm$core$List$sum(
+		A2($elm$core$List$map, $author$project$Aoc05$findMiddle, highlighted));
+	return _Utils_update(
+		model,
+		{rows: rows, sumOfMiddles: sumOfMiddles});
 };
 var $author$project$Aoc05$updateToggleSample = function (model) {
 	var useSample = !model.useSample;
@@ -5424,9 +5440,13 @@ var $author$project$Aoc05$updateModel = F2(
 				return _Utils_Tuple2(
 					$author$project$Aoc05$updateClear(model),
 					$elm$core$Platform$Cmd$none);
-			case 'Solve':
+			case 'Sorted':
 				return _Utils_Tuple2(
-					$author$project$Aoc05$updateSolve(model),
+					$author$project$Aoc05$updateSolveSorted(model),
+					$elm$core$Platform$Cmd$none);
+			case 'Unsorted':
+				return _Utils_Tuple2(
+					$author$project$Aoc05$updateSolveUnsorted(model),
 					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(
@@ -5435,8 +5455,9 @@ var $author$project$Aoc05$updateModel = F2(
 		}
 	});
 var $author$project$Aoc05$Clear = {$: 'Clear'};
-var $author$project$Aoc05$Solve = {$: 'Solve'};
+var $author$project$Aoc05$Sorted = {$: 'Sorted'};
 var $author$project$Aoc05$ToggleSample = {$: 'ToggleSample'};
+var $author$project$Aoc05$Unsorted = {$: 'Unsorted'};
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -5593,11 +5614,22 @@ var $author$project$Aoc05$view = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Aoc05$Solve)
+										$elm$html$Html$Events$onClick($author$project$Aoc05$Sorted)
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Solve')
+										$elm$html$Html$text('Sorted')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick($author$project$Aoc05$Unsorted)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Unsorted')
 									])),
 								A2(
 								$elm$html$Html$button,

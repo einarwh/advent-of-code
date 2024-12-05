@@ -1490,7 +1490,7 @@ init _ =
 
 -- UPDATE
 
-type Msg = Clear | Solve | ToggleSample
+type Msg = Clear | Sorted | Unsorted | ToggleSample
 
 updateClear : Model -> Model
 updateClear model =
@@ -1499,9 +1499,6 @@ updateClear model =
     rows = updates |> List.map Plain
   in 
     { model | rules = rules, updates = updates, rows = rows, sumOfMiddles = 0 } 
-
--- let checkPage rules pagesAfter page = 
---     pagesAfter |> List.forall (fun p -> rules |> List.exists (fun (before, after) -> page = before && p = after))
 
 checkPage : List (Int, Int) -> List Int -> Int -> Bool 
 checkPage rules pagesAfter page = 
@@ -1526,26 +1523,41 @@ updateSolveSorted : Model -> Model
 updateSolveSorted model = 
   let 
     rows = model.updates |> List.map (\u -> if isSorted model.rules u then Highlighted u else Plain u)
-    pickSorted row = 
+    pick row = 
       case row of 
         Highlighted update -> Just update 
         Plain _ -> Nothing
-    sorted = rows |> List.filterMap pickSorted
+    sorted = rows |> List.filterMap pick
     sumOfMiddles = sorted |> List.map findMiddle |> List.sum 
   in 
     { model | rows = rows, sumOfMiddles = sumOfMiddles }
 
+comparePages : List (Int, Int) -> Int -> Int -> Order
+comparePages rules page1 page2 =
+  let
+    foundRule = rules |> List.any (\(before, after) -> page1 == before && page2 == after)
+  in 
+    if foundRule then LT else GT
+
+sortUpdate : List (Int, Int) -> List Int -> List Int 
+sortUpdate rules update = 
+  update |> List.sortWith (comparePages rules)
+
 updateSolveUnsorted : Model -> Model
 updateSolveUnsorted model =
   let 
-    rows = model.updates |> List.map (\u -> if isSorted model.rules u then Highlighted u else Plain u)
-    pickSorted row = 
+    tag u = 
+      if isSorted model.rules u then Plain u 
+      else Highlighted (u |> List.sortWith (comparePages model.rules))
+    rows = model.updates |> List.map tag
+    pick row = 
       case row of 
         Highlighted update -> Just update 
         Plain _ -> Nothing
-    sorted = rows |> List.filterMap pickSorted
+    highlighted = rows |> List.filterMap pick
+    sumOfMiddles = highlighted |> List.map findMiddle |> List.sum 
   in 
-    model
+    { model | rows = rows, sumOfMiddles = sumOfMiddles }
 
 updateSolve : Model -> Model
 updateSolve model = 
@@ -1563,13 +1575,24 @@ updateToggleSample model =
   in
     { model | useSample = useSample, rules = rules, updates = updates, rows = rows, sumOfMiddles = 0 } 
 
+updateToggleSorted : Model -> Model
+updateToggleSorted model = 
+  let
+    useSample = not model.useSample
+    (rules, updates) = initUpdates useSample
+    rows = updates |> List.map Plain
+  in
+    { model | useSample = useSample, rules = rules, updates = updates, rows = rows, sumOfMiddles = 0 } 
+
 updateModel : Msg -> Model -> (Model, Cmd Msg)
 updateModel msg model =
   case msg of
     Clear -> 
       (updateClear model, Cmd.none)
-    Solve -> 
-      (updateSolve model, Cmd.none)
+    Sorted -> 
+      (updateSolveSorted model, Cmd.none)
+    Unsorted -> 
+      (updateSolveUnsorted model, Cmd.none)
     ToggleSample -> 
       (updateToggleSample model, Cmd.none)
 
@@ -1623,8 +1646,11 @@ view model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Solve ] 
-                [ Html.text "Solve" ]
+                [ Html.Attributes.style "width" "80px", onClick Sorted ] 
+                [ Html.text "Sorted" ]
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Unsorted ] 
+                [ Html.text "Unsorted" ]
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Clear ] 
                 [ Html.text "Clear" ] 
