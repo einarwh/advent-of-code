@@ -1496,11 +1496,22 @@ updateClear : Model -> Model
 updateClear model =
   let 
     (rules, updates) = initUpdates model.useSample
+    rows = updates |> List.map Plain
   in 
-    { model | rules = rules, updates = updates } 
+    { model | rules = rules, updates = updates, rows = rows } 
+
+updateSolveSorted : Model -> Model
+updateSolveSorted model = model 
+
+updateSolveUnsorted : Model -> Model
+updateSolveUnsorted model = model 
 
 updateSolve : Model -> Model
-updateSolve model = model 
+updateSolve model = 
+  if model.checkSorted then 
+    updateSolveSorted model 
+  else 
+    updateSolveUnsorted model 
 
 updateToggleSample : Model -> Model
 updateToggleSample model = 

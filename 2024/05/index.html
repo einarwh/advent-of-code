@@ -5262,12 +5262,19 @@ var $author$project$Aoc05$updateClear = function (model) {
 	var _v0 = $author$project$Aoc05$initUpdates(model.useSample);
 	var rules = _v0.a;
 	var updates = _v0.b;
+	var rows = A2($elm$core$List$map, $author$project$Aoc05$Plain, updates);
 	return _Utils_update(
 		model,
-		{rules: rules, updates: updates});
+		{rows: rows, rules: rules, updates: updates});
+};
+var $author$project$Aoc05$updateSolveSorted = function (model) {
+	return model;
+};
+var $author$project$Aoc05$updateSolveUnsorted = function (model) {
+	return model;
 };
 var $author$project$Aoc05$updateSolve = function (model) {
-	return model;
+	return model.checkSorted ? $author$project$Aoc05$updateSolveSorted(model) : $author$project$Aoc05$updateSolveUnsorted(model);
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc05$updateToggleSample = function (model) {
