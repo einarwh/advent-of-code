@@ -5173,8 +5173,44 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $author$project$Aoc05$parseRule = function (s) {
+	var _v0 = A2(
+		$elm$core$List$filterMap,
+		$elm$core$String$toInt,
+		A2($elm$core$String$split, '|', s));
+	if ((_v0.b && _v0.b.b) && (!_v0.b.b.b)) {
+		var before = _v0.a;
+		var _v1 = _v0.b;
+		var after = _v1.a;
+		return $elm$core$Maybe$Just(
+			_Utils_Tuple2(before, after));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
 var $author$project$Aoc05$parseRules = function (s) {
-	return _List_Nil;
+	return A2(
+		$elm$core$List$filterMap,
+		$author$project$Aoc05$parseRule,
+		A2($elm$core$String$split, '\n', s));
 };
 var $author$project$Aoc05$parseUpdates = function (s) {
 	return _List_Nil;

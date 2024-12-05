@@ -36,8 +36,15 @@ parseNumbers : String -> List Int
 parseNumbers line = 
   line |> String.split " " |> List.filterMap String.toInt
 
+parseRule : String -> Maybe (Int, Int)
+parseRule s =
+  case s |> String.split "|" |> List.filterMap String.toInt of 
+    [ before, after ] -> Just (before, after)
+    _ -> Nothing
+
 parseRules : String -> List (Int, Int)
-parseRules s = []
+parseRules s =
+  s |> String.split "\n" |> List.filterMap parseRule 
 
 parseUpdates : String -> List (List Int)
 parseUpdates s = []
