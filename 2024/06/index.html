@@ -6450,6 +6450,27 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
 		var _v0 = f(mx);
@@ -6524,6 +6545,7 @@ var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
 };
+var $elm$html$Html$span = _VirtualDom_node('span');
 var $author$project$Aoc06$toCharElement = F2(
 	function (model, _v0) {
 		var x = _v0.a;
@@ -6539,7 +6561,26 @@ var $author$project$Aoc06$toCharElement = F2(
 				_Utils_Tuple2(x, y),
 				ch);
 			var str = $elm$core$String$fromChar(useChar);
-			return $elm$html$Html$text(str);
+			return A2(
+				$elm$core$List$any,
+				function (_v2) {
+					var p = _v2.a;
+					var d = _v2.b;
+					var m = _v2.c;
+					return _Utils_eq(
+						p,
+						_Utils_Tuple2(x, y));
+				},
+				model.routeWalked) ? A2(
+				$elm$html$Html$span,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'background-color', '#CCCCCC')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(str)
+					])) : $elm$html$Html$text(str);
 		}
 	});
 var $elm$html$Html$tr = _VirtualDom_node('tr');

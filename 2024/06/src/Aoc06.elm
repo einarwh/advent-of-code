@@ -372,9 +372,9 @@ toCharElement model (x, y) =
           useChar = chooseChar model (x, y) ch 
           str = String.fromChar useChar 
         in
-          -- if Set.member (x, y) model.highlighted then 
-          --   (Html.strong [] [ Html.text str ]) 
-          -- else 
+          if model.routeWalked |> List.any (\(p, d, m) -> p == (x, y)) then 
+            (Html.span [Html.Attributes.style "background-color" "#CCCCCC" ] [ Html.text str ]) 
+          else 
             Html.text str 
 
 view : Model -> Html Msg
