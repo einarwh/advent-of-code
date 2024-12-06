@@ -38,13 +38,13 @@ let turnRight dir =
     | _ -> failwith "no direction"
 
 let patrol startPos board = 
-    let rec walk (steps : Set<int*int>) (dir : int*int) (pos : int*int) = 
+    let rec walk (visited : Set<int*int>) (dir : int*int) (pos : int*int) = 
         let nextPos = move dir pos
         let inFront = nextPos |> Array2D.tryGet board 
         match inFront with 
-        | None -> 1 + (steps |> Set.count)
-        | Some '#' -> walk steps (turnRight dir) pos 
-        | _ -> walk (Set.add pos steps) dir nextPos
+        | None -> 1 + (visited |> Set.count)
+        | Some '#' -> walk visited (turnRight dir) pos 
+        | _ -> walk (Set.add pos visited) dir nextPos
     walk Set.empty (0, -1) startPos
 
 let run fileName = 
