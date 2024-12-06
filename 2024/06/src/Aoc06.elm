@@ -320,10 +320,10 @@ update msg model =
       (updateStep model, Cmd.none)
     Step ->
       (updateStep model, Cmd.none)
-    Faster ->
-      (updateStep model, Cmd.none)
-    Slower ->
-      (updateStep model, Cmd.none)
+    Faster -> 
+      ({model | delay = model.delay / 2 }, Cmd.none)
+    Slower -> 
+      ({model | delay = model.delay * 2 }, Cmd.none)
     TogglePlay -> 
       (updateTogglePlay model, Cmd.none)
     ToggleSample -> 
@@ -386,7 +386,7 @@ view model =
     nestedPositions = ys |> List.map (\y -> xs |> List.map (\x -> (x, y)))
     nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement model))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
-    commandsStr = ""
+    positionsVisited = model.routeWalked |> List.map (\(p, d, m) -> p) |> Set.fromList |> Set.size 
     textFontSize = if model.useSample then "36px" else "12px"
   in 
     Html.table 
@@ -406,17 +406,23 @@ view model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
-                [ Html.Attributes.style "width" "80px", onClick TogglePlay ] 
-                [ if model.paused then text "Play" else text "Pause" ]
-              , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Step ] 
-                [ Html.text "Step" ]
+                [ Html.Attributes.style "width" "80px", onClick ToggleSample ] 
+                [ Html.text (if model.useSample then "Input" else "Sample") ]
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Clear ] 
                 [ Html.text "Clear" ] 
               , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick ToggleSample ] 
-                [ Html.text (if model.useSample then "Input" else "Sample") ]
+                [ Html.Attributes.style "width" "80px", onClick Step ] 
+                [ Html.text "Step" ]
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Slower ] 
+                [ text "Slower" ]
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick TogglePlay ] 
+                [ if model.paused then text "Play" else text "Pause" ] 
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Faster ] 
+                [ text "Faster" ]
             ] ]
       , Html.tr 
           []
@@ -427,20 +433,19 @@ view model =
               , Html.Attributes.style "font-size" "24px"
               , Html.Attributes.style "width" "200px" ] 
               [ 
-                Html.div [] [ Html.text (String.fromInt model.found) ]
-              , Html.div [] [ Html.text commandsStr ]
+                Html.div [] [ Html.text (String.fromInt positionsVisited) ]
               ] ]
-      , Html.tr 
-          []
-          [ Html.td 
-              [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
-              , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "24px"
-              , Html.Attributes.style "width" "200px" ] 
-              [ 
-                Html.div [] [ Html.text model.message ]
-              ] ]
+      -- , Html.tr 
+      --     []
+      --     [ Html.td 
+      --         [ Html.Attributes.align "center"
+      --         , Html.Attributes.style "background-color" "white" 
+      --         , Html.Attributes.style "font-family" "Courier New"
+      --         , Html.Attributes.style "font-size" "24px"
+      --         , Html.Attributes.style "width" "200px" ] 
+      --         [ 
+      --           Html.div [] [ Html.text model.message ]
+      --         ] ]
       , Html.tr 
           []
           [ Html.td 
