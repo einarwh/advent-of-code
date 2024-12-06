@@ -5256,12 +5256,13 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Aoc06$Part1 = {$: 'Part1'};
 var $author$project$Aoc06$Forward = {$: 'Forward'};
 var $author$project$Aoc06$N = {$: 'N'};
 var $author$project$Aoc06$Plain = function (a) {
 	return {$: 'Plain', a: a};
 };
-var $author$project$Aoc06$defaultDelay = 10;
+var $author$project$Aoc06$defaultTickInterval = 10;
 var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
 	return array2d.columns;
 };
@@ -5943,32 +5944,42 @@ var $author$project$Aoc06$walk = F5(
 			}
 		}
 	});
-var $author$project$Aoc06$initModel = function (useSample) {
-	var dir = $author$project$Aoc06$N;
-	var board = $author$project$Aoc06$initBoard(useSample);
-	var startPos = $author$project$Aoc06$findStartPos(board);
-	var route = A5($author$project$Aoc06$walk, board, _List_Nil, $author$project$Aoc06$N, $author$project$Aoc06$Forward, startPos);
-	var vizBoard = A2($tortus$elm_array_2d$Array2D$map, $author$project$Aoc06$Plain, board);
-	var _v0 = startPos;
-	var xStart = _v0.a;
-	var yStart = _v0.b;
-	var guardless = A4(
-		$tortus$elm_array_2d$Array2D$set,
-		yStart,
-		xStart,
-		_Utils_chr('.'),
-		board);
-	var msg = $elm$core$String$fromInt(xStart) + (',' + $elm$core$String$fromInt(yStart));
-	return {board: guardless, counter: 0, debug: '', delay: $author$project$Aoc06$defaultDelay, finished: false, found: 0, guardDir: dir, guardPos: startPos, message: msg, paused: true, routeRemaining: route, routeWalked: _List_Nil, useSample: useSample, vizBoard: vizBoard};
-};
+var $author$project$Aoc06$initModel = F2(
+	function (mode, useSample) {
+		var dir = $author$project$Aoc06$N;
+		var board = $author$project$Aoc06$initBoard(useSample);
+		var startPos = $author$project$Aoc06$findStartPos(board);
+		var route = A5($author$project$Aoc06$walk, board, _List_Nil, $author$project$Aoc06$N, $author$project$Aoc06$Forward, startPos);
+		var candidateObstructions = A2(
+			$elm$core$List$map,
+			function (_v1) {
+				var p = _v1.a;
+				return p;
+			},
+			route);
+		var vizBoard = A2($tortus$elm_array_2d$Array2D$map, $author$project$Aoc06$Plain, board);
+		var _v0 = startPos;
+		var xStart = _v0.a;
+		var yStart = _v0.b;
+		var guardless = A4(
+			$tortus$elm_array_2d$Array2D$set,
+			yStart,
+			xStart,
+			_Utils_chr('.'),
+			board);
+		var msg = $elm$core$String$fromInt(xStart) + (',' + $elm$core$String$fromInt(yStart));
+		return {board: guardless, calcInterval: 100, calculating: false, candidateObstructions: candidateObstructions, counter: 0, currentLoopIndex: 0, debug: '', finished: false, guardDir: dir, guardPos: startPos, message: msg, mode: mode, paused: true, routeRemaining: route, routeWalked: _List_Nil, tickInterval: $author$project$Aoc06$defaultTickInterval, useSample: useSample, verifiedLoops: $elm$core$Array$empty, vizBoard: vizBoard};
+	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Aoc06$init = function (_v0) {
 	return _Utils_Tuple2(
-		$author$project$Aoc06$initModel(false),
+		A2($author$project$Aoc06$initModel, $author$project$Aoc06$Part1, false),
 		$elm$core$Platform$Cmd$none);
 };
+var $author$project$Aoc06$Calculate = {$: 'Calculate'};
 var $author$project$Aoc06$Tick = {$: 'Tick'};
+var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$time$Time$Every = F2(
 	function (a, b) {
 		return {$: 'Every', a: a, b: b};
@@ -6384,18 +6395,185 @@ var $elm$time$Time$every = F2(
 		return $elm$time$Time$subscription(
 			A2($elm$time$Time$Every, interval, tagger));
 	});
-var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc06$subscriptions = function (model) {
-	return model.paused ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = model.paused ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.delay,
-		function (_v0) {
+		model.tickInterval,
+		function (_v1) {
 			return $author$project$Aoc06$Tick;
 		});
+	var calcSub = model.calculating ? A2(
+		$elm$time$Time$every,
+		model.calcInterval,
+		function (_v0) {
+			return $author$project$Aoc06$Calculate;
+		}) : $elm$core$Platform$Sub$none;
+	return $elm$core$Platform$Sub$batch(
+		_List_fromArray(
+			[tickSub, calcSub]));
 };
+var $author$project$Aoc06$addObstruction = F2(
+	function (board, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		return A4(
+			$tortus$elm_array_2d$Array2D$set,
+			y,
+			x,
+			_Utils_chr('#'),
+			board);
+	});
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $author$project$Aoc06$hasLoop = F2(
+	function (startPos, board) {
+		return false;
+	});
+var $elm$core$List$takeReverse = F3(
+	function (n, list, kept) {
+		takeReverse:
+		while (true) {
+			if (n <= 0) {
+				return kept;
+			} else {
+				if (!list.b) {
+					return kept;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs,
+						$temp$kept = A2($elm$core$List$cons, x, kept);
+					n = $temp$n;
+					list = $temp$list;
+					kept = $temp$kept;
+					continue takeReverse;
+				}
+			}
+		}
+	});
+var $elm$core$List$takeTailRec = F2(
+	function (n, list) {
+		return $elm$core$List$reverse(
+			A3($elm$core$List$takeReverse, n, list, _List_Nil));
+	});
+var $elm$core$List$takeFast = F3(
+	function (ctr, n, list) {
+		if (n <= 0) {
+			return _List_Nil;
+		} else {
+			var _v0 = _Utils_Tuple2(n, list);
+			_v0$1:
+			while (true) {
+				_v0$5:
+				while (true) {
+					if (!_v0.b.b) {
+						return list;
+					} else {
+						if (_v0.b.b.b) {
+							switch (_v0.a) {
+								case 1:
+									break _v0$1;
+								case 2:
+									var _v2 = _v0.b;
+									var x = _v2.a;
+									var _v3 = _v2.b;
+									var y = _v3.a;
+									return _List_fromArray(
+										[x, y]);
+								case 3:
+									if (_v0.b.b.b.b) {
+										var _v4 = _v0.b;
+										var x = _v4.a;
+										var _v5 = _v4.b;
+										var y = _v5.a;
+										var _v6 = _v5.b;
+										var z = _v6.a;
+										return _List_fromArray(
+											[x, y, z]);
+									} else {
+										break _v0$5;
+									}
+								default:
+									if (_v0.b.b.b.b && _v0.b.b.b.b.b) {
+										var _v7 = _v0.b;
+										var x = _v7.a;
+										var _v8 = _v7.b;
+										var y = _v8.a;
+										var _v9 = _v8.b;
+										var z = _v9.a;
+										var _v10 = _v9.b;
+										var w = _v10.a;
+										var tl = _v10.b;
+										return (ctr > 1000) ? A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A2($elm$core$List$takeTailRec, n - 4, tl))))) : A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A3($elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
+									} else {
+										break _v0$5;
+									}
+							}
+						} else {
+							if (_v0.a === 1) {
+								break _v0$1;
+							} else {
+								break _v0$5;
+							}
+						}
+					}
+				}
+				return list;
+			}
+			var _v1 = _v0.b;
+			var x = _v1.a;
+			return _List_fromArray(
+				[x]);
+		}
+	});
+var $elm$core$List$take = F2(
+	function (n, list) {
+		return A3($elm$core$List$takeFast, 0, n, list);
+	});
 var $author$project$Aoc06$updateClear = function (model) {
-	return $author$project$Aoc06$initModel(model.useSample);
+	return A2($author$project$Aoc06$initModel, model.mode, model.useSample);
 };
 var $author$project$Aoc06$Highlight = function (a) {
 	return {$: 'Highlight', a: a};
@@ -6471,7 +6649,7 @@ var $author$project$Aoc06$updateStep = function (model) {
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc06$updateTogglePlay = function (model) {
 	if (model.finished) {
-		var m = $author$project$Aoc06$initModel(model.useSample);
+		var m = A2($author$project$Aoc06$initModel, model.mode, model.useSample);
 		return _Utils_update(
 			m,
 			{paused: false});
@@ -6483,7 +6661,7 @@ var $author$project$Aoc06$updateTogglePlay = function (model) {
 };
 var $author$project$Aoc06$updateToggleSample = function (model) {
 	var useSample = !model.useSample;
-	return $author$project$Aoc06$initModel(useSample);
+	return A2($author$project$Aoc06$initModel, model.mode, useSample);
 };
 var $author$project$Aoc06$update = F2(
 	function (msg, model) {
@@ -6504,26 +6682,57 @@ var $author$project$Aoc06$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{delay: model.delay / 2}),
+						{tickInterval: model.tickInterval / 2}),
 					$elm$core$Platform$Cmd$none);
 			case 'Slower':
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{delay: model.delay * 2}),
+						{tickInterval: model.tickInterval * 2}),
 					$elm$core$Platform$Cmd$none);
+			case 'EnablePart1':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{mode: $author$project$Aoc06$Part1}),
+					$elm$core$Platform$Cmd$none);
+			case 'EnablePart2':
+				var freshModel = A2($author$project$Aoc06$initModel, model.mode, model.useSample);
+				var m = _Utils_update(
+					freshModel,
+					{calculating: true});
+				return _Utils_Tuple2(m, $elm$core$Platform$Cmd$none);
 			case 'TogglePlay':
 				return _Utils_Tuple2(
 					$author$project$Aoc06$updateTogglePlay(model),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'ToggleSample':
 				return _Utils_Tuple2(
 					$author$project$Aoc06$updateToggleSample(model),
 					$elm$core$Platform$Cmd$none);
+			default:
+				var startPos = model.guardPos;
+				var board = model.board;
+				var batchSize = 100;
+				var candidates = A2($elm$core$List$take, batchSize, model.candidateObstructions);
+				var verified = A2(
+					$elm$core$List$filterMap,
+					function (obs) {
+						return A2(
+							$author$project$Aoc06$hasLoop,
+							startPos,
+							A2($author$project$Aoc06$addObstruction, board, obs)) ? $elm$core$Maybe$Just(obs) : $elm$core$Maybe$Nothing;
+					},
+					candidates);
+				var remaining = A2($elm$core$List$drop, batchSize, model.candidateObstructions);
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Aoc06$Clear = {$: 'Clear'};
+var $author$project$Aoc06$EnablePart1 = {$: 'EnablePart1'};
+var $author$project$Aoc06$EnablePart2 = {$: 'EnablePart2'};
 var $author$project$Aoc06$Faster = {$: 'Faster'};
+var $author$project$Aoc06$Part2 = {$: 'Part2'};
 var $author$project$Aoc06$Slower = {$: 'Slower'};
 var $author$project$Aoc06$Step = {$: 'Step'};
 var $author$project$Aoc06$TogglePlay = {$: 'TogglePlay'};
@@ -6547,6 +6756,15 @@ var $elm$core$List$append = F2(
 	});
 var $elm$html$Html$br = _VirtualDom_node('br');
 var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$core$Set$Set_elm_builtin = function (a) {
 	return {$: 'Set_elm_builtin', a: a};
@@ -6561,6 +6779,8 @@ var $elm$core$Set$insert = F2(
 var $elm$core$Set$fromList = function (list) {
 	return A3($elm$core$List$foldl, $elm$core$Set$insert, $elm$core$Set$empty, list);
 };
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -6646,22 +6866,23 @@ var $author$project$Aoc06$toCharElement = F2(
 		}
 	});
 var $elm$html$Html$tr = _VirtualDom_node('tr');
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Aoc06$view = function (model) {
 	var textFontSize = model.useSample ? '36px' : '12px';
 	var positionsVisited = $elm$core$Set$size(
 		$elm$core$Set$fromList(
 			A2(
 				$elm$core$List$map,
-				function (_v2) {
-					var p = _v2.a;
-					var d = _v2.b;
-					var m = _v2.c;
+				function (_v3) {
+					var p = _v3.a;
+					var d = _v3.b;
+					var m = _v3.c;
 					return p;
 				},
 				model.routeWalked)));
 	var guardChar = function () {
-		var _v1 = model.guardDir;
-		switch (_v1.$) {
+		var _v2 = model.guardDir;
+		switch (_v2.$) {
 			case 'N':
 				return _Utils_chr('^');
 			case 'W':
@@ -6723,6 +6944,13 @@ var $author$project$Aoc06$view = function (model) {
 			}),
 		_List_Nil,
 		nestedElements);
+	var _v1 = model.calculating ? _Utils_Tuple2('Calculating', '...') : (_Utils_eq(model.mode, $author$project$Aoc06$Part1) ? _Utils_Tuple2(
+		'Patrol Protocol',
+		$elm$core$String$fromInt(positionsVisited)) : _Utils_Tuple2(
+		'Loop X of Y',
+		$elm$core$String$fromInt(positionsVisited)));
+	var text1 = _v1.a;
+	var text2 = _v1.b;
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
@@ -6772,6 +7000,55 @@ var $author$project$Aoc06$view = function (model) {
 						$elm$html$Html$td,
 						_List_fromArray(
 							[
+								$elm$html$Html$Attributes$align('center')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('radio'),
+										$elm$html$Html$Events$onClick($author$project$Aoc06$EnablePart1),
+										$elm$html$Html$Attributes$checked(
+										_Utils_eq(model.mode, $author$project$Aoc06$Part1))
+									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Part 1')
+									])),
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('radio'),
+										$elm$html$Html$Events$onClick($author$project$Aoc06$EnablePart2),
+										$elm$html$Html$Attributes$checked(
+										_Utils_eq(model.mode, $author$project$Aoc06$Part2))
+									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Part 2')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'padding', '10px')
 							]),
@@ -6799,18 +7076,23 @@ var $author$project$Aoc06$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text('Clear')
-									])),
-								A2(
-								$elm$html$Html$button,
-								_List_fromArray(
-									[
-										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Aoc06$Step)
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Step')
-									])),
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'padding', '10px')
+							]),
+						_List_fromArray(
+							[
 								A2(
 								$elm$html$Html$button,
 								_List_fromArray(
@@ -6843,6 +7125,17 @@ var $author$project$Aoc06$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text('Faster')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick($author$project$Aoc06$Step)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Step')
 									]))
 							]))
 					])),
@@ -6868,8 +7161,14 @@ var $author$project$Aoc06$view = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(
-										$elm$core$String$fromInt(positionsVisited))
+										$elm$html$Html$text(text1)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(text2)
 									]))
 							]))
 					])),

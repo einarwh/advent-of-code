@@ -11,8 +11,8 @@ import Array2D exposing (Array2D)
 import Html exposing (text)
 import Time
 
-defaultDelay : Float
-defaultDelay = 10
+defaultTickInterval : Float
+defaultTickInterval = 10
 
 -- MAIN
 
@@ -35,18 +35,25 @@ type Visit = Vertical | Horizontal | Both
 
 type Cell = Highlight Char | Plain Char 
 
+type Mode = Part1 | Part2 
+
 type alias Model = 
-  { found : Int 
-  , board : Array2D Char
+  { board : Array2D Char
   , vizBoard : Array2D Cell 
   , guardPos : Pos 
   , guardDir : Dir
   , routeWalked : List (Pos, Dir, Move)
   , routeRemaining : List (Pos, Dir, Move)
+  , mode : Mode 
+  , calculating : Bool
+  , candidateObstructions : List Pos
+  , verifiedLoops : Array Pos
+  , currentLoopIndex : Int
   , useSample : Bool
   , paused : Bool 
   , finished : Bool 
-  , delay : Float 
+  , tickInterval : Float 
+  , calcInterval : Float 
   , message : String
   , counter : Int 
   , debug : String }
@@ -246,8 +253,8 @@ walk board visited dir move pos =
       _ -> -- Go ahead.
         walk board ((pos, dir, move) :: visited) dir Forward nextPos
 
-initModel : Bool -> Model 
-initModel useSample = 
+initModel : Mode -> Bool -> Model 
+initModel mode useSample = 
   let 
     board = initBoard useSample
     startPos = findStartPos board 
@@ -256,31 +263,47 @@ initModel useSample =
     vizBoard  = board |> Array2D.map Plain
     dir = N
     route = walk board [] N Forward startPos
+    candidateObstructions = route |> List.map (\(p, _, _) -> p)
     msg = (String.fromInt xStart) ++ "," ++ (String.fromInt yStart)
   in 
-    { found = 0
-    , board = guardless
+    { board = guardless
     , vizBoard = vizBoard
     , guardPos = startPos
     , guardDir = dir
     , routeRemaining = route
     , routeWalked = []
     , message = msg
-    , useSample = useSample 
+    , useSample = useSample
+    , calculating = False 
+    , candidateObstructions = candidateObstructions
+    , verifiedLoops = Array.empty
+    , currentLoopIndex = 0
+    , mode = mode 
     , paused = True
     , finished = False 
-    , delay = defaultDelay
+    , tickInterval = defaultTickInterval
+    , calcInterval = 100
     , counter = 0
     , debug = "" }
 
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel False, Cmd.none)
+  (initModel Part1 False, Cmd.none)
 
 -- UPDATE
 
-type Msg = Tick | Step | TogglePlay | Faster | Slower | Clear | ToggleSample
+type Msg = 
+  Tick 
+  | Step 
+  | TogglePlay 
+  | Faster 
+  | Slower 
+  | Clear 
+  | ToggleSample 
+  | EnablePart1 
+  | EnablePart2
+  | Calculate
 
 getAllPositions : Array2D Char -> List Pos
 getAllPositions board = 
@@ -292,7 +315,7 @@ getAllPositions board =
 
 updateClear : Model -> Model
 updateClear model = 
-  initModel model.useSample
+  initModel model.mode model.useSample
 
 updateStep : Model -> Model
 updateStep model = 
@@ -338,7 +361,7 @@ updateTogglePlay : Model -> Model
 updateTogglePlay model = 
   if model.finished then 
     let 
-      m = initModel model.useSample
+      m = initModel model.mode model.useSample
     in 
       {m | paused = False }
   else 
@@ -349,7 +372,14 @@ updateToggleSample model =
   let
     useSample = not model.useSample
   in
-    initModel useSample 
+    initModel model.mode useSample 
+
+hasLoop : Pos -> Array2D Char -> Bool 
+hasLoop startPos board = False 
+
+addObstruction : Array2D Char -> Pos -> Array2D Char 
+addObstruction board (x, y) =
+  Array2D.set y x '#' board 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -361,20 +391,43 @@ update msg model =
     Step ->
       (updateStep model, Cmd.none)
     Faster -> 
-      ({model | delay = model.delay / 2 }, Cmd.none)
+      ({model | tickInterval = model.tickInterval / 2 }, Cmd.none)
     Slower -> 
-      ({model | delay = model.delay * 2 }, Cmd.none)
+      ({model | tickInterval = model.tickInterval * 2 }, Cmd.none)
+    EnablePart1 -> 
+      ({model | mode = Part1 }, Cmd.none)
+    EnablePart2 -> 
+      let 
+        freshModel = initModel model.mode model.useSample
+        m = { freshModel | calculating = True }
+      in 
+        (m, Cmd.none)
     TogglePlay -> 
       (updateTogglePlay model, Cmd.none)
     ToggleSample -> 
       (updateToggleSample model, Cmd.none)
+    Calculate -> 
+      let 
+        batchSize = 100
+        candidates = model.candidateObstructions |> List.take batchSize 
+        remaining = model.candidateObstructions |> List.drop batchSize 
+        board = model.board
+        startPos = model.guardPos 
+        verified = 
+          candidates 
+          |> List.filterMap (\obs -> if hasLoop startPos (addObstruction board obs) then Just (obs) else Nothing)
+      in 
+        (model, Cmd.none)
 
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  if model.paused then Sub.none 
-  else Time.every model.delay (\_ -> Tick)
+  let 
+    tickSub = if model.paused then Sub.none else Time.every model.tickInterval (\_ -> Tick)
+    calcSub = if model.calculating then Time.every model.calcInterval (\_ -> Calculate) else Sub.none 
+  in 
+    Sub.batch [ tickSub, calcSub ]
 
 -- VIEW
 
@@ -431,8 +484,12 @@ view model =
     nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement board))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
     positionsVisited = model.routeWalked |> List.map (\(p, d, m) -> p) |> Set.fromList |> Set.size 
-
     textFontSize = if model.useSample then "36px" else "12px"
+    (text1, text2) = 
+      if model.calculating then ("Calculating", "...")
+      else 
+        if model.mode == Part1 then ("Patrol Protocol", String.fromInt positionsVisited)
+        else ("Loop X of Y", String.fromInt positionsVisited)
   in 
     Html.table 
       [ Html.Attributes.style "width" "1080px"]
@@ -448,6 +505,19 @@ view model =
       , Html.tr 
           []
           [ Html.td 
+              [ Html.Attributes.align "center" ]
+              [ Html.input 
+                [ Html.Attributes.type_ "radio", onClick EnablePart1, Html.Attributes.checked (model.mode == Part1) ] 
+                []
+              , Html.label [] [ Html.text "Part 1" ]
+              , Html.input 
+                [ Html.Attributes.type_ "radio", onClick EnablePart2, Html.Attributes.checked (model.mode == Part2) ] 
+                []
+              , Html.label [] [ Html.text "Part 2" ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
@@ -456,10 +526,13 @@ view model =
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Clear ] 
                 [ Html.text "Clear" ] 
-              , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Step ] 
-                [ Html.text "Step" ]
-              , Html.button 
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "padding" "10px" ]
+              [ Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Slower ] 
                 [ text "Slower" ]
               , Html.button 
@@ -468,6 +541,9 @@ view model =
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Faster ] 
                 [ text "Faster" ]
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Step ] 
+                [ Html.text "Step" ]
             ] ]
       , Html.tr 
           []
@@ -477,8 +553,8 @@ view model =
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "24px"
               , Html.Attributes.style "width" "200px" ] 
-              [ 
-                Html.div [] [ Html.text (String.fromInt positionsVisited) ]
+              [ Html.div [] [ Html.text text1 ]
+              , Html.div [] [ Html.text text2 ]
               ] ]
       -- , Html.tr 
       --     []
