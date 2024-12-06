@@ -1,4 +1,4 @@
-// Advent of Code 2024. Day 06
+// Advent of Code 2024. Day 06: Guard Gallivant.
 // dotnet fsi aoc06.fsx
 
 open System
