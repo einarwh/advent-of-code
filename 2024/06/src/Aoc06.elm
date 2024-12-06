@@ -12,7 +12,7 @@ import Html exposing (text)
 import Time
 
 defaultDelay : Float
-defaultDelay = 200
+defaultDelay = 10
 
 -- MAIN
 
@@ -33,9 +33,12 @@ type Move = Turn | Forward
 
 type Visit = Vertical | Horizontal | Both 
 
+type Cell = Highlight Char | Plain Char 
+
 type alias Model = 
   { found : Int 
   , board : Array2D Char
+  , vizBoard : Array2D Cell 
   , guardPos : Pos 
   , guardDir : Dir
   , routeWalked : List (Pos, Dir, Move)
@@ -250,12 +253,14 @@ initModel useSample =
     startPos = findStartPos board 
     (xStart, yStart) = startPos
     guardless = board |> Array2D.set yStart xStart '.'
+    vizBoard  = board |> Array2D.map Plain
     dir = N
     route = walk board [] N Forward startPos
     msg = (String.fromInt xStart) ++ "," ++ (String.fromInt yStart)
   in 
     { found = 0
     , board = guardless
+    , vizBoard = vizBoard
     , guardPos = startPos
     , guardDir = dir
     , routeRemaining = route
@@ -298,7 +303,34 @@ updateStep model =
   in 
     case model.routeRemaining of 
       (p, d, m) :: rest -> 
-        { model | guardPos = p, guardDir = d, routeRemaining = rest, routeWalked = (p, d, m) :: model.routeWalked }
+        -- Update vizBoard!
+        let 
+          guardPos = p 
+          (x, y) = p
+          guardDir = d 
+          newCell = 
+            case m of 
+              Turn -> Highlight '+'
+              Forward -> 
+                case Array2D.get y x model.vizBoard of 
+                  Nothing -> Plain '?' 
+                  Just cell ->
+                    case cell of 
+                      Highlight ch -> 
+                        case ch of 
+                          '|' -> Highlight (if dir == E || dir == W then '+' else '|')
+                          '-' -> Highlight (if dir == N || dir == S then '+' else '-')
+                          _ -> Highlight '?'
+                      Plain ch -> 
+                        if dir == E || dir == W then Highlight '-' else Highlight '|'
+
+          vizBoard = Array2D.set y x newCell model.vizBoard 
+        in 
+          { model | vizBoard = vizBoard
+          , guardPos = guardPos
+          , guardDir = guardDir
+          , routeRemaining = rest
+          , routeWalked = (p, d, m) :: model.routeWalked }
       _ -> 
         { model | paused = True, finished = True }
 
@@ -371,30 +403,35 @@ chooseChar model pos ch =
                 E -> '-'
         _ -> '+'
 
-toCharElement : Model -> Pos -> Html Msg 
-toCharElement model (x, y) = 
-    case Array2D.get y x model.board of 
+toCharElement : Array2D Cell -> Pos -> Html Msg 
+toCharElement vizBoard (x, y) = 
+    case Array2D.get y x vizBoard of 
       Nothing -> Html.text "?"
-      Just ch -> 
-        let
-          useChar = chooseChar model (x, y) ch 
-          str = String.fromChar useChar 
-        in
-          if model.routeWalked |> List.any (\(p, d, m) -> p == (x, y)) then 
-            (Html.span [Html.Attributes.style "background-color" "#CCCCCC" ] [ Html.text str ]) 
-          else 
-            Html.text str 
+      Just cell -> 
+        case cell of 
+          Highlight ch -> 
+            (Html.span [Html.Attributes.style "background-color" "#CCCCCC" ] [ Html.text (String.fromChar ch) ]) 
+          Plain ch -> 
+            Html.text (String.fromChar ch)
 
 view : Model -> Html Msg
 view model =
   let
-    board = model.board 
+    guardChar = 
+      case model.guardDir of 
+        N -> '^'
+        W -> '<'
+        S -> 'v'
+        E -> '>'
+    (xGuard, yGuard) = model.guardPos
+    board = Array2D.set yGuard xGuard (Highlight guardChar) model.vizBoard 
     ys = List.range 0 (Array2D.rows board - 1)
     xs = List.range 0 (Array2D.columns board - 1)
     nestedPositions = ys |> List.map (\y -> xs |> List.map (\x -> (x, y)))
-    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement model))
+    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement board))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
     positionsVisited = model.routeWalked |> List.map (\(p, d, m) -> p) |> Set.fromList |> Set.size 
+
     textFontSize = if model.useSample then "36px" else "12px"
   in 
     Html.table 

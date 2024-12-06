@@ -5258,7 +5258,10 @@ var $elm$core$Task$perform = F2(
 var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Aoc06$Forward = {$: 'Forward'};
 var $author$project$Aoc06$N = {$: 'N'};
-var $author$project$Aoc06$defaultDelay = 200;
+var $author$project$Aoc06$Plain = function (a) {
+	return {$: 'Plain', a: a};
+};
+var $author$project$Aoc06$defaultDelay = 10;
 var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
 	return array2d.columns;
 };
@@ -5717,6 +5720,70 @@ var $author$project$Aoc06$initBoard = function (useSample) {
 			$elm$core$String$toList,
 			A2($elm$core$String$split, '\n', data)));
 };
+var $elm$core$Elm$JsArray$indexedMap = _JsArray_indexedMap;
+var $elm$core$Array$indexedMap = F2(
+	function (func, _v0) {
+		var len = _v0.a;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		var initialBuilder = {
+			nodeList: _List_Nil,
+			nodeListSize: 0,
+			tail: A3(
+				$elm$core$Elm$JsArray$indexedMap,
+				func,
+				$elm$core$Array$tailIndex(len),
+				tail)
+		};
+		var helper = F2(
+			function (node, builder) {
+				if (node.$ === 'SubTree') {
+					var subTree = node.a;
+					return A3($elm$core$Elm$JsArray$foldl, helper, builder, subTree);
+				} else {
+					var leaf = node.a;
+					var offset = builder.nodeListSize * $elm$core$Array$branchFactor;
+					var mappedLeaf = $elm$core$Array$Leaf(
+						A3($elm$core$Elm$JsArray$indexedMap, func, offset, leaf));
+					return {
+						nodeList: A2($elm$core$List$cons, mappedLeaf, builder.nodeList),
+						nodeListSize: builder.nodeListSize + 1,
+						tail: builder.tail
+					};
+				}
+			});
+		return A2(
+			$elm$core$Array$builderToArray,
+			true,
+			A3($elm$core$Elm$JsArray$foldl, helper, initialBuilder, tree));
+	});
+var $tortus$elm_array_2d$Array2D$indexedMap = F2(
+	function (func, array2d) {
+		var mappedData = A2(
+			$elm$core$Array$indexedMap,
+			F2(
+				function (row, rowAry) {
+					return A2(
+						$elm$core$Array$indexedMap,
+						F2(
+							function (col, value) {
+								return A3(func, row, col, value);
+							}),
+						rowAry);
+				}),
+			array2d.data);
+		return {columns: array2d.columns, data: mappedData};
+	});
+var $tortus$elm_array_2d$Array2D$map = F2(
+	function (fn, array2d) {
+		return A2(
+			$tortus$elm_array_2d$Array2D$indexedMap,
+			F3(
+				function (_v0, _v1, val) {
+					return fn(val);
+				}),
+			array2d);
+	});
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
 		if (maybe.$ === 'Just') {
@@ -5881,6 +5948,7 @@ var $author$project$Aoc06$initModel = function (useSample) {
 	var board = $author$project$Aoc06$initBoard(useSample);
 	var startPos = $author$project$Aoc06$findStartPos(board);
 	var route = A5($author$project$Aoc06$walk, board, _List_Nil, $author$project$Aoc06$N, $author$project$Aoc06$Forward, startPos);
+	var vizBoard = A2($tortus$elm_array_2d$Array2D$map, $author$project$Aoc06$Plain, board);
 	var _v0 = startPos;
 	var xStart = _v0.a;
 	var yStart = _v0.b;
@@ -5891,7 +5959,7 @@ var $author$project$Aoc06$initModel = function (useSample) {
 		_Utils_chr('.'),
 		board);
 	var msg = $elm$core$String$fromInt(xStart) + (',' + $elm$core$String$fromInt(yStart));
-	return {board: guardless, counter: 0, debug: '', delay: $author$project$Aoc06$defaultDelay, finished: false, found: 0, guardDir: dir, guardPos: startPos, message: msg, paused: true, routeRemaining: route, routeWalked: _List_Nil, useSample: useSample};
+	return {board: guardless, counter: 0, debug: '', delay: $author$project$Aoc06$defaultDelay, finished: false, found: 0, guardDir: dir, guardPos: startPos, message: msg, paused: true, routeRemaining: route, routeWalked: _List_Nil, useSample: useSample, vizBoard: vizBoard};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -6329,6 +6397,9 @@ var $author$project$Aoc06$subscriptions = function (model) {
 var $author$project$Aoc06$updateClear = function (model) {
 	return $author$project$Aoc06$initModel(model.useSample);
 };
+var $author$project$Aoc06$Highlight = function (a) {
+	return {$: 'Highlight', a: a};
+};
 var $author$project$Aoc06$updateStep = function (model) {
 	var z = 0;
 	var pos = model.guardPos;
@@ -6340,16 +6411,56 @@ var $author$project$Aoc06$updateStep = function (model) {
 		var d = _v1.b;
 		var m = _v1.c;
 		var rest = _v0.b;
+		var guardPos = p;
+		var guardDir = d;
+		var _v2 = p;
+		var x = _v2.a;
+		var y = _v2.b;
+		var newCell = function () {
+			if (m.$ === 'Turn') {
+				return $author$project$Aoc06$Highlight(
+					_Utils_chr('+'));
+			} else {
+				var _v4 = A3($tortus$elm_array_2d$Array2D$get, y, x, model.vizBoard);
+				if (_v4.$ === 'Nothing') {
+					return $author$project$Aoc06$Plain(
+						_Utils_chr('?'));
+				} else {
+					var cell = _v4.a;
+					if (cell.$ === 'Highlight') {
+						var ch = cell.a;
+						switch (ch.valueOf()) {
+							case '|':
+								return $author$project$Aoc06$Highlight(
+									(_Utils_eq(dir, $author$project$Aoc06$E) || _Utils_eq(dir, $author$project$Aoc06$W)) ? _Utils_chr('+') : _Utils_chr('|'));
+							case '-':
+								return $author$project$Aoc06$Highlight(
+									(_Utils_eq(dir, $author$project$Aoc06$N) || _Utils_eq(dir, $author$project$Aoc06$S)) ? _Utils_chr('+') : _Utils_chr('-'));
+							default:
+								return $author$project$Aoc06$Highlight(
+									_Utils_chr('?'));
+						}
+					} else {
+						var ch = cell.a;
+						return (_Utils_eq(dir, $author$project$Aoc06$E) || _Utils_eq(dir, $author$project$Aoc06$W)) ? $author$project$Aoc06$Highlight(
+							_Utils_chr('-')) : $author$project$Aoc06$Highlight(
+							_Utils_chr('|'));
+					}
+				}
+			}
+		}();
+		var vizBoard = A4($tortus$elm_array_2d$Array2D$set, y, x, newCell, model.vizBoard);
 		return _Utils_update(
 			model,
 			{
-				guardDir: d,
-				guardPos: p,
+				guardDir: guardDir,
+				guardPos: guardPos,
 				routeRemaining: rest,
 				routeWalked: A2(
 					$elm$core$List$cons,
 					_Utils_Tuple3(p, d, m),
-					model.routeWalked)
+					model.routeWalked),
+				vizBoard: vizBoard
 			});
 	} else {
 		return _Utils_update(
@@ -6500,137 +6611,38 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$core$List$any = F2(
-	function (isOkay, list) {
-		any:
-		while (true) {
-			if (!list.b) {
-				return false;
-			} else {
-				var x = list.a;
-				var xs = list.b;
-				if (isOkay(x)) {
-					return true;
-				} else {
-					var $temp$isOkay = isOkay,
-						$temp$list = xs;
-					isOkay = $temp$isOkay;
-					list = $temp$list;
-					continue any;
-				}
-			}
-		}
-	});
-var $elm$core$List$maybeCons = F3(
-	function (f, mx, xs) {
-		var _v0 = f(mx);
-		if (_v0.$ === 'Just') {
-			var x = _v0.a;
-			return A2($elm$core$List$cons, x, xs);
-		} else {
-			return xs;
-		}
-	});
-var $elm$core$List$filterMap = F2(
-	function (f, xs) {
-		return A3(
-			$elm$core$List$foldr,
-			$elm$core$List$maybeCons(f),
-			_List_Nil,
-			xs);
-	});
-var $author$project$Aoc06$chooseChar = F3(
-	function (model, pos, ch) {
-		if (_Utils_eq(pos, model.guardPos)) {
-			var _v0 = model.guardDir;
-			switch (_v0.$) {
-				case 'N':
-					return _Utils_chr('^');
-				case 'W':
-					return _Utils_chr('<');
-				case 'S':
-					return _Utils_chr('v');
-				default:
-					return _Utils_chr('>');
-			}
-		} else {
-			var dirs = A2(
-				$elm$core$List$filterMap,
-				function (_v5) {
-					var p = _v5.a;
-					var d = _v5.b;
-					var m = _v5.c;
-					return _Utils_eq(p, pos) ? $elm$core$Maybe$Just(
-						_Utils_Tuple2(d, m)) : $elm$core$Maybe$Nothing;
-				},
-				model.routeWalked);
-			if (!dirs.b) {
-				return ch;
-			} else {
-				if (!dirs.b.b) {
-					var _v2 = dirs.a;
-					var dir = _v2.a;
-					var move = _v2.b;
-					if (move.$ === 'Turn') {
-						return _Utils_chr('+');
-					} else {
-						switch (dir.$) {
-							case 'N':
-								return _Utils_chr('|');
-							case 'W':
-								return _Utils_chr('-');
-							case 'S':
-								return _Utils_chr('|');
-							default:
-								return _Utils_chr('-');
-						}
-					}
-				} else {
-					return _Utils_chr('+');
-				}
-			}
-		}
-	});
 var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
 };
 var $elm$html$Html$span = _VirtualDom_node('span');
 var $author$project$Aoc06$toCharElement = F2(
-	function (model, _v0) {
+	function (vizBoard, _v0) {
 		var x = _v0.a;
 		var y = _v0.b;
-		var _v1 = A3($tortus$elm_array_2d$Array2D$get, y, x, model.board);
+		var _v1 = A3($tortus$elm_array_2d$Array2D$get, y, x, vizBoard);
 		if (_v1.$ === 'Nothing') {
 			return $elm$html$Html$text('?');
 		} else {
-			var ch = _v1.a;
-			var useChar = A3(
-				$author$project$Aoc06$chooseChar,
-				model,
-				_Utils_Tuple2(x, y),
-				ch);
-			var str = $elm$core$String$fromChar(useChar);
-			return A2(
-				$elm$core$List$any,
-				function (_v2) {
-					var p = _v2.a;
-					var d = _v2.b;
-					var m = _v2.c;
-					return _Utils_eq(
-						p,
-						_Utils_Tuple2(x, y));
-				},
-				model.routeWalked) ? A2(
-				$elm$html$Html$span,
-				_List_fromArray(
-					[
-						A2($elm$html$Html$Attributes$style, 'background-color', '#CCCCCC')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text(str)
-					])) : $elm$html$Html$text(str);
+			var cell = _v1.a;
+			if (cell.$ === 'Highlight') {
+				var ch = cell.a;
+				return A2(
+					$elm$html$Html$span,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'background-color', '#CCCCCC')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(
+							$elm$core$String$fromChar(ch))
+						]));
+			} else {
+				var ch = cell.a;
+				return $elm$html$Html$text(
+					$elm$core$String$fromChar(ch));
+			}
 		}
 	});
 var $elm$html$Html$tr = _VirtualDom_node('tr');
@@ -6640,14 +6652,35 @@ var $author$project$Aoc06$view = function (model) {
 		$elm$core$Set$fromList(
 			A2(
 				$elm$core$List$map,
-				function (_v0) {
-					var p = _v0.a;
-					var d = _v0.b;
-					var m = _v0.c;
+				function (_v2) {
+					var p = _v2.a;
+					var d = _v2.b;
+					var m = _v2.c;
 					return p;
 				},
 				model.routeWalked)));
-	var board = model.board;
+	var guardChar = function () {
+		var _v1 = model.guardDir;
+		switch (_v1.$) {
+			case 'N':
+				return _Utils_chr('^');
+			case 'W':
+				return _Utils_chr('<');
+			case 'S':
+				return _Utils_chr('v');
+			default:
+				return _Utils_chr('>');
+		}
+	}();
+	var _v0 = model.guardPos;
+	var xGuard = _v0.a;
+	var yGuard = _v0.b;
+	var board = A4(
+		$tortus$elm_array_2d$Array2D$set,
+		yGuard,
+		xGuard,
+		$author$project$Aoc06$Highlight(guardChar),
+		model.vizBoard);
 	var xs = A2(
 		$elm$core$List$range,
 		0,
@@ -6672,7 +6705,7 @@ var $author$project$Aoc06$view = function (model) {
 		function (positions) {
 			return A2(
 				$elm$core$List$map,
-				$author$project$Aoc06$toCharElement(model),
+				$author$project$Aoc06$toCharElement(board),
 				positions);
 		},
 		nestedPositions);
