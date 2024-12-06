@@ -504,7 +504,7 @@ view model =
     nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement board))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
     positionsVisited = model.routeWalked |> List.map (\(p, d, m) -> p) |> Set.fromList |> Set.size 
-    textFontSize = if model.useSample then "36px" else "8px"
+    textFontSize = if model.useSample then "36px" else "9px"
 
     (text1, text2) = 
       if model.calculating then 
