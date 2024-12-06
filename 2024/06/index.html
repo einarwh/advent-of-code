@@ -5891,7 +5891,7 @@ var $author$project$Aoc06$initModel = function (useSample) {
 		_Utils_chr('.'),
 		board);
 	var msg = $elm$core$String$fromInt(xStart) + (',' + $elm$core$String$fromInt(yStart));
-	return {board: guardless, counter: 0, debug: '', delay: $author$project$Aoc06$defaultDelay, found: 0, guardDir: dir, guardPos: startPos, message: msg, paused: true, routeRemaining: route, routeWalked: _List_Nil, useSample: useSample};
+	return {board: guardless, counter: 0, debug: '', delay: $author$project$Aoc06$defaultDelay, finished: false, found: 0, guardDir: dir, guardPos: startPos, message: msg, paused: true, routeRemaining: route, routeWalked: _List_Nil, useSample: useSample};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -6354,14 +6354,21 @@ var $author$project$Aoc06$updateStep = function (model) {
 	} else {
 		return _Utils_update(
 			model,
-			{paused: true});
+			{finished: true, paused: true});
 	}
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc06$updateTogglePlay = function (model) {
-	return _Utils_update(
-		model,
-		{paused: !model.paused});
+	if (model.finished) {
+		var m = $author$project$Aoc06$initModel(model.useSample);
+		return _Utils_update(
+			m,
+			{paused: false});
+	} else {
+		return _Utils_update(
+			model,
+			{paused: !model.paused});
+	}
 };
 var $author$project$Aoc06$updateToggleSample = function (model) {
 	var useSample = !model.useSample;

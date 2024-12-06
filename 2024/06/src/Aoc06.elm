@@ -42,6 +42,7 @@ type alias Model =
   , routeRemaining : List (Pos, Dir, Move)
   , useSample : Bool
   , paused : Bool 
+  , finished : Bool 
   , delay : Float 
   , message : String
   , counter : Int 
@@ -262,6 +263,7 @@ initModel useSample =
     , message = msg
     , useSample = useSample 
     , paused = True
+    , finished = False 
     , delay = defaultDelay
     , counter = 0
     , debug = "" }
@@ -298,11 +300,17 @@ updateStep model =
       (p, d, m) :: rest -> 
         { model | guardPos = p, guardDir = d, routeRemaining = rest, routeWalked = (p, d, m) :: model.routeWalked }
       _ -> 
-        { model | paused = True }
+        { model | paused = True, finished = True }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
-  { model | paused = not model.paused }
+  if model.finished then 
+    let 
+      m = initModel model.useSample
+    in 
+      {m | paused = False }
+  else 
+    { model | paused = not model.paused }
 
 updateToggleSample : Model -> Model
 updateToggleSample model = 
