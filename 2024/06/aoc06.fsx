@@ -48,8 +48,7 @@ let turnRight dir =
 let patrol startPos board = 
     let rec walk visited dir pos = 
         let nextPos = move dir pos
-        let inFront = nextPos |> Array2D.tryGet board 
-        match inFront with 
+        match nextPos |> Array2D.tryGet board with 
         | None -> visited |> Set.add pos
         | Some '#' -> walk visited (turnRight dir) pos 
         | _ -> walk (Set.add pos visited) dir nextPos
@@ -67,8 +66,7 @@ let hasLoop startPos board =
         if Set.contains (pos, dir) visited then true 
         else 
             let nextPos = move dir pos
-            let inFront = nextPos |> Array2D.tryGet board 
-            match inFront with 
+            match nextPos |> Array2D.tryGet board with 
             | None -> false
             | Some '#' -> walk visited (turnRight dir) pos 
             | _ -> 
