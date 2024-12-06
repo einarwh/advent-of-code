@@ -9,10 +9,6 @@ module Array2D =
         let first = y >= 0 && y < a.GetLength(0)
         let second = x >= 0 && x < a.GetLength(1)
         if first && second then Some (Array2D.get a y x) else None
-    let positions (a : 'a[,]) = 
-        let rowCount = a.GetLength(0)
-        let colCount = a.GetLength(1)
-        [for x in [0..colCount-1] do for y in [0..rowCount-1] -> (x, y)]
     let fromList (lst : 'a list list) = 
         let width = lst |> List.head |> List.length 
         let height = lst |> List.length 
