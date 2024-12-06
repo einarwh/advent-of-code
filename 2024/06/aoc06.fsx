@@ -16,7 +16,7 @@ let readLines =
     >> Array.toList
 
 let findStartPos (board : char[,]) = 
-    let xlen = Array2D.length1 board
+    let xlen = board.GetLength(1)
     let rec loop y x = 
         match Array2D.get board y x with 
         | '^' -> (x, y)
