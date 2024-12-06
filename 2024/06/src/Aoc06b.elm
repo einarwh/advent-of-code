@@ -504,7 +504,7 @@ view model =
     nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement board))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
     positionsVisited = model.routeWalked |> List.map (\(p, d, m) -> p) |> Set.fromList |> Set.size 
-    textFontSize = if model.useSample then "36px" else "8px"
+    textFontSize = if model.useSample then "36px" else "12px"
 
     (text1, text2) = 
       if model.calculating then 
@@ -529,19 +529,19 @@ view model =
               , Html.Attributes.style "padding" "20px"]
               [ Html.div [] [Html.text "Advent of Code 2024" ]
               , Html.div [] [Html.text "Day 6: Guard Gallivant" ] ] ]
-      -- , Html.tr 
-      --     []
-      --     [ Html.td 
-      --         [ Html.Attributes.align "center" ]
-      --         [ Html.input 
-      --           [ Html.Attributes.type_ "radio", onClick EnablePart1, Html.Attributes.checked (model.mode == Part1) ] 
-      --           []
-      --         , Html.label [] [ Html.text "Part 1" ]
-      --         , Html.input 
-      --           [ Html.Attributes.type_ "radio", onClick EnablePart2, Html.Attributes.checked (model.mode == Part2) ] 
-      --           []
-      --         , Html.label [] [ Html.text "Part 2" ]
-      --       ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center" ]
+              [ Html.input 
+                [ Html.Attributes.type_ "radio", onClick EnablePart1, Html.Attributes.checked (model.mode == Part1) ] 
+                []
+              , Html.label [] [ Html.text "Part 1" ]
+              , Html.input 
+                [ Html.Attributes.type_ "radio", onClick EnablePart2, Html.Attributes.checked (model.mode == Part2) ] 
+                []
+              , Html.label [] [ Html.text "Part 2" ]
+            ] ]
       , Html.tr 
           []
           [ Html.td 
@@ -580,9 +580,8 @@ view model =
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "24px"
               , Html.Attributes.style "width" "200px" ] 
-              [ 
-                -- Html.div [] [ Html.text text1 ]
-                Html.div [] [ Html.text text2 ]
+              [ Html.div [] [ Html.text text1 ]
+              , Html.div [] [ Html.text text2 ]
               ] ]
       -- , Html.tr 
       --     []
