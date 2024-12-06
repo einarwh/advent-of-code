@@ -13,10 +13,10 @@ module Array2D =
         let rowCount = a.GetLength(0)
         let colCount = a.GetLength(1)
         [for x in [0..colCount-1] do for y in [0..rowCount-1] -> (x, y)]
-    let fromStringList (lines : string list) = 
-        let width = lines |> List.head |> Seq.length 
-        let height = lines |> List.length 
-        Array2D.init height width (fun y x -> lines |> List.item y |> Seq.toList |> List.item x)
+    let fromList (lst : 'a list list) = 
+        let width = lst |> List.head |> List.length 
+        let height = lst |> List.length 
+        Array2D.init height width (fun y x -> lst |> List.item y |> List.item x)
 
 let readLines = 
     File.ReadAllLines
@@ -46,7 +46,7 @@ let turnRight dir =
     | _ -> failwith "no direction"
 
 let patrol startPos board = 
-    let rec walk (visited : Set<int*int>) (dir : int*int) (pos : int*int) = 
+    let rec walk visited dir pos = 
         let nextPos = move dir pos
         let inFront = nextPos |> Array2D.tryGet board 
         match inFront with 
@@ -56,7 +56,6 @@ let patrol startPos board =
     walk Set.empty (0, -1) startPos
 
 let generateBoards visited board = 
-    let positions = Array2D.positions board 
     let addObstruction board (x, y) = 
         let newBoard = Array2D.copy board 
         Array2D.set newBoard y x '#'
@@ -64,7 +63,7 @@ let generateBoards visited board =
     visited |> Set.toList |> List.map (addObstruction board)
 
 let hasLoop startPos board = 
-    let rec walk (visited : Set<(int*int)*(int*int)>) (dir : int*int) (pos : int*int) = 
+    let rec walk visited dir pos = 
         if Set.contains (pos, dir) visited then true 
         else 
             let nextPos = move dir pos
@@ -77,8 +76,8 @@ let hasLoop startPos board =
     walk Set.empty (0, -1) startPos
 
 let run fileName = 
-    let lines = readLines fileName
-    let board = Array2D.fromStringList lines
+    let lines = readLines fileName |> List.map Seq.toList
+    let board = Array2D.fromList lines
     let startPos = findStartPos board
     let visited = board |> patrol startPos
     // Part 1
