@@ -1,4 +1,4 @@
-// Advent of Code 2015. Day 01: Not Quite Lisp.
+// Advent of Code 2015. Day 01: Not Quite Lisp.<
 // dotnet fsi aoc01.fsx
 
 open System
