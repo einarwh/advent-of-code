@@ -5256,14 +5256,9 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Aoc06$Forward = {$: 'Forward'};
 var $author$project$Aoc06$N = {$: 'N'};
 var $author$project$Aoc06$defaultDelay = 200;
-var $elm$core$Set$Set_elm_builtin = function (a) {
-	return {$: 'Set_elm_builtin', a: a};
-};
-var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
-var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
-var $elm$core$Set$empty = $elm$core$Set$Set_elm_builtin($elm$core$Dict$empty);
 var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
 	return array2d.columns;
 };
@@ -5803,7 +5798,8 @@ var $tortus$elm_array_2d$Array2D$set = F4(
 				},
 				A2($tortus$elm_array_2d$Array2D$getRow, row, array2d)));
 	});
-var $author$project$Aoc06$move = F2(
+var $author$project$Aoc06$Turn = {$: 'Turn'};
+var $author$project$Aoc06$moveForward = F2(
 	function (dir, _v0) {
 		var x = _v0.a;
 		var y = _v0.b;
@@ -5833,11 +5829,11 @@ var $author$project$Aoc06$turnRight = function (dir) {
 			return $author$project$Aoc06$N;
 	}
 };
-var $author$project$Aoc06$walk = F4(
-	function (board, visited, dir, pos) {
+var $author$project$Aoc06$walk = F5(
+	function (board, visited, dir, move, pos) {
 		walk:
 		while (true) {
-			var nextPos = A2($author$project$Aoc06$move, dir, pos);
+			var nextPos = A2($author$project$Aoc06$moveForward, dir, pos);
 			var _v0 = nextPos;
 			var nextX = _v0.a;
 			var nextY = _v0.b;
@@ -5846,30 +5842,34 @@ var $author$project$Aoc06$walk = F4(
 				return $elm$core$List$reverse(
 					A2(
 						$elm$core$List$cons,
-						_Utils_Tuple2(pos, dir),
+						_Utils_Tuple3(pos, dir, move),
 						visited));
 			} else {
 				if ('#' === _v1.a.valueOf()) {
 					var $temp$board = board,
 						$temp$visited = visited,
 						$temp$dir = $author$project$Aoc06$turnRight(dir),
+						$temp$move = $author$project$Aoc06$Turn,
 						$temp$pos = pos;
 					board = $temp$board;
 					visited = $temp$visited;
 					dir = $temp$dir;
+					move = $temp$move;
 					pos = $temp$pos;
 					continue walk;
 				} else {
 					var $temp$board = board,
 						$temp$visited = A2(
 						$elm$core$List$cons,
-						_Utils_Tuple2(pos, dir),
+						_Utils_Tuple3(pos, dir, move),
 						visited),
 						$temp$dir = dir,
+						$temp$move = $author$project$Aoc06$Forward,
 						$temp$pos = nextPos;
 					board = $temp$board;
 					visited = $temp$visited;
 					dir = $temp$dir;
+					move = $temp$move;
 					pos = $temp$pos;
 					continue walk;
 				}
@@ -5880,7 +5880,7 @@ var $author$project$Aoc06$initModel = function (useSample) {
 	var dir = $author$project$Aoc06$N;
 	var board = $author$project$Aoc06$initBoard(useSample);
 	var startPos = $author$project$Aoc06$findStartPos(board);
-	var route = A4($author$project$Aoc06$walk, board, _List_Nil, $author$project$Aoc06$N, startPos);
+	var route = A5($author$project$Aoc06$walk, board, _List_Nil, $author$project$Aoc06$N, $author$project$Aoc06$Forward, startPos);
 	var _v0 = startPos;
 	var xStart = _v0.a;
 	var yStart = _v0.b;
@@ -5891,7 +5891,7 @@ var $author$project$Aoc06$initModel = function (useSample) {
 		_Utils_chr('.'),
 		board);
 	var msg = $elm$core$String$fromInt(xStart) + (',' + $elm$core$String$fromInt(yStart));
-	return {board: board, counter: 0, debug: '', delay: $author$project$Aoc06$defaultDelay, dir: dir, found: 0, highlighted: $elm$core$Set$empty, message: msg, paused: true, pos: startPos, route: route, startPos: startPos, useSample: useSample, visited: $elm$core$Set$empty};
+	return {board: guardless, counter: 0, debug: '', delay: $author$project$Aoc06$defaultDelay, found: 0, guardDir: dir, guardPos: startPos, message: msg, paused: true, routeRemaining: route, routeWalked: _List_Nil, useSample: useSample};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -5909,6 +5909,8 @@ var $elm$time$Time$State = F2(
 	function (taggers, processes) {
 		return {processes: processes, taggers: taggers};
 	});
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $elm$time$Time$init = $elm$core$Task$succeed(
 	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
 var $elm$core$Basics$compare = _Utils_compare;
@@ -6325,16 +6327,35 @@ var $author$project$Aoc06$subscriptions = function (model) {
 		});
 };
 var $author$project$Aoc06$updateClear = function (model) {
-	return _Utils_update(
-		model,
-		{found: 0, highlighted: $elm$core$Set$empty});
+	return $author$project$Aoc06$initModel(model.useSample);
 };
 var $author$project$Aoc06$updateStep = function (model) {
 	var z = 0;
-	var visited = model.visited;
-	var pos = model.pos;
-	var dir = model.dir;
-	return model;
+	var pos = model.guardPos;
+	var dir = model.guardDir;
+	var _v0 = model.routeRemaining;
+	if (_v0.b) {
+		var _v1 = _v0.a;
+		var p = _v1.a;
+		var d = _v1.b;
+		var m = _v1.c;
+		var rest = _v0.b;
+		return _Utils_update(
+			model,
+			{
+				guardDir: d,
+				guardPos: p,
+				routeRemaining: rest,
+				routeWalked: A2(
+					$elm$core$List$cons,
+					_Utils_Tuple3(p, d, m),
+					model.routeWalked)
+			});
+	} else {
+		return _Utils_update(
+			model,
+			{paused: true});
+	}
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc06$updateTogglePlay = function (model) {
@@ -6429,25 +6450,80 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $author$project$Aoc06$chooseChar = F3(
+	function (model, pos, ch) {
+		if (_Utils_eq(pos, model.guardPos)) {
+			var _v0 = model.guardDir;
+			switch (_v0.$) {
+				case 'N':
+					return _Utils_chr('^');
+				case 'W':
+					return _Utils_chr('<');
+				case 'S':
+					return _Utils_chr('v');
+				default:
+					return _Utils_chr('>');
+			}
+		} else {
+			var dirs = A2(
+				$elm$core$List$filterMap,
+				function (_v5) {
+					var p = _v5.a;
+					var d = _v5.b;
+					var m = _v5.c;
+					return _Utils_eq(p, pos) ? $elm$core$Maybe$Just(
+						_Utils_Tuple2(d, m)) : $elm$core$Maybe$Nothing;
+				},
+				model.routeWalked);
+			if (!dirs.b) {
+				return ch;
+			} else {
+				if (!dirs.b.b) {
+					var _v2 = dirs.a;
+					var dir = _v2.a;
+					var move = _v2.b;
+					if (move.$ === 'Turn') {
+						return _Utils_chr('+');
+					} else {
+						switch (dir.$) {
+							case 'N':
+								return _Utils_chr('|');
+							case 'W':
+								return _Utils_chr('-');
+							case 'S':
+								return _Utils_chr('|');
+							default:
+								return _Utils_chr('-');
+						}
+					}
+				} else {
+					return _Utils_chr('+');
+				}
+			}
+		}
+	});
 var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
 };
-var $elm$core$Dict$member = F2(
-	function (key, dict) {
-		var _v0 = A2($elm$core$Dict$get, key, dict);
-		if (_v0.$ === 'Just') {
-			return true;
-		} else {
-			return false;
-		}
-	});
-var $elm$core$Set$member = F2(
-	function (key, _v0) {
-		var dict = _v0.a;
-		return A2($elm$core$Dict$member, key, dict);
-	});
-var $elm$html$Html$strong = _VirtualDom_node('strong');
 var $author$project$Aoc06$toCharElement = F2(
 	function (model, _v0) {
 		var x = _v0.a;
@@ -6457,22 +6533,18 @@ var $author$project$Aoc06$toCharElement = F2(
 			return $elm$html$Html$text('?');
 		} else {
 			var ch = _v1.a;
-			var str = $elm$core$String$fromChar(ch);
-			return A2(
-				$elm$core$Set$member,
+			var useChar = A3(
+				$author$project$Aoc06$chooseChar,
+				model,
 				_Utils_Tuple2(x, y),
-				model.highlighted) ? A2(
-				$elm$html$Html$strong,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text(str)
-					])) : $elm$html$Html$text(str);
+				ch);
+			var str = $elm$core$String$fromChar(useChar);
+			return $elm$html$Html$text(str);
 		}
 	});
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $author$project$Aoc06$view = function (model) {
-	var textFontSize = model.useSample ? '32px' : '12px';
+	var textFontSize = model.useSample ? '36px' : '12px';
 	var commandsStr = '';
 	var board = model.board;
 	var xs = A2(
@@ -6689,7 +6761,7 @@ var $author$project$Aoc06$view = function (model) {
 							[
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
-								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'Source Code Pro, monospace'),
 								A2($elm$html$Html$Attributes$style, 'font-size', textFontSize),
 								A2($elm$html$Html$Attributes$style, 'padding', '10px'),
 								A2($elm$html$Html$Attributes$style, 'width', '200px')

@@ -29,19 +29,17 @@ type alias Pos = (Int, Int)
 
 type Dir = N | W | S | E
 
-type Move = UpOrDown Pos | EastOrWest Pos | Turn Pos 
+type Move = Turn | Forward
 
 type Visit = Vertical | Horizontal | Both 
 
 type alias Model = 
   { found : Int 
   , board : Array2D Char
-  , startPos : Pos
-  , pos : Pos 
-  , dir : Dir
-  , visited : Set Visit
-  , route : List (Pos, Dir)
-  , highlighted : Set Pos
+  , guardPos : Pos 
+  , guardDir : Dir
+  , routeWalked : List (Pos, Dir, Move)
+  , routeRemaining : List (Pos, Dir, Move)
   , useSample : Bool
   , paused : Bool 
   , delay : Float 
@@ -214,8 +212,8 @@ findStartPos board =
   in 
     loop (0, 0)
 
-move : Dir -> Pos -> Pos 
-move dir (x, y) = 
+moveForward : Dir -> Pos -> Pos 
+moveForward dir (x, y) = 
   case dir of 
     N -> (x, y - 1)
     W -> (x - 1, y)
@@ -230,19 +228,19 @@ turnRight dir =
     S -> W
     W -> N
 
-walk : Array2D Char -> List (Pos, Dir) -> Dir -> Pos -> List (Pos, Dir) 
-walk board visited dir pos = 
+walk : Array2D Char -> List (Pos, Dir, Move) -> Dir -> Move -> Pos -> List (Pos, Dir, Move) 
+walk board visited dir move pos = 
   let 
-    nextPos = move dir pos 
+    nextPos = moveForward dir pos 
     (nextX, nextY) = nextPos 
   in 
     case Array2D.get nextY nextX board of 
       Nothing -> -- Leaving the board.
-        ((pos, dir) :: visited) |> List.reverse
+        ((pos, dir, move) :: visited) |> List.reverse
       Just '#' -> -- Found an obstacle.
-        walk board visited (turnRight dir) pos 
+        walk board visited (turnRight dir) Turn pos  
       _ -> -- Go ahead.
-        walk board ((pos, dir) :: visited) dir nextPos
+        walk board ((pos, dir, move) :: visited) dir Forward nextPos
 
 initModel : Bool -> Model 
 initModel useSample = 
@@ -252,17 +250,15 @@ initModel useSample =
     (xStart, yStart) = startPos
     guardless = board |> Array2D.set yStart xStart '.'
     dir = N
-    route = walk board [] N startPos
+    route = walk board [] N Forward startPos
     msg = (String.fromInt xStart) ++ "," ++ (String.fromInt yStart)
   in 
     { found = 0
-    , board = board
-    , startPos = startPos
-    , pos = startPos
-    , dir = dir
-    , visited = Set.empty
-    , route = route
-    , highlighted = Set.empty
+    , board = guardless
+    , guardPos = startPos
+    , guardDir = dir
+    , routeRemaining = route
+    , routeWalked = []
     , message = msg
     , useSample = useSample 
     , paused = True
@@ -288,17 +284,21 @@ getAllPositions board =
     ys |> List.concatMap (\y -> xs |> List.map (\x -> (x, y)))
 
 updateClear : Model -> Model
-updateClear model = { model | highlighted = Set.empty, found = 0 } 
+updateClear model = 
+  initModel model.useSample
 
 updateStep : Model -> Model
 updateStep model = 
   let 
     z = 0
-    pos = model.pos 
-    dir = model.dir 
-    visited = model.visited 
+    pos = model.guardPos
+    dir = model.guardDir 
   in 
-    model 
+    case model.routeRemaining of 
+      (p, d, m) :: rest -> 
+        { model | guardPos = p, guardDir = d, routeRemaining = rest, routeWalked = (p, d, m) :: model.routeWalked }
+      _ -> 
+        { model | paused = True }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -338,17 +338,43 @@ subscriptions model =
 
 -- VIEW
 
+chooseChar : Model -> Pos -> Char -> Char 
+chooseChar model pos ch = 
+  if pos == model.guardPos then 
+    case model.guardDir of 
+      N -> '^'
+      W -> '<'
+      S -> 'v'
+      E -> '>'
+  else 
+    let 
+      dirs = model.routeWalked |> List.filterMap (\(p, d, m) -> if p == pos then Just (d, m) else Nothing)
+    in 
+      case dirs of 
+        [] -> ch 
+        [(dir, move)] -> 
+          case move of 
+            Turn -> '+'
+            Forward -> 
+              case dir of  
+                N -> '|'
+                W -> '-'
+                S -> '|'
+                E -> '-'
+        _ -> '+'
+
 toCharElement : Model -> Pos -> Html Msg 
 toCharElement model (x, y) = 
     case Array2D.get y x model.board of 
       Nothing -> Html.text "?"
       Just ch -> 
         let
-          str = String.fromChar ch 
+          useChar = chooseChar model (x, y) ch 
+          str = String.fromChar useChar 
         in
-          if Set.member (x, y) model.highlighted then 
-            (Html.strong [] [ Html.text str ]) 
-          else 
+          -- if Set.member (x, y) model.highlighted then 
+          --   (Html.strong [] [ Html.text str ]) 
+          -- else 
             Html.text str 
 
 view : Model -> Html Msg
@@ -361,7 +387,7 @@ view model =
     nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement model))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
     commandsStr = ""
-    textFontSize = if model.useSample then "32px" else "12px"
+    textFontSize = if model.useSample then "36px" else "12px"
   in 
     Html.table 
       [ Html.Attributes.style "width" "1080px"]
@@ -420,7 +446,7 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "background-color" "white" 
-              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-family" "Source Code Pro, monospace"
               , Html.Attributes.style "font-size" textFontSize
               , Html.Attributes.style "padding" "10px"
               , Html.Attributes.style "width" "200px" ] 
