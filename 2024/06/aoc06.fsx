@@ -9,6 +9,14 @@ module Array2D =
         let first = y >= 0 && y < a.GetLength(0)
         let second = x >= 0 && x < a.GetLength(1)
         if first && second then Some (Array2D.get a y x) else None
+    let positions (a : 'a[,]) = 
+        let rowCount = a.GetLength(0)
+        let colCount = a.GetLength(1)
+        [for x in [0..colCount-1] do for y in [0..rowCount-1] -> (x, y)]
+    let fromStringList (lines : string list) = 
+        let width = lines |> List.head |> Seq.length 
+        let height = lines |> List.length 
+        Array2D.init height width (fun y x -> lines |> List.item y |> Seq.toList |> List.item x)
 
 let readLines = 
     File.ReadAllLines
@@ -42,17 +50,43 @@ let patrol startPos board =
         let nextPos = move dir pos
         let inFront = nextPos |> Array2D.tryGet board 
         match inFront with 
-        | None -> 1 + (visited |> Set.count)
+        | None -> visited |> Set.add pos
         | Some '#' -> walk visited (turnRight dir) pos 
         | _ -> walk (Set.add pos visited) dir nextPos
     walk Set.empty (0, -1) startPos
 
+let generateBoards visited board = 
+    let positions = Array2D.positions board 
+    let addObstruction board (x, y) = 
+        let newBoard = Array2D.copy board 
+        Array2D.set newBoard y x '#'
+        newBoard 
+    visited |> Set.toList |> List.map (addObstruction board)
+
+let hasLoop startPos board = 
+    let rec walk (visited : Set<(int*int)*(int*int)>) (dir : int*int) (pos : int*int) = 
+        if Set.contains (pos, dir) visited then true 
+        else 
+            let nextPos = move dir pos
+            let inFront = nextPos |> Array2D.tryGet board 
+            match inFront with 
+            | None -> false
+            | Some '#' -> walk visited (turnRight dir) pos 
+            | _ -> 
+                walk (Set.add (pos,dir) visited) dir nextPos
+    walk Set.empty (0, -1) startPos
+
 let run fileName = 
     let lines = readLines fileName
-    let width = lines |> List.head |> Seq.length 
-    let height = lines |> List.length 
-    let board = Array2D.init height width (fun y x -> lines.[y].[x])
+    let board = Array2D.fromStringList lines
     let startPos = findStartPos board
-    board |> patrol startPos |> printfn "%A"
+    let visited = board |> patrol startPos
+    // Part 1
+    visited |> Set.count |> printfn "%d"
+    // Part 2
+    generateBoards visited board
+    |> List.filter (hasLoop startPos) 
+    |> List.length 
+    |> printfn "%d"
 
 run "input"
