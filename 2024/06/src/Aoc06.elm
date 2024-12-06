@@ -29,18 +29,23 @@ type alias Pos = (Int, Int)
 
 type Dir = N | W | S | E
 
-type Move = Vertical | Horizontal | Turn 
+type Move = UpOrDown Pos | EastOrWest Pos | Turn Pos 
+
+type Visit = Vertical | Horizontal | Both 
 
 type alias Model = 
   { found : Int 
   , board : Array2D Char
   , startPos : Pos
+  , pos : Pos 
   , dir : Dir
+  , visited : Set Visit
+  , route : List (Pos, Dir)
   , highlighted : Set Pos
   , useSample : Bool
   , paused : Bool 
   , delay : Float 
-  , lastCommandText : String
+  , message : String
   , counter : Int 
   , debug : String }
 
@@ -186,24 +191,12 @@ input = """........#.............................................#.........#....
 ..#.......#........................#........................#.....................................................................
 ........................#...............................#.#.............#................................#..................#....."""
 
-
 initBoard : Bool -> Array2D Char
 initBoard useSample = 
   let 
     data = if useSample then sample else input 
   in 
     data |> String.split "\n" |> List.map (String.toList) |> Array2D.fromList
-
--- let findStartPos (board : char[,]) = 
---     let xlen = board.GetLength(1)
---     let rec loop y x = 
---         match Array2D.get board y x with 
---         | '^' -> (x, y)
---         | _ -> 
---             let (x', y') = 
---                 if x + 1 = xlen then (0, y + 1) else (x + 1, y)
---             loop y' x' 
---     loop 0 0 
 
 findStartPos : Array2D Char -> (Int, Int)
 findStartPos board = 
@@ -214,31 +207,73 @@ findStartPos board =
         Nothing -> (0, 0)
         Just '^' -> (x, y)
         _ -> 
-          if (x + 1 == columns) then (0, y + 1) else (x + 1, y) |> loop
+          let 
+            next = if (x + 1 == columns) then (0, y + 1) else (x + 1, y)
+          in 
+            loop next
   in 
     loop (0, 0)
 
-init : () -> (Model, Cmd Msg)
-init _ =
+move : Dir -> Pos -> Pos 
+move dir (x, y) = 
+  case dir of 
+    N -> (x, y - 1)
+    W -> (x - 1, y)
+    S -> (x, y + 1)
+    E -> (x + 1, y)
+
+turnRight : Dir -> Dir 
+turnRight dir = 
+  case dir of 
+    N -> E
+    E -> S 
+    S -> W
+    W -> N
+
+walk : Array2D Char -> List (Pos, Dir) -> Dir -> Pos -> List (Pos, Dir) 
+walk board visited dir pos = 
   let 
-    board = initBoard False
+    nextPos = move dir pos 
+    (nextX, nextY) = nextPos 
+  in 
+    case Array2D.get nextY nextX board of 
+      Nothing -> -- Leaving the board.
+        ((pos, dir) :: visited) |> List.reverse
+      Just '#' -> -- Found an obstacle.
+        walk board visited (turnRight dir) pos 
+      _ -> -- Go ahead.
+        walk board ((pos, dir) :: visited) dir nextPos
+
+initModel : Bool -> Model 
+initModel useSample = 
+  let 
+    board = initBoard useSample
     startPos = findStartPos board 
     (xStart, yStart) = startPos
     guardless = board |> Array2D.set yStart xStart '.'
     dir = N
-    model = { found = 0
-            , board = board
-            , startPos = startPos
-            , dir = dir
-            , highlighted = Set.empty
-            , lastCommandText = "press play to start"
-            , useSample = False 
-            , paused = True
-            , delay = defaultDelay
-            , counter = 0
-            , debug = "" }
+    route = walk board [] N startPos
+    msg = (String.fromInt xStart) ++ "," ++ (String.fromInt yStart)
   in 
-    (model, Cmd.none)
+    { found = 0
+    , board = board
+    , startPos = startPos
+    , pos = startPos
+    , dir = dir
+    , visited = Set.empty
+    , route = route
+    , highlighted = Set.empty
+    , message = msg
+    , useSample = useSample 
+    , paused = True
+    , delay = defaultDelay
+    , counter = 0
+    , debug = "" }
+
+
+init : () -> (Model, Cmd Msg)
+init _ =
+  (initModel False, Cmd.none)
 
 -- UPDATE
 
@@ -256,7 +291,14 @@ updateClear : Model -> Model
 updateClear model = { model | highlighted = Set.empty, found = 0 } 
 
 updateStep : Model -> Model
-updateStep model = model
+updateStep model = 
+  let 
+    z = 0
+    pos = model.pos 
+    dir = model.dir 
+    visited = model.visited 
+  in 
+    model 
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -267,7 +309,7 @@ updateToggleSample model =
   let
     useSample = not model.useSample
   in
-    { model | useSample = useSample, highlighted = Set.empty, found = 0, board = initBoard useSample } 
+    initModel useSample 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -361,6 +403,17 @@ view model =
               [ 
                 Html.div [] [ Html.text (String.fromInt model.found) ]
               , Html.div [] [ Html.text commandsStr ]
+              ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "background-color" "white" 
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "24px"
+              , Html.Attributes.style "width" "200px" ] 
+              [ 
+                Html.div [] [ Html.text model.message ]
               ] ]
       , Html.tr 
           []

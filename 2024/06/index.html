@@ -5332,17 +5332,22 @@ var $tortus$elm_array_2d$Array2D$get = F3(
 var $author$project$Aoc06$findStartPos = function (board) {
 	var columns = $tortus$elm_array_2d$Array2D$columns(board);
 	var loop = function (_v0) {
-		var x = _v0.a;
-		var y = _v0.b;
-		var _v1 = A3($tortus$elm_array_2d$Array2D$get, y, x, board);
-		if (_v1.$ === 'Nothing') {
-			return _Utils_Tuple2(0, 0);
-		} else {
-			if ('^' === _v1.a.valueOf()) {
-				return _Utils_Tuple2(x, y);
+		loop:
+		while (true) {
+			var x = _v0.a;
+			var y = _v0.b;
+			var _v1 = A3($tortus$elm_array_2d$Array2D$get, y, x, board);
+			if (_v1.$ === 'Nothing') {
+				return _Utils_Tuple2(0, 0);
 			} else {
-				return _Utils_eq(x + 1, columns) ? _Utils_Tuple2(0, y + 1) : loop(
-					_Utils_Tuple2(x + 1, y));
+				if ('^' === _v1.a.valueOf()) {
+					return _Utils_Tuple2(x, y);
+				} else {
+					var next = _Utils_eq(x + 1, columns) ? _Utils_Tuple2(0, y + 1) : _Utils_Tuple2(x + 1, y);
+					var $temp$_v0 = next;
+					_v0 = $temp$_v0;
+					continue loop;
+				}
 			}
 		}
 	};
@@ -5717,8 +5722,6 @@ var $author$project$Aoc06$initBoard = function (useSample) {
 			$elm$core$String$toList,
 			A2($elm$core$String$split, '\n', data)));
 };
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
 		if (maybe.$ === 'Just') {
@@ -5800,21 +5803,102 @@ var $tortus$elm_array_2d$Array2D$set = F4(
 				},
 				A2($tortus$elm_array_2d$Array2D$getRow, row, array2d)));
 	});
-var $author$project$Aoc06$init = function (_v0) {
+var $author$project$Aoc06$move = F2(
+	function (dir, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		switch (dir.$) {
+			case 'N':
+				return _Utils_Tuple2(x, y - 1);
+			case 'W':
+				return _Utils_Tuple2(x - 1, y);
+			case 'S':
+				return _Utils_Tuple2(x, y + 1);
+			default:
+				return _Utils_Tuple2(x + 1, y);
+		}
+	});
+var $author$project$Aoc06$E = {$: 'E'};
+var $author$project$Aoc06$S = {$: 'S'};
+var $author$project$Aoc06$W = {$: 'W'};
+var $author$project$Aoc06$turnRight = function (dir) {
+	switch (dir.$) {
+		case 'N':
+			return $author$project$Aoc06$E;
+		case 'E':
+			return $author$project$Aoc06$S;
+		case 'S':
+			return $author$project$Aoc06$W;
+		default:
+			return $author$project$Aoc06$N;
+	}
+};
+var $author$project$Aoc06$walk = F4(
+	function (board, visited, dir, pos) {
+		walk:
+		while (true) {
+			var nextPos = A2($author$project$Aoc06$move, dir, pos);
+			var _v0 = nextPos;
+			var nextX = _v0.a;
+			var nextY = _v0.b;
+			var _v1 = A3($tortus$elm_array_2d$Array2D$get, nextY, nextX, board);
+			if (_v1.$ === 'Nothing') {
+				return $elm$core$List$reverse(
+					A2(
+						$elm$core$List$cons,
+						_Utils_Tuple2(pos, dir),
+						visited));
+			} else {
+				if ('#' === _v1.a.valueOf()) {
+					var $temp$board = board,
+						$temp$visited = visited,
+						$temp$dir = $author$project$Aoc06$turnRight(dir),
+						$temp$pos = pos;
+					board = $temp$board;
+					visited = $temp$visited;
+					dir = $temp$dir;
+					pos = $temp$pos;
+					continue walk;
+				} else {
+					var $temp$board = board,
+						$temp$visited = A2(
+						$elm$core$List$cons,
+						_Utils_Tuple2(pos, dir),
+						visited),
+						$temp$dir = dir,
+						$temp$pos = nextPos;
+					board = $temp$board;
+					visited = $temp$visited;
+					dir = $temp$dir;
+					pos = $temp$pos;
+					continue walk;
+				}
+			}
+		}
+	});
+var $author$project$Aoc06$initModel = function (useSample) {
 	var dir = $author$project$Aoc06$N;
-	var board = $author$project$Aoc06$initBoard(false);
+	var board = $author$project$Aoc06$initBoard(useSample);
 	var startPos = $author$project$Aoc06$findStartPos(board);
-	var model = {board: board, counter: 0, debug: '', delay: $author$project$Aoc06$defaultDelay, dir: dir, found: 0, highlighted: $elm$core$Set$empty, lastCommandText: 'press play to start', paused: true, startPos: startPos, useSample: false};
-	var _v1 = startPos;
-	var xStart = _v1.a;
-	var yStart = _v1.b;
+	var route = A4($author$project$Aoc06$walk, board, _List_Nil, $author$project$Aoc06$N, startPos);
+	var _v0 = startPos;
+	var xStart = _v0.a;
+	var yStart = _v0.b;
 	var guardless = A4(
 		$tortus$elm_array_2d$Array2D$set,
 		yStart,
 		xStart,
 		_Utils_chr('.'),
 		board);
-	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+	var msg = $elm$core$String$fromInt(xStart) + (',' + $elm$core$String$fromInt(yStart));
+	return {board: board, counter: 0, debug: '', delay: $author$project$Aoc06$defaultDelay, dir: dir, found: 0, highlighted: $elm$core$Set$empty, message: msg, paused: true, pos: startPos, route: route, startPos: startPos, useSample: useSample, visited: $elm$core$Set$empty};
+};
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$Aoc06$init = function (_v0) {
+	return _Utils_Tuple2(
+		$author$project$Aoc06$initModel(false),
+		$elm$core$Platform$Cmd$none);
 };
 var $author$project$Aoc06$Tick = {$: 'Tick'};
 var $elm$time$Time$Every = F2(
@@ -6246,6 +6330,10 @@ var $author$project$Aoc06$updateClear = function (model) {
 		{found: 0, highlighted: $elm$core$Set$empty});
 };
 var $author$project$Aoc06$updateStep = function (model) {
+	var z = 0;
+	var visited = model.visited;
+	var pos = model.pos;
+	var dir = model.dir;
 	return model;
 };
 var $elm$core$Basics$not = _Basics_not;
@@ -6256,14 +6344,7 @@ var $author$project$Aoc06$updateTogglePlay = function (model) {
 };
 var $author$project$Aoc06$updateToggleSample = function (model) {
 	var useSample = !model.useSample;
-	return _Utils_update(
-		model,
-		{
-			board: $author$project$Aoc06$initBoard(useSample),
-			found: 0,
-			highlighted: $elm$core$Set$empty,
-			useSample: useSample
-		});
+	return $author$project$Aoc06$initModel(useSample);
 };
 var $author$project$Aoc06$update = F2(
 	function (msg, model) {
@@ -6568,6 +6649,32 @@ var $author$project$Aoc06$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(commandsStr)
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '24px'),
+								A2($elm$html$Html$Attributes$style, 'width', '200px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(model.message)
 									]))
 							]))
 					])),
