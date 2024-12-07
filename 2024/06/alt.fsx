@@ -87,9 +87,9 @@ let hasLoop (intervalsByRow : (Boundary*Boundary) list array) (intervalsByCol : 
     printfn "Check board for loop!"
     let between (n : int) (startBoundary : Boundary, stopBoundary : Boundary) : bool =
         match (startBoundary, stopBoundary) with 
-        | Outside, Obstacle upper -> n < upper 
-        | Obstacle lower, Obstacle upper -> lower < n && n < upper 
-        | Obstacle lower, Outside -> lower < n 
+        | Outside, Obstacle upper -> n <= upper 
+        | Obstacle lower, Obstacle upper -> lower <= n && n <= upper 
+        | Obstacle lower, Outside -> lower <= n 
         | Outside, Outside -> true 
     let tryFindLargest (n : int) (intervals : (Boundary*Boundary) list) : int option = 
         printfn "tryFindLargest: %d - %A" n intervals
@@ -260,12 +260,12 @@ let run fileName =
     printfn "ALL CANDIDATES %A" allCandidates    
 
     let extraObs = (3, 6)
-    hasLoopWithAddedObstruction obsByRow obsByCol startPos board extraObs
+    // hasLoopWithAddedObstruction obsByRow obsByCol startPos board extraObs
     //hasLoop intervalsByRow intervalsByCol startPos board
-    // allCandidates
-    // |> List.filter (hasLoopWithAddedObstruction intervalsByRow intervalsByCol startPos board) 
-    // |> List.length 
-    // |> printfn "%d"
+    allCandidates
+    |> List.filter (hasLoopWithAddedObstruction obsByRow obsByCol startPos board) 
+    |> List.length 
+    |> printfn "%d"
     printfn "%A" sw.Elapsed
 
 run "sample"
