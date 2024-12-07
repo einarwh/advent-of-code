@@ -1,0 +1,1192 @@
+41
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+----------------
+Check for loop!
+
+At (4, 6) facing (0, -1) having visited set []
+Moving N
+tryFindSmallest: 6 - [(Outside, Obstacle 0); (Obstacle 0, Outside)]
+Found obstacle at (4, 0)
+Move to (4, 1)
+Add moves set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+No overlap!
+
+At (4, 1) facing (1, 0) having visited set
+  [((4, 1), (0, -1)); ((4, 2), (0, -1)); ((4, 3), (0, -1)); ((4, 4), (0, -1));
+   ((4, 5), (0, -1)); ((4, 6), (0, -1))]
+Moving E
+tryFindLargest: 4 - [(Outside, Obstacle 6); (Obstacle 6, Outside)]
+Found obstacle at (6, 1)
+Move to (5, 1)
+Add moves set [((4, 1), (1, 0)); ((5, 1), (1, 0))]
+No overlap!
+
+At (5, 1) facing (0, 1) having visited set
+  [((4, 1), (0, -1)); ((4, 1), (1, 0)); ((4, 2), (0, -1)); ((4, 3), (0, -1));
+   ((4, 4), (0, -1)); ((4, 5), (0, -1)); ((4, 6), (0, -1)); ((5, 1), (1, 0))]
+Moving S
+tryFindLargest: 1 - [(Outside, Outside)]
+Found no obstacle - exiting. No loop.
+0
+00:00:00.0759134
