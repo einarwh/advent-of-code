@@ -6,7 +6,7 @@ open System.IO
 
 let split (splitter : string) (input : string) = input.Split(splitter)
 
-let parseLine (s : string) = 
+let parseLine s = 
     let parts = s |> split ": "
     let testValue = int64 parts.[0]
     let numbers = parts.[1] |> split " " |> Array.toList |> List.map int64 
@@ -17,14 +17,15 @@ let readLines =
     >> Array.filter (fun line -> line <> String.Empty)
     >> Array.toList
 
-let checkEquation (testValue : int64, numbers : int64 list) : int64 option  = 
+let checkEquation operators (testValue, numbers) = 
     let rec check result nums = 
         match nums with 
         | [] -> result = testValue
         | n :: rest -> 
-            let sum = result + n 
-            let prod = result * n 
-            (sum <= testValue && check sum rest) || (prod <= testValue && check prod rest)
+            let withOp op = 
+                let value = op result n 
+                value <= testValue && check value rest 
+            operators |> List.exists (withOp) 
     match numbers with 
     | [] -> None 
     | h :: t -> 
@@ -33,6 +34,16 @@ let checkEquation (testValue : int64, numbers : int64 list) : int64 option  =
 let run fileName = 
     let lines = readLines fileName
     let equations = lines |> List.map parseLine 
-    equations |> List.choose checkEquation |> List.sum |> printfn "%d"
+    let add = fun (a : int64) (b : int64) -> a + b
+    let mul = fun (a : int64) (b : int64) -> a * b 
+    let concat = fun (a : int64) (b : int64) -> int64 ((string a) + (string b))
+    equations 
+    |> List.choose (checkEquation [add; mul])
+    |> List.sum 
+    |> printfn "%d"
+    equations
+    |> List.choose (checkEquation [add; mul;concat])
+    |> List.sum 
+    |> printfn "%d"
 
 run "input"
