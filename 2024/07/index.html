@@ -5173,10 +5173,10 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Aoc07$Unbalanced = function (a) {
-	return {$: 'Unbalanced', a: a};
+var $author$project$Aoc07$Unchecked = function (a) {
+	return {$: 'Unchecked', a: a};
 };
-var $author$project$Aoc07$equationAsUnbalanced = function (_v0) {
+var $author$project$Aoc07$equationAsUnchecked = function (_v0) {
 	var testValue = _v0.a;
 	var numbers = _v0.b;
 	var testValueStr = $elm$core$String$fromInt(testValue);
@@ -5184,7 +5184,7 @@ var $author$project$Aoc07$equationAsUnbalanced = function (_v0) {
 		$elm$core$String$join,
 		' ',
 		A2($elm$core$List$map, $elm$core$String$fromInt, numbers));
-	return $author$project$Aoc07$Unbalanced(testValueStr + (': ' + numbersStr));
+	return $author$project$Aoc07$Unchecked(testValueStr + (': ' + numbersStr));
 };
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
@@ -5238,7 +5238,7 @@ var $author$project$Aoc07$initModel = F2(
 		var equations = $author$project$Aoc07$initEquations(useSample);
 		var debug = $elm$core$String$fromInt(
 			$elm$core$List$length(equations));
-		var checked = A2($elm$core$List$map, $author$project$Aoc07$equationAsUnbalanced, equations);
+		var checked = A2($elm$core$List$map, $author$project$Aoc07$equationAsUnchecked, equations);
 		var model = {checkedEquations: checked, count: 0, debug: debug, equations: equations, lastCommandText: 'press play to start', useSample: useSample, withConcat: withConcat};
 		return model;
 	});
@@ -5262,6 +5262,9 @@ var $author$project$Aoc07$Con = {$: 'Con'};
 var $author$project$Aoc07$Mul = {$: 'Mul'};
 var $author$project$Aoc07$Balanced = function (a) {
 	return {$: 'Balanced', a: a};
+};
+var $author$project$Aoc07$Unbalanced = function (a) {
+	return {$: 'Unbalanced', a: a};
 };
 var $author$project$Aoc07$concat = F2(
 	function (a, b) {
@@ -5302,20 +5305,26 @@ var $author$project$Aoc07$tryFindFirst = F2(
 		tryFindFirst:
 		while (true) {
 			if (!lst.b) {
-				return $elm$core$Maybe$Nothing;
+				return $elm$core$Result$Err(
+					_Utils_Tuple3(0, 0, '?'));
 			} else {
-				var h = lst.a;
-				var t = lst.b;
-				var _v1 = fn(h);
-				if (_v1.$ === 'Just') {
-					var v = _v1.a;
-					return $elm$core$Maybe$Just(v);
+				if (!lst.b.b) {
+					var x = lst.a;
+					return fn(x);
 				} else {
-					var $temp$fn = fn,
-						$temp$lst = t;
-					fn = $temp$fn;
-					lst = $temp$lst;
-					continue tryFindFirst;
+					var h = lst.a;
+					var t = lst.b;
+					var _v1 = fn(h);
+					if (_v1.$ === 'Ok') {
+						var v = _v1.a;
+						return $elm$core$Result$Ok(v);
+					} else {
+						var $temp$fn = fn,
+							$temp$lst = t;
+						fn = $temp$fn;
+						lst = $temp$lst;
+						continue tryFindFirst;
+					}
 				}
 			}
 		}
@@ -5325,11 +5334,24 @@ var $author$project$Aoc07$check = F4(
 		var testValue = _v0.a;
 		var numbers = _v0.b;
 		if (!numbers.b) {
-			return _Utils_eq(result, testValue) ? $elm$core$Maybe$Just(
-				A2(
+			if (_Utils_eq(result, testValue)) {
+				var tvStr = $elm$core$String$fromInt(testValue);
+				var seqStr = A2(
 					$elm$core$String$join,
 					' ',
-					$elm$core$List$reverse(sequence))) : $elm$core$Maybe$Nothing;
+					$elm$core$List$reverse(sequence));
+				return $elm$core$Result$Ok(
+					_Utils_Tuple2(testValue, tvStr + (': ' + seqStr)));
+			} else {
+				return $elm$core$Result$Err(
+					_Utils_Tuple3(
+						testValue,
+						result,
+						A2(
+							$elm$core$String$join,
+							' ',
+							$elm$core$List$reverse(sequence))));
+			}
 		} else {
 			var n = numbers.a;
 			var rest = numbers.b;
@@ -5346,11 +5368,28 @@ var $author$project$Aoc07$check = F4(
 							$author$project$Aoc07$op2s(op),
 							sequence)),
 					availableOperators,
-					_Utils_Tuple2(testValue, rest)) : $elm$core$Maybe$Nothing;
+					_Utils_Tuple2(testValue, rest)) : $elm$core$Result$Err(
+					_Utils_Tuple3(
+						testValue,
+						value,
+						A2(
+							$elm$core$String$join,
+							' ',
+							$elm$core$List$reverse(sequence))));
 			};
 			return A2($author$project$Aoc07$tryFindFirst, withOp, availableOperators);
 		}
 	});
+var $author$project$Aoc07$equationAsUnbalanced = function (_v0) {
+	var testValue = _v0.a;
+	var numbers = _v0.b;
+	var testValueStr = $elm$core$String$fromInt(testValue);
+	var numbersStr = A2(
+		$elm$core$String$join,
+		' ',
+		A2($elm$core$List$map, $elm$core$String$fromInt, numbers));
+	return $author$project$Aoc07$Unbalanced(testValueStr + (': ' + numbersStr));
+};
 var $author$project$Aoc07$checkEquation = F2(
 	function (availableOperators, _v0) {
 		var testValue = _v0.a;
@@ -5364,7 +5403,7 @@ var $author$project$Aoc07$checkEquation = F2(
 			return $author$project$Aoc07$Unbalanced(tvStr + (': ' + numStr));
 		};
 		if (!numbers.b) {
-			return toUnbalanced(numbers);
+			return $author$project$Aoc07$Unbalanced('empty');
 		} else {
 			var n = numbers.a;
 			var rest = numbers.b;
@@ -5376,16 +5415,52 @@ var $author$project$Aoc07$checkEquation = F2(
 						$elm$core$String$fromInt(n)
 					]),
 				availableOperators,
-				_Utils_Tuple2(testValue, numbers));
-			if (_v2.$ === 'Just') {
-				var result = _v2.a;
+				_Utils_Tuple2(testValue, rest));
+			if (_v2.$ === 'Ok') {
+				var _v3 = _v2.a;
+				var str = _v3.b;
 				return $author$project$Aoc07$Balanced(
-					_Utils_Tuple2(result, testValue));
+					_Utils_Tuple2(str, testValue));
 			} else {
-				return toUnbalanced(numbers);
+				var _v4 = _v2.a;
+				var result = _v4.b;
+				var str = _v4.c;
+				return $author$project$Aoc07$equationAsUnbalanced(
+					_Utils_Tuple2(testValue, numbers));
 			}
 		}
 	});
+var $author$project$Aoc07$debugCalculation = F2(
+	function (ops, maybeEq) {
+		if (maybeEq.$ === 'Nothing') {
+			return '???';
+		} else {
+			var eq = maybeEq.a;
+			var _v1 = A2($author$project$Aoc07$checkEquation, ops, eq);
+			switch (_v1.$) {
+				case 'Unchecked':
+					var uc = _v1.a;
+					return 'Unchecked (' + (uc + ')');
+				case 'Unbalanced':
+					var ub = _v1.a;
+					return 'Unbalanced (' + (ub + ')');
+				default:
+					var _v2 = _v1.a;
+					var b = _v2.a;
+					var tv = _v2.b;
+					return 'Balanced (' + (b + (', ' + ($elm$core$String$fromInt(tv) + ')')));
+			}
+		}
+	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
 var $elm$core$List$sum = function (numbers) {
 	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
 };
@@ -5394,15 +5469,22 @@ var $author$project$Aoc07$updateSolve = function (model) {
 		[$author$project$Aoc07$Add, $author$project$Aoc07$Mul, $author$project$Aoc07$Con]) : _List_fromArray(
 		[$author$project$Aoc07$Add, $author$project$Aoc07$Mul]);
 	var getValue = function (ce) {
-		if (ce.$ === 'Balanced') {
-			var _v1 = ce.a;
-			var s = _v1.a;
-			var n = _v1.b;
-			return n;
-		} else {
-			return 0;
+		switch (ce.$) {
+			case 'Balanced':
+				var _v1 = ce.a;
+				var s = _v1.a;
+				var n = _v1.b;
+				return n;
+			case 'Unbalanced':
+				return 0;
+			default:
+				return 0;
 		}
 	};
+	var debug = A2(
+		$author$project$Aoc07$debugCalculation,
+		operators,
+		$elm$core$List$head(model.equations));
 	var checked = A2(
 		$elm$core$List$map,
 		$author$project$Aoc07$checkEquation(operators),
@@ -5411,7 +5493,7 @@ var $author$project$Aoc07$updateSolve = function (model) {
 		A2($elm$core$List$map, getValue, checked));
 	return _Utils_update(
 		model,
-		{checkedEquations: checked, count: balancedCount});
+		{checkedEquations: checked, count: balancedCount, debug: debug});
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc07$updateToggleConcat = function (model) {
@@ -5527,6 +5609,22 @@ var $author$project$Aoc07$toBalancedHtmlElement = function (s) {
 		]);
 };
 var $author$project$Aoc07$toUnbalancedHtmlElement = function (s) {
+	var textElement = $elm$html$Html$text(s);
+	var spanElement = A2(
+		$elm$html$Html$span,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'background-color', '#FAA0A0')
+			]),
+		_List_fromArray(
+			[textElement]));
+	return _List_fromArray(
+		[
+			spanElement,
+			A2($elm$html$Html$br, _List_Nil, _List_Nil)
+		]);
+};
+var $author$project$Aoc07$toUncheckedHtmlElement = function (s) {
 	return _List_fromArray(
 		[
 			$elm$html$Html$text(s),
@@ -5534,13 +5632,17 @@ var $author$project$Aoc07$toUnbalancedHtmlElement = function (s) {
 		]);
 };
 var $author$project$Aoc07$toEquationHtmlElement = function (checked) {
-	if (checked.$ === 'Unbalanced') {
-		var s = checked.a;
-		return $author$project$Aoc07$toUnbalancedHtmlElement(s);
-	} else {
-		var _v1 = checked.a;
-		var s = _v1.a;
-		return $author$project$Aoc07$toBalancedHtmlElement(s);
+	switch (checked.$) {
+		case 'Unchecked':
+			var s = checked.a;
+			return $author$project$Aoc07$toUncheckedHtmlElement(s);
+		case 'Unbalanced':
+			var s = checked.a;
+			return $author$project$Aoc07$toUnbalancedHtmlElement(s);
+		default:
+			var _v1 = checked.a;
+			var s = _v1.a;
+			return $author$project$Aoc07$toBalancedHtmlElement(s);
 	}
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');

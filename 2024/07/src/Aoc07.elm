@@ -23,7 +23,7 @@ main =
 
 -- MODEL
 
-type CheckedEquation = Balanced (String, Int) | Unbalanced String 
+type CheckedEquation = Balanced (String, Int) | Unbalanced String | Unchecked String 
 
 type alias Model = 
   { count : Int 
@@ -919,6 +919,14 @@ initEquations useSample =
   in 
     lines |> List.filterMap parseEquation 
 
+equationAsUnchecked : Equation -> CheckedEquation
+equationAsUnchecked (testValue, numbers) = 
+  let 
+    testValueStr = String.fromInt testValue 
+    numbersStr = numbers |> List.map String.fromInt |> String.join " "
+  in 
+    Unchecked (testValueStr ++ ": " ++ numbersStr)
+
 equationAsUnbalanced : Equation -> CheckedEquation
 equationAsUnbalanced (testValue, numbers) = 
   let 
@@ -931,7 +939,7 @@ initModel : Bool -> Bool -> Model
 initModel useSample withConcat =
   let 
     equations = initEquations useSample
-    checked = equations |> List.map equationAsUnbalanced
+    checked = equations |> List.map equationAsUnchecked
     debug = equations |> List.length |> String.fromInt 
     model = { count = 0
             , useSample = useSample
@@ -964,20 +972,6 @@ concat a b =
       Just result -> result 
       Nothing -> 0
 
--- let checkEquation operators (testValue, numbers) = 
---     let rec check result nums = 
---         match nums with 
---         | [] -> result = testValue
---         | n :: rest -> 
---             let withOp op = 
---                 let value = op result n 
---                 value <= testValue && check value rest 
---             operators |> List.exists (withOp) 
---     match numbers with 
---     | [] -> None 
---     | h :: t -> 
---         if check h t then Some testValue else None
-
 calculate : Op -> Int -> Int -> Int 
 calculate op a b = 
   case op of 
@@ -992,23 +986,28 @@ op2s op =
     Mul -> "*"
     Con -> "||"
 
-tryFindFirst : (a -> Maybe b) -> List a -> Maybe b
+tryFindFirst : (a -> Result (Int, Int, String) (Int, String)) -> List a -> Result (Int, Int, String) (Int, String)
 tryFindFirst fn lst = 
   case lst of 
-    [] -> Nothing 
+    [] -> Err (0, 0, "?")
+    [x] -> fn x  
     h :: t -> 
       case fn h of 
-        Just v -> Just v 
-        Nothing -> tryFindFirst fn t 
+        Ok v -> Ok v 
+        Err _ -> tryFindFirst fn t 
 
-check : Int -> List String -> List Op -> Equation -> Maybe String 
+check : Int -> List String -> List Op -> Equation -> Result (Int, Int, String) (Int, String) 
 check result sequence availableOperators (testValue, numbers) = 
   case numbers of 
     [] -> 
-      if result == testValue then 
-        Just (sequence |> List.reverse |> String.join " ") 
+      if result == testValue then
+        let 
+          seqStr = sequence |> List.reverse |> String.join " "
+          tvStr = String.fromInt testValue 
+        in 
+          Ok (testValue, tvStr ++ ": " ++ seqStr)  
       else 
-        Nothing 
+        Err (testValue, result, sequence |> List.reverse |> String.join " ") 
     n :: rest ->
       let 
         withOp op = 
@@ -1018,9 +1017,8 @@ check result sequence availableOperators (testValue, numbers) =
             if value <= testValue then 
               check value ((String.fromInt n) :: (op2s op) :: sequence) availableOperators (testValue, rest)
             else 
-              Nothing  
+              Err (testValue, value, sequence |> List.reverse |> String.join " ")
       in 
-        -- Find first somehow.
         availableOperators |> tryFindFirst withOp
 
 checkEquation : List Op -> Equation -> CheckedEquation
@@ -1035,11 +1033,21 @@ checkEquation availableOperators (testValue, numbers) =
   in 
     case numbers of 
       [] ->
-        numbers |> toUnbalanced
+        Unbalanced "empty"
       n :: rest -> 
-        case check n [ String.fromInt n ] availableOperators (testValue, numbers) of 
-          Just result -> Balanced (result, testValue)
-          Nothing -> numbers |> toUnbalanced
+        case check n [ String.fromInt n ] availableOperators (testValue, rest) of 
+          Ok (_, str) -> Balanced (str, testValue)
+          Err (_, result, str) -> equationAsUnbalanced (testValue, numbers) 
+
+debugCalculation : List Op -> Maybe Equation -> String 
+debugCalculation ops maybeEq = 
+  case maybeEq of 
+    Nothing -> "???"
+    Just eq -> 
+      case checkEquation ops eq of 
+        Unchecked uc -> "Unchecked (" ++ uc ++ ")"
+        Unbalanced ub -> "Unbalanced (" ++ ub ++ ")"
+        Balanced (b, tv) -> "Balanced (" ++ b ++ ", " ++ (String.fromInt tv) ++ ")"
 
 updateSolve model = 
   let 
@@ -1049,7 +1057,9 @@ updateSolve model =
       case ce of 
         Balanced (s, n) -> n 
         Unbalanced _ -> 0 
+        Unchecked _ -> 0
     balancedCount = checked |> List.map getValue |> List.sum
+    debug = debugCalculation operators (List.head model.equations)
   in  
   -- let
   --   checkedEquations = 
@@ -1059,7 +1069,7 @@ updateSolve model =
   --       model.reports |> List.map checkReport
   --   found = countSafe reports 
   -- in
-    { model | checkedEquations = checked, count = balancedCount }
+    { model | checkedEquations = checked, count = balancedCount, debug = debug }
 
 updateToggleConcat : Model -> Model
 updateToggleConcat model = 
@@ -1094,9 +1104,17 @@ subscriptions model = Sub.none
 
 -- VIEW
 
+toUncheckedHtmlElement : String -> List (Html Msg) 
+toUncheckedHtmlElement s =
+  [ s |> Html.text, Html.br [] [] ]
+
 toUnbalancedHtmlElement : String -> List (Html Msg) 
 toUnbalancedHtmlElement s =
-  [ s |> Html.text, Html.br [] [] ]
+  let 
+    textElement = Html.text s 
+    spanElement = Html.span [ Html.Attributes.style "background-color" "#FAA0A0" ] [ textElement ]
+  in 
+    [ spanElement, Html.br [] [] ]
 
 toBalancedHtmlElement : String -> List (Html Msg) 
 toBalancedHtmlElement s =
@@ -1109,6 +1127,7 @@ toBalancedHtmlElement s =
 toEquationHtmlElement : CheckedEquation -> List (Html Msg)  
 toEquationHtmlElement checked = 
   case checked of 
+    Unchecked s -> toUncheckedHtmlElement s 
     Unbalanced s -> toUnbalancedHtmlElement s 
     Balanced (s, _) -> toBalancedHtmlElement s
 
