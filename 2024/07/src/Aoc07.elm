@@ -12,6 +12,8 @@ import Html exposing (text)
 
 type alias Equation = (Int, List Int)
 
+type Op = Add | Mul | Con
+
 main =
   Browser.element
     { init = init
@@ -21,14 +23,14 @@ main =
 
 -- MODEL
 
-type CheckedEquation = Balanced String | Unbalanced String 
+type CheckedEquation = Balanced (String, Int) | Unbalanced String 
 
 type alias Model = 
   { count : Int 
   , useSample : Bool 
   , withConcat : Bool
   , equations : List (Int, List Int) 
-  , checkedEquations : List String
+  , checkedEquations : List CheckedEquation
   , lastCommandText : String
   , debug : String }
 
@@ -42,11 +44,11 @@ parseEquation line =
     [h, t] -> 
       case String.toInt h of 
         Nothing -> Nothing
-        Just targetValue -> 
+        Just testValue -> 
           let 
             numbers = t |> String.split " " |> List.filterMap (String.toInt)
           in 
-            Just (targetValue, numbers)
+            Just (testValue, numbers)
     _ -> Nothing
 
 
@@ -917,28 +919,138 @@ initEquations useSample =
   in 
     lines |> List.filterMap parseEquation 
 
+equationAsUnbalanced : Equation -> CheckedEquation
+equationAsUnbalanced (testValue, numbers) = 
+  let 
+    testValueStr = String.fromInt testValue 
+    numbersStr = numbers |> List.map String.fromInt |> String.join " "
+  in 
+    Unbalanced (testValueStr ++ ": " ++ numbersStr)
+
+initModel : Bool -> Bool -> Model
+initModel useSample withConcat =
+  let 
+    equations = initEquations useSample
+    checked = equations |> List.map equationAsUnbalanced
+    debug = equations |> List.length |> String.fromInt 
+    model = { count = 0
+            , useSample = useSample
+            , withConcat = withConcat
+            , equations = equations
+            , checkedEquations = checked
+            , lastCommandText = "press play to start"
+            , debug = debug }
+  in 
+    model 
+
 init : () -> (Model, Cmd Msg)
 init _ =
-  let 
-    equations = initEquations False
-    model = { count = 0
-            , useSample = False
-            , withConcat = False
-            , equations = equations
-            , checkedEquations = []
-            , lastCommandText = "press play to start"
-            , debug = "" }
-  in 
-    (model, Cmd.none)
+  (initModel False False, Cmd.none)
 
 -- UPDATE
 
 type Msg = Clear | Solve | ToggleConcat | ToggleSample
 
 updateClear : Model -> Model
-updateClear model = { model | checkedEquations = [], count = 0 } 
+updateClear model = 
+  initModel model.useSample model.withConcat
+
+concat : Int -> Int -> Int 
+concat a b = 
+  let 
+    s = (String.fromInt a) ++ (String.fromInt b)
+  in 
+    case String.toInt s of 
+      Just result -> result 
+      Nothing -> 0
+
+-- let checkEquation operators (testValue, numbers) = 
+--     let rec check result nums = 
+--         match nums with 
+--         | [] -> result = testValue
+--         | n :: rest -> 
+--             let withOp op = 
+--                 let value = op result n 
+--                 value <= testValue && check value rest 
+--             operators |> List.exists (withOp) 
+--     match numbers with 
+--     | [] -> None 
+--     | h :: t -> 
+--         if check h t then Some testValue else None
+
+calculate : Op -> Int -> Int -> Int 
+calculate op a b = 
+  case op of 
+    Add -> a + b 
+    Mul -> a * b 
+    Con -> concat a b 
+
+op2s : Op -> String 
+op2s op = 
+  case op of 
+    Add -> "+"
+    Mul -> "*"
+    Con -> "||"
+
+tryFindFirst : (a -> Maybe b) -> List a -> Maybe b
+tryFindFirst fn lst = 
+  case lst of 
+    [] -> Nothing 
+    h :: t -> 
+      case fn h of 
+        Just v -> Just v 
+        Nothing -> tryFindFirst fn t 
+
+check : Int -> List String -> List Op -> Equation -> Maybe String 
+check result sequence availableOperators (testValue, numbers) = 
+  case numbers of 
+    [] -> 
+      if result == testValue then 
+        Just (sequence |> List.reverse |> String.join " ") 
+      else 
+        Nothing 
+    n :: rest ->
+      let 
+        withOp op = 
+          let 
+            value = calculate op result n 
+          in 
+            if value <= testValue then 
+              check value ((String.fromInt n) :: (op2s op) :: sequence) availableOperators (testValue, rest)
+            else 
+              Nothing  
+      in 
+        -- Find first somehow.
+        availableOperators |> tryFindFirst withOp
+
+checkEquation : List Op -> Equation -> CheckedEquation
+checkEquation availableOperators (testValue, numbers) = 
+  let 
+    toUnbalanced ns = 
+      let 
+        numStr = ns |> List.map String.fromInt |> String.join " "
+        tvStr = String.fromInt testValue 
+      in 
+        Unbalanced (tvStr ++ ": " ++ numStr)
+  in 
+    case numbers of 
+      [] ->
+        numbers |> toUnbalanced
+      n :: rest -> 
+        case check n [ String.fromInt n ] availableOperators (testValue, numbers) of 
+          Just result -> Balanced (result, testValue)
+          Nothing -> numbers |> toUnbalanced
 
 updateSolve model = 
+  let 
+    operators = if model.withConcat then [ Add, Mul, Con ] else [ Add, Mul ]
+    checked = model.equations |> List.map (checkEquation operators)
+    getValue ce = 
+      case ce of 
+        Balanced (s, n) -> n 
+        Unbalanced _ -> 0 
+    balancedCount = checked |> List.map getValue |> List.sum
+  in  
   -- let
   --   checkedEquations = 
   --     if model.withConcat then 
@@ -947,21 +1059,21 @@ updateSolve model =
   --       model.reports |> List.map checkReport
   --   found = countSafe reports 
   -- in
-    { model | checkedEquations = [], count = 0 }
+    { model | checkedEquations = checked, count = balancedCount }
 
 updateToggleConcat : Model -> Model
 updateToggleConcat model = 
   let
     withConcat = not model.withConcat
   in
-    { model | withConcat = withConcat, checkedEquations = [], count = 0 } 
+    initModel model.useSample withConcat
 
 updateToggleSample : Model -> Model
 updateToggleSample model = 
   let
     useSample = not model.useSample
   in
-    { model | useSample = useSample, count = 0, checkedEquations = [] } 
+    initModel useSample model.withConcat
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -982,20 +1094,30 @@ subscriptions model = Sub.none
 
 -- VIEW
 
--- toReportHtmlElement : Report -> List (Html Msg)  
--- toReportHtmlElement report = 
---   case report of 
---     Unchecked numbers -> toUncheckedHtmlElement numbers 
---     Unsafe numbers -> toUnsafeHtmlElement numbers
---     Safe numbers -> toSafeHtmlElement numbers
---     Dampened (numbers, index) -> toDampenedHtmlElement index numbers
+toUnbalancedHtmlElement : String -> List (Html Msg) 
+toUnbalancedHtmlElement s =
+  [ s |> Html.text, Html.br [] [] ]
+
+toBalancedHtmlElement : String -> List (Html Msg) 
+toBalancedHtmlElement s =
+  let 
+    textElement = Html.text s 
+    spanElement = Html.span [ Html.Attributes.style "background-color" "#AFE1AF" ] [ textElement ]
+  in 
+    [ spanElement, Html.br [] [] ]
+
+toEquationHtmlElement : CheckedEquation -> List (Html Msg)  
+toEquationHtmlElement checked = 
+  case checked of 
+    Unbalanced s -> toUnbalancedHtmlElement s 
+    Balanced (s, _) -> toBalancedHtmlElement s
 
 view : Model -> Html Msg
 view model =
   let
     commandsStr = ""
     textFontSize = if model.useSample then "36px" else "14px"
-    elements = []
+    elements = model.checkedEquations |> List.concatMap toEquationHtmlElement
   in 
     Html.table 
       [ Html.Attributes.style "width" "1080px"]
@@ -1042,7 +1164,7 @@ view model =
               , Html.Attributes.style "width" "200px" ] 
               [ 
                 Html.div [] [ Html.text (String.fromInt model.count) ]
-              , Html.div [] [ Html.text commandsStr ]
+              , Html.div [] [ Html.text model.debug ]
               ] ]
       , Html.tr 
           []

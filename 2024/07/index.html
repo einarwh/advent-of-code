@@ -5173,6 +5173,19 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Aoc07$Unbalanced = function (a) {
+	return {$: 'Unbalanced', a: a};
+};
+var $author$project$Aoc07$equationAsUnbalanced = function (_v0) {
+	var testValue = _v0.a;
+	var numbers = _v0.b;
+	var testValueStr = $elm$core$String$fromInt(testValue);
+	var numbersStr = A2(
+		$elm$core$String$join,
+		' ',
+		A2($elm$core$List$map, $elm$core$String$fromInt, numbers));
+	return $author$project$Aoc07$Unbalanced(testValueStr + (': ' + numbersStr));
+};
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
 		var _v0 = f(mx);
@@ -5201,13 +5214,13 @@ var $author$project$Aoc07$parseEquation = function (line) {
 		if (_v2.$ === 'Nothing') {
 			return $elm$core$Maybe$Nothing;
 		} else {
-			var targetValue = _v2.a;
+			var testValue = _v2.a;
 			var numbers = A2(
 				$elm$core$List$filterMap,
 				$elm$core$String$toInt,
 				A2($elm$core$String$split, ' ', t));
 			return $elm$core$Maybe$Just(
-				_Utils_Tuple2(targetValue, numbers));
+				_Utils_Tuple2(testValue, numbers));
 		}
 	} else {
 		return $elm$core$Maybe$Nothing;
@@ -5220,12 +5233,21 @@ var $author$project$Aoc07$initEquations = function (useSample) {
 	var lines = A2($elm$core$String$split, '\n', data);
 	return A2($elm$core$List$filterMap, $author$project$Aoc07$parseEquation, lines);
 };
+var $author$project$Aoc07$initModel = F2(
+	function (useSample, withConcat) {
+		var equations = $author$project$Aoc07$initEquations(useSample);
+		var debug = $elm$core$String$fromInt(
+			$elm$core$List$length(equations));
+		var checked = A2($elm$core$List$map, $author$project$Aoc07$equationAsUnbalanced, equations);
+		var model = {checkedEquations: checked, count: 0, debug: debug, equations: equations, lastCommandText: 'press play to start', useSample: useSample, withConcat: withConcat};
+		return model;
+	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Aoc07$init = function (_v0) {
-	var equations = $author$project$Aoc07$initEquations(false);
-	var model = {checkedEquations: _List_Nil, count: 0, debug: '', equations: equations, lastCommandText: 'press play to start', useSample: false, withConcat: false};
-	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+	return _Utils_Tuple2(
+		A2($author$project$Aoc07$initModel, false, false),
+		$elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
@@ -5233,27 +5255,172 @@ var $author$project$Aoc07$subscriptions = function (model) {
 	return $elm$core$Platform$Sub$none;
 };
 var $author$project$Aoc07$updateClear = function (model) {
-	return _Utils_update(
-		model,
-		{checkedEquations: _List_Nil, count: 0});
+	return A2($author$project$Aoc07$initModel, model.useSample, model.withConcat);
+};
+var $author$project$Aoc07$Add = {$: 'Add'};
+var $author$project$Aoc07$Con = {$: 'Con'};
+var $author$project$Aoc07$Mul = {$: 'Mul'};
+var $author$project$Aoc07$Balanced = function (a) {
+	return {$: 'Balanced', a: a};
+};
+var $author$project$Aoc07$concat = F2(
+	function (a, b) {
+		var s = _Utils_ap(
+			$elm$core$String$fromInt(a),
+			$elm$core$String$fromInt(b));
+		var _v0 = $elm$core$String$toInt(s);
+		if (_v0.$ === 'Just') {
+			var result = _v0.a;
+			return result;
+		} else {
+			return 0;
+		}
+	});
+var $author$project$Aoc07$calculate = F3(
+	function (op, a, b) {
+		switch (op.$) {
+			case 'Add':
+				return a + b;
+			case 'Mul':
+				return a * b;
+			default:
+				return A2($author$project$Aoc07$concat, a, b);
+		}
+	});
+var $author$project$Aoc07$op2s = function (op) {
+	switch (op.$) {
+		case 'Add':
+			return '+';
+		case 'Mul':
+			return '*';
+		default:
+			return '||';
+	}
+};
+var $author$project$Aoc07$tryFindFirst = F2(
+	function (fn, lst) {
+		tryFindFirst:
+		while (true) {
+			if (!lst.b) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var h = lst.a;
+				var t = lst.b;
+				var _v1 = fn(h);
+				if (_v1.$ === 'Just') {
+					var v = _v1.a;
+					return $elm$core$Maybe$Just(v);
+				} else {
+					var $temp$fn = fn,
+						$temp$lst = t;
+					fn = $temp$fn;
+					lst = $temp$lst;
+					continue tryFindFirst;
+				}
+			}
+		}
+	});
+var $author$project$Aoc07$check = F4(
+	function (result, sequence, availableOperators, _v0) {
+		var testValue = _v0.a;
+		var numbers = _v0.b;
+		if (!numbers.b) {
+			return _Utils_eq(result, testValue) ? $elm$core$Maybe$Just(
+				A2(
+					$elm$core$String$join,
+					' ',
+					$elm$core$List$reverse(sequence))) : $elm$core$Maybe$Nothing;
+		} else {
+			var n = numbers.a;
+			var rest = numbers.b;
+			var withOp = function (op) {
+				var value = A3($author$project$Aoc07$calculate, op, result, n);
+				return (_Utils_cmp(value, testValue) < 1) ? A4(
+					$author$project$Aoc07$check,
+					value,
+					A2(
+						$elm$core$List$cons,
+						$elm$core$String$fromInt(n),
+						A2(
+							$elm$core$List$cons,
+							$author$project$Aoc07$op2s(op),
+							sequence)),
+					availableOperators,
+					_Utils_Tuple2(testValue, rest)) : $elm$core$Maybe$Nothing;
+			};
+			return A2($author$project$Aoc07$tryFindFirst, withOp, availableOperators);
+		}
+	});
+var $author$project$Aoc07$checkEquation = F2(
+	function (availableOperators, _v0) {
+		var testValue = _v0.a;
+		var numbers = _v0.b;
+		var toUnbalanced = function (ns) {
+			var tvStr = $elm$core$String$fromInt(testValue);
+			var numStr = A2(
+				$elm$core$String$join,
+				' ',
+				A2($elm$core$List$map, $elm$core$String$fromInt, ns));
+			return $author$project$Aoc07$Unbalanced(tvStr + (': ' + numStr));
+		};
+		if (!numbers.b) {
+			return toUnbalanced(numbers);
+		} else {
+			var n = numbers.a;
+			var rest = numbers.b;
+			var _v2 = A4(
+				$author$project$Aoc07$check,
+				n,
+				_List_fromArray(
+					[
+						$elm$core$String$fromInt(n)
+					]),
+				availableOperators,
+				_Utils_Tuple2(testValue, numbers));
+			if (_v2.$ === 'Just') {
+				var result = _v2.a;
+				return $author$project$Aoc07$Balanced(
+					_Utils_Tuple2(result, testValue));
+			} else {
+				return toUnbalanced(numbers);
+			}
+		}
+	});
+var $elm$core$List$sum = function (numbers) {
+	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
 };
 var $author$project$Aoc07$updateSolve = function (model) {
+	var operators = model.withConcat ? _List_fromArray(
+		[$author$project$Aoc07$Add, $author$project$Aoc07$Mul, $author$project$Aoc07$Con]) : _List_fromArray(
+		[$author$project$Aoc07$Add, $author$project$Aoc07$Mul]);
+	var getValue = function (ce) {
+		if (ce.$ === 'Balanced') {
+			var _v1 = ce.a;
+			var s = _v1.a;
+			var n = _v1.b;
+			return n;
+		} else {
+			return 0;
+		}
+	};
+	var checked = A2(
+		$elm$core$List$map,
+		$author$project$Aoc07$checkEquation(operators),
+		model.equations);
+	var balancedCount = $elm$core$List$sum(
+		A2($elm$core$List$map, getValue, checked));
 	return _Utils_update(
 		model,
-		{checkedEquations: _List_Nil, count: 0});
+		{checkedEquations: checked, count: balancedCount});
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc07$updateToggleConcat = function (model) {
 	var withConcat = !model.withConcat;
-	return _Utils_update(
-		model,
-		{checkedEquations: _List_Nil, count: 0, withConcat: withConcat});
+	return A2($author$project$Aoc07$initModel, model.useSample, withConcat);
 };
 var $author$project$Aoc07$updateToggleSample = function (model) {
 	var useSample = !model.useSample;
-	return _Utils_update(
-		model,
-		{checkedEquations: _List_Nil, count: 0, useSample: useSample});
+	return A2($author$project$Aoc07$initModel, useSample, model.withConcat);
 };
 var $author$project$Aoc07$update = F2(
 	function (msg, model) {
@@ -5299,6 +5466,22 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 			$elm$json$Json$Encode$bool(bool));
 	});
 var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$label = _VirtualDom_node('label');
@@ -5325,11 +5508,46 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$html$Html$br = _VirtualDom_node('br');
+var $elm$html$Html$span = _VirtualDom_node('span');
+var $author$project$Aoc07$toBalancedHtmlElement = function (s) {
+	var textElement = $elm$html$Html$text(s);
+	var spanElement = A2(
+		$elm$html$Html$span,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'background-color', '#AFE1AF')
+			]),
+		_List_fromArray(
+			[textElement]));
+	return _List_fromArray(
+		[
+			spanElement,
+			A2($elm$html$Html$br, _List_Nil, _List_Nil)
+		]);
+};
+var $author$project$Aoc07$toUnbalancedHtmlElement = function (s) {
+	return _List_fromArray(
+		[
+			$elm$html$Html$text(s),
+			A2($elm$html$Html$br, _List_Nil, _List_Nil)
+		]);
+};
+var $author$project$Aoc07$toEquationHtmlElement = function (checked) {
+	if (checked.$ === 'Unbalanced') {
+		var s = checked.a;
+		return $author$project$Aoc07$toUnbalancedHtmlElement(s);
+	} else {
+		var _v1 = checked.a;
+		var s = _v1.a;
+		return $author$project$Aoc07$toBalancedHtmlElement(s);
+	}
+};
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Aoc07$view = function (model) {
 	var textFontSize = model.useSample ? '36px' : '14px';
-	var elements = _List_Nil;
+	var elements = A2($elm$core$List$concatMap, $author$project$Aoc07$toEquationHtmlElement, model.checkedEquations);
 	var commandsStr = '';
 	return A2(
 		$elm$html$Html$table,
@@ -5482,7 +5700,7 @@ var $author$project$Aoc07$view = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(commandsStr)
+										$elm$html$Html$text(model.debug)
 									]))
 							]))
 					])),
