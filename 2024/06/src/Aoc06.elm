@@ -515,7 +515,11 @@ view model =
         in 
           ("Calculating", str)
       else 
-        if model.mode == Part1 then ("Patrol Protocol", String.fromInt positionsVisited)
+        if model.mode == Part1 then 
+          let 
+            t1 = "(" ++ (String.fromInt xGuard) ++ ", " ++ (String.fromInt yGuard) ++ ")"
+          in 
+            (t1, String.fromInt positionsVisited)
         else ("Loop X of Y", String.fromInt positionsVisited)
   in 
     Html.table 
@@ -581,8 +585,8 @@ view model =
               , Html.Attributes.style "font-size" "24px"
               , Html.Attributes.style "width" "200px" ] 
               [ 
-                -- Html.div [] [ Html.text text1 ]
-                Html.div [] [ Html.text text2 ]
+                Html.div [] [ Html.text text1 ]
+              , Html.div [] [ Html.text text2 ]
               ] ]
       -- , Html.tr 
       --     []

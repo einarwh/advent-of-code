@@ -7179,8 +7179,9 @@ var $author$project$Aoc06$view = function (model) {
 			return _Utils_Tuple2('Calculating', str);
 		} else {
 			if (_Utils_eq(model.mode, $author$project$Aoc06$Part1)) {
+				var t1 = '(' + ($elm$core$String$fromInt(xGuard) + (', ' + ($elm$core$String$fromInt(yGuard) + ')')));
 				return _Utils_Tuple2(
-					'Patrol Protocol',
+					t1,
 					$elm$core$String$fromInt(positionsVisited));
 			} else {
 				return _Utils_Tuple2(
@@ -7347,6 +7348,13 @@ var $author$project$Aoc06$view = function (model) {
 							]),
 						_List_fromArray(
 							[
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(text1)
+									])),
 								A2(
 								$elm$html$Html$div,
 								_List_Nil,
