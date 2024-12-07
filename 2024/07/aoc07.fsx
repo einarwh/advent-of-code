@@ -32,8 +32,7 @@ let checkEquation operators (testValue, numbers) =
         if check h t then Some testValue else None
 
 let run fileName = 
-    let lines = readLines fileName
-    let equations = lines |> List.map parseLine 
+    let equations = readLines fileName |> List.map parseLine 
     let concat = fun a b -> int64 ((string a) + (string b))
     equations 
     |> List.choose (checkEquation [(+); (*)])
