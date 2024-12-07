@@ -65,6 +65,15 @@ let patrol startPos board =
         | _ -> walk (Set.add pos visited) dir nextPos
     walk Set.empty (0, -1) startPos
 
+let traceRoute startPos board = 
+    let rec walk visited dir pos = 
+        let nextPos = move dir pos
+        match nextPos |> Array2D.tryGet board with 
+        | None -> (pos :: visited) |> List.rev
+        | Some '#' -> walk visited (turnRight dir) pos 
+        | _ -> walk (pos :: visited) dir nextPos
+    walk [] (0, -1) startPos
+
 let generateBoards visited board = 
     let addObstruction board (x, y) = 
         let newBoard = Array2D.copy board 
@@ -215,6 +224,8 @@ let run fileName =
     visited |> Set.count |> printfn "%d"
     // Part 2
     let sw = Stopwatch.StartNew()
+    let route = board |> traceRoute startPos
+    printfn "%A" route
     generateBoards visited board
     |> List.filter (hasLoop intervalsByRow intervalsByCol startPos) 
     |> List.length 
