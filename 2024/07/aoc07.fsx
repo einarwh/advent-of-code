@@ -34,15 +34,13 @@ let checkEquation operators (testValue, numbers) =
 let run fileName = 
     let lines = readLines fileName
     let equations = lines |> List.map parseLine 
-    let add = fun (a : int64) (b : int64) -> a + b
-    let mul = fun (a : int64) (b : int64) -> a * b 
-    let concat = fun (a : int64) (b : int64) -> int64 ((string a) + (string b))
+    let concat = fun a b -> int64 ((string a) + (string b))
     equations 
-    |> List.choose (checkEquation [add; mul])
+    |> List.choose (checkEquation [(+); (*)])
     |> List.sum 
     |> printfn "%d"
     equations
-    |> List.choose (checkEquation [add; mul;concat])
+    |> List.choose (checkEquation [(+); (*); concat])
     |> List.sum 
     |> printfn "%d"
 
