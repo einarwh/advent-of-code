@@ -27,6 +27,7 @@ type alias Model =
   { board : Array2D Char
   , antinodes : Set (Int, Int)
   , useSample : Bool
+  , withHarmonics : Bool 
   , message : String
   , counter : Int 
   , debug : String }
@@ -102,8 +103,8 @@ initBoard useSample =
   in 
     data |> String.split "\n" |> List.map (String.toList) |> Array2D.fromList
 
-initModel : Bool -> Model 
-initModel useSample = 
+initModel : Bool -> Bool -> Model 
+initModel withHarmonics useSample = 
   let 
     board = initBoard useSample
   in 
@@ -111,12 +112,13 @@ initModel useSample =
     , antinodes = Set.empty
     , message = "blabl"
     , useSample = useSample
+    , withHarmonics = withHarmonics
     , counter = 0
     , debug = "" }
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel False, Cmd.none)
+  (initModel False False, Cmd.none)
 
 -- UPDATE
 
@@ -124,6 +126,7 @@ type Msg =
   Clear 
   | Solve 
   | ToggleSample 
+  | ToggleHarmonics 
 
 getAllPositions : Array2D Char -> List Pos
 getAllPositions board = 
@@ -135,12 +138,7 @@ getAllPositions board =
 
 updateClear : Model -> Model
 updateClear model = 
-  initModel model.useSample
-
--- let findAntinodes board ((x1, y1), (x2, y2)) = 
---     let xd = x2 - x1 
---     let yd = y2 - y1
---     [ (x1 - xd, y1 - yd); (x2 + xd, y2 + yd) ] |> List.filter (Array2D.inBounds board)
+  initModel model.withHarmonics model.useSample
 
 inBounds : Array2D Char -> (Int, Int) -> Bool
 inBounds board (x, y) = 
@@ -148,7 +146,7 @@ inBounds board (x, y) =
     Just _ -> True 
     Nothing -> False 
 
-findAntinodes : Array2D Char -> ((Int, Int), (Int, Int)) -> List (Int, Int)
+findAntinodes : Array2D Char -> (Pos, Pos) -> List (Int, Int)
 findAntinodes board ((x1, y1), (x2, y2)) = 
   let 
     xd = x2 - x1 
@@ -156,6 +154,25 @@ findAntinodes board ((x1, y1), (x2, y2)) =
     candidates = [ (x1 - xd, y1 - yd), (x2 + xd, y2 + yd) ]
   in 
     candidates |> List.filter (inBounds board)
+
+unfold : (s -> Maybe (a, s)) -> s -> List a 
+unfold generator state = 
+  case generator state of 
+    Just (a, s) -> a :: (unfold generator s)
+    Nothing -> []
+
+findAntinodesWithHarmonics : Array2D Char -> (Pos, Pos) -> List (Int, Int)
+findAntinodesWithHarmonics board ((x1, y1), (x2, y2)) = 
+  let 
+    xd = x2 - x1 
+    yd = y2 - y1 
+    unfolder fn pos = if inBounds board pos then Just (pos, fn pos) else Nothing
+    sub (x, y) = (x - xd, y - yd)
+    add (x, y) = (x + xd, y + yd)
+    subList = (x1, y1) |> unfold (unfolder sub)
+    addList = (x1, y1) |> unfold (unfolder add)
+  in 
+    List.append subList addList 
 
 checkAntenna : Array2D Char -> Pos -> Maybe Char 
 checkAntenna board (x, y) = 
@@ -209,7 +226,7 @@ findAllAntinodes antinodeFinder board =
 updateSolve : Model -> Model 
 updateSolve model = 
   let 
-    antinodeFinder = findAntinodes
+    antinodeFinder = if model.withHarmonics then findAntinodesWithHarmonics else findAntinodes
     board = model.board
     antinodes = findAllAntinodes antinodeFinder board
   in 
@@ -220,7 +237,14 @@ updateToggleSample model =
   let
     useSample = not model.useSample
   in
-    initModel useSample 
+    initModel model.withHarmonics useSample 
+
+updateToggleHarmonics : Model -> Model
+updateToggleHarmonics model = 
+  let
+    withHarmonics = not model.withHarmonics
+  in
+    initModel withHarmonics model.useSample 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -231,6 +255,8 @@ update msg model =
       (updateSolve model, Cmd.none)
     ToggleSample -> 
       (updateToggleSample model, Cmd.none)
+    ToggleHarmonics -> 
+      (updateToggleHarmonics model, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -301,6 +327,15 @@ view model =
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick ToggleSample ] 
                 [ Html.text (if model.useSample then "Input" else "Sample") ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center" ]
+              [ Html.input 
+                [ Html.Attributes.type_ "checkbox", onClick ToggleHarmonics, Html.Attributes.checked model.withHarmonics ] 
+                []
+              , Html.label [] [ Html.text "With harmonics" ]
             ] ]
       , Html.tr 
           []
