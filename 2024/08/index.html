@@ -5210,9 +5210,6 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Aoc08$Plain = function (a) {
-	return {$: 'Plain', a: a};
-};
 var $elm$core$Set$Set_elm_builtin = function (a) {
 	return {$: 'Set_elm_builtin', a: a};
 };
@@ -5596,74 +5593,9 @@ var $author$project$Aoc08$initBoard = function (useSample) {
 			$elm$core$String$toList,
 			A2($elm$core$String$split, '\n', data)));
 };
-var $elm$core$Elm$JsArray$indexedMap = _JsArray_indexedMap;
-var $elm$core$Array$indexedMap = F2(
-	function (func, _v0) {
-		var len = _v0.a;
-		var tree = _v0.c;
-		var tail = _v0.d;
-		var initialBuilder = {
-			nodeList: _List_Nil,
-			nodeListSize: 0,
-			tail: A3(
-				$elm$core$Elm$JsArray$indexedMap,
-				func,
-				$elm$core$Array$tailIndex(len),
-				tail)
-		};
-		var helper = F2(
-			function (node, builder) {
-				if (node.$ === 'SubTree') {
-					var subTree = node.a;
-					return A3($elm$core$Elm$JsArray$foldl, helper, builder, subTree);
-				} else {
-					var leaf = node.a;
-					var offset = builder.nodeListSize * $elm$core$Array$branchFactor;
-					var mappedLeaf = $elm$core$Array$Leaf(
-						A3($elm$core$Elm$JsArray$indexedMap, func, offset, leaf));
-					return {
-						nodeList: A2($elm$core$List$cons, mappedLeaf, builder.nodeList),
-						nodeListSize: builder.nodeListSize + 1,
-						tail: builder.tail
-					};
-				}
-			});
-		return A2(
-			$elm$core$Array$builderToArray,
-			true,
-			A3($elm$core$Elm$JsArray$foldl, helper, initialBuilder, tree));
-	});
-var $tortus$elm_array_2d$Array2D$indexedMap = F2(
-	function (func, array2d) {
-		var mappedData = A2(
-			$elm$core$Array$indexedMap,
-			F2(
-				function (row, rowAry) {
-					return A2(
-						$elm$core$Array$indexedMap,
-						F2(
-							function (col, value) {
-								return A3(func, row, col, value);
-							}),
-						rowAry);
-				}),
-			array2d.data);
-		return {columns: array2d.columns, data: mappedData};
-	});
-var $tortus$elm_array_2d$Array2D$map = F2(
-	function (fn, array2d) {
-		return A2(
-			$tortus$elm_array_2d$Array2D$indexedMap,
-			F3(
-				function (_v0, _v1, val) {
-					return fn(val);
-				}),
-			array2d);
-	});
 var $author$project$Aoc08$initModel = function (useSample) {
 	var board = $author$project$Aoc08$initBoard(useSample);
-	var vizBoard = A2($tortus$elm_array_2d$Array2D$map, $author$project$Aoc08$Plain, board);
-	return {antinodes: $elm$core$Set$empty, board: board, counter: 0, debug: '', message: 'blabl', useSample: useSample, vizBoard: vizBoard};
+	return {antinodes: $elm$core$Set$empty, board: board, counter: 0, debug: '', message: 'blabl', useSample: useSample};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -6116,6 +6048,30 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
+var $elm$core$Dict$sizeHelp = F2(
+	function (n, dict) {
+		sizeHelp:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return n;
+			} else {
+				var left = dict.d;
+				var right = dict.e;
+				var $temp$n = A2($elm$core$Dict$sizeHelp, n + 1, right),
+					$temp$dict = left;
+				n = $temp$n;
+				dict = $temp$dict;
+				continue sizeHelp;
+			}
+		}
+	});
+var $elm$core$Dict$size = function (dict) {
+	return A2($elm$core$Dict$sizeHelp, 0, dict);
+};
+var $elm$core$Set$size = function (_v0) {
+	var dict = _v0.a;
+	return $elm$core$Dict$size(dict);
+};
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$html$Html$table = _VirtualDom_node('table');
@@ -6171,47 +6127,28 @@ var $elm$core$Set$member = F2(
 		var dict = _v0.a;
 		return A2($elm$core$Dict$member, key, dict);
 	});
-var $elm$html$Html$span = _VirtualDom_node('span');
 var $author$project$Aoc08$toCharElement = F3(
-	function (vizBoard, antinodes, _v0) {
+	function (board, antinodes, _v0) {
 		var x = _v0.a;
 		var y = _v0.b;
-		if (A2(
-			$elm$core$Set$member,
-			_Utils_Tuple2(x, y),
-			antinodes)) {
-			return $elm$html$Html$text('#');
+		var _v1 = A3($tortus$elm_array_2d$Array2D$get, y, x, board);
+		if (_v1.$ === 'Nothing') {
+			return $elm$html$Html$text('?');
 		} else {
-			var _v1 = A3($tortus$elm_array_2d$Array2D$get, y, x, vizBoard);
-			if (_v1.$ === 'Nothing') {
-				return $elm$html$Html$text('?');
-			} else {
-				var cell = _v1.a;
-				if (cell.$ === 'Highlight') {
-					var ch = cell.a;
-					return A2(
-						$elm$html$Html$span,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'background-color', '#CCCCCC')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								$elm$core$String$fromChar(ch))
-							]));
-				} else {
-					var ch = cell.a;
-					return $elm$html$Html$text(
-						$elm$core$String$fromChar(ch));
-				}
-			}
+			var ch = _v1.a;
+			return (_Utils_eq(
+				ch,
+				_Utils_chr('.')) && A2(
+				$elm$core$Set$member,
+				_Utils_Tuple2(x, y),
+				antinodes)) ? $elm$html$Html$text('#') : $elm$html$Html$text(
+				$elm$core$String$fromChar(ch));
 		}
 	});
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $author$project$Aoc08$view = function (model) {
 	var textFontSize = model.useSample ? '32px' : '12px';
-	var board = model.vizBoard;
+	var board = model.board;
 	var xs = A2(
 		$elm$core$List$range,
 		0,
@@ -6232,6 +6169,8 @@ var $author$project$Aoc08$view = function (model) {
 		},
 		ys);
 	var antinodes = model.antinodes;
+	var countStr = $elm$core$String$fromInt(
+		$elm$core$Set$size(antinodes));
 	var nestedElements = A2(
 		$elm$core$List$map,
 		function (positions) {
@@ -6255,9 +6194,6 @@ var $author$project$Aoc08$view = function (model) {
 			}),
 		_List_Nil,
 		nestedElements);
-	var _v0 = _Utils_Tuple2('Loop X of Y', 'blibla');
-	var text1 = _v0.a;
-	var text2 = _v0.b;
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
@@ -6370,14 +6306,7 @@ var $author$project$Aoc08$view = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(text1)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(text2)
+										$elm$html$Html$text(countStr)
 									]))
 							]))
 					])),

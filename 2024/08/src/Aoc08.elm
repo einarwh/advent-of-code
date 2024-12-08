@@ -23,17 +23,8 @@ main =
 
 type alias Pos = (Int, Int)
 
-type Dir = N | W | S | E
-
-type Move = Turn | Forward
-
-type Visit = Vertical | Horizontal | Both 
-
-type Cell = Highlight Char | Plain Char 
-
 type alias Model = 
   { board : Array2D Char
-  , vizBoard : Array2D Cell 
   , antinodes : Set (Int, Int)
   , useSample : Bool
   , message : String
@@ -111,60 +102,12 @@ initBoard useSample =
   in 
     data |> String.split "\n" |> List.map (String.toList) |> Array2D.fromList
 
-findStartPos : Array2D Char -> (Int, Int)
-findStartPos board = 
-  let 
-    columns = Array2D.columns board 
-    loop (x, y) = 
-      case Array2D.get y x board of 
-        Nothing -> (0, 0)
-        Just '^' -> (x, y)
-        _ -> 
-          let 
-            next = if (x + 1 == columns) then (0, y + 1) else (x + 1, y)
-          in 
-            loop next
-  in 
-    loop (0, 0)
-
-moveForward : Dir -> Pos -> Pos 
-moveForward dir (x, y) = 
-  case dir of 
-    N -> (x, y - 1)
-    W -> (x - 1, y)
-    S -> (x, y + 1)
-    E -> (x + 1, y)
-
-turnRight : Dir -> Dir 
-turnRight dir = 
-  case dir of 
-    N -> E
-    E -> S 
-    S -> W
-    W -> N
-
-walk : Array2D Char -> List (Pos, Dir, Move) -> Dir -> Move -> Pos -> List (Pos, Dir, Move) 
-walk board visited dir move pos = 
-  let 
-    nextPos = moveForward dir pos 
-    (nextX, nextY) = nextPos 
-  in 
-    case Array2D.get nextY nextX board of 
-      Nothing -> -- Leaving the board.
-        ((pos, dir, move) :: visited) |> List.reverse
-      Just '#' -> -- Found an obstacle.
-        walk board visited (turnRight dir) Turn pos  
-      _ -> -- Go ahead.
-        walk board ((pos, dir, move) :: visited) dir Forward nextPos
-
 initModel : Bool -> Model 
 initModel useSample = 
   let 
     board = initBoard useSample
-    vizBoard  = board |> Array2D.map Plain
   in 
     { board = board
-    , vizBoard = vizBoard
     , antinodes = Set.empty
     , message = "blabl"
     , useSample = useSample
@@ -297,24 +240,20 @@ subscriptions model =
 
 -- VIEW
 
-toCharElement : Array2D Cell -> Set (Int, Int) -> Pos -> Html Msg 
-toCharElement vizBoard antinodes (x, y) = 
-  if Set.member (x, y) antinodes then 
-    Html.text "#"
-  else 
-    case Array2D.get y x vizBoard of 
-      Nothing -> Html.text "?"
-      Just cell -> 
-        case cell of 
-          Highlight ch -> 
-            (Html.span [Html.Attributes.style "background-color" "#CCCCCC" ] [ Html.text (String.fromChar ch) ]) 
-          Plain ch -> 
-            Html.text (String.fromChar ch)
+toCharElement : Array2D Char -> Set (Int, Int) -> Pos -> Html Msg 
+toCharElement board antinodes (x, y) = 
+  case Array2D.get y x board of 
+    Nothing -> Html.text "?"
+    Just ch ->
+        if ch == '.' && Set.member (x, y) antinodes then 
+          Html.text "#"
+        else 
+          Html.text (String.fromChar ch) 
 
 view : Model -> Html Msg
 view model =
   let
-    board = model.vizBoard 
+    board = model.board 
     antinodes = model.antinodes
     ys = List.range 0 (Array2D.rows board - 1)
     xs = List.range 0 (Array2D.columns board - 1)
@@ -322,8 +261,7 @@ view model =
     nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement board antinodes))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
     textFontSize = if model.useSample then "32px" else "12px"
-
-    (text1, text2) = ("Loop X of Y", "blibla")
+    countStr = antinodes |> Set.size |> String.fromInt    
   in 
     Html.table 
       [ Html.Attributes.style "width" "1080px"]
@@ -373,8 +311,7 @@ view model =
               , Html.Attributes.style "font-size" "24px"
               , Html.Attributes.style "width" "200px" ] 
               [ 
-                Html.div [] [ Html.text text1 ]
-              , Html.div [] [ Html.text text2 ]
+                Html.div [] [ Html.text countStr ]
               ] ]
       -- , Html.tr 
       --     []
