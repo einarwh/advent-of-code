@@ -192,11 +192,25 @@ updateClear : Model -> Model
 updateClear model = 
   initModel model.useSample
 
--- let rec pairs lst = 
---     match lst with 
---     | [] -> []
---     | h :: t -> 
---         List.map (fun it -> (h, it)) t @ pairs t 
+-- let findAntinodes board ((x1, y1), (x2, y2)) = 
+--     let xd = x2 - x1 
+--     let yd = y2 - y1
+--     [ (x1 - xd, y1 - yd); (x2 + xd, y2 + yd) ] |> List.filter (Array2D.inBounds board)
+
+inBounds : Array2D Char -> (Int, Int) -> Bool
+inBounds board (x, y) = 
+  case Array2D.get y x board of 
+    Just _ -> True 
+    Nothing -> False 
+
+findAntinodes : Array2D Char -> ((Int, Int), (Int, Int)) -> List (Int, Int)
+findAntinodes board ((x1, y1), (x2, y2)) = 
+  let 
+    xd = x2 - x1 
+    yd = y2 - y1 
+    candidates = [ (x1 - xd, y1 - yd), (x2 + xd, y2 + yd) ]
+  in 
+    candidates |> List.filter (inBounds board)
 
 pairs : List a -> List (a, a) 
 pairs lst = 
