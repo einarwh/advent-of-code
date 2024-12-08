@@ -34,6 +34,7 @@ type Cell = Highlight Char | Plain Char
 type alias Model = 
   { board : Array2D Char
   , vizBoard : Array2D Cell 
+  , antinodes : Set (Int, Int)
   , useSample : Bool
   , message : String
   , counter : Int 
@@ -164,6 +165,7 @@ initModel useSample =
   in 
     { board = board
     , vizBoard = vizBoard
+    , antinodes = Set.empty
     , message = "blabl"
     , useSample = useSample
     , counter = 0
@@ -219,19 +221,22 @@ checkAntenna board (x, y) =
     Just '.' -> Nothing 
     Just ch -> Just ch
 
--- let findAllAntinodes antinodeFinder board = 
---     let check board (x, y) = 
---         match Array2D.get board y x with 
---         | '.' -> None 
---         | antenna -> Some (antenna, (x, y))
---     board 
---     |> Array2D.positions 
---     |> List.choose (check board) 
---     |> List.groupBy (fun (a, p)-> a)
---     |> List.map (fun (a, lst) -> (a, List.map snd lst))
---     |> List.map (fun (a, positions) -> (positions |> pairs |> List.collect (antinodeFinder board)))
---     |> List.concat
---     |> Set.ofList 
+findAllAntennae : Array2D Char -> List (Char, Pos)
+findAllAntennae board = 
+  board
+  |> getAllPositions
+  |> List.filterMap (\pos -> checkAntenna board pos |> Maybe.map (\ch -> (ch, pos)))
+
+gatherPositionsForAntenna : List (Char, Pos) -> Char -> List Pos
+gatherPositionsForAntenna antennae antenna = 
+  antennae |> List.filterMap (\(a, lst) -> if a == antenna then Just lst else Nothing)
+
+groupAntennae : List (Char, Pos) -> List (Char, List Pos)
+groupAntennae antennae = 
+  let 
+    distinct = antennae |> List.map (Tuple.first) |> Set.fromList |> Set.toList 
+  in 
+    distinct |> List.map (\ch -> (ch, gatherPositionsForAntenna antennae ch)) 
 
 pairs : List a -> List (a, a) 
 pairs lst = 
@@ -244,8 +249,28 @@ pairs lst =
       in 
         List.append these rest 
 
+findAntinodesForAntenna board antinodeFinder positions = 
+  positions
+  |> pairs 
+  |> List.concatMap (antinodeFinder board)
+
+findAllAntinodes : (Array2D Char -> ((Int, Int), (Int, Int)) -> List (Int, Int)) -> Array2D Char -> Set (Int, Int)
+findAllAntinodes antinodeFinder board = 
+  let 
+    antennae = findAllAntennae board
+    grouped = groupAntennae antennae
+    all = grouped |> List.concatMap (\(a, posList) -> findAntinodesForAntenna board antinodeFinder posList)
+  in 
+    Set.fromList all 
+
 updateSolve : Model -> Model 
-updateSolve model = model 
+updateSolve model = 
+  let 
+    antinodeFinder = findAntinodes
+    board = model.board
+    antinodes = findAllAntinodes antinodeFinder board
+  in 
+    { model | antinodes = antinodes }
 
 updateToggleSample : Model -> Model
 updateToggleSample model = 
@@ -272,8 +297,11 @@ subscriptions model =
 
 -- VIEW
 
-toCharElement : Array2D Cell -> Pos -> Html Msg 
-toCharElement vizBoard (x, y) = 
+toCharElement : Array2D Cell -> Set (Int, Int) -> Pos -> Html Msg 
+toCharElement vizBoard antinodes (x, y) = 
+  if Set.member (x, y) antinodes then 
+    Html.text "#"
+  else 
     case Array2D.get y x vizBoard of 
       Nothing -> Html.text "?"
       Just cell -> 
@@ -287,10 +315,11 @@ view : Model -> Html Msg
 view model =
   let
     board = model.vizBoard 
+    antinodes = model.antinodes
     ys = List.range 0 (Array2D.rows board - 1)
     xs = List.range 0 (Array2D.columns board - 1)
     nestedPositions = ys |> List.map (\y -> xs |> List.map (\x -> (x, y)))
-    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement board))
+    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement board antinodes))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
     textFontSize = if model.useSample then "32px" else "12px"
 

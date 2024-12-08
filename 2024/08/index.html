@@ -5213,6 +5213,12 @@ var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Aoc08$Plain = function (a) {
 	return {$: 'Plain', a: a};
 };
+var $elm$core$Set$Set_elm_builtin = function (a) {
+	return {$: 'Set_elm_builtin', a: a};
+};
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
+var $elm$core$Set$empty = $elm$core$Set$Set_elm_builtin($elm$core$Dict$empty);
 var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
 var $elm$core$Array$foldl = F3(
 	function (func, baseCase, _v0) {
@@ -5657,7 +5663,7 @@ var $tortus$elm_array_2d$Array2D$map = F2(
 var $author$project$Aoc08$initModel = function (useSample) {
 	var board = $author$project$Aoc08$initBoard(useSample);
 	var vizBoard = A2($tortus$elm_array_2d$Array2D$map, $author$project$Aoc08$Plain, board);
-	return {board: board, counter: 0, debug: '', message: 'blabl', useSample: useSample, vizBoard: vizBoard};
+	return {antinodes: $elm$core$Set$empty, board: board, counter: 0, debug: '', message: 'blabl', useSample: useSample, vizBoard: vizBoard};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -5674,43 +5680,6 @@ var $author$project$Aoc08$subscriptions = function (model) {
 var $author$project$Aoc08$updateClear = function (model) {
 	return $author$project$Aoc08$initModel(model.useSample);
 };
-var $author$project$Aoc08$updateSolve = function (model) {
-	return model;
-};
-var $elm$core$Basics$not = _Basics_not;
-var $author$project$Aoc08$updateToggleSample = function (model) {
-	var useSample = !model.useSample;
-	return $author$project$Aoc08$initModel(useSample);
-};
-var $author$project$Aoc08$update = F2(
-	function (msg, model) {
-		switch (msg.$) {
-			case 'Clear':
-				return _Utils_Tuple2(
-					$author$project$Aoc08$updateClear(model),
-					$elm$core$Platform$Cmd$none);
-			case 'Solve':
-				return _Utils_Tuple2(
-					$author$project$Aoc08$updateSolve(model),
-					$elm$core$Platform$Cmd$none);
-			default:
-				return _Utils_Tuple2(
-					$author$project$Aoc08$updateToggleSample(model),
-					$elm$core$Platform$Cmd$none);
-		}
-	});
-var $author$project$Aoc08$Clear = {$: 'Clear'};
-var $author$project$Aoc08$Solve = {$: 'Solve'};
-var $author$project$Aoc08$ToggleSample = {$: 'ToggleSample'};
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$string(string));
-	});
-var $elm$html$Html$Attributes$align = $elm$html$Html$Attributes$stringProperty('align');
 var $elm$core$List$append = F2(
 	function (xs, ys) {
 		if (!ys.b) {
@@ -5719,42 +5688,14 @@ var $elm$core$List$append = F2(
 			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
 		}
 	});
-var $elm$html$Html$br = _VirtualDom_node('br');
-var $elm$html$Html$button = _VirtualDom_node('button');
-var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
-	return array2d.columns;
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
 };
-var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
 	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
-var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
-	return $elm$core$Array$length(array2d.data);
-};
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $elm$html$Html$table = _VirtualDom_node('table');
-var $elm$html$Html$td = _VirtualDom_node('td');
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$core$String$cons = _String_cons;
-var $elm$core$String$fromChar = function (_char) {
-	return A2($elm$core$String$cons, _char, '');
-};
 var $elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
 		if (maybeValue.$ === 'Just') {
@@ -5808,33 +5749,462 @@ var $tortus$elm_array_2d$Array2D$get = F3(
 			$elm$core$Array$get(col),
 			A2($tortus$elm_array_2d$Array2D$getRow, row, array2d));
 	});
-var $elm$html$Html$span = _VirtualDom_node('span');
-var $author$project$Aoc08$toCharElement = F2(
-	function (vizBoard, _v0) {
+var $author$project$Aoc08$checkAntenna = F2(
+	function (board, _v0) {
 		var x = _v0.a;
 		var y = _v0.b;
-		var _v1 = A3($tortus$elm_array_2d$Array2D$get, y, x, vizBoard);
+		var _v1 = A3($tortus$elm_array_2d$Array2D$get, y, x, board);
 		if (_v1.$ === 'Nothing') {
-			return $elm$html$Html$text('?');
+			return $elm$core$Maybe$Nothing;
 		} else {
-			var cell = _v1.a;
-			if (cell.$ === 'Highlight') {
-				var ch = cell.a;
-				return A2(
-					$elm$html$Html$span,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'background-color', '#CCCCCC')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text(
-							$elm$core$String$fromChar(ch))
-						]));
+			if ('.' === _v1.a.valueOf()) {
+				return $elm$core$Maybe$Nothing;
 			} else {
-				var ch = cell.a;
-				return $elm$html$Html$text(
-					$elm$core$String$fromChar(ch));
+				var ch = _v1.a;
+				return $elm$core$Maybe$Just(ch);
+			}
+		}
+	});
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
+	return array2d.columns;
+};
+var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
+	return $elm$core$Array$length(array2d.data);
+};
+var $author$project$Aoc08$getAllPositions = function (board) {
+	var ys = A2(
+		$elm$core$List$range,
+		0,
+		$tortus$elm_array_2d$Array2D$rows(board) - 1);
+	var xs = A2(
+		$elm$core$List$range,
+		0,
+		$tortus$elm_array_2d$Array2D$columns(board) - 1);
+	return A2(
+		$elm$core$List$concatMap,
+		function (y) {
+			return A2(
+				$elm$core$List$map,
+				function (x) {
+					return _Utils_Tuple2(x, y);
+				},
+				xs);
+		},
+		ys);
+};
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $author$project$Aoc08$findAllAntennae = function (board) {
+	return A2(
+		$elm$core$List$filterMap,
+		function (pos) {
+			return A2(
+				$elm$core$Maybe$map,
+				function (ch) {
+					return _Utils_Tuple2(ch, pos);
+				},
+				A2($author$project$Aoc08$checkAntenna, board, pos));
+		},
+		$author$project$Aoc08$getAllPositions(board));
+};
+var $author$project$Aoc08$pairs = function (lst) {
+	if (!lst.b) {
+		return _List_Nil;
+	} else {
+		var h = lst.a;
+		var t = lst.b;
+		var these = A2(
+			$elm$core$List$map,
+			function (it) {
+				return _Utils_Tuple2(h, it);
+			},
+			t);
+		var rest = $author$project$Aoc08$pairs(t);
+		return A2($elm$core$List$append, these, rest);
+	}
+};
+var $author$project$Aoc08$findAntinodesForAntenna = F3(
+	function (board, antinodeFinder, positions) {
+		return A2(
+			$elm$core$List$concatMap,
+			antinodeFinder(board),
+			$author$project$Aoc08$pairs(positions));
+	});
+var $elm$core$Dict$Black = {$: 'Black'};
+var $elm$core$Dict$RBNode_elm_builtin = F5(
+	function (a, b, c, d, e) {
+		return {$: 'RBNode_elm_builtin', a: a, b: b, c: c, d: d, e: e};
+	});
+var $elm$core$Dict$Red = {$: 'Red'};
+var $elm$core$Dict$balance = F5(
+	function (color, key, value, left, right) {
+		if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Red')) {
+			var _v1 = right.a;
+			var rK = right.b;
+			var rV = right.c;
+			var rLeft = right.d;
+			var rRight = right.e;
+			if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
+				var _v3 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var lLeft = left.d;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					key,
+					value,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					color,
+					rK,
+					rV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, left, rLeft),
+					rRight);
+			}
+		} else {
+			if ((((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_elm_builtin')) && (left.d.a.$ === 'Red')) {
+				var _v5 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var _v6 = left.d;
+				var _v7 = _v6.a;
+				var llK = _v6.b;
+				var llV = _v6.c;
+				var llLeft = _v6.d;
+				var llRight = _v6.e;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					lK,
+					lV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, key, value, lRight, right));
+			} else {
+				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
+			}
+		}
+	});
+var $elm$core$Basics$compare = _Utils_compare;
+var $elm$core$Dict$insertHelp = F3(
+	function (key, value, dict) {
+		if (dict.$ === 'RBEmpty_elm_builtin') {
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
+		} else {
+			var nColor = dict.a;
+			var nKey = dict.b;
+			var nValue = dict.c;
+			var nLeft = dict.d;
+			var nRight = dict.e;
+			var _v1 = A2($elm$core$Basics$compare, key, nKey);
+			switch (_v1.$) {
+				case 'LT':
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						A3($elm$core$Dict$insertHelp, key, value, nLeft),
+						nRight);
+				case 'EQ':
+					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
+				default:
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						nLeft,
+						A3($elm$core$Dict$insertHelp, key, value, nRight));
+			}
+		}
+	});
+var $elm$core$Dict$insert = F3(
+	function (key, value, dict) {
+		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
+		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
+			var _v1 = _v0.a;
+			var k = _v0.b;
+			var v = _v0.c;
+			var l = _v0.d;
+			var r = _v0.e;
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
+		} else {
+			var x = _v0;
+			return x;
+		}
+	});
+var $elm$core$Set$insert = F2(
+	function (key, _v0) {
+		var dict = _v0.a;
+		return $elm$core$Set$Set_elm_builtin(
+			A3($elm$core$Dict$insert, key, _Utils_Tuple0, dict));
+	});
+var $elm$core$Set$fromList = function (list) {
+	return A3($elm$core$List$foldl, $elm$core$Set$insert, $elm$core$Set$empty, list);
+};
+var $author$project$Aoc08$gatherPositionsForAntenna = F2(
+	function (antennae, antenna) {
+		return A2(
+			$elm$core$List$filterMap,
+			function (_v0) {
+				var a = _v0.a;
+				var lst = _v0.b;
+				return _Utils_eq(a, antenna) ? $elm$core$Maybe$Just(lst) : $elm$core$Maybe$Nothing;
+			},
+			antennae);
+	});
+var $author$project$Aoc08$groupAntennae = function (antennae) {
+	var distinct = $elm$core$Set$toList(
+		$elm$core$Set$fromList(
+			A2($elm$core$List$map, $elm$core$Tuple$first, antennae)));
+	return A2(
+		$elm$core$List$map,
+		function (ch) {
+			return _Utils_Tuple2(
+				ch,
+				A2($author$project$Aoc08$gatherPositionsForAntenna, antennae, ch));
+		},
+		distinct);
+};
+var $author$project$Aoc08$findAllAntinodes = F2(
+	function (antinodeFinder, board) {
+		var antennae = $author$project$Aoc08$findAllAntennae(board);
+		var grouped = $author$project$Aoc08$groupAntennae(antennae);
+		var all = A2(
+			$elm$core$List$concatMap,
+			function (_v0) {
+				var a = _v0.a;
+				var posList = _v0.b;
+				return A3($author$project$Aoc08$findAntinodesForAntenna, board, antinodeFinder, posList);
+			},
+			grouped);
+		return $elm$core$Set$fromList(all);
+	});
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $author$project$Aoc08$inBounds = F2(
+	function (board, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var _v1 = A3($tortus$elm_array_2d$Array2D$get, y, x, board);
+		if (_v1.$ === 'Just') {
+			return true;
+		} else {
+			return false;
+		}
+	});
+var $author$project$Aoc08$findAntinodes = F2(
+	function (board, _v0) {
+		var _v1 = _v0.a;
+		var x1 = _v1.a;
+		var y1 = _v1.b;
+		var _v2 = _v0.b;
+		var x2 = _v2.a;
+		var y2 = _v2.b;
+		var yd = y2 - y1;
+		var xd = x2 - x1;
+		var candidates = _List_fromArray(
+			[
+				_Utils_Tuple2(x1 - xd, y1 - yd),
+				_Utils_Tuple2(x2 + xd, y2 + yd)
+			]);
+		return A2(
+			$elm$core$List$filter,
+			$author$project$Aoc08$inBounds(board),
+			candidates);
+	});
+var $author$project$Aoc08$updateSolve = function (model) {
+	var board = model.board;
+	var antinodeFinder = $author$project$Aoc08$findAntinodes;
+	var antinodes = A2($author$project$Aoc08$findAllAntinodes, antinodeFinder, board);
+	return _Utils_update(
+		model,
+		{antinodes: antinodes});
+};
+var $elm$core$Basics$not = _Basics_not;
+var $author$project$Aoc08$updateToggleSample = function (model) {
+	var useSample = !model.useSample;
+	return $author$project$Aoc08$initModel(useSample);
+};
+var $author$project$Aoc08$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'Clear':
+				return _Utils_Tuple2(
+					$author$project$Aoc08$updateClear(model),
+					$elm$core$Platform$Cmd$none);
+			case 'Solve':
+				return _Utils_Tuple2(
+					$author$project$Aoc08$updateSolve(model),
+					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					$author$project$Aoc08$updateToggleSample(model),
+					$elm$core$Platform$Cmd$none);
+		}
+	});
+var $author$project$Aoc08$Clear = {$: 'Clear'};
+var $author$project$Aoc08$Solve = {$: 'Solve'};
+var $author$project$Aoc08$ToggleSample = {$: 'ToggleSample'};
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$align = $elm$html$Html$Attributes$stringProperty('align');
+var $elm$html$Html$br = _VirtualDom_node('br');
+var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $elm$html$Html$table = _VirtualDom_node('table');
+var $elm$html$Html$td = _VirtualDom_node('td');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
+var $elm$core$Dict$get = F2(
+	function (targetKey, dict) {
+		get:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
+				switch (_v1.$) {
+					case 'LT':
+						var $temp$targetKey = targetKey,
+							$temp$dict = left;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+					case 'EQ':
+						return $elm$core$Maybe$Just(value);
+					default:
+						var $temp$targetKey = targetKey,
+							$temp$dict = right;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+				}
+			}
+		}
+	});
+var $elm$core$Dict$member = F2(
+	function (key, dict) {
+		var _v0 = A2($elm$core$Dict$get, key, dict);
+		if (_v0.$ === 'Just') {
+			return true;
+		} else {
+			return false;
+		}
+	});
+var $elm$core$Set$member = F2(
+	function (key, _v0) {
+		var dict = _v0.a;
+		return A2($elm$core$Dict$member, key, dict);
+	});
+var $elm$html$Html$span = _VirtualDom_node('span');
+var $author$project$Aoc08$toCharElement = F3(
+	function (vizBoard, antinodes, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		if (A2(
+			$elm$core$Set$member,
+			_Utils_Tuple2(x, y),
+			antinodes)) {
+			return $elm$html$Html$text('#');
+		} else {
+			var _v1 = A3($tortus$elm_array_2d$Array2D$get, y, x, vizBoard);
+			if (_v1.$ === 'Nothing') {
+				return $elm$html$Html$text('?');
+			} else {
+				var cell = _v1.a;
+				if (cell.$ === 'Highlight') {
+					var ch = cell.a;
+					return A2(
+						$elm$html$Html$span,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'background-color', '#CCCCCC')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								$elm$core$String$fromChar(ch))
+							]));
+				} else {
+					var ch = cell.a;
+					return $elm$html$Html$text(
+						$elm$core$String$fromChar(ch));
+				}
 			}
 		}
 	});
@@ -5861,12 +6231,13 @@ var $author$project$Aoc08$view = function (model) {
 				xs);
 		},
 		ys);
+	var antinodes = model.antinodes;
 	var nestedElements = A2(
 		$elm$core$List$map,
 		function (positions) {
 			return A2(
 				$elm$core$List$map,
-				$author$project$Aoc08$toCharElement(board),
+				A2($author$project$Aoc08$toCharElement, board, antinodes),
 				positions);
 		},
 		nestedPositions);
