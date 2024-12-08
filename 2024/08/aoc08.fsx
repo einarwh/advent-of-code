@@ -33,11 +33,9 @@ let findAntinodes board ((x1, y1), (x2, y2)) =
 let findAntinodesWithHarmonics board ((x1, y1), (x2, y2)) = 
     let xd = x2 - x1 
     let yd = y2 - y1
-    let sub (x, y) = (x - xd, y - yd) 
-    let add (x, y) = (x + xd, y + yd) 
     let unfold fn = List.unfold (fun pos -> if Array2D.inBounds board pos then Some (pos, fn pos) else None)
-    let subList = (x1, y1) |> unfold sub
-    let addList = (x2, y2) |> unfold add
+    let subList = (x1, y1) |> unfold (fun (x, y) -> (x - xd, y - yd))
+    let addList = (x2, y2) |> unfold (fun (x, y) -> (x + xd, y + yd))
     subList @ addList 
 
 let rec pairs lst = 
