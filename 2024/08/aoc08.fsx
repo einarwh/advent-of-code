@@ -1,4 +1,4 @@
-// Advent of Code 2024. Day 08
+// Advent of Code 2024. Day 08: Resonant Collinearity.
 // dotnet fsi aoc08.fsx
 
 open System
@@ -51,13 +51,11 @@ let countAntinodes antinodeFinder board =
         match Array2D.get board y x with 
         | '.' -> None 
         | antenna -> Some (antenna, (x, y))
-    let antennae = 
-        board 
-        |> Array2D.positions 
-        |> List.choose (check board) 
-        |> List.groupBy (fun (a, p)-> a)
-        |> List.map (fun (a, lst) -> (a, List.map snd lst))
-    antennae
+    board 
+    |> Array2D.positions 
+    |> List.choose (check board) 
+    |> List.groupBy (fun (a, p)-> a)
+    |> List.map (fun (a, lst) -> (a, List.map snd lst))
     |> List.map (fun (a, positions) -> (positions |> pairs |> List.collect (antinodeFinder board)))
     |> List.concat
     |> Set.ofList 
@@ -69,4 +67,4 @@ let run fileName =
     board |> countAntinodes findAntinodes |> printfn "%d"
     board |> countAntinodes findAntinodesWithHarmonics |> printfn "%d"
 
-run "sample"
+run "input"
