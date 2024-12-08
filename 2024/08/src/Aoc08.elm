@@ -212,6 +212,27 @@ findAntinodes board ((x1, y1), (x2, y2)) =
   in 
     candidates |> List.filter (inBounds board)
 
+checkAntenna : Array2D Char -> Pos -> Maybe Char 
+checkAntenna board (x, y) = 
+  case Array2D.get y x board of 
+    Nothing -> Nothing
+    Just '.' -> Nothing 
+    Just ch -> Just ch
+
+-- let findAllAntinodes antinodeFinder board = 
+--     let check board (x, y) = 
+--         match Array2D.get board y x with 
+--         | '.' -> None 
+--         | antenna -> Some (antenna, (x, y))
+--     board 
+--     |> Array2D.positions 
+--     |> List.choose (check board) 
+--     |> List.groupBy (fun (a, p)-> a)
+--     |> List.map (fun (a, lst) -> (a, List.map snd lst))
+--     |> List.map (fun (a, positions) -> (positions |> pairs |> List.collect (antinodeFinder board)))
+--     |> List.concat
+--     |> Set.ofList 
+
 pairs : List a -> List (a, a) 
 pairs lst = 
   case lst of 
