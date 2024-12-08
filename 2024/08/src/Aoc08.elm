@@ -192,6 +192,23 @@ updateClear : Model -> Model
 updateClear model = 
   initModel model.useSample
 
+-- let rec pairs lst = 
+--     match lst with 
+--     | [] -> []
+--     | h :: t -> 
+--         List.map (fun it -> (h, it)) t @ pairs t 
+
+pairs : List a -> List (a, a) 
+pairs lst = 
+  case lst of 
+    [] -> []
+    h :: t -> 
+      let 
+        these = t |> List.map (\it -> (h, it))
+        rest = pairs t 
+      in 
+        List.append these rest 
+
 updateSolve : Model -> Model 
 updateSolve model = model 
 
