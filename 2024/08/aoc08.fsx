@@ -44,7 +44,7 @@ let rec pairs lst =
     | h :: t -> 
         List.map (fun it -> (h, it)) t @ pairs t 
 
-let countAntinodes antinodeFinder board = 
+let findAllAntinodes antinodeFinder board = 
     let check board (x, y) = 
         match Array2D.get board y x with 
         | '.' -> None 
@@ -57,7 +57,9 @@ let countAntinodes antinodeFinder board =
     |> List.map (fun (a, positions) -> (positions |> pairs |> List.collect (antinodeFinder board)))
     |> List.concat
     |> Set.ofList 
-    |> Set.count 
+
+let countAntinodes antinodeFinder board = 
+    findAllAntinodes antinodeFinder board |> Set.count
 
 let run fileName = 
     let lines = readLines fileName |> List.map Seq.toList
