@@ -5,12 +5,9 @@ open System
 open System.IO
 open System.Collections.Generic
 
-type FileId = int64
-type Space = int 
-
 type DiskEntry = 
-    | File of (FileId * Space) 
-    | Free of Space 
+    | File of (int * int) 
+    | Free of int 
 
 let rec tryFindSpace (requiredBlocks : int) (endNode : LinkedListNode<DiskEntry>) (node : LinkedListNode<DiskEntry>) : LinkedListNode<DiskEntry> option = 
     if node = endNode then None 
@@ -68,7 +65,7 @@ let run fileName =
     let digits : int list = text |> Seq.toList |> List.map (fun ch -> int (ch - '0'))
     let accumulateEntries (index : int, entries : DiskEntry list) (blocks : int) : (int * DiskEntry list) = 
         let entry = 
-            if index % 2 = 0 then File (int64 (index / 2), blocks)
+            if index % 2 = 0 then File ((index / 2), blocks)
             else Free blocks
         (index + 1, entry :: entries)
     let (_, reversedEntries) = List.fold accumulateEntries (0, []) digits
