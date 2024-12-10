@@ -89,6 +89,15 @@ let compactWholeFiles (linked : LinkedList<DiskEntry>) =
             match node.Value with 
             | Free _ -> node 
             | _ -> findFirstFree node.Next 
+    let tryGetIndex (node : LinkedListNode<DiskEntry>) : int option = 
+        match node with 
+        | null -> None 
+        | _ -> 
+            let space = 
+                match node.Value with 
+                | File (_, fileSpace) -> fileSpace 
+                | Free freeSpace -> freeSpace 
+            Some space.index 
     let rec loop (firstFreeNode : LinkedListNode<DiskEntry>) (node : LinkedListNode<DiskEntry>) (moved : Set<int>) = 
         printfn ""
         printfn "Looping."
@@ -113,37 +122,41 @@ let compactWholeFiles (linked : LinkedList<DiskEntry>) =
                         printfn "No space, file remains in place."
                         loop firstFreeNode node.Previous moved
                     | Some spaceNode -> 
-                        // Found space! Can safely remove the file.
-                        printfn "Found free space for the file."
-                        let previous = node.Previous 
-                        // Leave space where the file was!
-                        linked.AddBefore(node, Free { index = fileSpace.index; blocks = fileSpace.blocks }) |> ignore
-                        linked.Remove(node)
                         match spaceNode.Value with 
                         | File _ -> failwith "?"
                         | Free freeSpace -> 
-                            // Insert file before original space.
-                            linked.AddBefore(spaceNode, File (fileId, fileSpace)) |> ignore
-                            let leftover = freeSpace.blocks - fileSpace.blocks 
-                            printfn "Leftover space: %d" leftover
-                            if leftover > 0 then 
-                                printfn "Adding remaining space node."
-                                // Insert remaining space after original space.
-                                linked.AddAfter(spaceNode, Free { index = freeSpace.index + fileSpace.blocks; blocks = leftover }) |> ignore
+                            if freeSpace.index >= fileSpace.index then 
+                                printfn "Free space to the right, not to the left."
+                                loop firstFreeNode node.Previous moved
                             else 
-                                printfn "No space to add."
-                                ()
-                            // Update first free.
-                            let firstFree = 
-                                if spaceNode = firstFreeNode then 
-                                    printfn "Updating first free node."
-                                    findFirstFree spaceNode.Next 
-                                else
-                                    printfn "First free node is unchanged." 
-                                    firstFreeNode 
-                            // Remove original space.
-                            linked.Remove(spaceNode)
-                            loop firstFree previous (moved |> Set.add fileId)
+                                // Found space! Can safely remove the file.
+                                printfn "Found free space for the file."
+                                let previous = node.Previous 
+                                // Leave space where the file was!
+                                linked.AddBefore(node, Free { index = fileSpace.index; blocks = fileSpace.blocks }) |> ignore
+                                linked.Remove(node)
+                                // Insert file before original space.
+                                linked.AddBefore(spaceNode, File (fileId, fileSpace)) |> ignore
+                                let leftover = freeSpace.blocks - fileSpace.blocks 
+                                printfn "Leftover space: %d" leftover
+                                if leftover > 0 then 
+                                    printfn "Adding remaining space node."
+                                    // Insert remaining space after original space.
+                                    linked.AddAfter(spaceNode, Free { index = freeSpace.index + fileSpace.blocks; blocks = leftover }) |> ignore
+                                else 
+                                    printfn "No space to add."
+                                    ()
+                                // Update first free.
+                                let firstFree = 
+                                    if spaceNode = firstFreeNode then 
+                                        printfn "Updating first free node."
+                                        findFirstFree spaceNode.Next 
+                                    else
+                                        printfn "First free node is unchanged." 
+                                        firstFreeNode 
+                                // Remove original space.
+                                linked.Remove(spaceNode)
+                                loop firstFree previous (moved |> Set.add fileId)
     loop (findFirstFree linked.First) (linked.Last) Set.empty |> ignore
     linked |> Seq.toList
 
