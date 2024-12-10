@@ -19,68 +19,104 @@ create space entry at 40: 0 blocks
 create file entry with id 9 at 40: 2 blocks
 Entries: 19
 Linked: 19
+=======================
 Loop. 0 files placed. 19 entries remaining to handle. 
-Found file entry { fileId = 0
+Found file entry first { fileId = 0
   blocks = 2 }
+=======================
 Loop. 1 files placed. 18 entries remaining to handle. 
-Found space entry { blocks = 3 }
+Found space entry first { blocks = 3 }
+Found file to insert last.
+=======================
 Loop. 2 files placed. 17 entries remaining to handle. 
-Found space entry { blocks = 1 }
-Loop. 2 files placed. 15 entries remaining to handle. 
-Found file entry { fileId = 1
+Found space entry first { blocks = 1 }
+Found space last, just skip it.
+Put back the space in front, we didn't use it.
+=======================
+Loop. 2 files placed. 16 entries remaining to handle. 
+Found space entry first { blocks = 1 }
+Found file to insert last.
+=======================
+Loop. 3 files placed. 15 entries remaining to handle. 
+Found file entry first { fileId = 1
   blocks = 3 }
-Loop. 3 files placed. 14 entries remaining to handle. 
-Found space entry { blocks = 3 }
-Loop. 4 files placed. 13 entries remaining to handle. 
-Found file entry { fileId = 2
-  blocks = 1 }
+=======================
+Loop. 4 files placed. 14 entries remaining to handle. 
+Found space entry first { blocks = 3 }
+Found file to insert last.
+Perfect match, just insert the file. Nothing to put back.
+=======================
 Loop. 5 files placed. 12 entries remaining to handle. 
-Found space entry { blocks = 3 }
+Found file entry first { fileId = 2
+  blocks = 1 }
+=======================
 Loop. 6 files placed. 11 entries remaining to handle. 
-Found space entry { blocks = 2 }
-Loop. 6 files placed. 9 entries remaining to handle. 
-Found file entry { fileId = 3
-  blocks = 3 }
+Found space entry first { blocks = 3 }
+Found space last, just skip it.
+Put back the space in front, we didn't use it.
+=======================
+Loop. 6 files placed. 10 entries remaining to handle. 
+Found space entry first { blocks = 3 }
+Found file to insert last.
+Perfect match, just insert the file. Nothing to put back.
+=======================
 Loop. 7 files placed. 8 entries remaining to handle. 
-Found space entry { blocks = 1 }
+Found file entry first { fileId = 3
+  blocks = 3 }
+=======================
 Loop. 8 files placed. 7 entries remaining to handle. 
-Found file entry { fileId = 4
+Found space entry first { blocks = 1 }
+Found space last, just skip it.
+Put back the space in front, we didn't use it.
+=======================
+Loop. 8 files placed. 6 entries remaining to handle. 
+Found space entry first { blocks = 1 }
+Found file to insert last.
+=======================
+Loop. 9 files placed. 5 entries remaining to handle. 
+Found file entry first { fileId = 4
   blocks = 2 }
-Loop. 9 files placed. 6 entries remaining to handle. 
-Found space entry { blocks = 1 }
-Loop. 10 files placed. 5 entries remaining to handle. 
-Found file entry { fileId = 5
+=======================
+Loop. 10 files placed. 4 entries remaining to handle. 
+Found space entry first { blocks = 1 }
+Found file to insert last.
+=======================
+Loop. 11 files placed. 3 entries remaining to handle. 
+Found file entry first { fileId = 5
   blocks = 4 }
-Loop. 11 files placed. 4 entries remaining to handle. 
-Found space entry { blocks = 1 }
+=======================
 Loop. 12 files placed. 2 entries remaining to handle. 
-Found file entry { fileId = 6
-  blocks = 4 }
+Found space entry first { blocks = 1 }
+Found file to insert last.
+=======================
 Loop. 13 files placed. 1 entries remaining to handle. 
-Drop space.
+Add file.
 { fileId = 0
   blocks = 2 }
 { fileId = 9
   blocks = 2 }
+{ fileId = 8
+  blocks = 1 }
 { fileId = 1
   blocks = 3 }
 { fileId = 8
   blocks = 3 }
 { fileId = 2
   blocks = 1 }
-{ fileId = 8
-  blocks = 1 }
+{ fileId = 7
+  blocks = 3 }
 { fileId = 3
   blocks = 3 }
-{ fileId = 7
+{ fileId = 6
   blocks = 1 }
 { fileId = 4
   blocks = 2 }
-{ fileId = 7
+{ fileId = 6
   blocks = 1 }
 { fileId = 5
   blocks = 4 }
-{ fileId = 7
+{ fileId = 6
   blocks = 1 }
 { fileId = 6
-  blocks = 4 }
+  blocks = 1 }
+1928

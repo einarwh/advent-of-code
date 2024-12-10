@@ -31,6 +31,7 @@ let createSpaceEntry blockIndex blocks =
 
 let compact (linked : LinkedList<DiskEntry>) : DiskFile list =
     let rec loop (result : DiskFile list) = 
+        printfn "======================="
         printfn "Loop. %d files placed. %d entries remaining to handle. " (List.length result) linked.Count
         match linked.Count with 
         | 0 -> result 
@@ -47,23 +48,32 @@ let compact (linked : LinkedList<DiskEntry>) : DiskFile list =
             linked.RemoveFirst()
             match firstEntry with 
             | FileEntry (file : DiskFile) -> 
-                printfn "Found file entry %A" file
+                printfn "Found file entry first %A" file
                 loop (file :: result)
             | SpaceEntry (space : FreeSpace) -> 
-                printfn "Found space entry %A" space
+                printfn "Found space entry first %A" space
                 let lastEntry = linked.Last.Value 
                 linked.RemoveLast()
                 match lastEntry with 
+                | SpaceEntry _ ->
+                    printfn "Found space last, just skip it."
+                    printfn "Put back the space in front, we didn't use it."
+                    linked.AddFirst(firstEntry)
+                    loop result 
                 | FileEntry fileToInsert -> 
+                    printfn "Found file to insert last."
                     // Insert.
                     if fileToInsert.blocks = space.blocks then 
                         // Perfect match! 
+                        printfn "Perfect match, just insert the file. Nothing to put back."
                         loop (fileToInsert :: result)
                     else if fileToInsert.blocks < space.blocks then 
                         // Leftover space.
                         let leftoverSpace = 
                             { blocks = space.blocks - fileToInsert.blocks } |> SpaceEntry
+                        // Put leftover space back in front.
                         linked.AddFirst(leftoverSpace)
+                        // Insert the file.
                         loop (fileToInsert :: result)
                     else 
                         // File too big.
@@ -73,10 +83,11 @@ let compact (linked : LinkedList<DiskEntry>) : DiskFile list =
                         let leftoverFile = 
                             { fileId = fileToInsert.fileId
                               blocks = fileToInsert.blocks - space.blocks } |> FileEntry
+                        // No space to put back in front.
+                        // Put remaining file back last.
                         linked.AddLast(leftoverFile)
+                        // Insert the file.
                         loop (placedFile :: result)
-                | SpaceEntry _ ->
-                    loop result 
     loop [] |> List.rev
 
 let run fileName = 
@@ -95,8 +106,15 @@ let run fileName =
     let linked = new LinkedList<DiskEntry>(entries)
     printfn "Linked: %d" (Seq.length linked)
     // linked |> Seq.iter (printfn "%A")
-    let compacted = compact linked 
+    let compacted : DiskFile list = compact linked 
     compacted |> List.iter (printfn "%A")
+    let calculate (index : int, sum : int) (file : DiskFile) : (int * int) = 
+        let nextIndex = index + file.blocks
+        let fileSum = [ index .. (nextIndex - 1) ] |> List.sumBy ((*) file.fileId)
+        let nextSum = sum + fileSum
+        (nextIndex, nextSum)
+    let (_, checksum) = compacted |> List.fold calculate (0, 0)
+    printfn "%d" checksum
 
     0
     // digits |> List.length |> printfn "%d"
