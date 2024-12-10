@@ -1,95 +1,175 @@
 1928
-Loop with 19 entries remaining in linked list, 0 added to result.
-Last entry was a file to try to move.
-Found enough space for the file!
-File takes 2 blocks, found space with 3 blocks.
-Loop with 19 entries remaining in linked list, 2 added to result.
-Last entry was just space. Adding it to result.
-Loop with 18 entries remaining in linked list, 3 added to result.
-Last entry was a file to try to move.
-Loop with 17 entries remaining in linked list, 4 added to result.
-Last entry was just space. Adding it to result.
-Loop with 16 entries remaining in linked list, 5 added to result.
-Last entry was a file to try to move.
-Found enough space for the file!
-File takes 3 blocks, found space with 3 blocks.
-Loop with 16 entries remaining in linked list, 7 added to result.
-Last entry was just space. Adding it to result.
-Loop with 15 entries remaining in linked list, 8 added to result.
-Last entry was a file to try to move.
-Loop with 14 entries remaining in linked list, 9 added to result.
-Last entry was just space. Adding it to result.
-Loop with 13 entries remaining in linked list, 10 added to result.
-Last entry was a file to try to move.
-Loop with 12 entries remaining in linked list, 11 added to result.
-Last entry was just space. Adding it to result.
-Loop with 11 entries remaining in linked list, 12 added to result.
-Last entry was a file to try to move.
-Found enough space for the file!
-File takes 2 blocks, found space with 3 blocks.
-Loop with 11 entries remaining in linked list, 14 added to result.
-Last entry was just space. Adding it to result.
-Loop with 10 entries remaining in linked list, 15 added to result.
-Last entry was a file to try to move.
-Loop with 9 entries remaining in linked list, 16 added to result.
-Last entry was just space. Adding it to result.
-Loop with 8 entries remaining in linked list, 17 added to result.
-Last entry was a file to try to move.
-Loop with 7 entries remaining in linked list, 18 added to result.
-Last entry was a file to try to move.
-Found enough space for the file!
-File takes 1 blocks, found space with 1 blocks.
-Loop with 7 entries remaining in linked list, 20 added to result.
-Last entry was just space. Adding it to result.
-Loop with 6 entries remaining in linked list, 21 added to result.
-Last entry was a file to try to move.
-Loop with 5 entries remaining in linked list, 22 added to result.
-Last entry was a file to try to move.
-Loop with 4 entries remaining in linked list, 23 added to result.
-Last entry was just space. Adding it to result.
-Loop with 3 entries remaining in linked list, 24 added to result.
-Last entry was a file to try to move.
-Loop with 2 entries remaining in linked list, 25 added to result.
-Last entry was a file to try to move.
-Loop with 1 entries remaining in linked list, 26 added to result.
-SpaceEntry { blocks = 1 }
-FileEntry { fileId = 9
-            blocks = 2 }
-SpaceEntry { blocks = 0 }
-FileEntry { fileId = 8
-            blocks = 4 }
-SpaceEntry { blocks = 1 }
-SpaceEntry { blocks = 0 }
-FileEntry { fileId = 7
-            blocks = 3 }
-SpaceEntry { blocks = 1 }
-FileEntry { fileId = 6
-            blocks = 4 }
-SpaceEntry { blocks = 1 }
-FileEntry { fileId = 5
-            blocks = 4 }
-SpaceEntry { blocks = 1 }
-SpaceEntry { blocks = 1 }
-FileEntry { fileId = 4
-            blocks = 2 }
-SpaceEntry { blocks = 1 }
-FileEntry { fileId = 3
-            blocks = 3 }
-SpaceEntry { blocks = 1 }
-FileEntry { fileId = 4
-            blocks = 2 }
-SpaceEntry { blocks = 0 }
-FileEntry { fileId = 2
-            blocks = 1 }
-SpaceEntry { blocks = 0 }
-FileEntry { fileId = 7
-            blocks = 3 }
-FileEntry { fileId = 1
-            blocks = 3 }
-SpaceEntry { blocks = 0 }
-FileEntry { fileId = 2
-            blocks = 1 }
-FileEntry { fileId = 9
-            blocks = 2 }
-FileEntry { fileId = 0
-            blocks = 2 }
+
+Looping.
+00...111...2...333.44.5555.6666.777.888899
+Entry is a file.
+Found a file to move: (id: 9, blocks: 2)
+Found free space for the file.
+Leftover space: 1
+Adding remaining space node.
+Updating first free node.
+
+Looping.
+0099.111...2...333.44.5555.6666.777.8888..
+Skipping past space.
+
+Looping.
+0099.111...2...333.44.5555.6666.777.8888..
+Entry is a file.
+Found a file to move: (id: 8, blocks: 4)
+No space, file remains in place.
+
+Looping.
+0099.111...2...333.44.5555.6666.777.8888..
+Skipping past space.
+
+Looping.
+0099.111...2...333.44.5555.6666.777.8888..
+Entry is a file.
+Found a file to move: (id: 7, blocks: 3)
+Found free space for the file.
+Leftover space: 0
+No space to add.
+First free node is unchanged.
+
+Looping.
+0099.1117772...333.44.5555.6666.....8888..
+Skipping past space.
+
+Looping.
+0099.1117772...333.44.5555.6666.....8888..
+Entry is a file.
+Found a file to move: (id: 6, blocks: 4)
+No space, file remains in place.
+
+Looping.
+0099.1117772...333.44.5555.6666.....8888..
+Skipping past space.
+
+Looping.
+0099.1117772...333.44.5555.6666.....8888..
+Entry is a file.
+Found a file to move: (id: 5, blocks: 4)
+No space, file remains in place.
+
+Looping.
+0099.1117772...333.44.5555.6666.....8888..
+Skipping past space.
+
+Looping.
+0099.1117772...333.44.5555.6666.....8888..
+Entry is a file.
+Found a file to move: (id: 4, blocks: 2)
+Found free space for the file.
+Leftover space: 1
+Adding remaining space node.
+First free node is unchanged.
+
+Looping.
+0099.111777244.333....5555.6666.....8888..
+Skipping past space.
+
+Looping.
+0099.111777244.333....5555.6666.....8888..
+Entry is a file.
+Found a file to move: (id: 3, blocks: 3)
+Found free space for the file.
+Leftover space: 0
+No space to add.
+First free node is unchanged.
+
+Looping.
+0099.111777244........5555.6666.333.8888..
+Skipping past space.
+
+Looping.
+0099.111777244........5555.6666.333.8888..
+Entry is a file.
+File already moved, skipping past.
+
+Looping.
+0099.111777244........5555.6666.333.8888..
+Entry is a file.
+Found a file to move: (id: 2, blocks: 1)
+Found free space for the file.
+Leftover space: 0
+No space to add.
+Updating first free node.
+
+Looping.
+00992111777.44........5555.6666.333.8888..
+Entry is a file.
+File already moved, skipping past.
+
+Looping.
+00992111777.44........5555.6666.333.8888..
+Entry is a file.
+Found a file to move: (id: 1, blocks: 3)
+Found free space for the file.
+Leftover space: 0
+No space to add.
+First free node is unchanged.
+
+Looping.
+00992...777.44.111....5555.6666.333.8888..
+Entry is a file.
+File already moved, skipping past.
+
+Looping.
+00992...777.44.111....5555.6666.333.8888..
+Entry is a file.
+File already moved, skipping past.
+
+Looping.
+00992...777.44.111....5555.6666.333.8888..
+Entry is a file.
+Found a file to move: (id: 0, blocks: 2)
+Found free space for the file.
+Leftover space: 0
+No space to add.
+First free node is unchanged.
+
+Looping.
+..992...777.44.111.00.5555.6666.333.8888..
+Free { index = 0
+       blocks = 2 }
+File (9, { index = 40
+           blocks = 2 })
+File (2, { index = 11
+           blocks = 1 })
+Free { index = 5
+       blocks = 3 }
+File (7, { index = 32
+           blocks = 3 })
+Free { index = 11
+       blocks = 1 }
+File (4, { index = 19
+           blocks = 2 })
+Free { index = 14
+       blocks = 1 }
+File (1, { index = 5
+           blocks = 3 })
+Free { index = 18
+       blocks = 1 }
+File (0, { index = 0
+           blocks = 2 })
+Free { index = 21
+       blocks = 1 }
+File (5, { index = 22
+           blocks = 4 })
+Free { index = 26
+       blocks = 1 }
+File (6, { index = 27
+           blocks = 4 })
+Free { index = 31
+       blocks = 1 }
+File (3, { index = 15
+           blocks = 3 })
+Free { index = 35
+       blocks = 1 }
+File (8, { index = 36
+           blocks = 4 })
+Free { index = 40
+       blocks = 0 }
+Free { index = 40
+       blocks = 2 }
