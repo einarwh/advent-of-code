@@ -99,60 +99,61 @@ let compactWholeFiles (linked : LinkedList<DiskEntry>) =
                 | Free freeSpace -> freeSpace 
             Some space.index 
     let rec loop (firstFreeNode : LinkedListNode<DiskEntry>) (node : LinkedListNode<DiskEntry>) (moved : Set<int>) = 
-        printfn ""
-        printfn "Looping."
-        printfn "%s" (toString linked.First)
+        // printfn ""
+        // printfn "Looping."
+        // printfn "%s" (toString linked.First)
         match node with 
         | null -> linked 
         | _ -> 
             match node.Value with 
             | Free _ -> 
-                printfn "Skipping past space."
+                // printfn "Skipping past space."
                 loop firstFreeNode node.Previous moved 
             | File (fileId, fileSpace) -> 
-                printfn "Entry is a file."
+                // printfn "Entry is a file."
                 if Set.contains fileId moved then 
-                    printfn "File already moved, skipping past."
+                    // printfn "File already moved, skipping past."
                     loop firstFreeNode node.Previous moved 
                 else
-                    printfn "Found a file to move: (id: %d, blocks: %d)" fileId fileSpace.blocks
+                    // printfn "Found a file to move: (id: %d, blocks: %d)" fileId fileSpace.blocks
                     match tryFindSpaceNode fileSpace.blocks firstFreeNode with 
                     | None -> 
                         // No space found for the given file!
-                        printfn "No space, file remains in place."
+                        // printfn "No space, file remains in place."
                         loop firstFreeNode node.Previous moved
                     | Some spaceNode -> 
                         match spaceNode.Value with 
                         | File _ -> failwith "?"
                         | Free freeSpace -> 
                             if freeSpace.index >= fileSpace.index then 
-                                printfn "Free space to the right, not to the left."
+                                // printfn "Free space to the right, not to the left."
                                 loop firstFreeNode node.Previous moved
                             else 
                                 // Found space! Can safely remove the file.
-                                printfn "Found free space for the file."
+                                // printfn "Found free space for the file."
                                 let previous = node.Previous 
                                 // Leave space where the file was!
                                 linked.AddBefore(node, Free { index = fileSpace.index; blocks = fileSpace.blocks }) |> ignore
                                 linked.Remove(node)
                                 // Insert file before original space.
-                                linked.AddBefore(spaceNode, File (fileId, fileSpace)) |> ignore
+                                let movedFile = (fileId, { index = freeSpace.index; blocks = fileSpace.blocks })
+                                linked.AddBefore(spaceNode, File movedFile) |> ignore
                                 let leftover = freeSpace.blocks - fileSpace.blocks 
-                                printfn "Leftover space: %d" leftover
+                                // printfn "Leftover space: %d" leftover
                                 if leftover > 0 then 
-                                    printfn "Adding remaining space node."
+                                    // printfn "Adding remaining space node."
                                     // Insert remaining space after original space.
                                     linked.AddAfter(spaceNode, Free { index = freeSpace.index + fileSpace.blocks; blocks = leftover }) |> ignore
                                 else 
-                                    printfn "No space to add."
+                                    // printfn "No space to add."
                                     ()
                                 // Update first free.
                                 let firstFree = 
                                     if spaceNode = firstFreeNode then 
-                                        printfn "Updating first free node."
+                                        // printfn "Updating first free node."
                                         findFirstFree spaceNode.Next 
                                     else
-                                        printfn "First free node is unchanged." 
+                                        // printfn "First free node is unchanged." 
                                         firstFreeNode 
                                 // Remove original space.
                                 linked.Remove(spaceNode)
@@ -173,15 +174,23 @@ let run fileName =
     let (_, _, reversedEntries) = List.fold accumulateEntries (0, 0, []) digits
     let entries = reversedEntries |> List.rev 
     let fragmented = compactFragmenting (new LinkedList<DiskEntry>(entries)) 
-    let calculate (index : int, sum : int64) (file : (int * Space)) : (int * int64) = 
+    let calculateFragmented (index : int, sum : int64) (file : (int * Space)) : (int * int64) = 
         let (fileId, fileSpace) = file 
         let nextIndex = index + fileSpace.blocks
         let fileSum = [ index .. (nextIndex - 1) ] |> List.map int64 |> List.sumBy ((*) (int64 fileId))
         let nextSum = sum + fileSum
         (nextIndex, nextSum)
-    fragmented |> List.fold calculate (0, 0) |> snd |> printfn "%d"
+    fragmented |> List.fold calculateFragmented (0, 0) |> snd |> printfn "%d"
+    let calculateWholeFiles (sum : int64) (entry : DiskEntry) : int64 = 
+        match entry with 
+        | File (fileId, fileSpace) -> 
+            let nextIndex = fileSpace.index + fileSpace.blocks
+            let fileSum = [ fileSpace.index .. (nextIndex - 1) ] |> List.map int64 |> List.sumBy ((*) (int64 fileId))
+            // printfn "file sum for %d (%d blocks at index %d) = %d" fileId fileSpace.blocks fileSpace.index fileSum
+            sum + fileSum
+        | Free _ -> sum 
     let compacted = compactWholeFiles (new LinkedList<DiskEntry>(entries))
-    compacted |> List.iter (printfn "%A")
+    compacted |> List.fold calculateWholeFiles 0 |> printfn "%d"
     0
 
 run "sample"
