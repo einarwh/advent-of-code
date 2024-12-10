@@ -8,7 +8,7 @@ open System.Collections.Generic
 type Space = { index : int; blocks : int }
 
 type DiskEntry = 
-    | File of (int * Space) 
+    | File of (int64 * Space) 
     | Free of Space 
 
 let trim (input : string) = input.Trim()
@@ -21,8 +21,8 @@ let createFileEntry fileId blockIndex blocks =
 let createSpaceEntry blockIndex blocks = 
     { index = blockIndex; blocks = blocks } |> Free 
 
-let compactFragmenting (linked : LinkedList<DiskEntry>) : (int * Space) list =
-    let rec loop (result : (int * Space) list) = 
+let compactFragmenting (linked : LinkedList<DiskEntry>) : (int64 * Space) list =
+    let rec loop (result : (int64 * Space) list) = 
         match linked.Count with 
         | 0 -> result 
         | 1 ->
@@ -75,13 +75,22 @@ let rec toString (node : LinkedListNode<DiskEntry>) =
             s + toString (node.Next)
 
 let compactWholeFiles (linked : LinkedList<DiskEntry>) =
-    let rec tryFindSpaceNode (blocks : int) (node : LinkedListNode<DiskEntry>) : LinkedListNode<DiskEntry> option = 
+    let rec tryFindSpaceNode (maxIndex : int) (blocks : int) (node : LinkedListNode<DiskEntry>) : LinkedListNode<DiskEntry> option = 
         match node with 
         | null -> None 
         | _ -> 
             match node.Value with 
             | Free freeSpace when freeSpace.blocks >= blocks -> Some node 
-            | _ -> tryFindSpaceNode blocks node.Next
+            | Free freeSpace -> 
+                if freeSpace.index >= maxIndex then 
+                    None 
+                else 
+                    tryFindSpaceNode maxIndex blocks node.Next
+            | File (_, fileSpace) -> 
+                if fileSpace.index >=  maxIndex then 
+                    None 
+                else 
+                    tryFindSpaceNode maxIndex blocks node.Next
     let rec findFirstFree (node : LinkedListNode<DiskEntry>) : LinkedListNode<DiskEntry> = 
         match node with 
         | null -> null 
@@ -98,7 +107,7 @@ let compactWholeFiles (linked : LinkedList<DiskEntry>) =
                 | File (_, fileSpace) -> fileSpace 
                 | Free freeSpace -> freeSpace 
             Some space.index 
-    let rec loop (firstFreeNode : LinkedListNode<DiskEntry>) (node : LinkedListNode<DiskEntry>) (moved : Set<int>) = 
+    let rec loop (node : LinkedListNode<DiskEntry>) (moved : Set<int64>) = 
         // printfn ""
         // printfn "Looping."
         // printfn "%s" (toString linked.First)
@@ -108,27 +117,27 @@ let compactWholeFiles (linked : LinkedList<DiskEntry>) =
             match node.Value with 
             | Free _ -> 
                 // printfn "Skipping past space."
-                loop firstFreeNode node.Previous moved 
+                loop node.Previous moved 
             | File (fileId, fileSpace) -> 
                 // printfn "Entry is a file."
                 if Set.contains fileId moved then 
-                    // printfn "File already moved, skipping past."
-                    loop firstFreeNode node.Previous moved 
+                    printfn "File already moved, skipping past."
+                    loop node.Previous moved 
                 else
                     let moved' = moved |> Set.add fileId 
                     // printfn "Found a file to move: (id: %d, blocks: %d)" fileId fileSpace.blocks
-                    match tryFindSpaceNode fileSpace.blocks linked.First with 
+                    match tryFindSpaceNode fileSpace.index fileSpace.blocks linked.First with 
                     | None -> 
                         // No space found for the given file!
                         // printfn "No space, file remains in place."
-                        loop firstFreeNode node.Previous moved'
+                        loop node.Previous moved'
                     | Some spaceNode -> 
                         match spaceNode.Value with 
                         | File _ -> failwith "?"
                         | Free freeSpace -> 
                             if freeSpace.index >= fileSpace.index then 
                                 // printfn "Free space to the right, not to the left."
-                                loop firstFreeNode node.Previous moved'
+                                loop node.Previous moved'
                             else 
                                 // Found space! Can safely remove the file.
                                 // printfn "Found free space for the file."
@@ -148,19 +157,27 @@ let compactWholeFiles (linked : LinkedList<DiskEntry>) =
                                 else 
                                     // printfn "No space to add."
                                     ()
-                                // Update first free.
-                                let firstFree = 
-                                    if spaceNode = firstFreeNode then 
-                                        // printfn "Updating first free node."
-                                        findFirstFree spaceNode.Next 
-                                    else
-                                        // printfn "First free node is unchanged." 
-                                        firstFreeNode 
                                 // Remove original space.
                                 linked.Remove(spaceNode)
-                                loop firstFree previous moved'
-    loop (findFirstFree linked.First) (linked.Last) Set.empty |> ignore
+                                loop previous moved'
+    loop (linked.Last) Set.empty |> ignore
     linked |> Seq.toList
+
+let verifyCompacted compacted = 
+    let rec fn index lst = 
+        match lst with 
+        | [] -> printfn "."
+        | h :: t -> 
+            match h with 
+            | File (fileId, fileSpace) -> 
+                if index <> fileSpace.index then 
+                    printfn "???"
+                fn (index + fileSpace.blocks) t 
+            | Free freeSpace -> 
+                if index <> freeSpace.index then 
+                    printfn "!!!"
+                fn (index + freeSpace.blocks) t 
+    fn 0 compacted 
 
 let run fileName = 
     let text = File.ReadAllText fileName |> trim 
@@ -168,14 +185,14 @@ let run fileName =
     let accumulateEntries (index : int, blockIndex : int, entries : DiskEntry list) (blocks : int) : (int * int * DiskEntry list) = 
         let entry = 
             if index % 2 = 0 then  
-                createFileEntry (index / 2) blockIndex blocks 
+                createFileEntry (int64 (index / 2)) blockIndex blocks 
             else 
                 createSpaceEntry blockIndex blocks
         (index + 1, blockIndex + blocks, entry :: entries)
     let (_, _, reversedEntries) = List.fold accumulateEntries (0, 0, []) digits
     let entries = reversedEntries |> List.rev 
     let fragmented = compactFragmenting (new LinkedList<DiskEntry>(entries)) 
-    let calculateFragmented (index : int, sum : int64) (file : (int * Space)) : (int * int64) = 
+    let calculateFragmented (index : int, sum : int64) (file : (int64 * Space)) : (int * int64) = 
         let (fileId, fileSpace) = file 
         let nextIndex = index + fileSpace.blocks
         let fileSum = [ index .. (nextIndex - 1) ] |> List.map int64 |> List.sumBy ((*) (int64 fileId))
@@ -190,7 +207,9 @@ let run fileName =
             // printfn "file sum for %d (%d blocks at index %d) = %d" fileId fileSpace.blocks fileSpace.index fileSum
             sum + fileSum
         | Free _ -> sum 
+    entries |> List.iter (printfn "%A")
     let compacted = compactWholeFiles (new LinkedList<DiskEntry>(entries))
+    verifyCompacted compacted 
     compacted |> List.fold calculateWholeFiles 0 |> printfn "%d"
     0
 
