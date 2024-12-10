@@ -108,9 +108,9 @@ let run fileName =
     // linked |> Seq.iter (printfn "%A")
     let compacted : DiskFile list = compact linked 
     compacted |> List.iter (printfn "%A")
-    let calculate (index : int, sum : int) (file : DiskFile) : (int * int) = 
+    let calculate (index : int, sum : int64) (file : DiskFile) : (int * int64) = 
         let nextIndex = index + file.blocks
-        let fileSum = [ index .. (nextIndex - 1) ] |> List.sumBy ((*) file.fileId)
+        let fileSum = [ index .. (nextIndex - 1) ] |> List.map int64 |> List.sumBy ((*) (int64 file.fileId))
         let nextSum = sum + fileSum
         (nextIndex, nextSum)
     let (_, checksum) = compacted |> List.fold calculate (0, 0)
@@ -119,4 +119,4 @@ let run fileName =
     0
     // digits |> List.length |> printfn "%d"
 
-run "sample"
+run "input"
