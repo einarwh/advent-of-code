@@ -1,0 +1,86 @@
+create file entry with id 0 at 0: 2 blocks
+create space entry at 2: 3 blocks
+create file entry with id 1 at 5: 3 blocks
+create space entry at 8: 3 blocks
+create file entry with id 2 at 11: 1 blocks
+create space entry at 12: 3 blocks
+create file entry with id 3 at 15: 3 blocks
+create space entry at 18: 1 blocks
+create file entry with id 4 at 19: 2 blocks
+create space entry at 21: 1 blocks
+create file entry with id 5 at 22: 4 blocks
+create space entry at 26: 1 blocks
+create file entry with id 6 at 27: 4 blocks
+create space entry at 31: 1 blocks
+create file entry with id 7 at 32: 3 blocks
+create space entry at 35: 1 blocks
+create file entry with id 8 at 36: 4 blocks
+create space entry at 40: 0 blocks
+create file entry with id 9 at 40: 2 blocks
+Entries: 19
+Linked: 19
+Loop. 0 files placed. 19 entries remaining to handle. 
+Found file entry { fileId = 0
+  blocks = 2 }
+Loop. 1 files placed. 18 entries remaining to handle. 
+Found space entry { blocks = 3 }
+Loop. 2 files placed. 17 entries remaining to handle. 
+Found space entry { blocks = 1 }
+Loop. 2 files placed. 15 entries remaining to handle. 
+Found file entry { fileId = 1
+  blocks = 3 }
+Loop. 3 files placed. 14 entries remaining to handle. 
+Found space entry { blocks = 3 }
+Loop. 4 files placed. 13 entries remaining to handle. 
+Found file entry { fileId = 2
+  blocks = 1 }
+Loop. 5 files placed. 12 entries remaining to handle. 
+Found space entry { blocks = 3 }
+Loop. 6 files placed. 11 entries remaining to handle. 
+Found space entry { blocks = 2 }
+Loop. 6 files placed. 9 entries remaining to handle. 
+Found file entry { fileId = 3
+  blocks = 3 }
+Loop. 7 files placed. 8 entries remaining to handle. 
+Found space entry { blocks = 1 }
+Loop. 8 files placed. 7 entries remaining to handle. 
+Found file entry { fileId = 4
+  blocks = 2 }
+Loop. 9 files placed. 6 entries remaining to handle. 
+Found space entry { blocks = 1 }
+Loop. 10 files placed. 5 entries remaining to handle. 
+Found file entry { fileId = 5
+  blocks = 4 }
+Loop. 11 files placed. 4 entries remaining to handle. 
+Found space entry { blocks = 1 }
+Loop. 12 files placed. 2 entries remaining to handle. 
+Found file entry { fileId = 6
+  blocks = 4 }
+Loop. 13 files placed. 1 entries remaining to handle. 
+Drop space.
+{ fileId = 0
+  blocks = 2 }
+{ fileId = 9
+  blocks = 2 }
+{ fileId = 1
+  blocks = 3 }
+{ fileId = 8
+  blocks = 3 }
+{ fileId = 2
+  blocks = 1 }
+{ fileId = 8
+  blocks = 1 }
+{ fileId = 3
+  blocks = 3 }
+{ fileId = 7
+  blocks = 1 }
+{ fileId = 4
+  blocks = 2 }
+{ fileId = 7
+  blocks = 1 }
+{ fileId = 5
+  blocks = 4 }
+{ fileId = 7
+  blocks = 1 }
+{ fileId = 6
+  blocks = 4 }
