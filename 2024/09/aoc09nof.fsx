@@ -121,7 +121,7 @@ let compactWholeFiles (linked : LinkedList<DiskEntry>) =
             | File (fileId, fileSpace) -> 
                 // printfn "Entry is a file."
                 if Set.contains fileId moved then 
-                    printfn "File already moved, skipping past."
+                    // printfn "File already moved, skipping past."
                     loop node.Previous moved 
                 else
                     let moved' = moved |> Set.add fileId 
@@ -139,6 +139,7 @@ let compactWholeFiles (linked : LinkedList<DiskEntry>) =
                                 // printfn "Free space to the right, not to the left."
                                 loop node.Previous moved'
                             else 
+                                printfn "Moving file id %d (%d blocks) from %d to %d" fileId fileSpace.blocks fileSpace.index freeSpace.index
                                 // Found space! Can safely remove the file.
                                 // printfn "Found free space for the file."
                                 let previous = node.Previous 
@@ -185,9 +186,9 @@ let run fileName =
     let accumulateEntries (index : int, blockIndex : int, entries : DiskEntry list) (blocks : int) : (int * int * DiskEntry list) = 
         let entry = 
             if index % 2 = 0 then  
-                createFileEntry (int64 (index / 2)) blockIndex blocks 
+                createFileEntry (int64 (index / 2)) index blocks 
             else 
-                createSpaceEntry blockIndex blocks
+                createSpaceEntry index blocks
         (index + 1, blockIndex + blocks, entry :: entries)
     let (_, _, reversedEntries) = List.fold accumulateEntries (0, 0, []) digits
     let entries = reversedEntries |> List.rev 
@@ -198,7 +199,7 @@ let run fileName =
         let fileSum = [ index .. (nextIndex - 1) ] |> List.map int64 |> List.sumBy ((*) (int64 fileId))
         let nextSum = sum + fileSum
         (nextIndex, nextSum)
-    fragmented |> List.fold calculateFragmented (0, 0) |> snd |> printfn "%d"
+    // fragmented |> List.fold calculateFragmented (0, 0) |> snd |> printfn "%d"
     let calculateWholeFiles (sum : int64) (entry : DiskEntry) : int64 = 
         match entry with 
         | File (fileId, fileSpace) -> 
@@ -207,7 +208,7 @@ let run fileName =
             // printfn "file sum for %d (%d blocks at index %d) = %d" fileId fileSpace.blocks fileSpace.index fileSum
             sum + fileSum
         | Free _ -> sum 
-    entries |> List.iter (printfn "%A")
+    // entries |> List.iter (printfn "%A")
     let compacted = compactWholeFiles (new LinkedList<DiskEntry>(entries))
     verifyCompacted compacted 
     compacted |> List.fold calculateWholeFiles 0 |> printfn "%d"
