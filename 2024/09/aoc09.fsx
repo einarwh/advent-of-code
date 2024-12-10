@@ -78,6 +78,7 @@ let compactWholeFiles (linked : LinkedList<DiskEntry>) : DiskEntry list =
             | SpaceEntry space when space.blocks >= blocks -> Some node 
             | _ -> tryFindSpaceNode blocks node.Next
     let rec loop (result : DiskEntry list) = 
+        printfn "Loop with %d entries remaining in linked list, %d added to result." linked.Count (List.length result)
         match linked.Count with 
         | 0 -> result 
         | 1 -> linked.First.Value :: result 
@@ -86,22 +87,27 @@ let compactWholeFiles (linked : LinkedList<DiskEntry>) : DiskEntry list =
             linked.RemoveLast()
             match lastEntry with
             | SpaceEntry _ -> 
+                printfn "Last entry was just space. Adding it to result."
                 loop (lastEntry :: result) 
             | FileEntry file -> 
+                printfn "Last entry was a file to try to move."
                 // Try to find enough space!
                 match tryFindSpaceNode file.blocks linked.First with 
                 | Some spaceNode -> 
-                    // Add file before.
-                    linked.AddBefore(spaceNode, lastEntry)
-                    // Any remaining space after.
+                    printfn "Found enough space for the file!"
                     match spaceNode.Value with 
                     | SpaceEntry space -> 
+                        printfn "File takes %d blocks, found space with %d blocks." file.blocks space.blocks
+                        // Add file before.
+                        linked.AddBefore(spaceNode, lastEntry)
+                        // Any remaining space after.
                         let leftoverSpace = 
                             { blocks = space.blocks - file.blocks } |> SpaceEntry
                         linked.AddAfter(spaceNode, leftoverSpace)
                         // Remove old space.
                         linked.Remove(spaceNode)
-                        loop result
+                        // What now?
+                        loop (FileEntry file :: leftoverSpace :: result)
                     | FileEntry _ -> failwith "wrong"
                 | None -> 
                     // File can't be moved.
@@ -120,16 +126,15 @@ let run fileName =
         (index + 1, blockIndex + blocks, entry :: entries)
     let (_, _, reversedEntries) = List.fold accumulateEntries (0, 0, []) digits
     let entries = reversedEntries |> List.rev 
-    let linked = new LinkedList<DiskEntry>(entries)
-    let fragmented : DiskFile list = compactFragmenting linked 
+    let fragmented : DiskFile list = compactFragmenting (new LinkedList<DiskEntry>(entries)) 
     let calculate (index : int, sum : int64) (file : DiskFile) : (int * int64) = 
         let nextIndex = index + file.blocks
         let fileSum = [ index .. (nextIndex - 1) ] |> List.map int64 |> List.sumBy ((*) (int64 file.fileId))
         let nextSum = sum + fileSum
         (nextIndex, nextSum)
     fragmented |> List.fold calculate (0, 0) |> snd |> printfn "%d"
-    let compacted : DiskEntry list = compactWholeFiles linked 
-    printfn "%A" compacted
+    let compacted : DiskEntry list = compactWholeFiles (new LinkedList<DiskEntry>(entries))
+    compacted |> List.iter (printfn "%A")
     0
 
 run "sample"
