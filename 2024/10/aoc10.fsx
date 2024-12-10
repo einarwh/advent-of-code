@@ -28,25 +28,22 @@ let readLines =
 let findTrailheads board = 
     board |> Array2D.positions |> List.choose (fun (x, y) -> if 0 = (Array2D.get board y x) then Some (x, y) else None)
 
-let findScore board (xStart, yStart) = 
-    let rec find height (x, y) = 
-        if height = 9 then [ (x, y) ]
-        else 
-            [ (x, y - 1); (x - 1, y); (x, y + 1); (x + 1, y) ]
-            |> List.filter (Array2D.inBounds board)
-            |> List.choose (fun (x, y) -> if (height + 1) = (Array2D.get board y x) then Some (x, y) else None)
-            |> List.collect (fun (x, y) -> find (height + 1) (x, y))
-    find 0 (xStart, yStart) |> Set.ofList |> Set.count
+let findNext board height (x, y) = 
+    [ (x, y - 1); (x - 1, y); (x, y + 1); (x + 1, y) ]
+    |> List.filter (Array2D.inBounds board)
+    |> List.choose (fun (x, y) -> if (height + 1) = (Array2D.get board y x) then Some (x, y) else None)
 
-let findRating board (xStart, yStart) = 
-    let rec find height (x, y) = 
+let findScore board pos = 
+    let rec find height pos = 
+        if height = 9 then [ pos ]
+        else pos |> findNext board height |> List.collect (fun (x, y) -> find (height + 1) (x, y))
+    pos |> find 0 |> Set.ofList |> Set.count
+
+let findRating board pos = 
+    let rec find height pos = 
         if height = 9 then 1
-        else 
-            [ (x, y - 1); (x - 1, y); (x, y + 1); (x + 1, y) ]
-            |> List.filter (Array2D.inBounds board)
-            |> List.choose (fun (x, y) -> if (height + 1) = (Array2D.get board y x) then Some (x, y) else None)
-            |> List.sumBy (fun (x, y) -> find (height + 1) (x, y))
-    find 0 (xStart, yStart) 
+        else pos |> findNext board height |> List.sumBy (fun (x, y) -> find (height + 1) (x, y))
+    pos |> find 0 
 
 let run fileName = 
     let lines = readLines fileName |> List.map Seq.toList
