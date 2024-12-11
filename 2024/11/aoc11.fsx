@@ -16,31 +16,34 @@ let applyRules stone =
         else
             [stone * 2024L]
 
-let rec blink (memo : Map<int64 * int, int64 list>) (stone : int64, times : int) : (Map<int64 *int, int64 list> * int64 list) = 
-    match memo |> Map.tryFind (stone, times) with 
-    | Some result -> (memo, result)
-    | None -> 
-        let stones = applyRules stone 
-        let folder (memo : Map<int64 * int, int64 list>, result : int64 list) (stone : int64) : (Map<int64 *int, int64 list> * int64 list) = 
-            let (m, r) = blink memo (stone, times - 1)
-            (m, result @ r)  
-        let (m, r) = stones |> List.fold folder (memo, [])
-        (m, r)
+let sequence countedStones = 
+    let generator counted = 
+        let next = counted |> List.collect (fun (stone, count) -> applyRules stone |> List.map (fun s -> (s, count)))
+        let grouped = next |> List.groupBy (fun (s, n) -> s)
+        let compacted = grouped |> List.map (fun (s, lst) -> (s, lst |> List.map snd |> List.sum))
+        Some (compacted, compacted)
+    countedStones |> Seq.unfold generator 
 
-let blinking (times : int) (stones : int64 list) = 
-    let memo : Map<int64 * int, int64 list> = Map.empty
-    let rec loop (times : int) (stones : int64 list)
-
-    let folder (memo : Map<int64 * int, int64 list>, result : int64 list) (stone : int64) : (Map<int64 *int, int64 list> * int64 list) = 
-        let (m, r) = blink memo (stone, times - 1)
-        (m, result @ r)  
-    let (m, r) = stones |> List.fold folder (memo, [])
-    r 
+let blinking times stones = 
+    stones 
+    |> List.countBy id 
+    |> List.map (fun (s, c) -> (s, int64 c))
+    |> sequence 
+    |> Seq.take times 
+    |> Seq.last 
+    |> List.map snd 
+    |> List.sum
 
 let run fileName = 
     let text = File.ReadAllText fileName 
     let stones = text.Trim().Split(" ") |> Array.toList |> List.map int64 
-    stones |> blinking 25 |> List.length |> printfn "%d"
+    stones |> blinking 25 |> printfn "%d"
+    stones |> blinking 75 |> printfn "%d"
+    // let counted = stones |> List.countBy id |> List.map (fun (s, c) -> (s, int64 c))
+    // let blinked = counted |> sequence |> Seq.take 75 |> Seq.last 
+    // printfn "%A" blinked
+    // blinked |> List.map snd |> List.sum |> printfn "%d"
     // stones |> blinking 75 |> List.length |> printfn "%d"
+    0
 
 run "input"
