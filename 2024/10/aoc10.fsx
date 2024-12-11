@@ -9,8 +9,6 @@ module Array2D =
         let first = y >= 0 && y < a.GetLength(0)
         let second = x >= 0 && x < a.GetLength(1)
         first && second
-    let tryGet (a : 'a[,]) (x, y) = 
-        if inBounds a (x, y) then Some (Array2D.get a y x) else None
     let positions (a : 'a[,]) = 
         let rowCount = a.GetLength(0)
         let colCount = a.GetLength(1)
