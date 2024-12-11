@@ -16,14 +16,26 @@ let applyRules stone =
         else
             [stone * 2024L]
 
-let blink stones = 
-    stones |> List.collect applyRules
+let rec blink (memo : Map<int64 * int, int64 list>) (stone : int64, times : int) : (Map<int64 *int, int64 list> * int64 list) = 
+    match memo |> Map.tryFind (stone, times) with 
+    | Some result -> (memo, result)
+    | None -> 
+        let stones = applyRules stone 
+        let folder (memo : Map<int64 * int, int64 list>, result : int64 list) (stone : int64) : (Map<int64 *int, int64 list> * int64 list) = 
+            let (m, r) = blink memo (stone, times - 1)
+            (m, result @ r)  
+        let (m, r) = stones |> List.fold folder (memo, [])
+        (m, r)
 
-let rec blinking times stones = 
-    if times > 0 then 
-        stones |> blink |> blinking (times - 1)
-    else 
-        stones 
+let blinking (times : int) (stones : int64 list) = 
+    let memo : Map<int64 * int, int64 list> = Map.empty
+    let rec loop (times : int) (stones : int64 list)
+
+    let folder (memo : Map<int64 * int, int64 list>, result : int64 list) (stone : int64) : (Map<int64 *int, int64 list> * int64 list) = 
+        let (m, r) = blink memo (stone, times - 1)
+        (m, result @ r)  
+    let (m, r) = stones |> List.fold folder (memo, [])
+    r 
 
 let run fileName = 
     let text = File.ReadAllText fileName 
