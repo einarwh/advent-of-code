@@ -441,7 +441,7 @@ subscriptions model =
 toPlantElement : Int -> Int -> String -> Pos -> Svg Msg 
 toPlantElement plantWidth plantHeight plantStr (xInt, yInt) = 
   let 
-    xStr = String.fromInt (plantWidth + xInt * plantWidth)
+    xStr = String.fromInt ((plantWidth // 4) + xInt * plantWidth)
     yStr = String.fromInt (plantHeight + yInt * plantHeight)
   in 
     Svg.text_ [ x xStr, y yStr ] [ Svg.text plantStr ]

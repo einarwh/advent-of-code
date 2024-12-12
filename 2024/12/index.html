@@ -6564,7 +6564,7 @@ var $author$project$Aoc12$toPlantElement = F4(
 		var xInt = _v0.a;
 		var yInt = _v0.b;
 		var yStr = $elm$core$String$fromInt(plantHeight + (yInt * plantHeight));
-		var xStr = $elm$core$String$fromInt(plantWidth + (xInt * plantWidth));
+		var xStr = $elm$core$String$fromInt(((plantWidth / 4) | 0) + (xInt * plantWidth));
 		return A2(
 			$elm$svg$Svg$text_,
 			_List_fromArray(
