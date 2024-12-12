@@ -6804,7 +6804,7 @@ var $author$project$Aoc12$updateClear = function (model) {
 var $author$project$Aoc12$Highlight = function (a) {
 	return {$: 'Highlight', a: a};
 };
-var $author$project$Aoc12$updateStep = function (model) {
+var $author$project$Aoc12$updateNextStep = function (model) {
 	var z = 0;
 	var pos = model.guardPos;
 	var dir = model.guardDir;
@@ -6872,6 +6872,9 @@ var $author$project$Aoc12$updateStep = function (model) {
 			{finished: true, paused: true});
 	}
 };
+var $author$project$Aoc12$updatePrevStep = function (model) {
+	return model;
+};
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc12$updateTogglePlay = function (model) {
 	if (model.finished) {
@@ -6898,11 +6901,15 @@ var $author$project$Aoc12$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 'Tick':
 				return _Utils_Tuple2(
-					$author$project$Aoc12$updateStep(model),
+					$author$project$Aoc12$updateNextStep(model),
 					$elm$core$Platform$Cmd$none);
-			case 'Step':
+			case 'PrevStep':
 				return _Utils_Tuple2(
-					$author$project$Aoc12$updateStep(model),
+					$author$project$Aoc12$updatePrevStep(model),
+					$elm$core$Platform$Cmd$none);
+			case 'NextStep':
+				return _Utils_Tuple2(
+					$author$project$Aoc12$updateNextStep(model),
 					$elm$core$Platform$Cmd$none);
 			case 'Faster':
 				return _Utils_Tuple2(
@@ -6970,8 +6977,9 @@ var $author$project$Aoc12$update = F2(
 	});
 var $author$project$Aoc12$Clear = {$: 'Clear'};
 var $author$project$Aoc12$Faster = {$: 'Faster'};
+var $author$project$Aoc12$NextStep = {$: 'NextStep'};
+var $author$project$Aoc12$PrevStep = {$: 'PrevStep'};
 var $author$project$Aoc12$Slower = {$: 'Slower'};
-var $author$project$Aoc12$Step = {$: 'Step'};
 var $author$project$Aoc12$TogglePlay = {$: 'TogglePlay'};
 var $author$project$Aoc12$ToggleSample = {$: 'ToggleSample'};
 var $elm$json$Json$Encode$string = _Json_wrap;
@@ -7290,6 +7298,17 @@ var $author$project$Aoc12$view = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick($author$project$Aoc12$PrevStep)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Prev')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
 										$elm$html$Html$Events$onClick($author$project$Aoc12$Slower)
 									]),
 								_List_fromArray(
@@ -7323,11 +7342,11 @@ var $author$project$Aoc12$view = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Aoc12$Step)
+										$elm$html$Html$Events$onClick($author$project$Aoc12$NextStep)
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Step')
+										$elm$html$Html$text('Next')
 									]))
 							]))
 					])),

@@ -294,7 +294,8 @@ init _ =
 
 type Msg = 
   Tick 
-  | Step 
+  | PrevStep 
+  | NextStep 
   | TogglePlay 
   | Faster 
   | Slower 
@@ -316,8 +317,11 @@ updateClear : Model -> Model
 updateClear model = 
   initModel model.mode model.useSample
 
-updateStep : Model -> Model
-updateStep model = 
+updatePrevStep : Model -> Model 
+updatePrevStep model = model 
+
+updateNextStep : Model -> Model
+updateNextStep model = 
   let 
     z = 0
     pos = model.guardPos
@@ -399,9 +403,11 @@ update msg model =
     Clear -> 
       (updateClear model, Cmd.none)
     Tick ->
-      (updateStep model, Cmd.none)
-    Step ->
-      (updateStep model, Cmd.none)
+      (updateNextStep model, Cmd.none)
+    PrevStep ->
+      (updatePrevStep model, Cmd.none)
+    NextStep ->
+      (updateNextStep model, Cmd.none)
     Faster -> 
       ({model | tickInterval = model.tickInterval / 2 }, Cmd.none)
     Slower -> 
@@ -564,6 +570,9 @@ view model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
+                [ Html.Attributes.style "width" "80px", onClick PrevStep ] 
+                [ Html.text "Prev" ]
+              , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Slower ] 
                 [ text "Slower" ]
               , Html.button 
@@ -573,8 +582,8 @@ view model =
                 [ Html.Attributes.style "width" "80px", onClick Faster ] 
                 [ text "Faster" ]
               , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Step ] 
-                [ Html.text "Step" ]
+                [ Html.Attributes.style "width" "80px", onClick NextStep ] 
+                [ Html.text "Next" ]
             ] ]
       , Html.tr 
           []
