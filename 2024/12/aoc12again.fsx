@@ -22,7 +22,11 @@ module Garden =
         let height = lst |> List.length 
         Array2D.init height width (fun y x -> lst |> List.item y |> List.item x)
 
+type Garden = char[,]
+
 type Pos = (int * int)
+
+type Plot = Set<Pos>
 
 type Side = { startPos : Pos; endPos : Pos }
 
@@ -33,7 +37,7 @@ let readLines =
     >> Array.filter (fun line -> line <> String.Empty)
     >> Array.toList
 
-let rec fill (garden : char[,]) (ch : char) (x : int, y : int) (plot : Set<int * int>) = 
+let rec fill (garden : Garden) (ch : char) (x, y) (plot : Plot) = 
     if (x, y) |> Garden.inBounds garden then 
         if Set.contains (x, y) plot then plot 
         else 
@@ -47,12 +51,12 @@ let rec fill (garden : char[,]) (ch : char) (x : int, y : int) (plot : Set<int *
             else plot 
     else plot 
 
-let fillPlot (garden : char[,]) (x, y)  = 
+let fillPlot (garden : Garden) (x, y)  = 
     let ch = Garden.get garden (x, y)
     fill garden ch (x, y) Set.empty
 
-let findPlots (garden : char[,]) =
-    let rec loop (startPositions : (int*int) list) (plots : Set<int*int> list) (visited : Set<int*int>) = 
+let findPlots (garden : Garden) =
+    let rec loop (startPositions : Pos list) (plots : Plot list) (visited : Set<Pos>) = 
         match startPositions with 
         | [] -> plots 
         | pos :: remaining -> 
@@ -66,7 +70,7 @@ let findPlots (garden : char[,]) =
 
 let calculateArea plot = Set.count plot 
 
-let countBorders (garden : char[,]) (x, y) : int = 
+let countBorders (garden : Garden) (x, y) : int = 
     let isBorder plotPlant pos = 
         match Garden.tryGet garden pos with 
         | None -> true 
@@ -122,17 +126,12 @@ let rec combine (borders : Border list) : Border list =
                 | _ -> failwith "?"
             combine (combined :: filtered)
 
-let sideLength { startPos=(x1, y1); endPos=(x2, y2) } = 
-    if x1 = x2 then abs (y1 - y2)
-    else abs (x1 - x2)
-
 let combineAll (borders : Border list) : Border list = 
     let horizontals = borders |> List.filter isHorizontal |> combine
     let verticals = borders |> List.filter isVertical |> combine
-    let combined = horizontals @ verticals
-    combined
+    horizontals @ verticals
 
-let getBordersForPlot (garden : char[,]) (plot : Set<int*int>) : Border list = 
+let getBordersForPlot (garden : Garden) (plot : Plot) : Border list = 
     let xs = plot |> Set.map fst
     let ys = plot |> Set.map snd
     let xMin = xs |> Set.minElement
@@ -162,16 +161,16 @@ let getBordersForPlot (garden : char[,]) (plot : Set<int*int>) : Border list =
     let horizontalBorders = [ xMin .. xMax ] |> List.collect (findHorizontalBorders plot)
     verticalBorders @ horizontalBorders
 
-let calculateWithDiscount (garden : char[,]) (plot : Set<int*int>) = 
+let calculateWithDiscount (garden : Garden) (plot : Plot) = 
     plot 
     |> getBordersForPlot garden
     |> combineAll
     |> List.length
 
-let calculateWithoutDiscount (garden : char[,]) (plot : Set<int*int>) = 
+let calculateWithoutDiscount (garden : Garden) (plot : Plot) = 
     plot |> Set.toList |> List.sumBy (countBorders garden) 
 
-let fenceCost discount (garden : char[,]) (plot : Set<int*int>) = 
+let fenceCost discount (garden : Garden) (plot : Plot) = 
     let a = calculateArea plot
     let calculatePerimeter = if discount then calculateWithDiscount else calculateWithoutDiscount
     let p = calculatePerimeter garden plot 
@@ -191,11 +190,10 @@ let run fileName maybeExpectedPart1 maybeExpectedPart2 =
     printfn "%s" fileName
     let lines = readLines fileName |> List.map Seq.toList
     let garden = Garden.fromList lines 
-    let foo = fillPlot garden (0, 0)
-    let allPlots = findPlots garden 
-    let result1 = allPlots |> List.sumBy (fenceCost false garden) 
+    let plots = findPlots garden 
+    let result1 = plots |> List.sumBy (fenceCost false garden) 
     outputResult maybeExpectedPart1 result1
-    let result2 = allPlots |> List.sumBy (fenceCost true garden) 
+    let result2 = plots |> List.sumBy (fenceCost true garden) 
     outputResult maybeExpectedPart2 result2
     printfn ""
 
