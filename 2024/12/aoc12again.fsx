@@ -74,10 +74,10 @@ let countBorders (garden : char[,]) (x, y) : int =
     |> List.filter (isBorder plotPlant)
     |> List.length 
 
-let isHorizontal { side = { startPos=(x1, y1); endPos=(x2, y2) }; plot = _} = 
+let isHorizontal { startPos=(x1, y1); endPos=(x2, y2) } = 
     y1 = y2
 
-let isVertical { side = { startPos=(x1, y1); endPos=(x2, y2) }; plot = _} = 
+let isVertical { startPos=(x1, y1); endPos=(x2, y2) } = 
     x1 = x2
 
 let rec combine (borders : Border list) : Border list = 
@@ -87,10 +87,7 @@ let rec combine (borders : Border list) : Border list =
     | [] -> []
     | first :: rest -> 
         let fit (first : Border) (border : Border) = 
-            let sideFit = border.side.startPos = first.side.endPos || first.side.startPos = border.side.endPos
-            let plotFit = border.plot = first.plot 
-            sideFit && plotFit
-        // 
+            border.startPos = first.endPos || first.startPos = border.endPos
         match rest |> List.tryFind (fit first) with 
         | None -> 
             // printfn "No match for %A" first
@@ -101,12 +98,12 @@ let rec combine (borders : Border list) : Border list =
             // printfn "Original length: \n%d" (List.length rest)
             // printfn "Filtered length: \n%d" (List.length filtered)
             let combined = 
-                if border.side.startPos = first.side.endPos then 
-                    { startPos = first.side.startPos; endPos = border.side.endPos }
+                if border.startPos = first.endPos then 
+                    { startPos = first.startPos; endPos = border.endPos }
                 else 
-                    { startPos = border.side.startPos; endPos = first.side.endPos }
+                    { startPos = border.startPos; endPos = first.endPos }
             // printfn "Combined side\n%A" combined
-            combine ({ side = combined; plot = first.plot } :: filtered)
+            combine (combined :: filtered)
 
 let sideLength { startPos=(x1, y1); endPos=(x2, y2) } = 
     if x1 = x2 then abs (y1 - y2)
@@ -118,20 +115,14 @@ let combineAll (borders : Border list) : Border list =
     let combined = horizontals @ verticals
     combined
 
-let findPlot (allPlots : Set<int*int> list) (pos : Pos) : Set<int*int> = 
-    allPlots |> List.find (Set.contains pos)
-
-let getBorders (garden : char[,]) (allPlots : Set<int*int> list) (plot : Set<int*int>) ((x, y) : Pos) : Border list = 
-    let tryGetBorder plotPlant (pos, side) : Border option = 
+let getBorders (garden : char[,]) (plot : Set<int*int>) ((x, y) : Pos) : Border list = 
+    let tryGetBorder plotPlant (pos, border) : Border option = 
         match Garden.tryGet garden pos with 
         | None -> 
-            let border = { side = side; plot = plot }
             Some border 
         | Some plant -> 
             if plant = plotPlant then None 
             else 
-                let otherPlot : Set<Pos> = findPlot allPlots pos 
-                let border = { side = side; plot = plot }
                 Some border 
     let plotPlant = Garden.get garden (x, y)
     [ ((x, y-1), { startPos = (x, y); endPos = (x+1, y) })
@@ -140,11 +131,11 @@ let getBorders (garden : char[,]) (allPlots : Set<int*int> list) (plot : Set<int
       ((x+1, y), { startPos = (x+1, y); endPos = (x+1, y+1) }) ]
     |> List.choose (tryGetBorder plotPlant)
 
-let calculateWithDiscount (garden : char[,]) (allPlots : Set<int*int> list) (plot : Set<int*int>) = 
+let calculateWithDiscount (garden : char[,]) (plot : Set<int*int>) = 
     let borders : Border list = 
         plot 
         |> Set.toList 
-        |> List.collect (getBorders garden allPlots plot)
+        |> List.collect (getBorders garden plot)
     // printfn "%A" borders
     let combined = borders |> combineAll
     combined |> List.length
@@ -157,14 +148,14 @@ let calculateWithDiscount (garden : char[,]) (allPlots : Set<int*int> list) (plo
 let calculateWithoutDiscount (garden : char[,]) (plot : (int*int) list) = 
     plot |> List.sumBy (countBorders garden) 
 
-let calculatePerimeter (discount : bool) (garden : char[,]) (allPlots : Set<int*int> list) (plot : Set<int*int>) = 
+let calculatePerimeter (discount : bool) (garden : char[,]) (plot : Set<int*int>) = 
     let plotLst = plot |> Set.toList 
-    if discount then calculateWithDiscount garden allPlots plot
+    if discount then calculateWithDiscount garden plot
     else calculateWithoutDiscount garden plotLst
 
-let fenceCost (garden : char[,]) (allPlots : Set<int*int> list) (plot : Set<int*int>) = 
+let fenceCost (garden : char[,]) (plot : Set<int*int>) = 
     let a = calculateArea plot
-    let p = calculatePerimeter true garden allPlots plot 
+    let p = calculatePerimeter true garden plot 
     // printfn "(a:%d) * (p:%d) = %d" a p (a * p)
     a * p
 
@@ -176,7 +167,7 @@ let run fileName =
     // plots |> List.length |> printfn "%d"
     // plots |> List.map (fenceCost garden) |> printfn "%A"
     printfn "%s" fileName
-    allPlots |> List.sumBy (fenceCost garden allPlots) |> printfn "%A"
+    allPlots |> List.sumBy (fenceCost garden) |> printfn "%A"
     // [(0, 0); (1, 0); (2, 0); (3, 0)]
     // |> calculateWithDiscount garden
 
