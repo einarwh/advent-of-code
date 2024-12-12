@@ -267,8 +267,8 @@ tryGetPlantAtPos : Array2D Plant -> Pos -> Maybe Char
 tryGetPlantAtPos garden (x, y) = 
   garden |> Array2D.get y x 
 
-fill : Array2D Plant -> Plant -> Pos -> (Plot, PlotSequence) -> (Plot, PlotSequence)
-fill garden plant (x, y) (plot, seq) = 
+fillLoop : Array2D Plant -> Plant -> Pos -> (Plot, PlotSequence) -> (Plot, PlotSequence)
+fillLoop garden plant (x, y) (plot, seq) = 
   if (x, y) |> inGardenBounds garden then 
     if Set.member (x, y) plot then (plot, seq) 
     else 
@@ -281,10 +281,10 @@ fill garden plant (x, y) (plot, seq) =
               nextSeq = nextPlot :: seq 
             in 
               (nextPlot, nextSeq)
-              |> fill garden plant ((x - 1), y)
-              |> fill garden plant ((x + 1), y)
-              |> fill garden plant (x, (y - 1))
-              |> fill garden plant (x, (y + 1))
+              |> fillLoop garden plant ((x - 1), y)
+              |> fillLoop garden plant ((x + 1), y)
+              |> fillLoop garden plant (x, (y - 1))
+              |> fillLoop garden plant (x, (y + 1))
           else (plot, seq) 
   else (plot, seq) 
 
@@ -294,9 +294,9 @@ fillPlot garden pos =
     Nothing -> Nothing 
     Just plant -> 
       let 
-        (plot, seq) = fill garden plant pos (Set.empty, []) 
+        (plot, seq) = fillLoop garden plant pos (Set.empty, []) 
       in 
-        Just (plant, plot, seq)
+        Just (plant, plot, seq |> List.reverse)
 
 findPlotsLoop : Array2D Plant -> List (Plant, Plot, PlotSequence) -> Set Pos -> List Pos -> List (Plant, Plot, PlotSequence) 
 findPlotsLoop garden plotList visited positions = 
@@ -340,10 +340,11 @@ initModel dataSource =
     garden = data |> String.split "\n" |> List.map (String.toList) |> Array2D.fromList
     plotList = findPlots garden 
     plotInfoList = plotList |> List.map toPlotInfo 
+    maxSteps = plotInfoList |> List.map (\pi -> pi.totalSteps) |> List.maximum |> Maybe.withDefault 0
   in 
     { plotInfoList = plotInfoList  
     , step = 0 
-    , maxSteps = 0
+    , maxSteps = maxSteps
     , totalCost = 0 
     , totalCostDiscount = 0  
     , dataSource = dataSource
@@ -354,7 +355,7 @@ initModel dataSource =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel SampleAbba, Cmd.none)
+  (initModel SampleLarger, Cmd.none)
 
 -- UPDATE
 
@@ -378,10 +379,19 @@ updateClear model =
   initModel model.dataSource
 
 updatePrevStep : Model -> Model 
-updatePrevStep model = model 
+updatePrevStep model =
+  let 
+    prevStep = Basics.max 0 (model.step - 1)
+  in 
+    { model | step = prevStep, message = "Prev step."}
+
 
 updateNextStep : Model -> Model
-updateNextStep model = model 
+updateNextStep model =
+  let 
+    nextStep = Basics.min model.maxSteps (model.step + 1)
+  in 
+    { model | step = nextStep, message = "Next step : " ++ String.fromInt nextStep }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -444,32 +454,55 @@ toPlantElement plantWidth plantHeight plantStr (xInt, yInt) =
     xStr = String.fromInt ((plantWidth // 4) + xInt * plantWidth)
     yStr = String.fromInt (plantHeight + yInt * plantHeight)
   in 
-    Svg.text_ [ x xStr, y yStr ] [ Svg.text plantStr ]
+    Svg.text_ [ x xStr, y yStr, Svg.Attributes.style "background-color:pink" ] [ Svg.text plantStr ]
 
-toPlotSvgElements : Int -> Int -> PlotInfo -> List (Svg Msg)
-toPlotSvgElements plantWidth plantHeight plotInfo = 
+toFilledElement : Int -> Int -> String -> Pos -> Svg Msg 
+toFilledElement plantWidth plantHeight colorStr (xInt, yInt) = 
+  let 
+    xStr = String.fromInt (2 + xInt * plantWidth)
+    yStr = String.fromInt (2 + yInt * plantHeight)
+  in 
+    rect
+          [ x xStr
+          , y yStr
+          , width (String.fromInt plantWidth)
+          , height (String.fromInt plantHeight)
+          , fill colorStr
+          ]
+          []
+
+toPlotSvgElements : Int -> Int -> Int -> PlotInfo -> List (Svg Msg)
+toPlotSvgElements step plantWidth plantHeight plotInfo = 
   let 
     posList = plotInfo.complete |> Set.toList 
     plantStr = String.fromChar plotInfo.plant 
-    plants = posList |> List.map (toPlantElement plantWidth plantHeight plantStr)
-    foo = 17
+    plantElements = posList |> List.map (toPlantElement plantWidth plantHeight plantStr)
+    filled = 
+      if step == 0 then [] 
+      else 
+        case plotInfo.sequence |> List.drop (step - 1) |> List.head of 
+          Just plot -> plot |> Set.toList 
+          Nothing -> posList
+    filledElements = filled |> List.map (toFilledElement plantWidth plantHeight "lightgreen")
   in 
-    plants
+    filledElements ++ plantElements
 
 toSvg : Model -> Html Msg 
 toSvg model = 
   let 
     plantWidth = 12
     plantHeight = 16  
+    step = model.step 
     plotInfoList = model.plotInfoList 
-    elements = model.plotInfoList |> List.concatMap (toPlotSvgElements plantWidth plantHeight)
+    elements = model.plotInfoList |> List.concatMap (toPlotSvgElements step plantWidth plantHeight)
     rects = []
   in 
     svg
       [ viewBox "0 0 600 600"
       , width "600"
       , height "600"
-      , Svg.Attributes.style "background-color:lightgreen; font-family:Source Code Pro,monospace"
+      -- , Svg.Attributes.style "background-color:lightgreen; font-family:Source Code Pro,monospace"
+      , Svg.Attributes.style "font-family:Source Code Pro,monospace"
       ]
       elements
 
@@ -559,8 +592,8 @@ view model =
               , Html.Attributes.style "font-size" "24px"
               , Html.Attributes.style "width" "200px" ] 
               [ 
-                Html.div [] [ Html.text "foo" ]
-              , Html.div [] [ Html.text "bar" ]
+                Html.div [] [ Html.text (String.fromInt model.step) ]
+              , Html.div [] [ Html.text model.message ]
               ] ]
       , Html.tr 
           []
