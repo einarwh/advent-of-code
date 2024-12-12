@@ -3,10 +3,10 @@
 
 open System
 open System.IO
+open System.Diagnostics
 
 let applyRules stone = 
-    if stone = 0L then 
-        [1L]
+    if stone = 0L then [1L]
     else 
         let s = stone.ToString()
         if s.Length % 2 = 0 then 
@@ -16,19 +16,19 @@ let applyRules stone =
         else
             [stone * 2024L]
 
-let sequence countedStones = 
-    let generator counted = 
-        let next = counted |> List.collect (fun (stone, count) -> applyRules stone |> List.map (fun s -> (s, count)))
-        let grouped = next |> List.groupBy (fun (s, n) -> s)
-        let compacted = grouped |> List.map (fun (s, lst) -> (s, lst |> List.map snd |> List.sum))
-        Some (compacted, compacted)
-    countedStones |> Seq.unfold generator 
+let generator counted = 
+    let compacted = 
+        counted 
+        |> List.collect (fun (stone, count) -> applyRules stone |> List.map (fun s -> (s, count)))
+        |> List.groupBy (fun (s, n) -> s)
+        |> List.map (fun (s, lst) -> (s, lst |> List.map snd |> List.sum))
+    Some (compacted, compacted)
 
 let blinking times stones = 
     stones 
     |> List.countBy id 
     |> List.map (fun (s, c) -> (s, int64 c))
-    |> sequence 
+    |> Seq.unfold generator  
     |> Seq.take times 
     |> Seq.last 
     |> List.map snd 
@@ -38,12 +38,7 @@ let run fileName =
     let text = File.ReadAllText fileName 
     let stones = text.Trim().Split(" ") |> Array.toList |> List.map int64 
     stones |> blinking 25 |> printfn "%d"
+    let sw = Stopwatch.StartNew()
     stones |> blinking 75 |> printfn "%d"
-    // let counted = stones |> List.countBy id |> List.map (fun (s, c) -> (s, int64 c))
-    // let blinked = counted |> sequence |> Seq.take 75 |> Seq.last 
-    // printfn "%A" blinked
-    // blinked |> List.map snd |> List.sum |> printfn "%d"
-    // stones |> blinking 75 |> List.length |> printfn "%d"
-    0
 
 run "input"
