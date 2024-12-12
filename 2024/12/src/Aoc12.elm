@@ -271,66 +271,55 @@ tryGetPlantAtPos : Array2D Char -> Pos -> Maybe Char
 tryGetPlantAtPos garden (x, y) = 
   garden |> Array2D.get y x 
 
--- let rec fill garden ch (x, y) plot = 
---     if (x, y) |> Garden.inBounds garden then 
---         if Set.contains (x, y) plot then plot 
---         else 
---             if ch = Garden.get garden (x, y) then 
---                 plot 
---                 |> Set.add (x, y)
---                 |> fill garden ch ((x - 1), y) 
---                 |> fill garden ch ((x + 1), y) 
---                 |> fill garden ch (x, (y - 1)) 
---                 |> fill garden ch (x, (y + 1))
---             else plot 
---     else plot 
-
-fill : Array2D Char -> Char -> Pos -> Set Pos -> Set Pos
-fill garden plant (x, y) plot = 
+fill : Array2D Char -> Char -> Pos -> (Plot, PlotSequence) -> (Plot, PlotSequence)
+fill garden plant (x, y) (plot, seq) = 
   if (x, y) |> inGardenBounds garden then 
-    if Set.member (x, y) plot then plot 
+    if Set.member (x, y) plot then (plot, seq) 
     else 
       case tryGetPlantAtPos garden (x, y) of 
-        Nothing -> plot
+        Nothing -> (plot, seq)
         Just plantFound -> 
           if plantFound == plant then 
-            plot 
-            |> Set.insert (x, y)
-            |> fill garden plant ((x - 1), y)
-            |> fill garden plant ((x + 1), y)
-            |> fill garden plant (x, (y - 1))
-            |> fill garden plant (x, (y + 1))
-          else plot 
-  else plot 
+            let 
+              nextPlot = plot |> Set.insert (x, y) 
+              nextSeq = nextPlot :: seq 
+            in 
+              (nextPlot, nextSeq)
+              |> fill garden plant ((x - 1), y)
+              |> fill garden plant ((x + 1), y)
+              |> fill garden plant (x, (y - 1))
+              |> fill garden plant (x, (y + 1))
+          else (plot, seq) 
+  else (plot, seq) 
 
-fillPlot : Array2D Char -> Pos -> Set Pos 
+fillPlot : Array2D Char -> Pos -> (Plot, PlotSequence) 
 fillPlot garden pos = 
   case tryGetPlantAtPos garden pos of 
-    Nothing -> Set.empty 
+    Nothing -> (Set.empty, []) 
     Just plant -> 
-      fill garden plant pos Set.empty 
+      fill garden plant pos (Set.empty, []) 
 
-findPlotsLoop : Array2D Char -> List (Set Pos) -> Set Pos -> List Pos -> List (Set Pos) 
-findPlotsLoop garden plots visited positions = 
+findPlotsLoop : Array2D Char -> List (Plot, PlotSequence) -> Set Pos -> List Pos -> List (Plot, PlotSequence) 
+findPlotsLoop garden plotList visited positions = 
   case positions of 
-    [] -> plots 
+    [] -> plotList
     (pos :: remaining) -> 
       if visited |> Set.member pos then 
-        remaining |> findPlotsLoop garden plots visited 
+        remaining |> findPlotsLoop garden plotList visited 
       else 
         let 
-          plot = fillPlot garden pos 
+          (plot, seq) = fillPlot garden pos 
         in 
-          remaining |> findPlotsLoop garden (plot :: plots) (Set.union visited plot)
+          remaining |> findPlotsLoop garden ((plot, seq) :: plotList) (Set.union visited plot)
 
-findPlots : Array2D Char -> List (Set Pos)
+findPlots : Array2D Char -> List (Plot, PlotSequence)
 findPlots garden = 
   garden |> getAllPositions |> findPlotsLoop garden [] Set.empty
 
-toPlotInfo : Plot -> PlotInfo 
-toPlotInfo plot = 
+toPlotInfo : (Plot, PlotSequence) -> PlotInfo 
+toPlotInfo (plot, seq) = 
   { complete = plot  
-  , sequence = []
+  , sequence = seq
   , totalSteps = 0 
   , plant = "?" 
   , color = "#FFCCDD"
@@ -345,8 +334,8 @@ initModel dataSource =
   let 
     data = read dataSource
     garden = data |> String.split "\n" |> List.map (String.toList) |> Array2D.fromList
-    plots = findPlots garden 
-    plotInfoList = plots |> List.map toPlotInfo 
+    plotList = findPlots garden 
+    plotInfoList = plotList |> List.map toPlotInfo 
   in 
     { plotInfoList = plotInfoList  
     , step = 0 

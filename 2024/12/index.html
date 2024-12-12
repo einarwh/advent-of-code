@@ -5515,9 +5515,11 @@ var $author$project$Aoc12$tryGetPlantAtPos = F2(
 		return A3($tortus$elm_array_2d$Array2D$get, y, x, garden);
 	});
 var $author$project$Aoc12$fill = F4(
-	function (garden, plant, _v0, plot) {
+	function (garden, plant, _v0, _v1) {
 		var x = _v0.a;
 		var y = _v0.b;
+		var plot = _v1.a;
+		var seq = _v1.b;
 		if (A2(
 			$author$project$Aoc12$inGardenBounds,
 			garden,
@@ -5526,54 +5528,65 @@ var $author$project$Aoc12$fill = F4(
 				$elm$core$Set$member,
 				_Utils_Tuple2(x, y),
 				plot)) {
-				return plot;
+				return _Utils_Tuple2(plot, seq);
 			} else {
-				var _v1 = A2(
+				var _v2 = A2(
 					$author$project$Aoc12$tryGetPlantAtPos,
 					garden,
 					_Utils_Tuple2(x, y));
-				if (_v1.$ === 'Nothing') {
-					return plot;
+				if (_v2.$ === 'Nothing') {
+					return _Utils_Tuple2(plot, seq);
 				} else {
-					var plantFound = _v1.a;
-					return _Utils_eq(plantFound, plant) ? A4(
-						$author$project$Aoc12$fill,
-						garden,
-						plant,
-						_Utils_Tuple2(x, y + 1),
-						A4(
+					var plantFound = _v2.a;
+					if (_Utils_eq(plantFound, plant)) {
+						var nextPlot = A2(
+							$elm$core$Set$insert,
+							_Utils_Tuple2(x, y),
+							plot);
+						var nextSeq = A2($elm$core$List$cons, nextPlot, seq);
+						return A4(
 							$author$project$Aoc12$fill,
 							garden,
 							plant,
-							_Utils_Tuple2(x, y - 1),
+							_Utils_Tuple2(x, y + 1),
 							A4(
 								$author$project$Aoc12$fill,
 								garden,
 								plant,
-								_Utils_Tuple2(x + 1, y),
+								_Utils_Tuple2(x, y - 1),
 								A4(
 									$author$project$Aoc12$fill,
 									garden,
 									plant,
-									_Utils_Tuple2(x - 1, y),
-									A2(
-										$elm$core$Set$insert,
-										_Utils_Tuple2(x, y),
-										plot))))) : plot;
+									_Utils_Tuple2(x + 1, y),
+									A4(
+										$author$project$Aoc12$fill,
+										garden,
+										plant,
+										_Utils_Tuple2(x - 1, y),
+										_Utils_Tuple2(nextPlot, nextSeq)))));
+					} else {
+						return _Utils_Tuple2(plot, seq);
+					}
 				}
 			}
 		} else {
-			return plot;
+			return _Utils_Tuple2(plot, seq);
 		}
 	});
 var $author$project$Aoc12$fillPlot = F2(
 	function (garden, pos) {
 		var _v0 = A2($author$project$Aoc12$tryGetPlantAtPos, garden, pos);
 		if (_v0.$ === 'Nothing') {
-			return $elm$core$Set$empty;
+			return _Utils_Tuple2($elm$core$Set$empty, _List_Nil);
 		} else {
 			var plant = _v0.a;
-			return A4($author$project$Aoc12$fill, garden, plant, pos, $elm$core$Set$empty);
+			return A4(
+				$author$project$Aoc12$fill,
+				garden,
+				plant,
+				pos,
+				_Utils_Tuple2($elm$core$Set$empty, _List_Nil));
 		}
 	});
 var $elm$core$Dict$foldl = F3(
@@ -5613,20 +5626,25 @@ var $elm$core$Set$union = F2(
 			A2($elm$core$Dict$union, dict1, dict2));
 	});
 var $author$project$Aoc12$findPlotsLoop = F4(
-	function (garden, plots, visited, positions) {
+	function (garden, plotList, visited, positions) {
 		if (!positions.b) {
-			return plots;
+			return plotList;
 		} else {
 			var pos = positions.a;
 			var remaining = positions.b;
 			if (A2($elm$core$Set$member, pos, visited)) {
-				return A4($author$project$Aoc12$findPlotsLoop, garden, plots, visited, remaining);
+				return A4($author$project$Aoc12$findPlotsLoop, garden, plotList, visited, remaining);
 			} else {
-				var plot = A2($author$project$Aoc12$fillPlot, garden, pos);
+				var _v1 = A2($author$project$Aoc12$fillPlot, garden, pos);
+				var plot = _v1.a;
+				var seq = _v1.b;
 				return A4(
 					$author$project$Aoc12$findPlotsLoop,
 					garden,
-					A2($elm$core$List$cons, plot, plots),
+					A2(
+						$elm$core$List$cons,
+						_Utils_Tuple2(plot, seq),
+						plotList),
 					A2($elm$core$Set$union, visited, plot),
 					remaining);
 			}
@@ -6053,8 +6071,10 @@ var $elm$core$String$foldr = _String_foldr;
 var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
 };
-var $author$project$Aoc12$toPlotInfo = function (plot) {
-	return {area: 0, color: '#FFCCDD', complete: plot, fenceCost: 0, fenceCostDiscount: 0, perimeter: 0, perimeterDiscount: 0, plant: '?', sequence: _List_Nil, totalSteps: 0};
+var $author$project$Aoc12$toPlotInfo = function (_v0) {
+	var plot = _v0.a;
+	var seq = _v0.b;
+	return {area: 0, color: '#FFCCDD', complete: plot, fenceCost: 0, fenceCostDiscount: 0, perimeter: 0, perimeterDiscount: 0, plant: '?', sequence: seq, totalSteps: 0};
 };
 var $author$project$Aoc12$initModel = function (dataSource) {
 	var data = $author$project$Aoc12$read(dataSource);
@@ -6063,8 +6083,8 @@ var $author$project$Aoc12$initModel = function (dataSource) {
 			$elm$core$List$map,
 			$elm$core$String$toList,
 			A2($elm$core$String$split, '\n', data)));
-	var plots = $author$project$Aoc12$findPlots(garden);
-	var plotInfoList = A2($elm$core$List$map, $author$project$Aoc12$toPlotInfo, plots);
+	var plotList = $author$project$Aoc12$findPlots(garden);
+	var plotInfoList = A2($elm$core$List$map, $author$project$Aoc12$toPlotInfo, plotList);
 	return {dataSource: dataSource, finished: false, maxSteps: 0, message: '?', paused: true, plotInfoList: plotInfoList, step: 0, tickInterval: $author$project$Aoc12$defaultTickInterval, totalCost: 0, totalCostDiscount: 0};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
