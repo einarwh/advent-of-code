@@ -29,7 +29,7 @@ main =
 
 type alias Pos = (Int, Int)
 
-type DataSource = Input | Sample | SampleXo | SampleLarger | SampleE | SampleAbba
+type DataSource = Input | Sample | SampleXoXo | SampleLarger | SampleEShape | SampleAbba
 
 type alias Plant = Char 
 
@@ -73,7 +73,7 @@ ABBAAA
 ABBAAA
 AAAAAA"""
 
-sampleE = """EEEEE
+sampleEShape = """EEEEE
 EXXXX
 EEEEE
 EXXXX
@@ -90,7 +90,7 @@ MIIIIIJJEE
 MIIISIJEEE
 MMMISSJEEE"""
 
-sampleXo = """OOOOO
+sampleXoXo = """OOOOO
 OXOXO
 OOOOO
 OXOXO
@@ -243,9 +243,9 @@ read dataSource =
     Input -> input
     Sample -> sample
     SampleAbba -> sampleAbba
-    SampleE -> sampleE 
+    SampleEShape -> sampleEShape
     SampleLarger -> sampleLarger
-    SampleXo -> sampleXo
+    SampleXoXo -> sampleXoXo
 
 getAllPositions : Array2D Plant -> List Pos
 getAllPositions board = 
@@ -354,7 +354,7 @@ initModel dataSource =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel Sample, Cmd.none)
+  (initModel SampleAbba, Cmd.none)
 
 -- UPDATE
 
@@ -366,7 +366,12 @@ type Msg =
   | Faster 
   | Slower 
   | Clear 
-  | ChangeDataSource 
+  | UseInput
+  | UseSample
+  | UseXoXo
+  | UseLarger
+  | UseEShape
+  | UseAbba
 
 updateClear : Model -> Model
 updateClear model = 
@@ -388,12 +393,9 @@ updateTogglePlay model =
   else 
     { model | paused = not model.paused }
 
-updateToggleSample : Model -> Model
-updateToggleSample model = 
-  let
-    dataSource = model.dataSource
-  in
-    initModel dataSource 
+updateUseInput : Model -> Model
+updateUseInput model = 
+  initModel Input 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -412,8 +414,18 @@ update msg model =
       ({model | tickInterval = model.tickInterval * 2 }, Cmd.none)
     TogglePlay -> 
       (updateTogglePlay model, Cmd.none)
-    ChangeDataSource -> 
-      (updateToggleSample model, Cmd.none)
+    UseInput -> 
+      (initModel Input, Cmd.none)
+    UseSample -> 
+      (initModel Sample, Cmd.none)
+    UseXoXo -> 
+      (initModel SampleXoXo, Cmd.none)
+    UseLarger -> 
+      (initModel SampleLarger, Cmd.none)
+    UseEShape -> 
+      (initModel SampleEShape, Cmd.none)
+    UseAbba -> 
+      (initModel SampleAbba, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -425,28 +437,6 @@ subscriptions model =
     tickSub
 
 -- VIEW
-
--- toCharElement : Array2D Cell -> Pos -> Html Msg 
--- toCharElement vizBoard (x, y) = 
---     case Array2D.get y x vizBoard of 
---       Nothing -> Html.text "?"
---       Just cell -> 
---         case cell of 
---           Highlight ch -> 
---             (Html.span [Html.Attributes.style "background-color" "#CCCCCC" ] [ Html.text (String.fromChar ch) ]) 
---           Plain ch -> 
---             Html.text (String.fromChar ch)
-
-  -- { complete : Plot  
-  -- , sequence : PlotSequence
-  -- , totalSteps : Int 
-  -- , plant : Plant 
-  -- , color : String
-  -- , area : Int 
-  -- , perimeter : Int
-  -- , perimeterDiscount : Int
-  -- , fenceCost : Int 
-  -- , fenceCostDiscount : Int }
 
 toPlantElement : Int -> Int -> String -> Pos -> Svg Msg 
 toPlantElement plantWidth plantHeight plantStr (xInt, yInt) = 
@@ -470,7 +460,7 @@ toSvg : Model -> Html Msg
 toSvg model = 
   let 
     plantWidth = 12
-    plantHeight = 16
+    plantHeight = 16  
     plotInfoList = model.plotInfoList 
     elements = model.plotInfoList |> List.concatMap (toPlotSvgElements plantWidth plantHeight)
     rects = []
@@ -501,28 +491,41 @@ view model =
               , Html.Attributes.style "padding" "20px"]
               [ Html.div [] [Html.text "Advent of Code 2024" ]
               , Html.div [] [Html.text "Day 12: Garden Groups." ] ] ]
-      -- , Html.tr 
-      --     []
-      --     [ Html.td 
-      --         [ Html.Attributes.align "center" ]
-      --         [ Html.input 
-      --           [ Html.Attributes.type_ "radio", onClick EnablePart1, Html.Attributes.checked (model.mode == Part1) ] 
-      --           []
-      --         , Html.label [] [ Html.text "Part 1" ]
-      --         , Html.input 
-      --           [ Html.Attributes.type_ "radio", onClick EnablePart2, Html.Attributes.checked (model.mode == Part2) ] 
-      --           []
-      --         , Html.label [] [ Html.text "Part 2" ]
-      --       ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center" ]
+              [ Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseInput, Html.Attributes.checked (model.dataSource == Input) ] 
+                []
+              , Html.label [] [ Html.text "Input" ]
+              , Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseSample, Html.Attributes.checked (model.dataSource == Sample) ] 
+                []
+              , Html.label [] [ Html.text "Sample" ]
+              , Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseXoXo, Html.Attributes.checked (model.dataSource == SampleXoXo) ] 
+                []
+              , Html.label [] [ Html.text "XOXO" ]
+              , Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseLarger, Html.Attributes.checked (model.dataSource == SampleLarger) ] 
+                []
+              , Html.label [] [ Html.text "Larger" ]
+              , Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseEShape, Html.Attributes.checked (model.dataSource == SampleEShape) ] 
+                []
+              , Html.label [] [ Html.text "E-shape" ]
+              , Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseAbba, Html.Attributes.checked (model.dataSource == SampleAbba) ] 
+                []
+              , Html.label [] [ Html.text "ABBA" ]
+            ] ]
       , Html.tr 
           []
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
-                [ Html.Attributes.style "width" "80px", onClick ChangeDataSource ] 
-                [ Html.text "Input?" ]
-              , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Clear ] 
                 [ Html.text "Clear" ] 
             ] ]
