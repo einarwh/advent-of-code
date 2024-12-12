@@ -26,7 +26,7 @@ type Pos = (int * int)
 
 type Side = { startPos : Pos; endPos : Pos }
 
-type Border = { side : Side; plots : Set<int*int> list }
+type Border = { side : Side; plot : Set<int*int> }
 
 let readLines = 
     File.ReadAllLines
@@ -76,10 +76,10 @@ let countBorders (garden : char[,]) (x, y) : int =
     |> List.filter (isBorder plotPlant)
     |> List.length 
 
-let isHorizontal { side = { startPos=(x1, y1); endPos=(x2, y2) }; plots = _} = 
+let isHorizontal { side = { startPos=(x1, y1); endPos=(x2, y2) }; plot = _} = 
     y1 = y2
 
-let isVertical { side = { startPos=(x1, y1); endPos=(x2, y2) }; plots = _} = 
+let isVertical { side = { startPos=(x1, y1); endPos=(x2, y2) }; plot = _} = 
     x1 = x2
 
 let rec combine (borders : Border list) : Border list = 
@@ -147,9 +147,9 @@ let calculateWithDiscount (garden : char[,]) (allPlots : Set<int*int> list) (plo
         plot 
         |> Set.toList 
         |> List.collect (getBorders garden allPlots plot)
-    printfn "%A" borders
+    // printfn "%A" borders
     let combined = borders |> combineAll
-    0
+    combined |> List.length
     // let bar = 
     //     foo 
     //     |> combineAll 
@@ -167,7 +167,7 @@ let calculatePerimeter (discount : bool) (garden : char[,]) (allPlots : Set<int*
 let fenceCost (garden : char[,]) (allPlots : Set<int*int> list) (plot : Set<int*int>) = 
     let a = calculateArea plot
     let p = calculatePerimeter true garden allPlots plot 
-    printfn "(a:%d) * (p:%d) = %d" a p (a * p)
+    // printfn "(a:%d) * (p:%d) = %d" a p (a * p)
     a * p
 
 let run fileName = 
@@ -189,6 +189,7 @@ run "sample-xo"     // 436
 run "sample-larger" // 1206
 run "sample-e"      // 236
 run "sample-abba"   // 368
+// run "input"         // ???
 
 printfn "\n\nExpected"
 printfn "========="
