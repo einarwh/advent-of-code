@@ -93,8 +93,6 @@ let isVertical border =
     | Exit side -> isVerticalSide side 
 
 let rec combine (borders : Border list) : Border list = 
-    // printfn "---"
-    // printfn "Combine\n %A" borders
     match borders with 
     | [] -> []
     | first :: rest -> 
@@ -107,10 +105,8 @@ let rec combine (borders : Border list) : Border list =
             | _ -> false
         match rest |> List.tryFind (fit first) with 
         | None -> 
-            // printfn "No match for %A" first
             first :: combine rest 
         | Some border -> 
-            // printfn "Found match for %A: %A" first border
             let filtered = rest |> List.filter ((<>) border)
             let combineSides side1 side2 = 
                 if side2.startPos = side1.endPos then 
@@ -143,11 +139,6 @@ let getBordersForPlot (garden : char[,]) (plot : Set<int*int>) : Border list =
     let xMax = xs |> Set.maxElement
     let yMin = ys |> Set.minElement
     let yMax = ys |> Set.maxElement
-    // printfn "Plot: %A" plot 
-    // printfn "xMin: %d" xMin
-    // printfn "xMax: %d" xMax
-    // printfn "yMin: %d" yMin
-    // printfn "yMax: %d" yMax
     let xRange = [ (xMin - 1) .. (xMax + 1) ]
     let yRange = [ (yMin - 1) .. (yMax + 1) ]
     let checkBorder before after endPos : Border option = 
@@ -156,80 +147,61 @@ let getBordersForPlot (garden : char[,]) (plot : Set<int*int>) : Border list =
         | true, false -> Some <| Exit ({ startPos = after; endPos = endPos })
         | _ -> None 
     let findVerticalBorders plot y0 = 
-        // printfn "findVerticalBorders for y0: %d" y0
         let xs = plot |> Set.filter (fun (x, y) -> y = y0) |> Set.map fst
         let xMin = xs |> Set.minElement
         let xMax = xs |> Set.maxElement
         let xRange = [ (xMin - 1) .. (xMax + 1) ]
-        // printfn "x-range: %A" xRange
         xRange |> List.pairwise |> List.choose (fun (x1, x2) -> checkBorder (x1, y0) (x2, y0) (x2, y0 + 1))
     let findHorizontalBorders plot x0 = 
-        // printfn "findHorizontalBorders for x0: %d" x0
         let ys = plot |> Set.filter (fun (x, y) -> x = x0) |> Set.map snd
         let yMin = ys |> Set.minElement
         let yMax = ys |> Set.maxElement
         let yRange = [ (yMin - 1) .. (yMax + 1) ]
-        // printfn "y-range: %A" yRange
         yRange |> List.pairwise |> List.choose (fun (y1, y2) -> checkBorder (x0, y1) (x0, y2) (x0+1, y2))
     let verticalBorders = [ yMin .. yMax ] |> List.collect (findVerticalBorders plot)
     let horizontalBorders = [ xMin .. xMax ] |> List.collect (findHorizontalBorders plot)
     verticalBorders @ horizontalBorders
 
 let calculateWithDiscount (garden : char[,]) (plot : Set<int*int>) = 
-    let borders : Border list = plot |> getBordersForPlot garden
-    // printfn "Border count. %A" (List.length borders)
-    let combined = borders |> combineAll
-    // printfn "Combined count. %A" (List.length combined)
-    combined |> List.length
-    // let bar = 
-    //     foo 
-    //     |> combineAll 
-    //     |> List.length
-    // foo
+    plot 
+    |> getBordersForPlot garden
+    |> combineAll
+    |> List.length
 
-let calculateWithoutDiscount (garden : char[,]) (plot : (int*int) list) = 
-    plot |> List.sumBy (countBorders garden) 
+let calculateWithoutDiscount (garden : char[,]) (plot : Set<int*int>) = 
+    plot |> Set.toList |> List.sumBy (countBorders garden) 
 
-let calculatePerimeter (discount : bool) (garden : char[,]) (plot : Set<int*int>) = 
-    let plotLst = plot |> Set.toList 
-    if discount then calculateWithDiscount garden plot
-    else calculateWithoutDiscount garden plotLst
-
-let fenceCost (garden : char[,]) (plot : Set<int*int>) = 
+let fenceCost discount (garden : char[,]) (plot : Set<int*int>) = 
     let a = calculateArea plot
-    let p = calculatePerimeter true garden plot 
-    // printfn "(a:%d) * (p:%d) = %d" a p (a * p)
+    let calculatePerimeter = if discount then calculateWithDiscount else calculateWithoutDiscount
+    let p = calculatePerimeter garden plot 
     a * p
 
-let run fileName = 
+let outputResult maybeExpected result = 
+    match maybeExpected with 
+    | None -> 
+        printfn "%d" result 
+    | Some expected -> 
+        if result = expected then 
+            printfn "%d ✓" result 
+        else 
+            printfn "%d vs %d ✗" result expected
+
+let run fileName maybeExpectedPart1 maybeExpectedPart2 = 
+    printfn "%s" fileName
     let lines = readLines fileName |> List.map Seq.toList
     let garden = Garden.fromList lines 
     let foo = fillPlot garden (0, 0)
     let allPlots = findPlots garden 
-    // plots |> List.length |> printfn "%d"
-    // plots |> List.map (fenceCost garden) |> printfn "%A"
-    // printfn "%s" fileName
-    allPlots |> List.sumBy (fenceCost garden) |> printfn "%A"
-    // [(0, 0); (1, 0); (2, 0); (3, 0)]
-    // |> Set.ofList
-    // |> calculateWithDiscount garden
-    // |> printfn "%d"
-    // // |> List.iter (printfn "%A")
+    let result1 = allPlots |> List.sumBy (fenceCost false garden) 
+    outputResult maybeExpectedPart1 result1
+    let result2 = allPlots |> List.sumBy (fenceCost true garden) 
+    outputResult maybeExpectedPart2 result2
+    printfn ""
 
-    // [(0, 0); (1, 0); (2, 0); (3, 0)]
-    // |> calculateWithDiscount garden
-
-// run "sample"
-
-// printfn "\nActual"
-// printfn "======"
-run "sample"        // 80
-run "sample-xo"     // 436
-run "sample-larger" // 1206
-run "sample-e"      // 236
-run "sample-abba"   // 368
-run "input"         // ???
-
-printfn "\n\nExpected"
-printfn "========="
-[80;436;1206;236;368] |> List.iter (printfn "%d")
+run "sample" (Some 140) (Some 80)       
+run "sample-xo" (Some 772) (Some 436)    
+run "sample-larger" (Some 1930) (Some 1206) 
+run "sample-e" None (Some 236) 
+run "sample-abba" None (Some 368)
+run "input" None None
