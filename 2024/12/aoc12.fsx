@@ -90,7 +90,7 @@ let rec combine (borders : Border list) : Border list =
     | first :: rest -> 
         let fit (first : Border) (border : Border) = 
             let sideFit = border.side.startPos = first.side.endPos || first.side.startPos = border.side.endPos
-            let plotFit = border.plots = first.plots 
+            let plotFit = border.plot = first.plot 
             sideFit && plotFit
         // 
         match rest |> List.tryFind (fit first) with 
@@ -108,7 +108,7 @@ let rec combine (borders : Border list) : Border list =
                 else 
                     { startPos = border.side.startPos; endPos = first.side.endPos }
             // printfn "Combined side\n%A" combined
-            combine ({ side = combined; plots = first.plots } :: filtered)
+            combine ({ side = combined; plot = first.plot } :: filtered)
 
 let sideLength { startPos=(x1, y1); endPos=(x2, y2) } = 
     if x1 = x2 then abs (y1 - y2)
@@ -127,13 +127,13 @@ let getBorders (garden : char[,]) (allPlots : Set<int*int> list) (plot : Set<int
     let tryGetBorder plotPlant (pos, side) : Border option = 
         match Garden.tryGet garden pos with 
         | None -> 
-            let border = { side = side; plots = [plot; Set.empty] }
+            let border = { side = side; plot = plot }
             Some border 
         | Some plant -> 
             if plant = plotPlant then None 
             else 
                 let otherPlot : Set<Pos> = findPlot allPlots pos 
-                let border = { side = side; plots = [plot; otherPlot] }
+                let border = { side = side; plot = plot }
                 Some border 
     let plotPlant = Garden.get garden (x, y)
     [ ((x, y-1), { startPos = (x, y); endPos = (x+1, y) })
