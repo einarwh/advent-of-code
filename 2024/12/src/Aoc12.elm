@@ -237,8 +237,6 @@ GGGGGGQQQQQQQPPPPPPPWWWWWWWWWIIIIIIQQQQQNNNNNNNNNNNNNZZZZZZZZZZZZZZZZEEEEEZZZZZZ
 GGGQQQQQQQQQQQPPPPRRWWWWWWWWWIIIIIIQQQQQNNNNNNNNNNNVNZZZZZZZZZZZZZZZZZZEZZZZZZZZZZOOOOOOOOOHHHHHHHHHHKKKKKTTSSSSNNNWNNIIIIIIIIIIIIIIIISSSSSG
 GEGQQQQQQQQQQQQQPRRRWLLWWZIIIIIIIIIQQQQQNMNNNNNNNNNNNNNZZZZZZZZZZZZZZZZZZZZZZZZZZZOOOOOOOOHHHHHHHHHHHXKKKKTTTSSSNNNNNNIIIFIIIIIIIIIIILLSSSSG"""
 
---data |> String.split "\n" |> List.map (String.toList) |> Array2D.fromList
-
 read : DataSource -> String
 read dataSource = 
   case dataSource of 
@@ -249,11 +247,87 @@ read dataSource =
     SampleLarger -> sampleLarger
     SampleXo -> sampleXo
 
+getAllPositions : Array2D Char -> List Pos
+getAllPositions board = 
+  let
+    ys = List.range 0 (Array2D.rows board - 1)
+    xs = List.range 0 (Array2D.columns board - 1)
+  in 
+    ys |> List.concatMap (\y -> xs |> List.map (\x -> (x, y)))
+
+inGardenBounds : Array2D Char -> Pos -> Bool 
+inGardenBounds garden (x, y) = 
+  let 
+    insideRows = y >= 0 && y < Array2D.rows garden
+    insideCols = x >= 0 && x < Array2D.columns garden
+  in 
+    insideRows && insideCols 
+
+tryGetPlantAtPos : Array2D Char -> Pos -> Maybe Char
+tryGetPlantAtPos garden (x, y) = 
+  garden |> Array2D.get y x 
+
+-- let rec fill garden ch (x, y) plot = 
+--     if (x, y) |> Garden.inBounds garden then 
+--         if Set.contains (x, y) plot then plot 
+--         else 
+--             if ch = Garden.get garden (x, y) then 
+--                 plot 
+--                 |> Set.add (x, y)
+--                 |> fill garden ch ((x - 1), y) 
+--                 |> fill garden ch ((x + 1), y) 
+--                 |> fill garden ch (x, (y - 1)) 
+--                 |> fill garden ch (x, (y + 1))
+--             else plot 
+--     else plot 
+
+fill : Array2D Char -> Char -> Pos -> Set Pos -> Set Pos
+fill garden plant (x, y) plot = 
+  if (x, y) |> inGardenBounds garden then 
+    if Set.member (x, y) plot then plot 
+    else 
+      case tryGetPlantAtPos garden (x, y) of 
+        Nothing -> plot
+        Just plantFound -> 
+          if plantFound == plant then 
+            plot 
+            |> Set.insert (x, y)
+            |> fill garden plant ((x - 1), y)
+            |> fill garden plant ((x + 1), y)
+            |> fill garden plant (x, (y - 1))
+            |> fill garden plant (x, (y + 1))
+          else plot 
+  else plot 
+
+fillPlot : Array2D Char -> Pos -> Set Pos 
+fillPlot garden pos = 
+  case tryGetPlantAtPos garden pos of 
+    Nothing -> Set.empty 
+    Just plant -> 
+      fill garden plant pos Set.empty 
+
+findPlotsLoop : Array2D Char -> List (Set Pos) -> Set Pos -> List Pos -> List (Set Pos) 
+findPlotsLoop garden plots visited positions = 
+  case positions of 
+    [] -> plots 
+    (pos :: remaining) -> 
+      if visited |> Set.member pos then 
+        remaining |> findPlotsLoop garden plots visited 
+      else 
+        let 
+          plot = fillPlot garden pos 
+        in 
+          remaining |> findPlotsLoop garden (plot :: plots) (Set.union visited plot)
+
+findPlots : Array2D Char -> List (Set Pos)
+findPlots garden = 
+  garden |> getAllPositions |> findPlotsLoop garden [] Set.empty
+
 initModel : DataSource -> Model 
 initModel dataSource = 
   let 
     data = read dataSource
-    garden = String.split "\n" |> List.map (String.toList) |> Array2D.fromList
+    garden = data |> String.split "\n" |> List.map (String.toList) |> Array2D.fromList
     plots = []
   in 
     { plots = plots 
@@ -282,14 +356,6 @@ type Msg =
   | Slower 
   | Clear 
   | ChangeDataSource 
-
-getAllPositions : Array2D Char -> List Pos
-getAllPositions board = 
-  let
-    ys = List.range 0 (Array2D.rows board - 1)
-    xs = List.range 0 (Array2D.columns board - 1)
-  in 
-    ys |> List.concatMap (\y -> xs |> List.map (\x -> (x, y)))
 
 updateClear : Model -> Model
 updateClear model = 
