@@ -253,6 +253,7 @@ initModel : DataSource -> Model
 initModel dataSource = 
   let 
     data = read dataSource
+    garden = String.split "\n" |> List.map (String.toList) |> Array2D.fromList
     plots = []
   in 
     { plots = plots 
