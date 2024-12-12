@@ -318,13 +318,14 @@ toPlotInfo : (Plant, Plot, PlotSequence) -> PlotInfo
 toPlotInfo (plant, plot, seq) = 
   let 
     totalSteps = List.length seq 
+    area = Set.size plot
   in 
     { complete = plot  
     , sequence = seq
     , totalSteps = List.length seq 
     , plant = plant 
     , color = "#FFCCDD"
-    , area = 0  
+    , area = area  
     , perimeter = 0 
     , perimeterDiscount = 0 
     , fenceCost = 0  

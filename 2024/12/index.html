@@ -6081,13 +6081,38 @@ var $elm$core$String$foldr = _String_foldr;
 var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
 };
+var $elm$core$Dict$sizeHelp = F2(
+	function (n, dict) {
+		sizeHelp:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return n;
+			} else {
+				var left = dict.d;
+				var right = dict.e;
+				var $temp$n = A2($elm$core$Dict$sizeHelp, n + 1, right),
+					$temp$dict = left;
+				n = $temp$n;
+				dict = $temp$dict;
+				continue sizeHelp;
+			}
+		}
+	});
+var $elm$core$Dict$size = function (dict) {
+	return A2($elm$core$Dict$sizeHelp, 0, dict);
+};
+var $elm$core$Set$size = function (_v0) {
+	var dict = _v0.a;
+	return $elm$core$Dict$size(dict);
+};
 var $author$project$Aoc12$toPlotInfo = function (_v0) {
 	var plant = _v0.a;
 	var plot = _v0.b;
 	var seq = _v0.c;
 	var totalSteps = $elm$core$List$length(seq);
+	var area = $elm$core$Set$size(plot);
 	return {
-		area: 0,
+		area: area,
 		color: '#FFCCDD',
 		complete: plot,
 		fenceCost: 0,
