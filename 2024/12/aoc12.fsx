@@ -22,11 +22,7 @@ module Garden =
         let height = lst |> List.length 
         Array2D.init height width (fun y x -> lst |> List.item y |> List.item x)
 
-type Garden = char[,]
-
 type Pos = (int * int)
-
-type Plot = Set<Pos>
 
 type Side = { startPos : Pos; endPos : Pos }
 
