@@ -4387,43 +4387,6 @@ function _Browser_load(url)
 
 
 
-var _Bitwise_and = F2(function(a, b)
-{
-	return a & b;
-});
-
-var _Bitwise_or = F2(function(a, b)
-{
-	return a | b;
-});
-
-var _Bitwise_xor = F2(function(a, b)
-{
-	return a ^ b;
-});
-
-function _Bitwise_complement(a)
-{
-	return ~a;
-};
-
-var _Bitwise_shiftLeftBy = F2(function(offset, a)
-{
-	return a << offset;
-});
-
-var _Bitwise_shiftRightBy = F2(function(offset, a)
-{
-	return a >> offset;
-});
-
-var _Bitwise_shiftRightZfBy = F2(function(offset, a)
-{
-	return a >>> offset;
-});
-
-
-
 function _Time_now(millisToPosix)
 {
 	return _Scheduler_binding(function(callback)
@@ -5256,730 +5219,43 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Aoc12$Part1 = {$: 'Part1'};
-var $author$project$Aoc12$Forward = {$: 'Forward'};
-var $author$project$Aoc12$N = {$: 'N'};
-var $author$project$Aoc12$Plain = function (a) {
-	return {$: 'Plain', a: a};
-};
+var $author$project$Aoc12$Sample = {$: 'Sample'};
 var $author$project$Aoc12$defaultTickInterval = 10;
-var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
-	return array2d.columns;
-};
-var $elm$core$Maybe$andThen = F2(
-	function (callback, maybeValue) {
-		if (maybeValue.$ === 'Just') {
-			var value = maybeValue.a;
-			return callback(value);
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $elm$core$Bitwise$and = _Bitwise_and;
-var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
-var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
-var $elm$core$Basics$ge = _Utils_ge;
-var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
-var $elm$core$Array$getHelp = F3(
-	function (shift, index, tree) {
-		getHelp:
-		while (true) {
-			var pos = $elm$core$Array$bitMask & (index >>> shift);
-			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
-			if (_v0.$ === 'SubTree') {
-				var subTree = _v0.a;
-				var $temp$shift = shift - $elm$core$Array$shiftStep,
-					$temp$index = index,
-					$temp$tree = subTree;
-				shift = $temp$shift;
-				index = $temp$index;
-				tree = $temp$tree;
-				continue getHelp;
-			} else {
-				var values = _v0.a;
-				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
-			}
-		}
-	});
-var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
-var $elm$core$Array$tailIndex = function (len) {
-	return (len >>> 5) << 5;
-};
-var $elm$core$Array$get = F2(
-	function (index, _v0) {
-		var len = _v0.a;
-		var startShift = _v0.b;
-		var tree = _v0.c;
-		var tail = _v0.d;
-		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
-			index,
-			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
-			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
-			A3($elm$core$Array$getHelp, startShift, index, tree)));
-	});
-var $tortus$elm_array_2d$Array2D$getRow = F2(
-	function (row, array2d) {
-		return A2($elm$core$Array$get, row, array2d.data);
-	});
-var $tortus$elm_array_2d$Array2D$get = F3(
-	function (row, col, array2d) {
-		return A2(
-			$elm$core$Maybe$andThen,
-			$elm$core$Array$get(col),
-			A2($tortus$elm_array_2d$Array2D$getRow, row, array2d));
-	});
-var $author$project$Aoc12$findStartPos = function (board) {
-	var columns = $tortus$elm_array_2d$Array2D$columns(board);
-	var loop = function (_v0) {
-		loop:
-		while (true) {
-			var x = _v0.a;
-			var y = _v0.b;
-			var _v1 = A3($tortus$elm_array_2d$Array2D$get, y, x, board);
-			if (_v1.$ === 'Nothing') {
-				return _Utils_Tuple2(0, 0);
-			} else {
-				if ('^' === _v1.a.valueOf()) {
-					return _Utils_Tuple2(x, y);
-				} else {
-					var next = _Utils_eq(x + 1, columns) ? _Utils_Tuple2(0, y + 1) : _Utils_Tuple2(x + 1, y);
-					var $temp$_v0 = next;
-					_v0 = $temp$_v0;
-					continue loop;
-				}
-			}
-		}
-	};
-	return loop(
-		_Utils_Tuple2(0, 0));
-};
-var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
-var $elm$core$Array$foldl = F3(
-	function (func, baseCase, _v0) {
-		var tree = _v0.c;
-		var tail = _v0.d;
-		var helper = F2(
-			function (node, acc) {
-				if (node.$ === 'SubTree') {
-					var subTree = node.a;
-					return A3($elm$core$Elm$JsArray$foldl, helper, acc, subTree);
-				} else {
-					var values = node.a;
-					return A3($elm$core$Elm$JsArray$foldl, func, acc, values);
-				}
-			});
-		return A3(
-			$elm$core$Elm$JsArray$foldl,
-			func,
-			A3($elm$core$Elm$JsArray$foldl, helper, baseCase, tree),
-			tail);
-	});
-var $elm$core$Array$isEmpty = function (_v0) {
-	var len = _v0.a;
-	return !len;
-};
-var $elm$core$Array$length = function (_v0) {
-	var len = _v0.a;
-	return len;
-};
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
-var $tortus$elm_array_2d$Array2D$ArrayHelpers$minRowLength = function (array) {
-	return $elm$core$Array$isEmpty(array) ? 0 : A3(
-		$elm$core$Array$foldl,
-		F2(
-			function (row, min) {
-				var rowLen = $elm$core$Array$length(row);
-				return _Utils_eq(min, -1) ? rowLen : ((_Utils_cmp(rowLen, min) < 0) ? rowLen : min);
-			}),
-		-1,
-		array);
-};
-var $elm$core$Elm$JsArray$map = _JsArray_map;
-var $elm$core$Array$map = F2(
-	function (func, _v0) {
-		var len = _v0.a;
-		var startShift = _v0.b;
-		var tree = _v0.c;
-		var tail = _v0.d;
-		var helper = function (node) {
-			if (node.$ === 'SubTree') {
-				var subTree = node.a;
-				return $elm$core$Array$SubTree(
-					A2($elm$core$Elm$JsArray$map, helper, subTree));
-			} else {
-				var values = node.a;
-				return $elm$core$Array$Leaf(
-					A2($elm$core$Elm$JsArray$map, func, values));
-			}
-		};
-		return A4(
-			$elm$core$Array$Array_elm_builtin,
-			len,
-			startShift,
-			A2($elm$core$Elm$JsArray$map, helper, tree),
-			A2($elm$core$Elm$JsArray$map, func, tail));
-	});
-var $elm$core$Elm$JsArray$appendN = _JsArray_appendN;
-var $elm$core$Elm$JsArray$slice = _JsArray_slice;
-var $elm$core$Array$appendHelpBuilder = F2(
-	function (tail, builder) {
-		var tailLen = $elm$core$Elm$JsArray$length(tail);
-		var notAppended = ($elm$core$Array$branchFactor - $elm$core$Elm$JsArray$length(builder.tail)) - tailLen;
-		var appended = A3($elm$core$Elm$JsArray$appendN, $elm$core$Array$branchFactor, builder.tail, tail);
-		return (notAppended < 0) ? {
-			nodeList: A2(
-				$elm$core$List$cons,
-				$elm$core$Array$Leaf(appended),
-				builder.nodeList),
-			nodeListSize: builder.nodeListSize + 1,
-			tail: A3($elm$core$Elm$JsArray$slice, notAppended, tailLen, tail)
-		} : ((!notAppended) ? {
-			nodeList: A2(
-				$elm$core$List$cons,
-				$elm$core$Array$Leaf(appended),
-				builder.nodeList),
-			nodeListSize: builder.nodeListSize + 1,
-			tail: $elm$core$Elm$JsArray$empty
-		} : {nodeList: builder.nodeList, nodeListSize: builder.nodeListSize, tail: appended});
-	});
-var $elm$core$List$drop = F2(
-	function (n, list) {
-		drop:
-		while (true) {
-			if (n <= 0) {
-				return list;
-			} else {
-				if (!list.b) {
-					return list;
-				} else {
-					var x = list.a;
-					var xs = list.b;
-					var $temp$n = n - 1,
-						$temp$list = xs;
-					n = $temp$n;
-					list = $temp$list;
-					continue drop;
-				}
-			}
-		}
-	});
-var $elm$core$Array$sliceLeft = F2(
-	function (from, array) {
-		var len = array.a;
-		var tree = array.c;
-		var tail = array.d;
-		if (!from) {
-			return array;
-		} else {
-			if (_Utils_cmp(
-				from,
-				$elm$core$Array$tailIndex(len)) > -1) {
-				return A4(
-					$elm$core$Array$Array_elm_builtin,
-					len - from,
-					$elm$core$Array$shiftStep,
-					$elm$core$Elm$JsArray$empty,
-					A3(
-						$elm$core$Elm$JsArray$slice,
-						from - $elm$core$Array$tailIndex(len),
-						$elm$core$Elm$JsArray$length(tail),
-						tail));
-			} else {
-				var skipNodes = (from / $elm$core$Array$branchFactor) | 0;
-				var helper = F2(
-					function (node, acc) {
-						if (node.$ === 'SubTree') {
-							var subTree = node.a;
-							return A3($elm$core$Elm$JsArray$foldr, helper, acc, subTree);
-						} else {
-							var leaf = node.a;
-							return A2($elm$core$List$cons, leaf, acc);
-						}
-					});
-				var leafNodes = A3(
-					$elm$core$Elm$JsArray$foldr,
-					helper,
-					_List_fromArray(
-						[tail]),
-					tree);
-				var nodesToInsert = A2($elm$core$List$drop, skipNodes, leafNodes);
-				if (!nodesToInsert.b) {
-					return $elm$core$Array$empty;
-				} else {
-					var head = nodesToInsert.a;
-					var rest = nodesToInsert.b;
-					var firstSlice = from - (skipNodes * $elm$core$Array$branchFactor);
-					var initialBuilder = {
-						nodeList: _List_Nil,
-						nodeListSize: 0,
-						tail: A3(
-							$elm$core$Elm$JsArray$slice,
-							firstSlice,
-							$elm$core$Elm$JsArray$length(head),
-							head)
-					};
-					return A2(
-						$elm$core$Array$builderToArray,
-						true,
-						A3($elm$core$List$foldl, $elm$core$Array$appendHelpBuilder, initialBuilder, rest));
-				}
-			}
-		}
-	});
-var $elm$core$Array$fetchNewTail = F4(
-	function (shift, end, treeEnd, tree) {
-		fetchNewTail:
-		while (true) {
-			var pos = $elm$core$Array$bitMask & (treeEnd >>> shift);
-			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
-			if (_v0.$ === 'SubTree') {
-				var sub = _v0.a;
-				var $temp$shift = shift - $elm$core$Array$shiftStep,
-					$temp$end = end,
-					$temp$treeEnd = treeEnd,
-					$temp$tree = sub;
-				shift = $temp$shift;
-				end = $temp$end;
-				treeEnd = $temp$treeEnd;
-				tree = $temp$tree;
-				continue fetchNewTail;
-			} else {
-				var values = _v0.a;
-				return A3($elm$core$Elm$JsArray$slice, 0, $elm$core$Array$bitMask & end, values);
-			}
-		}
-	});
-var $elm$core$Array$hoistTree = F3(
-	function (oldShift, newShift, tree) {
-		hoistTree:
-		while (true) {
-			if ((_Utils_cmp(oldShift, newShift) < 1) || (!$elm$core$Elm$JsArray$length(tree))) {
-				return tree;
-			} else {
-				var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, 0, tree);
-				if (_v0.$ === 'SubTree') {
-					var sub = _v0.a;
-					var $temp$oldShift = oldShift - $elm$core$Array$shiftStep,
-						$temp$newShift = newShift,
-						$temp$tree = sub;
-					oldShift = $temp$oldShift;
-					newShift = $temp$newShift;
-					tree = $temp$tree;
-					continue hoistTree;
-				} else {
-					return tree;
-				}
-			}
-		}
-	});
-var $elm$core$Elm$JsArray$unsafeSet = _JsArray_unsafeSet;
-var $elm$core$Array$sliceTree = F3(
-	function (shift, endIdx, tree) {
-		var lastPos = $elm$core$Array$bitMask & (endIdx >>> shift);
-		var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, lastPos, tree);
-		if (_v0.$ === 'SubTree') {
-			var sub = _v0.a;
-			var newSub = A3($elm$core$Array$sliceTree, shift - $elm$core$Array$shiftStep, endIdx, sub);
-			return (!$elm$core$Elm$JsArray$length(newSub)) ? A3($elm$core$Elm$JsArray$slice, 0, lastPos, tree) : A3(
-				$elm$core$Elm$JsArray$unsafeSet,
-				lastPos,
-				$elm$core$Array$SubTree(newSub),
-				A3($elm$core$Elm$JsArray$slice, 0, lastPos + 1, tree));
-		} else {
-			return A3($elm$core$Elm$JsArray$slice, 0, lastPos, tree);
-		}
-	});
-var $elm$core$Array$sliceRight = F2(
-	function (end, array) {
-		var len = array.a;
-		var startShift = array.b;
-		var tree = array.c;
-		var tail = array.d;
-		if (_Utils_eq(end, len)) {
-			return array;
-		} else {
-			if (_Utils_cmp(
-				end,
-				$elm$core$Array$tailIndex(len)) > -1) {
-				return A4(
-					$elm$core$Array$Array_elm_builtin,
-					end,
-					startShift,
-					tree,
-					A3($elm$core$Elm$JsArray$slice, 0, $elm$core$Array$bitMask & end, tail));
-			} else {
-				var endIdx = $elm$core$Array$tailIndex(end);
-				var depth = $elm$core$Basics$floor(
-					A2(
-						$elm$core$Basics$logBase,
-						$elm$core$Array$branchFactor,
-						A2($elm$core$Basics$max, 1, endIdx - 1)));
-				var newShift = A2($elm$core$Basics$max, 5, depth * $elm$core$Array$shiftStep);
-				return A4(
-					$elm$core$Array$Array_elm_builtin,
-					end,
-					newShift,
-					A3(
-						$elm$core$Array$hoistTree,
-						startShift,
-						newShift,
-						A3($elm$core$Array$sliceTree, startShift, endIdx, tree)),
-					A4($elm$core$Array$fetchNewTail, startShift, end, endIdx, tree));
-			}
-		}
-	});
-var $elm$core$Array$translateIndex = F2(
-	function (index, _v0) {
-		var len = _v0.a;
-		var posIndex = (index < 0) ? (len + index) : index;
-		return (posIndex < 0) ? 0 : ((_Utils_cmp(posIndex, len) > 0) ? len : posIndex);
-	});
-var $elm$core$Array$slice = F3(
-	function (from, to, array) {
-		var correctTo = A2($elm$core$Array$translateIndex, to, array);
-		var correctFrom = A2($elm$core$Array$translateIndex, from, array);
-		return (_Utils_cmp(correctFrom, correctTo) > 0) ? $elm$core$Array$empty : A2(
-			$elm$core$Array$sliceLeft,
-			correctFrom,
-			A2($elm$core$Array$sliceRight, correctTo, array));
-	});
-var $tortus$elm_array_2d$Array2D$ArrayHelpers$truncateRows = F2(
-	function (columns, array) {
-		return A2(
-			$elm$core$Array$map,
-			function (row) {
-				return (_Utils_cmp(
-					$elm$core$Array$length(row),
-					columns) > 0) ? A3($elm$core$Array$slice, 0, columns, row) : row;
-			},
-			array);
-	});
-var $tortus$elm_array_2d$Array2D$ArrayHelpers$getMinColumnsAndTruncateRows = function (array) {
-	var columns = $tortus$elm_array_2d$Array2D$ArrayHelpers$minRowLength(array);
-	var normalizedData = A2($tortus$elm_array_2d$Array2D$ArrayHelpers$truncateRows, columns, array);
-	return _Utils_Tuple2(columns, normalizedData);
-};
-var $tortus$elm_array_2d$Array2D$fromArray = function (array) {
-	var _v0 = $tortus$elm_array_2d$Array2D$ArrayHelpers$getMinColumnsAndTruncateRows(array);
-	var initialColumns = _v0.a;
-	var normalizedData = _v0.b;
-	return {columns: initialColumns, data: normalizedData};
-};
-var $elm$core$Array$fromListHelp = F3(
-	function (list, nodeList, nodeListSize) {
-		fromListHelp:
-		while (true) {
-			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
-			var jsArray = _v0.a;
-			var remainingItems = _v0.b;
-			if (_Utils_cmp(
-				$elm$core$Elm$JsArray$length(jsArray),
-				$elm$core$Array$branchFactor) < 0) {
-				return A2(
-					$elm$core$Array$builderToArray,
-					true,
-					{nodeList: nodeList, nodeListSize: nodeListSize, tail: jsArray});
-			} else {
-				var $temp$list = remainingItems,
-					$temp$nodeList = A2(
-					$elm$core$List$cons,
-					$elm$core$Array$Leaf(jsArray),
-					nodeList),
-					$temp$nodeListSize = nodeListSize + 1;
-				list = $temp$list;
-				nodeList = $temp$nodeList;
-				nodeListSize = $temp$nodeListSize;
-				continue fromListHelp;
-			}
-		}
-	});
-var $elm$core$Array$fromList = function (list) {
-	if (!list.b) {
-		return $elm$core$Array$empty;
-	} else {
-		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
-	}
-};
-var $tortus$elm_array_2d$Array2D$fromList = function (list) {
-	return $tortus$elm_array_2d$Array2D$fromArray(
-		$elm$core$Array$fromList(
-			A2($elm$core$List$map, $elm$core$Array$fromList, list)));
-};
-var $author$project$Aoc12$input = '........#.............................................#.........#..............#.......#....................#....................#\n......................#........#........................#.............##............................#.#.............#..........#..\n....#..................................#..................#.........#....#..............#..#......................#........#...#..\n.....#...#...............#................#..........................#......#.....................#.......................#.......\n......................................................##.#....#..................................................................#\n#....#....................#..................................#.....................................#......................#.......\n.......#...........................#.......................#......#...#.................................................#...#.....\n....................##..........................#................#..........................#.#..................#....#.........#.\n#..................................#...............#...............#.........................#............##......................\n.............................#....................................#...............#.........#..........#.......................#..\n.................................#............###.......#............##......#...............................#...............#.#..\n.#..........................................#.......#.......................##..#........#........#...............#...............\n......#...#............#.#..............#...................#..........................................................##.........\n#................##....................................................................#........#.................#...#...........\n...#..........#..........................##......#....#..............................#......................................#.....\n..............................##.#..........................................................#..............................#......\n......#...........#....#..................#............#....................................................................#.....\n.....................#........................#.......................................................#...........................\n...................#.#..........................................................................................#.#...............\n.........................................##.........................................................#.......#...###......#........\n...............................................................##.......................#..........................#..............\n...#...........#.................#..............#......#.....#..........................#....................#....#...............\n.................................#................#................#..............................................#.......##.....#\n........#..........................#................#.......................#...................#.................................\n.............................#.............................#..........#.........................#........#........................\n....#................#.#................#...........................................................#...#....#......#......#......\n........#..............................#...............................#.................#........................................\n...........................................#..#........#...#...........#..#.............#.........................................\n.#.................#.#................................#................#.#..................................#........#............\n.......#..........................................#.................................................................#.............\n...................#....................................................#..#...............................................#......\n...#.#........#...#.....#.....................................................................................................#...\n......#.........................#......................#.............#.....................#......................................\n..........................#............#.................................#..#..........#........#......................#..........\n...#..#......#.......................#........................#...................................................................\n............#...........#................#..............#.........................................................................\n.#........#....#.........................................#........................................#...............................\n...#......................##.........#.......#.#...........#................................................#...#.................\n...........#......#.........#....#.....#.......................................................#.............#....................\n.............#...#..............................................#.........#.....##....................#...#.........#.............\n...............#................................#..........................................#.....#.#.........................#...#\n................#.....#..#.............#..............#..............#.......#....................................................\n......#.........................................................................................................#.........##......\n..#...........................#.#...........................................#..#.....#............................................\n...#...#..................#..................................#.........#...................#..................................#...\n............#..#.....................#.........................................#.......#..................................#.......\n...#.......................................................................#.............................#........................\n......#..................#....................................#......##...........................................................\n.#...............#.....#..........................................................................................#...............\n...#.............#.........................#.....................#...#..........#....#............................#...............\n...#............................#.......#...........#.........#........#.....#...........#...................................#....\n.....................#...................#................................#...............................#......#.........#..##..\n.............#........................................................................................#........................##.\n.....#.......#.......#............................................................................................................\n............................................#................................................................#..............#.....\n....#..#......................................................#...................................................#...............\n.................................#...##..................#.................................................#....#.................\n........#...................................#...#..........................................................#......................\n........................#........##...........#.......#........#...................................#..............................\n...........#...#...................................................#..............#......#...............#.#..................#...\n........#.............................................#...........................................................................\n........#................#......#..........#..#........#.#.......#...#........................#..#......................#.......#.\n.......#..........................................................................................................#.....#.....#...\n......................##....................#.....#.................#...........#.......................#.##..........#......#....\n....................................##....................................................................#.................#.....\n..#.................................#.#...........#............................................#....#.............................\n#...................................#...........................................#............#.........#...............#..........\n.......................#.............................................................#..........#...#.............#.....#.........\n#..................#.#.............................................................................#.................#............\n.....................#......#.......#...........#..........................................^...............................#......\n................................#......................#.#.....#..............#..................#....#.#......#....#.............\n............................................................................#........#.....................................#......\n.............#......................................................#...................................#......##..#....#.........\n...............#.................#...................#...............#............................................................\n..............#...........#..#...........................................#...................................#..........#.........\n..........#...........................#...................#..............#...#.......#..........#...................#.............\n.............#.#..................................#....#..#............#.....................#................#...#.....#.........\n...................#..........................................................#............##.....................................\n...........................................#............#........................................................................#\n..#..............................#....#...........................................................................................\n..#..#............#...........................#...#...........#............#.....#.................#..............................\n....#...................#.........#...............................................................................................\n.......#..........................#....................................##........#.................##...#.#........#..#...........\n.#........................#....#.......#.....#...................#.............................................#..................\n..#...............................................................#................................................#..............\n.....#........................................#...................................................................................\n..........................................#..........................................................#............................\n....................###.........................#............................#...#...........#............#.......................\n.....#.....#...............#........#.#....#...................#...........#........#...........#.................................\n................................................................................................#...##............................\n......................#............#.........................#.......................#.....#...........#...#.#....................\n............................#....................#..................#..............#..................................#...........\n...........................#...................................#..............................................................#...\n..................#................#.....................#...................#........#..............#............................\n............#.............#.....................#..................#.........#......................#............#............#...\n....#..........................#...............................................................................................#..\n................#.....................................#.............................#...........#........................#........\n#.##...........#.........................................#...............#..........................................#.#...........\n........................................#..............#.....................#............#.....#.................................\n.......#....##..#..#.....#........................................................................................................\n....##.............#..............................#...............................................................................\n.....#........................#.........#..#......#........#......................#.......#..............#..........#.......#.....\n..#....#.........................#.#....................#..#.......#.............#..................#........#..................#.\n..........##....#........................................................................#........................................\n........#......#................................................................................................#................#\n.....#.......#...#.............#....................................#..#........................#...#..............#....#.........\n.............#...................................................##...#...........................................................\n..............#.............................................#.............#................#.............#..............#.........\n..#....#..........#.....#......#......................#................................#...............................#..........\n.................................................................................##......#...........................#.....#......\n..#....#..........#.......#.........................................#...............#..#............................#........#....\n...........#........#.#....................#........#.....................................#..................#....................\n.......#............#................#...........#.............#......#.........#...........................#.....................\n#.#....#.#...............#....#.....#.......................#...............................#...................##...#............\n.................##...#.................................................................#...........................#.............\n.....#........................................#.........#...................................................#.....................\n....................#.....................#................................................#...##.....................#...........\n...............#...............................................................#....#.............................................\n.................#................#...#.....................................#......#....................#...............#.#.......\n...................#............................................#..#....#..#........#...............................#.........#...\n..#........#...............#..................#.....#..................#.....................................#........##...#......\n.....#.....#....#.....#................#.#.....................##.............................................................#...\n................#............#......#......#.......................................................#....................#........#\n........#..............#..#......................................................................##.....##........................\n.........#.............................#.........#.......................................#..........................#.##..........\n.#...................#........................................................#....#......................................#.......\n....#..........#.....#.........................................................................................#..................\n.......#.............................#............#.........................#....#....#........#......#.....#.......#.............\n..#.......#........................#........................#.....................................................................\n........................#...............................#.#.............#................................#..................#.....';
-var $author$project$Aoc12$sample = '....#.....\n.........#\n..........\n..#.......\n.......#..\n..........\n.#..^.....\n........#.\n#.........\n......#...';
-var $elm$core$String$foldr = _String_foldr;
-var $elm$core$String$toList = function (string) {
-	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
-};
-var $author$project$Aoc12$initBoard = function (useSample) {
-	var data = useSample ? $author$project$Aoc12$sample : $author$project$Aoc12$input;
-	return $tortus$elm_array_2d$Array2D$fromList(
-		A2(
-			$elm$core$List$map,
-			$elm$core$String$toList,
-			A2($elm$core$String$split, '\n', data)));
-};
-var $elm$core$Elm$JsArray$indexedMap = _JsArray_indexedMap;
-var $elm$core$Array$indexedMap = F2(
-	function (func, _v0) {
-		var len = _v0.a;
-		var tree = _v0.c;
-		var tail = _v0.d;
-		var initialBuilder = {
-			nodeList: _List_Nil,
-			nodeListSize: 0,
-			tail: A3(
-				$elm$core$Elm$JsArray$indexedMap,
-				func,
-				$elm$core$Array$tailIndex(len),
-				tail)
-		};
-		var helper = F2(
-			function (node, builder) {
-				if (node.$ === 'SubTree') {
-					var subTree = node.a;
-					return A3($elm$core$Elm$JsArray$foldl, helper, builder, subTree);
-				} else {
-					var leaf = node.a;
-					var offset = builder.nodeListSize * $elm$core$Array$branchFactor;
-					var mappedLeaf = $elm$core$Array$Leaf(
-						A3($elm$core$Elm$JsArray$indexedMap, func, offset, leaf));
-					return {
-						nodeList: A2($elm$core$List$cons, mappedLeaf, builder.nodeList),
-						nodeListSize: builder.nodeListSize + 1,
-						tail: builder.tail
-					};
-				}
-			});
-		return A2(
-			$elm$core$Array$builderToArray,
-			true,
-			A3($elm$core$Elm$JsArray$foldl, helper, initialBuilder, tree));
-	});
-var $tortus$elm_array_2d$Array2D$indexedMap = F2(
-	function (func, array2d) {
-		var mappedData = A2(
-			$elm$core$Array$indexedMap,
-			F2(
-				function (row, rowAry) {
-					return A2(
-						$elm$core$Array$indexedMap,
-						F2(
-							function (col, value) {
-								return A3(func, row, col, value);
-							}),
-						rowAry);
-				}),
-			array2d.data);
-		return {columns: array2d.columns, data: mappedData};
-	});
-var $tortus$elm_array_2d$Array2D$map = F2(
-	function (fn, array2d) {
-		return A2(
-			$tortus$elm_array_2d$Array2D$indexedMap,
-			F3(
-				function (_v0, _v1, val) {
-					return fn(val);
-				}),
-			array2d);
-	});
-var $elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return $elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $elm$core$Array$setHelp = F4(
-	function (shift, index, value, tree) {
-		var pos = $elm$core$Array$bitMask & (index >>> shift);
-		var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
-		if (_v0.$ === 'SubTree') {
-			var subTree = _v0.a;
-			var newSub = A4($elm$core$Array$setHelp, shift - $elm$core$Array$shiftStep, index, value, subTree);
-			return A3(
-				$elm$core$Elm$JsArray$unsafeSet,
-				pos,
-				$elm$core$Array$SubTree(newSub),
-				tree);
-		} else {
-			var values = _v0.a;
-			var newLeaf = A3($elm$core$Elm$JsArray$unsafeSet, $elm$core$Array$bitMask & index, value, values);
-			return A3(
-				$elm$core$Elm$JsArray$unsafeSet,
-				pos,
-				$elm$core$Array$Leaf(newLeaf),
-				tree);
-		}
-	});
-var $elm$core$Array$set = F3(
-	function (index, value, array) {
-		var len = array.a;
-		var startShift = array.b;
-		var tree = array.c;
-		var tail = array.d;
-		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? array : ((_Utils_cmp(
-			index,
-			$elm$core$Array$tailIndex(len)) > -1) ? A4(
-			$elm$core$Array$Array_elm_builtin,
-			len,
-			startShift,
-			tree,
-			A3($elm$core$Elm$JsArray$unsafeSet, $elm$core$Array$bitMask & index, value, tail)) : A4(
-			$elm$core$Array$Array_elm_builtin,
-			len,
-			startShift,
-			A4($elm$core$Array$setHelp, startShift, index, value, tree),
-			tail));
-	});
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
-var $tortus$elm_array_2d$Array2D$set = F4(
-	function (row, col, newValue, array2d) {
-		return A2(
-			$elm$core$Maybe$withDefault,
-			array2d,
-			A2(
-				$elm$core$Maybe$map,
-				function (rowAry) {
-					return _Utils_update(
-						array2d,
-						{
-							data: A3(
-								$elm$core$Array$set,
-								row,
-								A3($elm$core$Array$set, col, newValue, rowAry),
-								array2d.data)
-						});
-				},
-				A2($tortus$elm_array_2d$Array2D$getRow, row, array2d)));
-	});
-var $author$project$Aoc12$Turn = {$: 'Turn'};
-var $author$project$Aoc12$moveForward = F2(
-	function (dir, _v0) {
-		var x = _v0.a;
-		var y = _v0.b;
-		switch (dir.$) {
-			case 'N':
-				return _Utils_Tuple2(x, y - 1);
-			case 'W':
-				return _Utils_Tuple2(x - 1, y);
-			case 'S':
-				return _Utils_Tuple2(x, y + 1);
-			default:
-				return _Utils_Tuple2(x + 1, y);
-		}
-	});
-var $author$project$Aoc12$E = {$: 'E'};
-var $author$project$Aoc12$S = {$: 'S'};
-var $author$project$Aoc12$W = {$: 'W'};
-var $author$project$Aoc12$turnRight = function (dir) {
-	switch (dir.$) {
-		case 'N':
-			return $author$project$Aoc12$E;
-		case 'E':
-			return $author$project$Aoc12$S;
-		case 'S':
-			return $author$project$Aoc12$W;
+var $author$project$Aoc12$input = 'LLLLLLLLLLLLLLLLLLLLLLLPBBBVVVVVPPPPPSSSSCCCCCCCCCCCCCCVVVVVVVVVJJJJJJJJJJJJJJYIYYYYYYYYYYKKKKKKKKKKKKKZQQQQQQQQQQQQQQQBBLLLLLLWWWWFFFWWWWWW\nLLLLLLLLLLLLLLLLLLLLUPPPPBBVVVPPPPPPPSSSCCCCCCCCCCCCCCVVVVVVVVVCCCJJJJJJJJJJJJYYYYYYYYYYYYKKKKKKKKKKKKKKKQQQQQQQQQQQWCCLLLLLLLLWWWWWWWWWWWWW\nLLLLLLLLLLLLLLLLLPPHPPPPPPPVVPPPPPPPPSSSCCCCCCCCCCCCCCCVVVVVVVVCCCCJJCJCJJJJJYYYYYYYYYYYYYYKKKKKKKKKKKQQKQQQQQQQQQQQWWWWWNLLWWWWWWWWWWWWWWWW\nLLLLLLLLLLLLLLLLPPPPOOPPPWPVVVPPPPPPPPCCCCUCCCCCCCCCCCCCVVVVVVCCCCCCCCCCCCJJJJYYYYYYYYYYYYYYHKKKKKKKKYQQQQQQQQQQQQQQWWWWWWWLWWWWWWWWWWWWWWWW\nLLLLLLLLLLLLLLULLPPPPPPPPPVVVVVPPPPPPPPPCCCCCCCCCICCVCCVVVVVVVCCCCCCCCCCJJJJJJJYYYYYYYYYYYYKKKKKKKKKKYQQQQQQQQQWQQQQQWWWWWWWWWWWWWWWWWWWWWWW\nZLLLLLLLLLZLLLULUUPPPPPPPPPPVVVPPPPPPPPPPSCCCCCCCCNVVVVVVVVVVCCCCCCCCCCCCJJJJJJJCYYYYYYYYYYYYYKKKKKKKYQQQQQQQQQWWWQWQWWWWWWWSSWWWWWWWWWWWWWW\nZLLLLLLLLZZLLLUUUUUUPPPPPPPPVPPPPPPPPPPPPPPCCCCCCNNVVVVVVTVVVCCCCCCCCCCCJJJJJJJJYYYYYYYYYYYYYYKKKKKDDQQQQQQQQQQQPWWWWWWRRRWWSSMMWWWWWWWWWWWW\nZLLLLLLLZZZZLLUUUUUHPPPPPPPPPPPPPPPPPPPPPPPVCCCOCTTVHTTTTTVVVVCCCCCCCCCCCJJJJJYYYIYYYYYYYYYYOOKKKDDDDQQQQQQQQQQQPPWWWWWRRSSIISSMWWWWWWWWWWWW\nZLLLLLLLZZZZZZUUUUUUPPPPPPPMMPPPPPPPPPPPPPPVVCKTTTTTHTTTTTVVVCCCCCCCCCCCCJJJJJJYYYTYYYYYYYYYYOKDDDDDDDQQQQQQQQQMWWWWWWWWWKSSSSSWWWWWWWWWWWWW\nLLLLLZLGGZZZZZUUUUUUUUUUPPMMMPPPPPPPPPPPPPPPVTTTTTTTTTTTTTYVVWCCCCCCCCCCCJJJJJJJYYYYYYYYYYYOOOODDKKDDDDDDQQQQQMMMWWWWWWWWKSSSSSSWWWWWWWWWWWW\nWLNNLZZZZZZZZZUUUUUUUUUUMMMMMMMPPPPPPPPPPVVVVVTTTTTTTTTTTTTEECCCCCCCCCCCJJJJJJJJPIYYYYYYRRRFFDDDDDKDDDDDYYQQQQMMMWWWWWWWWWSSSSSSSWWWWWWWWWWW\nWLLLLLZZZZZZZZZUUUUUUUUUMMMMMMMPMPPPPPPPPVVVVVTTTTTTTTTTTTTECCLCCCCCCCHHHOJPPJJPPIIYYYYYRFFFFFDDDDKDKDDDDYQQQQMMMMMWWWWWWWSSSSSSSSWWWWWWWWXX\nWWWLWWZZWZZZZZKKKUUUUUUUMMMMMMMPMPPPPPPTPVVTTTTTTTTTTTTTTEEEECCCCCIIHCCHHHHPPPPPPFIIYYYFFFFFFDDDDDKKKDDDDQQQMMMMWWWWWWWWBSSSSSSSSSSWWWWWWWBX\nWWWWWWWWWZZZZKKKKUMUUMMUMMMMMLMMMMPDLDPTTTVTTTTTTTTTTTTTTTTEECCCCCCHHCCHHHHPPPPPPFFFYFFFFFFFFFDDDDKQQQQYYQMMMMMMMMWWWWWINSSSSSSSSSWWDWWWWBBX\nWWWWWWWZZZZZGKKKKKMMMMQQQMMMMLLLLLLDLLLTTTTTTTTTTTTTTTTTTTTTEGGGCCOHHHHHHHHPPPPPFFFFFFFFFFFFFFFFFDDDQQQYQMMMMMMMMMNNNNNNNSSSSSSSSSSWWBWWBBBB\nWWWWWWWWWCZDKKKKKKMMMMUQQQMMMLLLLLLLLLLTTTTTTTTTTTTTTTTTTTTGGGGGCHHHHHHHHHHKPPPPFFFFFFFFFFFFFFFFFFQQQQQYQMMMMMMMMMMMMNNNNNSSSSSSSSSWBBWBBBBB\nWWWWWWWWCCZZKKKKKKMMMQQQQQDDMLLLLLLLLLLLTTTTTTTTTETTTTTTOTTTOGCCCHHHHHHHHHHKPPPFFFFFFFFFFFFFFFFFFFQQQQQQQMMMMMMMMNNMNNNNNNNNNSSSSSBBBBBBBBBB\nNWWWWWWWWWIIKKKKKVMMMMMDQDDLMLLLLLLLLLFTTTTTTTTTTETTTTTOOOOOOGJCCOOOHHHHHHHKKKPPPPPPFFFFFFFFFFFFFNNQQQQQMMMMMMMMMNNMNNNNNNNNNSSSSSSBBBBBBBBB\nWWWWWWWWWWIIIKIVVVVMDDDDDDLLLLLLLLLLLLLWWTTTTTTTTEETTTTTOOOOGGGOOOOHHHHHHHHHKKPPPBBBFFFFFFFFFFFFFNNQQQMMMMOOOOOOOOONNNNNNNNNSSSSSSSBBBBBBBBB\nGGWWWWWWIIIIIIIIIVVWDDDWDDDLLLLLLLLLLLLWWWWTTEEEEEEEEEEOOOOOOOOOOOOHHHHHHHHHKPPPPPNFFFFFFFFFFFFFFFFYQQMMMMOOOOOOOOONNNNNNNNNSSSSSSSBBBBBBBBB\nGGGGWWIWIIIIIIIIVVWWDDDDDLLLLLLLLLLLLLWWWWWTTEEEEEEEEEOOOOOKOOOOOOOHHHHHHHHHPPPPPPNNNNNNNFFFNFFFIIIIQMMMVVOOOOOOOOOONNNNNNNNSSSSSSSBBBBBBBBB\nGGGGIIIIIIIIIIIIVVWWDDDLLLLLLLLLLLLLLLLLWWWTEEEEEEEEEOOOOOKKOOOOOOOHNHHHHHHPPPPPPPNNNNNNNNNNNFFFIIIISIIMIVOOOOOOOOOOONNNNNNNNSSSSSSSSBBBBBBB\nGGJJIIIIIIIIIITIVWDDDDDWWEWLLLLLLLLLLLLLLEWEEEEEEEEEEOOKOOKKKOOOONNNNHNHHHHHPPPPPPPNNNNHNNNNSSFFIIIIIIIIIVOOOOOOOOOOONNNNNNNNNSSSSSSBBBWBBBB\nGJJJJIIIIIIFFFFFVDDDDDDDDDDLLLLLLLLLLLLFEEEEEEEEEEEEEEEKKKKKOOOONNNNNNNHHHHHPPPPPJPDNNFJNNNNSSSSIIIIIIIIIIOOOOOOOOOOONNNNNNNNISISSSSBBBWBBLB\nJJJJJJJIIIUFFFFFWDDDDDDDDDDOLLLLLLLLLLLFEEEEEEEEEEEEAEEKKKKKKOOONONNNNNNHHHOYYBBBJJDDJFJJNNSSSSIIIIIIIIIIIOOOOOOOOOONNNNIIIINIIIIISSBEBBLLLL\nMJJJJJMIIIFFFFFFWDDDDDDDDDDOOLOLLLLLLEEEEEEEEEEEEEEEEEKKKKKKKOOONONNNNNNHHYYYYBBBJJJJJJJJNJSSSIIIIIIIIIIIIOOOOOOOOOONNNIIIIIIIIISSSSWEEWLLLL\nJJJJJMMMMFFFFFFFWDDDDDDDDDDOOOOOLLLLLEEAAEEEEEEEEEEEEKKKKKKKKKKOOONCNNNNHHHYYYYBBBJJJJJJJJJSSIIIIIIIIIIIIVOOOOOOOOOOWIIIIIIIIIISSSSWWEEWLLWW\nJJJJMMMMMMFFFFFWWDDDDDDDDDDOOOOOLLLUEEEEEEEEEEEZZKKKKKKKKKKKKKKEEEEEEEEENHYYYYYBBJJJJJJJJJJSSSSIIIIIIIIIVVOOOOOOOOOOWIIIIIIIIIIIIIIYWWWWWWWW\nOXOJMWMMFFFFFFWWWWWWWWKDDDOOOUUUHLTUEEEEEEEEEEEZKIKKKKKKKKKKKKOEEEEEEEEEYYYYYYJJJJJJJJJJJJJJJJIIIIIIIILLLVVOOOOOOOOOIIIIIIIIIIIIIIIWWWWWWWWW\nOOOMMWMFFFFFFFFWFFWWWWKDDDKOOUUUUWUUUEEEEEEEEEEEKKKKKKKKKKKKKOOEEEEEEEEEYYYYYYYJJJJJJJJJJJEENNINIIIIILLLLVVVIIIIIIWWWIIIIIIIIIIIIIIWWWWWWWWW\nLLOWWWWFFFFFFFFFFFWKWKKDDDOOOUUUUUUUUFEEEEEEEFENKKKKKKKKKKKKKKOEEEEEEEEEYYYYYYYJJJJJJJJJJEEENNNNNIIJLLLLLVVVIIIIIIWWIIIIIIIIIIIIIIIWWWWWWWWW\nOOOGWWVWFFFFFFFFFFOKKKKDDDKOUUUUUUUUUUEEEEEEEEXKKKKKKKKKKPPKPKOEEEEEEEEEYYYYYYYYYJJJJJJJEEEENNNNNIIJJJLLLLLVILIITHHWIIHIIIIIIIIIIIWWWWWWWWWW\nOOOOOWWWFFFFFFFFFFKKKKKDDDOOKNKUUUUUUEEEEEEEEEEKIIIKKKKKKPPPPPPPPPPCYYYYYYYYYYYYYJJJJEEJJEEEEEJJJJJJJJLLLLLLLIIITHHHHHHHIIIIIIIIIIIIWWWWWWWW\nOOOOOWWWWWFFFFFFFYKKKKKDDDKKKKKUUUUUUEEEEEEEEEWKIIIKKKKKKPNPPPPPPPYYYYYPYYYYYYYYYJJEEEEJEEEEEEJJJJJJJJQLLLLLLLLITHHHHHHHHIIIIIIIIIIWWWWWWWWW\nOOOOOWWWWWFFFFFFYYKKKKKDDDKKKKKUUUUUUUEEEEEEEEEEIIIIIKSIKKNPPPPPPPPPYYYPYPYYYYYYYJYEEEEEEEEEJJJJJJJJLLLLLLLLLLLTTTHHHHCHHHHIHIIIDIIWWWWWWWWW\nOOOOOWWWWWWFFYYYYYYKKKKDDDKKKKKUUUUUUUUUEEEEEEEIIIIIIKKIIKNNNPPPPPPPPPPPYPPYYYYYYYYEEEEEEEEEEJJJJSJJJLLLLLLLLLLLLHHHHHHHHHHHHHIDDIWWWWWWWWWW\nOOOOOWWWWWWFFYYYYYYKKKKKKKKKKKKUUUUUUUUEEEEEEEEEIIIIIIIIIIINPPPPPPPPPPPPPPPPPPPYYYYEEEEEEEEEEEEJJJLLLLLLLLLLLLLHHHHHHHHHHHHHNNIWWWWWWWWWWWWW\nOOOOOOOWWWWWWIIYYYYYKKKKKKKKUUKUUUUUUUUUEEEEEEEEEIIIIIIIIIIPPPPPPPPPPPPPPPPPPPPYYYYYEEEEEEEEEEEEGGLLLLLLLLLLLLLPPHHHHHHHHHHHNNWWWWWWWWWWWWWW\nDOOOOOOWWWWWWIIYYYYYYKKJKKNUUUUUUUUUUUUUUEEEEEEEEIIIIIIIIIIEPPPPPPPPPPPPPPPPPPPYYYYEEEEEEEEEEEEEEGGLLLLLLLLLLLPPPPPHHHHHHHNNNNWWWWWWWWWWWWWW\nDOOWOWWWWWWWWIIIYYYYYKKJJJUUUUUUUUUUUUUUUJEEEEEEEEIIIIIIIIIPPPPPPPPPPPPPPPPPPPPPYYYEEEEEEEEEEEEEGGSLLSLLLLLLLLLLHHHHHHHHHHHNNNNNWWWWWWNNWWWD\nDOWWOWWWWWWWWIIIYYYBYYKBBBBBUULUUUUUUUUUUUEEEEEEEEIIIIIIIIIIPPPPPPPXPPPPPPPPPPPAYYYYYEEEEEEEEEEEESSLLSLLLLLLLLLEHHHHHHHHHHHNNNNNWWWWWNNNWWDD\nWWWWOWWWWWWIWIIIIIIBBYBBBMBBULLUUUUUUQQQQXXXXEEEIIIIIIIIIIIIIBPPPXXXXXPPPPPPPUUUUUUUUEEYYYYYYEEESSSSSSLLLLLLLLLEHHHHHHHHHHHNNNNNNNWWNNRNWWGG\nWWWWWWWWWWWIIIIIIIBBBBBBBMMLLLLLLUUUQQQQQPXXXEEEIIIIIIIIIIIIIAAAPXXXXXPPPPPPPUUUUUUUUYYYYYYYYYEEESSSSSSSSSSLLLLEHHHHHHHHRRRNNNNNNNNNNRRNWGGG\nOOWWWWWWWWWIIIIIIIBBBBBBBBBLLLLXLUULWWWPPPPXXXXEVIIIIIIIIIIIIAAAAAXXXXXPPPPPPUUUUUUUUYYYYYYYYYEEESSSSSSWWSEAEEEEEHEHHHHHCRNNNNNNNNNRRRMNNNGC\nOWWWWWWWWWWWIIIIIIBBBBBBBBBBLLLLLLLLLWWPPPPXXXVEVIIVIIIIFIIIAAAAAXXXXXPPPPPPHUUUUUUUUYYYYYYYYYYYSSSNNSSSSEEEEEEEEEEEHHHCCRNRRRRNNNNRRRNNNNGG\nOOOWWWWWWWWWWWIIIIBBBBBBBPBBBLLLLLLWWWWPPPPPXVVVVVIVVVIIIIIIAAAAAXXXXXNPPPPPGUUUUUUUUYYYYYYYYYYYYSSYYSSSSEEEFEEEEEEHHEEEEENNRRRRRRRRRGGGGGGG\nOOOOOWWWWWWWWWBEIIBBBBBBBBBLLLLLLLLLWWWWPPPPXXVVVVVVVVIIIIIIAAAAAVXXXXNNNNNNNUUUUUUUUGYYYYYYYYYYYYSYYSSSEEEEEEEEEEEEEEEEVVVNRRRRRRRRGGGGGGGG\nZOUUUUUUUUUUWBBBIBBBBBBBBBBBLLLLLLLLFWWWPPPPPXXVVVVVVVVVBIZZZAAAMVVXXNNNNNNNNUUUUUUUUYYYYYYYYYYYYYYYYYYYFEEEEEEEEEEEEEEEVVVVRRRRRRRRGGGGGGGG\nZZUUUUUUUUUUUUUUUIBBBBBBBBBBLLLLLLLKFFWWWPPPQVXVVVVVVVVVBIZZZZZAMVVXXNNNNNNNNUUUUUUUUYYYYYYYYYYYYYYYYYEYEEEEEEEEEEEEEEEEEVVVRRRRRRRRGGGGGGGG\nZZUUUUUUUUUUUUUUUBBQQBBBTBQBLQQQQQLFFFFFFPPPPVXVVVVVVVVVVZZZZZZAMVXXXNNNNNNNNUUUUUUUUYYYYYYYPYYPYYYYYEEEENEOEEEEEEEEVVVVVVVPRRRRRRRRRGGRRGNN\nZZUUUUUUUUUUUUUUUQQQQQBBBBQQQQQQQQQFFFFFFPPJVVVVVVVVVVVVVVZZZZZVVVVXXXNNNNNNNUUUUUUUUYYYYYYPPPPPEYEYEEEBEEEOEEEEEEEEEVVVVVVVRERRRRRRRRRRJJNJ\nZZUUUUUUUUUUUUUUUQQQQQQBBBQQQQKKKKKKKKFFFFFJVVVVVVVVVVVVVVVZZZZVVVVVXXXXNNNNAIIIGGGGGYYYYYBPPPPPEEEYEEEEEEEOOEEEEEEEEVVVVVVVVVVRRRRRRJJJJJJJ\nZZUUUUUUUUUUUUUUUQQQQQQQQQQQQXKKKKKKKKFFFFFFVVVVVVVVVVVVVVZZZVVVVVXXXXXIRNAAAIIIIIIIGGYYYYBPPPPEEEEEEEEEEEEOOEEEEEEEVVVVVVVVVVVRRRRRRJJJJJJJ\nZZUUUUUUUUUUUUUUUPPPQQQQQQQQQXKKKKKKKKFFFFFBBVVVVVVVVVVVVVZZVVVVVVXXXXXIRRIIIIIIIIIIIYYYYBBBBPPLEEEEEEEEEEEEOEEKEEEEVVVVVVVVVRRRRRRRJJJJJJJJ\nZZUUUUUUUUUUUUUUUPPQQQQQQQQQQKKKKKKKKKFFFBBBBBVVVVVVVVVVVVVVVVVVVVVVXXXIIIIIIIIIIIIIIHYEEBBEEEJEEEEEEEEEEEEEEWEKKKEEVKVVVVVVVRRRRRRRJJJJJJJJ\nZZUUUUUUUUUUUUUUUPPQQQQQQQQQKKKKKKKKKKFFBBBBBBBVIIVVVVVVVVVVVVVVVVVVVXXXIIIIIIIIIIIIIIIIEEEEJJJJEEEEEEEEEEEEEEKKKKEKKKKKKKVRRRRRRRRJJJJJJJJJ\nZZPPUUUUUUUUOPPPPPQQQQQQQQQXKKKKKKKKKKKKKKBBBBBIIIIVVVVVTTTVVVVVVVVVVXXIIIIIIIIIIIIIIIIIEEEEEEEEEEEEEEEEEEEEEEKKKKKKKKKWKKVRRRRRRRJJJJJJJJJJ\nPPPPUUUUUUUUPPPPPQQQQQQQQXXXKKKKKKKKKKKKKKBBBBIIIIIIIVVVVTTVVVVVVVVVVVIIIIIIIIIIIIIIISEEEEEEEEEEEEEEEEEEEEEEEEKKKKKKKKKWKKVRRRRRRRJXJJJJJJJJ\nPPPPUUUUUUUUNPPEQQQQQQUQQXXXKKKKKKKKKKKKKKBBBBIIIIIIWWWWWWWWICVVEVVVVCCIIIIIIIIIIIIIIIIEEEEEEEEEEEEEEEEEEDDEEDKKKDKWWWWWKKVRVRRRRXXXJJJJJJJJ\nPDDPUUUUUUUURRREEQQQQQQQQQXXKKKKKKKKKKKKKKRRBRMIIIIIWWWWWWWWICVVVVYVVCCCIIIIIIIIIIIIIIEEEEEEEEEEEEEEEEEEEEDDDDDDDDKKKKWWWWWWVVRJSXXXJJJJJJJJ\nDDDPUUUUUUUURRRREEQQQQQQQXXXKKKKKKKKKKKKKKRRRRRIIIIIWWWWWWWWIVVVVYYYCCCCCCIIIIIIIIIIIREEEEEEEEEEEEEEEDDEEDDDDDDDDDKKKKWWWWWWVSSSSSSSIJJJJJJJ\nDDDPUUUUUUUURRRREEQQQQQXXXXXKKKKKKKKKKKKKKRRRRRRIIIIWWWWWWWWJJJJJCCCCCCCCCIIIIIIRRRXXXXXXXXEEEEEEEEEEDDDDDDDDDDDDWKKWWWWWWWSSSSSSSSSSJKJJJSJ\nDDDDUUUUUUUURRRRRQQQQQQQQXXXXXXXKKKKKKKKKKRRRRRRIIIIWWWWWWWWWWWJJCCCCCCCCCCIIIIIIERXXXXXXXXEEEEEEEEEDDDDDDDDDDDDDWWKWWWWWWWSSSSSSSSSSJJJJJJJ\nDDDDPPRRRRRRRRRRRQQQQQQQQQXXXXXXKKKKKKKKKKRRRRIIIIIIWWWWWWWWWWWWWWJCCCCCCCCIIIIIEERXXXXXXXXEEEEEEEEDDDDDDDDDDDDDDDWWWWWWWWWWKSSSSSSSSSSJJJSJ\nDDDRRRRRRRRRRRRRRQQQQQQQQQQXXXXXKKKKKKKKKKRRRRVIQIIIWWWWWWWWWWWWWWWWVCCGGGGGIIIGRRRXXXXXXXXEEEEEEEEEDDDDDDDDDDDDDWWWWWWWWWWWSSSSSSSSSSSSSSSS\nDDRRRRRRCRRRRRRRRQQQQQQQQQQXXXXXXKKKKKKRRRRRRRQQQQIIWWWWWWWWJJWWWWWWJJGGGGGGGGGGRRRXXXXXXXXEEEEEEEEEEDDDDDDDDDDDDDWWWWWWWWWWWSSSSSSSSSSSSSSS\nDDDRRRRRCCCRRRRRPQQQQQQQQQQXXXSSSKKKKKKRRRRRRRMQQQIIWWWWWWWWJJWWWWWWJJJJGGGGZZZGRRRXXXXXXXXREEEEEEELMLLLDDDDDDDDDDDDWWWWWWWWWSSSSSSSSSSSSSSS\nDDRRRRRRCCCCRCCPPPPPQQQQQQQMXXXSSKKKKKKRRRRRRRMQQQQIWWWWWWWWJJWWWWWWJJJJGGGZZZZZRRRXXXXXXXXREEEEEELLLLLLLIIIIIIIIIIDWWWWWWWWSSSSSSSSSSSSSSSS\nDDRRRRRCCCCCCCPPPPPPPPQQQQQQXXSSSSSSSSRRRRRRRRQQQQQQQIIIIIJJJJWWWWWWJJJJGGZXXXXXXXXXXXXXXXXRRRRLLELLLLLDDIIIIIIIIIIDWWWWWWWWSSSSSSSSSSSSSSSS\nDDDRDRRCCCCCCCPPPPPPPPQQQFQQNNNSSSSSSRRRRRRRRRQQQQQQQIIIIPJJJJWWWWWWJJJJGGZXXXXXXXXXXXXXXXXRRRRLLLLLLLLDDIIIIIIIIIILWWWWWWWWSSSSSSSSSSSSSSSS\nDDDDDRRRCCCCCCPPPPPPPPQQFFNNNNNSSSSSSRRRRRRRRRRQQQQQQIIIGJJJJJJWWWWWJTJGGHZXXXXXXXXXRRJJRJJRRRRRLLLLLLLDDDDDDDDLLLLLWWLWWWWWNNSSSSSSSSSRRRRS\nDDDDZRRZZRCCCCCYPYYPYPQQFNNNNNNSSSSSSSRRRRRRRRRQQQQQQQIGGJJJJJJWWWWWTTJGHHYXXXXXXXXXRRJJJJJJJJXXXXLLLLLHDDDHDDDLLLLLLWLWTWWNNNSSSNSSRRSRRRRR\nDDDBZZZZCCCCCCCYYYYYYYQQFNNNNNNSSSSSSSSRRRRRRRRRQQQQQQQQQJJJJJJWWWJJJJXXXXXXXXXXXXXZJJJJJJJJJJXXXPPHLLLLLHHHHDMLLLLLLLLWTTANNNNNNNRRRRRRRRRR\nDDBBBZZZCYCCCCYYYYYYCFQFFFNNNNSSSSSSSSSSGRGRGRRGQQQQQQHHSSLJJMJJJJJJJHXXXXXXXXXXXXXZZZJJJJJJJJPPPPYHLLHHHHHHHHLLLLLLLLLLTAANNNNRRNRRRRRRRRRL\nBBBBBZZZZYYCYCYYYYFFFFQFFFFNNNSSSSSSSSSGGGGGGGGQQQQQQQQHSSSSMMMJJJMMMHXXXXXXXXXXXXXZZZZZJJJJJJJPPPHHHLHHHHHHHHLLLLLLLLLAAAAARRNRRRRRRRRRRRRL\nBBBBBMYYYYYYYYYYYYVFFFFFFFFFFSXSSSSSSSGGGGDDDGGQQQQQQIQHSSXEMMMMMMMMUHXXXXXXXXXXXXXZZZZZYJJJJJJJPPHHHHHHHHHHHLLLLLLLLDAAAAAAARRRRRRRRRRRRRRL\nUBBBYYYYYYYYYYYYYYYYYFFFFFFFSSSSSSSSFFGGDDDDDDGQQQQQQEEEESSEMMMMRRRRUUXXXXXXXXXXXXXZZHHYYJJJJJJJPYHHHHHHHHHHHLLLLLLLLAAAAAAAARRRRRRRRRRRRRLL\nBBBBYYYYYYYYYYYYYYYYFFFFFFFFSSFFFFFFFFFGGDDDDDDDDYYEQEEEEEEEMMMRRRRRXUXXXXXXXXXXXXXYYYYYYJJJJJYYYYYHHHHHHHHHHHLLLLLLALLLAAAAAAAARRRRRRRRRRLL\nBBBBBBYYYYYYYYYYYYYYYFFFFFFFFFFFFFFFFFGGGGDDDDDDDDYEEEEEEEEEEMMRRRRUUUXXXXXXXXXXXXXYYYYVVYYYJYYYYYYVVHHHHHHHHHHLLLLLLLAQAAAAAAAAAARRRRRRRRLL\nBBBBYYYYYYYYYYYYYYYYYIFIFFFFFFFFFGGGFFGGGGDDDDDDDDYEEEEEEOWEOWRRRRRUUULUUUUUUZZZZZYYYYYIVYYYYYVVVYVVHHHHHHHHHHGFLLLLLLAAAAAAAAAAARRZRRYZZRRL\nBBBBYYYYYYYYYYYYYYYYYYFIIIFFIIIFFFGGGGGGDDDDDDMDYYYYYEEEEWWWWWRRRRUUUULLUUUUZZZZZZZZYMYVVVVVVVVVVVVVHHHHHHHHHHGFLLLVVVVAAAAAAAAAAAAZZZZZZZLL\nBBBBBYBBVRVYVVYYNYKYYYIIIIIIIIFFFFFGGGGGDDDDDDMDDYYYEEEEEWWWWWRRRRRRRULLLLUZZZZZZZZZZMYTTVVVVVVVVVVVVHHNHHHHHHGGULLLVVVAAAAAAAAAAAAAZZZZZJBB\nBBBBBBBBVVVVVVVNNNIIIIIIIIIIIIIIFFFGGGGGDDDDDDMDDDDYYEEEWWWWWCWRRRRRRRLLLIGIZZZZZZZZZMMVVVVVVVVVVVVVHHHHHHHGGGGGGLLVVVVAAAAAAAAAAAAZZZZZZZBB\nBBBBBBBBVVVVVVNNIIIIIIIIIIIIIIIFFFDGDDDDDDDDDDDDDDNDDREEWWWWWWWWWWIRRLLLIIIIIIIZZZZZZMMVVVVVVVVVVVVVVQQQQGGGGGGGGVVVDDDAAAAAAAAAAAAZZZZZZZBB\nBBBBBBBVVVVVVVVVVWIIIIIIIIIIIIIUUDDDDDDDDDDDDDDDDDDDDDWWWWWWWWWWWWWRRLLLIIIIIIIIIIZZUIMVQVVVVVVVVVVVQQQQQQQGGGGGVVVVDDDDAAAAAAAAKKAAAAZZZZBB\nBBBBBBBVVVVVVVVVWWWIEEIIIIIIIIIUUDDDDDDDDDDDDDDDDDDDWWWWWWWWWWWWWWWIIILLIIIIIIIIIIIIIIIQQVVVQQVVVVVQQQQQQQGGGGGGGVVVHDDDDHHHAAAKKKAKAAZZZZZZ\nBBBBBBVVVVVVVVWVVWWIIEIIIIIIIIUUUUUDDDDDDDDDDDDDDDDWWWWWWWWWWWWWWWDDLIIIIIIIIIIIIIIIIIIQQQQQQVVVVVQQQQQQQGGGGGGGGGVVHHHHHHHKKKKKKKKKKKKKJJJJ\nBBZBBBVVVVVVVWWVWWIIIIIIIIIIIIUUUUUUDDDDDDDDDDDDDOOOWWWWWWWWWWWWWWDDLLIIIIIIIIIIIIIIIIIIQQQQQQVVVVVQQQQQQQGGGGGGGVVHHHHHHHHKKKKKKKKKKKKKJJJJ\nBBBBBBVVVVVVWWWWWKIIIIIIIIIIKIIUUUUUDDDDDDDDDDOOOOOOOWWWWWWWWWWWWLLDLLIIIIIIIIIIIIIIIIIIQQEQQQQQVQQQQQQQQQQGGGGGGVVVHHHHHHHKKKKKKKKKKKKXXJJJ\nCCCBBBBBIVVWWWWWKKKIKIIIIIIIKKKDDUUDDDDDDDDDDDDDDOOOOOWWWWWWWWYWWLLLLLIIIIIIIIIIIIIIIIIIQQEEEQQQQQQQQNQQQQQQGGGGGVVVVHHHHKKKKKKKKKKKKKKXXJXJ\nCCCCBBBBIIVVWWWWKKKKKKKKIIKKKKKDDDDDDDDDDDDDDDDSOOOOOOWWYWWYYYYYYLLLLLLIIIIIIIIIIIIIIIJIQQQEEQQQQQQQNNQQQQQQQGGGPVVHHHHHHHOKKKKKKKKKKXXXXXXJ\nCCCCBBBIIKKKKKKKKKKKKKKKIKKKKKKKDDKKDDDDDDDDDDDDOOOOOOOWYYWYYYYLLLNLLLIIIIIIIIIIIIIIEEECEEEEEEEQQQQQQNQQQQQQGGGPPPPPPPPHHHHGKKKKKKKKKXXXXKXX\nCCCCCCBKIKKKKKKKKKKKKKKKKKKKKUKKKKKKKDDADDADDDDOOOOOOOOWYYYYYYYLLLNLLLIIIIIIIIIIIIEEEEEEEEEEEEEQQQQQQNNQQNQQQQPPPPPUPPPHHHHGGGGKKKKKKXXXXXXS\nCCCCCCKKKKKKKKKKKKKKXXKKKKKKUUUKUUUUKADAAAAAADDOOOOOOOOUYYYUUYYYYYOOOOIOOOIFFIIIIEEEEEEEEEEEEEEQQQQQQQNNNNQQQQQPPPPPPPGHHGHGGGGKKKKKKXXXXSSS\nCCCCCCKKKKKKKKXXXXKXXKKKKKKUUUSUUUUUPUUAAAAAAOOOOOOOOOOUYYUUUUYYYOOOOOOOOOIFFIIIIEEEEEEEEEEEEEEEQEEEQNNNNPPPQQPPPPPPPPPPGGGGGRKKKKKKKFFXXXSS\nCCCCCCKKKKKKKXXXXXXXXXXKKKKKUUUUUUUUUUUUUAAAOOOOOOOOJUOUURRRRRRYYOOOOOOOOOOOOOOIEEEEEEEEEEEEEEEEEEEEINNNNNPPPPPPPPXXXXXGGRRGGRRRKKFKFFXXXSSS\nCCCCCCKKKKKKKXXXXXXXXXXKKKKUUUUUUUUUUUUUUAAAOOOOOOOOJUUUURRRRRROOOOOOOOOOOOOOOIIEEEEEEEEEEEEEEEEEEEIINNNNNNNZPPPPPXXXXXGRRRRGRRFFFFKFSSSSSSS\nCCCCCCKKKKXXXXXXXXXXXXXKKUUUUUUUUUUUUUUAAAAAAOOOOOOOUUUUURRRRRROOOOOOOOOOOOOOOOIEEEEEEKKEKKEEEEEEEEINNNNNNNPPPPPPPXXXXXRRRRRRRRFFFFFFSSSSSSS\nCCCCCCKKKKXXXXXXXXXXXXXXKSJJUUUUUUUUUUAAAAAAAOOOOOOOOUUUURRRRRROOOOOOOOOOOCOIOIIKELEWKKKKKAEEEEEEEENNNNNNNNPPPPPPPXXXXXRRRRRRRRRFFFFFFSSSSSG\nCCCCCCKKKKKXXXXXXXXXXXXSSSJJURUUUUUUUUAAAAAOOVOOOOOOUUUUURRRRRROOXXOOOOOOOOOIIIIKKKKKKKKKKKEENENEENNNNNNNNNPPPPPPPXXXXXRRRRRRRRRRFFFFSSSSSGG\nCLLLCLKLKKKKSYYYXXXXXXXXSSSSUPXUUUUUUUYAAAAOOOOOOWWUUUUUURRRRRRXXXXXXOOOOOOOOIIIIIIKKKKKKKKEENNNNENNNNONNNNPXXXXXXXXXXXRRRRRRRRRRFFFFFSSSSGG\nCCLLLLLLLLSSSYYYXXXXXSXBSSSRPPXXXUUYYYYYVAOOOOOOOWOCUUUUURRRRRRXXXXXOOOOOOOOOIIIIIIKKKKKKKKEKNNNNNNNNNONONNPXXXXXXXXXXXRRRRRRRFFFFFFFFSGGSGG\nCCLLLLLLLLLSYYYYYYYXXSSSSSSPPPXXXUUYVVHVVAAAOOOOOOOOMUUUURRRRRRXXXXXOOOOOOOIOIIIIIIKKKKKKKKKKNKNNNNNNOOOOOOOXXXXXXXXXXXXRRRRRRFFFFFFFLLGGGGG\nCCCLLLLLLLLLYYYYYYYXXOOSISSPPPXVXVVVVVHVVAAUOOOOOOOOMMUUUUUURXXXXXXOOOOOOOIIIIIIIIIKKKKKKKKKKKKNNNNNNNXXXXXXXXXXXXXXXXXXXRRRRRFRFFLLLLGGGGIG\nCCCLLPLLLLLGYYYYYYXXXPPPPPPPPPVVVVVVVVVVVVUUVOOOOONOOMUURRUURRXXXXXOOOOOOOIIIIIIIIKKKKKKKKKKKKKNNNNNNOXXXXXXXXXXXXXXXXXXXRRRRRRRRLLLLLLGIIII\nCCCLCLLLLWYGYYYYYYXXPPPPPPPPPPPVVVVVVVVVVVKUVOOOOOOOOOOORRUURRRRRXXOOOOOOIIIIIIIIKKKKKKKKKKKKKKKMMMMMMXXXXXXXXXXXXXXXXXXXRRRRRRRRCLLLLCIIIII\nCCCCCCCLWWYYYYYYYYPPPFFPPPPPPPVVVVVVVVVVVVUUUOOOOOOOOOOORRRRRRXXXXXXNNOOOOOIIIIIIKKKKKKKKKKKKKKKMMMMMMMMMEOEXXXXXXXXXXXXXUURRRRRRRJJJIIIIIII\nCCCCGGGGGYYYYYYYYYPFFFPPPPPPPPPGVVVVVVVVVXUUUOOOOOOOOOOQOORRRRRRMMMMNMOMIIIIIIIIIKKKKKKKKKKKKKKKMMMMMMMMMEEEXXXXXXUUXXXXXPRRRRRRRRJJJJIIIIII\nCCGGGGGGGYYFFYYYYYYFFFFPPPPPPPVGVVVVVVVVVUUUUUOOOOOOOOOOOOORRRRMMMMMMMMMMMMMIIMIIKKKKKKKKKKKKKKKMMMMMMMMMMMMXXXXXMUUXXXXXPRRRRPPJJJJJJIIIIII\nCGGGGGGGGGFFFFFFFYFFFFFFPPPPPPVVVVVVVVVVUUUUUZOOOOOOOOOOORRRRZRMMMMMMMMMMMMMMIMMIIKKKKKKKKKKKKKKMMMMMMMMMMMMXXXXXMCUUUURRRRRRRPPPJPJJJIIIIII\nCCGGGGGGGGGFFFFFFFFFFFFFPPPPPPPPVMMPPPVVUUUUUZZOOUUOOOORORRRRZZMMMMMMMMMMMMMMMMMMIIIKKKKKKKKKKKKMMMMMMMMMMMMMMMMMMDDDDPRRRRRRRPPPPPJJJIIIIII\nCCGGGGGGGGGFFFFFFFFFFFFFPPPPPPPPVPPPPPVUUUUUUUUUUUOOOOORRRRZZZZZMMZMMMMMMMMMMMMMMIIIKVVKKKKKKKKKMMMMMMMMMMMMMMMMMMRRRRRRRRRPPPPPPPPJJJJJIIII\nCCGGGGGGNSSSFFFFFFFFFFFFPPPCPPPCVTPPPPPUUUUUUUUURRRRORRRRRRZZZZZZZZMMMMMMMMMMMMMVIIVVVVVKKKKKKKKKKEEEMMMMMMMMRRRRRRRRRRRRRRPPPPPPPPPPJJJIIII\nCCGIIIGGSSSSFFFFFFFPFFFFPPPCCCCCCCPGUUPUUUUUUUURRRRRRRRRRRZZZZZZZZZZZMWWWWWWWMMMVVVVVKKKKKKKKKKKKKKEEMMMMMMMMMMRRRRRRRRRRRRRRPPPMMPPPJJJMIII\nCCGIISSSUSSSSFFFFFPPAAAFAPACCCCCCCTUUUUUUUUUUUUUURRRRRRRRRRZZZZZZZZZMMWWWWWWWWWWWWWVVVKQKKKKKKKKKKKEEMMMMMMMMMMRRRRRRRRRRRRRRPPPPMMMPJMMMIII\nCBBBSSSSSSSSSSFFPPPPPAAAAAAAACCCCCCUUUUUUUUUUUUUURRRRRRRZZZZZZZZZZZZZMWWWWWWWWWWWWWVVVVVVKKKKKKKKKKKEMMMMMMMMMMRRRRRRRRRRRRRRPPPPMMMMMMMMIII\nCBBBBBSSSSSSSSFFPPPPPAAAAAAAAACCCCGCOUUUUUUUUUUURRRRRRRZZZZZZZZZZZZCJJWWWWWWWWWWWWWVVVVVVVNKNKKKKKKKECCCEMMMMMMHHCCDRRRRRRRRRPPPMMMMMMMMMMII\nCBBBBBBSSSSSSSPPPPPPPAAAAAAAAACCCCCCUUUUUUUUUUUURRRRRRRZZZZFZZZZZCCCCJJJMWWWWWWWWWSVVVVVVVNKNNNKKKKKKCCCHMMMMMMSHDCDRRRRRRRRRPPPSSMMMMMMMMMI\nBBBBBBDSSSSSSSSSIIPPPPAAAAPPACCCCCCUUCUUUXUUUUUURRRRRRRRRRRFZZZZZCCCCJJZZWWWWWWWWWSVVVVVVNNNNNNNKKKKKKCCHMMMMMMHHDDDRRRRRRRRRPPPPPCMMMMMMMMM\nBBBBBBBSSSSSSSSSIIIPPAAAAAPPPPCCCCCCCCUUSUUUUNNBBRRRRRRRRRRRRZZZZCCCCCJZZWWWWWWWWWSVVVVVVNNNNNNNNGKKKHCCHMMMMMMHHHDDRRRRRRRRRPPPCPCMMMMMMMMV\nBBBBBBBBSSSSSSSSIIPPPAAPAAAPPPCCCCCCJNUUUUUUBBBBBRRLRRRRRRRRRZZZZCCCCCJZZDVSVVSSVVVVVVVVVNNNNNNNNGKKKHHHHMMMMMMHHHHDRRRRRRRRRCPPCCCCCMMMMMMV\nBBBBBBBBSSSSSSSSIIPPPAPPPPPPPPCCCCNJJNNUCCUBBBBBBLLLRRRRRRRUULLZZCCCCCCLVVVVVVSSSVVVVVNNNNNNNNNNNGKKQHHHHHHHHHHHHHHHRRRRRRRRRCPPCCCCMMMMMMVV\nBBBBBBBBBBSSSSIIIIIIPPPPPPPPPCCCCCNNNNNNCCBBBBBBBBLLLRRRRRRLLLLHCCCCCCLLVVVVVIVVSVVVVVNNNNNNNNNNNGSSQQQHHHHHHHHHHHHICCCCCCCCCCCCCCCCMMMMMMMV\nBBBBBBBJBFFSSSVVVVPPPPPPPPPPPCCCPCNNNNNNCCCBBBBBBLLLLLRRRRLLLLLCCCCCCCCLVVVVVVVVVVVVVVNNNNNNNNNNNGGSQQHHHHHHHHHHHHCCCCCCCCCCCCCCCCCCCMMMMMMV\nGBBBBGBBBFFSSSVVKVPPPPPPPPPPPPPCPPNNNNNCCCBBBBBBBBBLLLLRLRLLLLLCCCCCCNNVVVVVVVVAVVVVVNNNNNNNNNNNSSSSSSHHHHHHHHHHHFFCCCLCCCCCCMMCCCCCCMMMVVMV\nGBBGGGBBBFVVGGVVVVVPPPPPPPPPPPPPPPNNNNNCCCBBBBBBBBBLLLLLLLLLLLLGCCCCCNEVEEVVVVVEEVVVVNNNNNNNNTTHSSSSSSSHHHHHHHHFFFFFCCCCCCCMMMMCCCCCCCCMVVVV\nGBBBGGGVWVVVVVVVVVVVVPPPPPPPPPPPPNNNNNNCCCBBBBBBBBBBLLLLLLLLLLLCCCCCCNEEEEEVVEEEETTTTTTNNNNNNTTHHSSSSSSHHHHHHHHFFFFFCCCCCMCMMMMCCCCCCSCCSSVV\nGGBBGGGVVVVVVVVVVVVVVVVWPPPPPPPPPNNNNNNCCBBBBBBBPBBBLLLLLLLLLLLLCCCCCEEEEEEVEEEEEEETTTTTTTNNTTHHHSSSSSDHHHDDHHHHFFFFCCCCCMMMMMMMCCCCCSSSSSVV\nGGGGGGGGVVVVVVVVVVXVVWWWWPPPPPWPPPPPNCCCBBBBBBPPPPBBLLLLLLLLLLLLCCJCJJJEEEEEEEEEEEEETTTTTTTTTHHHPPSSSDDHHDDDHHFFFFFFFFCFMMMMMMCCCCCCCSSSSSSS\nGGGGGGGGVVVVVVVVVVXWWWWWWWWWWWWWWPPPNNCCCCBSPPPPPPPPJLLLXLLLLBLJJJJJJJEEEEEEEEEEEEEETTTTTTHHHHHHHHHHSDDDDDDUUUFFFFFFFFFFFFMMMMCCCCCSSSSSSSSA\nGGGGGGGGVVVVVVVVVVWWWWWWWWWWWWWWPPPPPCCCCCCPPPPPPPPJJLLLLLGLLBIJJJJJJJEEEEEEEEZEEEETTTTTTTHHHHHHHHHHDHDDDDDUUUUFFWFWWFFMMFMMMMMCCCIIISSSSSAA\nGGGGGGGGQQQVVVVVVGGWWWWWWWWWWWWWPPPPQQQCCCPPPPPPPPNNNNLLLGGIIBIJJIIJEEEEGEEEEEZEEEETTTTTTHHHHHHHHHHHHHHHDUUUUUUSFWWXWWMMMMMMMCCCCIIIISSSSSSS\nGGGGGGGGQQQVVVVVPPWWWWWWWWWWWWWWPIIQTQCCCPPPPPPNNNNNNNZZLIIIIIIIIIWEEEEEEEEZZEZZEEETTTTOOHHHHHHHHHHHHHUUUUUUUUUSWWWWWWMMMIIMIICCIXIISSSSSSSS\nGGGGGGGGQQQQQQQPPPPPWWWWWWWWWWWWPIIQQQCCCPPPPNPNNNNZZNZZZZZZZIIIIIWWEEEEEEEZZZZQQTTTTTTTOOHHHHHHHHHHHHHUUUUUUUUSSWWAWWMNIIIIIIIIIIIIISSSSSSS\nGGGGGGGGQQQQQQQPPPPPWWWWWWWWWWWBIIQQQQCQCCPPNNNNNNNZZZZZZZZZZIIIIIIIIYEEEGEZZZZQQQOTTTTTOOHHHHHHHHHHHHHUUKUUUSUSSSSWWIIIIIIIIICIIIIIISSSSSSS\nGGGGGGGGGQQQQQQPPPPPWWWWWWWWWWWWIIQQQQQQQNNNNNNNNNNNZZZZZZZZZIIIIIIIIEEEEEEEZZZZZQOTOTTOOOHHHHHHHHHHHKKUUKKUSSTSNSVWWWIIIIIIIIIIIIIIYSSSSSSS\nGGGGGGQQQQQQQPPPPPPPWWWWWWWWWIIIIQQQQQQQNNNNNNNNNNZZZZZZZZZZZZIIIIIZZEEEEEECZZZZZQOOOOOOOOHHHHHHHHHMMKKKKKSSSSSSNNWWWNIXIIIGIIIIIIIIYSSSSSSS\nGGGGGGQQQQQQQPPPPPPPWWWWWWWWWIIIIIIQQQQQNNNNNNNNNNNNNZZZZZZZZZZZZZZZZEEEEEZZZZZZZZOVVOOOOOOHHHHHHHHHMKKKKKTSSSSSNNWWNNIIIIIIIIIIIIIIYYSSSSSG\nGGGQQQQQQQQQQQPPPPRRWWWWWWWWWIIIIIIQQQQQNNNNNNNNNNNVNZZZZZZZZZZZZZZZZZZEZZZZZZZZZZOOOOOOOOOHHHHHHHHHHKKKKKTTSSSSNNNWNNIIIIIIIIIIIIIIIISSSSSG\nGEGQQQQQQQQQQQQQPRRRWLLWWZIIIIIIIIIQQQQQNMNNNNNNNNNNNNNZZZZZZZZZZZZZZZZZZZZZZZZZZZOOOOOOOOHHHHHHHHHHHXKKKKTTTSSSNNNNNNIIIFIIIIIIIIIIILLSSSSG';
+var $author$project$Aoc12$sample = 'AAAA\nBBCD\nBBCC\nEEEC';
+var $author$project$Aoc12$sampleAbba = 'AAAAAA\nAAABBA\nAAABBA\nABBAAA\nABBAAA\nAAAAAA';
+var $author$project$Aoc12$sampleE = 'EEEEE\nEXXXX\nEEEEE\nEXXXX\nEEEEE';
+var $author$project$Aoc12$sampleLarger = 'RRRRIICCFF\nRRRRIICCCF\nVVRRRCCFFF\nVVRCCCJFFF\nVVVVCJJCFE\nVVIVCCJJEE\nVVIIICJJEE\nMIIIIIJJEE\nMIIISIJEEE\nMMMISSJEEE';
+var $author$project$Aoc12$sampleXo = 'OOOOO\nOXOXO\nOOOOO\nOXOXO\nOOOOO';
+var $author$project$Aoc12$read = function (dataSource) {
+	switch (dataSource.$) {
+		case 'Input':
+			return $author$project$Aoc12$input;
+		case 'Sample':
+			return $author$project$Aoc12$sample;
+		case 'SampleAbba':
+			return $author$project$Aoc12$sampleAbba;
+		case 'SampleE':
+			return $author$project$Aoc12$sampleE;
+		case 'SampleLarger':
+			return $author$project$Aoc12$sampleLarger;
 		default:
-			return $author$project$Aoc12$N;
+			return $author$project$Aoc12$sampleXo;
 	}
 };
-var $author$project$Aoc12$walk = F5(
-	function (board, visited, dir, move, pos) {
-		walk:
-		while (true) {
-			var nextPos = A2($author$project$Aoc12$moveForward, dir, pos);
-			var _v0 = nextPos;
-			var nextX = _v0.a;
-			var nextY = _v0.b;
-			var _v1 = A3($tortus$elm_array_2d$Array2D$get, nextY, nextX, board);
-			if (_v1.$ === 'Nothing') {
-				return $elm$core$List$reverse(
-					A2(
-						$elm$core$List$cons,
-						_Utils_Tuple3(pos, dir, move),
-						visited));
-			} else {
-				if ('#' === _v1.a.valueOf()) {
-					var $temp$board = board,
-						$temp$visited = visited,
-						$temp$dir = $author$project$Aoc12$turnRight(dir),
-						$temp$move = $author$project$Aoc12$Turn,
-						$temp$pos = pos;
-					board = $temp$board;
-					visited = $temp$visited;
-					dir = $temp$dir;
-					move = $temp$move;
-					pos = $temp$pos;
-					continue walk;
-				} else {
-					var $temp$board = board,
-						$temp$visited = A2(
-						$elm$core$List$cons,
-						_Utils_Tuple3(pos, dir, move),
-						visited),
-						$temp$dir = dir,
-						$temp$move = $author$project$Aoc12$Forward,
-						$temp$pos = nextPos;
-					board = $temp$board;
-					visited = $temp$visited;
-					dir = $temp$dir;
-					move = $temp$move;
-					pos = $temp$pos;
-					continue walk;
-				}
-			}
-		}
-	});
-var $author$project$Aoc12$initModel = F2(
-	function (mode, useSample) {
-		var dir = $author$project$Aoc12$N;
-		var board = $author$project$Aoc12$initBoard(useSample);
-		var startPos = $author$project$Aoc12$findStartPos(board);
-		var route = A5($author$project$Aoc12$walk, board, _List_Nil, $author$project$Aoc12$N, $author$project$Aoc12$Forward, startPos);
-		var candidateObstructions = A2(
-			$elm$core$List$map,
-			function (_v1) {
-				var p = _v1.a;
-				return p;
-			},
-			route);
-		var vizBoard = A2($tortus$elm_array_2d$Array2D$map, $author$project$Aoc12$Plain, board);
-		var _v0 = startPos;
-		var xStart = _v0.a;
-		var yStart = _v0.b;
-		var guardless = A4(
-			$tortus$elm_array_2d$Array2D$set,
-			yStart,
-			xStart,
-			_Utils_chr('.'),
-			board);
-		var msg = $elm$core$String$fromInt(xStart) + (',' + $elm$core$String$fromInt(yStart));
-		return {board: guardless, calcInterval: 100, calculating: false, candidateObstructions: candidateObstructions, counter: 0, currentLoopIndex: 0, debug: '', finished: false, guardDir: dir, guardPos: startPos, message: msg, mode: mode, paused: true, routeRemaining: route, routeWalked: _List_Nil, tickInterval: $author$project$Aoc12$defaultTickInterval, useSample: useSample, verifiedLoops: $elm$core$Array$empty, vizBoard: vizBoard};
-	});
+var $author$project$Aoc12$initModel = function (dataSource) {
+	var plots = _List_Nil;
+	var data = $author$project$Aoc12$read(dataSource);
+	return {dataSource: dataSource, finished: false, maxSteps: 0, message: '?', paused: true, plots: plots, step: 0, tickInterval: $author$project$Aoc12$defaultTickInterval, totalCost: 0, totalCostDiscount: 0};
+};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Aoc12$init = function (_v0) {
 	return _Utils_Tuple2(
-		A2($author$project$Aoc12$initModel, $author$project$Aoc12$Part1, false),
+		$author$project$Aoc12$initModel($author$project$Aoc12$Sample),
 		$elm$core$Platform$Cmd$none);
 };
-var $author$project$Aoc12$Calculate = {$: 'Calculate'};
 var $author$project$Aoc12$Tick = {$: 'Tick'};
-var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$time$Time$Every = F2(
 	function (a, b) {
 		return {$: 'Every', a: a, b: b};
@@ -6395,482 +5671,22 @@ var $elm$time$Time$every = F2(
 		return $elm$time$Time$subscription(
 			A2($elm$time$Time$Every, interval, tagger));
 	});
+var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc12$subscriptions = function (model) {
 	var tickSub = model.paused ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
 		model.tickInterval,
-		function (_v1) {
+		function (_v0) {
 			return $author$project$Aoc12$Tick;
 		});
-	var calcSub = model.calculating ? A2(
-		$elm$time$Time$every,
-		model.calcInterval,
-		function (_v0) {
-			return $author$project$Aoc12$Calculate;
-		}) : $elm$core$Platform$Sub$none;
-	return $elm$core$Platform$Sub$batch(
-		_List_fromArray(
-			[tickSub, calcSub]));
+	return tickSub;
 };
-var $author$project$Aoc12$Part2 = {$: 'Part2'};
-var $author$project$Aoc12$addObstruction = F2(
-	function (board, _v0) {
-		var x = _v0.a;
-		var y = _v0.b;
-		return A4(
-			$tortus$elm_array_2d$Array2D$set,
-			y,
-			x,
-			_Utils_chr('#'),
-			board);
-	});
-var $elm$core$Elm$JsArray$push = _JsArray_push;
-var $elm$core$Elm$JsArray$singleton = _JsArray_singleton;
-var $elm$core$Array$insertTailInTree = F4(
-	function (shift, index, tail, tree) {
-		var pos = $elm$core$Array$bitMask & (index >>> shift);
-		if (_Utils_cmp(
-			pos,
-			$elm$core$Elm$JsArray$length(tree)) > -1) {
-			if (shift === 5) {
-				return A2(
-					$elm$core$Elm$JsArray$push,
-					$elm$core$Array$Leaf(tail),
-					tree);
-			} else {
-				var newSub = $elm$core$Array$SubTree(
-					A4($elm$core$Array$insertTailInTree, shift - $elm$core$Array$shiftStep, index, tail, $elm$core$Elm$JsArray$empty));
-				return A2($elm$core$Elm$JsArray$push, newSub, tree);
-			}
-		} else {
-			var value = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
-			if (value.$ === 'SubTree') {
-				var subTree = value.a;
-				var newSub = $elm$core$Array$SubTree(
-					A4($elm$core$Array$insertTailInTree, shift - $elm$core$Array$shiftStep, index, tail, subTree));
-				return A3($elm$core$Elm$JsArray$unsafeSet, pos, newSub, tree);
-			} else {
-				var newSub = $elm$core$Array$SubTree(
-					A4(
-						$elm$core$Array$insertTailInTree,
-						shift - $elm$core$Array$shiftStep,
-						index,
-						tail,
-						$elm$core$Elm$JsArray$singleton(value)));
-				return A3($elm$core$Elm$JsArray$unsafeSet, pos, newSub, tree);
-			}
-		}
-	});
-var $elm$core$Array$unsafeReplaceTail = F2(
-	function (newTail, _v0) {
-		var len = _v0.a;
-		var startShift = _v0.b;
-		var tree = _v0.c;
-		var tail = _v0.d;
-		var originalTailLen = $elm$core$Elm$JsArray$length(tail);
-		var newTailLen = $elm$core$Elm$JsArray$length(newTail);
-		var newArrayLen = len + (newTailLen - originalTailLen);
-		if (_Utils_eq(newTailLen, $elm$core$Array$branchFactor)) {
-			var overflow = _Utils_cmp(newArrayLen >>> $elm$core$Array$shiftStep, 1 << startShift) > 0;
-			if (overflow) {
-				var newShift = startShift + $elm$core$Array$shiftStep;
-				var newTree = A4(
-					$elm$core$Array$insertTailInTree,
-					newShift,
-					len,
-					newTail,
-					$elm$core$Elm$JsArray$singleton(
-						$elm$core$Array$SubTree(tree)));
-				return A4($elm$core$Array$Array_elm_builtin, newArrayLen, newShift, newTree, $elm$core$Elm$JsArray$empty);
-			} else {
-				return A4(
-					$elm$core$Array$Array_elm_builtin,
-					newArrayLen,
-					startShift,
-					A4($elm$core$Array$insertTailInTree, startShift, len, newTail, tree),
-					$elm$core$Elm$JsArray$empty);
-			}
-		} else {
-			return A4($elm$core$Array$Array_elm_builtin, newArrayLen, startShift, tree, newTail);
-		}
-	});
-var $elm$core$Array$appendHelpTree = F2(
-	function (toAppend, array) {
-		var len = array.a;
-		var tree = array.c;
-		var tail = array.d;
-		var itemsToAppend = $elm$core$Elm$JsArray$length(toAppend);
-		var notAppended = ($elm$core$Array$branchFactor - $elm$core$Elm$JsArray$length(tail)) - itemsToAppend;
-		var appended = A3($elm$core$Elm$JsArray$appendN, $elm$core$Array$branchFactor, tail, toAppend);
-		var newArray = A2($elm$core$Array$unsafeReplaceTail, appended, array);
-		if (notAppended < 0) {
-			var nextTail = A3($elm$core$Elm$JsArray$slice, notAppended, itemsToAppend, toAppend);
-			return A2($elm$core$Array$unsafeReplaceTail, nextTail, newArray);
-		} else {
-			return newArray;
-		}
-	});
-var $elm$core$Array$builderFromArray = function (_v0) {
-	var len = _v0.a;
-	var tree = _v0.c;
-	var tail = _v0.d;
-	var helper = F2(
-		function (node, acc) {
-			if (node.$ === 'SubTree') {
-				var subTree = node.a;
-				return A3($elm$core$Elm$JsArray$foldl, helper, acc, subTree);
-			} else {
-				return A2($elm$core$List$cons, node, acc);
-			}
-		});
-	return {
-		nodeList: A3($elm$core$Elm$JsArray$foldl, helper, _List_Nil, tree),
-		nodeListSize: (len / $elm$core$Array$branchFactor) | 0,
-		tail: tail
-	};
-};
-var $elm$core$Array$append = F2(
-	function (a, _v0) {
-		var aTail = a.d;
-		var bLen = _v0.a;
-		var bTree = _v0.c;
-		var bTail = _v0.d;
-		if (_Utils_cmp(bLen, $elm$core$Array$branchFactor * 4) < 1) {
-			var foldHelper = F2(
-				function (node, array) {
-					if (node.$ === 'SubTree') {
-						var tree = node.a;
-						return A3($elm$core$Elm$JsArray$foldl, foldHelper, array, tree);
-					} else {
-						var leaf = node.a;
-						return A2($elm$core$Array$appendHelpTree, leaf, array);
-					}
-				});
-			return A2(
-				$elm$core$Array$appendHelpTree,
-				bTail,
-				A3($elm$core$Elm$JsArray$foldl, foldHelper, a, bTree));
-		} else {
-			var foldHelper = F2(
-				function (node, builder) {
-					if (node.$ === 'SubTree') {
-						var tree = node.a;
-						return A3($elm$core$Elm$JsArray$foldl, foldHelper, builder, tree);
-					} else {
-						var leaf = node.a;
-						return A2($elm$core$Array$appendHelpBuilder, leaf, builder);
-					}
-				});
-			return A2(
-				$elm$core$Array$builderToArray,
-				true,
-				A2(
-					$elm$core$Array$appendHelpBuilder,
-					bTail,
-					A3(
-						$elm$core$Elm$JsArray$foldl,
-						foldHelper,
-						$elm$core$Array$builderFromArray(a),
-						bTree)));
-		}
-	});
-var $elm$core$List$maybeCons = F3(
-	function (f, mx, xs) {
-		var _v0 = f(mx);
-		if (_v0.$ === 'Just') {
-			var x = _v0.a;
-			return A2($elm$core$List$cons, x, xs);
-		} else {
-			return xs;
-		}
-	});
-var $elm$core$List$filterMap = F2(
-	function (f, xs) {
-		return A3(
-			$elm$core$List$foldr,
-			$elm$core$List$maybeCons(f),
-			_List_Nil,
-			xs);
-	});
-var $elm$core$List$any = F2(
-	function (isOkay, list) {
-		any:
-		while (true) {
-			if (!list.b) {
-				return false;
-			} else {
-				var x = list.a;
-				var xs = list.b;
-				if (isOkay(x)) {
-					return true;
-				} else {
-					var $temp$isOkay = isOkay,
-						$temp$list = xs;
-					isOkay = $temp$isOkay;
-					list = $temp$list;
-					continue any;
-				}
-			}
-		}
-	});
-var $elm$core$List$member = F2(
-	function (x, xs) {
-		return A2(
-			$elm$core$List$any,
-			function (a) {
-				return _Utils_eq(a, x);
-			},
-			xs);
-	});
-var $author$project$Aoc12$findLoop = F4(
-	function (visited, dir, pos, board) {
-		findLoop:
-		while (true) {
-			if (A2(
-				$elm$core$List$member,
-				_Utils_Tuple2(pos, dir),
-				visited)) {
-				return true;
-			} else {
-				var _v0 = A2($author$project$Aoc12$moveForward, dir, pos);
-				var x = _v0.a;
-				var y = _v0.b;
-				var _v1 = A3($tortus$elm_array_2d$Array2D$get, y, x, board);
-				if (_v1.$ === 'Nothing') {
-					return false;
-				} else {
-					if ('#' === _v1.a.valueOf()) {
-						var $temp$visited = visited,
-							$temp$dir = $author$project$Aoc12$turnRight(dir),
-							$temp$pos = pos,
-							$temp$board = board;
-						visited = $temp$visited;
-						dir = $temp$dir;
-						pos = $temp$pos;
-						board = $temp$board;
-						continue findLoop;
-					} else {
-						var $temp$visited = A2(
-							$elm$core$List$cons,
-							_Utils_Tuple2(pos, dir),
-							visited),
-							$temp$dir = dir,
-							$temp$pos = _Utils_Tuple2(x, y),
-							$temp$board = board;
-						visited = $temp$visited;
-						dir = $temp$dir;
-						pos = $temp$pos;
-						board = $temp$board;
-						continue findLoop;
-					}
-				}
-			}
-		}
-	});
-var $author$project$Aoc12$hasLoop = F2(
-	function (startPos, board) {
-		return A4($author$project$Aoc12$findLoop, _List_Nil, $author$project$Aoc12$N, startPos, board);
-	});
-var $elm$core$List$takeReverse = F3(
-	function (n, list, kept) {
-		takeReverse:
-		while (true) {
-			if (n <= 0) {
-				return kept;
-			} else {
-				if (!list.b) {
-					return kept;
-				} else {
-					var x = list.a;
-					var xs = list.b;
-					var $temp$n = n - 1,
-						$temp$list = xs,
-						$temp$kept = A2($elm$core$List$cons, x, kept);
-					n = $temp$n;
-					list = $temp$list;
-					kept = $temp$kept;
-					continue takeReverse;
-				}
-			}
-		}
-	});
-var $elm$core$List$takeTailRec = F2(
-	function (n, list) {
-		return $elm$core$List$reverse(
-			A3($elm$core$List$takeReverse, n, list, _List_Nil));
-	});
-var $elm$core$List$takeFast = F3(
-	function (ctr, n, list) {
-		if (n <= 0) {
-			return _List_Nil;
-		} else {
-			var _v0 = _Utils_Tuple2(n, list);
-			_v0$1:
-			while (true) {
-				_v0$5:
-				while (true) {
-					if (!_v0.b.b) {
-						return list;
-					} else {
-						if (_v0.b.b.b) {
-							switch (_v0.a) {
-								case 1:
-									break _v0$1;
-								case 2:
-									var _v2 = _v0.b;
-									var x = _v2.a;
-									var _v3 = _v2.b;
-									var y = _v3.a;
-									return _List_fromArray(
-										[x, y]);
-								case 3:
-									if (_v0.b.b.b.b) {
-										var _v4 = _v0.b;
-										var x = _v4.a;
-										var _v5 = _v4.b;
-										var y = _v5.a;
-										var _v6 = _v5.b;
-										var z = _v6.a;
-										return _List_fromArray(
-											[x, y, z]);
-									} else {
-										break _v0$5;
-									}
-								default:
-									if (_v0.b.b.b.b && _v0.b.b.b.b.b) {
-										var _v7 = _v0.b;
-										var x = _v7.a;
-										var _v8 = _v7.b;
-										var y = _v8.a;
-										var _v9 = _v8.b;
-										var z = _v9.a;
-										var _v10 = _v9.b;
-										var w = _v10.a;
-										var tl = _v10.b;
-										return (ctr > 1000) ? A2(
-											$elm$core$List$cons,
-											x,
-											A2(
-												$elm$core$List$cons,
-												y,
-												A2(
-													$elm$core$List$cons,
-													z,
-													A2(
-														$elm$core$List$cons,
-														w,
-														A2($elm$core$List$takeTailRec, n - 4, tl))))) : A2(
-											$elm$core$List$cons,
-											x,
-											A2(
-												$elm$core$List$cons,
-												y,
-												A2(
-													$elm$core$List$cons,
-													z,
-													A2(
-														$elm$core$List$cons,
-														w,
-														A3($elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
-									} else {
-										break _v0$5;
-									}
-							}
-						} else {
-							if (_v0.a === 1) {
-								break _v0$1;
-							} else {
-								break _v0$5;
-							}
-						}
-					}
-				}
-				return list;
-			}
-			var _v1 = _v0.b;
-			var x = _v1.a;
-			return _List_fromArray(
-				[x]);
-		}
-	});
-var $elm$core$List$take = F2(
-	function (n, list) {
-		return A3($elm$core$List$takeFast, 0, n, list);
-	});
 var $author$project$Aoc12$updateClear = function (model) {
-	return A2($author$project$Aoc12$initModel, model.mode, model.useSample);
-};
-var $author$project$Aoc12$Highlight = function (a) {
-	return {$: 'Highlight', a: a};
+	return $author$project$Aoc12$initModel(model.dataSource);
 };
 var $author$project$Aoc12$updateNextStep = function (model) {
-	var z = 0;
-	var pos = model.guardPos;
-	var dir = model.guardDir;
-	var _v0 = model.routeRemaining;
-	if (_v0.b) {
-		var _v1 = _v0.a;
-		var p = _v1.a;
-		var d = _v1.b;
-		var m = _v1.c;
-		var rest = _v0.b;
-		var guardPos = p;
-		var guardDir = d;
-		var _v2 = p;
-		var x = _v2.a;
-		var y = _v2.b;
-		var newCell = function () {
-			if (m.$ === 'Turn') {
-				return $author$project$Aoc12$Highlight(
-					_Utils_chr('+'));
-			} else {
-				var _v4 = A3($tortus$elm_array_2d$Array2D$get, y, x, model.vizBoard);
-				if (_v4.$ === 'Nothing') {
-					return $author$project$Aoc12$Plain(
-						_Utils_chr('?'));
-				} else {
-					var cell = _v4.a;
-					if (cell.$ === 'Highlight') {
-						var ch = cell.a;
-						switch (ch.valueOf()) {
-							case '|':
-								return $author$project$Aoc12$Highlight(
-									(_Utils_eq(dir, $author$project$Aoc12$E) || _Utils_eq(dir, $author$project$Aoc12$W)) ? _Utils_chr('+') : _Utils_chr('|'));
-							case '-':
-								return $author$project$Aoc12$Highlight(
-									(_Utils_eq(dir, $author$project$Aoc12$N) || _Utils_eq(dir, $author$project$Aoc12$S)) ? _Utils_chr('+') : _Utils_chr('-'));
-							default:
-								return $author$project$Aoc12$Highlight(
-									_Utils_chr('?'));
-						}
-					} else {
-						var ch = cell.a;
-						return (_Utils_eq(dir, $author$project$Aoc12$E) || _Utils_eq(dir, $author$project$Aoc12$W)) ? $author$project$Aoc12$Highlight(
-							_Utils_chr('-')) : $author$project$Aoc12$Highlight(
-							_Utils_chr('|'));
-					}
-				}
-			}
-		}();
-		var vizBoard = A4($tortus$elm_array_2d$Array2D$set, y, x, newCell, model.vizBoard);
-		return _Utils_update(
-			model,
-			{
-				guardDir: guardDir,
-				guardPos: guardPos,
-				routeRemaining: rest,
-				routeWalked: A2(
-					$elm$core$List$cons,
-					_Utils_Tuple3(p, d, m),
-					model.routeWalked),
-				vizBoard: vizBoard
-			});
-	} else {
-		return _Utils_update(
-			model,
-			{finished: true, paused: true});
-	}
+	return model;
 };
 var $author$project$Aoc12$updatePrevStep = function (model) {
 	return model;
@@ -6878,7 +5694,7 @@ var $author$project$Aoc12$updatePrevStep = function (model) {
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc12$updateTogglePlay = function (model) {
 	if (model.finished) {
-		var m = A2($author$project$Aoc12$initModel, model.mode, model.useSample);
+		var m = $author$project$Aoc12$initModel(model.dataSource);
 		return _Utils_update(
 			m,
 			{paused: false});
@@ -6889,8 +5705,8 @@ var $author$project$Aoc12$updateTogglePlay = function (model) {
 	}
 };
 var $author$project$Aoc12$updateToggleSample = function (model) {
-	var useSample = !model.useSample;
-	return A2($author$project$Aoc12$initModel, model.mode, useSample);
+	var dataSource = model.dataSource;
+	return $author$project$Aoc12$initModel(dataSource);
 };
 var $author$project$Aoc12$update = F2(
 	function (msg, model) {
@@ -6923,65 +5739,23 @@ var $author$project$Aoc12$update = F2(
 						model,
 						{tickInterval: model.tickInterval * 2}),
 					$elm$core$Platform$Cmd$none);
-			case 'EnablePart1':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{mode: $author$project$Aoc12$Part1}),
-					$elm$core$Platform$Cmd$none);
-			case 'EnablePart2':
-				var freshModel = A2($author$project$Aoc12$initModel, $author$project$Aoc12$Part2, model.useSample);
-				var m = _Utils_update(
-					freshModel,
-					{calculating: true});
-				return _Utils_Tuple2(m, $elm$core$Platform$Cmd$none);
 			case 'TogglePlay':
 				return _Utils_Tuple2(
 					$author$project$Aoc12$updateTogglePlay(model),
 					$elm$core$Platform$Cmd$none);
-			case 'ToggleSample':
+			default:
 				return _Utils_Tuple2(
 					$author$project$Aoc12$updateToggleSample(model),
 					$elm$core$Platform$Cmd$none);
-			default:
-				var batchSize = 1;
-				var candidates = A2($elm$core$List$take, batchSize, model.candidateObstructions);
-				if ($elm$core$List$length(candidates) > 0) {
-					var startPos = model.guardPos;
-					var remaining = A2($elm$core$List$drop, batchSize, model.candidateObstructions);
-					var board = model.board;
-					var newVerified = $elm$core$Array$fromList(
-						A2(
-							$elm$core$List$filterMap,
-							function (obs) {
-								return A2(
-									$author$project$Aoc12$hasLoop,
-									startPos,
-									A2($author$project$Aoc12$addObstruction, board, obs)) ? $elm$core$Maybe$Just(obs) : $elm$core$Maybe$Nothing;
-							},
-							candidates));
-					var verifiedLoops = A2($elm$core$Array$append, model.verifiedLoops, newVerified);
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{candidateObstructions: remaining, verifiedLoops: verifiedLoops}),
-						$elm$core$Platform$Cmd$none);
-				} else {
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{calculating: false}),
-						$elm$core$Platform$Cmd$none);
-				}
 		}
 	});
+var $author$project$Aoc12$ChangeDataSource = {$: 'ChangeDataSource'};
 var $author$project$Aoc12$Clear = {$: 'Clear'};
 var $author$project$Aoc12$Faster = {$: 'Faster'};
 var $author$project$Aoc12$NextStep = {$: 'NextStep'};
 var $author$project$Aoc12$PrevStep = {$: 'PrevStep'};
 var $author$project$Aoc12$Slower = {$: 'Slower'};
 var $author$project$Aoc12$TogglePlay = {$: 'TogglePlay'};
-var $author$project$Aoc12$ToggleSample = {$: 'ToggleSample'};
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -6991,30 +5765,8 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$align = $elm$html$Html$Attributes$stringProperty('align');
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
-var $elm$html$Html$br = _VirtualDom_node('br');
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$core$Set$Set_elm_builtin = function (a) {
-	return {$: 'Set_elm_builtin', a: a};
-};
-var $elm$core$Set$empty = $elm$core$Set$Set_elm_builtin($elm$core$Dict$empty);
-var $elm$core$Set$insert = F2(
-	function (key, _v0) {
-		var dict = _v0.a;
-		return $elm$core$Set$Set_elm_builtin(
-			A3($elm$core$Dict$insert, key, _Utils_Tuple0, dict));
-	});
-var $elm$core$Set$fromList = function (list) {
-	return A3($elm$core$List$foldl, $elm$core$Set$insert, $elm$core$Set$empty, list);
-};
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -7032,174 +5784,16 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
-var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
-	return $elm$core$Array$length(array2d.data);
-};
-var $elm$core$Dict$sizeHelp = F2(
-	function (n, dict) {
-		sizeHelp:
-		while (true) {
-			if (dict.$ === 'RBEmpty_elm_builtin') {
-				return n;
-			} else {
-				var left = dict.d;
-				var right = dict.e;
-				var $temp$n = A2($elm$core$Dict$sizeHelp, n + 1, right),
-					$temp$dict = left;
-				n = $temp$n;
-				dict = $temp$dict;
-				continue sizeHelp;
-			}
-		}
-	});
-var $elm$core$Dict$size = function (dict) {
-	return A2($elm$core$Dict$sizeHelp, 0, dict);
-};
-var $elm$core$Set$size = function (_v0) {
-	var dict = _v0.a;
-	return $elm$core$Dict$size(dict);
-};
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$core$String$cons = _String_cons;
-var $elm$core$String$fromChar = function (_char) {
-	return A2($elm$core$String$cons, _char, '');
-};
-var $elm$html$Html$span = _VirtualDom_node('span');
-var $author$project$Aoc12$toCharElement = F2(
-	function (vizBoard, _v0) {
-		var x = _v0.a;
-		var y = _v0.b;
-		var _v1 = A3($tortus$elm_array_2d$Array2D$get, y, x, vizBoard);
-		if (_v1.$ === 'Nothing') {
-			return $elm$html$Html$text('?');
-		} else {
-			var cell = _v1.a;
-			if (cell.$ === 'Highlight') {
-				var ch = cell.a;
-				return A2(
-					$elm$html$Html$span,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'background-color', '#CCCCCC')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text(
-							$elm$core$String$fromChar(ch))
-						]));
-			} else {
-				var ch = cell.a;
-				return $elm$html$Html$text(
-					$elm$core$String$fromChar(ch));
-			}
-		}
-	});
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $author$project$Aoc12$view = function (model) {
-	var textFontSize = model.useSample ? '36px' : '9px';
-	var positionsVisited = $elm$core$Set$size(
-		$elm$core$Set$fromList(
-			A2(
-				$elm$core$List$map,
-				function (_v3) {
-					var p = _v3.a;
-					var d = _v3.b;
-					var m = _v3.c;
-					return p;
-				},
-				model.routeWalked)));
-	var guardChar = function () {
-		var _v2 = model.guardDir;
-		switch (_v2.$) {
-			case 'N':
-				return _Utils_chr('^');
-			case 'W':
-				return _Utils_chr('<');
-			case 'S':
-				return _Utils_chr('v');
-			default:
-				return _Utils_chr('>');
-		}
-	}();
-	var _v0 = model.guardPos;
-	var xGuard = _v0.a;
-	var yGuard = _v0.b;
-	var board = A4(
-		$tortus$elm_array_2d$Array2D$set,
-		yGuard,
-		xGuard,
-		$author$project$Aoc12$Highlight(guardChar),
-		model.vizBoard);
-	var xs = A2(
-		$elm$core$List$range,
-		0,
-		$tortus$elm_array_2d$Array2D$columns(board) - 1);
-	var ys = A2(
-		$elm$core$List$range,
-		0,
-		$tortus$elm_array_2d$Array2D$rows(board) - 1);
-	var nestedPositions = A2(
-		$elm$core$List$map,
-		function (y) {
-			return A2(
-				$elm$core$List$map,
-				function (x) {
-					return _Utils_Tuple2(x, y);
-				},
-				xs);
-		},
-		ys);
-	var nestedElements = A2(
-		$elm$core$List$map,
-		function (positions) {
-			return A2(
-				$elm$core$List$map,
-				$author$project$Aoc12$toCharElement(board),
-				positions);
-		},
-		nestedPositions);
-	var elements = A3(
-		$elm$core$List$foldr,
-		F2(
-			function (a, b) {
-				return A2(
-					$elm$core$List$append,
-					a,
-					A2(
-						$elm$core$List$cons,
-						A2($elm$html$Html$br, _List_Nil, _List_Nil),
-						b));
-			}),
-		_List_Nil,
-		nestedElements);
-	var _v1 = function () {
-		if (model.calculating) {
-			var obsCountStr = $elm$core$String$fromInt(
-				$elm$core$List$length(model.candidateObstructions));
-			var loopCountStr = $elm$core$String$fromInt(
-				$elm$core$Array$length(model.verifiedLoops));
-			var str = obsCountStr + (' candidates left, ' + (loopCountStr + ' verified'));
-			return _Utils_Tuple2('Calculating', str);
-		} else {
-			if (_Utils_eq(model.mode, $author$project$Aoc12$Part1)) {
-				var t1 = '(' + ($elm$core$String$fromInt(xGuard) + (', ' + ($elm$core$String$fromInt(yGuard) + ')')));
-				return _Utils_Tuple2(
-					t1,
-					$elm$core$String$fromInt(positionsVisited));
-			} else {
-				return _Utils_Tuple2(
-					'Loop X of Y',
-					$elm$core$String$fromInt(positionsVisited));
-			}
-		}
-	}();
-	var text1 = _v1.a;
-	var text2 = _v1.b;
+	var textFontSize = '9px';
+	var elements = _List_Nil;
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
@@ -7259,12 +5853,11 @@ var $author$project$Aoc12$view = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Aoc12$ToggleSample)
+										$elm$html$Html$Events$onClick($author$project$Aoc12$ChangeDataSource)
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text(
-										model.useSample ? 'Input' : 'Sample')
+										$elm$html$Html$text('Input?')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -7372,14 +5965,14 @@ var $author$project$Aoc12$view = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(text1)
+										$elm$html$Html$text('foo')
 									])),
 								A2(
 								$elm$html$Html$div,
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(text2)
+										$elm$html$Html$text('bar')
 									]))
 							]))
 					])),

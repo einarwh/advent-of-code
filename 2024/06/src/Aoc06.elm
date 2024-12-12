@@ -58,6 +58,7 @@ type alias Model =
   , counter : Int 
   , debug : String }
 
+sample : String
 sample = """....#.....
 .........#
 ..........
@@ -69,6 +70,7 @@ sample = """....#.....
 #.........
 ......#..."""
 
+input : String
 input = """........#.............................................#.........#..............#.......#....................#....................#
 ......................#........#........................#.............##............................#.#.............#..........#..
 ....#..................................#..................#.........#....#..............#..#......................#........#...#..
@@ -319,8 +321,6 @@ updateClear model =
 updateStep : Model -> Model
 updateStep model = 
   let 
-    z = 0
-    pos = model.guardPos
     dir = model.guardDir 
   in 
     case model.routeRemaining of 
@@ -343,7 +343,7 @@ updateStep model =
                           '|' -> Highlight (if dir == E || dir == W then '+' else '|')
                           '-' -> Highlight (if dir == N || dir == S then '+' else '-')
                           _ -> Highlight '?'
-                      Plain ch -> 
+                      Plain _ -> 
                         if dir == E || dir == W then Highlight '-' else Highlight '|'
 
           vizBoard = Array2D.set y x newCell model.vizBoard 
@@ -503,7 +503,7 @@ view model =
     nestedPositions = ys |> List.map (\y -> xs |> List.map (\x -> (x, y)))
     nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement board))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
-    positionsVisited = model.routeWalked |> List.map (\(p, d, m) -> p) |> Set.fromList |> Set.size 
+    positionsVisited = model.routeWalked |> List.map (\(p, _, _) -> p) |> Set.fromList |> Set.size 
     textFontSize = if model.useSample then "36px" else "9px"
 
     (text1, text2) = 
