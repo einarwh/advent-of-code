@@ -76,22 +76,6 @@ let countBorders garden (x, y) =
     |> List.filter (isBorder plotPlant)
     |> List.length 
 
-let isHorizontalSide { startPos=(x1, y1); endPos=(x2, y2) } = 
-    y1 = y2
-
-let isHorizontal border = 
-    match border with 
-    | Enter side -> isHorizontalSide side 
-    | Exit side -> isHorizontalSide side 
-
-let isVerticalSide { startPos=(x1, y1); endPos=(x2, y2) } = 
-    x1 = x2
-
-let isVertical border = 
-    match border with 
-    | Enter side -> isVerticalSide side 
-    | Exit side -> isVerticalSide side 
-
 let rec combine borders = 
     match borders with 
     | [] -> []
@@ -122,20 +106,7 @@ let rec combine borders =
                 | _ -> failwith "?"
             combine (combined :: filtered)
 
-let combineAll borders = 
-    let horizontals = borders |> List.filter isHorizontal |> combine
-    let verticals = borders |> List.filter isVertical |> combine
-    horizontals @ verticals
-
 let getBordersForPlot garden plot = 
-    let xs = plot |> Set.map fst
-    let ys = plot |> Set.map snd
-    let xMin = xs |> Set.minElement
-    let xMax = xs |> Set.maxElement
-    let yMin = ys |> Set.minElement
-    let yMax = ys |> Set.maxElement
-    let xRange = [ (xMin - 1) .. (xMax + 1) ]
-    let yRange = [ (yMin - 1) .. (yMax + 1) ]
     let checkBorder before after endPos = 
         match (plot |> Set.contains before, plot |> Set.contains after) with 
         | false, true -> Some <| Enter ({ startPos = after; endPos = endPos })
@@ -153,15 +124,18 @@ let getBordersForPlot garden plot =
         let yMax = ys |> Set.maxElement
         let yRange = [ (yMin - 1) .. (yMax + 1) ]
         yRange |> List.pairwise |> List.choose (fun (y1, y2) -> checkBorder (x0, y1) (x0, y2) (x0+1, y2))
-    let verticalBorders = [ yMin .. yMax ] |> List.collect (findVerticalBorders plot)
-    let horizontalBorders = [ xMin .. xMax ] |> List.collect (findHorizontalBorders plot)
+    let xs = plot |> Set.map fst
+    let ys = plot |> Set.map snd
+    let xMin = xs |> Set.minElement
+    let xMax = xs |> Set.maxElement
+    let yMin = ys |> Set.minElement
+    let yMax = ys |> Set.maxElement
+    let verticalBorders = [ yMin .. yMax ] |> List.collect (findVerticalBorders plot) |> combine
+    let horizontalBorders = [ xMin .. xMax ] |> List.collect (findHorizontalBorders plot) |> combine
     verticalBorders @ horizontalBorders
 
 let calculateWithDiscount garden plot = 
-    plot 
-    |> getBordersForPlot garden
-    |> combineAll
-    |> List.length
+    plot |> getBordersForPlot garden |> List.length
 
 let calculateWithoutDiscount garden plot = 
     plot |> Set.toList |> List.sumBy (countBorders garden) 
