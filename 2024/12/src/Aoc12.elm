@@ -8,7 +8,9 @@ import Dict exposing (Dict)
 import Array exposing (Array)
 import Set exposing (Set)
 import Array2D exposing (Array2D)
-import Html exposing (text)
+-- import Html exposing (text)
+import Svg exposing (..)
+import Svg.Attributes exposing (..)
 import Time
 
 defaultTickInterval : Float
@@ -435,11 +437,58 @@ subscriptions model =
 --           Plain ch -> 
 --             Html.text (String.fromChar ch)
 
+  -- { complete : Plot  
+  -- , sequence : PlotSequence
+  -- , totalSteps : Int 
+  -- , plant : Plant 
+  -- , color : String
+  -- , area : Int 
+  -- , perimeter : Int
+  -- , perimeterDiscount : Int
+  -- , fenceCost : Int 
+  -- , fenceCostDiscount : Int }
+
+toPlantElement : Int -> Int -> String -> Pos -> Svg Msg 
+toPlantElement plantWidth plantHeight plantStr (xInt, yInt) = 
+  let 
+    xStr = String.fromInt (plantWidth + xInt * plantWidth)
+    yStr = String.fromInt (plantHeight + yInt * plantHeight)
+  in 
+    Svg.text_ [ x xStr, y yStr ] [ Svg.text plantStr ]
+
+toPlotSvgElements : Int -> Int -> PlotInfo -> List (Svg Msg)
+toPlotSvgElements plantWidth plantHeight plotInfo = 
+  let 
+    posList = plotInfo.complete |> Set.toList 
+    plantStr = String.fromChar plotInfo.plant 
+    plants = posList |> List.map (toPlantElement plantWidth plantHeight plantStr)
+    foo = 17
+  in 
+    plants
+
+toSvg : Model -> Html Msg 
+toSvg model = 
+  let 
+    plantWidth = 12
+    plantHeight = 16
+    plotInfoList = model.plotInfoList 
+    elements = model.plotInfoList |> List.concatMap (toPlotSvgElements plantWidth plantHeight)
+    rects = []
+  in 
+    svg
+      [ viewBox "0 0 600 600"
+      , width "600"
+      , height "600"
+      , Svg.Attributes.style "background-color:lightgreen; font-family:Source Code Pro,monospace"
+      ]
+      elements
+
 view : Model -> Html Msg
 view model =
   let
     elements = []
     textFontSize = "9px"
+    s = toSvg model 
   in 
     Html.table 
       [ Html.Attributes.style "width" "1080px"]
@@ -510,17 +559,14 @@ view model =
                 Html.div [] [ Html.text "foo" ]
               , Html.div [] [ Html.text "bar" ]
               ] ]
-      -- , Html.tr 
-      --     []
-      --     [ Html.td 
-      --         [ Html.Attributes.align "center"
-      --         , Html.Attributes.style "background-color" "white" 
-      --         , Html.Attributes.style "font-family" "Courier New"
-      --         , Html.Attributes.style "font-size" "24px"
-      --         , Html.Attributes.style "width" "200px" ] 
-      --         [ 
-      --           Html.div [] [ Html.text model.message ]
-      --         ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "background-color" "white" 
+              , Html.Attributes.style "padding" "20px"] 
+              [ Html.div [ Html.Attributes.align "center" ] [ s ] 
+              ] ] 
       , Html.tr 
           []
           [ Html.td 

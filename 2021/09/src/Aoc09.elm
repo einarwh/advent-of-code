@@ -262,7 +262,7 @@ view model =
               , Html.Attributes.style "font-size" "40px"
               , Html.Attributes.style "padding" "20px"]
               [ Html.div [] [Html.text "Advent of Code 2021" ]
-              , Html.div [] [Html.text "Day 9: Smoke Basin" ]] ]
+              , Html.div [] [Html.text "Day 9: Smoke Basin" ] ] ]
       , Html.tr 
           []
           [ Html.td 

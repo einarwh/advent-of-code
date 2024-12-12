@@ -6510,9 +6510,73 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
+var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
+var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
+var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
+var $author$project$Aoc12$toPlantElement = F4(
+	function (plantWidth, plantHeight, plantStr, _v0) {
+		var xInt = _v0.a;
+		var yInt = _v0.b;
+		var yStr = $elm$core$String$fromInt(plantHeight + (yInt * plantHeight));
+		var xStr = $elm$core$String$fromInt(plantWidth + (xInt * plantWidth));
+		return A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x(xStr),
+					$elm$svg$Svg$Attributes$y(yStr)
+				]),
+			_List_fromArray(
+				[
+					$elm$svg$Svg$text(plantStr)
+				]));
+	});
+var $author$project$Aoc12$toPlotSvgElements = F3(
+	function (plantWidth, plantHeight, plotInfo) {
+		var posList = $elm$core$Set$toList(plotInfo.complete);
+		var plantStr = $elm$core$String$fromChar(plotInfo.plant);
+		var plants = A2(
+			$elm$core$List$map,
+			A3($author$project$Aoc12$toPlantElement, plantWidth, plantHeight, plantStr),
+			posList);
+		var foo = 17;
+		return plants;
+	});
+var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
+var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $author$project$Aoc12$toSvg = function (model) {
+	var rects = _List_Nil;
+	var plotInfoList = model.plotInfoList;
+	var plantWidth = 12;
+	var plantHeight = 16;
+	var elements = A2(
+		$elm$core$List$concatMap,
+		A2($author$project$Aoc12$toPlotSvgElements, plantWidth, plantHeight),
+		model.plotInfoList);
+	return A2(
+		$elm$svg$Svg$svg,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$viewBox('0 0 600 600'),
+				$elm$svg$Svg$Attributes$width('600'),
+				$elm$svg$Svg$Attributes$height('600'),
+				$elm$svg$Svg$Attributes$style('background-color:lightgreen; font-family:Source Code Pro,monospace')
+			]),
+		elements);
+};
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $author$project$Aoc12$view = function (model) {
 	var textFontSize = '9px';
+	var s = $author$project$Aoc12$toSvg(model);
 	var elements = _List_Nil;
 	return A2(
 		$elm$html$Html$table,
@@ -6626,7 +6690,7 @@ var $author$project$Aoc12$view = function (model) {
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Slower')
+										$elm$svg$Svg$text('Slower')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -6637,7 +6701,7 @@ var $author$project$Aoc12$view = function (model) {
 									]),
 								_List_fromArray(
 									[
-										model.paused ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
+										model.paused ? $elm$svg$Svg$text('Play') : $elm$svg$Svg$text('Pause')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -6648,7 +6712,7 @@ var $author$project$Aoc12$view = function (model) {
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Faster')
+										$elm$svg$Svg$text('Faster')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -6694,6 +6758,31 @@ var $author$project$Aoc12$view = function (model) {
 									[
 										$elm$html$Html$text('bar')
 									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
+								A2($elm$html$Html$Attributes$style, 'padding', '20px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$align('center')
+									]),
+								_List_fromArray(
+									[s]))
 							]))
 					])),
 				A2(
