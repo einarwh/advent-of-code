@@ -27,15 +27,9 @@ main =
 
 type alias Pos = (Int, Int)
 
-type Dir = N | W | S | E
-
-type Move = Turn | Forward
-
-type Visit = Vertical | Horizontal | Both 
-
-type Cell = Highlight Char | Plain Char 
-
 type DataSource = Input | Sample | SampleXo | SampleLarger | SampleE | SampleAbba
+
+type alias Plant = Char 
 
 type alias Plot = Set Pos 
 
@@ -45,7 +39,7 @@ type alias PlotInfo =
   { complete : Plot  
   , sequence : PlotSequence
   , totalSteps : Int 
-  , plant : String 
+  , plant : Plant 
   , color : String
   , area : Int 
   , perimeter : Int
@@ -251,7 +245,7 @@ read dataSource =
     SampleLarger -> sampleLarger
     SampleXo -> sampleXo
 
-getAllPositions : Array2D Char -> List Pos
+getAllPositions : Array2D Plant -> List Pos
 getAllPositions board = 
   let
     ys = List.range 0 (Array2D.rows board - 1)
@@ -259,7 +253,7 @@ getAllPositions board =
   in 
     ys |> List.concatMap (\y -> xs |> List.map (\x -> (x, y)))
 
-inGardenBounds : Array2D Char -> Pos -> Bool 
+inGardenBounds : Array2D Plant -> Pos -> Bool 
 inGardenBounds garden (x, y) = 
   let 
     insideRows = y >= 0 && y < Array2D.rows garden
@@ -267,11 +261,11 @@ inGardenBounds garden (x, y) =
   in 
     insideRows && insideCols 
 
-tryGetPlantAtPos : Array2D Char -> Pos -> Maybe Char
+tryGetPlantAtPos : Array2D Plant -> Pos -> Maybe Char
 tryGetPlantAtPos garden (x, y) = 
   garden |> Array2D.get y x 
 
-fill : Array2D Char -> Char -> Pos -> (Plot, PlotSequence) -> (Plot, PlotSequence)
+fill : Array2D Plant -> Plant -> Pos -> (Plot, PlotSequence) -> (Plot, PlotSequence)
 fill garden plant (x, y) (plot, seq) = 
   if (x, y) |> inGardenBounds garden then 
     if Set.member (x, y) plot then (plot, seq) 
@@ -292,14 +286,17 @@ fill garden plant (x, y) (plot, seq) =
           else (plot, seq) 
   else (plot, seq) 
 
-fillPlot : Array2D Char -> Pos -> (Plot, PlotSequence) 
+fillPlot : Array2D Plant -> Pos -> Maybe (Plant, Plot, PlotSequence) 
 fillPlot garden pos = 
   case tryGetPlantAtPos garden pos of 
-    Nothing -> (Set.empty, []) 
+    Nothing -> Nothing 
     Just plant -> 
-      fill garden plant pos (Set.empty, []) 
+      let 
+        (plot, seq) = fill garden plant pos (Set.empty, []) 
+      in 
+        Just (plant, plot, seq)
 
-findPlotsLoop : Array2D Char -> List (Plot, PlotSequence) -> Set Pos -> List Pos -> List (Plot, PlotSequence) 
+findPlotsLoop : Array2D Plant -> List (Plant, Plot, PlotSequence) -> Set Pos -> List Pos -> List (Plant, Plot, PlotSequence) 
 findPlotsLoop garden plotList visited positions = 
   case positions of 
     [] -> plotList
@@ -307,27 +304,31 @@ findPlotsLoop garden plotList visited positions =
       if visited |> Set.member pos then 
         remaining |> findPlotsLoop garden plotList visited 
       else 
-        let 
-          (plot, seq) = fillPlot garden pos 
-        in 
-          remaining |> findPlotsLoop garden ((plot, seq) :: plotList) (Set.union visited plot)
+        case fillPlot garden pos of 
+          Just (plant, plot, seq) -> 
+            remaining |> findPlotsLoop garden ((plant, plot, seq) :: plotList) (Set.union visited plot)
+          Nothing -> 
+            []
 
-findPlots : Array2D Char -> List (Plot, PlotSequence)
+findPlots : Array2D Plant -> List (Plant, Plot, PlotSequence)
 findPlots garden = 
   garden |> getAllPositions |> findPlotsLoop garden [] Set.empty
 
-toPlotInfo : (Plot, PlotSequence) -> PlotInfo 
-toPlotInfo (plot, seq) = 
-  { complete = plot  
-  , sequence = seq
-  , totalSteps = 0 
-  , plant = "?" 
-  , color = "#FFCCDD"
-  , area = 0  
-  , perimeter = 0 
-  , perimeterDiscount = 0 
-  , fenceCost = 0  
-  , fenceCostDiscount = 0 }
+toPlotInfo : (Plant, Plot, PlotSequence) -> PlotInfo 
+toPlotInfo (plant, plot, seq) = 
+  let 
+    totalSteps = List.length seq 
+  in 
+    { complete = plot  
+    , sequence = seq
+    , totalSteps = List.length seq 
+    , plant = plant 
+    , color = "#FFCCDD"
+    , area = 0  
+    , perimeter = 0 
+    , perimeterDiscount = 0 
+    , fenceCost = 0  
+    , fenceCostDiscount = 0 }
 
 initModel : DataSource -> Model 
 initModel dataSource = 
@@ -422,16 +423,16 @@ subscriptions model =
 
 -- VIEW
 
-toCharElement : Array2D Cell -> Pos -> Html Msg 
-toCharElement vizBoard (x, y) = 
-    case Array2D.get y x vizBoard of 
-      Nothing -> Html.text "?"
-      Just cell -> 
-        case cell of 
-          Highlight ch -> 
-            (Html.span [Html.Attributes.style "background-color" "#CCCCCC" ] [ Html.text (String.fromChar ch) ]) 
-          Plain ch -> 
-            Html.text (String.fromChar ch)
+-- toCharElement : Array2D Cell -> Pos -> Html Msg 
+-- toCharElement vizBoard (x, y) = 
+--     case Array2D.get y x vizBoard of 
+--       Nothing -> Html.text "?"
+--       Just cell -> 
+--         case cell of 
+--           Highlight ch -> 
+--             (Html.span [Html.Attributes.style "background-color" "#CCCCCC" ] [ Html.text (String.fromChar ch) ]) 
+--           Plain ch -> 
+--             Html.text (String.fromChar ch)
 
 view : Model -> Html Msg
 view model =
