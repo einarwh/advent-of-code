@@ -109,10 +109,10 @@ let sideLength { startPos=(x1, y1); endPos=(x2, y2) } =
     else abs (x1 - x2)
 
 let combineAll (borders : Side list) : Side list = 
-    // printfn "borders\n%A" borders
     let horizontals = borders |> List.filter isHorizontal |> combine
     let verticals = borders |> List.filter isVertical |> combine
-    horizontals @ verticals
+    let combined = horizontals @ verticals
+    combined
 
 let getBorders (garden : char[,]) (x, y) : Side list = 
     let tryGetBorder plotPlant (pos, border)  = 
@@ -128,13 +128,11 @@ let getBorders (garden : char[,]) (x, y) : Side list =
     |> List.choose (tryGetBorder plotPlant)
 
 let calculateWithDiscount (garden : char[,]) (plot : (int*int) list) = 
-    printfn "PLOT %A" plot
     let foo = 
         plot 
         |> List.collect (getBorders garden)
         |> combineAll 
-        |> List.sumBy sideLength
-    printfn "Perimeter: %d" foo
+        |> List.length
     foo
 
 let calculateWithoutDiscount (garden : char[,]) (plot : (int*int) list) = 
@@ -148,6 +146,7 @@ let calculatePerimeter (discount : bool) (garden : char[,]) (plot : Set<int*int>
 let fenceCost (garden : char[,]) (plot : Set<int*int>) = 
     let a = calculateArea plot
     let p = calculatePerimeter true garden plot 
+    printfn "(a:%d) * (p:%d) = %d" a p (a * p)
     a * p
 
 let run fileName = 
@@ -157,6 +156,19 @@ let run fileName =
     let plots = findPlots garden 
     // plots |> List.length |> printfn "%d"
     // plots |> List.map (fenceCost garden) |> printfn "%A"
+    printfn "%s" fileName
     plots |> List.sumBy (fenceCost garden) |> printfn "%A"
+    // [(0, 0); (1, 0); (2, 0); (3, 0)]
+    // |> calculateWithDiscount garden
 
-run "sample"
+printfn "\nActual"
+printfn "======"
+run "sample"        // 80
+run "sample-xo"     // 436
+run "sample-larger" // 1206
+run "sample-e"      // 236
+run "sample-abba"   // 368
+
+printfn "\n\nExpected"
+printfn "========="
+[80;436;1206;236;368] |> List.iter (printfn "%d")
