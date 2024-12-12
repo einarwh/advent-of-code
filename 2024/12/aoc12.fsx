@@ -22,6 +22,10 @@ module Garden =
         let height = lst |> List.length 
         Array2D.init height width (fun y x -> lst |> List.item y |> List.item x)
 
+type Pos = (int * int)
+
+type Side = { startPos : Pos; endPos : Pos }
+
 let readLines = 
     File.ReadAllLines
     >> Array.filter (fun line -> line <> String.Empty)
@@ -60,7 +64,7 @@ let findPlots (garden : char[,]) =
 
 let calculateArea plot = Set.count plot 
 
-let borders (garden : char[,]) (x, y) : int = 
+let countBorders (garden : char[,]) (x, y) : int = 
     let isBorder plotPlant pos = 
         match Garden.tryGet garden pos with 
         | None -> true 
@@ -70,10 +74,23 @@ let borders (garden : char[,]) (x, y) : int =
     |> List.filter (isBorder plotPlant)
     |> List.length 
 
+let getBorders (garden : char[,]) (x, y) : Side list = 
+    let tryGetBorder plotPlant (pos, border)  = 
+        match Garden.tryGet garden pos with 
+        | None -> None 
+        | Some plant -> 
+            if plant <> plotPlant then Some border else None
+    let plotPlant = Garden.get garden (x, y)
+    [ ((x, y-1), { startPos = (x, y); endPos = (x+1, y) })
+      ((x-1, y), { startPos = (x, y); endPos = (x, y + 1) })
+      ((x, y+1), { startPos = (x, y+1); endPos = (x+1, y+1) })
+      ((x+1, y), { startPos = (x+1, y); endPos = (x+1, y+1) }) ]
+    |> List.choose (tryGetBorder plotPlant)
+
 let calculatePerimeter (garden : char[,]) (plot : Set<int*int>) = 
     plot 
     |> Set.toList 
-    |> List.sumBy (borders garden) 
+    |> List.sumBy (countBorders garden) 
 
 let fenceCost (garden : char[,]) (plot : Set<int*int>) = 
     let a = calculateArea plot
