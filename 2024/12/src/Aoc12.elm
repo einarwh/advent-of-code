@@ -37,9 +37,13 @@ type Cell = Highlight Char | Plain Char
 
 type DataSource = Input | Sample | SampleXo | SampleLarger | SampleE | SampleAbba
 
-type alias Plot = 
-  { complete : Set Pos 
-  , sequence : List (Set Pos)
+type alias Plot = Set Pos 
+
+type alias PlotSequence = List Plot 
+
+type alias PlotInfo = 
+  { complete : Plot  
+  , sequence : PlotSequence
   , totalSteps : Int 
   , plant : String 
   , color : String
@@ -50,7 +54,7 @@ type alias Plot =
   , fenceCostDiscount : Int }
 
 type alias Model = 
-  { plots : List Plot 
+  { plotInfoList : List PlotInfo
   , step : Int
   , maxSteps : Int
   , totalCost : Int 
@@ -323,14 +327,28 @@ findPlots : Array2D Char -> List (Set Pos)
 findPlots garden = 
   garden |> getAllPositions |> findPlotsLoop garden [] Set.empty
 
+toPlotInfo : Plot -> PlotInfo 
+toPlotInfo plot = 
+  { complete = plot  
+  , sequence = []
+  , totalSteps = 0 
+  , plant = "?" 
+  , color = "#FFCCDD"
+  , area = 0  
+  , perimeter = 0 
+  , perimeterDiscount = 0 
+  , fenceCost = 0  
+  , fenceCostDiscount = 0 }
+
 initModel : DataSource -> Model 
 initModel dataSource = 
   let 
     data = read dataSource
     garden = data |> String.split "\n" |> List.map (String.toList) |> Array2D.fromList
-    plots = []
+    plots = findPlots garden 
+    plotInfoList = plots |> List.map toPlotInfo 
   in 
-    { plots = plots 
+    { plotInfoList = plotInfoList  
     , step = 0 
     , maxSteps = 0
     , totalCost = 0 
