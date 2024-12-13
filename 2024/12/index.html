@@ -6058,7 +6058,7 @@ var $author$project$Aoc12Dict$toPlotColor = function (index) {
 	var satStr = $elm$core$String$fromInt(saturation) + '%';
 	var lightness = 90;
 	var lgtStr = $elm$core$String$fromInt(lightness) + '%';
-	var hue = A2($elm$core$Basics$modBy, 255, index * 71);
+	var hue = A2($elm$core$Basics$modBy, 255, index * 53);
 	var hueStr = $elm$core$String$fromInt(hue);
 	return 'hsl(' + (hueStr + (', ' + (satStr + (', ' + (lgtStr + ')')))));
 };
@@ -6118,7 +6118,7 @@ var $author$project$Aoc12Dict$initModel = function (dataSource) {
 					return pi.Z;
 				},
 				plotInfoList)));
-	return {N: numberOfCols, l: dataSource, E: false, G: maxSteps, L: '?', q: true, M: plotInfoList, U: numberOfRows, o: 0, y: $author$project$Aoc12Dict$defaultTickInterval, aB: 0, aC: 0};
+	return {N: numberOfCols, k: dataSource, E: false, G: maxSteps, L: '?', q: true, M: plotInfoList, U: numberOfRows, o: 0, y: $author$project$Aoc12Dict$defaultTickInterval, aB: 0, aC: 0};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -6391,7 +6391,7 @@ var $author$project$Aoc12Dict$SampleAbba = 5;
 var $author$project$Aoc12Dict$SampleEShape = 4;
 var $author$project$Aoc12Dict$SampleXoXo = 2;
 var $author$project$Aoc12Dict$updateClear = function (model) {
-	return $author$project$Aoc12Dict$initModel(model.l);
+	return $author$project$Aoc12Dict$initModel(model.k);
 };
 var $elm$core$Basics$min = F2(
 	function (x, y) {
@@ -6418,7 +6418,7 @@ var $author$project$Aoc12Dict$updatePrevStep = function (model) {
 };
 var $author$project$Aoc12Dict$updateTogglePlay = function (model) {
 	if (model.E) {
-		var m = $author$project$Aoc12Dict$initModel(model.l);
+		var m = $author$project$Aoc12Dict$initModel(model.k);
 		return _Utils_update(
 			m,
 			{q: false});
@@ -6655,19 +6655,31 @@ var $author$project$Aoc12Dict$toSvg = function (model) {
 	var step = model.o;
 	var rects = _List_Nil;
 	var plotInfoList = model.M;
-	var plantWidth = 12;
-	var svgWidth = $elm$core$String$fromInt(4 + (plantWidth * model.N));
-	var plantHeight = 16;
+	var fontFamilyAttr = 'font-family:Source Code Pro,monospace';
+	var _v0 = function () {
+		var _v1 = model.k;
+		if (!_v1) {
+			return _Utils_Tuple3('9px', 9, 12);
+		} else {
+			return _Utils_Tuple3('16px', 12, 16);
+		}
+	}();
+	var fontSize = _v0.a;
+	var plantWidth = _v0.b;
+	var plantHeight = _v0.c;
+	var fontSizeAttr = 'font-size:' + fontSize;
+	var styles = fontFamilyAttr + ('; ' + fontSizeAttr);
 	var svgHeight = $elm$core$String$fromInt(4 + (plantHeight * model.U));
+	var elements = A2(
+		$elm$core$List$concatMap,
+		A3($author$project$Aoc12Dict$toPlotSvgElements, step, plantWidth, plantHeight),
+		model.M);
+	var svgWidth = $elm$core$String$fromInt(4 + (plantWidth * model.N));
 	var viewBoxStr = A2(
 		$elm$core$String$join,
 		' ',
 		_List_fromArray(
 			['0', '0', svgWidth, svgHeight]));
-	var elements = A2(
-		$elm$core$List$concatMap,
-		A3($author$project$Aoc12Dict$toPlotSvgElements, step, plantWidth, plantHeight),
-		model.M);
 	return A2(
 		$elm$svg$Svg$svg,
 		_List_fromArray(
@@ -6675,7 +6687,7 @@ var $author$project$Aoc12Dict$toSvg = function (model) {
 				$elm$svg$Svg$Attributes$viewBox(viewBoxStr),
 				$elm$svg$Svg$Attributes$width(svgWidth),
 				$elm$svg$Svg$Attributes$height(svgHeight),
-				$elm$svg$Svg$Attributes$style('font-family:Source Code Pro,monospace')
+				$elm$svg$Svg$Attributes$style(styles)
 			]),
 		elements);
 };
@@ -6744,7 +6756,7 @@ var $author$project$Aoc12Dict$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(7),
-										$elm$html$Html$Attributes$checked(!model.l)
+										$elm$html$Html$Attributes$checked(!model.k)
 									]),
 								_List_Nil),
 								A2(
@@ -6760,7 +6772,7 @@ var $author$project$Aoc12Dict$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(8),
-										$elm$html$Html$Attributes$checked(model.l === 1)
+										$elm$html$Html$Attributes$checked(model.k === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -6776,7 +6788,7 @@ var $author$project$Aoc12Dict$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(9),
-										$elm$html$Html$Attributes$checked(model.l === 2)
+										$elm$html$Html$Attributes$checked(model.k === 2)
 									]),
 								_List_Nil),
 								A2(
@@ -6792,7 +6804,7 @@ var $author$project$Aoc12Dict$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(10),
-										$elm$html$Html$Attributes$checked(model.l === 3)
+										$elm$html$Html$Attributes$checked(model.k === 3)
 									]),
 								_List_Nil),
 								A2(
@@ -6808,7 +6820,7 @@ var $author$project$Aoc12Dict$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(11),
-										$elm$html$Html$Attributes$checked(model.l === 4)
+										$elm$html$Html$Attributes$checked(model.k === 4)
 									]),
 								_List_Nil),
 								A2(
@@ -6824,7 +6836,7 @@ var $author$project$Aoc12Dict$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(12),
-										$elm$html$Html$Attributes$checked(model.l === 5)
+										$elm$html$Html$Attributes$checked(model.k === 5)
 									]),
 								_List_Nil),
 								A2(

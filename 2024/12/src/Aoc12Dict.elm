@@ -319,7 +319,7 @@ findPlots garden =
 toPlotColor : Int -> String 
 toPlotColor index = 
   let 
-    hue = (index * 71) |> modBy 255
+    hue = (index * 53) |> modBy 255
     saturation = 90
     lightness = 90
     hueStr = String.fromInt hue 
@@ -512,8 +512,10 @@ toPlotSvgElements step plantWidth plantHeight plotInfo =
 toSvg : Model -> Html Msg 
 toSvg model = 
   let 
-    plantWidth = 12
-    plantHeight = 16  
+    (fontSize, plantWidth, plantHeight) = 
+      case model.dataSource of 
+        Input -> ("9px", 9, 12)
+        _ -> ("16px", 12, 16)
     svgWidth = (4 + plantWidth * model.colCount) |> String.fromInt 
     svgHeight = (4 + plantHeight * model.rowCount) |> String.fromInt 
     step = model.step 
@@ -521,13 +523,16 @@ toSvg model =
     elements = model.plotInfoList |> List.concatMap (toPlotSvgElements step plantWidth plantHeight)
     rects = []
     viewBoxStr = [ "0", "0", svgWidth, svgHeight ] |> String.join " "
+    fontFamilyAttr = "font-family:Source Code Pro,monospace"
+    fontSizeAttr = "font-size:" ++ fontSize
+    styles = fontFamilyAttr ++ "; " ++ fontSizeAttr 
   in 
     svg
       [ viewBox viewBoxStr
       , width svgWidth
       , height svgHeight
       -- , Svg.Attributes.style "background-color:lightgreen; font-family:Source Code Pro,monospace"
-      , Svg.Attributes.style "font-family:Source Code Pro,monospace"
+      , Svg.Attributes.style styles
       ]
       elements
 
