@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Aoc12</title>
+  <title>Aoc12Dict</title>
   <style>body { padding: 0; margin: 0; }</style>
 </head>
 
@@ -4387,43 +4387,6 @@ function _Browser_load(url)
 
 
 
-var _Bitwise_and = F2(function(a, b)
-{
-	return a & b;
-});
-
-var _Bitwise_or = F2(function(a, b)
-{
-	return a | b;
-});
-
-var _Bitwise_xor = F2(function(a, b)
-{
-	return a ^ b;
-});
-
-function _Bitwise_complement(a)
-{
-	return ~a;
-};
-
-var _Bitwise_shiftLeftBy = F2(function(offset, a)
-{
-	return a << offset;
-});
-
-var _Bitwise_shiftRightBy = F2(function(offset, a)
-{
-	return a >> offset;
-});
-
-var _Bitwise_shiftRightZfBy = F2(function(offset, a)
-{
-	return a >>> offset;
-});
-
-
-
 function _Time_now(millisToPosix)
 {
 	return _Scheduler_binding(function(callback)
@@ -5250,12 +5213,7 @@ var $elm$core$Task$perform = F2(
 			A2($elm$core$Task$map, toMessage, task));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Aoc12$SampleLarger = 3;
-var $author$project$Aoc12$defaultTickInterval = 100;
-var $elm$core$Set$Set_elm_builtin = $elm$core$Basics$identity;
-var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
-var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
-var $elm$core$Set$empty = $elm$core$Dict$empty;
+var $author$project$Aoc12Dict$SampleLarger = 3;
 var $elm$core$List$append = F2(
 	function (xs, ys) {
 		if (!ys.b) {
@@ -5267,21 +5225,35 @@ var $elm$core$List$append = F2(
 var $elm$core$List$concat = function (lists) {
 	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
 };
-var $elm$core$List$concatMap = F2(
-	function (f, list) {
-		return $elm$core$List$concat(
-			A2($elm$core$List$map, f, list));
-	});
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
+var $author$project$Aoc12Dict$defaultTickInterval = 100;
+var $elm$core$Set$Set_elm_builtin = $elm$core$Basics$identity;
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
+var $elm$core$Set$empty = $elm$core$Dict$empty;
+var $elm$core$Dict$foldl = F3(
+	function (func, acc, dict) {
+		foldl:
+		while (true) {
+			if (dict.$ === -2) {
+				return acc;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var $temp$func = func,
+					$temp$acc = A3(
+					func,
+					key,
+					value,
+					A3($elm$core$Dict$foldl, func, acc, left)),
+					$temp$dict = right;
+				func = $temp$func;
+				acc = $temp$acc;
+				dict = $temp$dict;
+				continue foldl;
+			}
+		}
 	});
 var $elm$core$Dict$Black = 1;
 var $elm$core$Dict$RBNode_elm_builtin = F5(
@@ -5342,6 +5314,401 @@ var $elm$core$Dict$balance = F5(
 				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
 			}
 		}
+	});
+var $elm$core$Dict$getMin = function (dict) {
+	getMin:
+	while (true) {
+		if ((dict.$ === -1) && (dict.d.$ === -1)) {
+			var left = dict.d;
+			var $temp$dict = left;
+			dict = $temp$dict;
+			continue getMin;
+		} else {
+			return dict;
+		}
+	}
+};
+var $elm$core$Dict$moveRedLeft = function (dict) {
+	if (((dict.$ === -1) && (dict.d.$ === -1)) && (dict.e.$ === -1)) {
+		if ((dict.e.d.$ === -1) && (!dict.e.d.a)) {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v1 = dict.d;
+			var lClr = _v1.a;
+			var lK = _v1.b;
+			var lV = _v1.c;
+			var lLeft = _v1.d;
+			var lRight = _v1.e;
+			var _v2 = dict.e;
+			var rClr = _v2.a;
+			var rK = _v2.b;
+			var rV = _v2.c;
+			var rLeft = _v2.d;
+			var _v3 = rLeft.a;
+			var rlK = rLeft.b;
+			var rlV = rLeft.c;
+			var rlL = rLeft.d;
+			var rlR = rLeft.e;
+			var rRight = _v2.e;
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				0,
+				rlK,
+				rlV,
+				A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					1,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, lK, lV, lLeft, lRight),
+					rlL),
+				A5($elm$core$Dict$RBNode_elm_builtin, 1, rK, rV, rlR, rRight));
+		} else {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v4 = dict.d;
+			var lClr = _v4.a;
+			var lK = _v4.b;
+			var lV = _v4.c;
+			var lLeft = _v4.d;
+			var lRight = _v4.e;
+			var _v5 = dict.e;
+			var rClr = _v5.a;
+			var rK = _v5.b;
+			var rV = _v5.c;
+			var rLeft = _v5.d;
+			var rRight = _v5.e;
+			if (clr === 1) {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					1,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					1,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, rK, rV, rLeft, rRight));
+			}
+		}
+	} else {
+		return dict;
+	}
+};
+var $elm$core$Dict$moveRedRight = function (dict) {
+	if (((dict.$ === -1) && (dict.d.$ === -1)) && (dict.e.$ === -1)) {
+		if ((dict.d.d.$ === -1) && (!dict.d.d.a)) {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v1 = dict.d;
+			var lClr = _v1.a;
+			var lK = _v1.b;
+			var lV = _v1.c;
+			var _v2 = _v1.d;
+			var _v3 = _v2.a;
+			var llK = _v2.b;
+			var llV = _v2.c;
+			var llLeft = _v2.d;
+			var llRight = _v2.e;
+			var lRight = _v1.e;
+			var _v4 = dict.e;
+			var rClr = _v4.a;
+			var rK = _v4.b;
+			var rV = _v4.c;
+			var rLeft = _v4.d;
+			var rRight = _v4.e;
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				0,
+				lK,
+				lV,
+				A5($elm$core$Dict$RBNode_elm_builtin, 1, llK, llV, llLeft, llRight),
+				A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					1,
+					k,
+					v,
+					lRight,
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, rK, rV, rLeft, rRight)));
+		} else {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v5 = dict.d;
+			var lClr = _v5.a;
+			var lK = _v5.b;
+			var lV = _v5.c;
+			var lLeft = _v5.d;
+			var lRight = _v5.e;
+			var _v6 = dict.e;
+			var rClr = _v6.a;
+			var rK = _v6.b;
+			var rV = _v6.c;
+			var rLeft = _v6.d;
+			var rRight = _v6.e;
+			if (clr === 1) {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					1,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					1,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, rK, rV, rLeft, rRight));
+			}
+		}
+	} else {
+		return dict;
+	}
+};
+var $elm$core$Dict$removeHelpPrepEQGT = F7(
+	function (targetKey, dict, color, key, value, left, right) {
+		if ((left.$ === -1) && (!left.a)) {
+			var _v1 = left.a;
+			var lK = left.b;
+			var lV = left.c;
+			var lLeft = left.d;
+			var lRight = left.e;
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				color,
+				lK,
+				lV,
+				lLeft,
+				A5($elm$core$Dict$RBNode_elm_builtin, 0, key, value, lRight, right));
+		} else {
+			_v2$2:
+			while (true) {
+				if ((right.$ === -1) && (right.a === 1)) {
+					if (right.d.$ === -1) {
+						if (right.d.a === 1) {
+							var _v3 = right.a;
+							var _v4 = right.d;
+							var _v5 = _v4.a;
+							return $elm$core$Dict$moveRedRight(dict);
+						} else {
+							break _v2$2;
+						}
+					} else {
+						var _v6 = right.a;
+						var _v7 = right.d;
+						return $elm$core$Dict$moveRedRight(dict);
+					}
+				} else {
+					break _v2$2;
+				}
+			}
+			return dict;
+		}
+	});
+var $elm$core$Dict$removeMin = function (dict) {
+	if ((dict.$ === -1) && (dict.d.$ === -1)) {
+		var color = dict.a;
+		var key = dict.b;
+		var value = dict.c;
+		var left = dict.d;
+		var lColor = left.a;
+		var lLeft = left.d;
+		var right = dict.e;
+		if (lColor === 1) {
+			if ((lLeft.$ === -1) && (!lLeft.a)) {
+				var _v3 = lLeft.a;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					color,
+					key,
+					value,
+					$elm$core$Dict$removeMin(left),
+					right);
+			} else {
+				var _v4 = $elm$core$Dict$moveRedLeft(dict);
+				if (_v4.$ === -1) {
+					var nColor = _v4.a;
+					var nKey = _v4.b;
+					var nValue = _v4.c;
+					var nLeft = _v4.d;
+					var nRight = _v4.e;
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						$elm$core$Dict$removeMin(nLeft),
+						nRight);
+				} else {
+					return $elm$core$Dict$RBEmpty_elm_builtin;
+				}
+			}
+		} else {
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				color,
+				key,
+				value,
+				$elm$core$Dict$removeMin(left),
+				right);
+		}
+	} else {
+		return $elm$core$Dict$RBEmpty_elm_builtin;
+	}
+};
+var $elm$core$Dict$removeHelp = F2(
+	function (targetKey, dict) {
+		if (dict.$ === -2) {
+			return $elm$core$Dict$RBEmpty_elm_builtin;
+		} else {
+			var color = dict.a;
+			var key = dict.b;
+			var value = dict.c;
+			var left = dict.d;
+			var right = dict.e;
+			if (_Utils_cmp(targetKey, key) < 0) {
+				if ((left.$ === -1) && (left.a === 1)) {
+					var _v4 = left.a;
+					var lLeft = left.d;
+					if ((lLeft.$ === -1) && (!lLeft.a)) {
+						var _v6 = lLeft.a;
+						return A5(
+							$elm$core$Dict$RBNode_elm_builtin,
+							color,
+							key,
+							value,
+							A2($elm$core$Dict$removeHelp, targetKey, left),
+							right);
+					} else {
+						var _v7 = $elm$core$Dict$moveRedLeft(dict);
+						if (_v7.$ === -1) {
+							var nColor = _v7.a;
+							var nKey = _v7.b;
+							var nValue = _v7.c;
+							var nLeft = _v7.d;
+							var nRight = _v7.e;
+							return A5(
+								$elm$core$Dict$balance,
+								nColor,
+								nKey,
+								nValue,
+								A2($elm$core$Dict$removeHelp, targetKey, nLeft),
+								nRight);
+						} else {
+							return $elm$core$Dict$RBEmpty_elm_builtin;
+						}
+					}
+				} else {
+					return A5(
+						$elm$core$Dict$RBNode_elm_builtin,
+						color,
+						key,
+						value,
+						A2($elm$core$Dict$removeHelp, targetKey, left),
+						right);
+				}
+			} else {
+				return A2(
+					$elm$core$Dict$removeHelpEQGT,
+					targetKey,
+					A7($elm$core$Dict$removeHelpPrepEQGT, targetKey, dict, color, key, value, left, right));
+			}
+		}
+	});
+var $elm$core$Dict$removeHelpEQGT = F2(
+	function (targetKey, dict) {
+		if (dict.$ === -1) {
+			var color = dict.a;
+			var key = dict.b;
+			var value = dict.c;
+			var left = dict.d;
+			var right = dict.e;
+			if (_Utils_eq(targetKey, key)) {
+				var _v1 = $elm$core$Dict$getMin(right);
+				if (_v1.$ === -1) {
+					var minKey = _v1.b;
+					var minValue = _v1.c;
+					return A5(
+						$elm$core$Dict$balance,
+						color,
+						minKey,
+						minValue,
+						left,
+						$elm$core$Dict$removeMin(right));
+				} else {
+					return $elm$core$Dict$RBEmpty_elm_builtin;
+				}
+			} else {
+				return A5(
+					$elm$core$Dict$balance,
+					color,
+					key,
+					value,
+					left,
+					A2($elm$core$Dict$removeHelp, targetKey, right));
+			}
+		} else {
+			return $elm$core$Dict$RBEmpty_elm_builtin;
+		}
+	});
+var $elm$core$Dict$remove = F2(
+	function (key, dict) {
+		var _v0 = A2($elm$core$Dict$removeHelp, key, dict);
+		if ((_v0.$ === -1) && (!_v0.a)) {
+			var _v1 = _v0.a;
+			var k = _v0.b;
+			var v = _v0.c;
+			var l = _v0.d;
+			var r = _v0.e;
+			return A5($elm$core$Dict$RBNode_elm_builtin, 1, k, v, l, r);
+		} else {
+			var x = _v0;
+			return x;
+		}
+	});
+var $elm$core$Dict$diff = F2(
+	function (t1, t2) {
+		return A3(
+			$elm$core$Dict$foldl,
+			F3(
+				function (k, v, t) {
+					return A2($elm$core$Dict$remove, k, t);
+				}),
+			t1,
+			t2);
+	});
+var $elm$core$Set$diff = F2(
+	function (_v0, _v1) {
+		var dict1 = _v0;
+		var dict2 = _v1;
+		return A2($elm$core$Dict$diff, dict1, dict2);
+	});
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
 	});
 var $elm$core$Basics$compare = _Utils_compare;
 var $elm$core$Dict$insertHelp = F3(
@@ -5445,7 +5812,7 @@ var $elm$core$Set$member = F2(
 		var dict = _v0;
 		return A2($elm$core$Dict$member, key, dict);
 	});
-var $author$project$Aoc12$neighbours = function (_v0) {
+var $author$project$Aoc12Dict$neighbours = function (_v0) {
 	var x = _v0.a;
 	var y = _v0.b;
 	return _List_fromArray(
@@ -5457,98 +5824,9 @@ var $author$project$Aoc12$neighbours = function (_v0) {
 		]);
 };
 var $elm$core$Basics$not = _Basics_not;
-var $elm$core$Maybe$andThen = F2(
-	function (callback, maybeValue) {
-		if (!maybeValue.$) {
-			var value = maybeValue.a;
-			return callback(value);
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $elm$core$Bitwise$and = _Bitwise_and;
-var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
-var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
-var $elm$core$Basics$ge = _Utils_ge;
-var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
-var $elm$core$Array$getHelp = F3(
-	function (shift, index, tree) {
-		getHelp:
-		while (true) {
-			var pos = $elm$core$Array$bitMask & (index >>> shift);
-			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
-			if (!_v0.$) {
-				var subTree = _v0.a;
-				var $temp$shift = shift - $elm$core$Array$shiftStep,
-					$temp$index = index,
-					$temp$tree = subTree;
-				shift = $temp$shift;
-				index = $temp$index;
-				tree = $temp$tree;
-				continue getHelp;
-			} else {
-				var values = _v0.a;
-				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
-			}
-		}
-	});
-var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
-var $elm$core$Array$tailIndex = function (len) {
-	return (len >>> 5) << 5;
-};
-var $elm$core$Array$get = F2(
-	function (index, _v0) {
-		var len = _v0.a;
-		var startShift = _v0.b;
-		var tree = _v0.c;
-		var tail = _v0.d;
-		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
-			index,
-			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
-			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
-			A3($elm$core$Array$getHelp, startShift, index, tree)));
-	});
-var $tortus$elm_array_2d$Array2D$getRow = F2(
-	function (row, array2d) {
-		return A2($elm$core$Array$get, row, array2d.a);
-	});
-var $tortus$elm_array_2d$Array2D$get = F3(
-	function (row, col, array2d) {
-		return A2(
-			$elm$core$Maybe$andThen,
-			$elm$core$Array$get(col),
-			A2($tortus$elm_array_2d$Array2D$getRow, row, array2d));
-	});
-var $author$project$Aoc12$tryGetPlantAtPos = F2(
-	function (garden, _v0) {
-		var x = _v0.a;
-		var y = _v0.b;
-		return A3($tortus$elm_array_2d$Array2D$get, y, x, garden);
-	});
-var $elm$core$Dict$foldl = F3(
-	function (func, acc, dict) {
-		foldl:
-		while (true) {
-			if (dict.$ === -2) {
-				return acc;
-			} else {
-				var key = dict.b;
-				var value = dict.c;
-				var left = dict.d;
-				var right = dict.e;
-				var $temp$func = func,
-					$temp$acc = A3(
-					func,
-					key,
-					value,
-					A3($elm$core$Dict$foldl, func, acc, left)),
-					$temp$dict = right;
-				func = $temp$func;
-				acc = $temp$acc;
-				dict = $temp$dict;
-				continue foldl;
-			}
-		}
+var $author$project$Aoc12Dict$tryGetPlantAtPos = F2(
+	function (garden, pos) {
+		return A2($elm$core$Dict$get, pos, garden);
 	});
 var $elm$core$Dict$union = F2(
 	function (t1, t2) {
@@ -5569,7 +5847,7 @@ var $elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
-var $author$project$Aoc12$fillLoop = F4(
+var $author$project$Aoc12Dict$fillLoop = F4(
 	function (garden, plant, candidates, _v0) {
 		fillLoop:
 		while (true) {
@@ -5589,12 +5867,12 @@ var $author$project$Aoc12$fillLoop = F4(
 						A2(
 							$elm$core$Maybe$withDefault,
 							'?',
-							A2($author$project$Aoc12$tryGetPlantAtPos, garden, p)));
+							A2($author$project$Aoc12Dict$tryGetPlantAtPos, garden, p)));
 				},
 				unseen);
 			var nextCandidates = $elm$core$Set$toList(
 				$elm$core$Set$fromList(
-					A2($elm$core$List$concatMap, $author$project$Aoc12$neighbours, verified)));
+					A2($elm$core$List$concatMap, $author$project$Aoc12Dict$neighbours, verified)));
 			if (!$elm$core$List$length(nextCandidates)) {
 				return _Utils_Tuple2(plot, seq);
 			} else {
@@ -5615,15 +5893,15 @@ var $author$project$Aoc12$fillLoop = F4(
 			}
 		}
 	});
-var $author$project$Aoc12$fillPlot = F2(
+var $author$project$Aoc12Dict$fillPlot = F2(
 	function (garden, pos) {
-		var _v0 = A2($author$project$Aoc12$tryGetPlantAtPos, garden, pos);
+		var _v0 = A2($author$project$Aoc12Dict$tryGetPlantAtPos, garden, pos);
 		if (_v0.$ === 1) {
 			return $elm$core$Maybe$Nothing;
 		} else {
 			var plant = _v0.a;
 			var _v1 = A4(
-				$author$project$Aoc12$fillLoop,
+				$author$project$Aoc12Dict$fillLoop,
 				garden,
 				plant,
 				_List_fromArray(
@@ -5638,7 +5916,7 @@ var $author$project$Aoc12$fillPlot = F2(
 					$elm$core$List$reverse(seq)));
 		}
 	});
-var $author$project$Aoc12$findPlotsLoop = F4(
+var $author$project$Aoc12Dict$findPlotsLoop = F4(
 	function (garden, plotList, visited, positions) {
 		findPlotsLoop:
 		while (true) {
@@ -5658,19 +5936,22 @@ var $author$project$Aoc12$findPlotsLoop = F4(
 					positions = $temp$positions;
 					continue findPlotsLoop;
 				} else {
-					var _v1 = A2($author$project$Aoc12$fillPlot, garden, pos);
+					var _v1 = A2($author$project$Aoc12Dict$fillPlot, garden, pos);
 					if (!_v1.$) {
 						var _v2 = _v1.a;
 						var plant = _v2.a;
 						var plot = _v2.b;
 						var seq = _v2.c;
+						var remainingSet = $elm$core$Set$fromList(remaining);
+						var diffSet = A2($elm$core$Set$diff, remainingSet, plot);
+						var remainingremaining = $elm$core$Set$toList(diffSet);
 						var $temp$garden = garden,
 							$temp$plotList = A2(
 							$elm$core$List$cons,
 							_Utils_Tuple3(plant, plot, seq),
 							plotList),
 							$temp$visited = A2($elm$core$Set$union, visited, plot),
-							$temp$positions = remaining;
+							$temp$positions = remainingremaining;
 						garden = $temp$garden;
 						plotList = $temp$plotList;
 						visited = $temp$visited;
@@ -5683,394 +5964,24 @@ var $author$project$Aoc12$findPlotsLoop = F4(
 			}
 		}
 	});
-var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
-	return array2d.h;
+var $author$project$Aoc12Dict$getAllPositions = function (garden) {
+	return $elm$core$Dict$keys(garden);
 };
-var $elm$core$Array$length = function (_v0) {
-	var len = _v0.a;
-	return len;
+var $author$project$Aoc12Dict$findPlots = function (garden) {
+	var positions = $author$project$Aoc12Dict$getAllPositions(garden);
+	return A4($author$project$Aoc12Dict$findPlotsLoop, garden, _List_Nil, $elm$core$Set$empty, positions);
 };
-var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
-	return $elm$core$Array$length(array2d.a);
-};
-var $author$project$Aoc12$getAllPositions = function (board) {
-	var ys = A2(
-		$elm$core$List$range,
-		0,
-		$tortus$elm_array_2d$Array2D$rows(board) - 1);
-	var xs = A2(
-		$elm$core$List$range,
-		0,
-		$tortus$elm_array_2d$Array2D$columns(board) - 1);
-	return A2(
-		$elm$core$List$concatMap,
-		function (y) {
-			return A2(
-				$elm$core$List$map,
-				function (x) {
-					return _Utils_Tuple2(x, y);
-				},
-				xs);
-		},
-		ys);
-};
-var $author$project$Aoc12$findPlots = function (garden) {
-	return A4(
-		$author$project$Aoc12$findPlotsLoop,
-		garden,
-		_List_Nil,
-		$elm$core$Set$empty,
-		$author$project$Aoc12$getAllPositions(garden));
-};
-var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
-var $elm$core$Array$foldl = F3(
-	function (func, baseCase, _v0) {
-		var tree = _v0.c;
-		var tail = _v0.d;
-		var helper = F2(
-			function (node, acc) {
-				if (!node.$) {
-					var subTree = node.a;
-					return A3($elm$core$Elm$JsArray$foldl, helper, acc, subTree);
-				} else {
-					var values = node.a;
-					return A3($elm$core$Elm$JsArray$foldl, func, acc, values);
-				}
-			});
-		return A3(
-			$elm$core$Elm$JsArray$foldl,
-			func,
-			A3($elm$core$Elm$JsArray$foldl, helper, baseCase, tree),
-			tail);
-	});
-var $elm$core$Array$isEmpty = function (_v0) {
-	var len = _v0.a;
-	return !len;
-};
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
-var $tortus$elm_array_2d$Array2D$ArrayHelpers$minRowLength = function (array) {
-	return $elm$core$Array$isEmpty(array) ? 0 : A3(
-		$elm$core$Array$foldl,
+var $elm$core$Dict$fromList = function (assocs) {
+	return A3(
+		$elm$core$List$foldl,
 		F2(
-			function (row, min) {
-				var rowLen = $elm$core$Array$length(row);
-				return _Utils_eq(min, -1) ? rowLen : ((_Utils_cmp(rowLen, min) < 0) ? rowLen : min);
+			function (_v0, dict) {
+				var key = _v0.a;
+				var value = _v0.b;
+				return A3($elm$core$Dict$insert, key, value, dict);
 			}),
-		-1,
-		array);
-};
-var $elm$core$Elm$JsArray$map = _JsArray_map;
-var $elm$core$Array$map = F2(
-	function (func, _v0) {
-		var len = _v0.a;
-		var startShift = _v0.b;
-		var tree = _v0.c;
-		var tail = _v0.d;
-		var helper = function (node) {
-			if (!node.$) {
-				var subTree = node.a;
-				return $elm$core$Array$SubTree(
-					A2($elm$core$Elm$JsArray$map, helper, subTree));
-			} else {
-				var values = node.a;
-				return $elm$core$Array$Leaf(
-					A2($elm$core$Elm$JsArray$map, func, values));
-			}
-		};
-		return A4(
-			$elm$core$Array$Array_elm_builtin,
-			len,
-			startShift,
-			A2($elm$core$Elm$JsArray$map, helper, tree),
-			A2($elm$core$Elm$JsArray$map, func, tail));
-	});
-var $elm$core$Elm$JsArray$appendN = _JsArray_appendN;
-var $elm$core$Elm$JsArray$slice = _JsArray_slice;
-var $elm$core$Array$appendHelpBuilder = F2(
-	function (tail, builder) {
-		var tailLen = $elm$core$Elm$JsArray$length(tail);
-		var notAppended = ($elm$core$Array$branchFactor - $elm$core$Elm$JsArray$length(builder.d)) - tailLen;
-		var appended = A3($elm$core$Elm$JsArray$appendN, $elm$core$Array$branchFactor, builder.d, tail);
-		return (notAppended < 0) ? {
-			e: A2(
-				$elm$core$List$cons,
-				$elm$core$Array$Leaf(appended),
-				builder.e),
-			b: builder.b + 1,
-			d: A3($elm$core$Elm$JsArray$slice, notAppended, tailLen, tail)
-		} : ((!notAppended) ? {
-			e: A2(
-				$elm$core$List$cons,
-				$elm$core$Array$Leaf(appended),
-				builder.e),
-			b: builder.b + 1,
-			d: $elm$core$Elm$JsArray$empty
-		} : {e: builder.e, b: builder.b, d: appended});
-	});
-var $elm$core$List$drop = F2(
-	function (n, list) {
-		drop:
-		while (true) {
-			if (n <= 0) {
-				return list;
-			} else {
-				if (!list.b) {
-					return list;
-				} else {
-					var x = list.a;
-					var xs = list.b;
-					var $temp$n = n - 1,
-						$temp$list = xs;
-					n = $temp$n;
-					list = $temp$list;
-					continue drop;
-				}
-			}
-		}
-	});
-var $elm$core$Array$sliceLeft = F2(
-	function (from, array) {
-		var len = array.a;
-		var tree = array.c;
-		var tail = array.d;
-		if (!from) {
-			return array;
-		} else {
-			if (_Utils_cmp(
-				from,
-				$elm$core$Array$tailIndex(len)) > -1) {
-				return A4(
-					$elm$core$Array$Array_elm_builtin,
-					len - from,
-					$elm$core$Array$shiftStep,
-					$elm$core$Elm$JsArray$empty,
-					A3(
-						$elm$core$Elm$JsArray$slice,
-						from - $elm$core$Array$tailIndex(len),
-						$elm$core$Elm$JsArray$length(tail),
-						tail));
-			} else {
-				var skipNodes = (from / $elm$core$Array$branchFactor) | 0;
-				var helper = F2(
-					function (node, acc) {
-						if (!node.$) {
-							var subTree = node.a;
-							return A3($elm$core$Elm$JsArray$foldr, helper, acc, subTree);
-						} else {
-							var leaf = node.a;
-							return A2($elm$core$List$cons, leaf, acc);
-						}
-					});
-				var leafNodes = A3(
-					$elm$core$Elm$JsArray$foldr,
-					helper,
-					_List_fromArray(
-						[tail]),
-					tree);
-				var nodesToInsert = A2($elm$core$List$drop, skipNodes, leafNodes);
-				if (!nodesToInsert.b) {
-					return $elm$core$Array$empty;
-				} else {
-					var head = nodesToInsert.a;
-					var rest = nodesToInsert.b;
-					var firstSlice = from - (skipNodes * $elm$core$Array$branchFactor);
-					var initialBuilder = {
-						e: _List_Nil,
-						b: 0,
-						d: A3(
-							$elm$core$Elm$JsArray$slice,
-							firstSlice,
-							$elm$core$Elm$JsArray$length(head),
-							head)
-					};
-					return A2(
-						$elm$core$Array$builderToArray,
-						true,
-						A3($elm$core$List$foldl, $elm$core$Array$appendHelpBuilder, initialBuilder, rest));
-				}
-			}
-		}
-	});
-var $elm$core$Array$fetchNewTail = F4(
-	function (shift, end, treeEnd, tree) {
-		fetchNewTail:
-		while (true) {
-			var pos = $elm$core$Array$bitMask & (treeEnd >>> shift);
-			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
-			if (!_v0.$) {
-				var sub = _v0.a;
-				var $temp$shift = shift - $elm$core$Array$shiftStep,
-					$temp$end = end,
-					$temp$treeEnd = treeEnd,
-					$temp$tree = sub;
-				shift = $temp$shift;
-				end = $temp$end;
-				treeEnd = $temp$treeEnd;
-				tree = $temp$tree;
-				continue fetchNewTail;
-			} else {
-				var values = _v0.a;
-				return A3($elm$core$Elm$JsArray$slice, 0, $elm$core$Array$bitMask & end, values);
-			}
-		}
-	});
-var $elm$core$Array$hoistTree = F3(
-	function (oldShift, newShift, tree) {
-		hoistTree:
-		while (true) {
-			if ((_Utils_cmp(oldShift, newShift) < 1) || (!$elm$core$Elm$JsArray$length(tree))) {
-				return tree;
-			} else {
-				var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, 0, tree);
-				if (!_v0.$) {
-					var sub = _v0.a;
-					var $temp$oldShift = oldShift - $elm$core$Array$shiftStep,
-						$temp$newShift = newShift,
-						$temp$tree = sub;
-					oldShift = $temp$oldShift;
-					newShift = $temp$newShift;
-					tree = $temp$tree;
-					continue hoistTree;
-				} else {
-					return tree;
-				}
-			}
-		}
-	});
-var $elm$core$Elm$JsArray$unsafeSet = _JsArray_unsafeSet;
-var $elm$core$Array$sliceTree = F3(
-	function (shift, endIdx, tree) {
-		var lastPos = $elm$core$Array$bitMask & (endIdx >>> shift);
-		var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, lastPos, tree);
-		if (!_v0.$) {
-			var sub = _v0.a;
-			var newSub = A3($elm$core$Array$sliceTree, shift - $elm$core$Array$shiftStep, endIdx, sub);
-			return (!$elm$core$Elm$JsArray$length(newSub)) ? A3($elm$core$Elm$JsArray$slice, 0, lastPos, tree) : A3(
-				$elm$core$Elm$JsArray$unsafeSet,
-				lastPos,
-				$elm$core$Array$SubTree(newSub),
-				A3($elm$core$Elm$JsArray$slice, 0, lastPos + 1, tree));
-		} else {
-			return A3($elm$core$Elm$JsArray$slice, 0, lastPos, tree);
-		}
-	});
-var $elm$core$Array$sliceRight = F2(
-	function (end, array) {
-		var len = array.a;
-		var startShift = array.b;
-		var tree = array.c;
-		var tail = array.d;
-		if (_Utils_eq(end, len)) {
-			return array;
-		} else {
-			if (_Utils_cmp(
-				end,
-				$elm$core$Array$tailIndex(len)) > -1) {
-				return A4(
-					$elm$core$Array$Array_elm_builtin,
-					end,
-					startShift,
-					tree,
-					A3($elm$core$Elm$JsArray$slice, 0, $elm$core$Array$bitMask & end, tail));
-			} else {
-				var endIdx = $elm$core$Array$tailIndex(end);
-				var depth = $elm$core$Basics$floor(
-					A2(
-						$elm$core$Basics$logBase,
-						$elm$core$Array$branchFactor,
-						A2($elm$core$Basics$max, 1, endIdx - 1)));
-				var newShift = A2($elm$core$Basics$max, 5, depth * $elm$core$Array$shiftStep);
-				return A4(
-					$elm$core$Array$Array_elm_builtin,
-					end,
-					newShift,
-					A3(
-						$elm$core$Array$hoistTree,
-						startShift,
-						newShift,
-						A3($elm$core$Array$sliceTree, startShift, endIdx, tree)),
-					A4($elm$core$Array$fetchNewTail, startShift, end, endIdx, tree));
-			}
-		}
-	});
-var $elm$core$Array$translateIndex = F2(
-	function (index, _v0) {
-		var len = _v0.a;
-		var posIndex = (index < 0) ? (len + index) : index;
-		return (posIndex < 0) ? 0 : ((_Utils_cmp(posIndex, len) > 0) ? len : posIndex);
-	});
-var $elm$core$Array$slice = F3(
-	function (from, to, array) {
-		var correctTo = A2($elm$core$Array$translateIndex, to, array);
-		var correctFrom = A2($elm$core$Array$translateIndex, from, array);
-		return (_Utils_cmp(correctFrom, correctTo) > 0) ? $elm$core$Array$empty : A2(
-			$elm$core$Array$sliceLeft,
-			correctFrom,
-			A2($elm$core$Array$sliceRight, correctTo, array));
-	});
-var $tortus$elm_array_2d$Array2D$ArrayHelpers$truncateRows = F2(
-	function (columns, array) {
-		return A2(
-			$elm$core$Array$map,
-			function (row) {
-				return (_Utils_cmp(
-					$elm$core$Array$length(row),
-					columns) > 0) ? A3($elm$core$Array$slice, 0, columns, row) : row;
-			},
-			array);
-	});
-var $tortus$elm_array_2d$Array2D$ArrayHelpers$getMinColumnsAndTruncateRows = function (array) {
-	var columns = $tortus$elm_array_2d$Array2D$ArrayHelpers$minRowLength(array);
-	var normalizedData = A2($tortus$elm_array_2d$Array2D$ArrayHelpers$truncateRows, columns, array);
-	return _Utils_Tuple2(columns, normalizedData);
-};
-var $tortus$elm_array_2d$Array2D$fromArray = function (array) {
-	var _v0 = $tortus$elm_array_2d$Array2D$ArrayHelpers$getMinColumnsAndTruncateRows(array);
-	var initialColumns = _v0.a;
-	var normalizedData = _v0.b;
-	return {h: initialColumns, a: normalizedData};
-};
-var $elm$core$Array$fromListHelp = F3(
-	function (list, nodeList, nodeListSize) {
-		fromListHelp:
-		while (true) {
-			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
-			var jsArray = _v0.a;
-			var remainingItems = _v0.b;
-			if (_Utils_cmp(
-				$elm$core$Elm$JsArray$length(jsArray),
-				$elm$core$Array$branchFactor) < 0) {
-				return A2(
-					$elm$core$Array$builderToArray,
-					true,
-					{e: nodeList, b: nodeListSize, d: jsArray});
-			} else {
-				var $temp$list = remainingItems,
-					$temp$nodeList = A2(
-					$elm$core$List$cons,
-					$elm$core$Array$Leaf(jsArray),
-					nodeList),
-					$temp$nodeListSize = nodeListSize + 1;
-				list = $temp$list;
-				nodeList = $temp$nodeList;
-				nodeListSize = $temp$nodeListSize;
-				continue fromListHelp;
-			}
-		}
-	});
-var $elm$core$Array$fromList = function (list) {
-	if (!list.b) {
-		return $elm$core$Array$empty;
-	} else {
-		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
-	}
-};
-var $tortus$elm_array_2d$Array2D$fromList = function (list) {
-	return $tortus$elm_array_2d$Array2D$fromArray(
-		$elm$core$Array$fromList(
-			A2($elm$core$List$map, $elm$core$Array$fromList, list)));
+		$elm$core$Dict$empty,
+		assocs);
 };
 var $elm$core$List$head = function (list) {
 	if (list.b) {
@@ -6091,26 +6002,26 @@ var $elm$core$List$maximum = function (list) {
 		return $elm$core$Maybe$Nothing;
 	}
 };
-var $author$project$Aoc12$input = 'LLLLLLLLLLLLLLLLLLLLLLLPBBBVVVVVPPPPPSSSSCCCCCCCCCCCCCCVVVVVVVVVJJJJJJJJJJJJJJYIYYYYYYYYYYKKKKKKKKKKKKKZQQQQQQQQQQQQQQQBBLLLLLLWWWWFFFWWWWWW\nLLLLLLLLLLLLLLLLLLLLUPPPPBBVVVPPPPPPPSSSCCCCCCCCCCCCCCVVVVVVVVVCCCJJJJJJJJJJJJYYYYYYYYYYYYKKKKKKKKKKKKKKKQQQQQQQQQQQWCCLLLLLLLLWWWWWWWWWWWWW\nLLLLLLLLLLLLLLLLLPPHPPPPPPPVVPPPPPPPPSSSCCCCCCCCCCCCCCCVVVVVVVVCCCCJJCJCJJJJJYYYYYYYYYYYYYYKKKKKKKKKKKQQKQQQQQQQQQQQWWWWWNLLWWWWWWWWWWWWWWWW\nLLLLLLLLLLLLLLLLPPPPOOPPPWPVVVPPPPPPPPCCCCUCCCCCCCCCCCCCVVVVVVCCCCCCCCCCCCJJJJYYYYYYYYYYYYYYHKKKKKKKKYQQQQQQQQQQQQQQWWWWWWWLWWWWWWWWWWWWWWWW\nLLLLLLLLLLLLLLULLPPPPPPPPPVVVVVPPPPPPPPPCCCCCCCCCICCVCCVVVVVVVCCCCCCCCCCJJJJJJJYYYYYYYYYYYYKKKKKKKKKKYQQQQQQQQQWQQQQQWWWWWWWWWWWWWWWWWWWWWWW\nZLLLLLLLLLZLLLULUUPPPPPPPPPPVVVPPPPPPPPPPSCCCCCCCCNVVVVVVVVVVCCCCCCCCCCCCJJJJJJJCYYYYYYYYYYYYYKKKKKKKYQQQQQQQQQWWWQWQWWWWWWWSSWWWWWWWWWWWWWW\nZLLLLLLLLZZLLLUUUUUUPPPPPPPPVPPPPPPPPPPPPPPCCCCCCNNVVVVVVTVVVCCCCCCCCCCCJJJJJJJJYYYYYYYYYYYYYYKKKKKDDQQQQQQQQQQQPWWWWWWRRRWWSSMMWWWWWWWWWWWW\nZLLLLLLLZZZZLLUUUUUHPPPPPPPPPPPPPPPPPPPPPPPVCCCOCTTVHTTTTTVVVVCCCCCCCCCCCJJJJJYYYIYYYYYYYYYYOOKKKDDDDQQQQQQQQQQQPPWWWWWRRSSIISSMWWWWWWWWWWWW\nZLLLLLLLZZZZZZUUUUUUPPPPPPPMMPPPPPPPPPPPPPPVVCKTTTTTHTTTTTVVVCCCCCCCCCCCCJJJJJJYYYTYYYYYYYYYYOKDDDDDDDQQQQQQQQQMWWWWWWWWWKSSSSSWWWWWWWWWWWWW\nLLLLLZLGGZZZZZUUUUUUUUUUPPMMMPPPPPPPPPPPPPPPVTTTTTTTTTTTTTYVVWCCCCCCCCCCCJJJJJJJYYYYYYYYYYYOOOODDKKDDDDDDQQQQQMMMWWWWWWWWKSSSSSSWWWWWWWWWWWW\nWLNNLZZZZZZZZZUUUUUUUUUUMMMMMMMPPPPPPPPPPVVVVVTTTTTTTTTTTTTEECCCCCCCCCCCJJJJJJJJPIYYYYYYRRRFFDDDDDKDDDDDYYQQQQMMMWWWWWWWWWSSSSSSSWWWWWWWWWWW\nWLLLLLZZZZZZZZZUUUUUUUUUMMMMMMMPMPPPPPPPPVVVVVTTTTTTTTTTTTTECCLCCCCCCCHHHOJPPJJPPIIYYYYYRFFFFFDDDDKDKDDDDYQQQQMMMMMWWWWWWWSSSSSSSSWWWWWWWWXX\nWWWLWWZZWZZZZZKKKUUUUUUUMMMMMMMPMPPPPPPTPVVTTTTTTTTTTTTTTEEEECCCCCIIHCCHHHHPPPPPPFIIYYYFFFFFFDDDDDKKKDDDDQQQMMMMWWWWWWWWBSSSSSSSSSSWWWWWWWBX\nWWWWWWWWWZZZZKKKKUMUUMMUMMMMMLMMMMPDLDPTTTVTTTTTTTTTTTTTTTTEECCCCCCHHCCHHHHPPPPPPFFFYFFFFFFFFFDDDDKQQQQYYQMMMMMMMMWWWWWINSSSSSSSSSWWDWWWWBBX\nWWWWWWWZZZZZGKKKKKMMMMQQQMMMMLLLLLLDLLLTTTTTTTTTTTTTTTTTTTTTEGGGCCOHHHHHHHHPPPPPFFFFFFFFFFFFFFFFFDDDQQQYQMMMMMMMMMNNNNNNNSSSSSSSSSSWWBWWBBBB\nWWWWWWWWWCZDKKKKKKMMMMUQQQMMMLLLLLLLLLLTTTTTTTTTTTTTTTTTTTTGGGGGCHHHHHHHHHHKPPPPFFFFFFFFFFFFFFFFFFQQQQQYQMMMMMMMMMMMMNNNNNSSSSSSSSSWBBWBBBBB\nWWWWWWWWCCZZKKKKKKMMMQQQQQDDMLLLLLLLLLLLTTTTTTTTTETTTTTTOTTTOGCCCHHHHHHHHHHKPPPFFFFFFFFFFFFFFFFFFFQQQQQQQMMMMMMMMNNMNNNNNNNNNSSSSSBBBBBBBBBB\nNWWWWWWWWWIIKKKKKVMMMMMDQDDLMLLLLLLLLLFTTTTTTTTTTETTTTTOOOOOOGJCCOOOHHHHHHHKKKPPPPPPFFFFFFFFFFFFFNNQQQQQMMMMMMMMMNNMNNNNNNNNNSSSSSSBBBBBBBBB\nWWWWWWWWWWIIIKIVVVVMDDDDDDLLLLLLLLLLLLLWWTTTTTTTTEETTTTTOOOOGGGOOOOHHHHHHHHHKKPPPBBBFFFFFFFFFFFFFNNQQQMMMMOOOOOOOOONNNNNNNNNSSSSSSSBBBBBBBBB\nGGWWWWWWIIIIIIIIIVVWDDDWDDDLLLLLLLLLLLLWWWWTTEEEEEEEEEEOOOOOOOOOOOOHHHHHHHHHKPPPPPNFFFFFFFFFFFFFFFFYQQMMMMOOOOOOOOONNNNNNNNNSSSSSSSBBBBBBBBB\nGGGGWWIWIIIIIIIIVVWWDDDDDLLLLLLLLLLLLLWWWWWTTEEEEEEEEEOOOOOKOOOOOOOHHHHHHHHHPPPPPPNNNNNNNFFFNFFFIIIIQMMMVVOOOOOOOOOONNNNNNNNSSSSSSSBBBBBBBBB\nGGGGIIIIIIIIIIIIVVWWDDDLLLLLLLLLLLLLLLLLWWWTEEEEEEEEEOOOOOKKOOOOOOOHNHHHHHHPPPPPPPNNNNNNNNNNNFFFIIIISIIMIVOOOOOOOOOOONNNNNNNNSSSSSSSSBBBBBBB\nGGJJIIIIIIIIIITIVWDDDDDWWEWLLLLLLLLLLLLLLEWEEEEEEEEEEOOKOOKKKOOOONNNNHNHHHHHPPPPPPPNNNNHNNNNSSFFIIIIIIIIIVOOOOOOOOOOONNNNNNNNNSSSSSSBBBWBBBB\nGJJJJIIIIIIFFFFFVDDDDDDDDDDLLLLLLLLLLLLFEEEEEEEEEEEEEEEKKKKKOOOONNNNNNNHHHHHPPPPPJPDNNFJNNNNSSSSIIIIIIIIIIOOOOOOOOOOONNNNNNNNISISSSSBBBWBBLB\nJJJJJJJIIIUFFFFFWDDDDDDDDDDOLLLLLLLLLLLFEEEEEEEEEEEEAEEKKKKKKOOONONNNNNNHHHOYYBBBJJDDJFJJNNSSSSIIIIIIIIIIIOOOOOOOOOONNNNIIIINIIIIISSBEBBLLLL\nMJJJJJMIIIFFFFFFWDDDDDDDDDDOOLOLLLLLLEEEEEEEEEEEEEEEEEKKKKKKKOOONONNNNNNHHYYYYBBBJJJJJJJJNJSSSIIIIIIIIIIIIOOOOOOOOOONNNIIIIIIIIISSSSWEEWLLLL\nJJJJJMMMMFFFFFFFWDDDDDDDDDDOOOOOLLLLLEEAAEEEEEEEEEEEEKKKKKKKKKKOOONCNNNNHHHYYYYBBBJJJJJJJJJSSIIIIIIIIIIIIVOOOOOOOOOOWIIIIIIIIIISSSSWWEEWLLWW\nJJJJMMMMMMFFFFFWWDDDDDDDDDDOOOOOLLLUEEEEEEEEEEEZZKKKKKKKKKKKKKKEEEEEEEEENHYYYYYBBJJJJJJJJJJSSSSIIIIIIIIIVVOOOOOOOOOOWIIIIIIIIIIIIIIYWWWWWWWW\nOXOJMWMMFFFFFFWWWWWWWWKDDDOOOUUUHLTUEEEEEEEEEEEZKIKKKKKKKKKKKKOEEEEEEEEEYYYYYYJJJJJJJJJJJJJJJJIIIIIIIILLLVVOOOOOOOOOIIIIIIIIIIIIIIIWWWWWWWWW\nOOOMMWMFFFFFFFFWFFWWWWKDDDKOOUUUUWUUUEEEEEEEEEEEKKKKKKKKKKKKKOOEEEEEEEEEYYYYYYYJJJJJJJJJJJEENNINIIIIILLLLVVVIIIIIIWWWIIIIIIIIIIIIIIWWWWWWWWW\nLLOWWWWFFFFFFFFFFFWKWKKDDDOOOUUUUUUUUFEEEEEEEFENKKKKKKKKKKKKKKOEEEEEEEEEYYYYYYYJJJJJJJJJJEEENNNNNIIJLLLLLVVVIIIIIIWWIIIIIIIIIIIIIIIWWWWWWWWW\nOOOGWWVWFFFFFFFFFFOKKKKDDDKOUUUUUUUUUUEEEEEEEEXKKKKKKKKKKPPKPKOEEEEEEEEEYYYYYYYYYJJJJJJJEEEENNNNNIIJJJLLLLLVILIITHHWIIHIIIIIIIIIIIWWWWWWWWWW\nOOOOOWWWFFFFFFFFFFKKKKKDDDOOKNKUUUUUUEEEEEEEEEEKIIIKKKKKKPPPPPPPPPPCYYYYYYYYYYYYYJJJJEEJJEEEEEJJJJJJJJLLLLLLLIIITHHHHHHHIIIIIIIIIIIIWWWWWWWW\nOOOOOWWWWWFFFFFFFYKKKKKDDDKKKKKUUUUUUEEEEEEEEEWKIIIKKKKKKPNPPPPPPPYYYYYPYYYYYYYYYJJEEEEJEEEEEEJJJJJJJJQLLLLLLLLITHHHHHHHHIIIIIIIIIIWWWWWWWWW\nOOOOOWWWWWFFFFFFYYKKKKKDDDKKKKKUUUUUUUEEEEEEEEEEIIIIIKSIKKNPPPPPPPPPYYYPYPYYYYYYYJYEEEEEEEEEJJJJJJJJLLLLLLLLLLLTTTHHHHCHHHHIHIIIDIIWWWWWWWWW\nOOOOOWWWWWWFFYYYYYYKKKKDDDKKKKKUUUUUUUUUEEEEEEEIIIIIIKKIIKNNNPPPPPPPPPPPYPPYYYYYYYYEEEEEEEEEEJJJJSJJJLLLLLLLLLLLLHHHHHHHHHHHHHIDDIWWWWWWWWWW\nOOOOOWWWWWWFFYYYYYYKKKKKKKKKKKKUUUUUUUUEEEEEEEEEIIIIIIIIIIINPPPPPPPPPPPPPPPPPPPYYYYEEEEEEEEEEEEJJJLLLLLLLLLLLLLHHHHHHHHHHHHHNNIWWWWWWWWWWWWW\nOOOOOOOWWWWWWIIYYYYYKKKKKKKKUUKUUUUUUUUUEEEEEEEEEIIIIIIIIIIPPPPPPPPPPPPPPPPPPPPYYYYYEEEEEEEEEEEEGGLLLLLLLLLLLLLPPHHHHHHHHHHHNNWWWWWWWWWWWWWW\nDOOOOOOWWWWWWIIYYYYYYKKJKKNUUUUUUUUUUUUUUEEEEEEEEIIIIIIIIIIEPPPPPPPPPPPPPPPPPPPYYYYEEEEEEEEEEEEEEGGLLLLLLLLLLLPPPPPHHHHHHHNNNNWWWWWWWWWWWWWW\nDOOWOWWWWWWWWIIIYYYYYKKJJJUUUUUUUUUUUUUUUJEEEEEEEEIIIIIIIIIPPPPPPPPPPPPPPPPPPPPPYYYEEEEEEEEEEEEEGGSLLSLLLLLLLLLLHHHHHHHHHHHNNNNNWWWWWWNNWWWD\nDOWWOWWWWWWWWIIIYYYBYYKBBBBBUULUUUUUUUUUUUEEEEEEEEIIIIIIIIIIPPPPPPPXPPPPPPPPPPPAYYYYYEEEEEEEEEEEESSLLSLLLLLLLLLEHHHHHHHHHHHNNNNNWWWWWNNNWWDD\nWWWWOWWWWWWIWIIIIIIBBYBBBMBBULLUUUUUUQQQQXXXXEEEIIIIIIIIIIIIIBPPPXXXXXPPPPPPPUUUUUUUUEEYYYYYYEEESSSSSSLLLLLLLLLEHHHHHHHHHHHNNNNNNNWWNNRNWWGG\nWWWWWWWWWWWIIIIIIIBBBBBBBMMLLLLLLUUUQQQQQPXXXEEEIIIIIIIIIIIIIAAAPXXXXXPPPPPPPUUUUUUUUYYYYYYYYYEEESSSSSSSSSSLLLLEHHHHHHHHRRRNNNNNNNNNNRRNWGGG\nOOWWWWWWWWWIIIIIIIBBBBBBBBBLLLLXLUULWWWPPPPXXXXEVIIIIIIIIIIIIAAAAAXXXXXPPPPPPUUUUUUUUYYYYYYYYYEEESSSSSSWWSEAEEEEEHEHHHHHCRNNNNNNNNNRRRMNNNGC\nOWWWWWWWWWWWIIIIIIBBBBBBBBBBLLLLLLLLLWWPPPPXXXVEVIIVIIIIFIIIAAAAAXXXXXPPPPPPHUUUUUUUUYYYYYYYYYYYSSSNNSSSSEEEEEEEEEEEHHHCCRNRRRRNNNNRRRNNNNGG\nOOOWWWWWWWWWWWIIIIBBBBBBBPBBBLLLLLLWWWWPPPPPXVVVVVIVVVIIIIIIAAAAAXXXXXNPPPPPGUUUUUUUUYYYYYYYYYYYYSSYYSSSSEEEFEEEEEEHHEEEEENNRRRRRRRRRGGGGGGG\nOOOOOWWWWWWWWWBEIIBBBBBBBBBLLLLLLLLLWWWWPPPPXXVVVVVVVVIIIIIIAAAAAVXXXXNNNNNNNUUUUUUUUGYYYYYYYYYYYYSYYSSSEEEEEEEEEEEEEEEEVVVNRRRRRRRRGGGGGGGG\nZOUUUUUUUUUUWBBBIBBBBBBBBBBBLLLLLLLLFWWWPPPPPXXVVVVVVVVVBIZZZAAAMVVXXNNNNNNNNUUUUUUUUYYYYYYYYYYYYYYYYYYYFEEEEEEEEEEEEEEEVVVVRRRRRRRRGGGGGGGG\nZZUUUUUUUUUUUUUUUIBBBBBBBBBBLLLLLLLKFFWWWPPPQVXVVVVVVVVVBIZZZZZAMVVXXNNNNNNNNUUUUUUUUYYYYYYYYYYYYYYYYYEYEEEEEEEEEEEEEEEEEVVVRRRRRRRRGGGGGGGG\nZZUUUUUUUUUUUUUUUBBQQBBBTBQBLQQQQQLFFFFFFPPPPVXVVVVVVVVVVZZZZZZAMVXXXNNNNNNNNUUUUUUUUYYYYYYYPYYPYYYYYEEEENEOEEEEEEEEVVVVVVVPRRRRRRRRRGGRRGNN\nZZUUUUUUUUUUUUUUUQQQQQBBBBQQQQQQQQQFFFFFFPPJVVVVVVVVVVVVVVZZZZZVVVVXXXNNNNNNNUUUUUUUUYYYYYYPPPPPEYEYEEEBEEEOEEEEEEEEEVVVVVVVRERRRRRRRRRRJJNJ\nZZUUUUUUUUUUUUUUUQQQQQQBBBQQQQKKKKKKKKFFFFFJVVVVVVVVVVVVVVVZZZZVVVVVXXXXNNNNAIIIGGGGGYYYYYBPPPPPEEEYEEEEEEEOOEEEEEEEEVVVVVVVVVVRRRRRRJJJJJJJ\nZZUUUUUUUUUUUUUUUQQQQQQQQQQQQXKKKKKKKKFFFFFFVVVVVVVVVVVVVVZZZVVVVVXXXXXIRNAAAIIIIIIIGGYYYYBPPPPEEEEEEEEEEEEOOEEEEEEEVVVVVVVVVVVRRRRRRJJJJJJJ\nZZUUUUUUUUUUUUUUUPPPQQQQQQQQQXKKKKKKKKFFFFFBBVVVVVVVVVVVVVZZVVVVVVXXXXXIRRIIIIIIIIIIIYYYYBBBBPPLEEEEEEEEEEEEOEEKEEEEVVVVVVVVVRRRRRRRJJJJJJJJ\nZZUUUUUUUUUUUUUUUPPQQQQQQQQQQKKKKKKKKKFFFBBBBBVVVVVVVVVVVVVVVVVVVVVVXXXIIIIIIIIIIIIIIHYEEBBEEEJEEEEEEEEEEEEEEWEKKKEEVKVVVVVVVRRRRRRRJJJJJJJJ\nZZUUUUUUUUUUUUUUUPPQQQQQQQQQKKKKKKKKKKFFBBBBBBBVIIVVVVVVVVVVVVVVVVVVVXXXIIIIIIIIIIIIIIIIEEEEJJJJEEEEEEEEEEEEEEKKKKEKKKKKKKVRRRRRRRRJJJJJJJJJ\nZZPPUUUUUUUUOPPPPPQQQQQQQQQXKKKKKKKKKKKKKKBBBBBIIIIVVVVVTTTVVVVVVVVVVXXIIIIIIIIIIIIIIIIIEEEEEEEEEEEEEEEEEEEEEEKKKKKKKKKWKKVRRRRRRRJJJJJJJJJJ\nPPPPUUUUUUUUPPPPPQQQQQQQQXXXKKKKKKKKKKKKKKBBBBIIIIIIIVVVVTTVVVVVVVVVVVIIIIIIIIIIIIIIISEEEEEEEEEEEEEEEEEEEEEEEEKKKKKKKKKWKKVRRRRRRRJXJJJJJJJJ\nPPPPUUUUUUUUNPPEQQQQQQUQQXXXKKKKKKKKKKKKKKBBBBIIIIIIWWWWWWWWICVVEVVVVCCIIIIIIIIIIIIIIIIEEEEEEEEEEEEEEEEEEDDEEDKKKDKWWWWWKKVRVRRRRXXXJJJJJJJJ\nPDDPUUUUUUUURRREEQQQQQQQQQXXKKKKKKKKKKKKKKRRBRMIIIIIWWWWWWWWICVVVVYVVCCCIIIIIIIIIIIIIIEEEEEEEEEEEEEEEEEEEEDDDDDDDDKKKKWWWWWWVVRJSXXXJJJJJJJJ\nDDDPUUUUUUUURRRREEQQQQQQQXXXKKKKKKKKKKKKKKRRRRRIIIIIWWWWWWWWIVVVVYYYCCCCCCIIIIIIIIIIIREEEEEEEEEEEEEEEDDEEDDDDDDDDDKKKKWWWWWWVSSSSSSSIJJJJJJJ\nDDDPUUUUUUUURRRREEQQQQQXXXXXKKKKKKKKKKKKKKRRRRRRIIIIWWWWWWWWJJJJJCCCCCCCCCIIIIIIRRRXXXXXXXXEEEEEEEEEEDDDDDDDDDDDDWKKWWWWWWWSSSSSSSSSSJKJJJSJ\nDDDDUUUUUUUURRRRRQQQQQQQQXXXXXXXKKKKKKKKKKRRRRRRIIIIWWWWWWWWWWWJJCCCCCCCCCCIIIIIIERXXXXXXXXEEEEEEEEEDDDDDDDDDDDDDWWKWWWWWWWSSSSSSSSSSJJJJJJJ\nDDDDPPRRRRRRRRRRRQQQQQQQQQXXXXXXKKKKKKKKKKRRRRIIIIIIWWWWWWWWWWWWWWJCCCCCCCCIIIIIEERXXXXXXXXEEEEEEEEDDDDDDDDDDDDDDDWWWWWWWWWWKSSSSSSSSSSJJJSJ\nDDDRRRRRRRRRRRRRRQQQQQQQQQQXXXXXKKKKKKKKKKRRRRVIQIIIWWWWWWWWWWWWWWWWVCCGGGGGIIIGRRRXXXXXXXXEEEEEEEEEDDDDDDDDDDDDDWWWWWWWWWWWSSSSSSSSSSSSSSSS\nDDRRRRRRCRRRRRRRRQQQQQQQQQQXXXXXXKKKKKKRRRRRRRQQQQIIWWWWWWWWJJWWWWWWJJGGGGGGGGGGRRRXXXXXXXXEEEEEEEEEEDDDDDDDDDDDDDWWWWWWWWWWWSSSSSSSSSSSSSSS\nDDDRRRRRCCCRRRRRPQQQQQQQQQQXXXSSSKKKKKKRRRRRRRMQQQIIWWWWWWWWJJWWWWWWJJJJGGGGZZZGRRRXXXXXXXXREEEEEEELMLLLDDDDDDDDDDDDWWWWWWWWWSSSSSSSSSSSSSSS\nDDRRRRRRCCCCRCCPPPPPQQQQQQQMXXXSSKKKKKKRRRRRRRMQQQQIWWWWWWWWJJWWWWWWJJJJGGGZZZZZRRRXXXXXXXXREEEEEELLLLLLLIIIIIIIIIIDWWWWWWWWSSSSSSSSSSSSSSSS\nDDRRRRRCCCCCCCPPPPPPPPQQQQQQXXSSSSSSSSRRRRRRRRQQQQQQQIIIIIJJJJWWWWWWJJJJGGZXXXXXXXXXXXXXXXXRRRRLLELLLLLDDIIIIIIIIIIDWWWWWWWWSSSSSSSSSSSSSSSS\nDDDRDRRCCCCCCCPPPPPPPPQQQFQQNNNSSSSSSRRRRRRRRRQQQQQQQIIIIPJJJJWWWWWWJJJJGGZXXXXXXXXXXXXXXXXRRRRLLLLLLLLDDIIIIIIIIIILWWWWWWWWSSSSSSSSSSSSSSSS\nDDDDDRRRCCCCCCPPPPPPPPQQFFNNNNNSSSSSSRRRRRRRRRRQQQQQQIIIGJJJJJJWWWWWJTJGGHZXXXXXXXXXRRJJRJJRRRRRLLLLLLLDDDDDDDDLLLLLWWLWWWWWNNSSSSSSSSSRRRRS\nDDDDZRRZZRCCCCCYPYYPYPQQFNNNNNNSSSSSSSRRRRRRRRRQQQQQQQIGGJJJJJJWWWWWTTJGHHYXXXXXXXXXRRJJJJJJJJXXXXLLLLLHDDDHDDDLLLLLLWLWTWWNNNSSSNSSRRSRRRRR\nDDDBZZZZCCCCCCCYYYYYYYQQFNNNNNNSSSSSSSSRRRRRRRRRQQQQQQQQQJJJJJJWWWJJJJXXXXXXXXXXXXXZJJJJJJJJJJXXXPPHLLLLLHHHHDMLLLLLLLLWTTANNNNNNNRRRRRRRRRR\nDDBBBZZZCYCCCCYYYYYYCFQFFFNNNNSSSSSSSSSSGRGRGRRGQQQQQQHHSSLJJMJJJJJJJHXXXXXXXXXXXXXZZZJJJJJJJJPPPPYHLLHHHHHHHHLLLLLLLLLLTAANNNNRRNRRRRRRRRRL\nBBBBBZZZZYYCYCYYYYFFFFQFFFFNNNSSSSSSSSSGGGGGGGGQQQQQQQQHSSSSMMMJJJMMMHXXXXXXXXXXXXXZZZZZJJJJJJJPPPHHHLHHHHHHHHLLLLLLLLLAAAAARRNRRRRRRRRRRRRL\nBBBBBMYYYYYYYYYYYYVFFFFFFFFFFSXSSSSSSSGGGGDDDGGQQQQQQIQHSSXEMMMMMMMMUHXXXXXXXXXXXXXZZZZZYJJJJJJJPPHHHHHHHHHHHLLLLLLLLDAAAAAAARRRRRRRRRRRRRRL\nUBBBYYYYYYYYYYYYYYYYYFFFFFFFSSSSSSSSFFGGDDDDDDGQQQQQQEEEESSEMMMMRRRRUUXXXXXXXXXXXXXZZHHYYJJJJJJJPYHHHHHHHHHHHLLLLLLLLAAAAAAAARRRRRRRRRRRRRLL\nBBBBYYYYYYYYYYYYYYYYFFFFFFFFSSFFFFFFFFFGGDDDDDDDDYYEQEEEEEEEMMMRRRRRXUXXXXXXXXXXXXXYYYYYYJJJJJYYYYYHHHHHHHHHHHLLLLLLALLLAAAAAAAARRRRRRRRRRLL\nBBBBBBYYYYYYYYYYYYYYYFFFFFFFFFFFFFFFFFGGGGDDDDDDDDYEEEEEEEEEEMMRRRRUUUXXXXXXXXXXXXXYYYYVVYYYJYYYYYYVVHHHHHHHHHHLLLLLLLAQAAAAAAAAAARRRRRRRRLL\nBBBBYYYYYYYYYYYYYYYYYIFIFFFFFFFFFGGGFFGGGGDDDDDDDDYEEEEEEOWEOWRRRRRUUULUUUUUUZZZZZYYYYYIVYYYYYVVVYVVHHHHHHHHHHGFLLLLLLAAAAAAAAAAARRZRRYZZRRL\nBBBBYYYYYYYYYYYYYYYYYYFIIIFFIIIFFFGGGGGGDDDDDDMDYYYYYEEEEWWWWWRRRRUUUULLUUUUZZZZZZZZYMYVVVVVVVVVVVVVHHHHHHHHHHGFLLLVVVVAAAAAAAAAAAAZZZZZZZLL\nBBBBBYBBVRVYVVYYNYKYYYIIIIIIIIFFFFFGGGGGDDDDDDMDDYYYEEEEEWWWWWRRRRRRRULLLLUZZZZZZZZZZMYTTVVVVVVVVVVVVHHNHHHHHHGGULLLVVVAAAAAAAAAAAAAZZZZZJBB\nBBBBBBBBVVVVVVVNNNIIIIIIIIIIIIIIFFFGGGGGDDDDDDMDDDDYYEEEWWWWWCWRRRRRRRLLLIGIZZZZZZZZZMMVVVVVVVVVVVVVHHHHHHHGGGGGGLLVVVVAAAAAAAAAAAAZZZZZZZBB\nBBBBBBBBVVVVVVNNIIIIIIIIIIIIIIIFFFDGDDDDDDDDDDDDDDNDDREEWWWWWWWWWWIRRLLLIIIIIIIZZZZZZMMVVVVVVVVVVVVVVQQQQGGGGGGGGVVVDDDAAAAAAAAAAAAZZZZZZZBB\nBBBBBBBVVVVVVVVVVWIIIIIIIIIIIIIUUDDDDDDDDDDDDDDDDDDDDDWWWWWWWWWWWWWRRLLLIIIIIIIIIIZZUIMVQVVVVVVVVVVVQQQQQQQGGGGGVVVVDDDDAAAAAAAAKKAAAAZZZZBB\nBBBBBBBVVVVVVVVVWWWIEEIIIIIIIIIUUDDDDDDDDDDDDDDDDDDDWWWWWWWWWWWWWWWIIILLIIIIIIIIIIIIIIIQQVVVQQVVVVVQQQQQQQGGGGGGGVVVHDDDDHHHAAAKKKAKAAZZZZZZ\nBBBBBBVVVVVVVVWVVWWIIEIIIIIIIIUUUUUDDDDDDDDDDDDDDDDWWWWWWWWWWWWWWWDDLIIIIIIIIIIIIIIIIIIQQQQQQVVVVVQQQQQQQGGGGGGGGGVVHHHHHHHKKKKKKKKKKKKKJJJJ\nBBZBBBVVVVVVVWWVWWIIIIIIIIIIIIUUUUUUDDDDDDDDDDDDDOOOWWWWWWWWWWWWWWDDLLIIIIIIIIIIIIIIIIIIQQQQQQVVVVVQQQQQQQGGGGGGGVVHHHHHHHHKKKKKKKKKKKKKJJJJ\nBBBBBBVVVVVVWWWWWKIIIIIIIIIIKIIUUUUUDDDDDDDDDDOOOOOOOWWWWWWWWWWWWLLDLLIIIIIIIIIIIIIIIIIIQQEQQQQQVQQQQQQQQQQGGGGGGVVVHHHHHHHKKKKKKKKKKKKXXJJJ\nCCCBBBBBIVVWWWWWKKKIKIIIIIIIKKKDDUUDDDDDDDDDDDDDDOOOOOWWWWWWWWYWWLLLLLIIIIIIIIIIIIIIIIIIQQEEEQQQQQQQQNQQQQQQGGGGGVVVVHHHHKKKKKKKKKKKKKKXXJXJ\nCCCCBBBBIIVVWWWWKKKKKKKKIIKKKKKDDDDDDDDDDDDDDDDSOOOOOOWWYWWYYYYYYLLLLLLIIIIIIIIIIIIIIIJIQQQEEQQQQQQQNNQQQQQQQGGGPVVHHHHHHHOKKKKKKKKKKXXXXXXJ\nCCCCBBBIIKKKKKKKKKKKKKKKIKKKKKKKDDKKDDDDDDDDDDDDOOOOOOOWYYWYYYYLLLNLLLIIIIIIIIIIIIIIEEECEEEEEEEQQQQQQNQQQQQQGGGPPPPPPPPHHHHGKKKKKKKKKXXXXKXX\nCCCCCCBKIKKKKKKKKKKKKKKKKKKKKUKKKKKKKDDADDADDDDOOOOOOOOWYYYYYYYLLLNLLLIIIIIIIIIIIIEEEEEEEEEEEEEQQQQQQNNQQNQQQQPPPPPUPPPHHHHGGGGKKKKKKXXXXXXS\nCCCCCCKKKKKKKKKKKKKKXXKKKKKKUUUKUUUUKADAAAAAADDOOOOOOOOUYYYUUYYYYYOOOOIOOOIFFIIIIEEEEEEEEEEEEEEQQQQQQQNNNNQQQQQPPPPPPPGHHGHGGGGKKKKKKXXXXSSS\nCCCCCCKKKKKKKKXXXXKXXKKKKKKUUUSUUUUUPUUAAAAAAOOOOOOOOOOUYYUUUUYYYOOOOOOOOOIFFIIIIEEEEEEEEEEEEEEEQEEEQNNNNPPPQQPPPPPPPPPPGGGGGRKKKKKKKFFXXXSS\nCCCCCCKKKKKKKXXXXXXXXXXKKKKKUUUUUUUUUUUUUAAAOOOOOOOOJUOUURRRRRRYYOOOOOOOOOOOOOOIEEEEEEEEEEEEEEEEEEEEINNNNNPPPPPPPPXXXXXGGRRGGRRRKKFKFFXXXSSS\nCCCCCCKKKKKKKXXXXXXXXXXKKKKUUUUUUUUUUUUUUAAAOOOOOOOOJUUUURRRRRROOOOOOOOOOOOOOOIIEEEEEEEEEEEEEEEEEEEIINNNNNNNZPPPPPXXXXXGRRRRGRRFFFFKFSSSSSSS\nCCCCCCKKKKXXXXXXXXXXXXXKKUUUUUUUUUUUUUUAAAAAAOOOOOOOUUUUURRRRRROOOOOOOOOOOOOOOOIEEEEEEKKEKKEEEEEEEEINNNNNNNPPPPPPPXXXXXRRRRRRRRFFFFFFSSSSSSS\nCCCCCCKKKKXXXXXXXXXXXXXXKSJJUUUUUUUUUUAAAAAAAOOOOOOOOUUUURRRRRROOOOOOOOOOOCOIOIIKELEWKKKKKAEEEEEEEENNNNNNNNPPPPPPPXXXXXRRRRRRRRRFFFFFFSSSSSG\nCCCCCCKKKKKXXXXXXXXXXXXSSSJJURUUUUUUUUAAAAAOOVOOOOOOUUUUURRRRRROOXXOOOOOOOOOIIIIKKKKKKKKKKKEENENEENNNNNNNNNPPPPPPPXXXXXRRRRRRRRRRFFFFSSSSSGG\nCLLLCLKLKKKKSYYYXXXXXXXXSSSSUPXUUUUUUUYAAAAOOOOOOWWUUUUUURRRRRRXXXXXXOOOOOOOOIIIIIIKKKKKKKKEENNNNENNNNONNNNPXXXXXXXXXXXRRRRRRRRRRFFFFFSSSSGG\nCCLLLLLLLLSSSYYYXXXXXSXBSSSRPPXXXUUYYYYYVAOOOOOOOWOCUUUUURRRRRRXXXXXOOOOOOOOOIIIIIIKKKKKKKKEKNNNNNNNNNONONNPXXXXXXXXXXXRRRRRRRFFFFFFFFSGGSGG\nCCLLLLLLLLLSYYYYYYYXXSSSSSSPPPXXXUUYVVHVVAAAOOOOOOOOMUUUURRRRRRXXXXXOOOOOOOIOIIIIIIKKKKKKKKKKNKNNNNNNOOOOOOOXXXXXXXXXXXXRRRRRRFFFFFFFLLGGGGG\nCCCLLLLLLLLLYYYYYYYXXOOSISSPPPXVXVVVVVHVVAAUOOOOOOOOMMUUUUUURXXXXXXOOOOOOOIIIIIIIIIKKKKKKKKKKKKNNNNNNNXXXXXXXXXXXXXXXXXXXRRRRRFRFFLLLLGGGGIG\nCCCLLPLLLLLGYYYYYYXXXPPPPPPPPPVVVVVVVVVVVVUUVOOOOONOOMUURRUURRXXXXXOOOOOOOIIIIIIIIKKKKKKKKKKKKKNNNNNNOXXXXXXXXXXXXXXXXXXXRRRRRRRRLLLLLLGIIII\nCCCLCLLLLWYGYYYYYYXXPPPPPPPPPPPVVVVVVVVVVVKUVOOOOOOOOOOORRUURRRRRXXOOOOOOIIIIIIIIKKKKKKKKKKKKKKKMMMMMMXXXXXXXXXXXXXXXXXXXRRRRRRRRCLLLLCIIIII\nCCCCCCCLWWYYYYYYYYPPPFFPPPPPPPVVVVVVVVVVVVUUUOOOOOOOOOOORRRRRRXXXXXXNNOOOOOIIIIIIKKKKKKKKKKKKKKKMMMMMMMMMEOEXXXXXXXXXXXXXUURRRRRRRJJJIIIIIII\nCCCCGGGGGYYYYYYYYYPFFFPPPPPPPPPGVVVVVVVVVXUUUOOOOOOOOOOQOORRRRRRMMMMNMOMIIIIIIIIIKKKKKKKKKKKKKKKMMMMMMMMMEEEXXXXXXUUXXXXXPRRRRRRRRJJJJIIIIII\nCCGGGGGGGYYFFYYYYYYFFFFPPPPPPPVGVVVVVVVVVUUUUUOOOOOOOOOOOOORRRRMMMMMMMMMMMMMIIMIIKKKKKKKKKKKKKKKMMMMMMMMMMMMXXXXXMUUXXXXXPRRRRPPJJJJJJIIIIII\nCGGGGGGGGGFFFFFFFYFFFFFFPPPPPPVVVVVVVVVVUUUUUZOOOOOOOOOOORRRRZRMMMMMMMMMMMMMMIMMIIKKKKKKKKKKKKKKMMMMMMMMMMMMXXXXXMCUUUURRRRRRRPPPJPJJJIIIIII\nCCGGGGGGGGGFFFFFFFFFFFFFPPPPPPPPVMMPPPVVUUUUUZZOOUUOOOORORRRRZZMMMMMMMMMMMMMMMMMMIIIKKKKKKKKKKKKMMMMMMMMMMMMMMMMMMDDDDPRRRRRRRPPPPPJJJIIIIII\nCCGGGGGGGGGFFFFFFFFFFFFFPPPPPPPPVPPPPPVUUUUUUUUUUUOOOOORRRRZZZZZMMZMMMMMMMMMMMMMMIIIKVVKKKKKKKKKMMMMMMMMMMMMMMMMMMRRRRRRRRRPPPPPPPPJJJJJIIII\nCCGGGGGGNSSSFFFFFFFFFFFFPPPCPPPCVTPPPPPUUUUUUUUURRRRORRRRRRZZZZZZZZMMMMMMMMMMMMMVIIVVVVVKKKKKKKKKKEEEMMMMMMMMRRRRRRRRRRRRRRPPPPPPPPPPJJJIIII\nCCGIIIGGSSSSFFFFFFFPFFFFPPPCCCCCCCPGUUPUUUUUUUURRRRRRRRRRRZZZZZZZZZZZMWWWWWWWMMMVVVVVKKKKKKKKKKKKKKEEMMMMMMMMMMRRRRRRRRRRRRRRPPPMMPPPJJJMIII\nCCGIISSSUSSSSFFFFFPPAAAFAPACCCCCCCTUUUUUUUUUUUUUURRRRRRRRRRZZZZZZZZZMMWWWWWWWWWWWWWVVVKQKKKKKKKKKKKEEMMMMMMMMMMRRRRRRRRRRRRRRPPPPMMMPJMMMIII\nCBBBSSSSSSSSSSFFPPPPPAAAAAAAACCCCCCUUUUUUUUUUUUUURRRRRRRZZZZZZZZZZZZZMWWWWWWWWWWWWWVVVVVVKKKKKKKKKKKEMMMMMMMMMMRRRRRRRRRRRRRRPPPPMMMMMMMMIII\nCBBBBBSSSSSSSSFFPPPPPAAAAAAAAACCCCGCOUUUUUUUUUUURRRRRRRZZZZZZZZZZZZCJJWWWWWWWWWWWWWVVVVVVVNKNKKKKKKKECCCEMMMMMMHHCCDRRRRRRRRRPPPMMMMMMMMMMII\nCBBBBBBSSSSSSSPPPPPPPAAAAAAAAACCCCCCUUUUUUUUUUUURRRRRRRZZZZFZZZZZCCCCJJJMWWWWWWWWWSVVVVVVVNKNNNKKKKKKCCCHMMMMMMSHDCDRRRRRRRRRPPPSSMMMMMMMMMI\nBBBBBBDSSSSSSSSSIIPPPPAAAAPPACCCCCCUUCUUUXUUUUUURRRRRRRRRRRFZZZZZCCCCJJZZWWWWWWWWWSVVVVVVNNNNNNNKKKKKKCCHMMMMMMHHDDDRRRRRRRRRPPPPPCMMMMMMMMM\nBBBBBBBSSSSSSSSSIIIPPAAAAAPPPPCCCCCCCCUUSUUUUNNBBRRRRRRRRRRRRZZZZCCCCCJZZWWWWWWWWWSVVVVVVNNNNNNNNGKKKHCCHMMMMMMHHHDDRRRRRRRRRPPPCPCMMMMMMMMV\nBBBBBBBBSSSSSSSSIIPPPAAPAAAPPPCCCCCCJNUUUUUUBBBBBRRLRRRRRRRRRZZZZCCCCCJZZDVSVVSSVVVVVVVVVNNNNNNNNGKKKHHHHMMMMMMHHHHDRRRRRRRRRCPPCCCCCMMMMMMV\nBBBBBBBBSSSSSSSSIIPPPAPPPPPPPPCCCCNJJNNUCCUBBBBBBLLLRRRRRRRUULLZZCCCCCCLVVVVVVSSSVVVVVNNNNNNNNNNNGKKQHHHHHHHHHHHHHHHRRRRRRRRRCPPCCCCMMMMMMVV\nBBBBBBBBBBSSSSIIIIIIPPPPPPPPPCCCCCNNNNNNCCBBBBBBBBLLLRRRRRRLLLLHCCCCCCLLVVVVVIVVSVVVVVNNNNNNNNNNNGSSQQQHHHHHHHHHHHHICCCCCCCCCCCCCCCCMMMMMMMV\nBBBBBBBJBFFSSSVVVVPPPPPPPPPPPCCCPCNNNNNNCCCBBBBBBLLLLLRRRRLLLLLCCCCCCCCLVVVVVVVVVVVVVVNNNNNNNNNNNGGSQQHHHHHHHHHHHHCCCCCCCCCCCCCCCCCCCMMMMMMV\nGBBBBGBBBFFSSSVVKVPPPPPPPPPPPPPCPPNNNNNCCCBBBBBBBBBLLLLRLRLLLLLCCCCCCNNVVVVVVVVAVVVVVNNNNNNNNNNNSSSSSSHHHHHHHHHHHFFCCCLCCCCCCMMCCCCCCMMMVVMV\nGBBGGGBBBFVVGGVVVVVPPPPPPPPPPPPPPPNNNNNCCCBBBBBBBBBLLLLLLLLLLLLGCCCCCNEVEEVVVVVEEVVVVNNNNNNNNTTHSSSSSSSHHHHHHHHFFFFFCCCCCCCMMMMCCCCCCCCMVVVV\nGBBBGGGVWVVVVVVVVVVVVPPPPPPPPPPPPNNNNNNCCCBBBBBBBBBBLLLLLLLLLLLCCCCCCNEEEEEVVEEEETTTTTTNNNNNNTTHHSSSSSSHHHHHHHHFFFFFCCCCCMCMMMMCCCCCCSCCSSVV\nGGBBGGGVVVVVVVVVVVVVVVVWPPPPPPPPPNNNNNNCCBBBBBBBPBBBLLLLLLLLLLLLCCCCCEEEEEEVEEEEEEETTTTTTTNNTTHHHSSSSSDHHHDDHHHHFFFFCCCCCMMMMMMMCCCCCSSSSSVV\nGGGGGGGGVVVVVVVVVVXVVWWWWPPPPPWPPPPPNCCCBBBBBBPPPPBBLLLLLLLLLLLLCCJCJJJEEEEEEEEEEEEETTTTTTTTTHHHPPSSSDDHHDDDHHFFFFFFFFCFMMMMMMCCCCCCCSSSSSSS\nGGGGGGGGVVVVVVVVVVXWWWWWWWWWWWWWWPPPNNCCCCBSPPPPPPPPJLLLXLLLLBLJJJJJJJEEEEEEEEEEEEEETTTTTTHHHHHHHHHHSDDDDDDUUUFFFFFFFFFFFFMMMMCCCCCSSSSSSSSA\nGGGGGGGGVVVVVVVVVVWWWWWWWWWWWWWWPPPPPCCCCCCPPPPPPPPJJLLLLLGLLBIJJJJJJJEEEEEEEEZEEEETTTTTTTHHHHHHHHHHDHDDDDDUUUUFFWFWWFFMMFMMMMMCCCIIISSSSSAA\nGGGGGGGGQQQVVVVVVGGWWWWWWWWWWWWWPPPPQQQCCCPPPPPPPPNNNNLLLGGIIBIJJIIJEEEEGEEEEEZEEEETTTTTTHHHHHHHHHHHHHHHDUUUUUUSFWWXWWMMMMMMMCCCCIIIISSSSSSS\nGGGGGGGGQQQVVVVVPPWWWWWWWWWWWWWWPIIQTQCCCPPPPPPNNNNNNNZZLIIIIIIIIIWEEEEEEEEZZEZZEEETTTTOOHHHHHHHHHHHHHUUUUUUUUUSWWWWWWMMMIIMIICCIXIISSSSSSSS\nGGGGGGGGQQQQQQQPPPPPWWWWWWWWWWWWPIIQQQCCCPPPPNPNNNNZZNZZZZZZZIIIIIWWEEEEEEEZZZZQQTTTTTTTOOHHHHHHHHHHHHHUUUUUUUUSSWWAWWMNIIIIIIIIIIIIISSSSSSS\nGGGGGGGGQQQQQQQPPPPPWWWWWWWWWWWBIIQQQQCQCCPPNNNNNNNZZZZZZZZZZIIIIIIIIYEEEGEZZZZQQQOTTTTTOOHHHHHHHHHHHHHUUKUUUSUSSSSWWIIIIIIIIICIIIIIISSSSSSS\nGGGGGGGGGQQQQQQPPPPPWWWWWWWWWWWWIIQQQQQQQNNNNNNNNNNNZZZZZZZZZIIIIIIIIEEEEEEEZZZZZQOTOTTOOOHHHHHHHHHHHKKUUKKUSSTSNSVWWWIIIIIIIIIIIIIIYSSSSSSS\nGGGGGGQQQQQQQPPPPPPPWWWWWWWWWIIIIQQQQQQQNNNNNNNNNNZZZZZZZZZZZZIIIIIZZEEEEEECZZZZZQOOOOOOOOHHHHHHHHHMMKKKKKSSSSSSNNWWWNIXIIIGIIIIIIIIYSSSSSSS\nGGGGGGQQQQQQQPPPPPPPWWWWWWWWWIIIIIIQQQQQNNNNNNNNNNNNNZZZZZZZZZZZZZZZZEEEEEZZZZZZZZOVVOOOOOOHHHHHHHHHMKKKKKTSSSSSNNWWNNIIIIIIIIIIIIIIYYSSSSSG\nGGGQQQQQQQQQQQPPPPRRWWWWWWWWWIIIIIIQQQQQNNNNNNNNNNNVNZZZZZZZZZZZZZZZZZZEZZZZZZZZZZOOOOOOOOOHHHHHHHHHHKKKKKTTSSSSNNNWNNIIIIIIIIIIIIIIIISSSSSG\nGEGQQQQQQQQQQQQQPRRRWLLWWZIIIIIIIIIQQQQQNMNNNNNNNNNNNNNZZZZZZZZZZZZZZZZZZZZZZZZZZZOOOOOOOOHHHHHHHHHHHXKKKKTTTSSSNNNNNNIIIFIIIIIIIIIIILLSSSSG';
-var $author$project$Aoc12$sample = 'AAAA\nBBCD\nBBCC\nEEEC';
-var $author$project$Aoc12$sampleAbba = 'AAAAAA\nAAABBA\nAAABBA\nABBAAA\nABBAAA\nAAAAAA';
-var $author$project$Aoc12$sampleEShape = 'EEEEE\nEXXXX\nEEEEE\nEXXXX\nEEEEE';
-var $author$project$Aoc12$sampleLarger = 'RRRRIICCFF\nRRRRIICCCF\nVVRRRCCFFF\nVVRCCCJFFF\nVVVVCJJCFE\nVVIVCCJJEE\nVVIIICJJEE\nMIIIIIJJEE\nMIIISIJEEE\nMMMISSJEEE';
-var $author$project$Aoc12$sampleXoXo = 'OOOOO\nOXOXO\nOOOOO\nOXOXO\nOOOOO';
-var $author$project$Aoc12$read = function (dataSource) {
+var $author$project$Aoc12Dict$input = 'LLLLLLLLLLLLLLLLLLLLLLLPBBBVVVVVPPPPPSSSSCCCCCCCCCCCCCCVVVVVVVVVJJJJJJJJJJJJJJYIYYYYYYYYYYKKKKKKKKKKKKKZQQQQQQQQQQQQQQQBBLLLLLLWWWWFFFWWWWWW\nLLLLLLLLLLLLLLLLLLLLUPPPPBBVVVPPPPPPPSSSCCCCCCCCCCCCCCVVVVVVVVVCCCJJJJJJJJJJJJYYYYYYYYYYYYKKKKKKKKKKKKKKKQQQQQQQQQQQWCCLLLLLLLLWWWWWWWWWWWWW\nLLLLLLLLLLLLLLLLLPPHPPPPPPPVVPPPPPPPPSSSCCCCCCCCCCCCCCCVVVVVVVVCCCCJJCJCJJJJJYYYYYYYYYYYYYYKKKKKKKKKKKQQKQQQQQQQQQQQWWWWWNLLWWWWWWWWWWWWWWWW\nLLLLLLLLLLLLLLLLPPPPOOPPPWPVVVPPPPPPPPCCCCUCCCCCCCCCCCCCVVVVVVCCCCCCCCCCCCJJJJYYYYYYYYYYYYYYHKKKKKKKKYQQQQQQQQQQQQQQWWWWWWWLWWWWWWWWWWWWWWWW\nLLLLLLLLLLLLLLULLPPPPPPPPPVVVVVPPPPPPPPPCCCCCCCCCICCVCCVVVVVVVCCCCCCCCCCJJJJJJJYYYYYYYYYYYYKKKKKKKKKKYQQQQQQQQQWQQQQQWWWWWWWWWWWWWWWWWWWWWWW\nZLLLLLLLLLZLLLULUUPPPPPPPPPPVVVPPPPPPPPPPSCCCCCCCCNVVVVVVVVVVCCCCCCCCCCCCJJJJJJJCYYYYYYYYYYYYYKKKKKKKYQQQQQQQQQWWWQWQWWWWWWWSSWWWWWWWWWWWWWW\nZLLLLLLLLZZLLLUUUUUUPPPPPPPPVPPPPPPPPPPPPPPCCCCCCNNVVVVVVTVVVCCCCCCCCCCCJJJJJJJJYYYYYYYYYYYYYYKKKKKDDQQQQQQQQQQQPWWWWWWRRRWWSSMMWWWWWWWWWWWW\nZLLLLLLLZZZZLLUUUUUHPPPPPPPPPPPPPPPPPPPPPPPVCCCOCTTVHTTTTTVVVVCCCCCCCCCCCJJJJJYYYIYYYYYYYYYYOOKKKDDDDQQQQQQQQQQQPPWWWWWRRSSIISSMWWWWWWWWWWWW\nZLLLLLLLZZZZZZUUUUUUPPPPPPPMMPPPPPPPPPPPPPPVVCKTTTTTHTTTTTVVVCCCCCCCCCCCCJJJJJJYYYTYYYYYYYYYYOKDDDDDDDQQQQQQQQQMWWWWWWWWWKSSSSSWWWWWWWWWWWWW\nLLLLLZLGGZZZZZUUUUUUUUUUPPMMMPPPPPPPPPPPPPPPVTTTTTTTTTTTTTYVVWCCCCCCCCCCCJJJJJJJYYYYYYYYYYYOOOODDKKDDDDDDQQQQQMMMWWWWWWWWKSSSSSSWWWWWWWWWWWW\nWLNNLZZZZZZZZZUUUUUUUUUUMMMMMMMPPPPPPPPPPVVVVVTTTTTTTTTTTTTEECCCCCCCCCCCJJJJJJJJPIYYYYYYRRRFFDDDDDKDDDDDYYQQQQMMMWWWWWWWWWSSSSSSSWWWWWWWWWWW\nWLLLLLZZZZZZZZZUUUUUUUUUMMMMMMMPMPPPPPPPPVVVVVTTTTTTTTTTTTTECCLCCCCCCCHHHOJPPJJPPIIYYYYYRFFFFFDDDDKDKDDDDYQQQQMMMMMWWWWWWWSSSSSSSSWWWWWWWWXX\nWWWLWWZZWZZZZZKKKUUUUUUUMMMMMMMPMPPPPPPTPVVTTTTTTTTTTTTTTEEEECCCCCIIHCCHHHHPPPPPPFIIYYYFFFFFFDDDDDKKKDDDDQQQMMMMWWWWWWWWBSSSSSSSSSSWWWWWWWBX\nWWWWWWWWWZZZZKKKKUMUUMMUMMMMMLMMMMPDLDPTTTVTTTTTTTTTTTTTTTTEECCCCCCHHCCHHHHPPPPPPFFFYFFFFFFFFFDDDDKQQQQYYQMMMMMMMMWWWWWINSSSSSSSSSWWDWWWWBBX\nWWWWWWWZZZZZGKKKKKMMMMQQQMMMMLLLLLLDLLLTTTTTTTTTTTTTTTTTTTTTEGGGCCOHHHHHHHHPPPPPFFFFFFFFFFFFFFFFFDDDQQQYQMMMMMMMMMNNNNNNNSSSSSSSSSSWWBWWBBBB\nWWWWWWWWWCZDKKKKKKMMMMUQQQMMMLLLLLLLLLLTTTTTTTTTTTTTTTTTTTTGGGGGCHHHHHHHHHHKPPPPFFFFFFFFFFFFFFFFFFQQQQQYQMMMMMMMMMMMMNNNNNSSSSSSSSSWBBWBBBBB\nWWWWWWWWCCZZKKKKKKMMMQQQQQDDMLLLLLLLLLLLTTTTTTTTTETTTTTTOTTTOGCCCHHHHHHHHHHKPPPFFFFFFFFFFFFFFFFFFFQQQQQQQMMMMMMMMNNMNNNNNNNNNSSSSSBBBBBBBBBB\nNWWWWWWWWWIIKKKKKVMMMMMDQDDLMLLLLLLLLLFTTTTTTTTTTETTTTTOOOOOOGJCCOOOHHHHHHHKKKPPPPPPFFFFFFFFFFFFFNNQQQQQMMMMMMMMMNNMNNNNNNNNNSSSSSSBBBBBBBBB\nWWWWWWWWWWIIIKIVVVVMDDDDDDLLLLLLLLLLLLLWWTTTTTTTTEETTTTTOOOOGGGOOOOHHHHHHHHHKKPPPBBBFFFFFFFFFFFFFNNQQQMMMMOOOOOOOOONNNNNNNNNSSSSSSSBBBBBBBBB\nGGWWWWWWIIIIIIIIIVVWDDDWDDDLLLLLLLLLLLLWWWWTTEEEEEEEEEEOOOOOOOOOOOOHHHHHHHHHKPPPPPNFFFFFFFFFFFFFFFFYQQMMMMOOOOOOOOONNNNNNNNNSSSSSSSBBBBBBBBB\nGGGGWWIWIIIIIIIIVVWWDDDDDLLLLLLLLLLLLLWWWWWTTEEEEEEEEEOOOOOKOOOOOOOHHHHHHHHHPPPPPPNNNNNNNFFFNFFFIIIIQMMMVVOOOOOOOOOONNNNNNNNSSSSSSSBBBBBBBBB\nGGGGIIIIIIIIIIIIVVWWDDDLLLLLLLLLLLLLLLLLWWWTEEEEEEEEEOOOOOKKOOOOOOOHNHHHHHHPPPPPPPNNNNNNNNNNNFFFIIIISIIMIVOOOOOOOOOOONNNNNNNNSSSSSSSSBBBBBBB\nGGJJIIIIIIIIIITIVWDDDDDWWEWLLLLLLLLLLLLLLEWEEEEEEEEEEOOKOOKKKOOOONNNNHNHHHHHPPPPPPPNNNNHNNNNSSFFIIIIIIIIIVOOOOOOOOOOONNNNNNNNNSSSSSSBBBWBBBB\nGJJJJIIIIIIFFFFFVDDDDDDDDDDLLLLLLLLLLLLFEEEEEEEEEEEEEEEKKKKKOOOONNNNNNNHHHHHPPPPPJPDNNFJNNNNSSSSIIIIIIIIIIOOOOOOOOOOONNNNNNNNISISSSSBBBWBBLB\nJJJJJJJIIIUFFFFFWDDDDDDDDDDOLLLLLLLLLLLFEEEEEEEEEEEEAEEKKKKKKOOONONNNNNNHHHOYYBBBJJDDJFJJNNSSSSIIIIIIIIIIIOOOOOOOOOONNNNIIIINIIIIISSBEBBLLLL\nMJJJJJMIIIFFFFFFWDDDDDDDDDDOOLOLLLLLLEEEEEEEEEEEEEEEEEKKKKKKKOOONONNNNNNHHYYYYBBBJJJJJJJJNJSSSIIIIIIIIIIIIOOOOOOOOOONNNIIIIIIIIISSSSWEEWLLLL\nJJJJJMMMMFFFFFFFWDDDDDDDDDDOOOOOLLLLLEEAAEEEEEEEEEEEEKKKKKKKKKKOOONCNNNNHHHYYYYBBBJJJJJJJJJSSIIIIIIIIIIIIVOOOOOOOOOOWIIIIIIIIIISSSSWWEEWLLWW\nJJJJMMMMMMFFFFFWWDDDDDDDDDDOOOOOLLLUEEEEEEEEEEEZZKKKKKKKKKKKKKKEEEEEEEEENHYYYYYBBJJJJJJJJJJSSSSIIIIIIIIIVVOOOOOOOOOOWIIIIIIIIIIIIIIYWWWWWWWW\nOXOJMWMMFFFFFFWWWWWWWWKDDDOOOUUUHLTUEEEEEEEEEEEZKIKKKKKKKKKKKKOEEEEEEEEEYYYYYYJJJJJJJJJJJJJJJJIIIIIIIILLLVVOOOOOOOOOIIIIIIIIIIIIIIIWWWWWWWWW\nOOOMMWMFFFFFFFFWFFWWWWKDDDKOOUUUUWUUUEEEEEEEEEEEKKKKKKKKKKKKKOOEEEEEEEEEYYYYYYYJJJJJJJJJJJEENNINIIIIILLLLVVVIIIIIIWWWIIIIIIIIIIIIIIWWWWWWWWW\nLLOWWWWFFFFFFFFFFFWKWKKDDDOOOUUUUUUUUFEEEEEEEFENKKKKKKKKKKKKKKOEEEEEEEEEYYYYYYYJJJJJJJJJJEEENNNNNIIJLLLLLVVVIIIIIIWWIIIIIIIIIIIIIIIWWWWWWWWW\nOOOGWWVWFFFFFFFFFFOKKKKDDDKOUUUUUUUUUUEEEEEEEEXKKKKKKKKKKPPKPKOEEEEEEEEEYYYYYYYYYJJJJJJJEEEENNNNNIIJJJLLLLLVILIITHHWIIHIIIIIIIIIIIWWWWWWWWWW\nOOOOOWWWFFFFFFFFFFKKKKKDDDOOKNKUUUUUUEEEEEEEEEEKIIIKKKKKKPPPPPPPPPPCYYYYYYYYYYYYYJJJJEEJJEEEEEJJJJJJJJLLLLLLLIIITHHHHHHHIIIIIIIIIIIIWWWWWWWW\nOOOOOWWWWWFFFFFFFYKKKKKDDDKKKKKUUUUUUEEEEEEEEEWKIIIKKKKKKPNPPPPPPPYYYYYPYYYYYYYYYJJEEEEJEEEEEEJJJJJJJJQLLLLLLLLITHHHHHHHHIIIIIIIIIIWWWWWWWWW\nOOOOOWWWWWFFFFFFYYKKKKKDDDKKKKKUUUUUUUEEEEEEEEEEIIIIIKSIKKNPPPPPPPPPYYYPYPYYYYYYYJYEEEEEEEEEJJJJJJJJLLLLLLLLLLLTTTHHHHCHHHHIHIIIDIIWWWWWWWWW\nOOOOOWWWWWWFFYYYYYYKKKKDDDKKKKKUUUUUUUUUEEEEEEEIIIIIIKKIIKNNNPPPPPPPPPPPYPPYYYYYYYYEEEEEEEEEEJJJJSJJJLLLLLLLLLLLLHHHHHHHHHHHHHIDDIWWWWWWWWWW\nOOOOOWWWWWWFFYYYYYYKKKKKKKKKKKKUUUUUUUUEEEEEEEEEIIIIIIIIIIINPPPPPPPPPPPPPPPPPPPYYYYEEEEEEEEEEEEJJJLLLLLLLLLLLLLHHHHHHHHHHHHHNNIWWWWWWWWWWWWW\nOOOOOOOWWWWWWIIYYYYYKKKKKKKKUUKUUUUUUUUUEEEEEEEEEIIIIIIIIIIPPPPPPPPPPPPPPPPPPPPYYYYYEEEEEEEEEEEEGGLLLLLLLLLLLLLPPHHHHHHHHHHHNNWWWWWWWWWWWWWW\nDOOOOOOWWWWWWIIYYYYYYKKJKKNUUUUUUUUUUUUUUEEEEEEEEIIIIIIIIIIEPPPPPPPPPPPPPPPPPPPYYYYEEEEEEEEEEEEEEGGLLLLLLLLLLLPPPPPHHHHHHHNNNNWWWWWWWWWWWWWW\nDOOWOWWWWWWWWIIIYYYYYKKJJJUUUUUUUUUUUUUUUJEEEEEEEEIIIIIIIIIPPPPPPPPPPPPPPPPPPPPPYYYEEEEEEEEEEEEEGGSLLSLLLLLLLLLLHHHHHHHHHHHNNNNNWWWWWWNNWWWD\nDOWWOWWWWWWWWIIIYYYBYYKBBBBBUULUUUUUUUUUUUEEEEEEEEIIIIIIIIIIPPPPPPPXPPPPPPPPPPPAYYYYYEEEEEEEEEEEESSLLSLLLLLLLLLEHHHHHHHHHHHNNNNNWWWWWNNNWWDD\nWWWWOWWWWWWIWIIIIIIBBYBBBMBBULLUUUUUUQQQQXXXXEEEIIIIIIIIIIIIIBPPPXXXXXPPPPPPPUUUUUUUUEEYYYYYYEEESSSSSSLLLLLLLLLEHHHHHHHHHHHNNNNNNNWWNNRNWWGG\nWWWWWWWWWWWIIIIIIIBBBBBBBMMLLLLLLUUUQQQQQPXXXEEEIIIIIIIIIIIIIAAAPXXXXXPPPPPPPUUUUUUUUYYYYYYYYYEEESSSSSSSSSSLLLLEHHHHHHHHRRRNNNNNNNNNNRRNWGGG\nOOWWWWWWWWWIIIIIIIBBBBBBBBBLLLLXLUULWWWPPPPXXXXEVIIIIIIIIIIIIAAAAAXXXXXPPPPPPUUUUUUUUYYYYYYYYYEEESSSSSSWWSEAEEEEEHEHHHHHCRNNNNNNNNNRRRMNNNGC\nOWWWWWWWWWWWIIIIIIBBBBBBBBBBLLLLLLLLLWWPPPPXXXVEVIIVIIIIFIIIAAAAAXXXXXPPPPPPHUUUUUUUUYYYYYYYYYYYSSSNNSSSSEEEEEEEEEEEHHHCCRNRRRRNNNNRRRNNNNGG\nOOOWWWWWWWWWWWIIIIBBBBBBBPBBBLLLLLLWWWWPPPPPXVVVVVIVVVIIIIIIAAAAAXXXXXNPPPPPGUUUUUUUUYYYYYYYYYYYYSSYYSSSSEEEFEEEEEEHHEEEEENNRRRRRRRRRGGGGGGG\nOOOOOWWWWWWWWWBEIIBBBBBBBBBLLLLLLLLLWWWWPPPPXXVVVVVVVVIIIIIIAAAAAVXXXXNNNNNNNUUUUUUUUGYYYYYYYYYYYYSYYSSSEEEEEEEEEEEEEEEEVVVNRRRRRRRRGGGGGGGG\nZOUUUUUUUUUUWBBBIBBBBBBBBBBBLLLLLLLLFWWWPPPPPXXVVVVVVVVVBIZZZAAAMVVXXNNNNNNNNUUUUUUUUYYYYYYYYYYYYYYYYYYYFEEEEEEEEEEEEEEEVVVVRRRRRRRRGGGGGGGG\nZZUUUUUUUUUUUUUUUIBBBBBBBBBBLLLLLLLKFFWWWPPPQVXVVVVVVVVVBIZZZZZAMVVXXNNNNNNNNUUUUUUUUYYYYYYYYYYYYYYYYYEYEEEEEEEEEEEEEEEEEVVVRRRRRRRRGGGGGGGG\nZZUUUUUUUUUUUUUUUBBQQBBBTBQBLQQQQQLFFFFFFPPPPVXVVVVVVVVVVZZZZZZAMVXXXNNNNNNNNUUUUUUUUYYYYYYYPYYPYYYYYEEEENEOEEEEEEEEVVVVVVVPRRRRRRRRRGGRRGNN\nZZUUUUUUUUUUUUUUUQQQQQBBBBQQQQQQQQQFFFFFFPPJVVVVVVVVVVVVVVZZZZZVVVVXXXNNNNNNNUUUUUUUUYYYYYYPPPPPEYEYEEEBEEEOEEEEEEEEEVVVVVVVRERRRRRRRRRRJJNJ\nZZUUUUUUUUUUUUUUUQQQQQQBBBQQQQKKKKKKKKFFFFFJVVVVVVVVVVVVVVVZZZZVVVVVXXXXNNNNAIIIGGGGGYYYYYBPPPPPEEEYEEEEEEEOOEEEEEEEEVVVVVVVVVVRRRRRRJJJJJJJ\nZZUUUUUUUUUUUUUUUQQQQQQQQQQQQXKKKKKKKKFFFFFFVVVVVVVVVVVVVVZZZVVVVVXXXXXIRNAAAIIIIIIIGGYYYYBPPPPEEEEEEEEEEEEOOEEEEEEEVVVVVVVVVVVRRRRRRJJJJJJJ\nZZUUUUUUUUUUUUUUUPPPQQQQQQQQQXKKKKKKKKFFFFFBBVVVVVVVVVVVVVZZVVVVVVXXXXXIRRIIIIIIIIIIIYYYYBBBBPPLEEEEEEEEEEEEOEEKEEEEVVVVVVVVVRRRRRRRJJJJJJJJ\nZZUUUUUUUUUUUUUUUPPQQQQQQQQQQKKKKKKKKKFFFBBBBBVVVVVVVVVVVVVVVVVVVVVVXXXIIIIIIIIIIIIIIHYEEBBEEEJEEEEEEEEEEEEEEWEKKKEEVKVVVVVVVRRRRRRRJJJJJJJJ\nZZUUUUUUUUUUUUUUUPPQQQQQQQQQKKKKKKKKKKFFBBBBBBBVIIVVVVVVVVVVVVVVVVVVVXXXIIIIIIIIIIIIIIIIEEEEJJJJEEEEEEEEEEEEEEKKKKEKKKKKKKVRRRRRRRRJJJJJJJJJ\nZZPPUUUUUUUUOPPPPPQQQQQQQQQXKKKKKKKKKKKKKKBBBBBIIIIVVVVVTTTVVVVVVVVVVXXIIIIIIIIIIIIIIIIIEEEEEEEEEEEEEEEEEEEEEEKKKKKKKKKWKKVRRRRRRRJJJJJJJJJJ\nPPPPUUUUUUUUPPPPPQQQQQQQQXXXKKKKKKKKKKKKKKBBBBIIIIIIIVVVVTTVVVVVVVVVVVIIIIIIIIIIIIIIISEEEEEEEEEEEEEEEEEEEEEEEEKKKKKKKKKWKKVRRRRRRRJXJJJJJJJJ\nPPPPUUUUUUUUNPPEQQQQQQUQQXXXKKKKKKKKKKKKKKBBBBIIIIIIWWWWWWWWICVVEVVVVCCIIIIIIIIIIIIIIIIEEEEEEEEEEEEEEEEEEDDEEDKKKDKWWWWWKKVRVRRRRXXXJJJJJJJJ\nPDDPUUUUUUUURRREEQQQQQQQQQXXKKKKKKKKKKKKKKRRBRMIIIIIWWWWWWWWICVVVVYVVCCCIIIIIIIIIIIIIIEEEEEEEEEEEEEEEEEEEEDDDDDDDDKKKKWWWWWWVVRJSXXXJJJJJJJJ\nDDDPUUUUUUUURRRREEQQQQQQQXXXKKKKKKKKKKKKKKRRRRRIIIIIWWWWWWWWIVVVVYYYCCCCCCIIIIIIIIIIIREEEEEEEEEEEEEEEDDEEDDDDDDDDDKKKKWWWWWWVSSSSSSSIJJJJJJJ\nDDDPUUUUUUUURRRREEQQQQQXXXXXKKKKKKKKKKKKKKRRRRRRIIIIWWWWWWWWJJJJJCCCCCCCCCIIIIIIRRRXXXXXXXXEEEEEEEEEEDDDDDDDDDDDDWKKWWWWWWWSSSSSSSSSSJKJJJSJ\nDDDDUUUUUUUURRRRRQQQQQQQQXXXXXXXKKKKKKKKKKRRRRRRIIIIWWWWWWWWWWWJJCCCCCCCCCCIIIIIIERXXXXXXXXEEEEEEEEEDDDDDDDDDDDDDWWKWWWWWWWSSSSSSSSSSJJJJJJJ\nDDDDPPRRRRRRRRRRRQQQQQQQQQXXXXXXKKKKKKKKKKRRRRIIIIIIWWWWWWWWWWWWWWJCCCCCCCCIIIIIEERXXXXXXXXEEEEEEEEDDDDDDDDDDDDDDDWWWWWWWWWWKSSSSSSSSSSJJJSJ\nDDDRRRRRRRRRRRRRRQQQQQQQQQQXXXXXKKKKKKKKKKRRRRVIQIIIWWWWWWWWWWWWWWWWVCCGGGGGIIIGRRRXXXXXXXXEEEEEEEEEDDDDDDDDDDDDDWWWWWWWWWWWSSSSSSSSSSSSSSSS\nDDRRRRRRCRRRRRRRRQQQQQQQQQQXXXXXXKKKKKKRRRRRRRQQQQIIWWWWWWWWJJWWWWWWJJGGGGGGGGGGRRRXXXXXXXXEEEEEEEEEEDDDDDDDDDDDDDWWWWWWWWWWWSSSSSSSSSSSSSSS\nDDDRRRRRCCCRRRRRPQQQQQQQQQQXXXSSSKKKKKKRRRRRRRMQQQIIWWWWWWWWJJWWWWWWJJJJGGGGZZZGRRRXXXXXXXXREEEEEEELMLLLDDDDDDDDDDDDWWWWWWWWWSSSSSSSSSSSSSSS\nDDRRRRRRCCCCRCCPPPPPQQQQQQQMXXXSSKKKKKKRRRRRRRMQQQQIWWWWWWWWJJWWWWWWJJJJGGGZZZZZRRRXXXXXXXXREEEEEELLLLLLLIIIIIIIIIIDWWWWWWWWSSSSSSSSSSSSSSSS\nDDRRRRRCCCCCCCPPPPPPPPQQQQQQXXSSSSSSSSRRRRRRRRQQQQQQQIIIIIJJJJWWWWWWJJJJGGZXXXXXXXXXXXXXXXXRRRRLLELLLLLDDIIIIIIIIIIDWWWWWWWWSSSSSSSSSSSSSSSS\nDDDRDRRCCCCCCCPPPPPPPPQQQFQQNNNSSSSSSRRRRRRRRRQQQQQQQIIIIPJJJJWWWWWWJJJJGGZXXXXXXXXXXXXXXXXRRRRLLLLLLLLDDIIIIIIIIIILWWWWWWWWSSSSSSSSSSSSSSSS\nDDDDDRRRCCCCCCPPPPPPPPQQFFNNNNNSSSSSSRRRRRRRRRRQQQQQQIIIGJJJJJJWWWWWJTJGGHZXXXXXXXXXRRJJRJJRRRRRLLLLLLLDDDDDDDDLLLLLWWLWWWWWNNSSSSSSSSSRRRRS\nDDDDZRRZZRCCCCCYPYYPYPQQFNNNNNNSSSSSSSRRRRRRRRRQQQQQQQIGGJJJJJJWWWWWTTJGHHYXXXXXXXXXRRJJJJJJJJXXXXLLLLLHDDDHDDDLLLLLLWLWTWWNNNSSSNSSRRSRRRRR\nDDDBZZZZCCCCCCCYYYYYYYQQFNNNNNNSSSSSSSSRRRRRRRRRQQQQQQQQQJJJJJJWWWJJJJXXXXXXXXXXXXXZJJJJJJJJJJXXXPPHLLLLLHHHHDMLLLLLLLLWTTANNNNNNNRRRRRRRRRR\nDDBBBZZZCYCCCCYYYYYYCFQFFFNNNNSSSSSSSSSSGRGRGRRGQQQQQQHHSSLJJMJJJJJJJHXXXXXXXXXXXXXZZZJJJJJJJJPPPPYHLLHHHHHHHHLLLLLLLLLLTAANNNNRRNRRRRRRRRRL\nBBBBBZZZZYYCYCYYYYFFFFQFFFFNNNSSSSSSSSSGGGGGGGGQQQQQQQQHSSSSMMMJJJMMMHXXXXXXXXXXXXXZZZZZJJJJJJJPPPHHHLHHHHHHHHLLLLLLLLLAAAAARRNRRRRRRRRRRRRL\nBBBBBMYYYYYYYYYYYYVFFFFFFFFFFSXSSSSSSSGGGGDDDGGQQQQQQIQHSSXEMMMMMMMMUHXXXXXXXXXXXXXZZZZZYJJJJJJJPPHHHHHHHHHHHLLLLLLLLDAAAAAAARRRRRRRRRRRRRRL\nUBBBYYYYYYYYYYYYYYYYYFFFFFFFSSSSSSSSFFGGDDDDDDGQQQQQQEEEESSEMMMMRRRRUUXXXXXXXXXXXXXZZHHYYJJJJJJJPYHHHHHHHHHHHLLLLLLLLAAAAAAAARRRRRRRRRRRRRLL\nBBBBYYYYYYYYYYYYYYYYFFFFFFFFSSFFFFFFFFFGGDDDDDDDDYYEQEEEEEEEMMMRRRRRXUXXXXXXXXXXXXXYYYYYYJJJJJYYYYYHHHHHHHHHHHLLLLLLALLLAAAAAAAARRRRRRRRRRLL\nBBBBBBYYYYYYYYYYYYYYYFFFFFFFFFFFFFFFFFGGGGDDDDDDDDYEEEEEEEEEEMMRRRRUUUXXXXXXXXXXXXXYYYYVVYYYJYYYYYYVVHHHHHHHHHHLLLLLLLAQAAAAAAAAAARRRRRRRRLL\nBBBBYYYYYYYYYYYYYYYYYIFIFFFFFFFFFGGGFFGGGGDDDDDDDDYEEEEEEOWEOWRRRRRUUULUUUUUUZZZZZYYYYYIVYYYYYVVVYVVHHHHHHHHHHGFLLLLLLAAAAAAAAAAARRZRRYZZRRL\nBBBBYYYYYYYYYYYYYYYYYYFIIIFFIIIFFFGGGGGGDDDDDDMDYYYYYEEEEWWWWWRRRRUUUULLUUUUZZZZZZZZYMYVVVVVVVVVVVVVHHHHHHHHHHGFLLLVVVVAAAAAAAAAAAAZZZZZZZLL\nBBBBBYBBVRVYVVYYNYKYYYIIIIIIIIFFFFFGGGGGDDDDDDMDDYYYEEEEEWWWWWRRRRRRRULLLLUZZZZZZZZZZMYTTVVVVVVVVVVVVHHNHHHHHHGGULLLVVVAAAAAAAAAAAAAZZZZZJBB\nBBBBBBBBVVVVVVVNNNIIIIIIIIIIIIIIFFFGGGGGDDDDDDMDDDDYYEEEWWWWWCWRRRRRRRLLLIGIZZZZZZZZZMMVVVVVVVVVVVVVHHHHHHHGGGGGGLLVVVVAAAAAAAAAAAAZZZZZZZBB\nBBBBBBBBVVVVVVNNIIIIIIIIIIIIIIIFFFDGDDDDDDDDDDDDDDNDDREEWWWWWWWWWWIRRLLLIIIIIIIZZZZZZMMVVVVVVVVVVVVVVQQQQGGGGGGGGVVVDDDAAAAAAAAAAAAZZZZZZZBB\nBBBBBBBVVVVVVVVVVWIIIIIIIIIIIIIUUDDDDDDDDDDDDDDDDDDDDDWWWWWWWWWWWWWRRLLLIIIIIIIIIIZZUIMVQVVVVVVVVVVVQQQQQQQGGGGGVVVVDDDDAAAAAAAAKKAAAAZZZZBB\nBBBBBBBVVVVVVVVVWWWIEEIIIIIIIIIUUDDDDDDDDDDDDDDDDDDDWWWWWWWWWWWWWWWIIILLIIIIIIIIIIIIIIIQQVVVQQVVVVVQQQQQQQGGGGGGGVVVHDDDDHHHAAAKKKAKAAZZZZZZ\nBBBBBBVVVVVVVVWVVWWIIEIIIIIIIIUUUUUDDDDDDDDDDDDDDDDWWWWWWWWWWWWWWWDDLIIIIIIIIIIIIIIIIIIQQQQQQVVVVVQQQQQQQGGGGGGGGGVVHHHHHHHKKKKKKKKKKKKKJJJJ\nBBZBBBVVVVVVVWWVWWIIIIIIIIIIIIUUUUUUDDDDDDDDDDDDDOOOWWWWWWWWWWWWWWDDLLIIIIIIIIIIIIIIIIIIQQQQQQVVVVVQQQQQQQGGGGGGGVVHHHHHHHHKKKKKKKKKKKKKJJJJ\nBBBBBBVVVVVVWWWWWKIIIIIIIIIIKIIUUUUUDDDDDDDDDDOOOOOOOWWWWWWWWWWWWLLDLLIIIIIIIIIIIIIIIIIIQQEQQQQQVQQQQQQQQQQGGGGGGVVVHHHHHHHKKKKKKKKKKKKXXJJJ\nCCCBBBBBIVVWWWWWKKKIKIIIIIIIKKKDDUUDDDDDDDDDDDDDDOOOOOWWWWWWWWYWWLLLLLIIIIIIIIIIIIIIIIIIQQEEEQQQQQQQQNQQQQQQGGGGGVVVVHHHHKKKKKKKKKKKKKKXXJXJ\nCCCCBBBBIIVVWWWWKKKKKKKKIIKKKKKDDDDDDDDDDDDDDDDSOOOOOOWWYWWYYYYYYLLLLLLIIIIIIIIIIIIIIIJIQQQEEQQQQQQQNNQQQQQQQGGGPVVHHHHHHHOKKKKKKKKKKXXXXXXJ\nCCCCBBBIIKKKKKKKKKKKKKKKIKKKKKKKDDKKDDDDDDDDDDDDOOOOOOOWYYWYYYYLLLNLLLIIIIIIIIIIIIIIEEECEEEEEEEQQQQQQNQQQQQQGGGPPPPPPPPHHHHGKKKKKKKKKXXXXKXX\nCCCCCCBKIKKKKKKKKKKKKKKKKKKKKUKKKKKKKDDADDADDDDOOOOOOOOWYYYYYYYLLLNLLLIIIIIIIIIIIIEEEEEEEEEEEEEQQQQQQNNQQNQQQQPPPPPUPPPHHHHGGGGKKKKKKXXXXXXS\nCCCCCCKKKKKKKKKKKKKKXXKKKKKKUUUKUUUUKADAAAAAADDOOOOOOOOUYYYUUYYYYYOOOOIOOOIFFIIIIEEEEEEEEEEEEEEQQQQQQQNNNNQQQQQPPPPPPPGHHGHGGGGKKKKKKXXXXSSS\nCCCCCCKKKKKKKKXXXXKXXKKKKKKUUUSUUUUUPUUAAAAAAOOOOOOOOOOUYYUUUUYYYOOOOOOOOOIFFIIIIEEEEEEEEEEEEEEEQEEEQNNNNPPPQQPPPPPPPPPPGGGGGRKKKKKKKFFXXXSS\nCCCCCCKKKKKKKXXXXXXXXXXKKKKKUUUUUUUUUUUUUAAAOOOOOOOOJUOUURRRRRRYYOOOOOOOOOOOOOOIEEEEEEEEEEEEEEEEEEEEINNNNNPPPPPPPPXXXXXGGRRGGRRRKKFKFFXXXSSS\nCCCCCCKKKKKKKXXXXXXXXXXKKKKUUUUUUUUUUUUUUAAAOOOOOOOOJUUUURRRRRROOOOOOOOOOOOOOOIIEEEEEEEEEEEEEEEEEEEIINNNNNNNZPPPPPXXXXXGRRRRGRRFFFFKFSSSSSSS\nCCCCCCKKKKXXXXXXXXXXXXXKKUUUUUUUUUUUUUUAAAAAAOOOOOOOUUUUURRRRRROOOOOOOOOOOOOOOOIEEEEEEKKEKKEEEEEEEEINNNNNNNPPPPPPPXXXXXRRRRRRRRFFFFFFSSSSSSS\nCCCCCCKKKKXXXXXXXXXXXXXXKSJJUUUUUUUUUUAAAAAAAOOOOOOOOUUUURRRRRROOOOOOOOOOOCOIOIIKELEWKKKKKAEEEEEEEENNNNNNNNPPPPPPPXXXXXRRRRRRRRRFFFFFFSSSSSG\nCCCCCCKKKKKXXXXXXXXXXXXSSSJJURUUUUUUUUAAAAAOOVOOOOOOUUUUURRRRRROOXXOOOOOOOOOIIIIKKKKKKKKKKKEENENEENNNNNNNNNPPPPPPPXXXXXRRRRRRRRRRFFFFSSSSSGG\nCLLLCLKLKKKKSYYYXXXXXXXXSSSSUPXUUUUUUUYAAAAOOOOOOWWUUUUUURRRRRRXXXXXXOOOOOOOOIIIIIIKKKKKKKKEENNNNENNNNONNNNPXXXXXXXXXXXRRRRRRRRRRFFFFFSSSSGG\nCCLLLLLLLLSSSYYYXXXXXSXBSSSRPPXXXUUYYYYYVAOOOOOOOWOCUUUUURRRRRRXXXXXOOOOOOOOOIIIIIIKKKKKKKKEKNNNNNNNNNONONNPXXXXXXXXXXXRRRRRRRFFFFFFFFSGGSGG\nCCLLLLLLLLLSYYYYYYYXXSSSSSSPPPXXXUUYVVHVVAAAOOOOOOOOMUUUURRRRRRXXXXXOOOOOOOIOIIIIIIKKKKKKKKKKNKNNNNNNOOOOOOOXXXXXXXXXXXXRRRRRRFFFFFFFLLGGGGG\nCCCLLLLLLLLLYYYYYYYXXOOSISSPPPXVXVVVVVHVVAAUOOOOOOOOMMUUUUUURXXXXXXOOOOOOOIIIIIIIIIKKKKKKKKKKKKNNNNNNNXXXXXXXXXXXXXXXXXXXRRRRRFRFFLLLLGGGGIG\nCCCLLPLLLLLGYYYYYYXXXPPPPPPPPPVVVVVVVVVVVVUUVOOOOONOOMUURRUURRXXXXXOOOOOOOIIIIIIIIKKKKKKKKKKKKKNNNNNNOXXXXXXXXXXXXXXXXXXXRRRRRRRRLLLLLLGIIII\nCCCLCLLLLWYGYYYYYYXXPPPPPPPPPPPVVVVVVVVVVVKUVOOOOOOOOOOORRUURRRRRXXOOOOOOIIIIIIIIKKKKKKKKKKKKKKKMMMMMMXXXXXXXXXXXXXXXXXXXRRRRRRRRCLLLLCIIIII\nCCCCCCCLWWYYYYYYYYPPPFFPPPPPPPVVVVVVVVVVVVUUUOOOOOOOOOOORRRRRRXXXXXXNNOOOOOIIIIIIKKKKKKKKKKKKKKKMMMMMMMMMEOEXXXXXXXXXXXXXUURRRRRRRJJJIIIIIII\nCCCCGGGGGYYYYYYYYYPFFFPPPPPPPPPGVVVVVVVVVXUUUOOOOOOOOOOQOORRRRRRMMMMNMOMIIIIIIIIIKKKKKKKKKKKKKKKMMMMMMMMMEEEXXXXXXUUXXXXXPRRRRRRRRJJJJIIIIII\nCCGGGGGGGYYFFYYYYYYFFFFPPPPPPPVGVVVVVVVVVUUUUUOOOOOOOOOOOOORRRRMMMMMMMMMMMMMIIMIIKKKKKKKKKKKKKKKMMMMMMMMMMMMXXXXXMUUXXXXXPRRRRPPJJJJJJIIIIII\nCGGGGGGGGGFFFFFFFYFFFFFFPPPPPPVVVVVVVVVVUUUUUZOOOOOOOOOOORRRRZRMMMMMMMMMMMMMMIMMIIKKKKKKKKKKKKKKMMMMMMMMMMMMXXXXXMCUUUURRRRRRRPPPJPJJJIIIIII\nCCGGGGGGGGGFFFFFFFFFFFFFPPPPPPPPVMMPPPVVUUUUUZZOOUUOOOORORRRRZZMMMMMMMMMMMMMMMMMMIIIKKKKKKKKKKKKMMMMMMMMMMMMMMMMMMDDDDPRRRRRRRPPPPPJJJIIIIII\nCCGGGGGGGGGFFFFFFFFFFFFFPPPPPPPPVPPPPPVUUUUUUUUUUUOOOOORRRRZZZZZMMZMMMMMMMMMMMMMMIIIKVVKKKKKKKKKMMMMMMMMMMMMMMMMMMRRRRRRRRRPPPPPPPPJJJJJIIII\nCCGGGGGGNSSSFFFFFFFFFFFFPPPCPPPCVTPPPPPUUUUUUUUURRRRORRRRRRZZZZZZZZMMMMMMMMMMMMMVIIVVVVVKKKKKKKKKKEEEMMMMMMMMRRRRRRRRRRRRRRPPPPPPPPPPJJJIIII\nCCGIIIGGSSSSFFFFFFFPFFFFPPPCCCCCCCPGUUPUUUUUUUURRRRRRRRRRRZZZZZZZZZZZMWWWWWWWMMMVVVVVKKKKKKKKKKKKKKEEMMMMMMMMMMRRRRRRRRRRRRRRPPPMMPPPJJJMIII\nCCGIISSSUSSSSFFFFFPPAAAFAPACCCCCCCTUUUUUUUUUUUUUURRRRRRRRRRZZZZZZZZZMMWWWWWWWWWWWWWVVVKQKKKKKKKKKKKEEMMMMMMMMMMRRRRRRRRRRRRRRPPPPMMMPJMMMIII\nCBBBSSSSSSSSSSFFPPPPPAAAAAAAACCCCCCUUUUUUUUUUUUUURRRRRRRZZZZZZZZZZZZZMWWWWWWWWWWWWWVVVVVVKKKKKKKKKKKEMMMMMMMMMMRRRRRRRRRRRRRRPPPPMMMMMMMMIII\nCBBBBBSSSSSSSSFFPPPPPAAAAAAAAACCCCGCOUUUUUUUUUUURRRRRRRZZZZZZZZZZZZCJJWWWWWWWWWWWWWVVVVVVVNKNKKKKKKKECCCEMMMMMMHHCCDRRRRRRRRRPPPMMMMMMMMMMII\nCBBBBBBSSSSSSSPPPPPPPAAAAAAAAACCCCCCUUUUUUUUUUUURRRRRRRZZZZFZZZZZCCCCJJJMWWWWWWWWWSVVVVVVVNKNNNKKKKKKCCCHMMMMMMSHDCDRRRRRRRRRPPPSSMMMMMMMMMI\nBBBBBBDSSSSSSSSSIIPPPPAAAAPPACCCCCCUUCUUUXUUUUUURRRRRRRRRRRFZZZZZCCCCJJZZWWWWWWWWWSVVVVVVNNNNNNNKKKKKKCCHMMMMMMHHDDDRRRRRRRRRPPPPPCMMMMMMMMM\nBBBBBBBSSSSSSSSSIIIPPAAAAAPPPPCCCCCCCCUUSUUUUNNBBRRRRRRRRRRRRZZZZCCCCCJZZWWWWWWWWWSVVVVVVNNNNNNNNGKKKHCCHMMMMMMHHHDDRRRRRRRRRPPPCPCMMMMMMMMV\nBBBBBBBBSSSSSSSSIIPPPAAPAAAPPPCCCCCCJNUUUUUUBBBBBRRLRRRRRRRRRZZZZCCCCCJZZDVSVVSSVVVVVVVVVNNNNNNNNGKKKHHHHMMMMMMHHHHDRRRRRRRRRCPPCCCCCMMMMMMV\nBBBBBBBBSSSSSSSSIIPPPAPPPPPPPPCCCCNJJNNUCCUBBBBBBLLLRRRRRRRUULLZZCCCCCCLVVVVVVSSSVVVVVNNNNNNNNNNNGKKQHHHHHHHHHHHHHHHRRRRRRRRRCPPCCCCMMMMMMVV\nBBBBBBBBBBSSSSIIIIIIPPPPPPPPPCCCCCNNNNNNCCBBBBBBBBLLLRRRRRRLLLLHCCCCCCLLVVVVVIVVSVVVVVNNNNNNNNNNNGSSQQQHHHHHHHHHHHHICCCCCCCCCCCCCCCCMMMMMMMV\nBBBBBBBJBFFSSSVVVVPPPPPPPPPPPCCCPCNNNNNNCCCBBBBBBLLLLLRRRRLLLLLCCCCCCCCLVVVVVVVVVVVVVVNNNNNNNNNNNGGSQQHHHHHHHHHHHHCCCCCCCCCCCCCCCCCCCMMMMMMV\nGBBBBGBBBFFSSSVVKVPPPPPPPPPPPPPCPPNNNNNCCCBBBBBBBBBLLLLRLRLLLLLCCCCCCNNVVVVVVVVAVVVVVNNNNNNNNNNNSSSSSSHHHHHHHHHHHFFCCCLCCCCCCMMCCCCCCMMMVVMV\nGBBGGGBBBFVVGGVVVVVPPPPPPPPPPPPPPPNNNNNCCCBBBBBBBBBLLLLLLLLLLLLGCCCCCNEVEEVVVVVEEVVVVNNNNNNNNTTHSSSSSSSHHHHHHHHFFFFFCCCCCCCMMMMCCCCCCCCMVVVV\nGBBBGGGVWVVVVVVVVVVVVPPPPPPPPPPPPNNNNNNCCCBBBBBBBBBBLLLLLLLLLLLCCCCCCNEEEEEVVEEEETTTTTTNNNNNNTTHHSSSSSSHHHHHHHHFFFFFCCCCCMCMMMMCCCCCCSCCSSVV\nGGBBGGGVVVVVVVVVVVVVVVVWPPPPPPPPPNNNNNNCCBBBBBBBPBBBLLLLLLLLLLLLCCCCCEEEEEEVEEEEEEETTTTTTTNNTTHHHSSSSSDHHHDDHHHHFFFFCCCCCMMMMMMMCCCCCSSSSSVV\nGGGGGGGGVVVVVVVVVVXVVWWWWPPPPPWPPPPPNCCCBBBBBBPPPPBBLLLLLLLLLLLLCCJCJJJEEEEEEEEEEEEETTTTTTTTTHHHPPSSSDDHHDDDHHFFFFFFFFCFMMMMMMCCCCCCCSSSSSSS\nGGGGGGGGVVVVVVVVVVXWWWWWWWWWWWWWWPPPNNCCCCBSPPPPPPPPJLLLXLLLLBLJJJJJJJEEEEEEEEEEEEEETTTTTTHHHHHHHHHHSDDDDDDUUUFFFFFFFFFFFFMMMMCCCCCSSSSSSSSA\nGGGGGGGGVVVVVVVVVVWWWWWWWWWWWWWWPPPPPCCCCCCPPPPPPPPJJLLLLLGLLBIJJJJJJJEEEEEEEEZEEEETTTTTTTHHHHHHHHHHDHDDDDDUUUUFFWFWWFFMMFMMMMMCCCIIISSSSSAA\nGGGGGGGGQQQVVVVVVGGWWWWWWWWWWWWWPPPPQQQCCCPPPPPPPPNNNNLLLGGIIBIJJIIJEEEEGEEEEEZEEEETTTTTTHHHHHHHHHHHHHHHDUUUUUUSFWWXWWMMMMMMMCCCCIIIISSSSSSS\nGGGGGGGGQQQVVVVVPPWWWWWWWWWWWWWWPIIQTQCCCPPPPPPNNNNNNNZZLIIIIIIIIIWEEEEEEEEZZEZZEEETTTTOOHHHHHHHHHHHHHUUUUUUUUUSWWWWWWMMMIIMIICCIXIISSSSSSSS\nGGGGGGGGQQQQQQQPPPPPWWWWWWWWWWWWPIIQQQCCCPPPPNPNNNNZZNZZZZZZZIIIIIWWEEEEEEEZZZZQQTTTTTTTOOHHHHHHHHHHHHHUUUUUUUUSSWWAWWMNIIIIIIIIIIIIISSSSSSS\nGGGGGGGGQQQQQQQPPPPPWWWWWWWWWWWBIIQQQQCQCCPPNNNNNNNZZZZZZZZZZIIIIIIIIYEEEGEZZZZQQQOTTTTTOOHHHHHHHHHHHHHUUKUUUSUSSSSWWIIIIIIIIICIIIIIISSSSSSS\nGGGGGGGGGQQQQQQPPPPPWWWWWWWWWWWWIIQQQQQQQNNNNNNNNNNNZZZZZZZZZIIIIIIIIEEEEEEEZZZZZQOTOTTOOOHHHHHHHHHHHKKUUKKUSSTSNSVWWWIIIIIIIIIIIIIIYSSSSSSS\nGGGGGGQQQQQQQPPPPPPPWWWWWWWWWIIIIQQQQQQQNNNNNNNNNNZZZZZZZZZZZZIIIIIZZEEEEEECZZZZZQOOOOOOOOHHHHHHHHHMMKKKKKSSSSSSNNWWWNIXIIIGIIIIIIIIYSSSSSSS\nGGGGGGQQQQQQQPPPPPPPWWWWWWWWWIIIIIIQQQQQNNNNNNNNNNNNNZZZZZZZZZZZZZZZZEEEEEZZZZZZZZOVVOOOOOOHHHHHHHHHMKKKKKTSSSSSNNWWNNIIIIIIIIIIIIIIYYSSSSSG\nGGGQQQQQQQQQQQPPPPRRWWWWWWWWWIIIIIIQQQQQNNNNNNNNNNNVNZZZZZZZZZZZZZZZZZZEZZZZZZZZZZOOOOOOOOOHHHHHHHHHHKKKKKTTSSSSNNNWNNIIIIIIIIIIIIIIIISSSSSG\nGEGQQQQQQQQQQQQQPRRRWLLWWZIIIIIIIIIQQQQQNMNNNNNNNNNNNNNZZZZZZZZZZZZZZZZZZZZZZZZZZZOOOOOOOOHHHHHHHHHHHXKKKKTTTSSSNNNNNNIIIFIIIIIIIIIIILLSSSSG';
+var $author$project$Aoc12Dict$sample = 'AAAA\nBBCD\nBBCC\nEEEC';
+var $author$project$Aoc12Dict$sampleAbba = 'AAAAAA\nAAABBA\nAAABBA\nABBAAA\nABBAAA\nAAAAAA';
+var $author$project$Aoc12Dict$sampleEShape = 'EEEEE\nEXXXX\nEEEEE\nEXXXX\nEEEEE';
+var $author$project$Aoc12Dict$sampleLarger = 'RRRRIICCFF\nRRRRIICCCF\nVVRRRCCFFF\nVVRCCCJFFF\nVVVVCJJCFE\nVVIVCCJJEE\nVVIIICJJEE\nMIIIIIJJEE\nMIIISIJEEE\nMMMISSJEEE';
+var $author$project$Aoc12Dict$sampleXoXo = 'OOOOO\nOXOXO\nOOOOO\nOXOXO\nOOOOO';
+var $author$project$Aoc12Dict$read = function (dataSource) {
 	switch (dataSource) {
 		case 0:
-			return $author$project$Aoc12$input;
+			return $author$project$Aoc12Dict$input;
 		case 1:
-			return $author$project$Aoc12$sample;
+			return $author$project$Aoc12Dict$sample;
 		case 5:
-			return $author$project$Aoc12$sampleAbba;
+			return $author$project$Aoc12Dict$sampleAbba;
 		case 4:
-			return $author$project$Aoc12$sampleEShape;
+			return $author$project$Aoc12Dict$sampleEShape;
 		case 3:
-			return $author$project$Aoc12$sampleLarger;
+			return $author$project$Aoc12Dict$sampleLarger;
 		default:
-			return $author$project$Aoc12$sampleXoXo;
+			return $author$project$Aoc12Dict$sampleXoXo;
 	}
 };
 var $elm$core$String$foldr = _String_foldr;
@@ -6142,7 +6053,7 @@ var $elm$core$Set$size = function (_v0) {
 	return $elm$core$Dict$size(dict);
 };
 var $elm$core$Basics$modBy = _Basics_modBy;
-var $author$project$Aoc12$toPlotColor = function (index) {
+var $author$project$Aoc12Dict$toPlotColor = function (index) {
 	var saturation = 90;
 	var satStr = $elm$core$String$fromInt(saturation) + '%';
 	var lightness = 90;
@@ -6151,7 +6062,7 @@ var $author$project$Aoc12$toPlotColor = function (index) {
 	var hueStr = $elm$core$String$fromInt(hue);
 	return 'hsl(' + (hueStr + (', ' + (satStr + (', ' + (lgtStr + ')')))));
 };
-var $author$project$Aoc12$toPlotInfo = F2(
+var $author$project$Aoc12Dict$toPlotInfo = F2(
 	function (index, _v0) {
 		var plant = _v0.a;
 		var plot = _v0.b;
@@ -6160,7 +6071,7 @@ var $author$project$Aoc12$toPlotInfo = F2(
 		var area = $elm$core$Set$size(plot);
 		return {
 			aa: area,
-			O: $author$project$Aoc12$toPlotColor(index),
+			O: $author$project$Aoc12Dict$toPlotColor(index),
 			P: plot,
 			af: 0,
 			ag: 0,
@@ -6171,13 +6082,32 @@ var $author$project$Aoc12$toPlotInfo = F2(
 			Z: $elm$core$List$length(seq)
 		};
 	});
-var $author$project$Aoc12$initModel = function (dataSource) {
-	var data = $author$project$Aoc12$read(dataSource);
+var $author$project$Aoc12Dict$initModel = function (dataSource) {
+	var data = $author$project$Aoc12Dict$read(dataSource);
 	var rows = A2($elm$core$String$split, '\n', data);
-	var garden = $tortus$elm_array_2d$Array2D$fromList(
-		A2($elm$core$List$map, $elm$core$String$toList, rows));
-	var plotList = $author$project$Aoc12$findPlots(garden);
-	var plotInfoList = A2($elm$core$List$indexedMap, $author$project$Aoc12$toPlotInfo, plotList);
+	var numberOfCols = $elm$core$String$length(
+		A2(
+			$elm$core$Maybe$withDefault,
+			'?',
+			$elm$core$List$head(rows)));
+	var numberOfRows = $elm$core$List$length(rows);
+	var createRowTuples = F2(
+		function (y, rowStr) {
+			return A2(
+				$elm$core$List$indexedMap,
+				F2(
+					function (x, ch) {
+						return _Utils_Tuple2(
+							_Utils_Tuple2(x, y),
+							ch);
+					}),
+				$elm$core$String$toList(rowStr));
+		});
+	var garden = $elm$core$Dict$fromList(
+		$elm$core$List$concat(
+			A2($elm$core$List$indexedMap, createRowTuples, rows)));
+	var plotList = $author$project$Aoc12Dict$findPlots(garden);
+	var plotInfoList = A2($elm$core$List$indexedMap, $author$project$Aoc12Dict$toPlotInfo, plotList);
 	var maxSteps = A2(
 		$elm$core$Maybe$withDefault,
 		0,
@@ -6188,22 +6118,16 @@ var $author$project$Aoc12$initModel = function (dataSource) {
 					return pi.Z;
 				},
 				plotInfoList)));
-	var numberOfCols = $elm$core$String$length(
-		A2(
-			$elm$core$Maybe$withDefault,
-			'?',
-			$elm$core$List$head(rows)));
-	var numberOfRows = $elm$core$List$length(rows);
-	return {N: numberOfCols, o: dataSource, E: false, G: maxSteps, L: '?', q: true, M: plotInfoList, U: numberOfRows, n: 0, y: $author$project$Aoc12$defaultTickInterval, aB: 0, aC: 0};
+	return {N: numberOfCols, l: dataSource, E: false, G: maxSteps, L: '?', q: true, M: plotInfoList, U: numberOfRows, o: 0, y: $author$project$Aoc12Dict$defaultTickInterval, aB: 0, aC: 0};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Aoc12$init = function (_v0) {
+var $author$project$Aoc12Dict$init = function (_v0) {
 	return _Utils_Tuple2(
-		$author$project$Aoc12$initModel(3),
+		$author$project$Aoc12Dict$initModel(3),
 		$elm$core$Platform$Cmd$none);
 };
-var $author$project$Aoc12$Tick = 0;
+var $author$project$Aoc12Dict$Tick = 0;
 var $elm$time$Time$Every = F2(
 	function (a, b) {
 		return {$: 0, a: a, b: b};
@@ -6452,7 +6376,7 @@ var $elm$time$Time$every = F2(
 	});
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $author$project$Aoc12$subscriptions = function (model) {
+var $author$project$Aoc12Dict$subscriptions = function (model) {
 	var tickSub = model.q ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
 		model.y,
@@ -6461,20 +6385,20 @@ var $author$project$Aoc12$subscriptions = function (model) {
 		});
 	return tickSub;
 };
-var $author$project$Aoc12$Input = 0;
-var $author$project$Aoc12$Sample = 1;
-var $author$project$Aoc12$SampleAbba = 5;
-var $author$project$Aoc12$SampleEShape = 4;
-var $author$project$Aoc12$SampleXoXo = 2;
-var $author$project$Aoc12$updateClear = function (model) {
-	return $author$project$Aoc12$initModel(model.o);
+var $author$project$Aoc12Dict$Input = 0;
+var $author$project$Aoc12Dict$Sample = 1;
+var $author$project$Aoc12Dict$SampleAbba = 5;
+var $author$project$Aoc12Dict$SampleEShape = 4;
+var $author$project$Aoc12Dict$SampleXoXo = 2;
+var $author$project$Aoc12Dict$updateClear = function (model) {
+	return $author$project$Aoc12Dict$initModel(model.l);
 };
 var $elm$core$Basics$min = F2(
 	function (x, y) {
 		return (_Utils_cmp(x, y) < 0) ? x : y;
 	});
-var $author$project$Aoc12$updateNextStep = function (model) {
-	var nextStep = A2($elm$core$Basics$min, model.G, model.n + 1);
+var $author$project$Aoc12Dict$updateNextStep = function (model) {
+	var nextStep = A2($elm$core$Basics$min, model.G, model.o + 1);
 	var finished = _Utils_eq(nextStep, model.G);
 	var paused = model.q || finished;
 	return _Utils_update(
@@ -6483,18 +6407,18 @@ var $author$project$Aoc12$updateNextStep = function (model) {
 			E: finished,
 			L: 'Next step : ' + $elm$core$String$fromInt(nextStep),
 			q: paused,
-			n: nextStep
+			o: nextStep
 		});
 };
-var $author$project$Aoc12$updatePrevStep = function (model) {
-	var prevStep = A2($elm$core$Basics$max, 0, model.n - 1);
+var $author$project$Aoc12Dict$updatePrevStep = function (model) {
+	var prevStep = A2($elm$core$Basics$max, 0, model.o - 1);
 	return _Utils_update(
 		model,
-		{E: false, L: 'Prev step.', n: prevStep});
+		{E: false, L: 'Prev step.', o: prevStep});
 };
-var $author$project$Aoc12$updateTogglePlay = function (model) {
+var $author$project$Aoc12Dict$updateTogglePlay = function (model) {
 	if (model.E) {
-		var m = $author$project$Aoc12$initModel(model.o);
+		var m = $author$project$Aoc12Dict$initModel(model.l);
 		return _Utils_update(
 			m,
 			{q: false});
@@ -6504,24 +6428,24 @@ var $author$project$Aoc12$updateTogglePlay = function (model) {
 			{q: !model.q});
 	}
 };
-var $author$project$Aoc12$update = F2(
+var $author$project$Aoc12Dict$update = F2(
 	function (msg, model) {
 		switch (msg) {
 			case 6:
 				return _Utils_Tuple2(
-					$author$project$Aoc12$updateClear(model),
+					$author$project$Aoc12Dict$updateClear(model),
 					$elm$core$Platform$Cmd$none);
 			case 0:
 				return _Utils_Tuple2(
-					$author$project$Aoc12$updateNextStep(model),
+					$author$project$Aoc12Dict$updateNextStep(model),
 					$elm$core$Platform$Cmd$none);
 			case 1:
 				return _Utils_Tuple2(
-					$author$project$Aoc12$updatePrevStep(model),
+					$author$project$Aoc12Dict$updatePrevStep(model),
 					$elm$core$Platform$Cmd$none);
 			case 2:
 				return _Utils_Tuple2(
-					$author$project$Aoc12$updateNextStep(model),
+					$author$project$Aoc12Dict$updateNextStep(model),
 					$elm$core$Platform$Cmd$none);
 			case 4:
 				return _Utils_Tuple2(
@@ -6537,45 +6461,46 @@ var $author$project$Aoc12$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 3:
 				return _Utils_Tuple2(
-					$author$project$Aoc12$updateTogglePlay(model),
+					$author$project$Aoc12Dict$updateTogglePlay(model),
 					$elm$core$Platform$Cmd$none);
 			case 7:
 				return _Utils_Tuple2(
-					$author$project$Aoc12$initModel(0),
+					$author$project$Aoc12Dict$initModel(0),
 					$elm$core$Platform$Cmd$none);
 			case 8:
 				return _Utils_Tuple2(
-					$author$project$Aoc12$initModel(1),
+					$author$project$Aoc12Dict$initModel(1),
 					$elm$core$Platform$Cmd$none);
 			case 9:
 				return _Utils_Tuple2(
-					$author$project$Aoc12$initModel(2),
+					$author$project$Aoc12Dict$initModel(2),
 					$elm$core$Platform$Cmd$none);
 			case 10:
 				return _Utils_Tuple2(
-					$author$project$Aoc12$initModel(3),
+					$author$project$Aoc12Dict$initModel(3),
 					$elm$core$Platform$Cmd$none);
 			case 11:
 				return _Utils_Tuple2(
-					$author$project$Aoc12$initModel(4),
+					$author$project$Aoc12Dict$initModel(4),
 					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(
-					$author$project$Aoc12$initModel(5),
+					$author$project$Aoc12Dict$initModel(5),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Aoc12$Clear = 6;
-var $author$project$Aoc12$Faster = 4;
-var $author$project$Aoc12$NextStep = 2;
-var $author$project$Aoc12$PrevStep = 1;
-var $author$project$Aoc12$Slower = 5;
-var $author$project$Aoc12$TogglePlay = 3;
-var $author$project$Aoc12$UseAbba = 12;
-var $author$project$Aoc12$UseEShape = 11;
-var $author$project$Aoc12$UseLarger = 10;
-var $author$project$Aoc12$UseSample = 8;
-var $author$project$Aoc12$UseXoXo = 9;
+var $author$project$Aoc12Dict$Clear = 6;
+var $author$project$Aoc12Dict$Faster = 4;
+var $author$project$Aoc12Dict$NextStep = 2;
+var $author$project$Aoc12Dict$PrevStep = 1;
+var $author$project$Aoc12Dict$Slower = 5;
+var $author$project$Aoc12Dict$TogglePlay = 3;
+var $author$project$Aoc12Dict$UseAbba = 12;
+var $author$project$Aoc12Dict$UseEShape = 11;
+var $author$project$Aoc12Dict$UseInput = 7;
+var $author$project$Aoc12Dict$UseLarger = 10;
+var $author$project$Aoc12Dict$UseSample = 8;
+var $author$project$Aoc12Dict$UseXoXo = 9;
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -6627,6 +6552,27 @@ var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$core$List$drop = F2(
+	function (n, list) {
+		drop:
+		while (true) {
+			if (n <= 0) {
+				return list;
+			} else {
+				if (!list.b) {
+					return list;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs;
+					n = $temp$n;
+					list = $temp$list;
+					continue drop;
+				}
+			}
+		}
+	});
 var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
@@ -6636,7 +6582,7 @@ var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
 var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
-var $author$project$Aoc12$toFilledElement = F4(
+var $author$project$Aoc12Dict$toFilledElement = F4(
 	function (plantWidth, plantHeight, colorStr, _v0) {
 		var xInt = _v0.a;
 		var yInt = _v0.b;
@@ -6657,7 +6603,7 @@ var $author$project$Aoc12$toFilledElement = F4(
 			_List_Nil);
 	});
 var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
-var $author$project$Aoc12$toPlantElement = F4(
+var $author$project$Aoc12Dict$toPlantElement = F4(
 	function (plantWidth, plantHeight, plantStr, _v0) {
 		var xInt = _v0.a;
 		var yInt = _v0.b;
@@ -6675,13 +6621,13 @@ var $author$project$Aoc12$toPlantElement = F4(
 					$elm$svg$Svg$text(plantStr)
 				]));
 	});
-var $author$project$Aoc12$toPlotSvgElements = F4(
+var $author$project$Aoc12Dict$toPlotSvgElements = F4(
 	function (step, plantWidth, plantHeight, plotInfo) {
 		var posList = $elm$core$Set$toList(plotInfo.P);
 		var plantStr = $elm$core$String$fromChar(plotInfo.S);
 		var plantElements = A2(
 			$elm$core$List$map,
-			A3($author$project$Aoc12$toPlantElement, plantWidth, plantHeight, plantStr),
+			A3($author$project$Aoc12Dict$toPlantElement, plantWidth, plantHeight, plantStr),
 			posList);
 		var filled = function () {
 			if (!step) {
@@ -6700,13 +6646,13 @@ var $author$project$Aoc12$toPlotSvgElements = F4(
 		var colorStr = plotInfo.O;
 		var filledElements = A2(
 			$elm$core$List$map,
-			A3($author$project$Aoc12$toFilledElement, plantWidth, plantHeight, colorStr),
+			A3($author$project$Aoc12Dict$toFilledElement, plantWidth, plantHeight, colorStr),
 			filled);
 		return _Utils_ap(filledElements, plantElements);
 	});
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
-var $author$project$Aoc12$toSvg = function (model) {
-	var step = model.n;
+var $author$project$Aoc12Dict$toSvg = function (model) {
+	var step = model.o;
 	var rects = _List_Nil;
 	var plotInfoList = model.M;
 	var plantWidth = 12;
@@ -6720,7 +6666,7 @@ var $author$project$Aoc12$toSvg = function (model) {
 			['0', '0', svgWidth, svgHeight]));
 	var elements = A2(
 		$elm$core$List$concatMap,
-		A3($author$project$Aoc12$toPlotSvgElements, step, plantWidth, plantHeight),
+		A3($author$project$Aoc12Dict$toPlotSvgElements, step, plantWidth, plantHeight),
 		model.M);
 	return A2(
 		$elm$svg$Svg$svg,
@@ -6735,9 +6681,9 @@ var $author$project$Aoc12$toSvg = function (model) {
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
-var $author$project$Aoc12$view = function (model) {
+var $author$project$Aoc12Dict$view = function (model) {
 	var textFontSize = '9px';
-	var s = $author$project$Aoc12$toSvg(model);
+	var s = $author$project$Aoc12Dict$toSvg(model);
 	var elements = _List_Nil;
 	return A2(
 		$elm$html$Html$table,
@@ -6797,8 +6743,24 @@ var $author$project$Aoc12$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$type_('radio'),
+										$elm$html$Html$Events$onClick(7),
+										$elm$html$Html$Attributes$checked(!model.l)
+									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Input')
+									])),
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(8),
-										$elm$html$Html$Attributes$checked(model.o === 1)
+										$elm$html$Html$Attributes$checked(model.l === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -6814,7 +6776,7 @@ var $author$project$Aoc12$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(9),
-										$elm$html$Html$Attributes$checked(model.o === 2)
+										$elm$html$Html$Attributes$checked(model.l === 2)
 									]),
 								_List_Nil),
 								A2(
@@ -6830,7 +6792,7 @@ var $author$project$Aoc12$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(10),
-										$elm$html$Html$Attributes$checked(model.o === 3)
+										$elm$html$Html$Attributes$checked(model.l === 3)
 									]),
 								_List_Nil),
 								A2(
@@ -6846,7 +6808,7 @@ var $author$project$Aoc12$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(11),
-										$elm$html$Html$Attributes$checked(model.o === 4)
+										$elm$html$Html$Attributes$checked(model.l === 4)
 									]),
 								_List_Nil),
 								A2(
@@ -6862,7 +6824,7 @@ var $author$project$Aoc12$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(12),
-										$elm$html$Html$Attributes$checked(model.o === 5)
+										$elm$html$Html$Attributes$checked(model.l === 5)
 									]),
 								_List_Nil),
 								A2(
@@ -6920,7 +6882,7 @@ var $author$project$Aoc12$view = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Attributes$disabled(!model.n),
+										$elm$html$Html$Attributes$disabled(!model.o),
 										$elm$html$Html$Events$onClick(1)
 									]),
 								_List_fromArray(
@@ -6966,7 +6928,7 @@ var $author$project$Aoc12$view = function (model) {
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
 										$elm$html$Html$Attributes$disabled(
-										_Utils_eq(model.n, model.G)),
+										_Utils_eq(model.o, model.G)),
 										$elm$html$Html$Events$onClick(2)
 									]),
 								_List_fromArray(
@@ -6998,7 +6960,7 @@ var $author$project$Aoc12$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										$elm$core$String$fromInt(model.n))
+										$elm$core$String$fromInt(model.o))
 									]))
 							]))
 					])),
@@ -7050,12 +7012,12 @@ var $author$project$Aoc12$view = function (model) {
 					]))
 			]));
 };
-var $author$project$Aoc12$main = $elm$browser$Browser$element(
-	{aQ: $author$project$Aoc12$init, aW: $author$project$Aoc12$subscriptions, aY: $author$project$Aoc12$update, aZ: $author$project$Aoc12$view});
-_Platform_export({'Aoc12':{'init':$author$project$Aoc12$main(
+var $author$project$Aoc12Dict$main = $elm$browser$Browser$element(
+	{aQ: $author$project$Aoc12Dict$init, aW: $author$project$Aoc12Dict$subscriptions, aY: $author$project$Aoc12Dict$update, aZ: $author$project$Aoc12Dict$view});
+_Platform_export({'Aoc12Dict':{'init':$author$project$Aoc12Dict$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
 
-  var app = Elm.Aoc12.init({ node: document.getElementById("elm") });
+  var app = Elm.Aoc12Dict.init({ node: document.getElementById("elm") });
 }
 catch (e)
 {
