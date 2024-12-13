@@ -31,7 +31,7 @@ let parseMachine (s : string) : Machine =
         let (ax, ay) = parseLine xLine 
         let (bx, by) = parseLine yLine 
         let (gx, gy) = parseLine goalLine 
-        { ax = ax; bx = bx; ay = ay; by = by; xGoal = gx + 10000000000000L; yGoal = gy + 10000000000000L }
+        { ax = ax; bx = bx; ay = ay; by = by; xGoal = gx; yGoal = gy }
     | _ -> failwith "machine ?"
 
 let calculateA (m : Machine) : int64 = 
@@ -40,7 +40,20 @@ let calculateA (m : Machine) : int64 =
 let calculateB (a : int64) (m : Machine) : int64 = 
     (m.xGoal - m.ax * a) / m.bx 
 
-let calculate (m : Machine) : int64 option = 
+let calculate1 (m : Machine) : int64 option = 
+    let a = m |> calculateA
+    let b = m |> calculateB a 
+    let x = a * m.ax + b * m.bx 
+    let y = a * m.ay + b * m.by
+    if a <= 100 && b <= 100 && x = m.xGoal && y = m.yGoal then 
+        Some (3L * a + b) 
+    else 
+        None 
+
+let adjustGoals (m : Machine) : Machine = 
+    { m with xGoal = m.xGoal + 10000000000000L; yGoal = m.yGoal + 10000000000000L }
+
+let calculate2 (m : Machine) : int64 option = 
     let a = m |> calculateA
     let b = m |> calculateB a 
     let x = a * m.ax + b * m.bx 
@@ -53,6 +66,7 @@ let calculate (m : Machine) : int64 option =
 let run fileName = 
     let chunks = File.ReadAllText fileName |> trim |> split "\n\n" |> Array.toList
     let machines = chunks |> List.map parseMachine
-    machines |> List.choose calculate |> List.sum |> printfn "%A"
+    machines |> List.choose calculate1 |> List.sum |> printfn "%d"
+    machines |> List.choose (adjustGoals >> calculate2) |> List.sum |> printfn "%d"
 
 run "input"
