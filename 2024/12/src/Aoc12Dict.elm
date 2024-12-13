@@ -383,8 +383,6 @@ type Msg =
   | PrevStep 
   | NextStep 
   | TogglePlay 
-  | Faster 
-  | Slower 
   | Clear 
   | UseInput
   | UseSample
@@ -439,10 +437,6 @@ update msg model =
       (updatePrevStep model, Cmd.none)
     NextStep ->
       (updateNextStep model, Cmd.none)
-    Faster -> 
-      ({model | tickInterval = model.tickInterval / 2 }, Cmd.none)
-    Slower -> 
-      ({model | tickInterval = model.tickInterval * 2 }, Cmd.none)
     TogglePlay -> 
       (updateTogglePlay model, Cmd.none)
     UseInput -> 
@@ -480,8 +474,8 @@ toPlantElement plantWidth plantHeight plantStr (xInt, yInt) =
 toFilledElement : Int -> Int -> String -> Pos -> Svg Msg 
 toFilledElement plantWidth plantHeight colorStr (xInt, yInt) = 
   let 
-    xStr = String.fromInt (2 + xInt * plantWidth)
-    yStr = String.fromInt (2 + yInt * plantHeight)
+    xStr = String.fromInt ((plantWidth // 6) + xInt * plantWidth)
+    yStr = String.fromInt ((plantWidth // 6) + yInt * plantHeight)
   in 
     rect
           [ x xStr
@@ -514,7 +508,7 @@ toSvg model =
   let 
     (fontSize, plantWidth, plantHeight) = 
       case model.dataSource of 
-        Input -> ("9px", 9, 12)
+        Input -> ("8px", 6, 8)
         _ -> ("16px", 12, 16)
     svgWidth = (4 + plantWidth * model.colCount) |> String.fromInt 
     svgHeight = (4 + plantHeight * model.rowCount) |> String.fromInt 
@@ -605,14 +599,8 @@ view model =
                 , onClick PrevStep ] 
                 [ Html.text "Prev" ]
               , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Slower ] 
-                [ text "Slower" ]
-              , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick TogglePlay ] 
                 [ if model.paused then text "Play" else text "Pause" ] 
-              , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Faster ] 
-                [ text "Faster" ]
               , Html.button 
                 [ Html.Attributes.style "width" "80px"
                 , Html.Attributes.disabled (model.step == model.maxSteps)

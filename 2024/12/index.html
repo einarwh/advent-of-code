@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.X.F === region.ad.F)
+	if (region.W.E === region.ad.E)
 	{
-		return 'on line ' + region.X.F;
+		return 'on line ' + region.W.E;
 	}
-	return 'on lines ' + region.X.F + ' through ' + region.ad.F;
+	return 'on lines ' + region.W.E + ' through ' + region.ad.E;
 }
 
 
@@ -2733,9 +2733,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		L: func(record.L),
-		Y: record.Y,
-		T: record.T
+		K: func(record.K),
+		X: record.X,
+		S: record.S
 	}
 });
 
@@ -3003,11 +3003,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.L;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.Y;
+		var message = !tag ? value : tag < 3 ? value.a : value.K;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.X;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.T) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.S) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3997,7 +3997,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 		impl.aY,
 		impl.aW,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.W && impl.W(sendToApp)
+			var divertHrefToApp = impl.V && impl.V(sendToApp)
 			var view = impl.aZ;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
@@ -4072,7 +4072,7 @@ function _Browser_application(impl)
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		W: function(sendToApp)
+		V: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -6071,14 +6071,14 @@ var $author$project$Aoc12Dict$toPlotInfo = F2(
 		var area = $elm$core$Set$size(plot);
 		return {
 			aa: area,
-			O: $author$project$Aoc12Dict$toPlotColor(index),
-			P: plot,
+			N: $author$project$Aoc12Dict$toPlotColor(index),
+			O: plot,
 			af: 0,
 			ag: 0,
 			ao: 0,
 			ap: 0,
-			S: plant,
-			V: seq,
+			R: plant,
+			U: seq,
 			Z: $elm$core$List$length(seq)
 		};
 	});
@@ -6118,7 +6118,7 @@ var $author$project$Aoc12Dict$initModel = function (dataSource) {
 					return pi.Z;
 				},
 				plotInfoList)));
-	return {N: numberOfCols, k: dataSource, E: false, G: maxSteps, L: '?', q: true, M: plotInfoList, U: numberOfRows, o: 0, y: $author$project$Aoc12Dict$defaultTickInterval, aB: 0, aC: 0};
+	return {M: numberOfCols, k: dataSource, D: false, F: maxSteps, K: '?', q: true, L: plotInfoList, T: numberOfRows, o: 0, Y: $author$project$Aoc12Dict$defaultTickInterval, aB: 0, aC: 0};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -6379,7 +6379,7 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc12Dict$subscriptions = function (model) {
 	var tickSub = model.q ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.y,
+		model.Y,
 		function (_v0) {
 			return 0;
 		});
@@ -6398,14 +6398,14 @@ var $elm$core$Basics$min = F2(
 		return (_Utils_cmp(x, y) < 0) ? x : y;
 	});
 var $author$project$Aoc12Dict$updateNextStep = function (model) {
-	var nextStep = A2($elm$core$Basics$min, model.G, model.o + 1);
-	var finished = _Utils_eq(nextStep, model.G);
+	var nextStep = A2($elm$core$Basics$min, model.F, model.o + 1);
+	var finished = _Utils_eq(nextStep, model.F);
 	var paused = model.q || finished;
 	return _Utils_update(
 		model,
 		{
-			E: finished,
-			L: 'Next step : ' + $elm$core$String$fromInt(nextStep),
+			D: finished,
+			K: 'Next step : ' + $elm$core$String$fromInt(nextStep),
 			q: paused,
 			o: nextStep
 		});
@@ -6414,10 +6414,10 @@ var $author$project$Aoc12Dict$updatePrevStep = function (model) {
 	var prevStep = A2($elm$core$Basics$max, 0, model.o - 1);
 	return _Utils_update(
 		model,
-		{E: false, L: 'Prev step.', o: prevStep});
+		{D: false, K: 'Prev step.', o: prevStep});
 };
 var $author$project$Aoc12Dict$updateTogglePlay = function (model) {
-	if (model.E) {
+	if (model.D) {
 		var m = $author$project$Aoc12Dict$initModel(model.k);
 		return _Utils_update(
 			m,
@@ -6431,7 +6431,7 @@ var $author$project$Aoc12Dict$updateTogglePlay = function (model) {
 var $author$project$Aoc12Dict$update = F2(
 	function (msg, model) {
 		switch (msg) {
-			case 6:
+			case 4:
 				return _Utils_Tuple2(
 					$author$project$Aoc12Dict$updateClear(model),
 					$elm$core$Platform$Cmd$none);
@@ -6447,39 +6447,27 @@ var $author$project$Aoc12Dict$update = F2(
 				return _Utils_Tuple2(
 					$author$project$Aoc12Dict$updateNextStep(model),
 					$elm$core$Platform$Cmd$none);
-			case 4:
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{y: model.y / 2}),
-					$elm$core$Platform$Cmd$none);
-			case 5:
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{y: model.y * 2}),
-					$elm$core$Platform$Cmd$none);
 			case 3:
 				return _Utils_Tuple2(
 					$author$project$Aoc12Dict$updateTogglePlay(model),
 					$elm$core$Platform$Cmd$none);
-			case 7:
+			case 5:
 				return _Utils_Tuple2(
 					$author$project$Aoc12Dict$initModel(0),
 					$elm$core$Platform$Cmd$none);
-			case 8:
+			case 6:
 				return _Utils_Tuple2(
 					$author$project$Aoc12Dict$initModel(1),
 					$elm$core$Platform$Cmd$none);
-			case 9:
+			case 7:
 				return _Utils_Tuple2(
 					$author$project$Aoc12Dict$initModel(2),
 					$elm$core$Platform$Cmd$none);
-			case 10:
+			case 8:
 				return _Utils_Tuple2(
 					$author$project$Aoc12Dict$initModel(3),
 					$elm$core$Platform$Cmd$none);
-			case 11:
+			case 9:
 				return _Utils_Tuple2(
 					$author$project$Aoc12Dict$initModel(4),
 					$elm$core$Platform$Cmd$none);
@@ -6489,18 +6477,16 @@ var $author$project$Aoc12Dict$update = F2(
 					$elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Aoc12Dict$Clear = 6;
-var $author$project$Aoc12Dict$Faster = 4;
+var $author$project$Aoc12Dict$Clear = 4;
 var $author$project$Aoc12Dict$NextStep = 2;
 var $author$project$Aoc12Dict$PrevStep = 1;
-var $author$project$Aoc12Dict$Slower = 5;
 var $author$project$Aoc12Dict$TogglePlay = 3;
-var $author$project$Aoc12Dict$UseAbba = 12;
-var $author$project$Aoc12Dict$UseEShape = 11;
-var $author$project$Aoc12Dict$UseInput = 7;
-var $author$project$Aoc12Dict$UseLarger = 10;
-var $author$project$Aoc12Dict$UseSample = 8;
-var $author$project$Aoc12Dict$UseXoXo = 9;
+var $author$project$Aoc12Dict$UseAbba = 10;
+var $author$project$Aoc12Dict$UseEShape = 9;
+var $author$project$Aoc12Dict$UseInput = 5;
+var $author$project$Aoc12Dict$UseLarger = 8;
+var $author$project$Aoc12Dict$UseSample = 6;
+var $author$project$Aoc12Dict$UseXoXo = 7;
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -6586,8 +6572,8 @@ var $author$project$Aoc12Dict$toFilledElement = F4(
 	function (plantWidth, plantHeight, colorStr, _v0) {
 		var xInt = _v0.a;
 		var yInt = _v0.b;
-		var yStr = $elm$core$String$fromInt(2 + (yInt * plantHeight));
-		var xStr = $elm$core$String$fromInt(2 + (xInt * plantWidth));
+		var yStr = $elm$core$String$fromInt(((plantWidth / 6) | 0) + (yInt * plantHeight));
+		var xStr = $elm$core$String$fromInt(((plantWidth / 6) | 0) + (xInt * plantWidth));
 		return A2(
 			$elm$svg$Svg$rect,
 			_List_fromArray(
@@ -6623,8 +6609,8 @@ var $author$project$Aoc12Dict$toPlantElement = F4(
 	});
 var $author$project$Aoc12Dict$toPlotSvgElements = F4(
 	function (step, plantWidth, plantHeight, plotInfo) {
-		var posList = $elm$core$Set$toList(plotInfo.P);
-		var plantStr = $elm$core$String$fromChar(plotInfo.S);
+		var posList = $elm$core$Set$toList(plotInfo.O);
+		var plantStr = $elm$core$String$fromChar(plotInfo.R);
 		var plantElements = A2(
 			$elm$core$List$map,
 			A3($author$project$Aoc12Dict$toPlantElement, plantWidth, plantHeight, plantStr),
@@ -6634,7 +6620,7 @@ var $author$project$Aoc12Dict$toPlotSvgElements = F4(
 				return _List_Nil;
 			} else {
 				var _v0 = $elm$core$List$head(
-					A2($elm$core$List$drop, step - 1, plotInfo.V));
+					A2($elm$core$List$drop, step - 1, plotInfo.U));
 				if (!_v0.$) {
 					var plot = _v0.a;
 					return $elm$core$Set$toList(plot);
@@ -6643,7 +6629,7 @@ var $author$project$Aoc12Dict$toPlotSvgElements = F4(
 				}
 			}
 		}();
-		var colorStr = plotInfo.O;
+		var colorStr = plotInfo.N;
 		var filledElements = A2(
 			$elm$core$List$map,
 			A3($author$project$Aoc12Dict$toFilledElement, plantWidth, plantHeight, colorStr),
@@ -6654,12 +6640,12 @@ var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $author$project$Aoc12Dict$toSvg = function (model) {
 	var step = model.o;
 	var rects = _List_Nil;
-	var plotInfoList = model.M;
+	var plotInfoList = model.L;
 	var fontFamilyAttr = 'font-family:Source Code Pro,monospace';
 	var _v0 = function () {
 		var _v1 = model.k;
 		if (!_v1) {
-			return _Utils_Tuple3('9px', 9, 12);
+			return _Utils_Tuple3('9px', 6, 8);
 		} else {
 			return _Utils_Tuple3('16px', 12, 16);
 		}
@@ -6669,12 +6655,12 @@ var $author$project$Aoc12Dict$toSvg = function (model) {
 	var plantHeight = _v0.c;
 	var fontSizeAttr = 'font-size:' + fontSize;
 	var styles = fontFamilyAttr + ('; ' + fontSizeAttr);
-	var svgHeight = $elm$core$String$fromInt(4 + (plantHeight * model.U));
+	var svgHeight = $elm$core$String$fromInt(4 + (plantHeight * model.T));
 	var elements = A2(
 		$elm$core$List$concatMap,
 		A3($author$project$Aoc12Dict$toPlotSvgElements, step, plantWidth, plantHeight),
-		model.M);
-	var svgWidth = $elm$core$String$fromInt(4 + (plantWidth * model.N));
+		model.L);
+	var svgWidth = $elm$core$String$fromInt(4 + (plantWidth * model.M));
 	var viewBoxStr = A2(
 		$elm$core$String$join,
 		' ',
@@ -6755,7 +6741,7 @@ var $author$project$Aoc12Dict$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$type_('radio'),
-										$elm$html$Html$Events$onClick(7),
+										$elm$html$Html$Events$onClick(5),
 										$elm$html$Html$Attributes$checked(!model.k)
 									]),
 								_List_Nil),
@@ -6771,7 +6757,7 @@ var $author$project$Aoc12Dict$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$type_('radio'),
-										$elm$html$Html$Events$onClick(8),
+										$elm$html$Html$Events$onClick(6),
 										$elm$html$Html$Attributes$checked(model.k === 1)
 									]),
 								_List_Nil),
@@ -6787,7 +6773,7 @@ var $author$project$Aoc12Dict$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$type_('radio'),
-										$elm$html$Html$Events$onClick(9),
+										$elm$html$Html$Events$onClick(7),
 										$elm$html$Html$Attributes$checked(model.k === 2)
 									]),
 								_List_Nil),
@@ -6803,7 +6789,7 @@ var $author$project$Aoc12Dict$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$type_('radio'),
-										$elm$html$Html$Events$onClick(10),
+										$elm$html$Html$Events$onClick(8),
 										$elm$html$Html$Attributes$checked(model.k === 3)
 									]),
 								_List_Nil),
@@ -6819,7 +6805,7 @@ var $author$project$Aoc12Dict$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$type_('radio'),
-										$elm$html$Html$Events$onClick(11),
+										$elm$html$Html$Events$onClick(9),
 										$elm$html$Html$Attributes$checked(model.k === 4)
 									]),
 								_List_Nil),
@@ -6835,7 +6821,7 @@ var $author$project$Aoc12Dict$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$type_('radio'),
-										$elm$html$Html$Events$onClick(12),
+										$elm$html$Html$Events$onClick(10),
 										$elm$html$Html$Attributes$checked(model.k === 5)
 									]),
 								_List_Nil),
@@ -6867,7 +6853,7 @@ var $author$project$Aoc12Dict$view = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick(6)
+										$elm$html$Html$Events$onClick(4)
 									]),
 								_List_fromArray(
 									[
@@ -6906,17 +6892,6 @@ var $author$project$Aoc12Dict$view = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick(5)
-									]),
-								_List_fromArray(
-									[
-										$elm$svg$Svg$text('Slower')
-									])),
-								A2(
-								$elm$html$Html$button,
-								_List_fromArray(
-									[
-										A2($elm$html$Html$Attributes$style, 'width', '80px'),
 										$elm$html$Html$Events$onClick(3)
 									]),
 								_List_fromArray(
@@ -6928,19 +6903,8 @@ var $author$project$Aoc12Dict$view = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick(4)
-									]),
-								_List_fromArray(
-									[
-										$elm$svg$Svg$text('Faster')
-									])),
-								A2(
-								$elm$html$Html$button,
-								_List_fromArray(
-									[
-										A2($elm$html$Html$Attributes$style, 'width', '80px'),
 										$elm$html$Html$Attributes$disabled(
-										_Utils_eq(model.o, model.G)),
+										_Utils_eq(model.o, model.F)),
 										$elm$html$Html$Events$onClick(2)
 									]),
 								_List_fromArray(
