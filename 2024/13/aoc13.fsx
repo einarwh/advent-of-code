@@ -1,4 +1,4 @@
-// Advent of Code 2024. Day 13
+// Advent of Code 2024. Day 13: Claw Contraption.
 // dotnet fsi aoc13.fsx
 
 open System
