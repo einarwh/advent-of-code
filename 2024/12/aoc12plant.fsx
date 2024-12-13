@@ -69,12 +69,7 @@ let neighbours (x, y) =
   [ ((x - 1), y); ((x + 1), y); (x, (y - 1)); (x, (y + 1)) ]
 
 let rec fillPlant (possiblePositionsLeft : Set<Pos>) (positionsToAdd : Set<Pos>) (plot : Set<Pos>) = 
-    // printfn "fillPlant"
-    // printfn " - possiblePositionsLeft [%d]" (Set.count possiblePositionsLeft)
-    // printfn " - positionsToAdd [%d]: %A" (Set.count positionsToAdd) (positionsToAdd |> Set.toList)
-    // printfn " - plot [%d]" (Set.count plot)
     if Set.count positionsToAdd = 0 then 
-        // printfn " - exit"
         (plot, possiblePositionsLeft)
     else 
         let nextPlot = Set.union plot positionsToAdd
@@ -94,15 +89,11 @@ let fillPlantPlot (plantPositions : Set<Pos>) startPos =
 let findPlantPlots plant (positions : Pos list)  =
     printfn "findPlantPlots: %A (%d plants)" plant (List.length positions)
     let rec loop posList plots = 
-        // printfn "findPlantPlots [loop]"
-        // printfn " - positions [%d]" (List.length posList)
-        // printfn " - plots [%d]" (List.length plots)
         match posList with 
         | [] -> plots 
         | pos :: remaining -> 
             let remSet = Set.ofList remaining
             let (plot, updatedRemSet) = fillPlantPlot remSet pos 
-            // printfn "updatedRemSet %d" (Set.count updatedRemSet)
             let rem = updatedRemSet |> Set.toList
             loop rem (plot :: plots)
     loop positions []

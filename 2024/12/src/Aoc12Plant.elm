@@ -316,6 +316,108 @@ findPlots garden =
   in 
     positions |> findPlotsLoop garden [] Set.empty
 
+fillPlant : Set Pos -> Set Pos -> Set Pos -> List (Set Pos) -> (Set Pos, List (Set Pos), Set Pos)
+fillPlant possiblePositionsLeft positionsToAdd plot seq = 
+  if Set.isEmpty positionsToAdd then 
+    (plot, seq, possiblePositionsLeft) 
+  else 
+    let 
+      nextPlot = Set.union plot positionsToAdd
+      nextSeq = nextPlot :: seq
+      nextPositionsToAdd = 
+        positionsToAdd
+        |> Set.toList  
+        |> List.concatMap neighbours 
+        |> Set.fromList 
+        |> Set.filter (\p -> (Set.member p possiblePositionsLeft))
+      possible = Set.diff possiblePositionsLeft nextPositionsToAdd
+    in 
+      fillPlant possible nextPositionsToAdd nextPlot nextSeq
+
+fillPlantPlot : Set Pos -> Pos -> (Set Pos, List (Set Pos), Set Pos)
+fillPlantPlot plantPositions startPos = 
+  let 
+    positionsToAdd = Set.empty |> Set.insert startPos 
+  in 
+    fillPlant plantPositions positionsToAdd Set.empty []
+
+findPlantPlotsLoop : Plant -> List Pos -> List (Plant, Plot, PlotSequence) -> List (Plant, Plot, PlotSequence)
+findPlantPlotsLoop plant posList plotInfoList = 
+  case posList of 
+    [] -> plotInfoList 
+    pos :: remaining -> 
+      let 
+        remSet = Set.fromList remaining
+        (plot, seq, updatedRemSet) = fillPlantPlot remSet pos 
+      in 
+        findPlantPlotsLoop plant (Set.toList updatedRemSet) ((plant, plot, seq) :: plotInfoList)
+
+findPlantPlots : Plant -> List Pos -> List (Plant, Plot, PlotSequence) 
+findPlantPlots plant posList = 
+  findPlantPlotsLoop plant posList [] 
+
+findAllPlots : Garden -> List (Plant, Plot, PlotSequence) 
+findAllPlots garden = 
+  let 
+    positionsWithPlant = garden |> getAllPositions |> List.map (\pos -> (pos, tryGetPlantAtPos garden pos |> Maybe.withDefault '?'))
+    selectByPlant p = 
+      positionsWithPlant |> List.filterMap (\(pos, plant) -> if plant == p then Just pos else Nothing)
+    getPlots p = 
+      p |> selectByPlant |> findPlantPlots p
+    aPlots = getPlots 'A'
+    bPlots = getPlots 'B'
+    cPlots = getPlots 'C'
+    dPlots = getPlots 'D'
+    ePlots = getPlots 'E'
+    fPlots = getPlots 'F'
+    gPlots = getPlots 'G'
+    hPlots = getPlots 'H'
+    iPlots = getPlots 'I'
+    jPlots = getPlots 'J'
+    kPlots = getPlots 'K'
+    lPlots = getPlots 'L'
+    mPlots = getPlots 'M'
+    nPlots = getPlots 'N'
+    oPlots = getPlots 'O'
+    pPlots = getPlots 'P'
+    qPlots = getPlots 'Q'
+    rPlots = getPlots 'R'
+    sPlots = getPlots 'S'
+    tPlots = getPlots 'T'
+    uPlots = getPlots 'U'
+    vPlots = getPlots 'V'
+    wPlots = getPlots 'W'
+    xPlots = getPlots 'X'
+    yPlots = getPlots 'Y'
+    zPlots = getPlots 'Z'
+  in 
+    [ aPlots
+    , bPlots 
+    , cPlots
+    , dPlots
+    , ePlots
+    , fPlots
+    , gPlots
+    , hPlots
+    , iPlots
+    , jPlots
+    , kPlots
+    , lPlots
+    , mPlots
+    , nPlots
+    , oPlots
+    , pPlots
+    , qPlots
+    , rPlots
+    , sPlots
+    , tPlots
+    , uPlots
+    , vPlots
+    , wPlots
+    , xPlots
+    , yPlots
+    , zPlots ] |> List.concat
+
 toPlotColor : Int -> String 
 toPlotColor index = 
   let 
@@ -340,7 +442,7 @@ toPlotInfo index (plant, plot, seq) =
     plantColor = getPlantColor plant
   in 
     { complete = plot  
-    , sequence = seq
+    , sequence = seq |> List.reverse
     , totalSteps = List.length seq 
     , plant = plant 
     , color = plantColor
@@ -360,7 +462,7 @@ initModel dataSource =
     createRowTuples y rowStr = 
       rowStr |> String.toList |> List.indexedMap (\x ch -> ((x, y), ch)) 
     garden = rows |> List.indexedMap createRowTuples |> List.concat |> Dict.fromList
-    plotList = findPlots garden 
+    plotList = findAllPlots garden 
     plotInfoList = plotList |> List.indexedMap toPlotInfo 
     maxSteps = plotInfoList |> List.map (\pi -> pi.totalSteps) |> List.maximum |> Maybe.withDefault 0
   in 
