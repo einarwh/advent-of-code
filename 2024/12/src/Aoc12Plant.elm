@@ -1,4 +1,4 @@
-module Aoc12 exposing (..)
+module Aoc12Plant exposing (..)
 
 import Browser
 import Html exposing (Html)
@@ -7,8 +7,6 @@ import Html.Events exposing (onClick)
 import Dict exposing (Dict)
 import Array exposing (Array)
 import Set exposing (Set)
-import Array2D exposing (Array2D)
--- import Html exposing (text)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Time
@@ -32,6 +30,8 @@ type alias Pos = (Int, Int)
 type DataSource = Input | Sample | SampleXoXo | SampleLarger | SampleEShape | SampleAbba
 
 type alias Plant = Char 
+
+type alias Garden = Dict Pos Plant
 
 type alias Plot = Set Pos 
 
@@ -249,37 +249,25 @@ read dataSource =
     SampleLarger -> sampleLarger
     SampleXoXo -> sampleXoXo
 
-getAllPositions : Array2D Plant -> List Pos
-getAllPositions board = 
-  let
-    ys = List.range 0 (Array2D.rows board - 1)
-    xs = List.range 0 (Array2D.columns board - 1)
-  in 
-    ys |> List.concatMap (\y -> xs |> List.map (\x -> (x, y)))
+getAllPositions : Garden -> List Pos
+getAllPositions garden = 
+  garden |> Dict.keys 
 
-inGardenBounds : Array2D Plant -> Pos -> Bool 
-inGardenBounds garden (x, y) = 
-  let 
-    insideRows = y >= 0 && y < Array2D.rows garden
-    insideCols = x >= 0 && x < Array2D.columns garden
-  in 
-    insideRows && insideCols 
-
-tryGetPlantAtPos : Array2D Plant -> Pos -> Maybe Char
-tryGetPlantAtPos garden (x, y) = 
-  garden |> Array2D.get y x 
+tryGetPlantAtPos : Garden -> Pos -> Maybe Plant
+tryGetPlantAtPos garden pos = 
+  garden |> Dict.get pos
 
 neighbours : Pos -> List Pos 
 neighbours (x, y) = 
   [ ((x - 1), y), ((x + 1), y), (x, (y - 1)), (x, (y + 1)) ]
 
-fillLoop : Array2D Plant -> Plant -> List Pos -> (Plot, PlotSequence) -> (Plot, PlotSequence)
+fillLoop : Garden -> Plant -> List Pos -> (Plot, PlotSequence) -> (Plot, PlotSequence)
 fillLoop garden plant candidates (plot, seq) = 
   let 
     -- inside = List.filter (inGardenBounds garden) candidates
     unseen = List.filter (\p -> not <| Set.member p plot) candidates 
     verified = List.filter (\p -> plant == ((tryGetPlantAtPos garden p) |> Maybe.withDefault '?')) unseen
-    nextCandidates = verified |> List.concatMap neighbours |> Set.fromList |> Set.toList
+    nextCandidates = List.concatMap neighbours verified |> Set.fromList |> Set.toList
   in 
     if List.length nextCandidates == 0 then 
       (plot, seq)
@@ -290,7 +278,7 @@ fillLoop garden plant candidates (plot, seq) =
       in 
         fillLoop garden plant nextCandidates (nextPlot, nextSeq)
 
-fillPlot : Array2D Plant -> Pos -> Maybe (Plant, Plot, PlotSequence) 
+fillPlot : Garden -> Pos -> Maybe (Plant, Plot, PlotSequence) 
 fillPlot garden pos = 
   case tryGetPlantAtPos garden pos of 
     Nothing -> Nothing 
@@ -300,7 +288,7 @@ fillPlot garden pos =
       in 
         Just (plant, plot, seq |> List.reverse)
 
-findPlotsLoop : Array2D Plant -> List (Plant, Plot, PlotSequence) -> Set Pos -> List Pos -> List (Plant, Plot, PlotSequence) 
+findPlotsLoop : Garden -> List (Plant, Plot, PlotSequence) -> Set Pos -> List Pos -> List (Plant, Plot, PlotSequence) 
 findPlotsLoop garden plotList visited positions = 
   case positions of 
     [] -> plotList
@@ -310,18 +298,28 @@ findPlotsLoop garden plotList visited positions =
       else 
         case fillPlot garden pos of 
           Just (plant, plot, seq) -> 
-            findPlotsLoop garden ((plant, plot, seq) :: plotList) (Set.union visited plot) remaining
+            let 
+              remainingSet = remaining |> Set.fromList 
+              diffSet = Set.diff remainingSet plot
+              remainingremaining = diffSet |> Set.toList 
+            in 
+              findPlotsLoop garden ((plant, plot, seq) :: plotList) (Set.union visited plot) remainingremaining
           Nothing -> 
             []
 
-findPlots : Array2D Plant -> List (Plant, Plot, PlotSequence)
+findPlots : Garden -> List (Plant, Plot, PlotSequence)
 findPlots garden = 
-  garden |> getAllPositions |> findPlotsLoop garden [] Set.empty
+  let 
+    positions = garden |> getAllPositions --|> List.filter (\(x, y) -> y < 100)
+    -- positions = [ (0, 0) ]
+    -- positions = garden |> getAllPositions
+  in 
+    positions |> findPlotsLoop garden [] Set.empty
 
 toPlotColor : Int -> String 
 toPlotColor index = 
   let 
-    hue = (index * 71) |> modBy 255
+    hue = (index * 79) |> modBy 255
     saturation = 90
     lightness = 90
     hueStr = String.fromInt hue 
@@ -330,17 +328,22 @@ toPlotColor index =
   in 
     "hsl(" ++ hueStr ++ ", " ++ satStr ++ ", " ++ lgtStr ++ ")"
 
+getPlantColor : Plant -> String 
+getPlantColor plant = 
+  plant |> Char.toCode |> toPlotColor
+
 toPlotInfo : Int -> (Plant, Plot, PlotSequence) -> PlotInfo 
 toPlotInfo index (plant, plot, seq) = 
   let 
     totalSteps = List.length seq 
     area = Set.size plot
+    plantColor = getPlantColor plant
   in 
     { complete = plot  
     , sequence = seq
     , totalSteps = List.length seq 
     , plant = plant 
-    , color = toPlotColor index
+    , color = plantColor
     , area = area  
     , perimeter = 0 
     , perimeterDiscount = 0 
@@ -354,7 +357,9 @@ initModel dataSource =
     rows = data |> String.split "\n"
     numberOfRows = rows |> List.length 
     numberOfCols = rows |> List.head |> Maybe.withDefault "?" |> String.length 
-    garden = rows |> List.map (String.toList) |> Array2D.fromList
+    createRowTuples y rowStr = 
+      rowStr |> String.toList |> List.indexedMap (\x ch -> ((x, y), ch)) 
+    garden = rows |> List.indexedMap createRowTuples |> List.concat |> Dict.fromList
     plotList = findPlots garden 
     plotInfoList = plotList |> List.indexedMap toPlotInfo 
     maxSteps = plotInfoList |> List.map (\pi -> pi.totalSteps) |> List.maximum |> Maybe.withDefault 0
@@ -383,8 +388,6 @@ type Msg =
   | PrevStep 
   | NextStep 
   | TogglePlay 
-  | Faster 
-  | Slower 
   | Clear 
   | UseInput
   | UseSample
@@ -439,10 +442,6 @@ update msg model =
       (updatePrevStep model, Cmd.none)
     NextStep ->
       (updateNextStep model, Cmd.none)
-    Faster -> 
-      ({model | tickInterval = model.tickInterval / 2 }, Cmd.none)
-    Slower -> 
-      ({model | tickInterval = model.tickInterval * 2 }, Cmd.none)
     TogglePlay -> 
       (updateTogglePlay model, Cmd.none)
     UseInput -> 
@@ -480,8 +479,8 @@ toPlantElement plantWidth plantHeight plantStr (xInt, yInt) =
 toFilledElement : Int -> Int -> String -> Pos -> Svg Msg 
 toFilledElement plantWidth plantHeight colorStr (xInt, yInt) = 
   let 
-    xStr = String.fromInt (2 + xInt * plantWidth)
-    yStr = String.fromInt (2 + yInt * plantHeight)
+    xStr = String.fromInt ((plantWidth // 6) + xInt * plantWidth)
+    yStr = String.fromInt ((plantWidth // 6) + yInt * plantHeight)
   in 
     rect
           [ x xStr
@@ -512,8 +511,10 @@ toPlotSvgElements step plantWidth plantHeight plotInfo =
 toSvg : Model -> Html Msg 
 toSvg model = 
   let 
-    plantWidth = 12
-    plantHeight = 16  
+    (fontSize, plantWidth, plantHeight) = 
+      case model.dataSource of 
+        Input -> ("8px", 6, 8)
+        _ -> ("16px", 12, 16)
     svgWidth = (4 + plantWidth * model.colCount) |> String.fromInt 
     svgHeight = (4 + plantHeight * model.rowCount) |> String.fromInt 
     step = model.step 
@@ -521,13 +522,16 @@ toSvg model =
     elements = model.plotInfoList |> List.concatMap (toPlotSvgElements step plantWidth plantHeight)
     rects = []
     viewBoxStr = [ "0", "0", svgWidth, svgHeight ] |> String.join " "
+    fontFamilyAttr = "font-family:Source Code Pro,monospace"
+    fontSizeAttr = "font-size:" ++ fontSize
+    styles = fontFamilyAttr ++ "; " ++ fontSizeAttr 
   in 
     svg
       [ viewBox viewBoxStr
       , width svgWidth
       , height svgHeight
       -- , Svg.Attributes.style "background-color:lightgreen; font-family:Source Code Pro,monospace"
-      , Svg.Attributes.style "font-family:Source Code Pro,monospace"
+      , Svg.Attributes.style styles
       ]
       elements
 
@@ -555,11 +559,11 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center" ]
               [ 
-              --   Html.input 
-              --   [ Html.Attributes.type_ "radio", onClick UseInput, Html.Attributes.checked (model.dataSource == Input) ] 
-              --   []
-              -- , Html.label [] [ Html.text "Input" ]
-              -- , 
+                Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseInput, Html.Attributes.checked (model.dataSource == Input) ] 
+                []
+              , Html.label [] [ Html.text "Input" ]
+              , 
                 Html.input 
                 [ Html.Attributes.type_ "radio", onClick UseSample, Html.Attributes.checked (model.dataSource == Sample) ] 
                 []
@@ -601,14 +605,8 @@ view model =
                 , onClick PrevStep ] 
                 [ Html.text "Prev" ]
               , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Slower ] 
-                [ text "Slower" ]
-              , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick TogglePlay ] 
                 [ if model.paused then text "Play" else text "Pause" ] 
-              , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Faster ] 
-                [ text "Faster" ]
               , Html.button 
                 [ Html.Attributes.style "width" "80px"
                 , Html.Attributes.disabled (model.step == model.maxSteps)
