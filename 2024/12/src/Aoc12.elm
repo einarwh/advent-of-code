@@ -274,8 +274,8 @@ neighbours (x, y) =
 fillLoop : Array2D Plant -> Plant -> List Pos -> (Plot, PlotSequence) -> (Plot, PlotSequence)
 fillLoop garden plant candidates (plot, seq) = 
   let 
-    inside = List.filter (inGardenBounds garden) candidates
-    unseen = List.filter (\p -> not <| Set.member p plot) inside 
+    -- inside = List.filter (inGardenBounds garden) candidates
+    unseen = List.filter (\p -> not <| Set.member p plot) candidates 
     verified = List.filter (\p -> plant == ((tryGetPlantAtPos garden p) |> Maybe.withDefault '?')) unseen
     nextCandidates = List.concatMap neighbours verified
   in 
