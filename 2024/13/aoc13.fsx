@@ -40,28 +40,22 @@ let calculateA (m : Machine) : int64 =
 let calculateB (a : int64) (m : Machine) : int64 = 
     (m.xGoal - m.ax * a) / m.bx 
 
-let calculate1 (m : Machine) : int64 option = 
+let calculate clickConstraint (m : Machine) : int64 option = 
     let a = m |> calculateA
     let b = m |> calculateB a 
     let x = a * m.ax + b * m.bx 
     let y = a * m.ay + b * m.by
-    if a <= 100 && b <= 100 && x = m.xGoal && y = m.yGoal then 
+    if clickConstraint a && clickConstraint b && x = m.xGoal && y = m.yGoal then 
         Some (3L * a + b) 
     else 
         None 
+
+let calculate1 = calculate (fun clicks -> clicks <= 100)
+
+let calculate2 = calculate (fun _ -> true)
 
 let adjustGoals (m : Machine) : Machine = 
     { m with xGoal = m.xGoal + 10000000000000L; yGoal = m.yGoal + 10000000000000L }
-
-let calculate2 (m : Machine) : int64 option = 
-    let a = m |> calculateA
-    let b = m |> calculateB a 
-    let x = a * m.ax + b * m.bx 
-    let y = a * m.ay + b * m.by
-    if x = m.xGoal && y = m.yGoal then 
-        Some (3L * a + b) 
-    else 
-        None 
 
 let run fileName = 
     let chunks = File.ReadAllText fileName |> trim |> split "\n\n" |> Array.toList
