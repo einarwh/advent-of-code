@@ -402,15 +402,17 @@ updatePrevStep model =
   let 
     prevStep = Basics.max 0 (model.step - 1)
   in 
-    { model | step = prevStep, message = "Prev step."}
-
+    { model | step = prevStep, finished = False, message = "Prev step."}
 
 updateNextStep : Model -> Model
 updateNextStep model =
   let 
     nextStep = Basics.min model.maxSteps (model.step + 1)
+    finished = nextStep == model.maxSteps 
+    paused = model.paused || finished
+    -- paused = if model.paused then model.paused else nextStep == model.maxSteps 
   in 
-    { model | step = nextStep, message = "Next step : " ++ String.fromInt nextStep }
+    { model | step = nextStep, paused = paused, finished = finished, message = "Next step : " ++ String.fromInt nextStep }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -551,11 +553,13 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center" ]
-              [ Html.input 
-                [ Html.Attributes.type_ "radio", onClick UseInput, Html.Attributes.checked (model.dataSource == Input) ] 
-                []
-              , Html.label [] [ Html.text "Input" ]
-              , Html.input 
+              [ 
+              --   Html.input 
+              --   [ Html.Attributes.type_ "radio", onClick UseInput, Html.Attributes.checked (model.dataSource == Input) ] 
+              --   []
+              -- , Html.label [] [ Html.text "Input" ]
+              -- , 
+                Html.input 
                 [ Html.Attributes.type_ "radio", onClick UseSample, Html.Attributes.checked (model.dataSource == Sample) ] 
                 []
               , Html.label [] [ Html.text "Sample" ]
