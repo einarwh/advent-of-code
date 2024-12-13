@@ -2733,7 +2733,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		K: func(record.K),
+		L: func(record.L),
 		X: record.X,
 		S: record.S
 	}
@@ -3003,7 +3003,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.K;
+		var message = !tag ? value : tag < 3 ? value.a : value.L;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.X;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -6028,6 +6028,20 @@ var $elm$core$String$foldr = _String_foldr;
 var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
 };
+var $elm$core$Basics$modBy = _Basics_modBy;
+var $author$project$Aoc12Dict$toPlotColor = function (index) {
+	var saturation = 90;
+	var satStr = $elm$core$String$fromInt(saturation) + '%';
+	var lightness = 90;
+	var lgtStr = $elm$core$String$fromInt(lightness) + '%';
+	var hue = A2($elm$core$Basics$modBy, 255, index * 79);
+	var hueStr = $elm$core$String$fromInt(hue);
+	return 'hsl(' + (hueStr + (', ' + (satStr + (', ' + (lgtStr + ')')))));
+};
+var $author$project$Aoc12Dict$getPlantColor = function (plant) {
+	return $author$project$Aoc12Dict$toPlotColor(
+		$elm$core$Char$toCode(plant));
+};
 var $elm$core$Dict$sizeHelp = F2(
 	function (n, dict) {
 		sizeHelp:
@@ -6052,26 +6066,17 @@ var $elm$core$Set$size = function (_v0) {
 	var dict = _v0;
 	return $elm$core$Dict$size(dict);
 };
-var $elm$core$Basics$modBy = _Basics_modBy;
-var $author$project$Aoc12Dict$toPlotColor = function (index) {
-	var saturation = 90;
-	var satStr = $elm$core$String$fromInt(saturation) + '%';
-	var lightness = 90;
-	var lgtStr = $elm$core$String$fromInt(lightness) + '%';
-	var hue = A2($elm$core$Basics$modBy, 255, index * 53);
-	var hueStr = $elm$core$String$fromInt(hue);
-	return 'hsl(' + (hueStr + (', ' + (satStr + (', ' + (lgtStr + ')')))));
-};
 var $author$project$Aoc12Dict$toPlotInfo = F2(
 	function (index, _v0) {
 		var plant = _v0.a;
 		var plot = _v0.b;
 		var seq = _v0.c;
 		var totalSteps = $elm$core$List$length(seq);
+		var plantColor = $author$project$Aoc12Dict$getPlantColor(plant);
 		var area = $elm$core$Set$size(plot);
 		return {
 			aa: area,
-			N: $author$project$Aoc12Dict$toPlotColor(index),
+			N: plantColor,
 			O: plot,
 			af: 0,
 			ag: 0,
@@ -6118,7 +6123,7 @@ var $author$project$Aoc12Dict$initModel = function (dataSource) {
 					return pi.Z;
 				},
 				plotInfoList)));
-	return {M: numberOfCols, k: dataSource, D: false, F: maxSteps, K: '?', q: true, L: plotInfoList, T: numberOfRows, o: 0, Y: $author$project$Aoc12Dict$defaultTickInterval, aB: 0, aC: 0};
+	return {M: numberOfCols, k: dataSource, D: false, F: maxSteps, L: '?', q: true, G: plotInfoList, T: numberOfRows, o: 0, Y: $author$project$Aoc12Dict$defaultTickInterval, aB: 0, aC: 0};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -6405,7 +6410,7 @@ var $author$project$Aoc12Dict$updateNextStep = function (model) {
 		model,
 		{
 			D: finished,
-			K: 'Next step : ' + $elm$core$String$fromInt(nextStep),
+			L: 'Next step : ' + $elm$core$String$fromInt(nextStep),
 			q: paused,
 			o: nextStep
 		});
@@ -6414,7 +6419,7 @@ var $author$project$Aoc12Dict$updatePrevStep = function (model) {
 	var prevStep = A2($elm$core$Basics$max, 0, model.o - 1);
 	return _Utils_update(
 		model,
-		{D: false, K: 'Prev step.', o: prevStep});
+		{D: false, L: 'Prev step.', o: prevStep});
 };
 var $author$project$Aoc12Dict$updateTogglePlay = function (model) {
 	if (model.D) {
@@ -6640,12 +6645,12 @@ var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $author$project$Aoc12Dict$toSvg = function (model) {
 	var step = model.o;
 	var rects = _List_Nil;
-	var plotInfoList = model.L;
+	var plotInfoList = model.G;
 	var fontFamilyAttr = 'font-family:Source Code Pro,monospace';
 	var _v0 = function () {
 		var _v1 = model.k;
 		if (!_v1) {
-			return _Utils_Tuple3('9px', 6, 8);
+			return _Utils_Tuple3('8px', 6, 8);
 		} else {
 			return _Utils_Tuple3('16px', 12, 16);
 		}
@@ -6659,7 +6664,7 @@ var $author$project$Aoc12Dict$toSvg = function (model) {
 	var elements = A2(
 		$elm$core$List$concatMap,
 		A3($author$project$Aoc12Dict$toPlotSvgElements, step, plantWidth, plantHeight),
-		model.L);
+		model.G);
 	var svgWidth = $elm$core$String$fromInt(4 + (plantWidth * model.M));
 	var viewBoxStr = A2(
 		$elm$core$String$join,
@@ -6682,6 +6687,8 @@ var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('
 var $author$project$Aoc12Dict$view = function (model) {
 	var textFontSize = '9px';
 	var s = $author$project$Aoc12Dict$toSvg(model);
+	var message = $elm$core$String$fromInt(
+		$elm$core$List$length(model.G));
 	var elements = _List_Nil;
 	return A2(
 		$elm$html$Html$table,
@@ -6937,6 +6944,13 @@ var $author$project$Aoc12Dict$view = function (model) {
 									[
 										$elm$html$Html$text(
 										$elm$core$String$fromInt(model.o))
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(message)
 									]))
 							]))
 					])),

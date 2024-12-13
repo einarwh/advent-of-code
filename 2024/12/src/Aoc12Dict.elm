@@ -319,7 +319,7 @@ findPlots garden =
 toPlotColor : Int -> String 
 toPlotColor index = 
   let 
-    hue = (index * 53) |> modBy 255
+    hue = (index * 79) |> modBy 255
     saturation = 90
     lightness = 90
     hueStr = String.fromInt hue 
@@ -328,17 +328,22 @@ toPlotColor index =
   in 
     "hsl(" ++ hueStr ++ ", " ++ satStr ++ ", " ++ lgtStr ++ ")"
 
+getPlantColor : Plant -> String 
+getPlantColor plant = 
+  plant |> Char.toCode |> toPlotColor
+
 toPlotInfo : Int -> (Plant, Plot, PlotSequence) -> PlotInfo 
 toPlotInfo index (plant, plot, seq) = 
   let 
     totalSteps = List.length seq 
     area = Set.size plot
+    plantColor = getPlantColor plant
   in 
     { complete = plot  
     , sequence = seq
     , totalSteps = List.length seq 
     , plant = plant 
-    , color = toPlotColor index
+    , color = plantColor
     , area = area  
     , perimeter = 0 
     , perimeterDiscount = 0 
@@ -536,6 +541,7 @@ view model =
     elements = []
     textFontSize = "9px"
     s = toSvg model 
+    message = model.plotInfoList |> List.length |> String.fromInt
   in 
     Html.table 
       [ Html.Attributes.style "width" "1080px"]
@@ -617,7 +623,7 @@ view model =
               , Html.Attributes.style "width" "200px" ] 
               [ 
                 Html.div [] [ Html.text (String.fromInt model.step) ]
-              -- , Html.div [] [ Html.text model.message ]
+              , Html.div [] [ Html.text message ]
               ] ]
       , Html.tr 
           []

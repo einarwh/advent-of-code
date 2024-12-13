@@ -625,7 +625,7 @@ view model =
               , Html.Attributes.style "width" "200px" ] 
               [ 
                 Html.div [] [ Html.text (String.fromInt model.step) ]
-              , Html.div [] [ Html.text model.message ]
+              , Html.div [] [ Html.text message ]
               ] ]
       , Html.tr 
           []
