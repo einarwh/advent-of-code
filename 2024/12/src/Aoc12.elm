@@ -595,7 +595,9 @@ view model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
-                [ Html.Attributes.style "width" "80px", onClick PrevStep ] 
+                [ Html.Attributes.style "width" "80px"
+                , Html.Attributes.disabled (model.step == 0)
+                , onClick PrevStep ] 
                 [ Html.text "Prev" ]
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Slower ] 
@@ -607,7 +609,9 @@ view model =
                 [ Html.Attributes.style "width" "80px", onClick Faster ] 
                 [ text "Faster" ]
               , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick NextStep ] 
+                [ Html.Attributes.style "width" "80px"
+                , Html.Attributes.disabled (model.step == model.maxSteps)
+                , onClick NextStep ] 
                 [ Html.text "Next" ]
             ] ]
       , Html.tr 

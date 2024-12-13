@@ -2733,7 +2733,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		G: func(record.G),
+		H: func(record.H),
 		Y: record.Y,
 		T: record.T
 	}
@@ -3003,7 +3003,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.G;
+		var message = !tag ? value : tag < 3 ? value.a : value.H;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.Y;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -6194,7 +6194,7 @@ var $author$project$Aoc12$initModel = function (dataSource) {
 			'?',
 			$elm$core$List$head(rows)));
 	var numberOfRows = $elm$core$List$length(rows);
-	return {N: numberOfCols, n: dataSource, E: false, L: maxSteps, G: '?', p: true, M: plotInfoList, U: numberOfRows, t: 0, y: $author$project$Aoc12$defaultTickInterval, aB: 0, aC: 0};
+	return {N: numberOfCols, o: dataSource, E: false, G: maxSteps, H: '?', q: true, M: plotInfoList, U: numberOfRows, n: 0, y: $author$project$Aoc12$defaultTickInterval, aB: 0, aC: 0};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -6453,7 +6453,7 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc12$subscriptions = function (model) {
-	var tickSub = model.p ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = model.q ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
 		model.y,
 		function (_v0) {
@@ -6467,41 +6467,41 @@ var $author$project$Aoc12$SampleAbba = 5;
 var $author$project$Aoc12$SampleEShape = 4;
 var $author$project$Aoc12$SampleXoXo = 2;
 var $author$project$Aoc12$updateClear = function (model) {
-	return $author$project$Aoc12$initModel(model.n);
+	return $author$project$Aoc12$initModel(model.o);
 };
 var $elm$core$Basics$min = F2(
 	function (x, y) {
 		return (_Utils_cmp(x, y) < 0) ? x : y;
 	});
 var $author$project$Aoc12$updateNextStep = function (model) {
-	var nextStep = A2($elm$core$Basics$min, model.L, model.t + 1);
-	var finished = _Utils_eq(nextStep, model.L);
-	var paused = model.p || finished;
+	var nextStep = A2($elm$core$Basics$min, model.G, model.n + 1);
+	var finished = _Utils_eq(nextStep, model.G);
+	var paused = model.q || finished;
 	return _Utils_update(
 		model,
 		{
 			E: finished,
-			G: 'Next step : ' + $elm$core$String$fromInt(nextStep),
-			p: paused,
-			t: nextStep
+			H: 'Next step : ' + $elm$core$String$fromInt(nextStep),
+			q: paused,
+			n: nextStep
 		});
 };
 var $author$project$Aoc12$updatePrevStep = function (model) {
-	var prevStep = A2($elm$core$Basics$max, 0, model.t - 1);
+	var prevStep = A2($elm$core$Basics$max, 0, model.n - 1);
 	return _Utils_update(
 		model,
-		{E: false, G: 'Prev step.', t: prevStep});
+		{E: false, H: 'Prev step.', n: prevStep});
 };
 var $author$project$Aoc12$updateTogglePlay = function (model) {
 	if (model.E) {
-		var m = $author$project$Aoc12$initModel(model.n);
+		var m = $author$project$Aoc12$initModel(model.o);
 		return _Utils_update(
 			m,
-			{p: false});
+			{q: false});
 	} else {
 		return _Utils_update(
 			model,
-			{p: !model.p});
+			{q: !model.q});
 	}
 };
 var $author$project$Aoc12$update = F2(
@@ -6595,6 +6595,7 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 			$elm$json$Json$Encode$bool(bool));
 	});
 var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
+var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$label = _VirtualDom_node('label');
@@ -6705,7 +6706,7 @@ var $author$project$Aoc12$toPlotSvgElements = F4(
 	});
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $author$project$Aoc12$toSvg = function (model) {
-	var step = model.t;
+	var step = model.n;
 	var rects = _List_Nil;
 	var plotInfoList = model.M;
 	var plantWidth = 12;
@@ -6797,7 +6798,7 @@ var $author$project$Aoc12$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(8),
-										$elm$html$Html$Attributes$checked(model.n === 1)
+										$elm$html$Html$Attributes$checked(model.o === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -6813,7 +6814,7 @@ var $author$project$Aoc12$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(9),
-										$elm$html$Html$Attributes$checked(model.n === 2)
+										$elm$html$Html$Attributes$checked(model.o === 2)
 									]),
 								_List_Nil),
 								A2(
@@ -6829,7 +6830,7 @@ var $author$project$Aoc12$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(10),
-										$elm$html$Html$Attributes$checked(model.n === 3)
+										$elm$html$Html$Attributes$checked(model.o === 3)
 									]),
 								_List_Nil),
 								A2(
@@ -6845,7 +6846,7 @@ var $author$project$Aoc12$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(11),
-										$elm$html$Html$Attributes$checked(model.n === 4)
+										$elm$html$Html$Attributes$checked(model.o === 4)
 									]),
 								_List_Nil),
 								A2(
@@ -6861,7 +6862,7 @@ var $author$project$Aoc12$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(12),
-										$elm$html$Html$Attributes$checked(model.n === 5)
+										$elm$html$Html$Attributes$checked(model.o === 5)
 									]),
 								_List_Nil),
 								A2(
@@ -6919,6 +6920,7 @@ var $author$project$Aoc12$view = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Attributes$disabled(!model.n),
 										$elm$html$Html$Events$onClick(1)
 									]),
 								_List_fromArray(
@@ -6945,7 +6947,7 @@ var $author$project$Aoc12$view = function (model) {
 									]),
 								_List_fromArray(
 									[
-										model.p ? $elm$svg$Svg$text('Play') : $elm$svg$Svg$text('Pause')
+										model.q ? $elm$svg$Svg$text('Play') : $elm$svg$Svg$text('Pause')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -6963,6 +6965,8 @@ var $author$project$Aoc12$view = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Attributes$disabled(
+										_Utils_eq(model.n, model.G)),
 										$elm$html$Html$Events$onClick(2)
 									]),
 								_List_fromArray(
@@ -6994,14 +6998,14 @@ var $author$project$Aoc12$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										$elm$core$String$fromInt(model.t))
+										$elm$core$String$fromInt(model.n))
 									])),
 								A2(
 								$elm$html$Html$div,
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(model.G)
+										$elm$html$Html$text(model.H)
 									]))
 							]))
 					])),
