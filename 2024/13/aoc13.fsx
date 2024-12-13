@@ -18,14 +18,13 @@ let split (splitter : string) (input : string) = input.Split(splitter)
 
 let substring (startIndex : int) (input : string) = input.Substring(startIndex)
 
-let parseLine (s : string) : (int64 * int64) = 
+let parseLine s = 
     let parts = s |> split ": " |> Array.item 1 |> split ", " |> Array.map (substring 2 >> int64)
     match parts with 
     | [|x;y|] -> (x, y)
     | _ -> failwith "button ?"
 
-let parseMachine (s : string) : Machine = 
-    let toLines = split "\n" >> Array.toList
+let parseMachine s = 
     match s |> split "\n" with 
     | [|xLine;yLine;goalLine|] -> 
         let (ax, ay) = parseLine xLine 
@@ -34,13 +33,13 @@ let parseMachine (s : string) : Machine =
         { ax = ax; bx = bx; ay = ay; by = by; xGoal = gx; yGoal = gy }
     | _ -> failwith "machine ?"
 
-let calculateA (m : Machine) : int64 = 
+let calculateA m = 
     (m.yGoal * m.bx - m.xGoal * m.by) / (m.bx * m.ay - m.by * m.ax)
 
-let calculateB (a : int64) (m : Machine) : int64 = 
+let calculateB a m = 
     (m.xGoal - m.ax * a) / m.bx 
 
-let calculate clickConstraint (m : Machine) : int64 option = 
+let calculate clickConstraint m = 
     let a = m |> calculateA
     let b = m |> calculateB a 
     let x = a * m.ax + b * m.bx 
@@ -54,7 +53,7 @@ let calculate1 = calculate (fun clicks -> clicks <= 100)
 
 let calculate2 = calculate (fun _ -> true)
 
-let adjustGoals (m : Machine) : Machine = 
+let adjustGoals m = 
     { m with xGoal = m.xGoal + 10000000000000L; yGoal = m.yGoal + 10000000000000L }
 
 let run fileName = 
