@@ -2733,7 +2733,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		H: func(record.H),
+		L: func(record.L),
 		Y: record.Y,
 		T: record.T
 	}
@@ -3003,7 +3003,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.H;
+		var message = !tag ? value : tag < 3 ? value.a : value.L;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.Y;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -6194,7 +6194,7 @@ var $author$project$Aoc12$initModel = function (dataSource) {
 			'?',
 			$elm$core$List$head(rows)));
 	var numberOfRows = $elm$core$List$length(rows);
-	return {N: numberOfCols, o: dataSource, E: false, G: maxSteps, H: '?', q: true, M: plotInfoList, U: numberOfRows, n: 0, y: $author$project$Aoc12$defaultTickInterval, aB: 0, aC: 0};
+	return {N: numberOfCols, o: dataSource, E: false, G: maxSteps, L: '?', q: true, M: plotInfoList, U: numberOfRows, n: 0, y: $author$project$Aoc12$defaultTickInterval, aB: 0, aC: 0};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -6481,7 +6481,7 @@ var $author$project$Aoc12$updateNextStep = function (model) {
 		model,
 		{
 			E: finished,
-			H: 'Next step : ' + $elm$core$String$fromInt(nextStep),
+			L: 'Next step : ' + $elm$core$String$fromInt(nextStep),
 			q: paused,
 			n: nextStep
 		});
@@ -6490,7 +6490,7 @@ var $author$project$Aoc12$updatePrevStep = function (model) {
 	var prevStep = A2($elm$core$Basics$max, 0, model.n - 1);
 	return _Utils_update(
 		model,
-		{E: false, H: 'Prev step.', n: prevStep});
+		{E: false, L: 'Prev step.', n: prevStep});
 };
 var $author$project$Aoc12$updateTogglePlay = function (model) {
 	if (model.E) {
@@ -6999,13 +6999,6 @@ var $author$project$Aoc12$view = function (model) {
 									[
 										$elm$html$Html$text(
 										$elm$core$String$fromInt(model.n))
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(model.H)
 									]))
 							]))
 					])),
