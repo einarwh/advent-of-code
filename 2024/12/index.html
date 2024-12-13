@@ -5592,7 +5592,9 @@ var $author$project$Aoc12$fillLoop = F4(
 							A2($author$project$Aoc12$tryGetPlantAtPos, garden, p)));
 				},
 				unseen);
-			var nextCandidates = A2($elm$core$List$concatMap, $author$project$Aoc12$neighbours, verified);
+			var nextCandidates = $elm$core$Set$toList(
+				$elm$core$Set$fromList(
+					A2($elm$core$List$concatMap, $author$project$Aoc12$neighbours, verified)));
 			if (!$elm$core$List$length(nextCandidates)) {
 				return _Utils_Tuple2(plot, seq);
 			} else {
@@ -6769,7 +6771,7 @@ var $author$project$Aoc12$view = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Day 12: Garden Groups.')
+										$elm$html$Html$text('Day 12: Garden Groups')
 									]))
 							]))
 					])),

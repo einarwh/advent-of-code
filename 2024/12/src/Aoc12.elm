@@ -279,7 +279,7 @@ fillLoop garden plant candidates (plot, seq) =
     -- inside = List.filter (inGardenBounds garden) candidates
     unseen = List.filter (\p -> not <| Set.member p plot) candidates 
     verified = List.filter (\p -> plant == ((tryGetPlantAtPos garden p) |> Maybe.withDefault '?')) unseen
-    nextCandidates = List.concatMap neighbours verified
+    nextCandidates = List.concatMap neighbours verified |> Set.fromList |> Set.toList
   in 
     if List.length nextCandidates == 0 then 
       (plot, seq)
