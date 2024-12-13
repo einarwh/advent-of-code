@@ -51,15 +51,15 @@ let calculate clickConstraint m =
 
 let calculate1 = calculate (fun clicks -> clicks <= 100)
 
-let calculate2 = calculate (fun _ -> true)
-
 let adjustGoals m = 
     { m with xGoal = m.xGoal + 10000000000000L; yGoal = m.yGoal + 10000000000000L }
+
+let calculate2 = adjustGoals >> calculate (fun _ -> true)
 
 let run fileName = 
     let chunks = File.ReadAllText fileName |> trim |> split "\n\n" |> Array.toList
     let machines = chunks |> List.map parseMachine
     machines |> List.choose calculate1 |> List.sum |> printfn "%d"
-    machines |> List.choose (adjustGoals >> calculate2) |> List.sum |> printfn "%d"
+    machines |> List.choose calculate2 |> List.sum |> printfn "%d"
 
 run "input"
