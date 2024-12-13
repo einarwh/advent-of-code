@@ -14,7 +14,7 @@ import Svg.Attributes exposing (..)
 import Time
 
 defaultTickInterval : Float
-defaultTickInterval = 10
+defaultTickInterval = 100
 
 -- MAIN
 
@@ -267,26 +267,26 @@ tryGetPlantAtPos : Array2D Plant -> Pos -> Maybe Char
 tryGetPlantAtPos garden (x, y) = 
   garden |> Array2D.get y x 
 
-fillLoop : Array2D Plant -> Plant -> Pos -> (Plot, PlotSequence) -> (Plot, PlotSequence)
-fillLoop garden plant (x, y) (plot, seq) = 
-  if (x, y) |> inGardenBounds garden then 
-    if Set.member (x, y) plot then (plot, seq) 
+neighbours : Pos -> List Pos 
+neighbours (x, y) = 
+  [ ((x - 1), y), ((x + 1), y), (x, (y - 1)), (x, (y + 1)) ]
+
+fillLoop : Array2D Plant -> Plant -> List Pos -> (Plot, PlotSequence) -> (Plot, PlotSequence)
+fillLoop garden plant candidates (plot, seq) = 
+  let 
+    inside = List.filter (inGardenBounds garden) candidates
+    unseen = List.filter (\p -> not <| Set.member p plot) inside 
+    verified = List.filter (\p -> plant == ((tryGetPlantAtPos garden p) |> Maybe.withDefault '?')) unseen
+    nextCandidates = List.concatMap neighbours verified
+  in 
+    if List.length nextCandidates == 0 then 
+      (plot, seq)
     else 
-      case tryGetPlantAtPos garden (x, y) of 
-        Nothing -> (plot, seq)
-        Just plantFound -> 
-          if plantFound == plant then 
-            let 
-              nextPlot = plot |> Set.insert (x, y) 
-              nextSeq = nextPlot :: seq 
-            in 
-              (nextPlot, nextSeq)
-              |> fillLoop garden plant ((x - 1), y)
-              |> fillLoop garden plant ((x + 1), y)
-              |> fillLoop garden plant (x, (y - 1))
-              |> fillLoop garden plant (x, (y + 1))
-          else (plot, seq) 
-  else (plot, seq) 
+      let 
+        nextPlot = Set.union plot (Set.fromList verified) 
+        nextSeq = nextPlot :: seq 
+      in 
+        fillLoop garden plant nextCandidates (nextPlot, nextSeq)
 
 fillPlot : Array2D Plant -> Pos -> Maybe (Plant, Plot, PlotSequence) 
 fillPlot garden pos = 
@@ -294,7 +294,7 @@ fillPlot garden pos =
     Nothing -> Nothing 
     Just plant -> 
       let 
-        (plot, seq) = fillLoop garden plant pos (Set.empty, []) 
+        (plot, seq) = fillLoop garden plant [pos] (Set.empty, []) 
       in 
         Just (plant, plot, seq |> List.reverse)
 
@@ -304,11 +304,11 @@ findPlotsLoop garden plotList visited positions =
     [] -> plotList
     (pos :: remaining) -> 
       if visited |> Set.member pos then 
-        remaining |> findPlotsLoop garden plotList visited 
+        findPlotsLoop garden plotList visited remaining
       else 
         case fillPlot garden pos of 
           Just (plant, plot, seq) -> 
-            remaining |> findPlotsLoop garden ((plant, plot, seq) :: plotList) (Set.union visited plot)
+            findPlotsLoop garden ((plant, plot, seq) :: plotList) (Set.union visited plot) remaining
           Nothing -> 
             []
 
@@ -316,8 +316,20 @@ findPlots : Array2D Plant -> List (Plant, Plot, PlotSequence)
 findPlots garden = 
   garden |> getAllPositions |> findPlotsLoop garden [] Set.empty
 
-toPlotInfo : (Plant, Plot, PlotSequence) -> PlotInfo 
-toPlotInfo (plant, plot, seq) = 
+toPlotColor : Int -> String 
+toPlotColor index = 
+  let 
+    hue = (index * 71) |> modBy 255
+    saturation = 90
+    lightness = 90
+    hueStr = String.fromInt hue 
+    satStr = (String.fromInt saturation) ++ "%"
+    lgtStr = (String.fromInt lightness) ++ "%"
+  in 
+    "hsl(" ++ hueStr ++ ", " ++ satStr ++ ", " ++ lgtStr ++ ")"
+
+toPlotInfo : Int -> (Plant, Plot, PlotSequence) -> PlotInfo 
+toPlotInfo index (plant, plot, seq) = 
   let 
     totalSteps = List.length seq 
     area = Set.size plot
@@ -326,7 +338,7 @@ toPlotInfo (plant, plot, seq) =
     , sequence = seq
     , totalSteps = List.length seq 
     , plant = plant 
-    , color = "#FFCCDD"
+    , color = toPlotColor index
     , area = area  
     , perimeter = 0 
     , perimeterDiscount = 0 
@@ -339,7 +351,7 @@ initModel dataSource =
     data = read dataSource
     garden = data |> String.split "\n" |> List.map (String.toList) |> Array2D.fromList
     plotList = findPlots garden 
-    plotInfoList = plotList |> List.map toPlotInfo 
+    plotInfoList = plotList |> List.indexedMap toPlotInfo 
     maxSteps = plotInfoList |> List.map (\pi -> pi.totalSteps) |> List.maximum |> Maybe.withDefault 0
   in 
     { plotInfoList = plotInfoList  
@@ -454,7 +466,7 @@ toPlantElement plantWidth plantHeight plantStr (xInt, yInt) =
     xStr = String.fromInt ((plantWidth // 4) + xInt * plantWidth)
     yStr = String.fromInt (plantHeight + yInt * plantHeight)
   in 
-    Svg.text_ [ x xStr, y yStr, Svg.Attributes.style "background-color:pink" ] [ Svg.text plantStr ]
+    Svg.text_ [ x xStr, y yStr ] [ Svg.text plantStr ]
 
 toFilledElement : Int -> Int -> String -> Pos -> Svg Msg 
 toFilledElement plantWidth plantHeight colorStr (xInt, yInt) = 
@@ -474,7 +486,8 @@ toFilledElement plantWidth plantHeight colorStr (xInt, yInt) =
 toPlotSvgElements : Int -> Int -> Int -> PlotInfo -> List (Svg Msg)
 toPlotSvgElements step plantWidth plantHeight plotInfo = 
   let 
-    posList = plotInfo.complete |> Set.toList 
+    posList = plotInfo.complete |> Set.toList
+    colorStr = plotInfo.color
     plantStr = String.fromChar plotInfo.plant 
     plantElements = posList |> List.map (toPlantElement plantWidth plantHeight plantStr)
     filled = 
@@ -483,7 +496,7 @@ toPlotSvgElements step plantWidth plantHeight plotInfo =
         case plotInfo.sequence |> List.drop (step - 1) |> List.head of 
           Just plot -> plot |> Set.toList 
           Nothing -> posList
-    filledElements = filled |> List.map (toFilledElement plantWidth plantHeight "lightgreen")
+    filledElements = filled |> List.map (toFilledElement plantWidth plantHeight colorStr)
   in 
     filledElements ++ plantElements
 
