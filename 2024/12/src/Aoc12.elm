@@ -51,6 +51,8 @@ type alias PlotInfo =
 
 type alias Model = 
   { plotInfoList : List PlotInfo
+  , rowCount : Int 
+  , colCount : Int 
   , step : Int
   , maxSteps : Int
   , totalCost : Int 
@@ -349,12 +351,17 @@ initModel : DataSource -> Model
 initModel dataSource = 
   let 
     data = read dataSource
-    garden = data |> String.split "\n" |> List.map (String.toList) |> Array2D.fromList
+    rows = data |> String.split "\n"
+    numberOfRows = rows |> List.length 
+    numberOfCols = rows |> List.head |> Maybe.withDefault "?" |> String.length 
+    garden = rows |> List.map (String.toList) |> Array2D.fromList
     plotList = findPlots garden 
     plotInfoList = plotList |> List.indexedMap toPlotInfo 
     maxSteps = plotInfoList |> List.map (\pi -> pi.totalSteps) |> List.maximum |> Maybe.withDefault 0
   in 
     { plotInfoList = plotInfoList  
+    , rowCount = numberOfRows
+    , colCount = numberOfCols
     , step = 0 
     , maxSteps = maxSteps
     , totalCost = 0 
@@ -505,15 +512,18 @@ toSvg model =
   let 
     plantWidth = 12
     plantHeight = 16  
+    svgWidth = (4 + plantWidth * model.colCount) |> String.fromInt 
+    svgHeight = (4 + plantHeight * model.rowCount) |> String.fromInt 
     step = model.step 
     plotInfoList = model.plotInfoList 
     elements = model.plotInfoList |> List.concatMap (toPlotSvgElements step plantWidth plantHeight)
     rects = []
+    viewBoxStr = [ "0", "0", svgWidth, svgHeight ] |> String.join " "
   in 
     svg
-      [ viewBox "0 0 600 600"
-      , width "600"
-      , height "600"
+      [ viewBox viewBoxStr
+      , width svgWidth
+      , height svgHeight
       -- , Svg.Attributes.style "background-color:lightgreen; font-family:Source Code Pro,monospace"
       , Svg.Attributes.style "font-family:Source Code Pro,monospace"
       ]
@@ -536,7 +546,7 @@ view model =
               , Html.Attributes.style "font-size" "40px"
               , Html.Attributes.style "padding" "20px"]
               [ Html.div [] [Html.text "Advent of Code 2024" ]
-              , Html.div [] [Html.text "Day 12: Garden Groups." ] ] ]
+              , Html.div [] [Html.text "Day 12: Garden Groups" ] ] ]
       , Html.tr 
           []
           [ Html.td 
