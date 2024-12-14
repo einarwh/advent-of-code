@@ -67,22 +67,23 @@ let readLines =
     >> Array.filter (fun line -> line <> String.Empty)
     >> Array.toList
 
-let toQuadrants width height robots = 
+let toQuadrant predicate robots = 
+    robots |> List.map (fun r -> r.p) |> List.filter predicate
+
+let calculateSafetyFactor width height robots = 
     let midRow = height / 2
     let midCol = width / 2
-    let nw = robots |> List.map (fun r -> r.p) |> List.filter (fun (x, y) -> x < midCol && y < midRow) |> countPositions
-    let ne = robots |> List.map (fun r -> r.p) |> List.filter (fun (x, y) -> x > midCol && y < midRow) |> countPositions
-    let sw = robots |> List.map (fun r -> r.p) |> List.filter (fun (x, y) -> x < midCol && y > midRow) |> countPositions
-    let se = robots |> List.map (fun r -> r.p) |> List.filter (fun (x, y) -> x > midCol && y > midRow) |> countPositions
+    let nw = toQuadrant (fun (x, y) -> x < midCol && y < midRow) |> countPositions
+    let ne = toQuadrant (fun (x, y) -> x > midCol && y < midRow) |> countPositions
+    let sw = toQuadrant (fun (x, y) -> x < midCol && y > midRow) |> countPositions
+    let se = toQuadrant (fun (x, y) -> x > midCol && y > midRow) |> countPositions
     nw * ne * sw * se 
-
-
 
 let run width height fileName = 
     let lines = readLines fileName
     let robots = lines |> List.map parseRobot
     let moved = robots |> simulate width height 100
-    moved |> toQuadrants width height |> printfn "%A"
+    moved |> calculateSafetyFactor width height |> printfn "%A"
 
 run 11 7 "sample"
 run 101 103 "input"
