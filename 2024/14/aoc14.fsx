@@ -36,12 +36,21 @@ let move width height seconds robot =
 let simulate width height seconds (robots : Robot list) = 
     robots |> List.map (move width height seconds)
 
-let createRow robots width yRow = 
-    let countedRobots = 
-        robots 
-        |> List.map (fun r -> r.p) 
-        |> List.choose (fun (x, y) -> if y = yRow then Some x else None) 
+let countRobotsInRow yRow robots = 
+    robots 
+    |> List.map (fun r -> r.p) 
+    |> List.choose (fun (x, y) -> if y = yRow then Some x else None) 
+    |> List.countBy id 
+
+let countPositions (positions : Pos list) : int = 
+    let foo = 
+        positions 
         |> List.countBy id 
+        |> List.sumBy snd 
+    foo
+
+let createRow robots width yRow = 
+    let countedRobots = robots |> countRobotsInRow yRow 
     let robotMap : Map<int, int> = 
         countedRobots
         |> Map.ofList
@@ -58,38 +67,26 @@ let readLines =
     >> Array.filter (fun line -> line <> String.Empty)
     >> Array.toList
 
+let toQuadrants width height robots = 
+    let midRow = height / 2
+    let midCol = width / 2
+    let nw = robots |> List.map (fun r -> r.p) |> List.filter (fun (x, y) -> x < midCol && y < midRow) |> countPositions
+    let ne = robots |> List.map (fun r -> r.p) |> List.filter (fun (x, y) -> x > midCol && y < midRow) |> countPositions
+    let sw = robots |> List.map (fun r -> r.p) |> List.filter (fun (x, y) -> x < midCol && y > midRow) |> countPositions
+    let se = robots |> List.map (fun r -> r.p) |> List.filter (fun (x, y) -> x > midCol && y > midRow) |> countPositions
+    nw * ne * sw * se 
+
 let run fileName = 
-    // width: 11
-    // height: 7
+    let width = 11
+    let height = 7
     let lines = readLines fileName
-    // let robots = lines |> List.map parseRobot
+    let robots = lines |> List.map parseRobot
     // visualize 11 7 robots 
     // // robots |> printfn "%A"
     // printfn ""
-    // let moved = robots |> simulate 11 7 100
-    // moved |> List.map (fun r -> r.p) |> List.iter (printfn "%A")
+    let moved = robots |> simulate 11 7 100
     // visualize 11 7 moved 
-    // // moved |> List.iter (printfn "%A")
-    // let robot = { p=(2,4); v=(2,-3) }
-    let robot = parseRobot "p=2,4 v=2,-3"
-    let after seconds robots = 
-        let moved = robots |> simulate 11 7 seconds
-        moved |> List.map (fun r -> r.p) |> List.iter (printfn "%A")
-        moved |> visualize 11 7 
-    // let after seconds [ robot  = robot |> move 11 7 seconds |> visualize 11 7 
-    printfn "%A" robot
-    printfn "\nAfter 0 seconds"
-    [ robot ] |> after 0
-    printfn "\nAfter 1 seconds"
-    [ robot ] |> after 1
-    printfn "\nAfter 2 seconds"
-    [ robot ] |> after 2
-    printfn "\nAfter 3 seconds"
-    [ robot ] |> after 3
-    printfn "\nAfter 4 seconds"
-    [ robot ] |> after 4
-    printfn "\nAfter 5 seconds"
-    [ robot ] |> after 5
+    moved |> toQuadrants 11 7 |> printfn "%A"
     0 
 
 run "sample"
