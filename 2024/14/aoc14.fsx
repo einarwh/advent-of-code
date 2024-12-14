@@ -3,6 +3,7 @@
 
 open System
 open System.IO
+open System.Diagnostics
 
 type Pos = (int * int)
 
@@ -67,20 +68,75 @@ let readLines =
     >> Array.filter (fun line -> line <> String.Empty)
     >> Array.toList
 
-let toQuadrants width height robots = 
+let toQuadrant predicate robots = 
+    robots |> List.map (fun r -> r.p) |> List.filter predicate
+
+let calculateSafetyFactor width height robots = 
     let midRow = height / 2
     let midCol = width / 2
-    let nw = robots |> List.map (fun r -> r.p) |> List.filter (fun (x, y) -> x < midCol && y < midRow) |> countPositions
-    let ne = robots |> List.map (fun r -> r.p) |> List.filter (fun (x, y) -> x > midCol && y < midRow) |> countPositions
-    let sw = robots |> List.map (fun r -> r.p) |> List.filter (fun (x, y) -> x < midCol && y > midRow) |> countPositions
-    let se = robots |> List.map (fun r -> r.p) |> List.filter (fun (x, y) -> x > midCol && y > midRow) |> countPositions
+    let nw = robots |> toQuadrant (fun (x, y) -> x < midCol && y < midRow) |> countPositions
+    let ne = robots |> toQuadrant (fun (x, y) -> x > midCol && y < midRow) |> countPositions
+    let sw = robots |> toQuadrant (fun (x, y) -> x < midCol && y > midRow) |> countPositions
+    let se = robots |> toQuadrant (fun (x, y) -> x > midCol && y > midRow) |> countPositions
     nw * ne * sw * se 
 
-let run width height fileName = 
+let neighbours (x, y) = 
+  [ ((x - 1), (y - 1)); ((x, y - 1)); ((x + 1), (y - 1))
+    ((x - 1), y); ((x + 1), y)
+    ((x - 1), (y + 1)); ((x, y + 1)); ((x + 1), (y + 1)) ]
+
+let rec fill (possiblePositionsLeft : Set<Pos>) (positionsToAdd : Set<Pos>) (connected : Set<Pos>) = 
+    if Set.count positionsToAdd = 0 then 
+        (connected, possiblePositionsLeft)
+    else 
+        let nextConnected = Set.union connected positionsToAdd
+        let nextPositionsToAdd = 
+            positionsToAdd
+            |> Set.toList  
+            |> List.collect neighbours 
+            |> Set.ofList 
+            |> Set.filter (fun p -> (Set.contains p possiblePositionsLeft))
+        let possible = Set.difference possiblePositionsLeft nextPositionsToAdd
+        fill possible nextPositionsToAdd nextConnected 
+
+let fillFromPosition (positions : Set<Pos>) startPos = 
+    let positionsToAdd = Set.empty |> Set.add startPos 
+    fill positions positionsToAdd Set.empty
+
+let tryFindTree (positions : Pos list)  =
+    let rec loop posList = 
+        match posList with 
+        | [] -> None  
+        | pos :: remaining -> 
+            let possible = Set.ofList remaining
+            let (connected, updatedPossible) = fillFromPosition possible pos 
+            if Set.count connected > 50 then 
+                Some connected 
+            else 
+                let rem = updatedPossible |> Set.toList 
+                loop rem 
+    loop positions
+
+let findTree width height robots = 
+    let clock = Stopwatch.StartNew()
+    let rec loop seconds robots = 
+        if seconds > 0 && seconds % 1000 = 0 then printfn "Simulated %d 'seconds' in %d seconds" seconds ((int) clock.Elapsed.TotalSeconds)
+        let positions = robots |> List.map (fun r -> r.p)
+        match tryFindTree positions with 
+        | Some connected -> 
+            printfn "Is this a tree? After %d seconds" seconds 
+            visualize width height robots
+        | None -> 
+            let moved = simulate width height 1 robots 
+            loop (seconds + 1) moved 
+    loop 0 robots 
+
+let run width height searchForTree fileName = 
     let lines = readLines fileName
     let robots = lines |> List.map parseRobot
     let moved = robots |> simulate width height 100
-    moved |> toQuadrants width height |> printfn "%A"
+    moved |> calculateSafetyFactor width height |> printfn "%A"
+    if searchForTree then findTree width height robots 
 
-run 11 7 "sample"
-run 101 103 "input"
+run 11 7 false "sample"
+run 101 103 true "input"
