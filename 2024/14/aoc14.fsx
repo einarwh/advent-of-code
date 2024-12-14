@@ -76,17 +76,11 @@ let toQuadrants width height robots =
     let se = robots |> List.map (fun r -> r.p) |> List.filter (fun (x, y) -> x > midCol && y > midRow) |> countPositions
     nw * ne * sw * se 
 
-let run fileName = 
-    let width = 11
-    let height = 7
+let run width height fileName = 
     let lines = readLines fileName
     let robots = lines |> List.map parseRobot
-    // visualize 11 7 robots 
-    // // robots |> printfn "%A"
-    // printfn ""
-    let moved = robots |> simulate 11 7 100
-    // visualize 11 7 moved 
-    moved |> toQuadrants 11 7 |> printfn "%A"
-    0 
+    let moved = robots |> simulate width height 100
+    moved |> toQuadrants width height |> printfn "%A"
 
-run "sample"
+run 11 7 "sample"
+run 101 103 "input"
