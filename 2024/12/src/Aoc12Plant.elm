@@ -37,6 +37,12 @@ type alias Plot = Set Pos
 
 type alias PlotSequence = List Plot 
 
+type alias Line = 
+  { startPos : Pos 
+  , endPos : Pos }
+
+type Border = Vertical Line | Horizontal Line 
+
 type alias PlotInfo = 
   { complete : Plot  
   , sequence : PlotSequence
@@ -257,106 +263,68 @@ tryGetPlantAtPos : Garden -> Pos -> Maybe Plant
 tryGetPlantAtPos garden pos = 
   garden |> Dict.get pos
 
-neighbours : Pos -> List Pos 
-neighbours (x, y) = 
+getNeighbourCandidates : Pos -> List Pos 
+getNeighbourCandidates (x, y) = 
   [ ((x - 1), y), ((x + 1), y), (x, (y - 1)), (x, (y + 1)) ]
 
-fillLoop : Garden -> Plant -> List Pos -> (Plot, PlotSequence) -> (Plot, PlotSequence)
-fillLoop garden plant candidates (plot, seq) = 
+getBorders : Set Pos -> Plot -> Pos -> List Border 
+getBorders possible plot (x, y) = 
   let 
-    -- inside = List.filter (inGardenBounds garden) candidates
-    unseen = List.filter (\p -> not <| Set.member p plot) candidates 
-    verified = List.filter (\p -> plant == ((tryGetPlantAtPos garden p) |> Maybe.withDefault '?')) unseen
-    nextCandidates = List.concatMap neighbours verified |> Set.fromList |> Set.toList
+    nb = getNeighbourCandidates (x, y) 
+    notInPlot = nb |> List.filter (\p -> not (Set.member p plot))
+    borderPositions = notInPlot |> List.filter (\p -> not (Set.member p possible))
   in 
-    if List.length nextCandidates == 0 then 
-      (plot, seq)
-    else 
-      let 
-        nextPlot = Set.union plot (Set.fromList verified) 
-        nextSeq = nextPlot :: seq 
-      in 
-        fillLoop garden plant nextCandidates (nextPlot, nextSeq)
+    [ if borderPositions |> List.member (x, y - 1) then Just (Horizontal { startPos = (x, y), endPos = (x + 1, y) }) else Nothing  -- N
+    , if borderPositions |> List.member (x - 1, y) then Just (Horizontal { startPos = (x, y), endPos = (x, y + 1) }) else Nothing -- W
+    , if borderPositions |> List.member (x, y + 1) then Just (Horizontal { startPos = (x, y + 1), endPos = (x + 1, y + 1) }) else Nothing -- S
+    , if borderPositions |> List.member (x + 1, y) then Just (Horizontal { startPos = (x + 1, y), endPos = (x + 1, y + 1) }) else Nothing -- E 
+    ] |> List.filterMap identity
 
-fillPlot : Garden -> Pos -> Maybe (Plant, Plot, PlotSequence) 
-fillPlot garden pos = 
-  case tryGetPlantAtPos garden pos of 
-    Nothing -> Nothing 
-    Just plant -> 
-      let 
-        (plot, seq) = fillLoop garden plant [pos] (Set.empty, []) 
-      in 
-        Just (plant, plot, seq |> List.reverse)
-
-findPlotsLoop : Garden -> List (Plant, Plot, PlotSequence) -> Set Pos -> List Pos -> List (Plant, Plot, PlotSequence) 
-findPlotsLoop garden plotList visited positions = 
-  case positions of 
-    [] -> plotList
-    (pos :: remaining) -> 
-      if visited |> Set.member pos then 
-        findPlotsLoop garden plotList visited remaining
-      else 
-        case fillPlot garden pos of 
-          Just (plant, plot, seq) -> 
-            let 
-              remainingSet = remaining |> Set.fromList 
-              diffSet = Set.diff remainingSet plot
-              remainingremaining = diffSet |> Set.toList 
-            in 
-              findPlotsLoop garden ((plant, plot, seq) :: plotList) (Set.union visited plot) remainingremaining
-          Nothing -> 
-            []
-
-findPlots : Garden -> List (Plant, Plot, PlotSequence)
-findPlots garden = 
-  let 
-    positions = garden |> getAllPositions --|> List.filter (\(x, y) -> y < 100)
-    -- positions = [ (0, 0) ]
-    -- positions = garden |> getAllPositions
-  in 
-    positions |> findPlotsLoop garden [] Set.empty
-
-fillPlant : Set Pos -> Set Pos -> Set Pos -> List (Set Pos) -> (Set Pos, List (Set Pos), Set Pos)
-fillPlant possiblePositionsLeft positionsToAdd plot seq = 
+fillPlant : Set Pos -> Set Pos -> Plot -> List (Plot) -> List Border -> ((Plot, List (Plot), List Border), Set Pos)
+fillPlant possiblePositionsLeft positionsToAdd plot seq borders = 
   if Set.isEmpty positionsToAdd then 
-    (plot, seq, possiblePositionsLeft) 
+    ((plot, seq, borders), possiblePositionsLeft) 
   else 
     let 
       nextPlot = Set.union plot positionsToAdd
       nextSeq = nextPlot :: seq
+      positionsToAddList = positionsToAdd |> Set.toList 
       nextPositionsToAdd = 
-        positionsToAdd
-        |> Set.toList  
-        |> List.concatMap neighbours 
+        positionsToAddList
+        |> List.concatMap getNeighbourCandidates 
         |> Set.fromList 
         |> Set.filter (\p -> (Set.member p possiblePositionsLeft))
+      newBorders = 
+        positionsToAddList
+        |> List.concatMap (getBorders possiblePositionsLeft plot)
+      nextBorders = borders ++ newBorders 
       possible = Set.diff possiblePositionsLeft nextPositionsToAdd
     in 
-      fillPlant possible nextPositionsToAdd nextPlot nextSeq
+      fillPlant possible nextPositionsToAdd nextPlot nextSeq nextBorders
 
-fillPlantPlot : Set Pos -> Pos -> (Set Pos, List (Set Pos), Set Pos)
+fillPlantPlot : Set Pos -> Pos -> ((Plot, List (Plot), List Border), Set Pos)
 fillPlantPlot plantPositions startPos = 
   let 
     positionsToAdd = Set.empty |> Set.insert startPos 
   in 
-    fillPlant plantPositions positionsToAdd Set.empty []
+    fillPlant plantPositions positionsToAdd Set.empty [] []
 
-findPlantPlotsLoop : Plant -> List Pos -> List (Plant, Plot, PlotSequence) -> List (Plant, Plot, PlotSequence)
+findPlantPlotsLoop : Plant -> List Pos -> List (Plant, (Plot, PlotSequence, List Border)) -> List (Plant, (Plot, PlotSequence, List Border))
 findPlantPlotsLoop plant posList plotInfoList = 
   case posList of 
     [] -> plotInfoList 
     pos :: remaining -> 
       let 
         remSet = Set.fromList remaining
-        (plot, seq, updatedRemSet) = fillPlantPlot remSet pos 
+        ((plot, seq, borders), updatedRemSet) = fillPlantPlot remSet pos 
       in 
-        findPlantPlotsLoop plant (Set.toList updatedRemSet) ((plant, plot, seq) :: plotInfoList)
+        findPlantPlotsLoop plant (Set.toList updatedRemSet) ((plant, (plot, seq, borders)) :: plotInfoList)
 
-findPlantPlots : Plant -> List Pos -> List (Plant, Plot, PlotSequence) 
+findPlantPlots : Plant -> List Pos -> List (Plant, (Plot, PlotSequence, List Border)) 
 findPlantPlots plant posList = 
   findPlantPlotsLoop plant posList [] 
 
-findAllPlots : Garden -> List (Plant, Plot, PlotSequence) 
+findAllPlots : Garden -> List (Plant, (Plot, PlotSequence, List Border)) 
 findAllPlots garden = 
   let 
     positionsWithPlant = garden |> getAllPositions |> List.map (\pos -> (pos, tryGetPlantAtPos garden pos |> Maybe.withDefault '?'))
@@ -434,8 +402,8 @@ getPlantColor : Plant -> String
 getPlantColor plant = 
   plant |> Char.toCode |> toPlotColor
 
-toPlotInfo : Int -> (Plant, Plot, PlotSequence) -> PlotInfo 
-toPlotInfo index (plant, plot, seq) = 
+toPlotInfo : Int -> (Plant, (Plot, PlotSequence, List Border)) -> PlotInfo 
+toPlotInfo index (plant, (plot, seq, borders)) = 
   let 
     totalSteps = List.length seq 
     area = Set.size plot
