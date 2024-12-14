@@ -275,9 +275,9 @@ getBorders possible plot (x, y) =
     borderPositions = notInPlot |> List.filter (\p -> not (Set.member p possible))
   in 
     [ if borderPositions |> List.member (x, y - 1) then Just (Horizontal { startPos = (x, y), endPos = (x + 1, y) }) else Nothing  -- N
-    , if borderPositions |> List.member (x - 1, y) then Just (Horizontal { startPos = (x, y), endPos = (x, y + 1) }) else Nothing -- W
+    , if borderPositions |> List.member (x - 1, y) then Just (Vertical { startPos = (x, y), endPos = (x, y + 1) }) else Nothing -- W
     , if borderPositions |> List.member (x, y + 1) then Just (Horizontal { startPos = (x, y + 1), endPos = (x + 1, y + 1) }) else Nothing -- S
-    , if borderPositions |> List.member (x + 1, y) then Just (Horizontal { startPos = (x + 1, y), endPos = (x + 1, y + 1) }) else Nothing -- E 
+    , if borderPositions |> List.member (x + 1, y) then Just (Vertical { startPos = (x + 1, y), endPos = (x + 1, y + 1) }) else Nothing -- E 
     ] |> List.filterMap identity
 
 fillPlant : Set Pos -> Set Pos -> Plot -> List (Plot) -> List Border -> ((Plot, List (Plot), List Border), Set Pos)
@@ -411,6 +411,27 @@ distinct lst =
       if List.member h t then distinct t 
       else h :: distinct t 
 
+areConnectedLines : Line -> Line -> Bool
+areConnectedLines v h = 
+  v.startPos == h.startPos || v.startPos == h.endPos || v.endPos == h.startPos || v.endPos == h.endPos
+
+countCorners : List Border -> Int 
+countCorners borders = 
+  let 
+    asVertical border = 
+      case border of 
+        Vertical b -> Just b 
+        _ -> Nothing 
+    asHorizontal border = 
+      case border of 
+        Horizontal b -> Just b 
+        _ -> Nothing 
+    verticals = borders |> List.filterMap (asVertical)
+    horizontals = borders |> List.filterMap (asHorizontal)
+    corners = verticals |> List.filter (\v -> horizontals |> List.any (\h -> areConnectedLines v h)) 
+  in 
+    corners |> List.length 
+
 toPlotInfo : Int -> (Plant, (Plot, PlotSequence, List Border)) -> PlotInfo 
 toPlotInfo index (plant, (plot, seq, borders)) = 
   let 
@@ -419,6 +440,7 @@ toPlotInfo index (plant, (plot, seq, borders)) =
     plantColor = getPlantColor plant
     distinctBorders = distinct borders
     perimeter = List.length distinctBorders
+    sections = countCorners distinctBorders
   in 
     { complete = plot  
     , sequence = seq |> List.reverse
@@ -427,9 +449,9 @@ toPlotInfo index (plant, (plot, seq, borders)) =
     , color = plantColor
     , area = area  
     , perimeter = perimeter
-    , perimeterDiscount = 0 
+    , perimeterDiscount = sections
     , fenceCost = area * perimeter  
-    , fenceCostDiscount = 0 }
+    , fenceCostDiscount = area * sections }
 
 initModel : DataSource -> Model 
 initModel dataSource = 
@@ -445,6 +467,7 @@ initModel dataSource =
     plotInfoList = plotList |> List.indexedMap toPlotInfo 
     maxSteps = plotInfoList |> List.map (\pi -> pi.totalSteps) |> List.maximum |> Maybe.withDefault 0
     totalCost = plotInfoList |> List.map (\pi -> pi.fenceCost) |> List.sum 
+    totalCostDiscount = plotInfoList |> List.map (\pi -> pi.fenceCostDiscount) |> List.sum 
   in 
     { plotInfoList = plotInfoList  
     , rowCount = numberOfRows
@@ -452,7 +475,7 @@ initModel dataSource =
     , step = 0 
     , maxSteps = maxSteps
     , totalCost = totalCost 
-    , totalCostDiscount = 0  
+    , totalCostDiscount = totalCostDiscount  
     , dataSource = dataSource
     , paused = True
     , finished = False  
@@ -706,7 +729,9 @@ view model =
               [ 
                 Html.div [] [ Html.text ("Step number: " ++ String.fromInt model.step) ]
               , Html.div [] [ Html.text ("Number of plots: " ++ String.fromInt numberOfPlots) ]
+              -- , Html.div [] [ Html.text ("Perimeters: " ++ String.fromInt model.totalCost) ]
               , Html.div [] [ Html.text ("Fence cost: " ++ String.fromInt model.totalCost) ]
+              , Html.div [] [ Html.text ("Bulk cost: " ++ String.fromInt model.totalCostDiscount) ]
               ] ]
       , Html.tr 
           []
