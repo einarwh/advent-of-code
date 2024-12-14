@@ -402,12 +402,22 @@ getPlantColor : Plant -> String
 getPlantColor plant = 
   plant |> Char.toCode |> toPlotColor
 
+distinct : List a -> List a 
+distinct lst = 
+  case lst of 
+    [] -> []
+    h :: t -> 
+      if List.member h t then distinct t 
+      else h :: distinct t 
+
 toPlotInfo : Int -> (Plant, (Plot, PlotSequence, List Border)) -> PlotInfo 
 toPlotInfo index (plant, (plot, seq, borders)) = 
   let 
     totalSteps = List.length seq 
     area = Set.size plot
     plantColor = getPlantColor plant
+    distinctBorders = distinct borders
+    perimeter = List.length distinctBorders
   in 
     { complete = plot  
     , sequence = seq |> List.reverse
@@ -415,9 +425,9 @@ toPlotInfo index (plant, (plot, seq, borders)) =
     , plant = plant 
     , color = plantColor
     , area = area  
-    , perimeter = 0 
+    , perimeter = perimeter
     , perimeterDiscount = 0 
-    , fenceCost = 0  
+    , fenceCost = area * perimeter  
     , fenceCostDiscount = 0 }
 
 initModel : DataSource -> Model 
@@ -433,13 +443,14 @@ initModel dataSource =
     plotList = findAllPlots garden 
     plotInfoList = plotList |> List.indexedMap toPlotInfo 
     maxSteps = plotInfoList |> List.map (\pi -> pi.totalSteps) |> List.maximum |> Maybe.withDefault 0
+    totalCost = plotInfoList |> List.map (\pi -> pi.fenceCost) |> List.sum 
   in 
     { plotInfoList = plotInfoList  
     , rowCount = numberOfRows
     , colCount = numberOfCols
     , step = 0 
     , maxSteps = maxSteps
-    , totalCost = 0 
+    , totalCost = totalCost 
     , totalCostDiscount = 0  
     , dataSource = dataSource
     , paused = True
@@ -611,7 +622,7 @@ view model =
     elements = []
     textFontSize = "9px"
     s = toSvg model 
-    message = model.plotInfoList |> List.length |> String.fromInt
+    numberOfPlots = model.plotInfoList |> List.length
   in 
     Html.table 
       [ Html.Attributes.style "width" "1080px"]
@@ -692,8 +703,9 @@ view model =
               , Html.Attributes.style "font-size" "24px"
               , Html.Attributes.style "width" "200px" ] 
               [ 
-                Html.div [] [ Html.text (String.fromInt model.step) ]
-              , Html.div [] [ Html.text message ]
+                Html.div [] [ Html.text ("Step number: " ++ String.fromInt model.step) ]
+              , Html.div [] [ Html.text ("Number of plots: " ++ String.fromInt numberOfPlots) ]
+              , Html.div [] [ Html.text ("Fence cost: " ++ String.fromInt model.totalCost) ]
               ] ]
       , Html.tr 
           []

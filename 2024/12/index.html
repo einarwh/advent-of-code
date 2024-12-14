@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.Y.F === region.af.F)
+	if (region.Z.F === region.ah.F)
 	{
-		return 'on line ' + region.Y.F;
+		return 'on line ' + region.Z.F;
 	}
-	return 'on lines ' + region.Y.F + ' through ' + region.af.F;
+	return 'on lines ' + region.Z.F + ' through ' + region.ah.F;
 }
 
 
@@ -2734,8 +2734,8 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
 		N: func(record.N),
-		Z: record.Z,
-		U: record.U
+		_: record._,
+		V: record.V
 	}
 });
 
@@ -3004,10 +3004,10 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 
 		var value = result.a;
 		var message = !tag ? value : tag < 3 ? value.a : value.N;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.Z;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value._;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.U) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.V) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3997,7 +3997,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 		impl.a_,
 		impl.aY,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.X && impl.X(sendToApp)
+			var divertHrefToApp = impl.Y && impl.Y(sendToApp)
 			var view = impl.a$;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
@@ -4072,7 +4072,7 @@ function _Browser_application(impl)
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		X: function(sendToApp)
+		Y: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4088,9 +4088,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.aw === next.aw
-							&& curr.al === next.al
-							&& curr.at.a === next.at.a
+							&& curr.ax === next.ax
+							&& curr.am === next.am
+							&& curr.au.a === next.au.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4261,12 +4261,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		aA: _Browser_getScene(),
+		aB: _Browser_getScene(),
 		aF: {
 			aH: _Browser_window.pageXOffset,
 			aI: _Browser_window.pageYOffset,
 			aG: _Browser_doc.documentElement.clientWidth,
-			ak: _Browser_doc.documentElement.clientHeight
+			al: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4277,7 +4277,7 @@ function _Browser_getScene()
 	var elem = _Browser_doc.documentElement;
 	return {
 		aG: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		ak: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		al: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4300,15 +4300,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			aA: {
+			aB: {
 				aG: node.scrollWidth,
-				ak: node.scrollHeight
+				al: node.scrollHeight
 			},
 			aF: {
 				aH: node.scrollLeft,
 				aI: node.scrollTop,
 				aG: node.clientWidth,
-				ak: node.clientHeight
+				al: node.clientHeight
 			}
 		};
 	});
@@ -4338,18 +4338,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			aA: _Browser_getScene(),
+			aB: _Browser_getScene(),
 			aF: {
 				aH: x,
 				aI: y,
 				aG: _Browser_doc.documentElement.clientWidth,
-				ak: _Browser_doc.documentElement.clientHeight
+				al: _Browser_doc.documentElement.clientHeight
 			},
 			aO: {
 				aH: x + rect.left,
 				aI: y + rect.top,
 				aG: rect.width,
-				ak: rect.height
+				al: rect.height
 			}
 		};
 	});
@@ -4934,7 +4934,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {aj: fragment, al: host, ap: path, at: port_, aw: protocol, ax: query};
+		return {ak: fragment, am: host, aq: path, au: port_, ax: protocol, ay: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -6185,9 +6185,33 @@ var $author$project$Aoc12Plant$read = function (dataSource) {
 			return $author$project$Aoc12Plant$sampleXoXo;
 	}
 };
+var $elm$core$List$sum = function (numbers) {
+	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
+};
 var $elm$core$String$foldr = _String_foldr;
 var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
+};
+var $author$project$Aoc12Plant$distinct = function (lst) {
+	distinct:
+	while (true) {
+		if (!lst.b) {
+			return _List_Nil;
+		} else {
+			var h = lst.a;
+			var t = lst.b;
+			if (A2($elm$core$List$member, h, t)) {
+				var $temp$lst = t;
+				lst = $temp$lst;
+				continue distinct;
+			} else {
+				return A2(
+					$elm$core$List$cons,
+					h,
+					$author$project$Aoc12Plant$distinct(t));
+			}
+		}
+	}
 };
 var $elm$core$Basics$modBy = _Basics_modBy;
 var $author$project$Aoc12Plant$toPlotColor = function (index) {
@@ -6236,18 +6260,20 @@ var $author$project$Aoc12Plant$toPlotInfo = F2(
 		var borders = _v1.c;
 		var totalSteps = $elm$core$List$length(seq);
 		var plantColor = $author$project$Aoc12Plant$getPlantColor(plant);
+		var distinctBorders = $author$project$Aoc12Plant$distinct(borders);
+		var perimeter = $elm$core$List$length(distinctBorders);
 		var area = $elm$core$Set$size(plot);
 		return {
-			ac: area,
+			ae: area,
 			P: plantColor,
 			Q: plot,
-			ah: 0,
-			ai: 0,
-			aq: 0,
-			ar: 0,
-			T: plant,
-			W: $elm$core$List$reverse(seq),
-			aa: $elm$core$List$length(seq)
+			R: area * perimeter,
+			aj: 0,
+			ar: perimeter,
+			as: 0,
+			U: plant,
+			X: $elm$core$List$reverse(seq),
+			ac: $elm$core$List$length(seq)
 		};
 	});
 var $author$project$Aoc12Plant$initModel = function (dataSource) {
@@ -6283,10 +6309,17 @@ var $author$project$Aoc12Plant$initModel = function (dataSource) {
 			A2(
 				$elm$core$List$map,
 				function (pi) {
-					return pi.aa;
+					return pi.ac;
 				},
 				plotInfoList)));
-	return {O: numberOfCols, k: dataSource, E: false, G: maxSteps, N: '?', q: true, H: plotInfoList, V: numberOfRows, o: 0, _: $author$project$Aoc12Plant$defaultTickInterval, aD: 0, aE: 0};
+	var totalCost = $elm$core$List$sum(
+		A2(
+			$elm$core$List$map,
+			function (pi) {
+				return pi.R;
+			},
+			plotInfoList));
+	return {O: numberOfCols, k: dataSource, E: false, G: maxSteps, N: '?', q: true, H: plotInfoList, W: numberOfRows, o: 0, aa: $author$project$Aoc12Plant$defaultTickInterval, ab: totalCost, aE: 0};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -6302,7 +6335,7 @@ var $elm$time$Time$Every = F2(
 	});
 var $elm$time$Time$State = F2(
 	function (taggers, processes) {
-		return {av: processes, aC: taggers};
+		return {aw: processes, aD: taggers};
 	});
 var $elm$time$Time$init = $elm$core$Task$succeed(
 	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
@@ -6427,7 +6460,7 @@ var $elm$time$Time$spawnHelp = F3(
 	});
 var $elm$time$Time$onEffects = F3(
 	function (router, subs, _v0) {
-		var processes = _v0.av;
+		var processes = _v0.aw;
 		var rightStep = F3(
 			function (_v6, id, _v7) {
 				var spawns = _v7.a;
@@ -6496,7 +6529,7 @@ var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
 var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $elm$time$Time$onSelfMsg = F3(
 	function (router, interval, state) {
-		var _v0 = A2($elm$core$Dict$get, interval, state.aC);
+		var _v0 = A2($elm$core$Dict$get, interval, state.aD);
 		if (_v0.$ === 1) {
 			return $elm$core$Task$succeed(state);
 		} else {
@@ -6547,7 +6580,7 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc12Plant$subscriptions = function (model) {
 	var tickSub = model.q ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model._,
+		model.aa,
 		function (_v0) {
 			return 0;
 		});
@@ -6778,7 +6811,7 @@ var $author$project$Aoc12Plant$toPlantElement = F4(
 var $author$project$Aoc12Plant$toPlotSvgElements = F4(
 	function (step, plantWidth, plantHeight, plotInfo) {
 		var posList = $elm$core$Set$toList(plotInfo.Q);
-		var plantStr = $elm$core$String$fromChar(plotInfo.T);
+		var plantStr = $elm$core$String$fromChar(plotInfo.U);
 		var plantElements = A2(
 			$elm$core$List$map,
 			A3($author$project$Aoc12Plant$toPlantElement, plantWidth, plantHeight, plantStr),
@@ -6788,7 +6821,7 @@ var $author$project$Aoc12Plant$toPlotSvgElements = F4(
 				return _List_Nil;
 			} else {
 				var _v0 = $elm$core$List$head(
-					A2($elm$core$List$drop, step - 1, plotInfo.W));
+					A2($elm$core$List$drop, step - 1, plotInfo.X));
 				if (!_v0.$) {
 					var plot = _v0.a;
 					return $elm$core$Set$toList(plot);
@@ -6823,7 +6856,7 @@ var $author$project$Aoc12Plant$toSvg = function (model) {
 	var plantHeight = _v0.c;
 	var fontSizeAttr = 'font-size:' + fontSize;
 	var styles = fontFamilyAttr + ('; ' + fontSizeAttr);
-	var svgHeight = $elm$core$String$fromInt(4 + (plantHeight * model.V));
+	var svgHeight = $elm$core$String$fromInt(4 + (plantHeight * model.W));
 	var elements = A2(
 		$elm$core$List$concatMap,
 		A3($author$project$Aoc12Plant$toPlotSvgElements, step, plantWidth, plantHeight),
@@ -6850,8 +6883,7 @@ var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('
 var $author$project$Aoc12Plant$view = function (model) {
 	var textFontSize = '9px';
 	var s = $author$project$Aoc12Plant$toSvg(model);
-	var message = $elm$core$String$fromInt(
-		$elm$core$List$length(model.H));
+	var numberOfPlots = $elm$core$List$length(model.H);
 	var elements = _List_Nil;
 	return A2(
 		$elm$html$Html$table,
@@ -7106,14 +7138,23 @@ var $author$project$Aoc12Plant$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										$elm$core$String$fromInt(model.o))
+										'Step number: ' + $elm$core$String$fromInt(model.o))
 									])),
 								A2(
 								$elm$html$Html$div,
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(message)
+										$elm$html$Html$text(
+										'Number of plots: ' + $elm$core$String$fromInt(numberOfPlots))
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(
+										'Fence cost: ' + $elm$core$String$fromInt(model.ab))
 									]))
 							]))
 					])),
