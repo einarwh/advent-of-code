@@ -124,7 +124,7 @@ let findTree width height robots =
         let positions = robots |> List.map (fun r -> r.p)
         match tryFindTree positions with 
         | Some connected -> 
-            printfn "Is this a tree? After %d seconds" seconds 
+            printfn "Is this a tree? After %d 'seconds'." seconds 
             visualize width height robots
         | None -> 
             let moved = simulate width height 1 robots 
