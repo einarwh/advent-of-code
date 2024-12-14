@@ -3,6 +3,7 @@
 
 open System
 open System.IO
+open System.Diagnostics
 
 type Pos = (int * int)
 
@@ -79,74 +80,63 @@ let calculateSafetyFactor width height robots =
     let se = robots |> toQuadrant (fun (x, y) -> x > midCol && y > midRow) |> countPositions
     nw * ne * sw * se 
 
-let mirrorX width quadrant =
-    quadrant |> List.map (fun (x, y) -> (width - 1 - x, y))
+let neighbours (x, y) = 
+  [ ((x - 1), (y - 1)); ((x, y - 1)); ((x + 1), (y - 1))
+    ((x - 1), y); ((x + 1), y)
+    ((x - 1), (y + 1)); ((x, y + 1)); ((x + 1), (y + 1)) ]
 
-let mirrorY height quadrant =
-    quadrant |> List.map (fun (x, y) -> (x, height - 1 - y))
-
-let isSymmetricX width height nw ne sw se = 
-    // printfn "NW: %A" nw 
-    // printfn "NE: %A" ne
-    // printfn "MIRROR NW: %A" (mirrorX width nw)
-    (mirrorX width nw) = ne || (mirrorX width sw) = se 
-
-let isSymmetricY width height nw ne sw se = 
-    (mirrorY height sw) = nw || (mirrorX height se) = ne 
-
-let isSymmetric width height nw ne sw se = 
-    isSymmetricX width height nw ne sw se || isSymmetricY width height nw ne sw se
-
-let rec findSymmetry width height robots = 
-    let midRow = height / 2
-    let midCol = width / 2
-    let nw = robots |> toQuadrant (fun (x, y) -> x < midCol && y < midRow)
-    let ne = robots |> toQuadrant (fun (x, y) -> x > midCol && y < midRow)
-    let sw = robots |> toQuadrant (fun (x, y) -> x < midCol && y > midRow)
-    let se = robots |> toQuadrant (fun (x, y) -> x > midCol && y > midRow)
-    if isSymmetric width height nw ne sw se then 
-        robots 
+let rec fill (possiblePositionsLeft : Set<Pos>) (positionsToAdd : Set<Pos>) (connected : Set<Pos>) = 
+    if Set.count positionsToAdd = 0 then 
+        (connected, possiblePositionsLeft)
     else 
-        let moved = robots |> List.map (move width height 1)
-        findSymmetry width height moved 
+        let nextConnected = Set.union connected positionsToAdd
+        let nextPositionsToAdd = 
+            positionsToAdd
+            |> Set.toList  
+            |> List.collect neighbours 
+            |> Set.ofList 
+            |> Set.filter (fun p -> (Set.contains p possiblePositionsLeft))
+        let possible = Set.difference possiblePositionsLeft nextPositionsToAdd
+        fill possible nextPositionsToAdd nextConnected 
 
-let checkSymmetry width height positions = 
-    let midRow = height / 2
-    let midCol = width / 2
-    let fakeRobots = positions |> List.map (fun p -> { p = p; v = p })
-    let nw = fakeRobots |> toQuadrant (fun (x, y) -> x < midCol && y < midRow)
-    let ne = fakeRobots |> toQuadrant (fun (x, y) -> x > midCol && y < midRow)
-    let sw = fakeRobots |> toQuadrant (fun (x, y) -> x < midCol && y > midRow)
-    let se = fakeRobots |> toQuadrant (fun (x, y) -> x > midCol && y > midRow)
-    let sym = isSymmetric width height nw ne sw se
-    // let symmetric = findSymmetry width height robots
-    printfn "symmetric? %b" sym
+let fillFromPosition (positions : Set<Pos>) startPos = 
+    let positionsToAdd = Set.empty |> Set.add startPos 
+    fill positions positionsToAdd Set.empty
 
-let run width height fileName = 
+let tryFindTree (positions : Pos list)  =
+    let rec loop posList = 
+        match posList with 
+        | [] -> None  
+        | pos :: remaining -> 
+            let possible = Set.ofList remaining
+            let (connected, updatedPossible) = fillFromPosition possible pos 
+            if Set.count connected > 50 then 
+                Some connected 
+            else 
+                let rem = updatedPossible |> Set.toList 
+                loop rem 
+    loop positions
+
+let findTree width height robots = 
+    let clock = Stopwatch.StartNew()
+    let rec loop seconds robots = 
+        if seconds > 0 && seconds % 1000 = 0 then printfn "Simulated %d 'seconds' in %d seconds" seconds ((int) clock.Elapsed.TotalSeconds)
+        let positions = robots |> List.map (fun r -> r.p)
+        match tryFindTree positions with 
+        | Some connected -> 
+            printfn "Is this a tree? After %d seconds" seconds 
+            visualize width height robots
+        | None -> 
+            let moved = simulate width height 1 robots 
+            loop (seconds + 1) moved 
+    loop 0 robots 
+
+let run width height searchForTree fileName = 
     let lines = readLines fileName
     let robots = lines |> List.map parseRobot
     let moved = robots |> simulate width height 100
     moved |> calculateSafetyFactor width height |> printfn "%A"
-    let positions1 = 
-        [ (0, 2); (10, 2)
-          (1, 6); (9, 6)
-          (3, 5); (7, 5)
-          (4, 5); (6, 5)
-          (4, 5); (6, 5) ]
-    checkSymmetry 11 7 positions1
+    if searchForTree then findTree width height robots 
 
-    let positions2 = 
-        [ (1, 0); (1, 6)
-          (3, 1); (3, 5)
-          (4, 1); (4, 5)
-          (4, 1); (4, 5)
-          (6, 0); (6, 6)
-        ]
-    checkSymmetry 11 7 positions2
-
-    let symmetric = findSymmetry width height robots
-    visualize width height symmetric
-    0
-
-// run 11 7 "sample"
-run 101 103 "input"
+run 11 7 false "sample"
+run 101 103 true "input"
