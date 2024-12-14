@@ -30,7 +30,7 @@ let parseRobot s =
 let move width height seconds robot = 
     let (x, y) = robot.p 
     let (vx, vy) = robot.v 
-    let (x', y') = ((x + x * seconds) % width, (y + y * seconds) % height)
+    let (x', y') = ((x + (vx + width) * seconds) % width, (y + (height + vy) * seconds) % height)
     { robot with p = (x', y') }
 
 let simulate width height seconds (robots : Robot list) = 
@@ -62,18 +62,34 @@ let run fileName =
     // width: 11
     // height: 7
     let lines = readLines fileName
-    let robots = lines |> List.map parseRobot
-    visualize 11 7 robots 
-    // robots |> printfn "%A"
+    // let robots = lines |> List.map parseRobot
+    // visualize 11 7 robots 
+    // // robots |> printfn "%A"
+    // printfn ""
     // let moved = robots |> simulate 11 7 100
-    // moved |> List.iter (printfn "%A")
+    // moved |> List.map (fun r -> r.p) |> List.iter (printfn "%A")
+    // visualize 11 7 moved 
+    // // moved |> List.iter (printfn "%A")
     // let robot = { p=(2,4); v=(2,-3) }
-    // robot |> (fun r -> r.p) |> printfn "0s : %A" 
-    // robot |> move 11 7 1 |> (fun r -> r.p) |> printfn "1s : %A"
-    // robot |> move 11 7 2 |> (fun r -> r.p) |> printfn "2s : %A"
-    // robot |> move 11 7 3 |> (fun r -> r.p) |> printfn "3s : %A"
-    // robot |> move 11 7 4 |> (fun r -> r.p) |> printfn "4s : %A"
-    // robot |> move 11 7 5 |> (fun r -> r.p) |> printfn "5s : %A"
+    let robot = parseRobot "p=2,4 v=2,-3"
+    let after seconds robots = 
+        let moved = robots |> simulate 11 7 seconds
+        moved |> List.map (fun r -> r.p) |> List.iter (printfn "%A")
+        moved |> visualize 11 7 
+    // let after seconds [ robot  = robot |> move 11 7 seconds |> visualize 11 7 
+    printfn "%A" robot
+    printfn "\nAfter 0 seconds"
+    [ robot ] |> after 0
+    printfn "\nAfter 1 seconds"
+    [ robot ] |> after 1
+    printfn "\nAfter 2 seconds"
+    [ robot ] |> after 2
+    printfn "\nAfter 3 seconds"
+    [ robot ] |> after 3
+    printfn "\nAfter 4 seconds"
+    [ robot ] |> after 4
+    printfn "\nAfter 5 seconds"
+    [ robot ] |> after 5
     0 
 
 run "sample"
