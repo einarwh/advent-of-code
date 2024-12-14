@@ -110,7 +110,7 @@ let tryFindTree (positions : Pos list)  =
         | pos :: remaining -> 
             let possible = Set.ofList remaining
             let (connected, updatedPossible) = fillFromPosition possible pos 
-            if Set.count connected > 50 then 
+            if Set.count connected > 100 then 
                 Some connected 
             else 
                 let rem = updatedPossible |> Set.toList 
@@ -120,7 +120,7 @@ let tryFindTree (positions : Pos list)  =
 let findTree width height robots = 
     let clock = Stopwatch.StartNew()
     let rec loop seconds robots = 
-        if seconds > 0 && seconds % 1000 = 0 then printfn "Simulated %d 'seconds' in %d seconds" seconds ((int) clock.Elapsed.TotalSeconds)
+        if seconds > 0 && seconds % 100 = 0 then printfn "Simulated %d 'seconds' in %d seconds" seconds ((int) clock.Elapsed.TotalSeconds)
         let positions = robots |> List.map (fun r -> r.p)
         match tryFindTree positions with 
         | Some connected -> 
@@ -138,5 +138,6 @@ let run width height searchForTree fileName =
     moved |> calculateSafetyFactor width height |> printfn "%A"
     if searchForTree then findTree width height robots 
 
-run 11 7 false "sample"
-run 101 103 true "input"
+// run 11 7 false "sample"
+// run 101 103 true "input"
+run 101 103 true "not-a-tree.txt"
