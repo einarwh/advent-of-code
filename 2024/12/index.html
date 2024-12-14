@@ -6219,7 +6219,7 @@ var $author$project$Aoc12Plant$toPlotColor = function (index) {
 	var satStr = $elm$core$String$fromInt(saturation) + '%';
 	var lightness = 90;
 	var lgtStr = $elm$core$String$fromInt(lightness) + '%';
-	var hue = A2($elm$core$Basics$modBy, 255, index * 79);
+	var hue = A2($elm$core$Basics$modBy, 255, index * 11);
 	var hueStr = $elm$core$String$fromInt(hue);
 	return 'hsl(' + (hueStr + (', ' + (satStr + (', ' + (lgtStr + ')')))));
 };

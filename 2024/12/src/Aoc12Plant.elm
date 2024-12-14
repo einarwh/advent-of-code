@@ -389,7 +389,8 @@ findAllPlots garden =
 toPlotColor : Int -> String 
 toPlotColor index = 
   let 
-    hue = (index * 79) |> modBy 255
+    -- hue = (index * 79) |> modBy 255
+    hue = (index * 11) |> modBy 255
     saturation = 90
     lightness = 90
     hueStr = String.fromInt hue 
