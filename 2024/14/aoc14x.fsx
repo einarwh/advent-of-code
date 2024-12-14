@@ -80,18 +80,27 @@ let calculateSafetyFactor width height robots =
     nw * ne * sw * se 
 
 let mirrorX width quadrant =
-    quadrant |> List.map (fun (x, y) -> (width - x, y))
+    quadrant |> List.map (fun (x, y) -> (width - 1 - x, y))
 
 let mirrorY height quadrant =
-    quadrant |> List.map (fun (x, y) -> (x, height - y))
+    quadrant |> List.map (fun (x, y) -> (x, height - 1 - y))
 
 let isSymmetricX width height nw ne sw se = 
-    (mirrorX width ne) = nw && (mirrorX width se) = sw 
+    // printfn "NW: %A" nw 
+    // printfn "NE: %A" ne
+    // printfn "MIRROR NW: %A" (mirrorX width nw)
+    (mirrorX width nw) = ne && (mirrorX width sw) = se 
 
 let isSymmetricY width height nw ne sw se = 
     (mirrorY height sw) = nw && (mirrorX height se) = ne 
 
 let isSymmetric width height nw ne sw se = 
+    // printfn "%A" nw 
+    // printfn "%A" ne 
+    // printfn "%A" sw 
+    // printfn "%A" se 
+
+
     isSymmetricX width height nw ne sw se || isSymmetricY width height nw ne sw se
 
 let rec findSymmetry width height robots = 
@@ -112,6 +121,20 @@ let run width height fileName =
     let robots = lines |> List.map parseRobot
     let moved = robots |> simulate width height 100
     moved |> calculateSafetyFactor width height |> printfn "%A"
+    let positions = 
+        [ (0, 2); (10, 2)
+          (1, 6); (9, 6)
+          (3, 5); (7, 5)
+          (4, 5); (6, 5)
+          (4, 5); (6, 5) ]
+    let fakeRobots = positions |> List.map (fun p -> { p = p; v = p })
+    let midRow = height / 2
+    let midCol = width / 2
+    let nw = fakeRobots |> toQuadrant (fun (x, y) -> x < midCol && y < midRow)
+    let ne = fakeRobots |> toQuadrant (fun (x, y) -> x > midCol && y < midRow)
+    let sw = fakeRobots |> toQuadrant (fun (x, y) -> x < midCol && y > midRow)
+    let se = fakeRobots |> toQuadrant (fun (x, y) -> x > midCol && y > midRow)
+    isSymmetric width height nw ne sw se |> printfn "%A"
     let symmetric = findSymmetry width height robots
     visualize width height symmetric
     0
