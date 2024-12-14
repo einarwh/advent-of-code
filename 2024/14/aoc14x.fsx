@@ -73,17 +73,48 @@ let toQuadrant predicate robots =
 let calculateSafetyFactor width height robots = 
     let midRow = height / 2
     let midCol = width / 2
-    let nw = toQuadrant (fun (x, y) -> x < midCol && y < midRow) |> countPositions
-    let ne = toQuadrant (fun (x, y) -> x > midCol && y < midRow) |> countPositions
-    let sw = toQuadrant (fun (x, y) -> x < midCol && y > midRow) |> countPositions
-    let se = toQuadrant (fun (x, y) -> x > midCol && y > midRow) |> countPositions
+    let nw = robots |> toQuadrant (fun (x, y) -> x < midCol && y < midRow) |> countPositions
+    let ne = robots |> toQuadrant (fun (x, y) -> x > midCol && y < midRow) |> countPositions
+    let sw = robots |> toQuadrant (fun (x, y) -> x < midCol && y > midRow) |> countPositions
+    let se = robots |> toQuadrant (fun (x, y) -> x > midCol && y > midRow) |> countPositions
     nw * ne * sw * se 
+
+let mirrorX width quadrant =
+    quadrant |> List.map (fun (x, y) -> (width - x, y))
+
+let mirrorY height quadrant =
+    quadrant |> List.map (fun (x, y) -> (x, height - y))
+
+let isSymmetricX width height nw ne sw se = 
+    (mirrorX width ne) = nw && (mirrorX width se) = sw 
+
+let isSymmetricY width height nw ne sw se = 
+    (mirrorY height sw) = nw && (mirrorX height se) = ne 
+
+let isSymmetric width height nw ne sw se = 
+    isSymmetricX width height nw ne sw se || isSymmetricY width height nw ne sw se
+
+let rec findSymmetry width height robots = 
+    let midRow = height / 2
+    let midCol = width / 2
+    let nw = robots |> toQuadrant (fun (x, y) -> x < midCol && y < midRow)
+    let ne = robots |> toQuadrant (fun (x, y) -> x > midCol && y < midRow)
+    let sw = robots |> toQuadrant (fun (x, y) -> x < midCol && y > midRow)
+    let se = robots |> toQuadrant (fun (x, y) -> x > midCol && y > midRow)
+    if isSymmetric width height nw ne sw se then 
+        robots 
+    else 
+        let moved = robots |> List.map (move width height 1)
+        findSymmetry width height moved 
 
 let run width height fileName = 
     let lines = readLines fileName
     let robots = lines |> List.map parseRobot
     let moved = robots |> simulate width height 100
     moved |> calculateSafetyFactor width height |> printfn "%A"
+    let symmetric = findSymmetry width height robots
+    visualize width height symmetric
+    0
 
-run 11 7 "sample"
+// run 11 7 "sample"
 run 101 103 "input"
