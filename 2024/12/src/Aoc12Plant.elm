@@ -9,6 +9,7 @@ import Array exposing (Array)
 import Set exposing (Set)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
+import List.Extra
 import Time
 
 defaultTickInterval : Float
@@ -49,11 +50,14 @@ type alias PlotInfo =
   , totalSteps : Int 
   , plant : Plant 
   , color : String
+  , verticals : List Line 
+  , horizontals : List Line 
   , area : Int 
   , perimeter : Int
   , perimeterDiscount : Int
   , fenceCost : Int 
-  , fenceCostDiscount : Int }
+  , fenceCostDiscount : Int
+  , debug : String }
 
 type alias Model = 
   { plotInfoList : List PlotInfo
@@ -411,12 +415,57 @@ distinct lst =
       if List.member h t then distinct t 
       else h :: distinct t 
 
-areConnectedLines : Line -> Line -> Bool
-areConnectedLines v h = 
-  v.startPos == h.startPos || v.startPos == h.endPos || v.endPos == h.startPos || v.endPos == h.endPos
+tryFindBorderMatch : Line -> List Line -> Maybe Line 
+tryFindBorderMatch v horizontals = 
+  case horizontals of 
+    [] -> Nothing 
+    h :: restHorizontals -> 
+      if v.startPos == h.startPos || v.startPos == h.endPos || v.endPos == h.startPos || v.endPos == h.endPos then 
+        Just h 
+      else 
+        tryFindBorderMatch v restHorizontals
 
-countCorners : List Border -> Int 
-countCorners borders = 
+findCornerPointsLoop : List Line -> List Line -> List Pos -> List Pos 
+findCornerPointsLoop verticals horizontals allCornerPoints = 
+  case verticals of 
+    [] -> allCornerPoints 
+    v :: restVerticals -> 
+      let 
+        topCornerPoints = horizontals |> List.filterMap (\h -> if h.startPos == v.startPos || h.endPos == v.startPos then Just v.startPos else Nothing) 
+        botCornerPoints = horizontals |> List.filterMap (\h -> if h.startPos == v.endPos || h.endPos == v.endPos then Just v.endPos else Nothing)
+        nextAllCornerPoints = topCornerPoints ++ botCornerPoints ++ allCornerPoints 
+      in 
+        findCornerPointsLoop restVerticals horizontals nextAllCornerPoints
+
+fixCrossroads : List Pos -> List Pos 
+fixCrossroads points = 
+  case points of 
+    [] -> []
+    a :: rest1 -> 
+      case rest1 of 
+        b :: rest2 -> 
+          if a == b then 
+            case rest2 of 
+              c :: d :: rest3 -> 
+                if b == c && c == d then 
+                  a :: b :: fixCrossroads rest3 
+                else 
+                  a :: b :: fixCrossroads rest2 
+              _ -> a :: b :: fixCrossroads rest2
+          else 
+            a :: fixCrossroads rest1 
+        _ -> a :: fixCrossroads rest1
+
+countCorners : List Line -> List Line -> Int 
+countCorners verticals horizontals = 
+  let 
+    allCornerPoints = findCornerPointsLoop verticals horizontals [] |> List.sort
+    fixed = allCornerPoints |> fixCrossroads
+  in 
+    fixed |> List.length  
+
+toPlotInfo : Int -> (Plant, (Plot, PlotSequence, List Border)) -> PlotInfo 
+toPlotInfo index (plant, (plot, seq, borders)) = 
   let 
     asVertical border = 
       case border of 
@@ -426,32 +475,32 @@ countCorners borders =
       case border of 
         Horizontal b -> Just b 
         _ -> Nothing 
-    verticals = borders |> List.filterMap (asVertical)
-    horizontals = borders |> List.filterMap (asHorizontal)
-    corners = verticals |> List.filter (\v -> horizontals |> List.any (\h -> areConnectedLines v h)) 
-  in 
-    corners |> List.length 
-
-toPlotInfo : Int -> (Plant, (Plot, PlotSequence, List Border)) -> PlotInfo 
-toPlotInfo index (plant, (plot, seq, borders)) = 
-  let 
     totalSteps = List.length seq 
     area = Set.size plot
     plantColor = getPlantColor plant
+    borderCount = List.length borders 
     distinctBorders = distinct borders
+    distinctBorderCount  = List.length distinctBorders 
     perimeter = List.length distinctBorders
-    sections = countCorners distinctBorders
+    verticals = distinctBorders |> List.filterMap asVertical
+    horizontals = distinctBorders |> List.filterMap asHorizontal
+    sections = countCorners verticals horizontals
+    -- debug = "Border count: " ++ String.fromInt borderCount ++ " vs Distinct border count: " ++ String.fromInt distinctBorderCount
+    debug = "?"
   in 
     { complete = plot  
     , sequence = seq |> List.reverse
     , totalSteps = List.length seq 
     , plant = plant 
     , color = plantColor
+    , verticals = verticals
+    , horizontals = horizontals
     , area = area  
     , perimeter = perimeter
     , perimeterDiscount = sections
     , fenceCost = area * perimeter  
-    , fenceCostDiscount = area * sections }
+    , fenceCostDiscount = area * sections
+    , debug = debug }
 
 initModel : DataSource -> Model 
 initModel dataSource = 
@@ -640,13 +689,28 @@ toSvg model =
       ]
       elements
 
+toLineText : Line -> String 
+toLineText line = 
+  case (line.startPos, line.endPos) of 
+    ((x1, y1), (x2, y2)) -> 
+      let 
+        x1s = String.fromInt x1
+        y1s = String.fromInt y1
+        x2s = String.fromInt x2 
+        y2s = String.fromInt y2
+      in 
+        "(" ++ x1s ++ "," ++ y1s ++ ")->(" ++ x2s ++ "," ++ y2s ++ ")"
+
 view : Model -> Html Msg
 view model =
   let
     elements = []
     textFontSize = "9px"
     s = toSvg model 
+    verticalsText = model.plotInfoList |> List.concatMap (\pi -> pi.verticals |> List.map toLineText) |> List.sort |> String.join "\n"
+    horizontalsText = model.plotInfoList |> List.concatMap (\pi -> pi.horizontals |> List.map toLineText) |> List.sort |> String.join "\n"
     numberOfPlots = model.plotInfoList |> List.length
+    debugText = model.plotInfoList |> List.map (\pi -> pi.debug) |> String.join " | "
   in 
     Html.table 
       [ Html.Attributes.style "width" "1080px"]
@@ -732,6 +796,11 @@ view model =
               -- , Html.div [] [ Html.text ("Perimeters: " ++ String.fromInt model.totalCost) ]
               , Html.div [] [ Html.text ("Fence cost: " ++ String.fromInt model.totalCost) ]
               , Html.div [] [ Html.text ("Bulk cost: " ++ String.fromInt model.totalCostDiscount) ]
+              , Html.div [] [ Html.text ("Debug: " ++ debugText) ]
+              , Html.div [] [ Html.text "Verticals" ]
+              , Html.div [] [ Html.text verticalsText ]
+              , Html.div [] [ Html.text "Horizontals" ]
+              , Html.div [] [ Html.text horizontalsText ]
               ] ]
       , Html.tr 
           []
