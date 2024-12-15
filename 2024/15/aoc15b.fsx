@@ -85,16 +85,23 @@ let moveStep move (x, y) =
 let tryFindSpaceVertical (warehouse : char[,]) (robotPos : Pos) (move : Move) : (Pos*Pos) list = 
     printfn "tryFindSpaceVertical with robot in pos %A: %A" robotPos move
     let rec loop positionsToMove (swaps : (Pos*Pos) list) = 
+        printfn "loop with positions to move: %A" positionsToMove
+        printfn "current swaps: %A" swaps
         let nextPositions = positionsToMove |> List.map (moveStep move)
         let things = nextPositions |> List.map (Warehouse.get warehouse)
+        printfn "Things: %A" things
+        let proposedSwaps = List.zip positionsToMove nextPositions
+        let nextSwaps = proposedSwaps @ swaps 
         if things |> List.exists ((=) '#') then 
             // Met a wall!
-            printfn "Met a wall!"
+            // printfn "Met a wall!"
             []
-        else if things |> List.forall ((=) '.') then 
+        else if things |> List.forall ((=) '.') then             
             // Free space for all! Make all the swaps.
-            swaps 
+            // printfn "Free space for all!"
+            nextSwaps 
         else 
+            // printfn "Boxes...!"
             let positionsAndThings = nextPositions |> List.map (fun p -> (p, Warehouse.get warehouse p))
             let openPositions = positionsAndThings |> List.choose (fun (p, obstacle) -> if obstacle = '[' then Some p else None)
             let closePositions = positionsAndThings |> List.choose (fun (p, obstacle) -> if obstacle = ']' then Some p else None)
@@ -103,8 +110,6 @@ let tryFindSpaceVertical (warehouse : char[,]) (robotPos : Pos) (move : Move) : 
             let rightPositions = openPositions |> List.map (toTheRight)
             let leftPositions = closePositions |> List.map (toTheLeft)
             let nextPositionsToMove = openPositions @ rightPositions @ closePositions @ leftPositions |> List.distinct 
-            let proposedSwaps = List.zip positionsToMove nextPositions
-            let nextSwaps = proposedSwaps @ swaps 
             loop nextPositionsToMove nextSwaps 
     loop [robotPos] []
 
@@ -148,10 +153,13 @@ let rec moveStuff warehouse swaps =
         moveStuff warehouse rest 
 
 let tryMoveRobot (warehouse : char[,], robotPos : Pos) (move : Move) = 
-    printfn "try to move robot at %A in direction %A" robotPos move
+    // printfn "try to move robot at %A in direction %A" robotPos move
     match tryFindSpace warehouse robotPos move with 
-    | [] -> (warehouse, robotPos)
+    | [] ->
+        // printfn "No swapping, nothing moves." 
+        (warehouse, robotPos)
     | swaps -> 
+        // printfn "Got some swaps! %A" swaps 
         moveStuff warehouse swaps 
         (warehouse, moveStep move robotPos)
 
@@ -174,7 +182,7 @@ let solve moves warehouseText =
     let robotPos = findRobot warehouse
     Warehouse.set warehouse robotPos '.'
     let (wh, rp) = makeMoves (warehouse, robotPos) moves 
-    let boxPositions = wh |> Warehouse.positions |> List.choose (fun p -> if Warehouse.get wh p = 'O' then Some p else None)
+    let boxPositions = wh |> Warehouse.positions |> List.choose (fun p -> if Warehouse.get wh p = 'O' || Warehouse.get wh p = '[' then Some p else None)
     boxPositions
     |> List.sumBy gpsCoordinate
     |> printfn "%d"
@@ -192,4 +200,4 @@ let run fileName =
     warehouseText |> widen |> solve moves 
     0
 
-run "sample"
+run "input"
