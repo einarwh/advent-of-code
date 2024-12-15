@@ -342,6 +342,10 @@ swapsToText swaps =
       in 
         s ++ (swapsToText rest)
 
+gpsCoordinate : Pos -> Int 
+gpsCoordinate (x, y) = 
+    y * 100 + x
+
 updateClear : Model -> Model
 updateClear model = 
   initModel model.dataSource
@@ -359,11 +363,6 @@ updateStep model =
         let 
           (wh, rb) = tryMoveRobot wide warehouse robot move
           (rx, ry) = rb 
-          -- swaps = tryFindSpace wide warehouse robot move
-          -- swapsStr = swaps |> List.length |> String.fromInt 
-          -- swapsAsStr = swapsToText swaps 
-          -- rbStr = "(" ++ String.fromInt rx ++ "," ++ String.fromInt ry ++ ")" 
-          -- msg = "Move: " ++ String.fromChar move ++ " " ++ rbStr ++ " " ++ swapsStr ++ " swaps: " ++ swapsAsStr
         in 
           { model | warehouse = wh, robot = rb, moves = movesLeft, message = ""  }
 
@@ -423,6 +422,9 @@ toRowElements : String -> List (Html Msg)
 toRowElements rowText = 
   [ Html.text rowText, Html.br [] [] ]
 
+isBox wh (x, y) = 
+  if (Array2D.get y x wh == Just 'O' || Array2D.get y x wh == Just '[') then Just (x, y) else Nothing
+
 view : Model -> Html Msg
 view model =
   let
@@ -431,7 +433,16 @@ view model =
     rows = toWarehouseRows warehouse
     -- Insert robot symbol.
     elements = rows |> List.concatMap (toRowElements)
-    message = model.message
+
+    gpsSum = 
+      if List.isEmpty model.moves then
+        let 
+          positions = warehouse |> getAllPositions
+          boxPositions = positions |> List.filterMap (isBox warehouse)  
+        in 
+          boxPositions |> List.map gpsCoordinate |> List.sum |> String.fromInt 
+      else 
+        "?"
   in 
     Html.table 
       [ Html.Attributes.style "width" "1080px"]
@@ -506,17 +517,17 @@ view model =
                 [ Html.Attributes.style "width" "80px", onClick Step ] 
                 [ Html.text "Step" ]
             ] ]
-      -- , Html.tr 
-      --     []
-      --     [ Html.td 
-      --         [ Html.Attributes.align "center"
-      --         , Html.Attributes.style "background-color" "white" 
-      --         , Html.Attributes.style "font-family" "Courier New"
-      --         , Html.Attributes.style "font-size" "24px"
-      --         , Html.Attributes.style "width" "200px" ] 
-      --         [ 
-      --           Html.div [] [ Html.text model.message ]
-      --         ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "background-color" "white" 
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "24px"
+              , Html.Attributes.style "width" "200px" ] 
+              [ 
+                Html.div [] [ Html.text gpsSum ]
+              ] ]
       , Html.tr 
           []
           [ Html.td 

@@ -6602,6 +6602,29 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 	});
 var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $author$project$Aoc15$gpsCoordinate = function (_v0) {
+	var x = _v0.a;
+	var y = _v0.b;
+	return (y * 100) + x;
+};
 var $elm$html$Html$Attributes$href = function (url) {
 	return A2(
 		$elm$html$Html$Attributes$stringProperty,
@@ -6609,6 +6632,26 @@ var $elm$html$Html$Attributes$href = function (url) {
 		_VirtualDom_noJavaScriptUri(url));
 };
 var $elm$html$Html$input = _VirtualDom_node('input');
+var $author$project$Aoc15$isBox = F2(
+	function (wh, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		return (_Utils_eq(
+			A3($tortus$elm_array_2d$Array2D$get, y, x, wh),
+			$elm$core$Maybe$Just(
+				_Utils_chr('O'))) || _Utils_eq(
+			A3($tortus$elm_array_2d$Array2D$get, y, x, wh),
+			$elm$core$Maybe$Just(
+				_Utils_chr('[')))) ? $elm$core$Maybe$Just(
+			_Utils_Tuple2(x, y)) : $elm$core$Maybe$Nothing;
+	});
+var $elm$core$List$isEmpty = function (xs) {
+	if (!xs.b) {
+		return true;
+	} else {
+		return false;
+	}
+};
 var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
@@ -6629,6 +6672,9 @@ var $elm$html$Html$Events$onClick = function (msg) {
 };
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $elm$core$List$sum = function (numbers) {
+	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
+};
 var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
@@ -6641,24 +6687,6 @@ var $author$project$Aoc15$toRowElements = function (rowText) {
 			A2($elm$html$Html$br, _List_Nil, _List_Nil)
 		]);
 };
-var $elm$core$List$maybeCons = F3(
-	function (f, mx, xs) {
-		var _v0 = f(mx);
-		if (_v0.$ === 'Just') {
-			var x = _v0.a;
-			return A2($elm$core$List$cons, x, xs);
-		} else {
-			return xs;
-		}
-	});
-var $elm$core$List$filterMap = F2(
-	function (f, xs) {
-		return A3(
-			$elm$core$List$foldr,
-			$elm$core$List$maybeCons(f),
-			_List_Nil,
-			xs);
-	});
 var $elm$core$String$fromList = _String_fromList;
 var $author$project$Aoc15$toWarehouseRows = function (warehouse) {
 	var ys = A2(
@@ -6689,7 +6717,20 @@ var $author$project$Aoc15$view = function (model) {
 	var warehouse = model.warehouse;
 	var textFontSize = model.large ? '12px' : '28px';
 	var rows = $author$project$Aoc15$toWarehouseRows(warehouse);
-	var message = model.message;
+	var gpsSum = function () {
+		if ($elm$core$List$isEmpty(model.moves)) {
+			var positions = $author$project$Aoc15$getAllPositions(warehouse);
+			var boxPositions = A2(
+				$elm$core$List$filterMap,
+				$author$project$Aoc15$isBox(warehouse),
+				positions);
+			return $elm$core$String$fromInt(
+				$elm$core$List$sum(
+					A2($elm$core$List$map, $author$project$Aoc15$gpsCoordinate, boxPositions)));
+		} else {
+			return '?';
+		}
+	}();
 	var elements = A2($elm$core$List$concatMap, $author$project$Aoc15$toRowElements, rows);
 	return A2(
 		$elm$html$Html$table,
@@ -6947,6 +6988,32 @@ var $author$project$Aoc15$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text('Step')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '24px'),
+								A2($elm$html$Html$Attributes$style, 'width', '200px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(gpsSum)
 									]))
 							]))
 					])),
