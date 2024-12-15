@@ -259,6 +259,44 @@ moveStep move (x, y) =
   in 
     (x + dx, y + dy)
 
+zip : List a -> List b -> List (a, b) 
+zip lst1 lst2 = 
+  case (lst1, lst2) of 
+    ((h1 :: r1), (h2 :: r2)) -> (h1, h2) :: zip r1 r2 
+    _ -> []
+
+tryFindSpaceDoubleLoop : Array2D Char -> Char -> List Pos -> List (Pos, Pos) -> List (Pos, Pos)
+tryFindSpaceDoubleLoop warehouse move positionsToMove swaps = 
+  let 
+    nextPositions = positionsToMove |> List.map (moveStep move)
+    things = nextPositions |> List.map (\(x, y) -> Array2D.get y x warehouse |> Maybe.withDefault '?')
+    proposedSwaps = zip positionsToMove nextPositions
+    nextSwaps = proposedSwaps ++ swaps 
+  in 
+    if things |> List.any (\ch -> ch == '#') then 
+      -- Met a wall! 
+      []
+    else if things |> List.all (\ch -> ch == '.') then 
+      -- Free space for all!
+      nextSwaps 
+    else 
+      -- Boxes...
+      let 
+        positionsAndThings = nextPositions |> List.map (\(x, y) -> ((x, y), Array2D.get y x warehouse |> Maybe.withDefault '?'))
+        openPositions = positionsAndThings |> List.filterMap (\(p, ch) -> if ch == '[' then Just p else Nothing)
+        closePositions = positionsAndThings |> List.filterMap (\(p, ch) -> if ch == ']' then Just p else Nothing)
+        toTheRight (x, y) = (x + 1, y)
+        toTheLeft (x, y) = (x - 1, y)
+        rightPositions = openPositions |> List.map toTheRight 
+        leftPositions = closePositions |> List.map toTheLeft 
+        nextPositionsToMove = (openPositions ++ rightPositions ++ closePositions ++ leftPositions) |> Set.fromList |> Set.toList 
+      in 
+        tryFindSpaceDoubleLoop warehouse move nextPositionsToMove nextSwaps
+
+tryFindSpaceDouble : Array2D Char -> Pos -> Char -> List (Pos, Pos)
+tryFindSpaceDouble warehouse robot move = 
+  tryFindSpaceDoubleLoop warehouse move [ robot ] []
+
 tryFindSpaceSimpleLoop : Array2D Char -> Char -> Pos -> List (Pos, Pos) -> List (Pos, Pos)
 tryFindSpaceSimpleLoop warehouse move pos swaps = 
   let 
@@ -269,6 +307,10 @@ tryFindSpaceSimpleLoop warehouse move pos swaps =
     case Array2D.get y x warehouse of 
       Just '#' -> []
       Just '.' -> nextSwaps 
+      Just '[' -> 
+        tryFindSpaceSimpleLoop warehouse move (x, y) nextSwaps 
+      Just ']' -> 
+        tryFindSpaceSimpleLoop warehouse move (x, y) nextSwaps 
       Just 'O' -> 
         tryFindSpaceSimpleLoop warehouse move (x, y) nextSwaps 
       _ -> [] 
@@ -279,7 +321,15 @@ tryFindSpaceSimple warehouse robot move =
 
 tryFindSpace : Bool -> Array2D Char -> Pos -> Char -> List (Pos, Pos) 
 tryFindSpace wide warehouse robot move = 
-  tryFindSpaceSimple warehouse robot move
+  if wide then 
+    case move of 
+      '^' -> tryFindSpaceDouble warehouse robot move 
+      'v' -> tryFindSpaceDouble warehouse robot move 
+      '<' -> tryFindSpaceSimple warehouse robot move 
+      '>' -> tryFindSpaceSimple warehouse robot move 
+      _ -> tryFindSpaceSimple warehouse robot move 
+  else 
+    tryFindSpaceSimple warehouse robot move
 
 moveStuff : Array2D Char -> List (Pos, Pos) -> Array2D Char
 moveStuff warehouse swaps = 
