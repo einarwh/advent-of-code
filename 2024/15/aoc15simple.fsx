@@ -95,6 +95,8 @@ let tryFindSpace (warehouse : char[,]) (robotPos : Pos) (move : Move) : (Pos*Pos
         | '.' ->
             // printfn "Found space!"
             nextSwaps
+        | '[' 
+        | ']' 
         | 'O' ->
             // printfn "Found box... keep looking." 
             loop pos nextSwaps
@@ -121,8 +123,8 @@ let tryMoveRobot (warehouse : char[,], robotPos : Pos) (move : Move) =
         (warehouse, moveStep move robotPos)
 
 let rec makeMoves (warehouse : char[,], robotPos : Pos) (moves : Move list) = 
-    // printfn "\n"
-    // visualize warehouse robotPos
+    printfn "\n"
+    visualize warehouse robotPos
     match moves with 
     | [] -> (warehouse, robotPos)
     | m :: restMoves -> 
@@ -153,7 +155,8 @@ let run fileName =
     let warehouseText = text.[0]
     let movesText = text.[1]
     let moves = movesText |> joinUp |> parseMoves 
-    warehouseText |> solve moves 
+    // warehouseText |> solve moves 
+    warehouseText |> widenWarehouse |> solve moves 
     0
 
-run "input"
+run "sample"
