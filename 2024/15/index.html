@@ -5777,6 +5777,28 @@ var $elm$core$String$foldr = _String_foldr;
 var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
 };
+var $elm$core$String$replace = F3(
+	function (before, after, string) {
+		return A2(
+			$elm$core$String$join,
+			after,
+			A2($elm$core$String$split, before, string));
+	});
+var $author$project$Aoc15$widen = function (text) {
+	return A3(
+		$elm$core$String$replace,
+		'@',
+		'@.',
+		A3(
+			$elm$core$String$replace,
+			'.',
+			'..',
+			A3(
+				$elm$core$String$replace,
+				'O',
+				'[]',
+				A3($elm$core$String$replace, '#', '##', text))));
+};
 var $elm$core$Maybe$withDefault = F2(
 	function (_default, maybe) {
 		if (maybe.$ === 'Just') {
@@ -5786,50 +5808,52 @@ var $elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
-var $author$project$Aoc15$initModel = function (dataSource) {
-	var data = $author$project$Aoc15$read(dataSource);
-	var _v0 = function () {
-		var _v1 = A2($elm$core$String$split, '\n\n', data);
-		if (_v1.b && _v1.b.b) {
-			var a = _v1.a;
-			var _v2 = _v1.b;
-			var b = _v2.a;
-			return _Utils_Tuple2(
-				A2($elm$core$String$split, '\n', a),
-				$elm$core$String$toList(b));
-		} else {
-			return _Utils_Tuple2(_List_Nil, _List_Nil);
-		}
-	}();
-	var rows = _v0.a;
-	var moves = _v0.b;
-	var numberOfCols = $elm$core$String$length(
-		A2(
-			$elm$core$Maybe$withDefault,
-			'?',
-			$elm$core$List$head(rows)));
-	var numberOfRows = $elm$core$List$length(rows);
-	var warehouse = $tortus$elm_array_2d$Array2D$fromList(
-		A2($elm$core$List$map, $elm$core$String$toList, rows));
-	var robot = $author$project$Aoc15$findRobot(warehouse);
-	return {
-		dataSource: dataSource,
-		finished: false,
-		large: _Utils_eq(dataSource, $author$project$Aoc15$Input),
-		message: '?',
-		moves: moves,
-		paused: true,
-		robot: robot,
-		tickInterval: $author$project$Aoc15$defaultTickInterval,
-		warehouse: warehouse,
-		wide: false
-	};
-};
+var $author$project$Aoc15$initModel = F2(
+	function (wide, dataSource) {
+		var data = $author$project$Aoc15$read(dataSource);
+		var _v0 = function () {
+			var _v1 = A2($elm$core$String$split, '\n\n', data);
+			if (_v1.b && _v1.b.b) {
+				var a = _v1.a;
+				var _v2 = _v1.b;
+				var b = _v2.a;
+				return _Utils_Tuple2(
+					A2($elm$core$String$split, '\n', a),
+					$elm$core$String$toList(b));
+			} else {
+				return _Utils_Tuple2(_List_Nil, _List_Nil);
+			}
+		}();
+		var basicRows = _v0.a;
+		var moves = _v0.b;
+		var rows = wide ? A2($elm$core$List$map, $author$project$Aoc15$widen, basicRows) : basicRows;
+		var numberOfCols = $elm$core$String$length(
+			A2(
+				$elm$core$Maybe$withDefault,
+				'?',
+				$elm$core$List$head(rows)));
+		var numberOfRows = $elm$core$List$length(rows);
+		var warehouse = $tortus$elm_array_2d$Array2D$fromList(
+			A2($elm$core$List$map, $elm$core$String$toList, rows));
+		var robot = $author$project$Aoc15$findRobot(warehouse);
+		return {
+			dataSource: dataSource,
+			finished: false,
+			large: _Utils_eq(dataSource, $author$project$Aoc15$Input),
+			message: '?',
+			moves: moves,
+			paused: true,
+			robot: robot,
+			tickInterval: $author$project$Aoc15$defaultTickInterval,
+			warehouse: warehouse,
+			wide: wide
+		};
+	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Aoc15$init = function (_v0) {
 	return _Utils_Tuple2(
-		$author$project$Aoc15$initModel($author$project$Aoc15$SampleLarger),
+		A2($author$project$Aoc15$initModel, false, $author$project$Aoc15$SampleLarger),
 		$elm$core$Platform$Cmd$none);
 };
 var $author$project$Aoc15$Tick = {$: 'Tick'};
@@ -6262,7 +6286,7 @@ var $author$project$Aoc15$subscriptions = function (model) {
 var $author$project$Aoc15$SampleSituation = {$: 'SampleSituation'};
 var $author$project$Aoc15$SampleSmaller = {$: 'SampleSmaller'};
 var $author$project$Aoc15$updateClear = function (model) {
-	return $author$project$Aoc15$initModel(model.dataSource);
+	return A2($author$project$Aoc15$initModel, model.wide, model.dataSource);
 };
 var $author$project$Aoc15$moveToOffset = function (move) {
 	switch (move.valueOf()) {
@@ -6524,6 +6548,9 @@ var $author$project$Aoc15$updateTogglePlay = function (model) {
 		model,
 		{paused: !model.paused});
 };
+var $author$project$Aoc15$updateToggleWide = function (model) {
+	return A2($author$project$Aoc15$initModel, !model.wide, model.dataSource);
+};
 var $author$project$Aoc15$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -6555,28 +6582,34 @@ var $author$project$Aoc15$update = F2(
 				return _Utils_Tuple2(
 					$author$project$Aoc15$updateTogglePlay(model),
 					$elm$core$Platform$Cmd$none);
+			case 'ToggleWide':
+				return _Utils_Tuple2(
+					$author$project$Aoc15$updateToggleWide(model),
+					$elm$core$Platform$Cmd$none);
 			case 'UseInput':
 				return _Utils_Tuple2(
-					$author$project$Aoc15$initModel($author$project$Aoc15$Input),
+					A2($author$project$Aoc15$initModel, model.wide, $author$project$Aoc15$Input),
 					$elm$core$Platform$Cmd$none);
 			case 'UseSmaller':
 				return _Utils_Tuple2(
-					$author$project$Aoc15$initModel($author$project$Aoc15$SampleSmaller),
+					A2($author$project$Aoc15$initModel, model.wide, $author$project$Aoc15$SampleSmaller),
 					$elm$core$Platform$Cmd$none);
 			case 'UseLarger':
 				return _Utils_Tuple2(
-					$author$project$Aoc15$initModel($author$project$Aoc15$SampleLarger),
+					A2($author$project$Aoc15$initModel, model.wide, $author$project$Aoc15$SampleLarger),
 					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(
-					$author$project$Aoc15$initModel($author$project$Aoc15$SampleSituation),
+					A2($author$project$Aoc15$initModel, model.wide, $author$project$Aoc15$SampleSituation),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
+var $author$project$Aoc15$Clear = {$: 'Clear'};
 var $author$project$Aoc15$Faster = {$: 'Faster'};
 var $author$project$Aoc15$Slower = {$: 'Slower'};
 var $author$project$Aoc15$Step = {$: 'Step'};
 var $author$project$Aoc15$TogglePlay = {$: 'TogglePlay'};
+var $author$project$Aoc15$ToggleWide = {$: 'ToggleWide'};
 var $author$project$Aoc15$UseInput = {$: 'UseInput'};
 var $author$project$Aoc15$UseLarger = {$: 'UseLarger'};
 var $author$project$Aoc15$UseSituation = {$: 'UseSituation'};
@@ -6950,6 +6983,17 @@ var $author$project$Aoc15$view = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick($author$project$Aoc15$Clear)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Reset')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
 										$elm$html$Html$Events$onClick($author$project$Aoc15$Slower)
 									]),
 								_List_fromArray(
@@ -6988,6 +7032,37 @@ var $author$project$Aoc15$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text('Step')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('checkbox'),
+										$elm$html$Html$Events$onClick($author$project$Aoc15$ToggleWide),
+										$elm$html$Html$Attributes$checked(model.wide)
+									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Wide')
 									]))
 							]))
 					])),

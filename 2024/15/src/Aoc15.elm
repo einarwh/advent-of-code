@@ -176,14 +176,18 @@ read dataSource =
     SampleLarger -> sampleLarger
     SampleSituation -> sampleSituation
 
-initModel : DataSource -> Model 
-initModel dataSource = 
+widen text = 
+    text |> String.replace "#" "##" |> String.replace "O" "[]" |> String.replace "." ".." |> String.replace "@" "@."
+
+initModel : Bool -> DataSource -> Model 
+initModel wide dataSource = 
   let 
     data = read dataSource
-    (rows, moves) = 
+    (basicRows, moves) = 
       case String.split "\n\n" data of 
         a :: b :: _ -> (a |> String.split "\n", b |> String.toList)
         _ -> ([], [])
+    rows = if wide then basicRows |> List.map widen else basicRows
     numberOfRows = rows |> List.length 
     numberOfCols = rows |> List.head |> Maybe.withDefault "?" |> String.length 
     warehouse = rows |> List.map (String.toList) |> Array2D.fromList
@@ -191,7 +195,7 @@ initModel dataSource =
   in 
     { warehouse = warehouse
     , large = dataSource == Input 
-    , wide = False
+    , wide = wide
     , robot = robot 
     , dataSource = dataSource
     , moves = moves
@@ -202,7 +206,7 @@ initModel dataSource =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel SampleLarger, Cmd.none)
+  (initModel False SampleLarger, Cmd.none)
 
 -- UPDATE
 
@@ -210,6 +214,7 @@ type Msg =
   Tick 
   | Step 
   | TogglePlay 
+  | ToggleWide 
   | Faster 
   | Slower 
   | Clear 
@@ -254,23 +259,6 @@ moveStep move (x, y) =
   in 
     (x + dx, y + dy)
 
--- let tryFindSpaceSimple (warehouse : char[,]) (robotPos : Pos) (move : Move) : (Pos*Pos) list =
---     let rec loop (x, y) (swaps : (Pos*Pos) list) = 
---         let (dx, dy) = moveToOffset move 
---         let pos = (x + dx, y + dy)
---         let nextSwaps = (pos, (x, y)) :: swaps 
---         match Warehouse.get warehouse pos with 
---         | '#' -> 
---             [] 
---         | '.' ->
---             nextSwaps
---         | '[' 
---         | ']' 
---         | 'O' ->
---             loop pos nextSwaps
---         | _ -> failwith "?" 
---     loop robotPos []
-
 tryFindSpaceSimpleLoop : Array2D Char -> Char -> Pos -> List (Pos, Pos) -> List (Pos, Pos)
 tryFindSpaceSimpleLoop warehouse move pos swaps = 
   let 
@@ -283,7 +271,7 @@ tryFindSpaceSimpleLoop warehouse move pos swaps =
       Just '.' -> nextSwaps 
       Just 'O' -> 
         tryFindSpaceSimpleLoop warehouse move (x, y) nextSwaps 
-      _ -> [ ((0, 0), (0, 0)), ((0, 0), (0, 0)), ((0, 0), (0, 0)), ((0, 0), (0, 0)), ((0, 0), (0, 0)), ((0, 0), (0, 0)) ] 
+      _ -> [] 
 
 tryFindSpaceSimple : Array2D Char -> Pos -> Char -> List (Pos, Pos) 
 tryFindSpaceSimple warehouse robot move = 
@@ -348,7 +336,7 @@ gpsCoordinate (x, y) =
 
 updateClear : Model -> Model
 updateClear model = 
-  initModel model.dataSource
+  initModel model.wide model.dataSource
 
 updateStep : Model -> Model
 updateStep model = 
@@ -372,7 +360,7 @@ updateTogglePlay model =
 
 updateToggleWide : Model -> Model
 updateToggleWide model = 
-    initModel SampleLarger 
+  initModel (not model.wide) model.dataSource 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -389,14 +377,16 @@ update msg model =
       ({model | tickInterval = model.tickInterval * 2 }, Cmd.none)
     TogglePlay -> 
       (updateTogglePlay model, Cmd.none)
+    ToggleWide -> 
+      (updateToggleWide model, Cmd.none)
     UseInput -> 
-      (initModel Input, Cmd.none)
+      (initModel model.wide Input, Cmd.none)
     UseSmaller -> 
-      (initModel SampleSmaller, Cmd.none)
+      (initModel model.wide SampleSmaller, Cmd.none)
     UseLarger -> 
-      (initModel SampleLarger, Cmd.none)
+      (initModel model.wide SampleLarger, Cmd.none)
     UseSituation -> 
-      (initModel SampleSituation, Cmd.none)
+      (initModel model.wide SampleSituation, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -505,6 +495,9 @@ view model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Clear ] 
+                [ text "Reset" ]
+              , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Slower ] 
                 [ text "Slower" ]
               , Html.button 
@@ -516,6 +509,15 @@ view model =
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Step ] 
                 [ Html.text "Step" ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center" ]
+              [ Html.input 
+                [ Html.Attributes.type_ "checkbox", onClick ToggleWide, Html.Attributes.checked model.wide ] 
+                []
+              , Html.label [] [ Html.text "Wide" ]
             ] ]
       , Html.tr 
           []
