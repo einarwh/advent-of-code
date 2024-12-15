@@ -121,7 +121,7 @@ let tryFindSpaceSimple (warehouse : char[,]) (robotPos : Pos) (move : Move) : (P
         | ']' 
         | 'O' ->
             loop pos nextSwaps
-        | _ -> failwith "tryFindSpz"
+        | _ -> failwith "?" 
     loop robotPos []
 
 let tryFindSpace wide (warehouse : char[,]) (robotPos : Pos) (move : Move) : (Pos*Pos) list =
@@ -163,7 +163,6 @@ let rec makeMoves wide (warehouse : char[,], robotPos : Pos) (moves : Move list)
 
 let gpsCoordinate (x, y) = 
     y * 100 + x
-
 
 let widen text = 
     text |> replace "#" "##" |> replace "O" "[]" |> replace "." ".." |> replace "@" "@."
