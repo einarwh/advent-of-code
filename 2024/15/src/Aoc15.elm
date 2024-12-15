@@ -472,8 +472,6 @@ update msg model =
         _ -> 
           (model, Cmd.none)
 
-
-
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
