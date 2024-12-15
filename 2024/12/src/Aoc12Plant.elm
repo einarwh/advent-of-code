@@ -710,7 +710,10 @@ view model =
     verticalsText = model.plotInfoList |> List.concatMap (\pi -> pi.verticals |> List.map toLineText) |> List.sort |> String.join "\n"
     horizontalsText = model.plotInfoList |> List.concatMap (\pi -> pi.horizontals |> List.map toLineText) |> List.sort |> String.join "\n"
     numberOfPlots = model.plotInfoList |> List.length
-    debugText = model.plotInfoList |> List.map (\pi -> pi.debug) |> String.join " | "
+    finishedPlotInfoList = model.plotInfoList |> List.filter (\pi -> pi.totalSteps <= model.step)
+    numberOfFinishedPlots = finishedPlotInfoList |> List.length
+    currentCost = finishedPlotInfoList |> List.map (\pi -> pi.fenceCost) |> List.sum 
+    currentCostDiscount = finishedPlotInfoList |> List.map (\pi -> pi.fenceCostDiscount) |> List.sum 
   in 
     Html.table 
       [ Html.Attributes.style "width" "1080px"]
@@ -726,7 +729,9 @@ view model =
       , Html.tr 
           []
           [ Html.td 
-              [ Html.Attributes.align "center" ]
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "16px" ]
               [ 
                 Html.input 
                 [ Html.Attributes.type_ "radio", onClick UseInput, Html.Attributes.checked (model.dataSource == Input) ] 
@@ -788,19 +793,20 @@ view model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "24px"
+              , Html.Attributes.style "font-size" "16px"
               , Html.Attributes.style "width" "200px" ] 
               [ 
-                Html.div [] [ Html.text ("Step number: " ++ String.fromInt model.step) ]
-              , Html.div [] [ Html.text ("Number of plots: " ++ String.fromInt numberOfPlots) ]
+                Html.div [] [ Html.text ("Total plots: " ++ String.fromInt numberOfPlots) ]
+              , Html.div [] [ Html.text ("Step number: " ++ String.fromInt model.step) ]
+              , Html.div [] [ Html.text ("Finished plots: " ++ String.fromInt numberOfFinishedPlots) ]
               -- , Html.div [] [ Html.text ("Perimeters: " ++ String.fromInt model.totalCost) ]
-              , Html.div [] [ Html.text ("Fence cost: " ++ String.fromInt model.totalCost) ]
-              , Html.div [] [ Html.text ("Bulk cost: " ++ String.fromInt model.totalCostDiscount) ]
-              , Html.div [] [ Html.text ("Debug: " ++ debugText) ]
-              , Html.div [] [ Html.text "Verticals" ]
-              , Html.div [] [ Html.text verticalsText ]
-              , Html.div [] [ Html.text "Horizontals" ]
-              , Html.div [] [ Html.text horizontalsText ]
+              , Html.div [] [ Html.text ("Fence cost: " ++ String.fromInt currentCost) ]
+              , Html.div [] [ Html.text ("Bulk cost: " ++ String.fromInt currentCostDiscount) ]
+              -- , Html.div [] [ Html.text ("Debug: " ++ debugText) ]
+              -- , Html.div [] [ Html.text "Verticals" ]
+              -- , Html.div [] [ Html.text verticalsText ]
+              -- , Html.div [] [ Html.text "Horizontals" ]
+              -- , Html.div [] [ Html.text horizontalsText ]
               ] ]
       , Html.tr 
           []
