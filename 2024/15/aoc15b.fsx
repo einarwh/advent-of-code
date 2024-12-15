@@ -82,26 +82,20 @@ let moveStep move (x, y) =
     let (dx, dy) = moveToOffset move 
     (x + dx, y + dy)
 
-let tryFindSpaceVertical (warehouse : char[,]) (robotPos : Pos) (move : Move) : (Pos*Pos) list = 
-    printfn "tryFindSpaceVertical with robot in pos %A: %A" robotPos move
+let tryFindSpaceDouble (warehouse : char[,]) (robotPos : Pos) (move : Move) : (Pos*Pos) list = 
     let rec loop positionsToMove (swaps : (Pos*Pos) list) = 
-        printfn "loop with positions to move: %A" positionsToMove
-        printfn "current swaps: %A" swaps
         let nextPositions = positionsToMove |> List.map (moveStep move)
         let things = nextPositions |> List.map (Warehouse.get warehouse)
-        printfn "Things: %A" things
         let proposedSwaps = List.zip positionsToMove nextPositions
         let nextSwaps = proposedSwaps @ swaps 
         if things |> List.exists ((=) '#') then 
             // Met a wall!
-            // printfn "Met a wall!"
             []
-        else if things |> List.forall ((=) '.') then             
-            // Free space for all! Make all the swaps.
-            // printfn "Free space for all!"
+        else if things |> List.forall ((=) '.') then 
+            // Free space for all! 
             nextSwaps 
         else 
-            // printfn "Boxes...!"
+            // Boxes...
             let positionsAndThings = nextPositions |> List.map (fun p -> (p, Warehouse.get warehouse p))
             let openPositions = positionsAndThings |> List.choose (fun (p, obstacle) -> if obstacle = '[' then Some p else None)
             let closePositions = positionsAndThings |> List.choose (fun (p, obstacle) -> if obstacle = ']' then Some p else None)
@@ -113,82 +107,79 @@ let tryFindSpaceVertical (warehouse : char[,]) (robotPos : Pos) (move : Move) : 
             loop nextPositionsToMove nextSwaps 
     loop [robotPos] []
 
-let tryFindSpaceHorizontal (warehouse : char[,]) (robotPos : Pos) (move : Move) : (Pos*Pos) list =
-    printfn "tryFindSpaceHorizontal with robot in pos %A: %A" robotPos move
+let tryFindSpaceSimple (warehouse : char[,]) (robotPos : Pos) (move : Move) : (Pos*Pos) list =
     let rec loop (x, y) (swaps : (Pos*Pos) list) = 
         let (dx, dy) = moveToOffset move 
         let pos = (x + dx, y + dy)
         let nextSwaps = (pos, (x, y)) :: swaps 
         match Warehouse.get warehouse pos with 
         | '#' -> 
-            // printfn "Hit wall."
             [] 
         | '.' ->
-            // printfn "Found space!"
             nextSwaps
         | '[' 
         | ']' 
         | 'O' ->
-            // printfn "Found box... keep looking." 
             loop pos nextSwaps
         | _ -> failwith "tryFindSpz"
     loop robotPos []
 
-let tryFindSpace (warehouse : char[,]) (robotPos : Pos) (move : Move) : (Pos*Pos) list =
-    match move with 
-    | N 
-    | S -> tryFindSpaceVertical warehouse robotPos move 
-    | W
-    | E -> tryFindSpaceHorizontal warehouse robotPos move 
+let tryFindSpace wide (warehouse : char[,]) (robotPos : Pos) (move : Move) : (Pos*Pos) list =
+    if wide then 
+        match move with 
+        | N 
+        | S -> tryFindSpaceDouble warehouse robotPos move 
+        | W
+        | E -> tryFindSpaceSimple warehouse robotPos move 
+    else 
+        tryFindSpaceSimple warehouse robotPos move
 
 let rec moveStuff warehouse swaps = 
     match swaps with 
     | [] -> ()
     | (pos1, pos2) :: rest -> 
-        // printfn "Swapping."
         let cell1 = Warehouse.get warehouse pos1 
         let cell2 = Warehouse.get warehouse pos2
         Warehouse.set warehouse pos1 cell2 
         Warehouse.set warehouse pos2 cell1 
         moveStuff warehouse rest 
 
-let tryMoveRobot (warehouse : char[,], robotPos : Pos) (move : Move) = 
-    // printfn "try to move robot at %A in direction %A" robotPos move
-    match tryFindSpace warehouse robotPos move with 
+let tryMoveRobot wide (warehouse : char[,], robotPos : Pos) (move : Move) = 
+    match tryFindSpace wide warehouse robotPos move with 
     | [] ->
-        // printfn "No swapping, nothing moves." 
         (warehouse, robotPos)
     | swaps -> 
-        // printfn "Got some swaps! %A" swaps 
         moveStuff warehouse swaps 
         (warehouse, moveStep move robotPos)
 
-let rec makeMoves (warehouse : char[,], robotPos : Pos) (moves : Move list) = 
-    printfn "\n"
-    visualize warehouse robotPos
+let rec makeMoves wide (warehouse : char[,], robotPos : Pos) (moves : Move list) = 
+    // printfn "\n"
+    // visualize warehouse robotPos
     match moves with 
     | [] -> (warehouse, robotPos)
     | m :: restMoves -> 
-        let result = tryMoveRobot (warehouse, robotPos) m 
-        makeMoves result restMoves
+        let result = tryMoveRobot wide (warehouse, robotPos) m 
+        makeMoves wide result restMoves
 
 let gpsCoordinate (x, y) = 
     y * 100 + x
 
-let solve moves warehouseText =  
+
+let widen text = 
+    text |> replace "#" "##" |> replace "O" "[]" |> replace "." ".." |> replace "@" "@."
+
+let solve wide moves text =  
     let toLines = split "\n" >> Array.toList
+    let warehouseText = if wide then widen text else text 
     let lines = warehouseText |> toLines |> List.map Seq.toList 
     let warehouse = lines |> Warehouse.fromList
     let robotPos = findRobot warehouse
     Warehouse.set warehouse robotPos '.'
-    let (wh, rp) = makeMoves (warehouse, robotPos) moves 
+    let (wh, rp) = makeMoves wide (warehouse, robotPos) moves 
     let boxPositions = wh |> Warehouse.positions |> List.choose (fun p -> if Warehouse.get wh p = 'O' || Warehouse.get wh p = '[' then Some p else None)
     boxPositions
     |> List.sumBy gpsCoordinate
     |> printfn "%d"
-
-let widen text = 
-    text |> replace "#" "##" |> replace "O" "[]" |> replace "." ".." |> replace "@" "@."
 
 let run fileName = 
     let text = File.ReadAllText fileName |> trim |> split "\n\n"
@@ -196,8 +187,8 @@ let run fileName =
     let warehouseText = text.[0]
     let movesText = text.[1]
     let moves = movesText |> joinUp |> parseMoves 
-    // warehouseText |> solve moves 
-    warehouseText |> widen |> solve moves 
+    warehouseText |> solve false moves 
+    warehouseText |> solve true moves 
     0
 
 run "input"
