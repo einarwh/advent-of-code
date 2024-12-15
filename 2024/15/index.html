@@ -5821,7 +5821,8 @@ var $author$project$Aoc15$initModel = function (dataSource) {
 		paused: true,
 		robot: robot,
 		tickInterval: $author$project$Aoc15$defaultTickInterval,
-		warehouse: warehouse
+		warehouse: warehouse,
+		wide: false
 	};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
@@ -6263,8 +6264,234 @@ var $author$project$Aoc15$SampleSmaller = {$: 'SampleSmaller'};
 var $author$project$Aoc15$updateClear = function (model) {
 	return $author$project$Aoc15$initModel(model.dataSource);
 };
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
+var $author$project$Aoc15$moveToOffset = function (move) {
+	switch (move.valueOf()) {
+		case '^':
+			return _Utils_Tuple2(0, -1);
+		case '<':
+			return _Utils_Tuple2(-1, 0);
+		case 'v':
+			return _Utils_Tuple2(0, 1);
+		case '>':
+			return _Utils_Tuple2(1, 0);
+		default:
+			return _Utils_Tuple2(0, 0);
+	}
+};
+var $author$project$Aoc15$moveStep = F2(
+	function (move, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var _v1 = $author$project$Aoc15$moveToOffset(move);
+		var dx = _v1.a;
+		var dy = _v1.b;
+		return _Utils_Tuple2(x + dx, y + dy);
+	});
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $elm$core$Array$setHelp = F4(
+	function (shift, index, value, tree) {
+		var pos = $elm$core$Array$bitMask & (index >>> shift);
+		var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+		if (_v0.$ === 'SubTree') {
+			var subTree = _v0.a;
+			var newSub = A4($elm$core$Array$setHelp, shift - $elm$core$Array$shiftStep, index, value, subTree);
+			return A3(
+				$elm$core$Elm$JsArray$unsafeSet,
+				pos,
+				$elm$core$Array$SubTree(newSub),
+				tree);
+		} else {
+			var values = _v0.a;
+			var newLeaf = A3($elm$core$Elm$JsArray$unsafeSet, $elm$core$Array$bitMask & index, value, values);
+			return A3(
+				$elm$core$Elm$JsArray$unsafeSet,
+				pos,
+				$elm$core$Array$Leaf(newLeaf),
+				tree);
+		}
+	});
+var $elm$core$Array$set = F3(
+	function (index, value, array) {
+		var len = array.a;
+		var startShift = array.b;
+		var tree = array.c;
+		var tail = array.d;
+		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? array : ((_Utils_cmp(
+			index,
+			$elm$core$Array$tailIndex(len)) > -1) ? A4(
+			$elm$core$Array$Array_elm_builtin,
+			len,
+			startShift,
+			tree,
+			A3($elm$core$Elm$JsArray$unsafeSet, $elm$core$Array$bitMask & index, value, tail)) : A4(
+			$elm$core$Array$Array_elm_builtin,
+			len,
+			startShift,
+			A4($elm$core$Array$setHelp, startShift, index, value, tree),
+			tail));
+	});
+var $tortus$elm_array_2d$Array2D$set = F4(
+	function (row, col, newValue, array2d) {
+		return A2(
+			$elm$core$Maybe$withDefault,
+			array2d,
+			A2(
+				$elm$core$Maybe$map,
+				function (rowAry) {
+					return _Utils_update(
+						array2d,
+						{
+							data: A3(
+								$elm$core$Array$set,
+								row,
+								A3($elm$core$Array$set, col, newValue, rowAry),
+								array2d.data)
+						});
+				},
+				A2($tortus$elm_array_2d$Array2D$getRow, row, array2d)));
+	});
+var $author$project$Aoc15$moveStuff = F2(
+	function (warehouse, swaps) {
+		moveStuff:
+		while (true) {
+			if (!swaps.b) {
+				return warehouse;
+			} else {
+				var _v1 = swaps.a;
+				var _v2 = _v1.a;
+				var x1 = _v2.a;
+				var y1 = _v2.b;
+				var _v3 = _v1.b;
+				var x2 = _v3.a;
+				var y2 = _v3.b;
+				var rest = swaps.b;
+				var maybeCell2 = A3($tortus$elm_array_2d$Array2D$get, y2, x2, warehouse);
+				var maybeCell1 = A3($tortus$elm_array_2d$Array2D$get, y1, x1, warehouse);
+				var _v4 = _Utils_Tuple2(maybeCell1, maybeCell2);
+				if ((_v4.a.$ === 'Just') && (_v4.b.$ === 'Just')) {
+					var cell1 = _v4.a.a;
+					var cell2 = _v4.b.a;
+					var wh = A4(
+						$tortus$elm_array_2d$Array2D$set,
+						y2,
+						x1,
+						cell1,
+						A4($tortus$elm_array_2d$Array2D$set, y1, x1, cell2, warehouse));
+					var $temp$warehouse = wh,
+						$temp$swaps = rest;
+					warehouse = $temp$warehouse;
+					swaps = $temp$swaps;
+					continue moveStuff;
+				} else {
+					var $temp$warehouse = warehouse,
+						$temp$swaps = rest;
+					warehouse = $temp$warehouse;
+					swaps = $temp$swaps;
+					continue moveStuff;
+				}
+			}
+		}
+	});
+var $author$project$Aoc15$tryFindSpaceSimpleLoop = F4(
+	function (warehouse, move, _v0, swaps) {
+		tryFindSpaceSimpleLoop:
+		while (true) {
+			var x = _v0.a;
+			var y = _v0.b;
+			var nextPos = A2(
+				$author$project$Aoc15$moveStep,
+				move,
+				_Utils_Tuple2(x, y));
+			var nextSwaps = A2(
+				$elm$core$List$cons,
+				_Utils_Tuple2(
+					_Utils_Tuple2(x, y),
+					nextPos),
+				swaps);
+			var _v1 = $author$project$Aoc15$moveToOffset(move);
+			var dx = _v1.a;
+			var dy = _v1.b;
+			var _v2 = A3($tortus$elm_array_2d$Array2D$get, y, x, warehouse);
+			_v2$3:
+			while (true) {
+				if (_v2.$ === 'Just') {
+					switch (_v2.a.valueOf()) {
+						case '#':
+							return _List_Nil;
+						case '.':
+							return nextSwaps;
+						case 'O':
+							var $temp$warehouse = warehouse,
+								$temp$move = move,
+								$temp$_v0 = nextPos,
+								$temp$swaps = nextSwaps;
+							warehouse = $temp$warehouse;
+							move = $temp$move;
+							_v0 = $temp$_v0;
+							swaps = $temp$swaps;
+							continue tryFindSpaceSimpleLoop;
+						default:
+							break _v2$3;
+					}
+				} else {
+					break _v2$3;
+				}
+			}
+			return _List_Nil;
+		}
+	});
+var $author$project$Aoc15$tryFindSpaceSimple = F3(
+	function (warehouse, robot, move) {
+		return A4($author$project$Aoc15$tryFindSpaceSimpleLoop, warehouse, move, robot, _List_Nil);
+	});
+var $author$project$Aoc15$tryFindSpace = F4(
+	function (wide, warehouse, robot, move) {
+		return A3($author$project$Aoc15$tryFindSpaceSimple, warehouse, robot, move);
+	});
+var $author$project$Aoc15$tryMoveRobot = F4(
+	function (wide, warehouse, robot, move) {
+		var swaps = A4($author$project$Aoc15$tryFindSpace, wide, warehouse, robot, move);
+		if (!$elm$core$List$length(swaps)) {
+			return _Utils_Tuple2(warehouse, robot);
+		} else {
+			var wh = A2($author$project$Aoc15$moveStuff, warehouse, swaps);
+			var rb = A2($author$project$Aoc15$moveStep, move, robot);
+			return _Utils_Tuple2(wh, rb);
+		}
+	});
 var $author$project$Aoc15$updateStep = function (model) {
-	return model;
+	var wide = model.wide;
+	var warehouse = model.warehouse;
+	var robot = model.robot;
+	var _v0 = model.moves;
+	if (!_v0.b) {
+		return _Utils_update(
+			model,
+			{message: 'No moves!'});
+	} else {
+		var move = _v0.a;
+		var movesLeft = _v0.b;
+		var msg = 'Move: ' + $elm$core$String$fromChar(move);
+		var _v1 = A4($author$project$Aoc15$tryMoveRobot, wide, warehouse, robot, move);
+		var wh = _v1.a;
+		var rb = _v1.b;
+		return _Utils_update(
+			model,
+			{message: msg, moves: movesLeft, robot: rb, warehouse: wh});
+	}
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc15$updateTogglePlay = function (model) {
@@ -6437,6 +6664,7 @@ var $author$project$Aoc15$view = function (model) {
 	var warehouse = model.warehouse;
 	var textFontSize = model.large ? '12px' : '28px';
 	var rows = $author$project$Aoc15$toWarehouseRows(warehouse);
+	var message = model.message;
 	var elements = A2($elm$core$List$concatMap, $author$project$Aoc15$toRowElements, rows);
 	return A2(
 		$elm$html$Html$table,
@@ -6694,6 +6922,32 @@ var $author$project$Aoc15$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text('Step')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '24px'),
+								A2($elm$html$Html$Attributes$style, 'width', '200px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(model.message)
 									]))
 							]))
 					])),

@@ -40,6 +40,7 @@ type Cell = Highlight Char | Plain Char
 type alias Model = 
   { warehouse : Array2D Char
   , large : Bool 
+  , wide : Bool 
   , robot : Pos 
   , dataSource : DataSource
   , moves : List Char 
@@ -190,6 +191,7 @@ initModel dataSource =
   in 
     { warehouse = warehouse
     , large = dataSource == Input 
+    , wide = False
     , robot = robot 
     , dataSource = dataSource
     , moves = moves
@@ -237,12 +239,121 @@ findRobot : Array2D Char -> Pos
 findRobot warehouse = 
   findRobotLoop warehouse (getAllPositions warehouse)
 
+moveToOffset : Char -> Pos 
+moveToOffset move = 
+  case move of 
+    '^' -> (0, -1)
+    '<' -> (-1, 0)
+    'v' -> (0, 1)
+    '>' -> (1, 0)
+    _ -> (0, 0)
+
+moveStep move (x, y) = 
+  let 
+    (dx, dy) = moveToOffset move 
+  in 
+    (x + dx, y + dy)
+
+-- let tryFindSpaceSimple (warehouse : char[,]) (robotPos : Pos) (move : Move) : (Pos*Pos) list =
+--     let rec loop (x, y) (swaps : (Pos*Pos) list) = 
+--         let (dx, dy) = moveToOffset move 
+--         let pos = (x + dx, y + dy)
+--         let nextSwaps = (pos, (x, y)) :: swaps 
+--         match Warehouse.get warehouse pos with 
+--         | '#' -> 
+--             [] 
+--         | '.' ->
+--             nextSwaps
+--         | '[' 
+--         | ']' 
+--         | 'O' ->
+--             loop pos nextSwaps
+--         | _ -> failwith "?" 
+--     loop robotPos []
+
+tryFindSpaceSimpleLoop : Array2D Char -> Char -> Pos -> List (Pos, Pos) -> List (Pos, Pos)
+tryFindSpaceSimpleLoop warehouse move (x, y) swaps = 
+  let 
+    (dx, dy) = moveToOffset move 
+    nextPos = moveStep move (x, y)
+    nextSwaps = ((x, y), nextPos) :: swaps 
+  in 
+    case Array2D.get y x warehouse of 
+      Just '#' -> []
+      Just '.' -> nextSwaps 
+      Just 'O' -> 
+        tryFindSpaceSimpleLoop warehouse move nextPos nextSwaps 
+      _ -> [] 
+
+tryFindSpaceSimple : Array2D Char -> Pos -> Char -> List (Pos, Pos) 
+tryFindSpaceSimple warehouse robot move = 
+  tryFindSpaceSimpleLoop warehouse move robot []
+
+tryFindSpace : Bool -> Array2D Char -> Pos -> Char -> List (Pos, Pos) 
+tryFindSpace wide warehouse robot move = 
+  tryFindSpaceSimple warehouse robot move
+
+-- let rec moveStuff warehouse swaps = 
+--     match swaps with 
+--     | [] -> ()
+--     | (pos1, pos2) :: rest -> 
+--         let cell1 = Warehouse.get warehouse pos1 
+--         let cell2 = Warehouse.get warehouse pos2
+--         Warehouse.set warehouse pos1 cell2 
+--         Warehouse.set warehouse pos2 cell1 
+--         moveStuff warehouse rest 
+
+moveStuff : Array2D Char -> List (Pos, Pos) -> Array2D Char
+moveStuff warehouse swaps = 
+  case swaps of
+    [] -> warehouse 
+    ((x1, y1), (x2, y2)) :: rest -> 
+      let 
+        maybeCell1 = Array2D.get y1 x1 warehouse
+        maybeCell2 = Array2D.get y2 x2 warehouse
+      in 
+        case (maybeCell1, maybeCell2) of 
+          (Just cell1, Just cell2) -> 
+            let 
+              wh = warehouse |> Array2D.set y1 x1 cell2 |> Array2D.set y2 x1 cell1 
+            in 
+              moveStuff wh rest  
+          _ -> 
+            moveStuff warehouse rest
+
+tryMoveRobot : Bool -> Array2D Char -> Pos -> Char -> (Array2D Char, Pos) 
+tryMoveRobot wide warehouse robot move = 
+  let 
+    swaps = tryFindSpace wide warehouse robot move
+  in 
+    if List.length swaps == 0 then 
+      (warehouse, robot) 
+    else 
+      let 
+        wh = moveStuff warehouse swaps
+        rb = moveStep move robot
+      in 
+        (wh, rb)
+
 updateClear : Model -> Model
 updateClear model = 
   initModel model.dataSource
 
 updateStep : Model -> Model
-updateStep model = model
+updateStep model = 
+  let 
+    wide = model.wide 
+    warehouse = model.warehouse 
+    robot = model.robot
+  in 
+    case model.moves of 
+      [] -> { model | message = "No moves!" } 
+      move :: movesLeft -> 
+        let 
+          (wh, rb) = tryMoveRobot wide warehouse robot move 
+          msg = "Move: " ++ String.fromChar move 
+        in 
+          { model | warehouse = wh, robot = rb, moves = movesLeft, message = msg  }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -308,6 +419,7 @@ view model =
     rows = toWarehouseRows warehouse
     -- Insert robot symbol.
     elements = rows |> List.concatMap (toRowElements)
+    message = model.message
   in 
     Html.table 
       [ Html.Attributes.style "width" "1080px"]
@@ -382,6 +494,17 @@ view model =
                 [ Html.Attributes.style "width" "80px", onClick Step ] 
                 [ Html.text "Step" ]
             ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "background-color" "white" 
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "24px"
+              , Html.Attributes.style "width" "200px" ] 
+              [ 
+                Html.div [] [ Html.text model.message ]
+              ] ]
       , Html.tr 
           []
           [ Html.td 
