@@ -10,6 +10,8 @@ import Set exposing (Set)
 import Array2D exposing (Array2D)
 import Html exposing (text)
 import Time
+import Keyboard exposing (RawKey)
+import Keyboard.Arrows exposing (..)
 
 defaultTickInterval : Float
 defaultTickInterval = 10
@@ -222,6 +224,7 @@ type Msg =
   | UseSmaller
   | UseLarger
   | UseSituation
+  | KeyDown RawKey
 
 getAllPositions : Array2D Char -> List Pos
 getAllPositions board = 
@@ -404,6 +407,17 @@ updateStep model =
         in 
           { model | warehouse = wh, robot = rb, moves = movesLeft, message = ""  }
 
+updateKey : Char -> Model -> Model
+updateKey move model = 
+  let 
+    wide = model.wide 
+    warehouse = model.warehouse 
+    robot = model.robot
+    (wh, rb) = tryMoveRobot wide warehouse robot move
+    (rx, ry) = rb 
+    in 
+      { model | warehouse = wh, robot = rb, message = ""  }
+
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
   { model | paused = not model.paused }
@@ -437,6 +451,28 @@ update msg model =
       (initModel model.wide SampleLarger, Cmd.none)
     UseSituation -> 
       (initModel model.wide SampleSituation, Cmd.none)
+    KeyDown rawKey ->
+      case Keyboard.Arrows.arrowKey rawKey of 
+        Just Keyboard.ArrowUp -> 
+          (updateKey '^' model, Cmd.none)
+        Just Keyboard.ArrowLeft -> 
+          (updateKey '<' model, Cmd.none)
+        Just Keyboard.ArrowDown -> 
+          (updateKey 'v' model, Cmd.none)
+        Just Keyboard.ArrowRight -> 
+          (updateKey '>' model, Cmd.none)
+        Just (Keyboard.Character "W") -> 
+          (updateKey '^' model, Cmd.none)
+        Just (Keyboard.Character "A") -> 
+          (updateKey '<' model, Cmd.none)
+        Just (Keyboard.Character "S") -> 
+          (updateKey 'v' model, Cmd.none)
+        Just (Keyboard.Character "D") -> 
+          (updateKey '>' model, Cmd.none)
+        _ -> 
+          (model, Cmd.none)
+
+
 
 -- SUBSCRIPTIONS
 
@@ -444,8 +480,9 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
   let 
     tickSub = if model.paused then Sub.none else Time.every model.tickInterval (\_ -> Tick)
+    keySub = Keyboard.downs KeyDown
   in 
-    tickSub
+    Sub.batch [ tickSub, keySub ] 
 
 -- VIEW
 

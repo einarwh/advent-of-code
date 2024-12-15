@@ -5856,51 +5856,49 @@ var $author$project$Aoc15$init = function (_v0) {
 		A2($author$project$Aoc15$initModel, false, $author$project$Aoc15$SampleLarger),
 		$elm$core$Platform$Cmd$none);
 };
+var $author$project$Aoc15$KeyDown = function (a) {
+	return {$: 'KeyDown', a: a};
+};
 var $author$project$Aoc15$Tick = {$: 'Tick'};
-var $elm$time$Time$Every = F2(
-	function (a, b) {
-		return {$: 'Every', a: a, b: b};
+var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $ohanhi$keyboard$Keyboard$RawKey = function (a) {
+	return {$: 'RawKey', a: a};
+};
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $ohanhi$keyboard$Keyboard$eventKeyDecoder = A2(
+	$elm$json$Json$Decode$field,
+	'key',
+	A2($elm$json$Json$Decode$map, $ohanhi$keyboard$Keyboard$RawKey, $elm$json$Json$Decode$string));
+var $elm$browser$Browser$Events$Document = {$: 'Document'};
+var $elm$browser$Browser$Events$MySub = F3(
+	function (a, b, c) {
+		return {$: 'MySub', a: a, b: b, c: c};
 	});
-var $elm$time$Time$State = F2(
-	function (taggers, processes) {
-		return {processes: processes, taggers: taggers};
+var $elm$browser$Browser$Events$State = F2(
+	function (subs, pids) {
+		return {pids: pids, subs: subs};
 	});
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
-var $elm$time$Time$init = $elm$core$Task$succeed(
-	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
-var $elm$core$Basics$compare = _Utils_compare;
-var $elm$core$Dict$get = F2(
-	function (targetKey, dict) {
-		get:
-		while (true) {
-			if (dict.$ === 'RBEmpty_elm_builtin') {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var key = dict.b;
-				var value = dict.c;
-				var left = dict.d;
-				var right = dict.e;
-				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
-				switch (_v1.$) {
-					case 'LT':
-						var $temp$targetKey = targetKey,
-							$temp$dict = left;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-					case 'EQ':
-						return $elm$core$Maybe$Just(value);
-					default:
-						var $temp$targetKey = targetKey,
-							$temp$dict = right;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-				}
-			}
-		}
-	});
+var $elm$browser$Browser$Events$init = $elm$core$Task$succeed(
+	A2($elm$browser$Browser$Events$State, _List_Nil, $elm$core$Dict$empty));
+var $elm$browser$Browser$Events$nodeToKey = function (node) {
+	if (node.$ === 'Document') {
+		return 'd_';
+	} else {
+		return 'w_';
+	}
+};
+var $elm$browser$Browser$Events$addKey = function (sub) {
+	var node = sub.a;
+	var name = sub.b;
+	return _Utils_Tuple2(
+		_Utils_ap(
+			$elm$browser$Browser$Events$nodeToKey(node),
+			name),
+		sub);
+};
 var $elm$core$Dict$Black = {$: 'Black'};
 var $elm$core$Dict$RBNode_elm_builtin = F5(
 	function (a, b, c, d, e) {
@@ -5961,6 +5959,7 @@ var $elm$core$Dict$balance = F5(
 			}
 		}
 	});
+var $elm$core$Basics$compare = _Utils_compare;
 var $elm$core$Dict$insertHelp = F3(
 	function (key, value, dict) {
 		if (dict.$ === 'RBEmpty_elm_builtin') {
@@ -6009,27 +6008,18 @@ var $elm$core$Dict$insert = F3(
 			return x;
 		}
 	});
-var $elm$time$Time$addMySub = F2(
-	function (_v0, state) {
-		var interval = _v0.a;
-		var tagger = _v0.b;
-		var _v1 = A2($elm$core$Dict$get, interval, state);
-		if (_v1.$ === 'Nothing') {
-			return A3(
-				$elm$core$Dict$insert,
-				interval,
-				_List_fromArray(
-					[tagger]),
-				state);
-		} else {
-			var taggers = _v1.a;
-			return A3(
-				$elm$core$Dict$insert,
-				interval,
-				A2($elm$core$List$cons, tagger, taggers),
-				state);
-		}
-	});
+var $elm$core$Dict$fromList = function (assocs) {
+	return A3(
+		$elm$core$List$foldl,
+		F2(
+			function (_v0, dict) {
+				var key = _v0.a;
+				var value = _v0.b;
+				return A3($elm$core$Dict$insert, key, value, dict);
+			}),
+		$elm$core$Dict$empty,
+		assocs);
+};
 var $elm$core$Process$kill = _Scheduler_kill;
 var $elm$core$Dict$foldl = F3(
 	function (func, acc, dict) {
@@ -6117,7 +6107,236 @@ var $elm$core$Dict$merge = F6(
 			intermediateResult,
 			leftovers);
 	});
+var $elm$browser$Browser$Events$Event = F2(
+	function (key, event) {
+		return {event: event, key: key};
+	});
 var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
+var $elm$browser$Browser$Events$spawn = F3(
+	function (router, key, _v0) {
+		var node = _v0.a;
+		var name = _v0.b;
+		var actualNode = function () {
+			if (node.$ === 'Document') {
+				return _Browser_doc;
+			} else {
+				return _Browser_window;
+			}
+		}();
+		return A2(
+			$elm$core$Task$map,
+			function (value) {
+				return _Utils_Tuple2(key, value);
+			},
+			A3(
+				_Browser_on,
+				actualNode,
+				name,
+				function (event) {
+					return A2(
+						$elm$core$Platform$sendToSelf,
+						router,
+						A2($elm$browser$Browser$Events$Event, key, event));
+				}));
+	});
+var $elm$core$Dict$union = F2(
+	function (t1, t2) {
+		return A3($elm$core$Dict$foldl, $elm$core$Dict$insert, t2, t1);
+	});
+var $elm$browser$Browser$Events$onEffects = F3(
+	function (router, subs, state) {
+		var stepRight = F3(
+			function (key, sub, _v6) {
+				var deads = _v6.a;
+				var lives = _v6.b;
+				var news = _v6.c;
+				return _Utils_Tuple3(
+					deads,
+					lives,
+					A2(
+						$elm$core$List$cons,
+						A3($elm$browser$Browser$Events$spawn, router, key, sub),
+						news));
+			});
+		var stepLeft = F3(
+			function (_v4, pid, _v5) {
+				var deads = _v5.a;
+				var lives = _v5.b;
+				var news = _v5.c;
+				return _Utils_Tuple3(
+					A2($elm$core$List$cons, pid, deads),
+					lives,
+					news);
+			});
+		var stepBoth = F4(
+			function (key, pid, _v2, _v3) {
+				var deads = _v3.a;
+				var lives = _v3.b;
+				var news = _v3.c;
+				return _Utils_Tuple3(
+					deads,
+					A3($elm$core$Dict$insert, key, pid, lives),
+					news);
+			});
+		var newSubs = A2($elm$core$List$map, $elm$browser$Browser$Events$addKey, subs);
+		var _v0 = A6(
+			$elm$core$Dict$merge,
+			stepLeft,
+			stepBoth,
+			stepRight,
+			state.pids,
+			$elm$core$Dict$fromList(newSubs),
+			_Utils_Tuple3(_List_Nil, $elm$core$Dict$empty, _List_Nil));
+		var deadPids = _v0.a;
+		var livePids = _v0.b;
+		var makeNewPids = _v0.c;
+		return A2(
+			$elm$core$Task$andThen,
+			function (pids) {
+				return $elm$core$Task$succeed(
+					A2(
+						$elm$browser$Browser$Events$State,
+						newSubs,
+						A2(
+							$elm$core$Dict$union,
+							livePids,
+							$elm$core$Dict$fromList(pids))));
+			},
+			A2(
+				$elm$core$Task$andThen,
+				function (_v1) {
+					return $elm$core$Task$sequence(makeNewPids);
+				},
+				$elm$core$Task$sequence(
+					A2($elm$core$List$map, $elm$core$Process$kill, deadPids))));
+	});
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $elm$browser$Browser$Events$onSelfMsg = F3(
+	function (router, _v0, state) {
+		var key = _v0.key;
+		var event = _v0.event;
+		var toMessage = function (_v2) {
+			var subKey = _v2.a;
+			var _v3 = _v2.b;
+			var node = _v3.a;
+			var name = _v3.b;
+			var decoder = _v3.c;
+			return _Utils_eq(subKey, key) ? A2(_Browser_decodeEvent, decoder, event) : $elm$core$Maybe$Nothing;
+		};
+		var messages = A2($elm$core$List$filterMap, toMessage, state.subs);
+		return A2(
+			$elm$core$Task$andThen,
+			function (_v1) {
+				return $elm$core$Task$succeed(state);
+			},
+			$elm$core$Task$sequence(
+				A2(
+					$elm$core$List$map,
+					$elm$core$Platform$sendToApp(router),
+					messages)));
+	});
+var $elm$browser$Browser$Events$subMap = F2(
+	function (func, _v0) {
+		var node = _v0.a;
+		var name = _v0.b;
+		var decoder = _v0.c;
+		return A3(
+			$elm$browser$Browser$Events$MySub,
+			node,
+			name,
+			A2($elm$json$Json$Decode$map, func, decoder));
+	});
+_Platform_effectManagers['Browser.Events'] = _Platform_createManager($elm$browser$Browser$Events$init, $elm$browser$Browser$Events$onEffects, $elm$browser$Browser$Events$onSelfMsg, 0, $elm$browser$Browser$Events$subMap);
+var $elm$browser$Browser$Events$subscription = _Platform_leaf('Browser.Events');
+var $elm$browser$Browser$Events$on = F3(
+	function (node, name, decoder) {
+		return $elm$browser$Browser$Events$subscription(
+			A3($elm$browser$Browser$Events$MySub, node, name, decoder));
+	});
+var $elm$browser$Browser$Events$onKeyDown = A2($elm$browser$Browser$Events$on, $elm$browser$Browser$Events$Document, 'keydown');
+var $ohanhi$keyboard$Keyboard$downs = function (toMsg) {
+	return $elm$browser$Browser$Events$onKeyDown(
+		A2($elm$json$Json$Decode$map, toMsg, $ohanhi$keyboard$Keyboard$eventKeyDecoder));
+};
+var $elm$time$Time$Every = F2(
+	function (a, b) {
+		return {$: 'Every', a: a, b: b};
+	});
+var $elm$time$Time$State = F2(
+	function (taggers, processes) {
+		return {processes: processes, taggers: taggers};
+	});
+var $elm$time$Time$init = $elm$core$Task$succeed(
+	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
+var $elm$core$Dict$get = F2(
+	function (targetKey, dict) {
+		get:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
+				switch (_v1.$) {
+					case 'LT':
+						var $temp$targetKey = targetKey,
+							$temp$dict = left;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+					case 'EQ':
+						return $elm$core$Maybe$Just(value);
+					default:
+						var $temp$targetKey = targetKey,
+							$temp$dict = right;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+				}
+			}
+		}
+	});
+var $elm$time$Time$addMySub = F2(
+	function (_v0, state) {
+		var interval = _v0.a;
+		var tagger = _v0.b;
+		var _v1 = A2($elm$core$Dict$get, interval, state);
+		if (_v1.$ === 'Nothing') {
+			return A3(
+				$elm$core$Dict$insert,
+				interval,
+				_List_fromArray(
+					[tagger]),
+				state);
+		} else {
+			var taggers = _v1.a;
+			return A3(
+				$elm$core$Dict$insert,
+				interval,
+				A2($elm$core$List$cons, tagger, taggers),
+				state);
+		}
+	});
 var $elm$time$Time$Name = function (a) {
 	return {$: 'Name', a: a};
 };
@@ -6272,7 +6491,6 @@ var $elm$time$Time$every = F2(
 		return $elm$time$Time$subscription(
 			A2($elm$time$Time$Every, interval, tagger));
 	});
-var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc15$subscriptions = function (model) {
 	var tickSub = model.paused ? $elm$core$Platform$Sub$none : A2(
@@ -6281,10 +6499,51 @@ var $author$project$Aoc15$subscriptions = function (model) {
 		function (_v0) {
 			return $author$project$Aoc15$Tick;
 		});
-	return tickSub;
+	var keySub = $ohanhi$keyboard$Keyboard$downs($author$project$Aoc15$KeyDown);
+	return $elm$core$Platform$Sub$batch(
+		_List_fromArray(
+			[tickSub, keySub]));
 };
 var $author$project$Aoc15$SampleSituation = {$: 'SampleSituation'};
 var $author$project$Aoc15$SampleSmaller = {$: 'SampleSmaller'};
+var $ohanhi$keyboard$Keyboard$ArrowDown = {$: 'ArrowDown'};
+var $ohanhi$keyboard$Keyboard$ArrowLeft = {$: 'ArrowLeft'};
+var $ohanhi$keyboard$Keyboard$ArrowRight = {$: 'ArrowRight'};
+var $ohanhi$keyboard$Keyboard$ArrowUp = {$: 'ArrowUp'};
+var $ohanhi$keyboard$Keyboard$Character = function (a) {
+	return {$: 'Character', a: a};
+};
+var $ohanhi$keyboard$Keyboard$rawValue = function (_v0) {
+	var key = _v0.a;
+	return key;
+};
+var $elm$core$String$toUpper = _String_toUpper;
+var $ohanhi$keyboard$Keyboard$Arrows$arrowKey = function (rawKey) {
+	var _v0 = $ohanhi$keyboard$Keyboard$rawValue(rawKey);
+	switch (_v0) {
+		case 'ArrowDown':
+			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowDown);
+		case 'ArrowLeft':
+			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowLeft);
+		case 'ArrowRight':
+			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowRight);
+		case 'ArrowUp':
+			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowUp);
+		case 'Down':
+			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowDown);
+		case 'Left':
+			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowLeft);
+		case 'Right':
+			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowRight);
+		case 'Up':
+			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowUp);
+		default:
+			var other = _v0;
+			var upper = $elm$core$String$toUpper(other);
+			return ((upper === 'W') || ((upper === 'A') || ((upper === 'S') || (upper === 'D')))) ? $elm$core$Maybe$Just(
+				$ohanhi$keyboard$Keyboard$Character(upper)) : $elm$core$Maybe$Nothing;
+	}
+};
 var $author$project$Aoc15$updateClear = function (model) {
 	return A2($author$project$Aoc15$initModel, model.wide, model.dataSource);
 };
@@ -6465,24 +6724,6 @@ var $elm$core$List$all = F2(
 			$elm$core$List$any,
 			A2($elm$core$Basics$composeL, $elm$core$Basics$not, isOkay),
 			list);
-	});
-var $elm$core$List$maybeCons = F3(
-	function (f, mx, xs) {
-		var _v0 = f(mx);
-		if (_v0.$ === 'Just') {
-			var x = _v0.a;
-			return A2($elm$core$List$cons, x, xs);
-		} else {
-			return xs;
-		}
-	});
-var $elm$core$List$filterMap = F2(
-	function (f, xs) {
-		return A3(
-			$elm$core$List$foldr,
-			$elm$core$List$maybeCons(f),
-			_List_Nil,
-			xs);
 	});
 var $elm$core$Set$Set_elm_builtin = function (a) {
 	return {$: 'Set_elm_builtin', a: a};
@@ -6730,6 +6971,21 @@ var $author$project$Aoc15$tryMoveRobot = F4(
 			return _Utils_Tuple2(wh, rb);
 		}
 	});
+var $author$project$Aoc15$updateKey = F2(
+	function (move, model) {
+		var wide = model.wide;
+		var warehouse = model.warehouse;
+		var robot = model.robot;
+		var _v0 = A4($author$project$Aoc15$tryMoveRobot, wide, warehouse, robot, move);
+		var wh = _v0.a;
+		var rb = _v0.b;
+		var _v1 = rb;
+		var rx = _v1.a;
+		var ry = _v1.b;
+		return _Utils_update(
+			model,
+			{message: '', robot: rb, warehouse: wh});
+	});
 var $author$project$Aoc15$updateStep = function (model) {
 	var wide = model.wide;
 	var warehouse = model.warehouse;
@@ -6806,10 +7062,90 @@ var $author$project$Aoc15$update = F2(
 				return _Utils_Tuple2(
 					A2($author$project$Aoc15$initModel, model.wide, $author$project$Aoc15$SampleLarger),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'UseSituation':
 				return _Utils_Tuple2(
 					A2($author$project$Aoc15$initModel, model.wide, $author$project$Aoc15$SampleSituation),
 					$elm$core$Platform$Cmd$none);
+			default:
+				var rawKey = msg.a;
+				var _v1 = $ohanhi$keyboard$Keyboard$Arrows$arrowKey(rawKey);
+				_v1$8:
+				while (true) {
+					if (_v1.$ === 'Just') {
+						switch (_v1.a.$) {
+							case 'ArrowUp':
+								var _v2 = _v1.a;
+								return _Utils_Tuple2(
+									A2(
+										$author$project$Aoc15$updateKey,
+										_Utils_chr('^'),
+										model),
+									$elm$core$Platform$Cmd$none);
+							case 'ArrowLeft':
+								var _v3 = _v1.a;
+								return _Utils_Tuple2(
+									A2(
+										$author$project$Aoc15$updateKey,
+										_Utils_chr('<'),
+										model),
+									$elm$core$Platform$Cmd$none);
+							case 'ArrowDown':
+								var _v4 = _v1.a;
+								return _Utils_Tuple2(
+									A2(
+										$author$project$Aoc15$updateKey,
+										_Utils_chr('v'),
+										model),
+									$elm$core$Platform$Cmd$none);
+							case 'ArrowRight':
+								var _v5 = _v1.a;
+								return _Utils_Tuple2(
+									A2(
+										$author$project$Aoc15$updateKey,
+										_Utils_chr('>'),
+										model),
+									$elm$core$Platform$Cmd$none);
+							case 'Character':
+								switch (_v1.a.a) {
+									case 'W':
+										return _Utils_Tuple2(
+											A2(
+												$author$project$Aoc15$updateKey,
+												_Utils_chr('^'),
+												model),
+											$elm$core$Platform$Cmd$none);
+									case 'A':
+										return _Utils_Tuple2(
+											A2(
+												$author$project$Aoc15$updateKey,
+												_Utils_chr('<'),
+												model),
+											$elm$core$Platform$Cmd$none);
+									case 'S':
+										return _Utils_Tuple2(
+											A2(
+												$author$project$Aoc15$updateKey,
+												_Utils_chr('v'),
+												model),
+											$elm$core$Platform$Cmd$none);
+									case 'D':
+										return _Utils_Tuple2(
+											A2(
+												$author$project$Aoc15$updateKey,
+												_Utils_chr('>'),
+												model),
+											$elm$core$Platform$Cmd$none);
+									default:
+										break _v1$8;
+								}
+							default:
+								break _v1$8;
+						}
+					} else {
+						break _v1$8;
+					}
+				}
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Aoc15$Clear = {$: 'Clear'};
