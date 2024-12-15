@@ -39,6 +39,8 @@ type Cell = Highlight Char | Plain Char
 
 type alias Model = 
   { warehouse : Array2D Char
+  , large : Bool 
+  , robot : Pos 
   , dataSource : DataSource
   , moves : List Char 
   , paused : Bool 
@@ -184,8 +186,11 @@ initModel dataSource =
     numberOfRows = rows |> List.length 
     numberOfCols = rows |> List.head |> Maybe.withDefault "?" |> String.length 
     warehouse = rows |> List.map (String.toList) |> Array2D.fromList
+    robot = findRobot warehouse 
   in 
-    { warehouse = warehouse  
+    { warehouse = warehouse
+    , large = dataSource == Input 
+    , robot = robot 
     , dataSource = dataSource
     , moves = moves
     , paused = True
@@ -218,6 +223,19 @@ getAllPositions board =
     xs = List.range 0 (Array2D.columns board - 1)
   in 
     ys |> List.concatMap (\y -> xs |> List.map (\x -> (x, y)))
+
+findRobotLoop : Array2D Char -> List Pos -> Pos 
+findRobotLoop warehouse positions = 
+  case positions of 
+    [] -> (0, 0)
+    (x, y) :: rest -> 
+      case Array2D.get y x warehouse of 
+        Just '@' -> (x, y)
+        _ -> findRobotLoop warehouse rest 
+
+findRobot : Array2D Char -> Pos 
+findRobot warehouse = 
+  findRobotLoop warehouse (getAllPositions warehouse)
 
 updateClear : Model -> Model
 updateClear model = 
@@ -285,9 +303,10 @@ toRowElements rowText =
 view : Model -> Html Msg
 view model =
   let
-    textFontSize = "12px"
+    textFontSize = if model.large then "12px" else "28px"
     warehouse = model.warehouse
     rows = toWarehouseRows warehouse
+    -- Insert robot symbol.
     elements = rows |> List.concatMap (toRowElements)
   in 
     Html.table 

@@ -5257,7 +5257,147 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Aoc15$SampleLarger = {$: 'SampleLarger'};
+var $author$project$Aoc15$Input = {$: 'Input'};
 var $author$project$Aoc15$defaultTickInterval = 10;
+var $elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (maybeValue.$ === 'Just') {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $elm$core$Bitwise$and = _Bitwise_and;
+var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
+var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
+var $elm$core$Basics$ge = _Utils_ge;
+var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
+var $elm$core$Array$getHelp = F3(
+	function (shift, index, tree) {
+		getHelp:
+		while (true) {
+			var pos = $elm$core$Array$bitMask & (index >>> shift);
+			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+			if (_v0.$ === 'SubTree') {
+				var subTree = _v0.a;
+				var $temp$shift = shift - $elm$core$Array$shiftStep,
+					$temp$index = index,
+					$temp$tree = subTree;
+				shift = $temp$shift;
+				index = $temp$index;
+				tree = $temp$tree;
+				continue getHelp;
+			} else {
+				var values = _v0.a;
+				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
+			}
+		}
+	});
+var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
+var $elm$core$Array$tailIndex = function (len) {
+	return (len >>> 5) << 5;
+};
+var $elm$core$Array$get = F2(
+	function (index, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
+			index,
+			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
+			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
+			A3($elm$core$Array$getHelp, startShift, index, tree)));
+	});
+var $tortus$elm_array_2d$Array2D$getRow = F2(
+	function (row, array2d) {
+		return A2($elm$core$Array$get, row, array2d.data);
+	});
+var $tortus$elm_array_2d$Array2D$get = F3(
+	function (row, col, array2d) {
+		return A2(
+			$elm$core$Maybe$andThen,
+			$elm$core$Array$get(col),
+			A2($tortus$elm_array_2d$Array2D$getRow, row, array2d));
+	});
+var $author$project$Aoc15$findRobotLoop = F2(
+	function (warehouse, positions) {
+		findRobotLoop:
+		while (true) {
+			if (!positions.b) {
+				return _Utils_Tuple2(0, 0);
+			} else {
+				var _v1 = positions.a;
+				var x = _v1.a;
+				var y = _v1.b;
+				var rest = positions.b;
+				var _v2 = A3($tortus$elm_array_2d$Array2D$get, y, x, warehouse);
+				if ((_v2.$ === 'Just') && ('@' === _v2.a.valueOf())) {
+					return _Utils_Tuple2(x, y);
+				} else {
+					var $temp$warehouse = warehouse,
+						$temp$positions = rest;
+					warehouse = $temp$warehouse;
+					positions = $temp$positions;
+					continue findRobotLoop;
+				}
+			}
+		}
+	});
+var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
+	return array2d.columns;
+};
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
+var $elm$core$Array$length = function (_v0) {
+	var len = _v0.a;
+	return len;
+};
+var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
+	return $elm$core$Array$length(array2d.data);
+};
+var $author$project$Aoc15$getAllPositions = function (board) {
+	var ys = A2(
+		$elm$core$List$range,
+		0,
+		$tortus$elm_array_2d$Array2D$rows(board) - 1);
+	var xs = A2(
+		$elm$core$List$range,
+		0,
+		$tortus$elm_array_2d$Array2D$columns(board) - 1);
+	return A2(
+		$elm$core$List$concatMap,
+		function (y) {
+			return A2(
+				$elm$core$List$map,
+				function (x) {
+					return _Utils_Tuple2(x, y);
+				},
+				xs);
+		},
+		ys);
+};
+var $author$project$Aoc15$findRobot = function (warehouse) {
+	return A2(
+		$author$project$Aoc15$findRobotLoop,
+		warehouse,
+		$author$project$Aoc15$getAllPositions(warehouse));
+};
 var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
 var $elm$core$Array$foldl = F3(
 	function (func, baseCase, _v0) {
@@ -5282,10 +5422,6 @@ var $elm$core$Array$foldl = F3(
 var $elm$core$Array$isEmpty = function (_v0) {
 	var len = _v0.a;
 	return !len;
-};
-var $elm$core$Array$length = function (_v0) {
-	var len = _v0.a;
-	return len;
 };
 var $elm$core$Basics$negate = function (n) {
 	return -n;
@@ -5370,12 +5506,6 @@ var $elm$core$List$drop = F2(
 			}
 		}
 	});
-var $elm$core$Basics$ge = _Utils_ge;
-var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
-var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
-var $elm$core$Array$tailIndex = function (len) {
-	return (len >>> 5) << 5;
-};
 var $elm$core$Array$sliceLeft = F2(
 	function (from, array) {
 		var len = array.a;
@@ -5439,9 +5569,6 @@ var $elm$core$Array$sliceLeft = F2(
 			}
 		}
 	});
-var $elm$core$Bitwise$and = _Bitwise_and;
-var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
-var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
 var $elm$core$Array$fetchNewTail = F4(
 	function (shift, end, treeEnd, tree) {
 		fetchNewTail:
@@ -5684,7 +5811,18 @@ var $author$project$Aoc15$initModel = function (dataSource) {
 	var numberOfRows = $elm$core$List$length(rows);
 	var warehouse = $tortus$elm_array_2d$Array2D$fromList(
 		A2($elm$core$List$map, $elm$core$String$toList, rows));
-	return {dataSource: dataSource, finished: false, message: '?', moves: moves, paused: true, tickInterval: $author$project$Aoc15$defaultTickInterval, warehouse: warehouse};
+	var robot = $author$project$Aoc15$findRobot(warehouse);
+	return {
+		dataSource: dataSource,
+		finished: false,
+		large: _Utils_eq(dataSource, $author$project$Aoc15$Input),
+		message: '?',
+		moves: moves,
+		paused: true,
+		robot: robot,
+		tickInterval: $author$project$Aoc15$defaultTickInterval,
+		warehouse: warehouse
+	};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -6120,7 +6258,6 @@ var $author$project$Aoc15$subscriptions = function (model) {
 		});
 	return tickSub;
 };
-var $author$project$Aoc15$Input = {$: 'Input'};
 var $author$project$Aoc15$SampleSituation = {$: 'SampleSituation'};
 var $author$project$Aoc15$SampleSmaller = {$: 'SampleSmaller'};
 var $author$project$Aoc15$updateClear = function (model) {
@@ -6212,22 +6349,6 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 			$elm$json$Json$Encode$bool(bool));
 	});
 var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
-};
-var $elm$core$List$concatMap = F2(
-	function (f, list) {
-		return $elm$core$List$concat(
-			A2($elm$core$List$map, f, list));
-	});
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$Attributes$href = function (url) {
 	return A2(
@@ -6268,9 +6389,6 @@ var $author$project$Aoc15$toRowElements = function (rowText) {
 			A2($elm$html$Html$br, _List_Nil, _List_Nil)
 		]);
 };
-var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
-	return array2d.columns;
-};
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
 		var _v0 = f(mx);
@@ -6290,62 +6408,6 @@ var $elm$core$List$filterMap = F2(
 			xs);
 	});
 var $elm$core$String$fromList = _String_fromList;
-var $elm$core$Maybe$andThen = F2(
-	function (callback, maybeValue) {
-		if (maybeValue.$ === 'Just') {
-			var value = maybeValue.a;
-			return callback(value);
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $elm$core$Array$getHelp = F3(
-	function (shift, index, tree) {
-		getHelp:
-		while (true) {
-			var pos = $elm$core$Array$bitMask & (index >>> shift);
-			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
-			if (_v0.$ === 'SubTree') {
-				var subTree = _v0.a;
-				var $temp$shift = shift - $elm$core$Array$shiftStep,
-					$temp$index = index,
-					$temp$tree = subTree;
-				shift = $temp$shift;
-				index = $temp$index;
-				tree = $temp$tree;
-				continue getHelp;
-			} else {
-				var values = _v0.a;
-				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
-			}
-		}
-	});
-var $elm$core$Array$get = F2(
-	function (index, _v0) {
-		var len = _v0.a;
-		var startShift = _v0.b;
-		var tree = _v0.c;
-		var tail = _v0.d;
-		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
-			index,
-			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
-			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
-			A3($elm$core$Array$getHelp, startShift, index, tree)));
-	});
-var $tortus$elm_array_2d$Array2D$getRow = F2(
-	function (row, array2d) {
-		return A2($elm$core$Array$get, row, array2d.data);
-	});
-var $tortus$elm_array_2d$Array2D$get = F3(
-	function (row, col, array2d) {
-		return A2(
-			$elm$core$Maybe$andThen,
-			$elm$core$Array$get(col),
-			A2($tortus$elm_array_2d$Array2D$getRow, row, array2d));
-	});
-var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
-	return $elm$core$Array$length(array2d.data);
-};
 var $author$project$Aoc15$toWarehouseRows = function (warehouse) {
 	var ys = A2(
 		$elm$core$List$range,
@@ -6373,7 +6435,7 @@ var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Aoc15$view = function (model) {
 	var warehouse = model.warehouse;
-	var textFontSize = '12px';
+	var textFontSize = model.large ? '12px' : '28px';
 	var rows = $author$project$Aoc15$toWarehouseRows(warehouse);
 	var elements = A2($elm$core$List$concatMap, $author$project$Aoc15$toRowElements, rows);
 	return A2(
