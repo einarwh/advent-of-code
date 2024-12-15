@@ -43,6 +43,8 @@ let concat (seq : string seq) = String.Concat(seq)
 
 let join (sep : string) (seq : string seq) = String.Join(sep, seq)
 
+let replace (oldValue : string) (newValue : string) (s : string) = s.Replace(oldValue, newValue) 
+
 let visualize warehouse robotPos =
     let viz = Array2D.copy warehouse 
     Warehouse.set viz robotPos '@'
@@ -130,7 +132,7 @@ let rec makeMoves (warehouse : char[,], robotPos : Pos) (moves : Move list) =
 let gpsCoordinate (x, y) = 
     y * 100 + x
 
-let solvePart1 warehouseText moves =  
+let solve moves warehouseText =  
     let toLines = split "\n" >> Array.toList
     let lines = warehouseText |> toLines |> List.map Seq.toList 
     let warehouse = lines |> Warehouse.fromList
@@ -142,14 +144,16 @@ let solvePart1 warehouseText moves =
     |> List.sumBy gpsCoordinate
     |> printfn "%d"
 
+let widenWarehouse warehouseText = 
+    warehouseText |> replace "#" "##" |> replace "O" "[]" |> replace "." ".." |> replace "@" "@."
 
 let run fileName = 
     let text = File.ReadAllText fileName |> trim |> split "\n\n"
     let joinUp = split "\n" >> concat
-    let text0 = text.[0]
-    let text1 = text.[1]
-    let moves = text1 |> joinUp |> parseMoves 
-    solvePart1 text0 moves 
+    let warehouseText = text.[0]
+    let movesText = text.[1]
+    let moves = movesText |> joinUp |> parseMoves 
+    warehouseText |> solve moves 
     0
 
 run "input"
