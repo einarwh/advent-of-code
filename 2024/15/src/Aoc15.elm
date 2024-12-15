@@ -272,18 +272,18 @@ moveStep move (x, y) =
 --     loop robotPos []
 
 tryFindSpaceSimpleLoop : Array2D Char -> Char -> Pos -> List (Pos, Pos) -> List (Pos, Pos)
-tryFindSpaceSimpleLoop warehouse move (x, y) swaps = 
+tryFindSpaceSimpleLoop warehouse move pos swaps = 
   let 
     (dx, dy) = moveToOffset move 
-    nextPos = moveStep move (x, y)
-    nextSwaps = ((x, y), nextPos) :: swaps 
+    (x, y) = moveStep move pos
+    nextSwaps = (pos, (x, y)) :: swaps 
   in 
     case Array2D.get y x warehouse of 
       Just '#' -> []
       Just '.' -> nextSwaps 
       Just 'O' -> 
-        tryFindSpaceSimpleLoop warehouse move nextPos nextSwaps 
-      _ -> [] 
+        tryFindSpaceSimpleLoop warehouse move (x, y) nextSwaps 
+      _ -> [ ((0, 0), (0, 0)), ((0, 0), (0, 0)), ((0, 0), (0, 0)), ((0, 0), (0, 0)), ((0, 0), (0, 0)), ((0, 0), (0, 0)) ] 
 
 tryFindSpaceSimple : Array2D Char -> Pos -> Char -> List (Pos, Pos) 
 tryFindSpaceSimple warehouse robot move = 
@@ -292,16 +292,6 @@ tryFindSpaceSimple warehouse robot move =
 tryFindSpace : Bool -> Array2D Char -> Pos -> Char -> List (Pos, Pos) 
 tryFindSpace wide warehouse robot move = 
   tryFindSpaceSimple warehouse robot move
-
--- let rec moveStuff warehouse swaps = 
---     match swaps with 
---     | [] -> ()
---     | (pos1, pos2) :: rest -> 
---         let cell1 = Warehouse.get warehouse pos1 
---         let cell2 = Warehouse.get warehouse pos2
---         Warehouse.set warehouse pos1 cell2 
---         Warehouse.set warehouse pos2 cell1 
---         moveStuff warehouse rest 
 
 moveStuff : Array2D Char -> List (Pos, Pos) -> Array2D Char
 moveStuff warehouse swaps = 
@@ -315,11 +305,15 @@ moveStuff warehouse swaps =
         case (maybeCell1, maybeCell2) of 
           (Just cell1, Just cell2) -> 
             let 
-              wh = warehouse |> Array2D.set y1 x1 cell2 |> Array2D.set y2 x1 cell1 
+              wh = warehouse |> Array2D.set y1 x1 cell2 |> Array2D.set y2 x2 cell1 
             in 
               moveStuff wh rest  
           _ -> 
-            moveStuff warehouse rest
+            let 
+              wh = Array2D.set 0 0 '?' warehouse  
+              wh2 = Array2D.set 3 3 '?' wh  
+            in 
+              moveStuff wh2 rest
 
 tryMoveRobot : Bool -> Array2D Char -> Pos -> Char -> (Array2D Char, Pos) 
 tryMoveRobot wide warehouse robot move = 
@@ -335,6 +329,19 @@ tryMoveRobot wide warehouse robot move =
       in 
         (wh, rb)
 
+swapsToText swaps = 
+  case swaps of 
+    [] -> ""
+    ((x1, y1), (x2, y2)) :: rest -> 
+      let 
+        x1s = String.fromInt x1
+        y1s = String.fromInt y1
+        x2s = String.fromInt x2
+        y2s = String.fromInt y2
+        s = "(" ++ x1s ++ "," ++ y1s ++ ") -> (" ++ x2s ++ "," ++ y2s ++ ")"
+      in 
+        s ++ (swapsToText rest)
+
 updateClear : Model -> Model
 updateClear model = 
   initModel model.dataSource
@@ -347,13 +354,18 @@ updateStep model =
     robot = model.robot
   in 
     case model.moves of 
-      [] -> { model | message = "No moves!" } 
+      [] -> model 
       move :: movesLeft -> 
         let 
-          (wh, rb) = tryMoveRobot wide warehouse robot move 
-          msg = "Move: " ++ String.fromChar move 
+          (wh, rb) = tryMoveRobot wide warehouse robot move
+          (rx, ry) = rb 
+          -- swaps = tryFindSpace wide warehouse robot move
+          -- swapsStr = swaps |> List.length |> String.fromInt 
+          -- swapsAsStr = swapsToText swaps 
+          -- rbStr = "(" ++ String.fromInt rx ++ "," ++ String.fromInt ry ++ ")" 
+          -- msg = "Move: " ++ String.fromChar move ++ " " ++ rbStr ++ " " ++ swapsStr ++ " swaps: " ++ swapsAsStr
         in 
-          { model | warehouse = wh, robot = rb, moves = movesLeft, message = msg  }
+          { model | warehouse = wh, robot = rb, moves = movesLeft, message = ""  }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -494,17 +506,17 @@ view model =
                 [ Html.Attributes.style "width" "80px", onClick Step ] 
                 [ Html.text "Step" ]
             ] ]
-      , Html.tr 
-          []
-          [ Html.td 
-              [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
-              , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "24px"
-              , Html.Attributes.style "width" "200px" ] 
-              [ 
-                Html.div [] [ Html.text model.message ]
-              ] ]
+      -- , Html.tr 
+      --     []
+      --     [ Html.td 
+      --         [ Html.Attributes.align "center"
+      --         , Html.Attributes.style "background-color" "white" 
+      --         , Html.Attributes.style "font-family" "Courier New"
+      --         , Html.Attributes.style "font-size" "24px"
+      --         , Html.Attributes.style "width" "200px" ] 
+      --         [ 
+      --           Html.div [] [ Html.text model.message ]
+      --         ] ]
       , Html.tr 
           []
           [ Html.td 

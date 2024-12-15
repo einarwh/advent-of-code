@@ -6264,10 +6264,6 @@ var $author$project$Aoc15$SampleSmaller = {$: 'SampleSmaller'};
 var $author$project$Aoc15$updateClear = function (model) {
 	return $author$project$Aoc15$initModel(model.dataSource);
 };
-var $elm$core$String$cons = _String_cons;
-var $elm$core$String$fromChar = function (_char) {
-	return A2($elm$core$String$cons, _char, '');
-};
 var $author$project$Aoc15$moveToOffset = function (move) {
 	switch (move.valueOf()) {
 		case '^':
@@ -6387,7 +6383,7 @@ var $author$project$Aoc15$moveStuff = F2(
 					var wh = A4(
 						$tortus$elm_array_2d$Array2D$set,
 						y2,
-						x1,
+						x2,
 						cell1,
 						A4($tortus$elm_array_2d$Array2D$set, y1, x1, cell2, warehouse));
 					var $temp$warehouse = wh,
@@ -6396,7 +6392,19 @@ var $author$project$Aoc15$moveStuff = F2(
 					swaps = $temp$swaps;
 					continue moveStuff;
 				} else {
-					var $temp$warehouse = warehouse,
+					var wh = A4(
+						$tortus$elm_array_2d$Array2D$set,
+						0,
+						0,
+						_Utils_chr('?'),
+						warehouse);
+					var wh2 = A4(
+						$tortus$elm_array_2d$Array2D$set,
+						3,
+						3,
+						_Utils_chr('?'),
+						wh);
+					var $temp$warehouse = wh2,
 						$temp$swaps = rest;
 					warehouse = $temp$warehouse;
 					swaps = $temp$swaps;
@@ -6406,20 +6414,17 @@ var $author$project$Aoc15$moveStuff = F2(
 		}
 	});
 var $author$project$Aoc15$tryFindSpaceSimpleLoop = F4(
-	function (warehouse, move, _v0, swaps) {
+	function (warehouse, move, pos, swaps) {
 		tryFindSpaceSimpleLoop:
 		while (true) {
+			var _v0 = A2($author$project$Aoc15$moveStep, move, pos);
 			var x = _v0.a;
 			var y = _v0.b;
-			var nextPos = A2(
-				$author$project$Aoc15$moveStep,
-				move,
-				_Utils_Tuple2(x, y));
 			var nextSwaps = A2(
 				$elm$core$List$cons,
 				_Utils_Tuple2(
-					_Utils_Tuple2(x, y),
-					nextPos),
+					pos,
+					_Utils_Tuple2(x, y)),
 				swaps);
 			var _v1 = $author$project$Aoc15$moveToOffset(move);
 			var dx = _v1.a;
@@ -6436,11 +6441,11 @@ var $author$project$Aoc15$tryFindSpaceSimpleLoop = F4(
 						case 'O':
 							var $temp$warehouse = warehouse,
 								$temp$move = move,
-								$temp$_v0 = nextPos,
+								$temp$pos = _Utils_Tuple2(x, y),
 								$temp$swaps = nextSwaps;
 							warehouse = $temp$warehouse;
 							move = $temp$move;
-							_v0 = $temp$_v0;
+							pos = $temp$pos;
 							swaps = $temp$swaps;
 							continue tryFindSpaceSimpleLoop;
 						default:
@@ -6450,7 +6455,27 @@ var $author$project$Aoc15$tryFindSpaceSimpleLoop = F4(
 					break _v2$3;
 				}
 			}
-			return _List_Nil;
+			return _List_fromArray(
+				[
+					_Utils_Tuple2(
+					_Utils_Tuple2(0, 0),
+					_Utils_Tuple2(0, 0)),
+					_Utils_Tuple2(
+					_Utils_Tuple2(0, 0),
+					_Utils_Tuple2(0, 0)),
+					_Utils_Tuple2(
+					_Utils_Tuple2(0, 0),
+					_Utils_Tuple2(0, 0)),
+					_Utils_Tuple2(
+					_Utils_Tuple2(0, 0),
+					_Utils_Tuple2(0, 0)),
+					_Utils_Tuple2(
+					_Utils_Tuple2(0, 0),
+					_Utils_Tuple2(0, 0)),
+					_Utils_Tuple2(
+					_Utils_Tuple2(0, 0),
+					_Utils_Tuple2(0, 0))
+				]);
 		}
 	});
 var $author$project$Aoc15$tryFindSpaceSimple = F3(
@@ -6478,19 +6503,19 @@ var $author$project$Aoc15$updateStep = function (model) {
 	var robot = model.robot;
 	var _v0 = model.moves;
 	if (!_v0.b) {
-		return _Utils_update(
-			model,
-			{message: 'No moves!'});
+		return model;
 	} else {
 		var move = _v0.a;
 		var movesLeft = _v0.b;
-		var msg = 'Move: ' + $elm$core$String$fromChar(move);
 		var _v1 = A4($author$project$Aoc15$tryMoveRobot, wide, warehouse, robot, move);
 		var wh = _v1.a;
 		var rb = _v1.b;
+		var _v2 = rb;
+		var rx = _v2.a;
+		var ry = _v2.b;
 		return _Utils_update(
 			model,
-			{message: msg, moves: movesLeft, robot: rb, warehouse: wh});
+			{message: '', moves: movesLeft, robot: rb, warehouse: wh});
 	}
 };
 var $elm$core$Basics$not = _Basics_not;
@@ -6922,32 +6947,6 @@ var $author$project$Aoc15$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text('Step')
-									]))
-							]))
-					])),
-				A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$td,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
-								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '24px'),
-								A2($elm$html$Html$Attributes$style, 'width', '200px')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(model.message)
 									]))
 							]))
 					])),
