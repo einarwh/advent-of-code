@@ -130,22 +130,26 @@ let rec makeMoves (warehouse : char[,], robotPos : Pos) (moves : Move list) =
 let gpsCoordinate (x, y) = 
     y * 100 + x
 
-let run fileName = 
-    let text = File.ReadAllText fileName |> trim |> split "\n\n"
+let solvePart1 warehouseText moves =  
     let toLines = split "\n" >> Array.toList
-    let joinUp = split "\n" >> concat
-    let text0 = text.[0]
-    let text1 = text.[1]
-    let lines = text0 |> toLines |> List.map Seq.toList 
+    let lines = warehouseText |> toLines |> List.map Seq.toList 
     let warehouse = lines |> Warehouse.fromList
     let robotPos = findRobot warehouse
     Warehouse.set warehouse robotPos '.'
-    let moves = text1 |> joinUp |> parseMoves 
     let (wh, rp) = makeMoves (warehouse, robotPos) moves 
     let boxPositions = wh |> Warehouse.positions |> List.choose (fun p -> if Warehouse.get wh p = 'O' then Some p else None)
     boxPositions
     |> List.sumBy gpsCoordinate
     |> printfn "%d"
+
+
+let run fileName = 
+    let text = File.ReadAllText fileName |> trim |> split "\n\n"
+    let joinUp = split "\n" >> concat
+    let text0 = text.[0]
+    let text1 = text.[1]
+    let moves = text1 |> joinUp |> parseMoves 
+    solvePart1 text0 moves 
     0
 
 run "input"
