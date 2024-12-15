@@ -17,10 +17,17 @@ module Warehouse =
         let rowCount = a.GetLength(0)
         let colCount = a.GetLength(1)
         [for x in [0..colCount-1] do for y in [0..rowCount-1] -> (x, y)]
+    let map fn (a : 'a[,]) = 
+        Array2D.map fn a 
     let fromList (lst : 'a list list) = 
         let width = lst |> List.head |> List.length 
         let height = lst |> List.length 
         Array2D.init height width (fun y x -> lst |> List.item y |> List.item x)
+    let toList (a : 'a[,]) = 
+        let yRange = [ 0 .. a.GetLength(0) - 1 ]
+        let xRange = [ 0 .. a.GetLength(1) - 1 ]
+        yRange 
+        |> List.map (fun y -> xRange |> List.map (fun x -> get a (x, y)))
 
 type Move = N | W | S | E 
 
@@ -32,14 +39,35 @@ let split (splitter : string) (input : string) = input.Split(splitter)
 
 let concat (seq : string seq) = String.Concat(seq)
 
+let join (sep : string) (seq : string seq) = String.Join(sep, seq)
+
+let charToCell ch = 
+    match ch with 
+    | '#' -> Wall
+    | 'O' -> Box 
+    | _ -> Space 
+
+let cellToChar cell =
+    match cell with 
+    | Wall -> '#'
+    | Box -> 'O' 
+    | Space -> '.' 
+
+let visualize warehouse = 
+    let lines = warehouse |> Warehouse.map cellToChar |> Warehouse.toList 
+    lines |> List.map (fun chars -> new String(List.toArray chars)) |> join "\n" |> printfn "%s"
+    // printfn "%A" lines
+
 let run fileName = 
     let text = File.ReadAllText fileName |> trim |> split "\n\n"
     let toLines = split "\n" >> Array.toList
     let joinUp = split "\n" >> concat
     let text0 = text.[0]
     let text1 = text.[1]
-    let lines = text0 |> toLines
-    lines |> printfn "%A"
+    let lines = text0 |> toLines |> List.map Seq.toList 
+    let warehouse = lines |> Warehouse.fromList |> Warehouse.map (charToCell)
+    // warehouse |> printfn "%A"
+    visualize warehouse
     let commandText = text1 |> joinUp
     commandText |> printfn "%A"
 

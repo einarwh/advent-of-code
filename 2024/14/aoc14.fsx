@@ -58,7 +58,6 @@ let createRow robots width yRow =
     [ 0 .. (width - 1) ] 
     |> List.map (fun x -> Map.tryFind x robotMap |> Option.map string |> Option.defaultValue ".")
     |> String.concat ""
-    // []
 
 let visualize width height robots = 
     [ 0 .. (height - 1) ] |> List.map (createRow robots width) |> String.concat "\n" |> printfn "%s"
