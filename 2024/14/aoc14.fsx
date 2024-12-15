@@ -1,4 +1,4 @@
-// Advent of Code 2024. Day 14
+// Advent of Code 2024. Day 14: Restroom Redoubt.
 // dotnet fsi aoc14.fsx
 
 open System
@@ -7,9 +7,7 @@ open System.Diagnostics
 
 type Pos = (int * int)
 
-type Robot = 
-    { p : Pos 
-      v : Pos }
+type Robot = { p : Pos; v : Pos }
 
 let trim (input : string) = input.Trim()
 
@@ -44,11 +42,9 @@ let countRobotsInRow yRow robots =
     |> List.countBy id 
 
 let countPositions (positions : Pos list) : int = 
-    let foo = 
-        positions 
-        |> List.countBy id 
-        |> List.sumBy snd 
-    foo
+    positions 
+    |> List.countBy id 
+    |> List.sumBy snd 
 
 let createRow robots width yRow = 
     let countedRobots = robots |> countRobotsInRow yRow 
@@ -137,6 +133,6 @@ let run width height searchForTree fileName =
     moved |> calculateSafetyFactor width height |> printfn "%A"
     if searchForTree then findTree width height robots 
 
-// run 11 7 false "sample"
-// run 101 103 true "input"
-run 101 103 true "not-a-tree.txt"
+run 11 7 false "sample"
+run 101 103 true "input"
+//run 101 103 true "not-a-tree.txt"
