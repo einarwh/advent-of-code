@@ -44,9 +44,18 @@ type alias Line =
 
 type Border = Vertical Line | Horizontal Line 
 
+type alias PlantSize = 
+  { width : Float 
+  , height : Float 
+  , xOffset : Float 
+  , yOffset : Float
+  , lineWidth : Float }
+
 type alias PlotInfo = 
   { complete : Plot  
   , sequence : PlotSequence
+  , borders : List Border 
+  , borderSequence : List (List Border)
   , totalSteps : Int 
   , plant : Plant 
   , color : String
@@ -284,10 +293,10 @@ getBorders possible plot (x, y) =
     , if borderPositions |> List.member (x + 1, y) then Just (Vertical { startPos = (x + 1, y), endPos = (x + 1, y + 1) }) else Nothing -- E 
     ] |> List.filterMap identity
 
-fillPlant : Set Pos -> Set Pos -> Plot -> List (Plot) -> List Border -> ((Plot, List (Plot), List Border), Set Pos)
-fillPlant possiblePositionsLeft positionsToAdd plot seq borders = 
+fillPlant : Set Pos -> Set Pos -> Plot -> List (Plot) -> List Border -> List (List Border) -> ((Plot, List (Plot), List (List Border)), Set Pos)
+fillPlant possiblePositionsLeft positionsToAdd plot seq borders borderSeq = 
   if Set.isEmpty positionsToAdd then 
-    ((plot, seq, borders), possiblePositionsLeft) 
+    ((plot, seq, borderSeq), possiblePositionsLeft) 
   else 
     let 
       nextPlot = Set.union plot positionsToAdd
@@ -302,33 +311,34 @@ fillPlant possiblePositionsLeft positionsToAdd plot seq borders =
         positionsToAddList
         |> List.concatMap (getBorders possiblePositionsLeft plot)
       nextBorders = borders ++ newBorders 
+      nextBorderSeq = nextBorders :: borderSeq 
       possible = Set.diff possiblePositionsLeft nextPositionsToAdd
     in 
-      fillPlant possible nextPositionsToAdd nextPlot nextSeq nextBorders
+      fillPlant possible nextPositionsToAdd nextPlot nextSeq nextBorders nextBorderSeq
 
-fillPlantPlot : Set Pos -> Pos -> ((Plot, List (Plot), List Border), Set Pos)
+fillPlantPlot : Set Pos -> Pos -> ((Plot, List (Plot), List (List Border)), Set Pos)
 fillPlantPlot plantPositions startPos = 
   let 
     positionsToAdd = Set.empty |> Set.insert startPos 
   in 
-    fillPlant plantPositions positionsToAdd Set.empty [] []
+    fillPlant plantPositions positionsToAdd Set.empty [] [] []
 
-findPlantPlotsLoop : Plant -> List Pos -> List (Plant, (Plot, PlotSequence, List Border)) -> List (Plant, (Plot, PlotSequence, List Border))
+findPlantPlotsLoop : Plant -> List Pos -> List (Plant, (Plot, PlotSequence, List (List Border))) -> List (Plant, (Plot, PlotSequence, List (List Border)))
 findPlantPlotsLoop plant posList plotInfoList = 
   case posList of 
     [] -> plotInfoList 
     pos :: remaining -> 
       let 
         remSet = Set.fromList remaining
-        ((plot, seq, borders), updatedRemSet) = fillPlantPlot remSet pos 
+        ((plot, seq, borderSeq), updatedRemSet) = fillPlantPlot remSet pos 
       in 
-        findPlantPlotsLoop plant (Set.toList updatedRemSet) ((plant, (plot, seq, borders)) :: plotInfoList)
+        findPlantPlotsLoop plant (Set.toList updatedRemSet) ((plant, (plot, seq, borderSeq)) :: plotInfoList)
 
-findPlantPlots : Plant -> List Pos -> List (Plant, (Plot, PlotSequence, List Border)) 
+findPlantPlots : Plant -> List Pos -> List (Plant, (Plot, PlotSequence, List (List Border))) 
 findPlantPlots plant posList = 
   findPlantPlotsLoop plant posList [] 
 
-findAllPlots : Garden -> List (Plant, (Plot, PlotSequence, List Border)) 
+findAllPlots : Garden -> List (Plant, (Plot, PlotSequence, List (List Border))) 
 findAllPlots garden = 
   let 
     positionsWithPlant = garden |> getAllPositions |> List.map (\pos -> (pos, tryGetPlantAtPos garden pos |> Maybe.withDefault '?'))
@@ -394,7 +404,7 @@ toPlotColor : Int -> String
 toPlotColor index = 
   let 
     -- hue = (index * 79) |> modBy 255
-    hue = (index * 11) |> modBy 255
+    hue = (index * 33) |> modBy 255
     saturation = 90
     lightness = 90
     hueStr = String.fromInt hue 
@@ -464,8 +474,8 @@ countCorners verticals horizontals =
   in 
     fixed |> List.length  
 
-toPlotInfo : Int -> (Plant, (Plot, PlotSequence, List Border)) -> PlotInfo 
-toPlotInfo index (plant, (plot, seq, borders)) = 
+toPlotInfo : Int -> (Plant, (Plot, PlotSequence, List (List Border))) -> PlotInfo 
+toPlotInfo index (plant, (plot, seq, borderSeq)) = 
   let 
     asVertical border = 
       case border of 
@@ -478,6 +488,7 @@ toPlotInfo index (plant, (plot, seq, borders)) =
     totalSteps = List.length seq 
     area = Set.size plot
     plantColor = getPlantColor plant
+    borders = borderSeq |> List.concat
     borderCount = List.length borders 
     distinctBorders = distinct borders
     distinctBorderCount  = List.length distinctBorders 
@@ -490,6 +501,8 @@ toPlotInfo index (plant, (plot, seq, borders)) =
   in 
     { complete = plot  
     , sequence = seq |> List.reverse
+    , borders = borders 
+    , borderSequence = borderSeq |> List.reverse
     , totalSteps = List.length seq 
     , plant = plant 
     , color = plantColor
@@ -622,60 +635,104 @@ subscriptions model =
 
 -- VIEW
 
-toPlantElement : Int -> Int -> String -> Pos -> Svg Msg 
-toPlantElement plantWidth plantHeight plantStr (xInt, yInt) = 
+toPlantElement : PlantSize -> String -> Pos -> Svg Msg 
+toPlantElement plantSize plantStr (xInt, yInt) = 
   let 
-    xStr = String.fromInt ((plantWidth // 4) + xInt * plantWidth)
-    yStr = String.fromInt (plantHeight + yInt * plantHeight)
+    w = plantSize.width 
+    dw = plantSize.xOffset
+    h = plantSize.height
+    dh = plantSize.yOffset 
+    xStr = String.fromFloat (dw + toFloat xInt * w)
+    yStr = String.fromFloat (dh + h + toFloat yInt * h)
   in 
     Svg.text_ [ x xStr, y yStr ] [ Svg.text plantStr ]
 
-toFilledElement : Int -> Int -> String -> Pos -> Svg Msg 
-toFilledElement plantWidth plantHeight colorStr (xInt, yInt) = 
+toFilledElement : PlantSize -> String -> Pos -> Svg Msg 
+toFilledElement plantSize colorStr (xInt, yInt) = 
   let 
-    xStr = String.fromInt ((plantWidth // 6) + xInt * plantWidth)
-    yStr = String.fromInt ((plantWidth // 6) + yInt * plantHeight)
+    w = plantSize.width 
+    h = plantSize.height
+    xStr = String.fromFloat (toFloat xInt * w)
+    yStr = String.fromFloat (toFloat yInt * h)
   in 
     rect
           [ x xStr
           , y yStr
-          , width (String.fromInt plantWidth)
-          , height (String.fromInt plantHeight)
+          , width (String.fromFloat w)
+          , height (String.fromFloat h)
           , fill colorStr
           ]
           []
 
-toPlotSvgElements : Int -> Int -> Int -> PlotInfo -> List (Svg Msg)
-toPlotSvgElements step plantWidth plantHeight plotInfo = 
+toBorderLine : Border -> Line 
+toBorderLine border = 
+  case border of 
+    Vertical v -> v 
+    Horizontal h -> h 
+
+toBorderElement : PlantSize -> Border -> Svg Msg 
+toBorderElement plantSize border = 
+  let 
+    w = plantSize.width
+    h = plantSize.height
+    borderLine = toBorderLine border 
+    (x1i, y1i) = borderLine.startPos 
+    (x2i, y2i) = borderLine.endPos 
+    x1s = String.fromFloat (toFloat x1i * w)
+    y1s = String.fromFloat (toFloat y1i * h)
+    x2s = String.fromFloat (toFloat x2i * w)
+    y2s = String.fromFloat (toFloat y2i * h)
+  in 
+    line
+          [ x1 x1s
+          , y1 y1s
+          , x2 x2s 
+          , y2 y2s
+          , stroke "black"
+          , strokeLinecap "round"
+          , strokeLinejoin "round"
+          , strokeWidth (String.fromFloat plantSize.lineWidth)
+          ]
+          []
+
+toPlotSvgElements : Int -> PlantSize -> PlotInfo -> List (Svg Msg)
+toPlotSvgElements step plantSize plotInfo = 
   let 
     posList = plotInfo.complete |> Set.toList
     colorStr = plotInfo.color
     plantStr = String.fromChar plotInfo.plant 
-    plantElements = posList |> List.map (toPlantElement plantWidth plantHeight plantStr)
+    plantElements = posList |> List.map (toPlantElement plantSize plantStr)
     filled = 
       if step == 0 then [] 
       else 
         case plotInfo.sequence |> List.drop (step - 1) |> List.head of 
           Just plot -> plot |> Set.toList 
           Nothing -> posList
-    filledElements = filled |> List.map (toFilledElement plantWidth plantHeight colorStr)
+    borders = 
+      if step == 0 then [] 
+      else 
+        case plotInfo.borderSequence |> List.drop (step - 1) |> List.head of 
+          Just bs -> bs 
+          Nothing -> plotInfo.borders
+    filledElements = filled |> List.map (toFilledElement plantSize colorStr)
+    borderElements = borders |> List.map (toBorderElement plantSize)
   in 
-    filledElements ++ plantElements
+    filledElements ++ plantElements ++ borderElements
 
 toSvg : Model -> Html Msg 
 toSvg model = 
   let 
-    (fontSize, plantWidth, plantHeight) = 
+    (fontSize, plantSize) = 
       case model.dataSource of 
-        Input -> ("8px", 6, 8)
-        _ -> ("16px", 12, 16)
-    svgWidth = (4 + plantWidth * model.colCount) |> String.fromInt 
-    svgHeight = (4 + plantHeight * model.rowCount) |> String.fromInt 
+        Input -> ("8px", { width = 6.5, height = 10, xOffset = 0.9, yOffset = -2.0, lineWidth = 0.5 })
+        _ -> ("16px", { width = 12, height = 16, xOffset = 0.9, yOffset = -2.0, lineWidth = 1.0 })
+    svgWidth = (toFloat 4 + plantSize.width * toFloat model.colCount) |> String.fromFloat 
+    svgHeight = (toFloat 4 + plantSize.height * toFloat model.rowCount) |> String.fromFloat 
     step = model.step 
     plotInfoList = model.plotInfoList 
-    elements = model.plotInfoList |> List.concatMap (toPlotSvgElements step plantWidth plantHeight)
+    elements = model.plotInfoList |> List.concatMap (toPlotSvgElements step plantSize)
     rects = []
-    viewBoxStr = [ "0", "0", svgWidth, svgHeight ] |> String.join " "
+    viewBoxStr = [ "-1", "-1", svgWidth, svgHeight ] |> String.join " "
     fontFamilyAttr = "font-family:Source Code Pro,monospace"
     fontSizeAttr = "font-size:" ++ fontSize
     styles = fontFamilyAttr ++ "; " ++ fontSizeAttr 
