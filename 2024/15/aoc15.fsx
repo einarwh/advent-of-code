@@ -45,7 +45,7 @@ let charToCell ch =
     match ch with 
     | '#' -> Wall
     | 'O' -> Box 
-    | _ -> Space 
+    | _ -> Space
 
 let cellToChar cell =
     match cell with 
@@ -58,6 +58,17 @@ let visualize warehouse =
     lines |> List.map (fun chars -> new String(List.toArray chars)) |> join "\n" |> printfn "%s"
     // printfn "%A" lines
 
+let charToCommand ch = 
+    match ch with 
+    | '^' -> N 
+    | '<' -> W 
+    | 'v' -> S 
+    | '>' -> E
+    | _ -> failwith (sprintf "%c ?" ch)
+
+let parseCommands text = 
+    text |> Seq.toList |> List.map charToCommand 
+
 let run fileName = 
     let text = File.ReadAllText fileName |> trim |> split "\n\n"
     let toLines = split "\n" >> Array.toList
@@ -66,9 +77,8 @@ let run fileName =
     let text1 = text.[1]
     let lines = text0 |> toLines |> List.map Seq.toList 
     let warehouse = lines |> Warehouse.fromList |> Warehouse.map (charToCell)
-    // warehouse |> printfn "%A"
     visualize warehouse
-    let commandText = text1 |> joinUp
-    commandText |> printfn "%A"
+    let commands = text1 |> joinUp |> parseCommands 
+    commands |> printfn "%A"
 
 run "sample-small"
