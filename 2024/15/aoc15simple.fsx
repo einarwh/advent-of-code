@@ -35,8 +35,6 @@ type Pos = int*int
 
 type Move = N | W | S | E 
 
-type Cell = Wall | Box | Space 
-
 let trim (input : string) = input.Trim()
 
 let split (splitter : string) (input : string) = input.Split(splitter)
@@ -45,24 +43,11 @@ let concat (seq : string seq) = String.Concat(seq)
 
 let join (sep : string) (seq : string seq) = String.Join(sep, seq)
 
-let charToCell ch = 
-    match ch with 
-    | '#' -> Wall
-    | 'O' -> Box 
-    | _ -> Space
-
-let cellToChar cell =
-    match cell with 
-    | Wall -> '#'
-    | Box -> 'O' 
-    | Space -> '.' 
-
 let visualize warehouse robotPos =
-    let charWarehouse = warehouse |> Warehouse.map cellToChar 
-    Warehouse.set charWarehouse robotPos '@'
-    let lines = charWarehouse |> Warehouse.toList 
+    let viz = Array2D.copy warehouse 
+    Warehouse.set viz robotPos '@'
+    let lines = viz |> Warehouse.toList 
     lines |> List.map (fun chars -> new String(List.toArray chars)) |> join "\n" |> printfn "%s"
-    // printfn "%A" lines
 
 let charToMove ch = 
     match ch with 
@@ -95,22 +80,23 @@ let moveStep move (x, y) =
     let (dx, dy) = moveToOffset move 
     (x + dx, y + dy)
 
-let tryFindSpace (warehouse : Cell[,]) (robotPos : Pos) (move : Move) : (Pos*Pos) list = 
+let tryFindSpace (warehouse : char[,]) (robotPos : Pos) (move : Move) : (Pos*Pos) list = 
     // printfn "tryFindSpace with robot in pos %A: %A" robotPos move
     let rec loop (x, y) (swaps : (Pos*Pos) list) = 
         let (dx, dy) = moveToOffset move 
         let pos = (x + dx, y + dy)
         let nextSwaps = (pos, (x, y)) :: swaps 
         match Warehouse.get warehouse pos with 
-        | Wall -> 
+        | '#' -> 
             // printfn "Hit wall."
             [] 
-        | Space ->
+        | '.' ->
             // printfn "Found space!"
             nextSwaps
-        | Box ->
+        | 'O' ->
             // printfn "Found box... keep looking." 
             loop pos nextSwaps
+        | _ -> failwith "tryFindSpz"
     loop robotPos []
 
 let rec moveStuff warehouse swaps = 
@@ -124,7 +110,7 @@ let rec moveStuff warehouse swaps =
         Warehouse.set warehouse pos2 cell1 
         moveStuff warehouse rest 
 
-let tryMoveRobot (warehouse : Cell[,], robotPos : Pos) (move : Move) = 
+let tryMoveRobot (warehouse : char[,], robotPos : Pos) (move : Move) = 
     // printfn "tryMoveRobot in pos %A: %A" robotPos move
     match tryFindSpace warehouse robotPos move with 
     | [] -> (warehouse, robotPos)
@@ -132,7 +118,7 @@ let tryMoveRobot (warehouse : Cell[,], robotPos : Pos) (move : Move) =
         moveStuff warehouse swaps 
         (warehouse, moveStep move robotPos)
 
-let rec makeMoves (warehouse : Cell[,], robotPos : Pos) (moves : Move list) = 
+let rec makeMoves (warehouse : char[,], robotPos : Pos) (moves : Move list) = 
     // printfn "\n"
     // visualize warehouse robotPos
     match moves with 
@@ -151,12 +137,12 @@ let run fileName =
     let text0 = text.[0]
     let text1 = text.[1]
     let lines = text0 |> toLines |> List.map Seq.toList 
-    let charWarehouse = lines |> Warehouse.fromList
-    let robotPos = findRobot charWarehouse
-    let warehouse = charWarehouse |> Warehouse.map (charToCell)
+    let warehouse = lines |> Warehouse.fromList
+    let robotPos = findRobot warehouse
+    Warehouse.set warehouse robotPos '.'
     let moves = text1 |> joinUp |> parseMoves 
     let (wh, rp) = makeMoves (warehouse, robotPos) moves 
-    let boxPositions = wh |> Warehouse.positions |> List.choose (fun p -> if Warehouse.get wh p = Box then Some p else None)
+    let boxPositions = wh |> Warehouse.positions |> List.choose (fun p -> if Warehouse.get wh p = 'O' then Some p else None)
     boxPositions
     |> List.sumBy gpsCoordinate
     |> printfn "%d"
