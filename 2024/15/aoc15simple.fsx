@@ -146,8 +146,8 @@ let solve moves warehouseText =
     |> List.sumBy gpsCoordinate
     |> printfn "%d"
 
-let widenWarehouse warehouseText = 
-    warehouseText |> replace "#" "##" |> replace "O" "[]" |> replace "." ".." |> replace "@" "@."
+let widen text = 
+    text |> replace "#" "##" |> replace "O" "[]" |> replace "." ".." |> replace "@" "@."
 
 let run fileName = 
     let text = File.ReadAllText fileName |> trim |> split "\n\n"
@@ -156,7 +156,7 @@ let run fileName =
     let movesText = text.[1]
     let moves = movesText |> joinUp |> parseMoves 
     // warehouseText |> solve moves 
-    warehouseText |> widenWarehouse |> solve moves 
+    warehouseText |> widen |> solve moves 
     0
 
 run "sample"
