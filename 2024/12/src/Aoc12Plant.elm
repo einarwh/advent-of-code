@@ -54,8 +54,8 @@ type alias PlantSize =
 type alias PlotInfo = 
   { complete : Plot  
   , sequence : PlotSequence
-  , borders : List Border 
-  , borderSequence : List (List Border)
+  , borderLines : List Line 
+  , lineSequence : List (List Line)
   , totalSteps : Int 
   , plant : Plant 
   , color : String
@@ -497,12 +497,14 @@ toPlotInfo index (plant, (plot, seq, borderSeq)) =
     horizontals = distinctBorders |> List.filterMap asHorizontal
     sections = countCorners verticals horizontals
     -- debug = "Border count: " ++ String.fromInt borderCount ++ " vs Distinct border count: " ++ String.fromInt distinctBorderCount
+    lineSequence = borderSeq |> List.reverse |> List.map (List.map toBorderLine)
+    borderLines = lineSequence |> List.concat
     debug = "?"
   in 
     { complete = plot  
     , sequence = seq |> List.reverse
-    , borders = borders 
-    , borderSequence = borderSeq |> List.reverse
+    , borderLines = borderLines 
+    , lineSequence = lineSequence
     , totalSteps = List.length seq 
     , plant = plant 
     , color = plantColor
@@ -670,12 +672,11 @@ toBorderLine border =
     Vertical v -> v 
     Horizontal h -> h 
 
-toBorderElement : PlantSize -> Border -> Svg Msg 
-toBorderElement plantSize border = 
+toBorderElement : PlantSize -> Line -> Svg Msg 
+toBorderElement plantSize borderLine = 
   let 
     w = plantSize.width
     h = plantSize.height
-    borderLine = toBorderLine border 
     (x1i, y1i) = borderLine.startPos 
     (x2i, y2i) = borderLine.endPos 
     x1s = String.fromFloat (toFloat x1i * w)
@@ -708,14 +709,14 @@ toPlotSvgElements step plantSize plotInfo =
         case plotInfo.sequence |> List.drop (step - 1) |> List.head of 
           Just plot -> plot |> Set.toList 
           Nothing -> posList
-    borders = 
+    borderLines = 
       if step == 0 then [] 
       else 
-        case plotInfo.borderSequence |> List.drop (step - 1) |> List.head of 
-          Just bs -> bs 
-          Nothing -> plotInfo.borders
+        case plotInfo.lineSequence |> List.drop (step - 1) |> List.head of 
+          Just borderLine -> borderLine
+          Nothing -> plotInfo.borderLines
     filledElements = filled |> List.map (toFilledElement plantSize colorStr)
-    borderElements = borders |> List.map (toBorderElement plantSize)
+    borderElements = borderLines |> List.map (toBorderElement plantSize)
   in 
     filledElements ++ plantElements ++ borderElements
 

@@ -6353,6 +6353,15 @@ var $elm$core$Set$size = function (_v0) {
 	var dict = _v0;
 	return $elm$core$Dict$size(dict);
 };
+var $author$project$Aoc12Plant$toBorderLine = function (border) {
+	if (!border.$) {
+		var v = border.a;
+		return v;
+	} else {
+		var h = border.a;
+		return h;
+	}
+};
 var $author$project$Aoc12Plant$toPlotInfo = F2(
 	function (index, _v0) {
 		var plant = _v0.a;
@@ -6362,11 +6371,16 @@ var $author$project$Aoc12Plant$toPlotInfo = F2(
 		var borderSeq = _v1.c;
 		var totalSteps = $elm$core$List$length(seq);
 		var plantColor = $author$project$Aoc12Plant$getPlantColor(plant);
+		var lineSequence = A2(
+			$elm$core$List$map,
+			$elm$core$List$map($author$project$Aoc12Plant$toBorderLine),
+			$elm$core$List$reverse(borderSeq));
 		var debug = '?';
 		var borders = $elm$core$List$concat(borderSeq);
 		var distinctBorders = $author$project$Aoc12Plant$distinct(borders);
 		var distinctBorderCount = $elm$core$List$length(distinctBorders);
 		var perimeter = $elm$core$List$length(distinctBorders);
+		var borderLines = $elm$core$List$concat(lineSequence);
 		var borderCount = $elm$core$List$length(borders);
 		var asVertical = function (border) {
 			if (!border.$) {
@@ -6390,14 +6404,14 @@ var $author$project$Aoc12Plant$toPlotInfo = F2(
 		var area = $elm$core$Set$size(plot);
 		return {
 			ap: area,
-			W: $elm$core$List$reverse(borderSeq),
-			X: borders,
-			Z: plantColor,
-			_: plot,
+			W: borderLines,
+			Y: plantColor,
+			Z: plot,
 			as: debug,
 			P: area * perimeter,
 			Q: area * sections,
-			ab: horizontals,
+			aa: horizontals,
+			ab: lineSequence,
 			aB: perimeter,
 			aC: sections,
 			ae: plant,
@@ -6456,7 +6470,7 @@ var $author$project$Aoc12Plant$initModel = function (dataSource) {
 				return pi.Q;
 			},
 			plotInfoList));
-	return {Y: numberOfCols, m: dataSource, I: false, K: maxSteps, S: '?', s: true, v: plotInfoList, ag: numberOfRows, o: 0, al: $author$project$Aoc12Plant$defaultTickInterval, aO: totalCost, aP: totalCostDiscount};
+	return {X: numberOfCols, m: dataSource, I: false, K: maxSteps, S: '?', s: true, v: plotInfoList, ag: numberOfRows, o: 0, al: $author$project$Aoc12Plant$defaultTickInterval, aO: totalCost, aP: totalCostDiscount};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -6924,24 +6938,14 @@ var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
 var $elm$svg$Svg$Attributes$strokeLinecap = _VirtualDom_attribute('stroke-linecap');
 var $elm$svg$Svg$Attributes$strokeLinejoin = _VirtualDom_attribute('stroke-linejoin');
 var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
-var $author$project$Aoc12Plant$toBorderLine = function (border) {
-	if (!border.$) {
-		var v = border.a;
-		return v;
-	} else {
-		var h = border.a;
-		return h;
-	}
-};
 var $elm$svg$Svg$Attributes$x1 = _VirtualDom_attribute('x1');
 var $elm$svg$Svg$Attributes$x2 = _VirtualDom_attribute('x2');
 var $elm$svg$Svg$Attributes$y1 = _VirtualDom_attribute('y1');
 var $elm$svg$Svg$Attributes$y2 = _VirtualDom_attribute('y2');
 var $author$project$Aoc12Plant$toBorderElement = F2(
-	function (plantSize, border) {
+	function (plantSize, borderLine) {
 		var w = plantSize.D;
 		var h = plantSize.z;
-		var borderLine = $author$project$Aoc12Plant$toBorderLine(border);
 		var _v0 = borderLine.f;
 		var x2i = _v0.a;
 		var y2i = _v0.b;
@@ -7020,7 +7024,7 @@ var $author$project$Aoc12Plant$toPlantElement = F3(
 	});
 var $author$project$Aoc12Plant$toPlotSvgElements = F3(
 	function (step, plantSize, plotInfo) {
-		var posList = $elm$core$Set$toList(plotInfo._);
+		var posList = $elm$core$Set$toList(plotInfo.Z);
 		var plantStr = $elm$core$String$fromChar(plotInfo.ae);
 		var plantElements = A2(
 			$elm$core$List$map,
@@ -7040,29 +7044,29 @@ var $author$project$Aoc12Plant$toPlotSvgElements = F3(
 				}
 			}
 		}();
-		var colorStr = plotInfo.Z;
+		var colorStr = plotInfo.Y;
 		var filledElements = A2(
 			$elm$core$List$map,
 			A2($author$project$Aoc12Plant$toFilledElement, plantSize, colorStr),
 			filled);
-		var borders = function () {
+		var borderLines = function () {
 			if (!step) {
 				return _List_Nil;
 			} else {
 				var _v0 = $elm$core$List$head(
-					A2($elm$core$List$drop, step - 1, plotInfo.W));
+					A2($elm$core$List$drop, step - 1, plotInfo.ab));
 				if (!_v0.$) {
-					var bs = _v0.a;
-					return bs;
+					var borderLine = _v0.a;
+					return borderLine;
 				} else {
-					return plotInfo.X;
+					return plotInfo.W;
 				}
 			}
 		}();
 		var borderElements = A2(
 			$elm$core$List$map,
 			$author$project$Aoc12Plant$toBorderElement(plantSize),
-			borders);
+			borderLines);
 		return _Utils_ap(
 			filledElements,
 			_Utils_ap(plantElements, borderElements));
@@ -7094,7 +7098,7 @@ var $author$project$Aoc12Plant$toSvg = function (model) {
 		A2($author$project$Aoc12Plant$toPlotSvgElements, step, plantSize),
 		model.v);
 	var svgHeight = $elm$core$String$fromFloat(4 + (plantSize.z * model.ag));
-	var svgWidth = $elm$core$String$fromFloat(4 + (plantSize.D * model.Y));
+	var svgWidth = $elm$core$String$fromFloat(4 + (plantSize.D * model.X));
 	var viewBoxStr = A2(
 		$elm$core$String$join,
 		' ',
@@ -7134,7 +7138,7 @@ var $author$project$Aoc12Plant$view = function (model) {
 			A2(
 				$elm$core$List$concatMap,
 				function (pi) {
-					return A2($elm$core$List$map, $author$project$Aoc12Plant$toLineText, pi.ab);
+					return A2($elm$core$List$map, $author$project$Aoc12Plant$toLineText, pi.aa);
 				},
 				model.v)));
 	var finishedPlotInfoList = A2(
