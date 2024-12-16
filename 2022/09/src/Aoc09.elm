@@ -15,7 +15,7 @@ import Svg.Attributes exposing (..)
 import Time
 
 defaultDelay : Float
-defaultDelay = 1000
+defaultDelay = 200
 
 crateSize : Int 
 crateSize = 10
@@ -2332,7 +2332,9 @@ view model =
     ropeLengthStr = "length: " ++ String.fromInt (1 + List.length tail)
   in 
     Html.table 
-      []
+      [ 
+        Html.Attributes.style "font-family" "Courier New"
+      ]
       [ Html.tr 
           [] 
           [ Html.td 
@@ -2342,6 +2344,27 @@ view model =
               , Html.Attributes.style "padding" "20px"]
               [ Html.div [] [Html.text "Advent of Code 2022" ]
               , Html.div [] [Html.text "Day 9: Rope Bridge" ]] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "padding-bottom" "10px" ]
+              [ Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2024/"] [ Html.text "2024" ]
+              , Html.text "] " 
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2023/"] [ Html.text "2023" ]
+              , Html.text "] "
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2022/"] [ Html.text "2022" ]
+              , Html.text "] "
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2021/"] [ Html.text "2021" ]
+              , Html.text "] "
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2020/"] [ Html.text "2020" ]
+              , Html.text "] "
+            ] ]
       , Html.tr 
           []
           [ Html.td 
