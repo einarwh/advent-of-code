@@ -213,7 +213,7 @@ view model =
               , Html.Attributes.style "font-size" "40px"
               , Html.Attributes.style "padding" "20px"]
               [ Html.div [] [Html.text "Advent of Code 2020" ]
-              , Html.div [] [Html.text "Day 12: Rain Risk (Part 1)" ] ] ]
+              , Html.div [] [Html.text "Day 12: Rain Risk (Part 2)" ] ] ]
       , Html.tr 
           []
           [ Html.td 
