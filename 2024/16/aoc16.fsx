@@ -21,7 +21,7 @@ type Maze = char[,]
 
 type Path = { pos : Pos; dir : Dir }
 
-type Distance = int64
+type Distance = int
 
 type PQ = PriorityQueue<Path * Distance * Path list, Distance>
 
@@ -84,17 +84,17 @@ let solve startPos (maze : Maze)  =
                     if not (Set.contains p visited) && isPathFree maze p then 
                         q.Enqueue((p, distance + cost, nextPaths), distance + cost)
                 let pathAhead = getPathAhead path.pos path.dir 
-                maybeEnqueue pathAhead 1L 
+                maybeEnqueue pathAhead 1
                 let pathLeft = getPathLeft path.pos path.dir 
-                maybeEnqueue pathLeft 1001L
+                maybeEnqueue pathLeft 1001
                 let pathRight = getPathRight path.pos path.dir 
-                maybeEnqueue pathRight 1001L
+                maybeEnqueue pathRight 1001
                 loop (results, nextVisited, q)
             | _ -> 
                 failwith (sprintf "%c" ch)
     let queue = PQ()
     let startPath = { pos = startPos; dir = E }
-    queue.Enqueue((startPath, 0, []), 0L)
+    queue.Enqueue((startPath, 0, []), 0)
     let results = loop ([], Set.empty, queue)
     results 
     |> List.groupBy (fun (d, posList) -> d) 
