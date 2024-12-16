@@ -65,7 +65,7 @@ let getPathRight (x, y) dir =
 let isPathFree maze path = 
     '#' <> Maze.get maze path.pos
 
-let solve startPos (maze : Maze)  = 
+let solve startPos maze  = 
     let rec loop (results, visited, q : PQ) = 
         if q.Count = 0 then results 
         else 
@@ -97,7 +97,7 @@ let solve startPos (maze : Maze)  =
     queue.Enqueue((startPath, 0, []), 0)
     let results = loop ([], Set.empty, queue)
     results 
-    |> List.groupBy (fun (d, posList) -> d) 
+    |> List.groupBy (fst) 
     |> List.map (fun (d, lst) -> (d, lst |> List.collect snd |> Set.ofList |> Set.count))
     |> List.sort
     |> List.head 
