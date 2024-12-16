@@ -26,7 +26,7 @@ type Path = {
 
 type Distance = int64
 
-type PQ = PriorityQueue<Path * Distance, Distance>
+type PQ = PriorityQueue<Path * Distance * Path list, Distance>
 
 let move dir (x, y) = 
     match dir with 
@@ -73,26 +73,26 @@ let isPathBlocked maze path =
 
 let isPathFree maze path = not <| isPathBlocked maze path
 
-let solve1 startPos (maze : Maze) : Distance = 
-    let rec loop (visited : Set<Path>, q : PQ) = 
-        // printfn "q elements: %d" q.Count 
-        if q.Count = 0 then None 
+let solve startPos (maze : Maze)  = 
+    let rec loop (results : (Distance * (Pos list)) list, visited : Set<Path>, q : PQ) = 
+        if q.Count = 0 then results 
         else 
-            let (path, distance) = q.Dequeue()
-            // printfn "Dequeued %A" (path, distance)
+            let (path, distance, paths) = q.Dequeue()
+            let nextPaths = path :: paths
             let nextVisited = visited |> Set.add path
-            // printfn "Visited %A" path
             let ch = Maze.get maze path.pos
             match ch with 
             | 'E' -> 
                 // End!
-                Some distance 
+                let positions : Pos list = nextPaths |> List.map (fun p -> p.pos)
+                let r : Distance * (Pos list) = (distance, positions)
+                loop ((r :: results), visited, q)
             | 'S' 
             | '.' ->
                 // Free space!
-                let maybeEnqueue path cost = 
-                    if not (Set.contains path visited) && isPathFree maze path then 
-                        q.Enqueue((path, distance + cost), distance + cost)
+                let maybeEnqueue p cost = 
+                    if not (Set.contains p visited) && isPathFree maze p then 
+                        q.Enqueue((p, distance + cost, nextPaths), distance + cost)
 
                 // Continue? 
                 let pathAhead = getPathAhead path.pos path.dir 
@@ -107,7 +107,7 @@ let solve1 startPos (maze : Maze) : Distance =
                 maybeEnqueue pathRight 1001L
 
                 // Keep going.
-                loop (nextVisited, q)
+                loop (results, nextVisited, q)
             | '#' -> 
                 failwith "#"
             | _ -> 
@@ -115,48 +115,13 @@ let solve1 startPos (maze : Maze) : Distance =
     let queue = PQ()
     // Find possible directions here. 
     let startPath = { pos = startPos; dir = E }
-    queue.Enqueue((startPath, 0), 0)
-    match loop (Set.empty, queue) with 
-    | Some distance -> distance 
-    | None -> failwith "?"
-
-
-let solve2 startPos maxDistance (maze : Maze) = 
-    let rec loop (visited : Set<Path>, path : Path, paths : Path list, distance : Distance) = 
-        if distance > maxDistance then 
-            []
-        else 
-            let nextVisited = visited |> Set.add path 
-            let nextPaths = path :: paths 
-            let ch = Maze.get maze path.pos
-            match ch with 
-            | 'E' -> 
-                nextPaths 
-            | 'S' 
-            | '.' ->
-                // Free space!
-                let move p cost = 
-                    if not (Set.contains p visited) && isPathFree maze p then 
-                        loop (nextVisited, p, nextPaths, distance + cost)
-                    else []
-
-                let pathAhead = getPathAhead path.pos path.dir 
-                let aheadResult = move pathAhead 1L
-
-                let pathLeft = getPathLeft path.pos path.dir 
-                let leftResult = move pathLeft 1001L 
-
-                let pathRight = getPathRight path.pos path.dir 
-                let rightResult = move pathRight 1001L 
-
-                aheadResult @ leftResult @ rightResult
-            | '#' -> 
-                failwith "#"
-            | _ -> 
-                failwith (sprintf "%c" ch)
-    let startPath = { pos = startPos; dir = E }
-    let result = loop (Set.empty, startPath, [], 0)
-    result |> List.map (fun path -> path.pos) |> Set.ofList |> Set.count
+    queue.Enqueue((startPath, 0, []), 0L)
+    let results = loop ([], Set.empty, queue)
+    results 
+    |> List.groupBy (fun (d, posList) -> d) 
+    |> List.map (fun (d, lst) -> (d, lst |> List.collect snd |> Set.ofList |> Set.count))
+    |> List.sort
+    |> List.head 
 
 let findStartPos (maze : Maze) : Pos = 
     let rec find positions = 
@@ -172,7 +137,6 @@ let run fileName =
     let lines = readLines fileName |> Array.map (Seq.toArray)
     let maze : char[,] = lines |> array2D
     let startPos = findStartPos maze 
-    let lowestScore = solve1 startPos maze 
-    solve2 startPos lowestScore maze |> printfn "%d"
+    solve startPos maze |> printfn "%A"
 
 "input" |> run
