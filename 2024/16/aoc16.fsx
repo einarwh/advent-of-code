@@ -41,41 +41,6 @@ let move dir (x, y) =
 let readLines =
     File.ReadAllLines >> Array.filter ((<>) String.Empty)
 
-// let tryMove dir (path, heat) maze (visited, queue : PQ) =  
-//     let yMax = (maze |> Array2D.getRowCount) - 1
-//     let xMax = (maze |> Array2D.getColumnCount) - 1
-//     let (x, y) = move dir path.pos 
-//     if x < 0 || x > xMax || y < 0 || y > yMax then 
-//         (visited, queue) 
-//     else 
-//         let steps = if dir = path.dir then path.steps else 0
-//         let next = {
-//             pos = (x, y)
-//             dir = dir 
-//             steps = steps + 1
-//         }
-//         if visited |> Set.contains next then 
-//             (visited, queue) 
-//         else
-//             let h = heat + Array2D.get maze y x 
-//             queue.Enqueue((next, h), h)
-//             (visited |> Set.add next, queue)
-
-let findNeighbours maze (x, y) = 
-    let possible =
-        [ { pos = (x, y - 1); dir = N } 
-          { pos = (x - 1, y); dir = W } 
-          { pos = (x, y + 1); dir = S } 
-          { pos = (x + 1, y); dir = E } ]
-    possible |> List.filter (fun path -> Maze.get maze path.pos <> '#')
-
-let oppositeDirection dir = 
-    match dir with 
-    | N -> S 
-    | W -> E 
-    | S -> N 
-    | E -> W
-
 let getPathInDirection (x, y) dir = 
     match dir with 
     | N -> { pos = (x, y - 1); dir = N }
@@ -117,12 +82,6 @@ let isPathBlocked maze path =
     isPosBlocked maze path.pos 
 
 let isPathFree maze path = not <| isPathBlocked maze path
-
-let findPossibleMoves maze path = 
-    let dirs = [ N; W; S; E ] |> List.filter (fun d -> d <> oppositeDirection path.dir)
-    dirs 
-    |> List.map (getPathInDirection path.pos)
-    |> List.filter (fun path -> '#' <> Maze.get maze path.pos)
 
 let solve startPos (maze : Maze) : Distance = 
     let rec loop (visited : Set<Path>, q : PQ) = 
