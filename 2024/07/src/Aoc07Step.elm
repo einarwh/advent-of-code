@@ -1166,6 +1166,27 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
+              , Html.Attributes.style "padding-bottom" "10px" ]
+              [ Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2024/"] [ Html.text "2024" ]
+              , Html.text "] " 
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2023/"] [ Html.text "2023" ]
+              , Html.text "] "
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2022/"] [ Html.text "2022" ]
+              , Html.text "] "
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2021/"] [ Html.text "2021" ]
+              , Html.text "] "
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2020/"] [ Html.text "2020" ]
+              , Html.text "] "
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Solve ] 
@@ -1196,7 +1217,6 @@ view model =
               , Html.Attributes.style "width" "200px" ] 
               [ 
                 Html.div [] [ Html.text (String.fromInt model.count) ]
-            --   , Html.div [] [ Html.text model.debug ]
               ] ]
       , Html.tr 
           []
