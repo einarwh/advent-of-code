@@ -74,7 +74,7 @@ let isPathBlocked maze path =
 let isPathFree maze path = not <| isPathBlocked maze path
 
 let solve startPos (maze : Maze)  = 
-    let rec loop (results : (Distance * (Pos list)) list, visited : Set<Path>, q : PQ) = 
+    let rec loop (results, visited, q : PQ) = 
         if q.Count = 0 then results 
         else 
             let (path, distance, paths) = q.Dequeue()
@@ -84,8 +84,8 @@ let solve startPos (maze : Maze)  =
             match ch with 
             | 'E' -> 
                 // End!
-                let positions : Pos list = nextPaths |> List.map (fun p -> p.pos)
-                let r : Distance * (Pos list) = (distance, positions)
+                let positions = nextPaths |> List.map (fun p -> p.pos)
+                let r = (distance, positions)
                 loop ((r :: results), visited, q)
             | 'S' 
             | '.' ->
@@ -113,7 +113,6 @@ let solve startPos (maze : Maze)  =
             | _ -> 
                 failwith (sprintf "%c" ch)
     let queue = PQ()
-    // Find possible directions here. 
     let startPath = { pos = startPos; dir = E }
     queue.Enqueue((startPath, 0, []), 0L)
     let results = loop ([], Set.empty, queue)

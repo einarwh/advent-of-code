@@ -19,14 +19,11 @@ type Pos = (int*int)
 
 type Maze = char[,]
 
-type Path = {
-    pos : Pos 
-    dir : Dir 
-}
+type Path = { pos : Pos; dir : Dir }
 
 type Distance = int64
 
-type PQ = PriorityQueue<Path * Distance, Distance>
+type PQ = PriorityQueue<Path * Distance * Path list, Distance>
 
 let move dir (x, y) = 
     match dir with 
@@ -65,60 +62,45 @@ let getPathLeft (x, y) dir =
 let getPathRight (x, y) dir = 
     dir |> turnRight |> getPathAhead (x, y)
 
-let isPosBlocked maze (x, y) = 
-    '#' = Maze.get maze (x, y)
+let isPathFree maze path = 
+    '#' <> Maze.get maze path.pos
 
-let isPathBlocked maze path = 
-    isPosBlocked maze path.pos 
-
-let isPathFree maze path = not <| isPathBlocked maze path
-
-let solve startPos (maze : Maze) : Distance = 
-    let rec loop (visited : Set<Path>, q : PQ) = 
-        // printfn "q elements: %d" q.Count 
-        if q.Count = 0 then None 
+let solve startPos (maze : Maze)  = 
+    let rec loop (results, visited, q : PQ) = 
+        if q.Count = 0 then results 
         else 
-            let (path, distance) = q.Dequeue()
-            // printfn "Dequeued %A" (path, distance)
+            let (path, distance, paths) = q.Dequeue()
+            let nextPaths = path :: paths
             let nextVisited = visited |> Set.add path
-            // printfn "Visited %A" path
             let ch = Maze.get maze path.pos
             match ch with 
             | 'E' -> 
-                // End!
-                Some distance 
+                let positions = nextPaths |> List.map (fun p -> p.pos)
+                let r = (distance, positions)
+                loop ((r :: results), visited, q)
             | 'S' 
             | '.' ->
-                // Free space!
-                let maybeEnqueue path cost = 
-                    if not (Set.contains path visited) && isPathFree maze path then 
-                        q.Enqueue((path, distance + cost), distance + cost)
-
-                // Continue? 
+                let maybeEnqueue p cost = 
+                    if not (Set.contains p visited) && isPathFree maze p then 
+                        q.Enqueue((p, distance + cost, nextPaths), distance + cost)
                 let pathAhead = getPathAhead path.pos path.dir 
                 maybeEnqueue pathAhead 1L 
-
-                // Turn left?
                 let pathLeft = getPathLeft path.pos path.dir 
                 maybeEnqueue pathLeft 1001L
-
-                // Turn right?
                 let pathRight = getPathRight path.pos path.dir 
                 maybeEnqueue pathRight 1001L
-
-                // Keep going.
-                loop (nextVisited, q)
-            | '#' -> 
-                failwith "#"
+                loop (results, nextVisited, q)
             | _ -> 
                 failwith (sprintf "%c" ch)
     let queue = PQ()
-    // Find possible directions here. 
     let startPath = { pos = startPos; dir = E }
-    queue.Enqueue((startPath, 0), 0)
-    match loop (Set.empty, queue) with 
-    | Some distance -> distance 
-    | None -> failwith "?"
+    queue.Enqueue((startPath, 0, []), 0L)
+    let results = loop ([], Set.empty, queue)
+    results 
+    |> List.groupBy (fun (d, posList) -> d) 
+    |> List.map (fun (d, lst) -> (d, lst |> List.collect snd |> Set.ofList |> Set.count))
+    |> List.sort
+    |> List.head 
 
 let findStartPos (maze : Maze) : Pos = 
     let rec find positions = 
@@ -132,7 +114,7 @@ let findStartPos (maze : Maze) : Pos =
 let run fileName =
     let charAsInt ch = Char.GetNumericValue(ch) |> int
     let lines = readLines fileName |> Array.map (Seq.toArray)
-    let maze : char[,] = lines |> array2D
+    let maze = lines |> array2D
     let startPos = findStartPos maze 
     solve startPos maze |> printfn "%A"
 
