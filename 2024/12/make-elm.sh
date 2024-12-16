@@ -1,0 +1,1 @@
+elm make --optimize src/Aoc12.elm --output=index.html

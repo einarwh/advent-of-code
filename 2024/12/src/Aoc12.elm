@@ -7,10 +7,9 @@ import Html.Events exposing (onClick)
 import Dict exposing (Dict)
 import Array exposing (Array)
 import Set exposing (Set)
-import Array2D exposing (Array2D)
--- import Html exposing (text)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
+import List.Extra
 import Time
 
 defaultTickInterval : Float
@@ -33,21 +32,41 @@ type DataSource = Input | Sample | SampleXoXo | SampleLarger | SampleEShape | Sa
 
 type alias Plant = Char 
 
+type alias Garden = Dict Pos Plant
+
 type alias Plot = Set Pos 
 
 type alias PlotSequence = List Plot 
 
+type alias Line = 
+  { startPos : Pos 
+  , endPos : Pos }
+
+type Border = Vertical Line | Horizontal Line 
+
+type alias PlantSize = 
+  { width : Float 
+  , height : Float 
+  , xOffset : Float 
+  , yOffset : Float
+  , lineWidth : Float }
+
 type alias PlotInfo = 
   { complete : Plot  
   , sequence : PlotSequence
+  , borderLines : List Line 
+  , lineSequence : List (List Line)
   , totalSteps : Int 
   , plant : Plant 
   , color : String
+  , verticals : List Line 
+  , horizontals : List Line 
   , area : Int 
   , perimeter : Int
   , perimeterDiscount : Int
   , fenceCost : Int 
-  , fenceCostDiscount : Int }
+  , fenceCostDiscount : Int
+  , debug : String }
 
 type alias Model = 
   { plotInfoList : List PlotInfo
@@ -249,79 +268,143 @@ read dataSource =
     SampleLarger -> sampleLarger
     SampleXoXo -> sampleXoXo
 
-getAllPositions : Array2D Plant -> List Pos
-getAllPositions board = 
-  let
-    ys = List.range 0 (Array2D.rows board - 1)
-    xs = List.range 0 (Array2D.columns board - 1)
-  in 
-    ys |> List.concatMap (\y -> xs |> List.map (\x -> (x, y)))
+getAllPositions : Garden -> List Pos
+getAllPositions garden = 
+  garden |> Dict.keys 
 
-inGardenBounds : Array2D Plant -> Pos -> Bool 
-inGardenBounds garden (x, y) = 
-  let 
-    insideRows = y >= 0 && y < Array2D.rows garden
-    insideCols = x >= 0 && x < Array2D.columns garden
-  in 
-    insideRows && insideCols 
+tryGetPlantAtPos : Garden -> Pos -> Maybe Plant
+tryGetPlantAtPos garden pos = 
+  garden |> Dict.get pos
 
-tryGetPlantAtPos : Array2D Plant -> Pos -> Maybe Char
-tryGetPlantAtPos garden (x, y) = 
-  garden |> Array2D.get y x 
-
-neighbours : Pos -> List Pos 
-neighbours (x, y) = 
+getNeighbourCandidates : Pos -> List Pos 
+getNeighbourCandidates (x, y) = 
   [ ((x - 1), y), ((x + 1), y), (x, (y - 1)), (x, (y + 1)) ]
 
-fillLoop : Array2D Plant -> Plant -> List Pos -> (Plot, PlotSequence) -> (Plot, PlotSequence)
-fillLoop garden plant candidates (plot, seq) = 
+getBorders : Set Pos -> Plot -> Pos -> List Border 
+getBorders possible plot (x, y) = 
   let 
-    -- inside = List.filter (inGardenBounds garden) candidates
-    unseen = List.filter (\p -> not <| Set.member p plot) candidates 
-    verified = List.filter (\p -> plant == ((tryGetPlantAtPos garden p) |> Maybe.withDefault '?')) unseen
-    nextCandidates = verified |> List.concatMap neighbours |> Set.fromList |> Set.toList
+    nb = getNeighbourCandidates (x, y) 
+    notInPlot = nb |> List.filter (\p -> not (Set.member p plot))
+    borderPositions = notInPlot |> List.filter (\p -> not (Set.member p possible))
   in 
-    if List.length nextCandidates == 0 then 
-      (plot, seq)
-    else 
+    [ if borderPositions |> List.member (x, y - 1) then Just (Horizontal { startPos = (x, y), endPos = (x + 1, y) }) else Nothing  -- N
+    , if borderPositions |> List.member (x - 1, y) then Just (Vertical { startPos = (x, y), endPos = (x, y + 1) }) else Nothing -- W
+    , if borderPositions |> List.member (x, y + 1) then Just (Horizontal { startPos = (x, y + 1), endPos = (x + 1, y + 1) }) else Nothing -- S
+    , if borderPositions |> List.member (x + 1, y) then Just (Vertical { startPos = (x + 1, y), endPos = (x + 1, y + 1) }) else Nothing -- E 
+    ] |> List.filterMap identity
+
+fillPlant : Set Pos -> Set Pos -> Plot -> List (Plot) -> List Border -> List (List Border) -> ((Plot, List (Plot), List (List Border)), Set Pos)
+fillPlant possiblePositionsLeft positionsToAdd plot seq borders borderSeq = 
+  if Set.isEmpty positionsToAdd then 
+    ((plot, seq, borderSeq), possiblePositionsLeft) 
+  else 
+    let 
+      nextPlot = Set.union plot positionsToAdd
+      nextSeq = nextPlot :: seq
+      positionsToAddList = positionsToAdd |> Set.toList 
+      nextPositionsToAdd = 
+        positionsToAddList
+        |> List.concatMap getNeighbourCandidates 
+        |> Set.fromList 
+        |> Set.filter (\p -> (Set.member p possiblePositionsLeft))
+      newBorders = 
+        positionsToAddList
+        |> List.concatMap (getBorders possiblePositionsLeft plot)
+      nextBorders = borders ++ newBorders 
+      nextBorderSeq = nextBorders :: borderSeq 
+      possible = Set.diff possiblePositionsLeft nextPositionsToAdd
+    in 
+      fillPlant possible nextPositionsToAdd nextPlot nextSeq nextBorders nextBorderSeq
+
+fillPlantPlot : Set Pos -> Pos -> ((Plot, List (Plot), List (List Border)), Set Pos)
+fillPlantPlot plantPositions startPos = 
+  let 
+    positionsToAdd = Set.empty |> Set.insert startPos 
+  in 
+    fillPlant plantPositions positionsToAdd Set.empty [] [] []
+
+findPlantPlotsLoop : Plant -> List Pos -> List (Plant, (Plot, PlotSequence, List (List Border))) -> List (Plant, (Plot, PlotSequence, List (List Border)))
+findPlantPlotsLoop plant posList plotInfoList = 
+  case posList of 
+    [] -> plotInfoList 
+    pos :: remaining -> 
       let 
-        nextPlot = Set.union plot (Set.fromList verified) 
-        nextSeq = nextPlot :: seq 
+        remSet = Set.fromList remaining
+        ((plot, seq, borderSeq), updatedRemSet) = fillPlantPlot remSet pos 
       in 
-        fillLoop garden plant nextCandidates (nextPlot, nextSeq)
+        findPlantPlotsLoop plant (Set.toList updatedRemSet) ((plant, (plot, seq, borderSeq)) :: plotInfoList)
 
-fillPlot : Array2D Plant -> Pos -> Maybe (Plant, Plot, PlotSequence) 
-fillPlot garden pos = 
-  case tryGetPlantAtPos garden pos of 
-    Nothing -> Nothing 
-    Just plant -> 
-      let 
-        (plot, seq) = fillLoop garden plant [pos] (Set.empty, []) 
-      in 
-        Just (plant, plot, seq |> List.reverse)
+findPlantPlots : Plant -> List Pos -> List (Plant, (Plot, PlotSequence, List (List Border))) 
+findPlantPlots plant posList = 
+  findPlantPlotsLoop plant posList [] 
 
-findPlotsLoop : Array2D Plant -> List (Plant, Plot, PlotSequence) -> Set Pos -> List Pos -> List (Plant, Plot, PlotSequence) 
-findPlotsLoop garden plotList visited positions = 
-  case positions of 
-    [] -> plotList
-    (pos :: remaining) -> 
-      if visited |> Set.member pos then 
-        findPlotsLoop garden plotList visited remaining
-      else 
-        case fillPlot garden pos of 
-          Just (plant, plot, seq) -> 
-            findPlotsLoop garden ((plant, plot, seq) :: plotList) (Set.union visited plot) remaining
-          Nothing -> 
-            []
-
-findPlots : Array2D Plant -> List (Plant, Plot, PlotSequence)
-findPlots garden = 
-  garden |> getAllPositions |> findPlotsLoop garden [] Set.empty
+findAllPlots : Garden -> List (Plant, (Plot, PlotSequence, List (List Border))) 
+findAllPlots garden = 
+  let 
+    positionsWithPlant = garden |> getAllPositions |> List.map (\pos -> (pos, tryGetPlantAtPos garden pos |> Maybe.withDefault '?'))
+    selectByPlant p = 
+      positionsWithPlant |> List.filterMap (\(pos, plant) -> if plant == p then Just pos else Nothing)
+    getPlots p = 
+      p |> selectByPlant |> findPlantPlots p
+    aPlots = getPlots 'A'
+    bPlots = getPlots 'B'
+    cPlots = getPlots 'C'
+    dPlots = getPlots 'D'
+    ePlots = getPlots 'E'
+    fPlots = getPlots 'F'
+    gPlots = getPlots 'G'
+    hPlots = getPlots 'H'
+    iPlots = getPlots 'I'
+    jPlots = getPlots 'J'
+    kPlots = getPlots 'K'
+    lPlots = getPlots 'L'
+    mPlots = getPlots 'M'
+    nPlots = getPlots 'N'
+    oPlots = getPlots 'O'
+    pPlots = getPlots 'P'
+    qPlots = getPlots 'Q'
+    rPlots = getPlots 'R'
+    sPlots = getPlots 'S'
+    tPlots = getPlots 'T'
+    uPlots = getPlots 'U'
+    vPlots = getPlots 'V'
+    wPlots = getPlots 'W'
+    xPlots = getPlots 'X'
+    yPlots = getPlots 'Y'
+    zPlots = getPlots 'Z'
+  in 
+    [ aPlots
+    , bPlots 
+    , cPlots
+    , dPlots
+    , ePlots
+    , fPlots
+    , gPlots
+    , hPlots
+    , iPlots
+    , jPlots
+    , kPlots
+    , lPlots
+    , mPlots
+    , nPlots
+    , oPlots
+    , pPlots
+    , qPlots
+    , rPlots
+    , sPlots
+    , tPlots
+    , uPlots
+    , vPlots
+    , wPlots
+    , xPlots
+    , yPlots
+    , zPlots ] |> List.concat
 
 toPlotColor : Int -> String 
 toPlotColor index = 
   let 
-    hue = (index * 71) |> modBy 255
+    -- hue = (index * 79) |> modBy 255
+    hue = (index * 33) |> modBy 255
     saturation = 90
     lightness = 90
     hueStr = String.fromInt hue 
@@ -330,22 +413,109 @@ toPlotColor index =
   in 
     "hsl(" ++ hueStr ++ ", " ++ satStr ++ ", " ++ lgtStr ++ ")"
 
-toPlotInfo : Int -> (Plant, Plot, PlotSequence) -> PlotInfo 
-toPlotInfo index (plant, plot, seq) = 
+getPlantColor : Plant -> String 
+getPlantColor plant = 
+  plant |> Char.toCode |> toPlotColor
+
+distinct : List a -> List a 
+distinct lst = 
+  case lst of 
+    [] -> []
+    h :: t -> 
+      if List.member h t then distinct t 
+      else h :: distinct t 
+
+tryFindBorderMatch : Line -> List Line -> Maybe Line 
+tryFindBorderMatch v horizontals = 
+  case horizontals of 
+    [] -> Nothing 
+    h :: restHorizontals -> 
+      if v.startPos == h.startPos || v.startPos == h.endPos || v.endPos == h.startPos || v.endPos == h.endPos then 
+        Just h 
+      else 
+        tryFindBorderMatch v restHorizontals
+
+findCornerPointsLoop : List Line -> List Line -> List Pos -> List Pos 
+findCornerPointsLoop verticals horizontals allCornerPoints = 
+  case verticals of 
+    [] -> allCornerPoints 
+    v :: restVerticals -> 
+      let 
+        topCornerPoints = horizontals |> List.filterMap (\h -> if h.startPos == v.startPos || h.endPos == v.startPos then Just v.startPos else Nothing) 
+        botCornerPoints = horizontals |> List.filterMap (\h -> if h.startPos == v.endPos || h.endPos == v.endPos then Just v.endPos else Nothing)
+        nextAllCornerPoints = topCornerPoints ++ botCornerPoints ++ allCornerPoints 
+      in 
+        findCornerPointsLoop restVerticals horizontals nextAllCornerPoints
+
+fixCrossroads : List Pos -> List Pos 
+fixCrossroads points = 
+  case points of 
+    [] -> []
+    a :: rest1 -> 
+      case rest1 of 
+        b :: rest2 -> 
+          if a == b then 
+            case rest2 of 
+              c :: d :: rest3 -> 
+                if b == c && c == d then 
+                  a :: b :: fixCrossroads rest3 
+                else 
+                  a :: b :: fixCrossroads rest2 
+              _ -> a :: b :: fixCrossroads rest2
+          else 
+            a :: fixCrossroads rest1 
+        _ -> a :: fixCrossroads rest1
+
+countCorners : List Line -> List Line -> Int 
+countCorners verticals horizontals = 
   let 
+    allCornerPoints = findCornerPointsLoop verticals horizontals [] |> List.sort
+    fixed = allCornerPoints |> fixCrossroads
+  in 
+    fixed |> List.length  
+
+toPlotInfo : Int -> (Plant, (Plot, PlotSequence, List (List Border))) -> PlotInfo 
+toPlotInfo index (plant, (plot, seq, borderSeq)) = 
+  let 
+    asVertical border = 
+      case border of 
+        Vertical b -> Just b 
+        _ -> Nothing 
+    asHorizontal border = 
+      case border of 
+        Horizontal b -> Just b 
+        _ -> Nothing 
     totalSteps = List.length seq 
     area = Set.size plot
+    plantColor = getPlantColor plant
+    borders = borderSeq |> List.concat
+    borderCount = List.length borders 
+    distinctBorders = distinct borders
+    distinctBorderCount  = List.length distinctBorders 
+    perimeter = List.length distinctBorders
+    verticals = distinctBorders |> List.filterMap asVertical
+    horizontals = distinctBorders |> List.filterMap asHorizontal
+    sections = countCorners verticals horizontals
+    -- debug = "Border count: " ++ String.fromInt borderCount ++ " vs Distinct border count: " ++ String.fromInt distinctBorderCount
+    lineSequence = borderSeq |> List.reverse |> List.map (List.map toBorderLine)
+    borderLines = lineSequence |> List.concat
+    debug = "?"
   in 
     { complete = plot  
-    , sequence = seq
+    , sequence = seq |> List.reverse
+    , borderLines = borderLines 
+    , lineSequence = lineSequence
     , totalSteps = List.length seq 
     , plant = plant 
-    , color = toPlotColor index
+    , color = plantColor
+    , verticals = verticals
+    , horizontals = horizontals
     , area = area  
-    , perimeter = 0 
-    , perimeterDiscount = 0 
-    , fenceCost = 0  
-    , fenceCostDiscount = 0 }
+    , perimeter = perimeter
+    , perimeterDiscount = sections
+    , fenceCost = area * perimeter  
+    , fenceCostDiscount = area * sections
+    , debug = debug }
 
 initModel : DataSource -> Model 
 initModel dataSource = 
@@ -354,18 +524,22 @@ initModel dataSource =
     rows = data |> String.split "\n"
     numberOfRows = rows |> List.length 
     numberOfCols = rows |> List.head |> Maybe.withDefault "?" |> String.length 
-    garden = rows |> List.map (String.toList) |> Array2D.fromList
-    plotList = findPlots garden 
+    createRowTuples y rowStr = 
+      rowStr |> String.toList |> List.indexedMap (\x ch -> ((x, y), ch)) 
+    garden = rows |> List.indexedMap createRowTuples |> List.concat |> Dict.fromList
+    plotList = findAllPlots garden 
     plotInfoList = plotList |> List.indexedMap toPlotInfo 
     maxSteps = plotInfoList |> List.map (\pi -> pi.totalSteps) |> List.maximum |> Maybe.withDefault 0
+    totalCost = plotInfoList |> List.map (\pi -> pi.fenceCost) |> List.sum 
+    totalCostDiscount = plotInfoList |> List.map (\pi -> pi.fenceCostDiscount) |> List.sum 
   in 
     { plotInfoList = plotInfoList  
     , rowCount = numberOfRows
     , colCount = numberOfCols
     , step = 0 
     , maxSteps = maxSteps
-    , totalCost = 0 
-    , totalCostDiscount = 0  
+    , totalCost = totalCost 
+    , totalCostDiscount = totalCostDiscount  
     , dataSource = dataSource
     , paused = True
     , finished = False  
@@ -383,8 +557,6 @@ type Msg =
   | PrevStep 
   | NextStep 
   | TogglePlay 
-  | Faster 
-  | Slower 
   | Clear 
   | UseInput
   | UseSample
@@ -439,10 +611,6 @@ update msg model =
       (updatePrevStep model, Cmd.none)
     NextStep ->
       (updateNextStep model, Cmd.none)
-    Faster -> 
-      ({model | tickInterval = model.tickInterval / 2 }, Cmd.none)
-    Slower -> 
-      ({model | tickInterval = model.tickInterval * 2 }, Cmd.none)
     TogglePlay -> 
       (updateTogglePlay model, Cmd.none)
     UseInput -> 
@@ -469,67 +637,127 @@ subscriptions model =
 
 -- VIEW
 
-toPlantElement : Int -> Int -> String -> Pos -> Svg Msg 
-toPlantElement plantWidth plantHeight plantStr (xInt, yInt) = 
+toPlantElement : PlantSize -> String -> Pos -> Svg Msg 
+toPlantElement plantSize plantStr (xInt, yInt) = 
   let 
-    xStr = String.fromInt ((plantWidth // 4) + xInt * plantWidth)
-    yStr = String.fromInt (plantHeight + yInt * plantHeight)
+    w = plantSize.width 
+    dw = plantSize.xOffset
+    h = plantSize.height
+    dh = plantSize.yOffset 
+    xStr = String.fromFloat (dw + toFloat xInt * w)
+    yStr = String.fromFloat (dh + h + toFloat yInt * h)
   in 
     Svg.text_ [ x xStr, y yStr ] [ Svg.text plantStr ]
 
-toFilledElement : Int -> Int -> String -> Pos -> Svg Msg 
-toFilledElement plantWidth plantHeight colorStr (xInt, yInt) = 
+toFilledElement : PlantSize -> String -> Pos -> Svg Msg 
+toFilledElement plantSize colorStr (xInt, yInt) = 
   let 
-    xStr = String.fromInt (2 + xInt * plantWidth)
-    yStr = String.fromInt (2 + yInt * plantHeight)
+    w = plantSize.width 
+    h = plantSize.height
+    xStr = String.fromFloat (toFloat xInt * w)
+    yStr = String.fromFloat (toFloat yInt * h)
   in 
     rect
           [ x xStr
           , y yStr
-          , width (String.fromInt plantWidth)
-          , height (String.fromInt plantHeight)
+          , width (String.fromFloat w)
+          , height (String.fromFloat h)
           , fill colorStr
           ]
           []
 
-toPlotSvgElements : Int -> Int -> Int -> PlotInfo -> List (Svg Msg)
-toPlotSvgElements step plantWidth plantHeight plotInfo = 
+toBorderLine : Border -> Line 
+toBorderLine border = 
+  case border of 
+    Vertical v -> v 
+    Horizontal h -> h 
+
+toBorderElement : PlantSize -> Line -> Svg Msg 
+toBorderElement plantSize borderLine = 
+  let 
+    w = plantSize.width
+    h = plantSize.height
+    (x1i, y1i) = borderLine.startPos 
+    (x2i, y2i) = borderLine.endPos 
+    x1s = String.fromFloat (toFloat x1i * w)
+    y1s = String.fromFloat (toFloat y1i * h)
+    x2s = String.fromFloat (toFloat x2i * w)
+    y2s = String.fromFloat (toFloat y2i * h)
+  in 
+    line
+          [ x1 x1s
+          , y1 y1s
+          , x2 x2s 
+          , y2 y2s
+          , stroke "black"
+          , strokeLinecap "round"
+          , strokeLinejoin "round"
+          , strokeWidth (String.fromFloat plantSize.lineWidth)
+          ]
+          []
+
+toPlotSvgElements : Int -> PlantSize -> PlotInfo -> List (Svg Msg)
+toPlotSvgElements step plantSize plotInfo = 
   let 
     posList = plotInfo.complete |> Set.toList
     colorStr = plotInfo.color
     plantStr = String.fromChar plotInfo.plant 
-    plantElements = posList |> List.map (toPlantElement plantWidth plantHeight plantStr)
+    plantElements = posList |> List.map (toPlantElement plantSize plantStr)
     filled = 
       if step == 0 then [] 
       else 
         case plotInfo.sequence |> List.drop (step - 1) |> List.head of 
           Just plot -> plot |> Set.toList 
           Nothing -> posList
-    filledElements = filled |> List.map (toFilledElement plantWidth plantHeight colorStr)
+    borderLines = 
+      if step == 0 then [] 
+      else 
+        case plotInfo.lineSequence |> List.drop (step - 1) |> List.head of 
+          Just borderLine -> borderLine
+          Nothing -> plotInfo.borderLines
+    filledElements = filled |> List.map (toFilledElement plantSize colorStr)
+    borderElements = borderLines |> List.map (toBorderElement plantSize)
   in 
-    filledElements ++ plantElements
+    filledElements ++ plantElements ++ borderElements
 
 toSvg : Model -> Html Msg 
 toSvg model = 
   let 
-    plantWidth = 12
-    plantHeight = 16  
-    svgWidth = (4 + plantWidth * model.colCount) |> String.fromInt 
-    svgHeight = (4 + plantHeight * model.rowCount) |> String.fromInt 
+    (fontSize, plantSize) = 
+      case model.dataSource of 
+        Input -> ("8px", { width = 6.5, height = 10, xOffset = 0.9, yOffset = -2.0, lineWidth = 0.5 })
+        _ -> ("16px", { width = 12, height = 16, xOffset = 0.9, yOffset = -2.0, lineWidth = 1.0 })
+    svgWidth = (toFloat 4 + plantSize.width * toFloat model.colCount) |> String.fromFloat 
+    svgHeight = (toFloat 4 + plantSize.height * toFloat model.rowCount) |> String.fromFloat 
     step = model.step 
     plotInfoList = model.plotInfoList 
-    elements = model.plotInfoList |> List.concatMap (toPlotSvgElements step plantWidth plantHeight)
+    elements = model.plotInfoList |> List.concatMap (toPlotSvgElements step plantSize)
     rects = []
-    viewBoxStr = [ "0", "0", svgWidth, svgHeight ] |> String.join " "
+    viewBoxStr = [ "-1", "-1", svgWidth, svgHeight ] |> String.join " "
+    fontFamilyAttr = "font-family:Source Code Pro,monospace"
+    fontSizeAttr = "font-size:" ++ fontSize
+    styles = fontFamilyAttr ++ "; " ++ fontSizeAttr 
   in 
     svg
       [ viewBox viewBoxStr
       , width svgWidth
       , height svgHeight
       -- , Svg.Attributes.style "background-color:lightgreen; font-family:Source Code Pro,monospace"
-      , Svg.Attributes.style "font-family:Source Code Pro,monospace"
+      , Svg.Attributes.style styles
       ]
       elements
+
+toLineText : Line -> String 
+toLineText line = 
+  case (line.startPos, line.endPos) of 
+    ((x1, y1), (x2, y2)) -> 
+      let 
+        x1s = String.fromInt x1
+        y1s = String.fromInt y1
+        x2s = String.fromInt x2 
+        y2s = String.fromInt y2
+      in 
+        "(" ++ x1s ++ "," ++ y1s ++ ")->(" ++ x2s ++ "," ++ y2s ++ ")"
 
 view : Model -> Html Msg
 view model =
@@ -537,7 +765,13 @@ view model =
     elements = []
     textFontSize = "9px"
     s = toSvg model 
-    message = model.plotInfoList |> List.length |> String.fromInt
+    verticalsText = model.plotInfoList |> List.concatMap (\pi -> pi.verticals |> List.map toLineText) |> List.sort |> String.join "\n"
+    horizontalsText = model.plotInfoList |> List.concatMap (\pi -> pi.horizontals |> List.map toLineText) |> List.sort |> String.join "\n"
+    numberOfPlots = model.plotInfoList |> List.length
+    finishedPlotInfoList = model.plotInfoList |> List.filter (\pi -> pi.totalSteps <= model.step)
+    numberOfFinishedPlots = finishedPlotInfoList |> List.length
+    currentCost = finishedPlotInfoList |> List.map (\pi -> pi.fenceCost) |> List.sum 
+    currentCostDiscount = finishedPlotInfoList |> List.map (\pi -> pi.fenceCostDiscount) |> List.sum 
   in 
     Html.table 
       [ Html.Attributes.style "width" "1080px"]
@@ -553,13 +787,36 @@ view model =
       , Html.tr 
           []
           [ Html.td 
-              [ Html.Attributes.align "center" ]
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "padding-bottom" "10px" ]
+              [ Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2024/"] [ Html.text "2024" ]
+              , Html.text "] " 
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2023/"] [ Html.text "2023" ]
+              , Html.text "] "
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2022/"] [ Html.text "2022" ]
+              , Html.text "] "
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2021/"] [ Html.text "2021" ]
+              , Html.text "] "
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2020/"] [ Html.text "2020" ]
+              , Html.text "] "
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "16px" ]
               [ 
-              --   Html.input 
-              --   [ Html.Attributes.type_ "radio", onClick UseInput, Html.Attributes.checked (model.dataSource == Input) ] 
-              --   []
-              -- , Html.label [] [ Html.text "Input" ]
-              -- , 
+                Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseInput, Html.Attributes.checked (model.dataSource == Input) ] 
+                []
+              , Html.label [] [ Html.text "Input" ]
+              , 
                 Html.input 
                 [ Html.Attributes.type_ "radio", onClick UseSample, Html.Attributes.checked (model.dataSource == Sample) ] 
                 []
@@ -601,14 +858,8 @@ view model =
                 , onClick PrevStep ] 
                 [ Html.text "Prev" ]
               , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Slower ] 
-                [ text "Slower" ]
-              , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick TogglePlay ] 
                 [ if model.paused then text "Play" else text "Pause" ] 
-              , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Faster ] 
-                [ text "Faster" ]
               , Html.button 
                 [ Html.Attributes.style "width" "80px"
                 , Html.Attributes.disabled (model.step == model.maxSteps)
@@ -621,11 +872,20 @@ view model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "24px"
+              , Html.Attributes.style "font-size" "16px"
               , Html.Attributes.style "width" "200px" ] 
               [ 
-                Html.div [] [ Html.text (String.fromInt model.step) ]
-              , Html.div [] [ Html.text message ]
+                Html.div [] [ Html.text ("Total plots: " ++ String.fromInt numberOfPlots) ]
+              , Html.div [] [ Html.text ("Step number: " ++ String.fromInt model.step) ]
+              , Html.div [] [ Html.text ("Finished plots: " ++ String.fromInt numberOfFinishedPlots) ]
+              -- , Html.div [] [ Html.text ("Perimeters: " ++ String.fromInt model.totalCost) ]
+              , Html.div [] [ Html.text ("Fence cost: " ++ String.fromInt currentCost) ]
+              , Html.div [] [ Html.text ("Bulk cost: " ++ String.fromInt currentCostDiscount) ]
+              -- , Html.div [] [ Html.text ("Debug: " ++ debugText) ]
+              -- , Html.div [] [ Html.text "Verticals" ]
+              -- , Html.div [] [ Html.text verticalsText ]
+              -- , Html.div [] [ Html.text "Horizontals" ]
+              -- , Html.div [] [ Html.text horizontalsText ]
               ] ]
       , Html.tr 
           []

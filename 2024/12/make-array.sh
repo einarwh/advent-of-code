@@ -1,1 +1,0 @@
-elm make --optimize src/Aoc12Array.elm --output=array.html
