@@ -1630,7 +1630,8 @@ view model =
     elements = model.rows |> List.concatMap toRowHtmlElement
   in 
     Html.table 
-      [ Html.Attributes.style "width" "1080px"]
+      [ Html.Attributes.style "width" "1080px" 
+      , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
           [ Html.td 

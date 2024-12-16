@@ -6055,6 +6055,7 @@ var $author$project$Aoc04$Clear = 0;
 var $author$project$Aoc04$MasX = 2;
 var $author$project$Aoc04$ToggleSample = 3;
 var $author$project$Aoc04$Xmas = 1;
+var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -6067,6 +6068,12 @@ var $elm$html$Html$Attributes$align = $elm$html$Html$Attributes$stringProperty('
 var $elm$html$Html$br = _VirtualDom_node('br');
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$html$Html$Attributes$href = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'href',
+		_VirtualDom_noJavaScriptUri(url));
+};
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 0, a: a};
 };
@@ -6213,7 +6220,8 @@ var $author$project$Aoc04$view = function (model) {
 		$elm$html$Html$table,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'width', '1080px')
+				A2($elm$html$Html$Attributes$style, 'width', '1080px'),
+				A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New')
 			]),
 		_List_fromArray(
 			[
@@ -6247,6 +6255,82 @@ var $author$project$Aoc04$view = function (model) {
 									[
 										$elm$html$Html$text('Day 4: Ceres Search')
 									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'padding-bottom', '10px')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(' ['),
+								A2(
+								$elm$html$Html$a,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$href('../../2024/')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('2024')
+									])),
+								$elm$html$Html$text('] '),
+								$elm$html$Html$text(' ['),
+								A2(
+								$elm$html$Html$a,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$href('../../2023/')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('2023')
+									])),
+								$elm$html$Html$text('] '),
+								$elm$html$Html$text(' ['),
+								A2(
+								$elm$html$Html$a,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$href('../../2022/')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('2022')
+									])),
+								$elm$html$Html$text('] '),
+								$elm$html$Html$text(' ['),
+								A2(
+								$elm$html$Html$a,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$href('../../2021/')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('2021')
+									])),
+								$elm$html$Html$text('] '),
+								$elm$html$Html$text(' ['),
+								A2(
+								$elm$html$Html$a,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$href('../../2020/')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('2020')
+									])),
+								$elm$html$Html$text('] ')
 							]))
 					])),
 				A2(

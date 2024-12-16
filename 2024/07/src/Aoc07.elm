@@ -7,6 +7,10 @@ import Html.Events exposing (onClick)
 import Dict exposing (Dict)
 import Array exposing (Array)
 import Html exposing (text)
+import Time
+
+defaultTickInterval : Float
+defaultTickInterval = 10
 
 -- MAIN
 
@@ -23,7 +27,7 @@ main =
 
 -- MODEL
 
-type CheckedEquation = Balanced (String, Int) | Unbalanced String | Unchecked String 
+type CheckedEquation = Balanced (String, Int) | Unbalanced String 
 
 type alias Model = 
   { count : Int 
@@ -31,7 +35,9 @@ type alias Model =
   , withConcat : Bool
   , equations : List (Int, List Int) 
   , checkedEquations : List CheckedEquation
-  , lastCommandText : String
+  , uncheckedEquations : List (Int, List Int)
+  , solving : Bool
+  , tickInterval : Float 
   , debug : String }
 
 parseNumbers : String -> List Int 
@@ -919,13 +925,13 @@ initEquations useSample =
   in 
     lines |> List.filterMap parseEquation 
 
-equationAsUnchecked : Equation -> CheckedEquation
-equationAsUnchecked (testValue, numbers) = 
+equationAsString : Equation -> String
+equationAsString (testValue, numbers) = 
   let 
     testValueStr = String.fromInt testValue 
     numbersStr = numbers |> List.map String.fromInt |> String.join " "
   in 
-    Unchecked (testValueStr ++ ": " ++ numbersStr)
+    (testValueStr ++ ": " ++ numbersStr)
 
 equationAsUnbalanced : Equation -> CheckedEquation
 equationAsUnbalanced (testValue, numbers) = 
@@ -939,14 +945,15 @@ initModel : Bool -> Bool -> Model
 initModel useSample withConcat =
   let 
     equations = initEquations useSample
-    checked = equations |> List.map equationAsUnchecked
     debug = equations |> List.length |> String.fromInt 
     model = { count = 0
             , useSample = useSample
             , withConcat = withConcat
             , equations = equations
-            , checkedEquations = checked
-            , lastCommandText = "press play to start"
+            , checkedEquations = []
+            , uncheckedEquations = equations
+            , solving = False
+            , tickInterval = defaultTickInterval
             , debug = debug }
   in 
     model 
@@ -957,7 +964,7 @@ init _ =
 
 -- UPDATE
 
-type Msg = Clear | Solve | ToggleConcat | ToggleSample
+type Msg = Tick | Clear | Solve | ToggleConcat | ToggleSample
 
 updateClear : Model -> Model
 updateClear model = 
@@ -1045,31 +1052,14 @@ debugCalculation ops maybeEq =
     Nothing -> "???"
     Just eq -> 
       case checkEquation ops eq of 
-        Unchecked uc -> "Unchecked (" ++ uc ++ ")"
         Unbalanced ub -> "Unbalanced (" ++ ub ++ ")"
         Balanced (b, tv) -> "Balanced (" ++ b ++ ", " ++ (String.fromInt tv) ++ ")"
 
 updateSolve model = 
   let 
-    operators = if model.withConcat then [ Add, Mul, Con ] else [ Add, Mul ]
-    checked = model.equations |> List.map (checkEquation operators)
-    getValue ce = 
-      case ce of 
-        Balanced (s, n) -> n 
-        Unbalanced _ -> 0 
-        Unchecked _ -> 0
-    balancedCount = checked |> List.map getValue |> List.sum
-    debug = debugCalculation operators (List.head model.equations)
+    solving = not model.solving
   in  
-  -- let
-  --   checkedEquations = 
-  --     if model.withConcat then 
-  --       model.reports |> List.map checkReportWithDampener
-  --     else 
-  --       model.reports |> List.map checkReport
-  --   found = countSafe reports 
-  -- in
-    { model | checkedEquations = checked, count = balancedCount, debug = debug }
+    { model | solving = solving }
 
 updateToggleConcat : Model -> Model
 updateToggleConcat model = 
@@ -1085,6 +1075,25 @@ updateToggleSample model =
   in
     initModel useSample model.withConcat
 
+updateTick : Model -> Model 
+updateTick model =
+  let 
+    operators = if model.withConcat then [ Add, Mul, Con ] else [ Add, Mul ]
+    getValue ce = 
+      case ce of 
+        Balanced (s, n) -> n 
+        Unbalanced _ -> 0 
+  in 
+    case model.uncheckedEquations of 
+      [] -> { model | solving = False }
+      (testValue, numbers) :: remaining -> 
+        let 
+          checked = checkEquation operators (testValue, numbers) 
+          checkedEquations = List.append model.checkedEquations [ checked ]
+          value = getValue checked
+        in 
+          { model | checkedEquations = checkedEquations, uncheckedEquations = remaining, count = model.count + value }
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
@@ -1096,11 +1105,14 @@ update msg model =
       (updateToggleConcat model, Cmd.none)
     ToggleSample -> 
       (updateToggleSample model, Cmd.none)
+    Tick -> 
+      (updateTick model, Cmd.none)
 
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
-subscriptions model = Sub.none
+subscriptions model =
+    if model.solving then Time.every model.tickInterval (\_ -> Tick) else Sub.none
 
 -- VIEW
 
@@ -1124,10 +1136,9 @@ toBalancedHtmlElement s =
   in 
     [ spanElement, Html.br [] [] ]
 
-toEquationHtmlElement : CheckedEquation -> List (Html Msg)  
-toEquationHtmlElement checked = 
+toCheckedEquationHtmlElement : CheckedEquation -> List (Html Msg)  
+toCheckedEquationHtmlElement checked = 
   case checked of 
-    Unchecked s -> toUncheckedHtmlElement s 
     Unbalanced s -> toUnbalancedHtmlElement s 
     Balanced (s, _) -> toBalancedHtmlElement s
 
@@ -1136,7 +1147,9 @@ view model =
   let
     commandsStr = ""
     textFontSize = if model.useSample then "36px" else "14px"
-    elements = model.checkedEquations |> List.concatMap toEquationHtmlElement
+    checkedElements = model.checkedEquations |> List.concatMap toCheckedEquationHtmlElement
+    uncheckedElements = model.uncheckedEquations |> List.map equationAsString |> List.concatMap toUncheckedHtmlElement
+    elements = List.append checkedElements uncheckedElements
   in 
     Html.table 
       [ Html.Attributes.style "width" "1080px"]
@@ -1153,10 +1166,31 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
+              , Html.Attributes.style "padding-bottom" "10px" ]
+              [ Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2024/"] [ Html.text "2024" ]
+              , Html.text "] " 
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2023/"] [ Html.text "2023" ]
+              , Html.text "] "
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2022/"] [ Html.text "2022" ]
+              , Html.text "] "
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2021/"] [ Html.text "2021" ]
+              , Html.text "] "
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2020/"] [ Html.text "2020" ]
+              , Html.text "] "
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Solve ] 
-                [ Html.text "Solve" ]
+                [ if model.solving then Html.text "Pause" else Html.text "Solve" ]
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Clear ] 
                 [ Html.text "Clear" ] 
@@ -1183,7 +1217,6 @@ view model =
               , Html.Attributes.style "width" "200px" ] 
               [ 
                 Html.div [] [ Html.text (String.fromInt model.count) ]
-              , Html.div [] [ Html.text model.debug ]
               ] ]
       , Html.tr 
           []

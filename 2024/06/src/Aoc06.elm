@@ -523,7 +523,8 @@ view model =
         else ("Loop X of Y", String.fromInt positionsVisited)
   in 
     Html.table 
-      [ Html.Attributes.style "width" "1080px"]
+      [ Html.Attributes.style "width" "1080px"
+      , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
           [ Html.td 
@@ -532,7 +533,7 @@ view model =
               , Html.Attributes.style "font-size" "40px"
               , Html.Attributes.style "padding" "20px"]
               [ Html.div [] [Html.text "Advent of Code 2024" ]
-              , Html.div [] [Html.text "Day 6: Guard Gallivant" ] ] ]
+              , Html.div [] [Html.text "Day 6: Guard Gallivant (Part 1)" ] ] ]
       , Html.tr 
           []
           [ Html.td 
