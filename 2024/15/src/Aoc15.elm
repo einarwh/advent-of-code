@@ -536,7 +536,8 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding-bottom" "10px" ]
-              [ Html.text " ["
+              [ 
+                Html.text " ["
               , Html.a [ Html.Attributes.href "../../2024/"] [ Html.text "2024" ]
               , Html.text "] " 
               , Html.text " ["
@@ -550,7 +551,16 @@ view model =
               , Html.text "] "
               , Html.text " ["
               , Html.a [ Html.Attributes.href "../../2020/"] [ Html.text "2020" ]
-              , Html.text "] "
+              , Html.text "] " ] 
+          ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "padding-bottom" "10px" ]
+              [ Html.a 
+                [ Html.Attributes.href "https://adventofcode.com/2024/day/15" ] 
+                [ text "https://adventofcode.com/2024/day/15" ]
             ] ]
       , Html.tr 
           []
