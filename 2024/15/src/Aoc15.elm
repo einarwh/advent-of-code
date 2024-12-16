@@ -520,7 +520,8 @@ view model =
         "?"
   in 
     Html.table 
-      [ Html.Attributes.style "width" "1080px"]
+      [ Html.Attributes.style "width" "1080px"
+      , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
           [ Html.td 
@@ -602,7 +603,7 @@ view model =
               [ Html.input 
                 [ Html.Attributes.type_ "checkbox", onClick ToggleWide, Html.Attributes.checked model.wide ] 
                 []
-              , Html.label [] [ Html.text "Wide" ]
+              , Html.label [] [ Html.text " Wide" ]
             ] ]
       , Html.tr 
           []
@@ -611,6 +612,7 @@ view model =
               , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "24px"
+              , Html.Attributes.style "padding-top" "10px"
               , Html.Attributes.style "width" "200px" ] 
               [ 
                 Html.div [] [ Html.text gpsSum ]

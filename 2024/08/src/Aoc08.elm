@@ -290,7 +290,8 @@ view model =
     countStr = antinodes |> Set.size |> String.fromInt    
   in 
     Html.table 
-      [ Html.Attributes.style "width" "1080px"]
+      [ Html.Attributes.style "width" "1080px"
+      , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
           [ Html.td 
@@ -343,7 +344,7 @@ view model =
               [ Html.input 
                 [ Html.Attributes.type_ "checkbox", onClick ToggleHarmonics, Html.Attributes.checked model.withHarmonics ] 
                 []
-              , Html.label [] [ Html.text "With harmonics" ]
+              , Html.label [] [ Html.text " With harmonics" ]
             ] ]
       , Html.tr 
           []
@@ -352,6 +353,7 @@ view model =
               , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "24px"
+              , Html.Attributes.style "padding-top" "10px"
               , Html.Attributes.style "width" "200px" ] 
               [ 
                 Html.div [] [ Html.text countStr ]
