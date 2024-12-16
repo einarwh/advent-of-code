@@ -550,7 +550,7 @@ view model =
               , Html.text " ["
               , Html.a [ Html.Attributes.href "../../2020/"] [ Html.text "2020" ]
               , Html.text "] "
-            ] ]     
+            ] ]
       , Html.tr 
           []
           [ Html.td 
