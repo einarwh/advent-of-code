@@ -1,0 +1,1 @@
+elm make --optimize src/Aoc11b.elm --output=aoc11b.html

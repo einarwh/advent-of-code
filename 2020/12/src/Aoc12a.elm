@@ -216,8 +216,40 @@ view model =
     elements = lineElement :: shipElements
   in 
     Html.table 
-      []
+      [ 
+        Html.Attributes.style "font-family" "Courier New"
+      ]
       [ Html.tr 
+          [] 
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "40px"
+              , Html.Attributes.style "padding" "20px"]
+              [ Html.div [] [Html.text "Advent of Code 2020" ]
+              , Html.div [] [Html.text "Day 12: Rain Risk (Part 1)" ] ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "padding-bottom" "10px" ]
+              [ Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2024/"] [ Html.text "2024" ]
+              , Html.text "] " 
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2023/"] [ Html.text "2023" ]
+              , Html.text "] "
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2022/"] [ Html.text "2022" ]
+              , Html.text "] "
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2021/"] [ Html.text "2021" ]
+              , Html.text "] "
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2020/"] [ Html.text "2020" ]
+              , Html.text "] "
+            ] ]
+      , Html.tr 
           [] 
           [ Html.td 
               [ Html.Attributes.align "center"
