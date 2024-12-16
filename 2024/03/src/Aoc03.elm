@@ -378,7 +378,10 @@ view model =
     commandsStr = ""
   in 
     Html.table 
-      [ Html.Attributes.style "width" "500px"]
+      [ 
+        Html.Attributes.style "width" "500px"
+      , Html.Attributes.style "font-family" "Courier New"
+      ]
       [ Html.tr 
           [] 
           [ Html.td 
@@ -437,7 +440,7 @@ view model =
               [ Html.input 
                 [ Html.Attributes.type_ "checkbox", onClick ToggleConditionals, Html.Attributes.checked model.parseConditionals ] 
                 []
-              , Html.label [] [ Html.text "Enable conditionals" ]
+              , Html.label [] [ Html.text " Enable conditionals" ]
             ] ]
       , Html.tr 
           []
@@ -446,12 +449,9 @@ view model =
               , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "24px"
-              , Html.Attributes.style "width" "200px" ] 
+              , Html.Attributes.style "width" "200px"
+              , Html.Attributes.style "padding-top" "10px" ] 
               [ 
-              -- Html.div [] [ Html.text model.lastCommandText ]
-              -- , Html.div [] [ Html.text (String.append "state: " (whichState model.state)) ]
-              -- , Html.div [] [ Html.text (String.append "junk: " model.junk) ]
-              -- , Html.div [] [ Html.text (String.append "scanning: " model.scanning) ]
                 Html.div [] [ Html.text (String.fromInt model.value) ]
               , Html.div [] [ Html.text commandsStr ]
               ] ]
