@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Aoc18</title>
+  <title>Aoc10Pretty</title>
   <style>body { padding: 0; margin: 0; }</style>
 </head>
 
@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.ae.M === region.al.M)
+	if (region.P.B === region.W.B)
 	{
-		return 'on line ' + region.ae.M;
+		return 'on line ' + region.P.B;
 	}
-	return 'on lines ' + region.ae.M + ' through ' + region.al.M;
+	return 'on lines ' + region.P.B + ' through ' + region.W.B;
 }
 
 
@@ -1871,9 +1871,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.a6,
-		impl.bu,
-		impl.bo,
+		impl.aD,
+		impl.aL,
+		impl.aJ,
 		function() { return function() {} }
 	);
 });
@@ -2733,9 +2733,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		r: func(record.r),
-		af: record.af,
-		ac: record.ac
+		q: func(record.q),
+		S: record.S,
+		N: record.N
 	}
 });
 
@@ -3003,11 +3003,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.r;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.af;
+		var message = !tag ? value : tag < 3 ? value.a : value.q;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.S;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.ac) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.N) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3957,11 +3957,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.a6,
-		impl.bu,
-		impl.bo,
+		impl.aD,
+		impl.aL,
+		impl.aJ,
 		function(sendToApp, initialModel) {
-			var view = impl.bv;
+			var view = impl.aM;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3993,12 +3993,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.a6,
-		impl.bu,
-		impl.bo,
+		impl.aD,
+		impl.aL,
+		impl.aJ,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.ad && impl.ad(sendToApp)
-			var view = impl.bv;
+			var divertHrefToApp = impl.O && impl.O(sendToApp)
+			var view = impl.aM;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -4006,12 +4006,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aR);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aw);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.bs) && (_VirtualDom_doc.title = title = doc.bs);
+				(title !== doc.aK) && (_VirtualDom_doc.title = title = doc.aK);
 			});
 		}
 	);
@@ -4067,12 +4067,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.bd;
-	var onUrlRequest = impl.be;
+	var onUrlChange = impl.aF;
+	var onUrlRequest = impl.aG;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		ad: function(sendToApp)
+		O: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4088,9 +4088,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.aD === next.aD
-							&& curr.ap === next.ap
-							&& curr.aA.a === next.aA.a
+							&& curr.aj === next.aj
+							&& curr.aa === next.aa
+							&& curr.ag.a === next.ag.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4098,13 +4098,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		a6: function(flags)
+		aD: function(flags)
 		{
-			return A3(impl.a6, flags, _Browser_getUrl(), key);
+			return A3(impl.aD, flags, _Browser_getUrl(), key);
 		},
-		bv: impl.bv,
-		bu: impl.bu,
-		bo: impl.bo
+		aM: impl.aM,
+		aL: impl.aL,
+		aJ: impl.aJ
 	});
 }
 
@@ -4170,17 +4170,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { a3: 'hidden', aT: 'visibilitychange' }
+		? { aB: 'hidden', ax: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { a3: 'mozHidden', aT: 'mozvisibilitychange' }
+		? { aB: 'mozHidden', ax: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { a3: 'msHidden', aT: 'msvisibilitychange' }
+		? { aB: 'msHidden', ax: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { a3: 'webkitHidden', aT: 'webkitvisibilitychange' }
-		: { a3: 'hidden', aT: 'visibilitychange' };
+		? { aB: 'webkitHidden', ax: 'webkitvisibilitychange' }
+		: { aB: 'hidden', ax: 'visibilitychange' };
 }
 
 
@@ -4261,12 +4261,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		aH: _Browser_getScene(),
-		aK: {
-			aM: _Browser_window.pageXOffset,
-			aN: _Browser_window.pageYOffset,
-			aL: _Browser_doc.documentElement.clientWidth,
-			ao: _Browser_doc.documentElement.clientHeight
+		an: _Browser_getScene(),
+		aq: {
+			as: _Browser_window.pageXOffset,
+			at: _Browser_window.pageYOffset,
+			ar: _Browser_doc.documentElement.clientWidth,
+			_: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4276,8 +4276,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		aL: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		ao: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		ar: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		_: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4300,15 +4300,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			aH: {
-				aL: node.scrollWidth,
-				ao: node.scrollHeight
+			an: {
+				ar: node.scrollWidth,
+				_: node.scrollHeight
 			},
-			aK: {
-				aM: node.scrollLeft,
-				aN: node.scrollTop,
-				aL: node.clientWidth,
-				ao: node.clientHeight
+			aq: {
+				as: node.scrollLeft,
+				at: node.scrollTop,
+				ar: node.clientWidth,
+				_: node.clientHeight
 			}
 		};
 	});
@@ -4338,18 +4338,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			aH: _Browser_getScene(),
-			aK: {
-				aM: x,
-				aN: y,
-				aL: _Browser_doc.documentElement.clientWidth,
-				ao: _Browser_doc.documentElement.clientHeight
+			an: _Browser_getScene(),
+			aq: {
+				as: x,
+				at: y,
+				ar: _Browser_doc.documentElement.clientWidth,
+				_: _Browser_doc.documentElement.clientHeight
 			},
-			a0: {
-				aM: x + rect.left,
-				aN: y + rect.top,
-				aL: rect.width,
-				ao: rect.height
+			az: {
+				as: x + rect.left,
+				at: y + rect.top,
+				ar: rect.width,
+				_: rect.height
 			}
 		};
 	});
@@ -4387,49 +4387,40 @@ function _Browser_load(url)
 
 
 
-function _Time_now(millisToPosix)
+var _Bitwise_and = F2(function(a, b)
 {
-	return _Scheduler_binding(function(callback)
-	{
-		callback(_Scheduler_succeed(millisToPosix(Date.now())));
-	});
-}
-
-var _Time_setInterval = F2(function(interval, task)
-{
-	return _Scheduler_binding(function(callback)
-	{
-		var id = setInterval(function() { _Scheduler_rawSpawn(task); }, interval);
-		return function() { clearInterval(id); };
-	});
+	return a & b;
 });
 
-function _Time_here()
+var _Bitwise_or = F2(function(a, b)
 {
-	return _Scheduler_binding(function(callback)
-	{
-		callback(_Scheduler_succeed(
-			A2($elm$time$Time$customZone, -(new Date().getTimezoneOffset()), _List_Nil)
-		));
-	});
-}
+	return a | b;
+});
 
-
-function _Time_getZoneName()
+var _Bitwise_xor = F2(function(a, b)
 {
-	return _Scheduler_binding(function(callback)
-	{
-		try
-		{
-			var name = $elm$time$Time$Name(Intl.DateTimeFormat().resolvedOptions().timeZone);
-		}
-		catch (e)
-		{
-			var name = $elm$time$Time$Offset(new Date().getTimezoneOffset());
-		}
-		callback(_Scheduler_succeed(name));
-	});
-}
+	return a ^ b;
+});
+
+function _Bitwise_complement(a)
+{
+	return ~a;
+};
+
+var _Bitwise_shiftLeftBy = F2(function(offset, a)
+{
+	return a << offset;
+});
+
+var _Bitwise_shiftRightBy = F2(function(offset, a)
+{
+	return a >> offset;
+});
+
+var _Bitwise_shiftRightZfBy = F2(function(offset, a)
+{
+	return a >>> offset;
+});
 var $elm$core$Basics$EQ = 1;
 var $elm$core$Basics$GT = 2;
 var $elm$core$Basics$LT = 0;
@@ -4934,7 +4925,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {an: fragment, ap: host, ay: path, aA: port_, aD: protocol, aE: query};
+		return {Z: fragment, aa: host, ae: path, ag: port_, aj: protocol, ak: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5213,131 +5204,19 @@ var $elm$core$Task$perform = F2(
 			A2($elm$core$Task$map, toMessage, task));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $elm$core$Basics$min = F2(
-	function (x, y) {
-		return (_Utils_cmp(x, y) < 0) ? x : y;
-	});
-var $elm$core$List$minimum = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(
-			A3($elm$core$List$foldl, $elm$core$Basics$min, x, xs));
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
+var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
+	return array2d.h;
 };
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (!maybe.$) {
-			var value = maybe.a;
-			return value;
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
 		} else {
-			return _default;
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
 		}
 	});
-var $author$project$Aoc18$adjustLagoon = function (positions) {
-	var ys = A2($elm$core$List$map, $elm$core$Tuple$second, positions);
-	var yMin = A2(
-		$elm$core$Maybe$withDefault,
-		0,
-		$elm$core$List$minimum(ys));
-	var yOffset = 0 - yMin;
-	var xs = A2($elm$core$List$map, $elm$core$Tuple$first, positions);
-	var xMin = A2(
-		$elm$core$Maybe$withDefault,
-		0,
-		$elm$core$List$minimum(xs));
-	var xOffset = 0 - xMin;
-	return A2(
-		$elm$core$List$map,
-		function (_v0) {
-			var x = _v0.a;
-			var y = _v0.b;
-			return _Utils_Tuple2(x + xOffset, y + yOffset);
-		},
-		positions);
-};
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $author$project$Aoc18$move = F3(
-	function (_v0, _v1, meters) {
-		var xStart = _v0.a;
-		var yStart = _v0.b;
-		var xStep = _v1.a;
-		var yStep = _v1.b;
-		return A2(
-			$elm$core$List$map,
-			function (m) {
-				return _Utils_Tuple2(xStart + (xStep * m), yStart + (yStep * m));
-			},
-			A2($elm$core$List$range, 1, meters));
-	});
-var $author$project$Aoc18$digLagoonLoop = F3(
-	function (current, positions, instructions) {
-		if (!instructions.b) {
-			return positions;
-		} else {
-			var inst = instructions.a;
-			var remaining = instructions.b;
-			var nextPositions = A3($author$project$Aoc18$move, current, inst.S, inst.U);
-			var next = A2(
-				$elm$core$Maybe$withDefault,
-				_Utils_Tuple2(0, 0),
-				$elm$core$List$head(
-					$elm$core$List$reverse(nextPositions)));
-			return A3(
-				$author$project$Aoc18$digLagoonLoop,
-				next,
-				_Utils_ap(positions, nextPositions),
-				remaining);
-		}
-	});
-var $author$project$Aoc18$digLagoon = function (instructions) {
-	return A3(
-		$author$project$Aoc18$digLagoonLoop,
-		_Utils_Tuple2(0, 0),
-		_List_Nil,
-		instructions);
-};
-var $elm$core$Set$Set_elm_builtin = $elm$core$Basics$identity;
-var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
-var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
-var $elm$core$Set$empty = $elm$core$Dict$empty;
-var $elm$core$List$maximum = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(
-			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $author$project$Aoc18$findDimensions = function (trench) {
-	var positions = $elm$core$Set$toList(trench);
-	var xs = A2($elm$core$List$map, $elm$core$Tuple$first, positions);
-	var xMax = A2(
-		$elm$core$Maybe$withDefault,
-		123,
-		$elm$core$List$maximum(xs));
-	var ys = A2($elm$core$List$map, $elm$core$Tuple$second, positions);
-	var yMax = A2(
-		$elm$core$Maybe$withDefault,
-		123,
-		$elm$core$List$maximum(ys));
-	return _Utils_Tuple2(xMax + 1, yMax + 1);
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
 };
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
@@ -5357,535 +5236,322 @@ var $elm$core$List$filterMap = F2(
 			_List_Nil,
 			xs);
 	});
-var $author$project$Aoc18$findStartPosition = function (positions) {
-	var ys = A2($elm$core$List$map, $elm$core$Tuple$second, positions);
-	var xs = A2($elm$core$List$map, $elm$core$Tuple$first, positions);
-	var xStart = A2(
-		$elm$core$Maybe$withDefault,
-		0,
-		$elm$core$List$minimum(xs));
-	var yStart = A2(
-		$elm$core$Maybe$withDefault,
-		0,
-		$elm$core$List$minimum(
-			A2(
-				$elm$core$List$filterMap,
-				function (_v0) {
-					var x = _v0.a;
-					var y = _v0.b;
-					return _Utils_eq(x, xStart) ? $elm$core$Maybe$Just(y) : $elm$core$Maybe$Nothing;
-				},
-				positions)));
-	return _Utils_Tuple2(xStart + 1, yStart + 1);
-};
-var $elm$core$Dict$Black = 1;
-var $elm$core$Dict$RBNode_elm_builtin = F5(
-	function (a, b, c, d, e) {
-		return {$: -1, a: a, b: b, c: c, d: d, e: e};
-	});
-var $elm$core$Dict$Red = 0;
-var $elm$core$Dict$balance = F5(
-	function (color, key, value, left, right) {
-		if ((right.$ === -1) && (!right.a)) {
-			var _v1 = right.a;
-			var rK = right.b;
-			var rV = right.c;
-			var rLeft = right.d;
-			var rRight = right.e;
-			if ((left.$ === -1) && (!left.a)) {
-				var _v3 = left.a;
-				var lK = left.b;
-				var lV = left.c;
-				var lLeft = left.d;
-				var lRight = left.e;
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					0,
-					key,
-					value,
-					A5($elm$core$Dict$RBNode_elm_builtin, 1, lK, lV, lLeft, lRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, 1, rK, rV, rLeft, rRight));
-			} else {
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					color,
-					rK,
-					rV,
-					A5($elm$core$Dict$RBNode_elm_builtin, 0, key, value, left, rLeft),
-					rRight);
-			}
-		} else {
-			if ((((left.$ === -1) && (!left.a)) && (left.d.$ === -1)) && (!left.d.a)) {
-				var _v5 = left.a;
-				var lK = left.b;
-				var lV = left.c;
-				var _v6 = left.d;
-				var _v7 = _v6.a;
-				var llK = _v6.b;
-				var llV = _v6.c;
-				var llLeft = _v6.d;
-				var llRight = _v6.e;
-				var lRight = left.e;
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					0,
-					lK,
-					lV,
-					A5($elm$core$Dict$RBNode_elm_builtin, 1, llK, llV, llLeft, llRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, 1, key, value, lRight, right));
-			} else {
-				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
-			}
-		}
-	});
-var $elm$core$Basics$compare = _Utils_compare;
-var $elm$core$Dict$insertHelp = F3(
-	function (key, value, dict) {
-		if (dict.$ === -2) {
-			return A5($elm$core$Dict$RBNode_elm_builtin, 0, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
-		} else {
-			var nColor = dict.a;
-			var nKey = dict.b;
-			var nValue = dict.c;
-			var nLeft = dict.d;
-			var nRight = dict.e;
-			var _v1 = A2($elm$core$Basics$compare, key, nKey);
-			switch (_v1) {
-				case 0:
-					return A5(
-						$elm$core$Dict$balance,
-						nColor,
-						nKey,
-						nValue,
-						A3($elm$core$Dict$insertHelp, key, value, nLeft),
-						nRight);
-				case 1:
-					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
-				default:
-					return A5(
-						$elm$core$Dict$balance,
-						nColor,
-						nKey,
-						nValue,
-						nLeft,
-						A3($elm$core$Dict$insertHelp, key, value, nRight));
-			}
-		}
-	});
-var $elm$core$Dict$insert = F3(
-	function (key, value, dict) {
-		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
-		if ((_v0.$ === -1) && (!_v0.a)) {
-			var _v1 = _v0.a;
-			var k = _v0.b;
-			var v = _v0.c;
-			var l = _v0.d;
-			var r = _v0.e;
-			return A5($elm$core$Dict$RBNode_elm_builtin, 1, k, v, l, r);
-		} else {
-			var x = _v0;
-			return x;
-		}
-	});
-var $elm$core$Set$insert = F2(
-	function (key, _v0) {
-		var dict = _v0;
-		return A3($elm$core$Dict$insert, key, 0, dict);
-	});
-var $elm$core$Set$fromList = function (list) {
-	return A3($elm$core$List$foldl, $elm$core$Set$insert, $elm$core$Set$empty, list);
-};
-var $author$project$Aoc18$inputname = 'input';
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
-var $author$project$Aoc18$toDirection = function (s) {
-	switch (s) {
-		case 'U':
-			return $elm$core$Maybe$Just(
-				_Utils_Tuple2(0, -1));
-		case 'D':
-			return $elm$core$Maybe$Just(
-				_Utils_Tuple2(0, 1));
-		case 'R':
-			return $elm$core$Maybe$Just(
-				_Utils_Tuple2(1, 0));
-		case 'L':
-			return $elm$core$Maybe$Just(
-				_Utils_Tuple2(-1, 0));
-		default:
-			return $elm$core$Maybe$Nothing;
-	}
-};
-var $author$project$Aoc18$parseLine = function (s) {
-	var _v0 = A2($elm$core$String$split, ' ', s);
-	if (_v0.b && _v0.b.b) {
-		var a = _v0.a;
-		var _v1 = _v0.b;
-		var b = _v1.a;
-		var m = A2(
-			$elm$core$Maybe$withDefault,
-			0,
-			$elm$core$String$toInt(b));
-		var d = A2(
-			$elm$core$Maybe$withDefault,
-			_Utils_Tuple2(0, 0),
-			$author$project$Aoc18$toDirection(a));
-		return {S: d, U: m};
-	} else {
-		return {
-			S: _Utils_Tuple2(0, 0),
-			U: 0
-		};
-	}
-};
-var $author$project$Aoc18$init = function (_v0) {
-	var sample = 'R 6 (#70c710)\nD 5 (#0dc571)\nL 2 (#5713f0)\nD 2 (#d2c081)\nR 2 (#59c680)\nD 2 (#411b91)\nL 5 (#8ceee2)\nU 2 (#caa173)\nL 1 (#1b58a2)\nU 2 (#caa171)\nR 2 (#7807d2)\nU 3 (#a77fa3)\nL 2 (#015232)\nU 2 (#7a21e3)';
-	var maxDim = 800;
-	var input = 'R 5 (#58a492)\nU 5 (#630fe3)\nL 3 (#7087b2)\nU 5 (#5f3ee1)\nL 3 (#313202)\nU 5 (#03d101)\nL 10 (#7c5562)\nU 4 (#404f43)\nL 3 (#412982)\nU 7 (#79c1c3)\nL 6 (#12d412)\nU 4 (#083683)\nL 4 (#775942)\nU 6 (#030323)\nL 6 (#0c9622)\nU 8 (#6cdc33)\nL 6 (#03d682)\nU 2 (#0e9c53)\nL 5 (#493272)\nU 2 (#03d643)\nL 2 (#3305b2)\nU 9 (#244203)\nL 6 (#6c6a70)\nU 4 (#341f73)\nL 8 (#28bb00)\nU 3 (#74c533)\nR 4 (#3cfdb0)\nU 3 (#3fd773)\nR 3 (#52a350)\nU 9 (#3c2073)\nR 3 (#316de0)\nU 6 (#3c4213)\nR 6 (#0b7720)\nU 5 (#3734e3)\nR 2 (#929370)\nU 7 (#372c31)\nR 7 (#503d70)\nU 7 (#27d791)\nR 5 (#4cac80)\nU 6 (#24f401)\nR 3 (#4c95a0)\nU 6 (#43bb01)\nR 5 (#2ff3b2)\nU 4 (#2fb481)\nR 2 (#7c5eb2)\nU 2 (#141aa1)\nR 9 (#1259d2)\nU 4 (#4e9531)\nR 4 (#2ad362)\nU 3 (#27d1b1)\nR 9 (#149920)\nU 3 (#0b0163)\nR 4 (#65fc30)\nU 4 (#5f54e3)\nR 3 (#473e00)\nU 4 (#0d0da3)\nR 8 (#327d60)\nU 3 (#187fc3)\nL 8 (#66f6c0)\nU 3 (#6981f3)\nL 3 (#42b9d0)\nU 4 (#6f32f3)\nL 3 (#42b9d2)\nU 7 (#16b7a3)\nL 5 (#66f6c2)\nD 7 (#0298a3)\nL 8 (#29c4a0)\nD 2 (#4f2473)\nL 4 (#266862)\nD 10 (#436fd1)\nL 4 (#3482b2)\nU 5 (#30fad3)\nL 4 (#6ac712)\nU 6 (#30fad1)\nL 2 (#4ee392)\nU 4 (#436fd3)\nR 6 (#59ff52)\nU 4 (#73a323)\nL 4 (#20ba82)\nU 8 (#5e5873)\nL 4 (#578df2)\nD 7 (#47e4f3)\nL 2 (#6a4792)\nD 8 (#2a00b3)\nL 6 (#854930)\nU 8 (#594903)\nL 3 (#854932)\nD 3 (#53db83)\nL 2 (#19e4f0)\nD 8 (#7c7af3)\nL 5 (#5062a0)\nU 4 (#2d3db3)\nL 3 (#2fe132)\nU 7 (#7059f3)\nL 3 (#4cc5b2)\nU 5 (#2a28a1)\nR 3 (#6d89e2)\nU 3 (#4398a1)\nR 3 (#09b672)\nU 11 (#4a32e1)\nR 3 (#0d6002)\nD 10 (#3ece11)\nR 2 (#81a642)\nD 4 (#096ba1)\nR 5 (#31df02)\nU 8 (#7ccf71)\nR 5 (#6239a2)\nU 7 (#6584c1)\nR 6 (#6c1fe0)\nU 4 (#1e1b01)\nL 3 (#5fbee0)\nU 2 (#5bfc41)\nL 12 (#49e020)\nU 4 (#48a6d1)\nR 8 (#6814a2)\nU 2 (#226a71)\nR 7 (#6814a0)\nU 4 (#436dc1)\nR 5 (#2a2f92)\nD 4 (#28eaf3)\nR 9 (#25ab52)\nD 3 (#22bd81)\nR 2 (#83aa92)\nD 3 (#22bd83)\nL 5 (#159182)\nD 2 (#0387c3)\nL 6 (#3599c2)\nD 4 (#4e6413)\nR 5 (#48f562)\nD 7 (#564e23)\nR 6 (#46fbf2)\nU 6 (#1e12d3)\nR 4 (#0bd062)\nU 5 (#1ffbb3)\nR 3 (#5fbb82)\nU 3 (#2d0803)\nR 6 (#101d70)\nU 8 (#11b903)\nR 6 (#9af6c0)\nD 6 (#11b901)\nR 9 (#1b70a0)\nU 6 (#479173)\nR 7 (#15cc02)\nD 2 (#0aa953)\nR 9 (#858072)\nD 3 (#3e60f3)\nR 3 (#2b3862)\nD 3 (#1f4af3)\nR 7 (#40b892)\nD 3 (#4f9151)\nR 3 (#343292)\nD 5 (#0ec741)\nR 6 (#549592)\nD 3 (#7e9611)\nR 5 (#0215c2)\nD 6 (#57bdb3)\nR 3 (#6964c2)\nD 6 (#38c523)\nR 4 (#172242)\nD 2 (#80a643)\nR 8 (#21dee0)\nD 2 (#1a89e3)\nR 8 (#5ea820)\nD 2 (#2baab3)\nR 4 (#6d2bb0)\nD 5 (#4bfb93)\nL 10 (#1f13e0)\nD 5 (#4fa9d3)\nR 10 (#8c3f92)\nD 5 (#014b33)\nR 4 (#0786d2)\nD 5 (#713641)\nR 5 (#30eb92)\nD 5 (#4591f3)\nR 4 (#44fef2)\nU 3 (#4591f1)\nR 2 (#5636e2)\nU 9 (#0cfbb1)\nL 5 (#2ded32)\nU 4 (#06c881)\nL 3 (#5c8ab0)\nU 7 (#5ba411)\nR 8 (#362110)\nU 5 (#023861)\nR 3 (#92abc2)\nD 6 (#423051)\nR 5 (#3bdda2)\nD 4 (#59ab71)\nR 2 (#103492)\nD 4 (#1bc8b1)\nR 5 (#739582)\nD 5 (#4591d1)\nR 3 (#03a662)\nU 12 (#0934f1)\nR 4 (#2a4662)\nD 5 (#2b07d1)\nR 3 (#49fd52)\nD 7 (#6b8561)\nR 3 (#18d152)\nD 3 (#573fa1)\nL 3 (#57c6b2)\nD 2 (#664a03)\nL 10 (#190712)\nD 4 (#34c2b3)\nR 3 (#21f322)\nD 3 (#25dc13)\nR 3 (#4be7d2)\nD 11 (#469a13)\nL 4 (#437350)\nD 8 (#1a9503)\nR 4 (#456d20)\nD 4 (#49d533)\nR 4 (#88e072)\nU 3 (#250333)\nR 8 (#4be7d0)\nU 3 (#16f773)\nR 3 (#8c07b2)\nU 5 (#53ad91)\nR 3 (#54b682)\nU 3 (#3b3621)\nR 3 (#54b680)\nU 3 (#5bb551)\nR 5 (#05def2)\nU 5 (#2241f1)\nR 4 (#7a0222)\nU 2 (#0e6b23)\nR 3 (#4b2592)\nU 5 (#936c13)\nR 2 (#48da12)\nU 7 (#727bb3)\nL 5 (#072a52)\nU 2 (#5c9f13)\nL 3 (#4592b0)\nU 4 (#3eb493)\nL 3 (#9828d0)\nU 7 (#3eb491)\nL 4 (#108bb0)\nU 2 (#88ff83)\nL 3 (#043dd0)\nU 2 (#88ff81)\nL 5 (#3ccdf0)\nU 3 (#29f651)\nL 5 (#3b58f0)\nU 9 (#1dfe43)\nL 3 (#3707e0)\nU 7 (#1dfe41)\nL 5 (#335470)\nU 2 (#29f653)\nL 3 (#0d04b0)\nU 3 (#045723)\nR 2 (#3df010)\nU 6 (#1eaaa3)\nR 6 (#390270)\nU 5 (#1e73d1)\nR 7 (#672f40)\nD 5 (#1e73d3)\nR 6 (#83a5d0)\nD 6 (#50dd53)\nR 2 (#48d590)\nD 3 (#5e3bf3)\nR 5 (#4064a0)\nD 11 (#08fa63)\nL 5 (#3f2af0)\nD 5 (#3f7793)\nR 5 (#6d57f0)\nU 2 (#135f33)\nR 3 (#445122)\nU 10 (#5285b3)\nR 3 (#3dc912)\nU 6 (#5285b1)\nR 4 (#355342)\nU 2 (#53a883)\nR 6 (#4c4be0)\nU 8 (#0303f3)\nR 4 (#6b2190)\nU 4 (#62c1b3)\nR 7 (#3241e0)\nD 4 (#057a23)\nR 3 (#692490)\nD 3 (#0eadb3)\nR 8 (#526c20)\nD 4 (#5721d3)\nR 4 (#33dd40)\nD 3 (#4a6513)\nR 2 (#1c8770)\nD 5 (#0db573)\nL 7 (#2a30a2)\nD 6 (#186ba3)\nR 7 (#788af2)\nD 7 (#186ba1)\nR 5 (#001542)\nD 5 (#3830c3)\nR 3 (#32b480)\nD 9 (#73a7a3)\nR 5 (#5b0230)\nD 5 (#562d53)\nR 8 (#7e0d30)\nD 3 (#059e93)\nL 6 (#3284d0)\nD 3 (#373711)\nL 2 (#4de350)\nD 7 (#6179f1)\nL 2 (#57f0b0)\nD 6 (#4cd0b1)\nL 6 (#6a0260)\nD 3 (#4cd0b3)\nR 4 (#47ed90)\nD 8 (#4e4a61)\nR 4 (#029330)\nD 3 (#56c261)\nR 4 (#029332)\nU 11 (#08aee1)\nR 4 (#3f9e40)\nD 3 (#124841)\nR 5 (#6af022)\nD 10 (#189be1)\nR 2 (#4058d2)\nD 3 (#6cd791)\nR 8 (#2c43c2)\nD 5 (#36a191)\nR 6 (#2c43c0)\nU 5 (#3fff21)\nR 3 (#4058d0)\nU 8 (#06ad11)\nR 4 (#6af020)\nD 3 (#487a71)\nR 3 (#77aa00)\nD 10 (#335cc1)\nR 4 (#445960)\nU 5 (#36c3f1)\nR 3 (#5d13b0)\nU 9 (#1f2761)\nR 2 (#49e9e0)\nU 3 (#7eb501)\nR 4 (#578e30)\nU 2 (#66dd31)\nR 7 (#469130)\nU 4 (#7f9823)\nR 6 (#1e1e90)\nU 5 (#127fa3)\nR 5 (#14ac40)\nD 6 (#130523)\nR 3 (#07a7b0)\nD 6 (#5f7be3)\nR 8 (#4fff10)\nD 6 (#1ad8f1)\nR 2 (#32df80)\nD 5 (#57a811)\nR 7 (#084830)\nD 4 (#127fa1)\nR 10 (#1fa950)\nD 6 (#70fee3)\nR 5 (#04f0e2)\nD 2 (#4052d3)\nR 5 (#3f7cc2)\nD 6 (#8a1e13)\nR 4 (#3be9a2)\nD 4 (#8a1e11)\nR 7 (#49c392)\nD 3 (#4052d1)\nL 6 (#1b27c2)\nD 3 (#4ae683)\nL 7 (#109120)\nD 3 (#634013)\nL 5 (#19bbb0)\nD 6 (#21de43)\nL 4 (#15dd60)\nD 5 (#4b3bc3)\nL 4 (#691db2)\nD 5 (#2f3753)\nL 4 (#0ed142)\nD 5 (#4d2823)\nL 5 (#378122)\nD 4 (#5b8733)\nL 3 (#35bdc2)\nU 6 (#2d1093)\nL 6 (#54e720)\nU 8 (#12e8d1)\nL 4 (#8bb140)\nU 4 (#12e8d3)\nR 6 (#049570)\nU 4 (#01c483)\nL 6 (#15dd62)\nU 6 (#5d8b23)\nR 4 (#4e5940)\nU 7 (#92cae1)\nL 8 (#1a3a50)\nU 3 (#0f4801)\nL 6 (#326690)\nU 4 (#01c2a1)\nL 5 (#051e00)\nD 7 (#61eb71)\nL 7 (#459650)\nD 2 (#9994f1)\nL 3 (#471090)\nD 8 (#0e7a31)\nL 2 (#550610)\nD 8 (#194501)\nR 6 (#4b09c0)\nD 4 (#8e6791)\nR 6 (#4b09c2)\nD 6 (#0bd3d1)\nL 8 (#4527f0)\nD 7 (#30e601)\nL 6 (#14a132)\nD 3 (#795df1)\nL 7 (#60edd2)\nD 4 (#056141)\nL 4 (#41dbc2)\nD 3 (#488971)\nR 8 (#38fef0)\nD 4 (#2cb3b1)\nR 3 (#38fef2)\nD 3 (#369c41)\nL 6 (#3e5bd2)\nD 4 (#19bcb3)\nL 4 (#173b32)\nD 4 (#0de2b3)\nL 12 (#377942)\nD 3 (#899b43)\nL 3 (#3e99b2)\nD 3 (#00b211)\nL 3 (#4b5ad2)\nD 5 (#1f0501)\nL 8 (#4abb70)\nD 4 (#7f6001)\nL 5 (#4abb72)\nD 3 (#20c3d1)\nL 7 (#1d68a0)\nD 9 (#471091)\nL 4 (#4c8650)\nD 3 (#25ab01)\nL 10 (#35f0b0)\nD 2 (#695131)\nL 10 (#051850)\nD 5 (#60dd93)\nL 9 (#567cc0)\nD 4 (#2e1ea3)\nL 5 (#2ffa30)\nD 5 (#22b051)\nL 5 (#911430)\nD 4 (#396521)\nL 4 (#11ec70)\nD 3 (#356891)\nR 8 (#6e13c0)\nD 4 (#4d3291)\nR 3 (#277462)\nD 5 (#57f681)\nR 3 (#2f8dc0)\nD 3 (#020321)\nR 9 (#628620)\nD 6 (#152051)\nL 6 (#9213e2)\nD 5 (#4ec671)\nL 6 (#277460)\nD 8 (#13c7b1)\nL 5 (#1b3e00)\nU 6 (#5e57f1)\nL 4 (#4a7b20)\nU 6 (#5e57f3)\nL 4 (#437f90)\nU 3 (#020143)\nL 4 (#034420)\nD 9 (#152c63)\nL 3 (#2296b2)\nD 2 (#771a63)\nL 4 (#2296b0)\nD 5 (#251a83)\nR 10 (#034422)\nD 5 (#6b7823)\nL 10 (#19c8c0)\nD 3 (#87f251)\nL 5 (#53ad40)\nU 7 (#534f61)\nL 7 (#3ee5c0)\nU 6 (#0c6d71)\nL 4 (#2d8ba0)\nD 6 (#29a941)\nL 5 (#0a35f0)\nU 6 (#2e83e1)\nL 2 (#0a35f2)\nU 11 (#45afc1)\nL 3 (#2a9d30)\nU 3 (#366473)\nL 8 (#1e5c90)\nU 6 (#73e5e3)\nR 8 (#01d790)\nU 4 (#3b0e81)\nL 2 (#155640)\nU 4 (#0f5351)\nL 8 (#608130)\nU 2 (#7af281)\nL 3 (#332700)\nU 4 (#05b091)\nL 2 (#0faf80)\nU 9 (#0091e1)\nR 3 (#0b3210)\nU 6 (#1ee971)\nL 7 (#24f6d2)\nU 4 (#519181)\nR 7 (#5e5392)\nU 3 (#3f1351)\nR 3 (#022282)\nU 4 (#857db1)\nR 9 (#09a712)\nU 4 (#3c1341)\nR 4 (#025442)\nD 8 (#69a253)\nR 4 (#767622)\nD 7 (#69a251)\nR 6 (#4267a2)\nD 4 (#320361)\nR 5 (#3c5870)\nU 7 (#267773)\nR 8 (#4b2b40)\nU 4 (#267771)\nR 4 (#3f77e0)\nU 8 (#32f0d1)\nR 3 (#834a60)\nU 5 (#2e98c1)\nR 3 (#635c80)\nD 6 (#1e7241)\nR 4 (#36a5c0)\nD 9 (#3c5311)\nR 3 (#0907f0)\nU 6 (#394291)\nR 2 (#952cc0)\nU 9 (#394293)\nR 4 (#6b81a0)\nD 5 (#592621)\nR 4 (#59ea50)\nU 8 (#4ef493)\nR 7 (#3e3f10)\nU 3 (#514253)\nL 7 (#3e3f12)\nU 9 (#23e503)\nL 3 (#3eb3b0)\nU 5 (#2e6433)\nL 3 (#67c590)\nD 5 (#77b101)\nL 3 (#21c682)\nD 11 (#754aa1)\nL 3 (#21c680)\nU 6 (#058471)\nL 3 (#0ec8c0)\nU 10 (#76bdd3)\nL 6 (#07fb80)\nU 7 (#386853)\nR 8 (#55a690)\nD 4 (#02f453)\nR 8 (#2fb280)\nU 4 (#4e8811)\nR 5 (#7c2910)\nU 3 (#639261)\nL 4 (#471b80)\nU 5 (#592623)\nL 5 (#42bc00)\nU 9 (#62c471)\nL 7 (#6a8c32)\nD 4 (#13d861)\nL 4 (#94bb72)\nD 6 (#13d863)\nL 5 (#2e3ba2)\nD 3 (#24ee61)\nL 4 (#888a22)\nD 9 (#366271)\nL 4 (#1201a2)\nD 6 (#238401)\nL 2 (#246412)\nD 7 (#1c23f1)\nL 4 (#41d152)\nD 3 (#6b5d81)\nL 6 (#659b22)\nU 3 (#6f1a03)\nL 3 (#32db02)\nU 4 (#186773)\nL 3 (#0043e2)\nU 7 (#295c31)\nL 3 (#3bd622)\nU 8 (#25f1c1)\nL 3 (#52ea70)\nD 5 (#302c41)\nL 4 (#52ea72)\nD 5 (#4cb371)\nR 4 (#0062e2)\nD 6 (#016ab1)\nL 4 (#6511c2)\nD 3 (#1fae91)\nL 3 (#5ca060)\nU 7 (#6daef1)\nL 5 (#5ca062)\nU 7 (#4904a1)\nL 7 (#6cc852)\nU 3 (#0e2451)\nL 3 (#109dd2)\nU 5 (#5b3813)\nR 8 (#6cb452)\nU 2 (#25f353)\nR 2 (#6cb450)\nU 5 (#4bd743)\nL 5 (#609a42)\nU 4 (#774593)\nL 3 (#609a40)\nD 2 (#6dd693)\nL 7 (#138f72)\nD 7 (#37ed73)\nL 7 (#0ad4c2)\nU 6 (#32a9f3)\nL 8 (#859122)\nU 4 (#143d73)\nL 11 (#64f202)\nU 2 (#18d5c3)\nL 3 (#24cb12)\nD 10 (#2e7523)\nL 2 (#461b52)\nD 2 (#5d9883)\nL 3 (#6ae660)\nD 5 (#1ac423)\nR 11 (#2c9fe2)\nD 3 (#2e1f33)\nL 11 (#8686b2)\nD 5 (#0bbc53)\nR 3 (#232a62)\nD 6 (#3f85d3)\nR 3 (#787172)\nD 9 (#20eda3)\nR 3 (#404292)\nD 3 (#3ab463)\nR 3 (#22a182)\nD 6 (#08f6e3)\nL 2 (#776202)\nD 2 (#4f3193)\nL 5 (#549e22)\nD 2 (#5cf443)\nL 5 (#549e20)\nD 5 (#4e5523)\nR 6 (#6f6852)\nD 3 (#00e383)\nR 10 (#4f9722)\nD 5 (#24e003)\nR 8 (#138892)\nD 3 (#782033)\nR 10 (#02bf92)\nD 4 (#0d0ad3)\nL 8 (#5a8342)\nD 2 (#244f11)\nL 3 (#182ce0)\nD 4 (#6c4331)\nL 9 (#140250)\nD 5 (#325901)\nL 3 (#033dc0)\nD 3 (#0c7231)\nL 11 (#54fbe0)\nD 4 (#094653)\nL 4 (#76ee60)\nD 11 (#094651)\nL 3 (#00f3f0)\nD 8 (#0c7233)\nL 4 (#255340)\nD 5 (#332281)\nL 3 (#487c52)\nD 3 (#70ada1)\nL 10 (#508b12)\nU 5 (#1e0d21)\nL 6 (#825812)\nU 7 (#2f5771)\nL 7 (#063ef2)\nU 5 (#34f4c1)\nL 5 (#1fa462)\nU 7 (#74be53)\nL 3 (#3c4402)\nU 4 (#837ef1)\nL 10 (#4fb490)\nU 2 (#573091)\nL 2 (#408920)\nU 5 (#3969e3)\nL 3 (#77eff0)\nU 5 (#3969e1)\nL 7 (#2bec10)\nU 4 (#7ac481)\nR 8 (#0b7162)\nU 2 (#0d6aa1)\nR 5 (#502642)\nU 3 (#5169c3)\nR 12 (#674d02)\nU 3 (#5169c1)\nL 5 (#713512)\nU 7 (#6bd621)\nL 7 (#69b9f2)\nU 3 (#749153)';
-	var data = ($author$project$Aoc18$inputname === 'sample') ? sample : input;
-	var lines = A2($elm$core$String$split, '\n', data);
-	var instructions = A2($elm$core$List$map, $author$project$Aoc18$parseLine, lines);
-	var positions = $author$project$Aoc18$adjustLagoon(
-		$author$project$Aoc18$digLagoon(instructions));
-	var startPoint = $author$project$Aoc18$findStartPosition(positions);
-	var trench = $elm$core$Set$fromList(positions);
-	var _v1 = startPoint;
-	var xStart = _v1.a;
-	var yStart = _v1.b;
-	var debugText = '(' + ($elm$core$String$fromInt(xStart) + (', ' + ($elm$core$String$fromInt(yStart) + ')')));
-	var _v2 = $author$project$Aoc18$findDimensions(trench);
-	var widthInUnits = _v2.a;
-	var heightInUnits = _v2.b;
-	var basin = {
-		C: 0,
-		E: A2($elm$core$Set$insert, startPoint, $elm$core$Set$empty),
-		w: true,
-		x: $elm$core$Set$empty,
-		F: heightInUnits,
-		N: startPoint,
-		t: trench,
-		K: widthInUnits
-	};
-	var maxUnits = A2($elm$core$Basics$max, widthInUnits, heightInUnits);
-	var unitSize = (maxDim / maxUnits) | 0;
-	var model = {g: basin, ak: debugText, Z: '', G: startPoint, H: false, u: unitSize};
-	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-};
-var $author$project$Aoc18$Tick = {$: 1};
-var $author$project$Aoc18$delay = 100;
-var $elm$time$Time$Every = F2(
-	function (a, b) {
-		return {$: 0, a: a, b: b};
-	});
-var $elm$time$Time$State = F2(
-	function (taggers, processes) {
-		return {aC: processes, aJ: taggers};
-	});
-var $elm$time$Time$init = $elm$core$Task$succeed(
-	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
-var $elm$core$Dict$get = F2(
-	function (targetKey, dict) {
-		get:
+var $elm$core$Basics$not = _Basics_not;
+var $author$project$Aoc10Pretty$findInsideHelper = F5(
+	function (ix, inside, maybeWallChar, found, remaining) {
+		findInsideHelper:
 		while (true) {
-			if (dict.$ === -2) {
-				return $elm$core$Maybe$Nothing;
+			if (!remaining.b) {
+				return found;
 			} else {
-				var key = dict.b;
-				var value = dict.c;
-				var left = dict.d;
-				var right = dict.e;
-				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
-				switch (_v1) {
-					case 0:
-						var $temp$targetKey = targetKey,
-							$temp$dict = left;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-					case 1:
-						return $elm$core$Maybe$Just(value);
-					default:
-						var $temp$targetKey = targetKey,
-							$temp$dict = right;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-				}
-			}
-		}
-	});
-var $elm$time$Time$addMySub = F2(
-	function (_v0, state) {
-		var interval = _v0.a;
-		var tagger = _v0.b;
-		var _v1 = A2($elm$core$Dict$get, interval, state);
-		if (_v1.$ === 1) {
-			return A3(
-				$elm$core$Dict$insert,
-				interval,
-				_List_fromArray(
-					[tagger]),
-				state);
-		} else {
-			var taggers = _v1.a;
-			return A3(
-				$elm$core$Dict$insert,
-				interval,
-				A2($elm$core$List$cons, tagger, taggers),
-				state);
-		}
-	});
-var $elm$core$Process$kill = _Scheduler_kill;
-var $elm$core$Dict$foldl = F3(
-	function (func, acc, dict) {
-		foldl:
-		while (true) {
-			if (dict.$ === -2) {
-				return acc;
-			} else {
-				var key = dict.b;
-				var value = dict.c;
-				var left = dict.d;
-				var right = dict.e;
-				var $temp$func = func,
-					$temp$acc = A3(
-					func,
-					key,
-					value,
-					A3($elm$core$Dict$foldl, func, acc, left)),
-					$temp$dict = right;
-				func = $temp$func;
-				acc = $temp$acc;
-				dict = $temp$dict;
-				continue foldl;
-			}
-		}
-	});
-var $elm$core$Dict$merge = F6(
-	function (leftStep, bothStep, rightStep, leftDict, rightDict, initialResult) {
-		var stepState = F3(
-			function (rKey, rValue, _v0) {
-				stepState:
-				while (true) {
-					var list = _v0.a;
-					var result = _v0.b;
-					if (!list.b) {
-						return _Utils_Tuple2(
-							list,
-							A3(rightStep, rKey, rValue, result));
-					} else {
-						var _v2 = list.a;
-						var lKey = _v2.a;
-						var lValue = _v2.b;
-						var rest = list.b;
-						if (_Utils_cmp(lKey, rKey) < 0) {
-							var $temp$rKey = rKey,
-								$temp$rValue = rValue,
-								$temp$_v0 = _Utils_Tuple2(
-								rest,
-								A3(leftStep, lKey, lValue, result));
-							rKey = $temp$rKey;
-							rValue = $temp$rValue;
-							_v0 = $temp$_v0;
-							continue stepState;
+				var h = remaining.a;
+				var t = remaining.b;
+				switch (h) {
+					case '|':
+						var $temp$ix = ix + 1,
+							$temp$inside = !inside,
+							$temp$maybeWallChar = $elm$core$Maybe$Nothing,
+							$temp$found = found,
+							$temp$remaining = t;
+						ix = $temp$ix;
+						inside = $temp$inside;
+						maybeWallChar = $temp$maybeWallChar;
+						found = $temp$found;
+						remaining = $temp$remaining;
+						continue findInsideHelper;
+					case '-':
+						var $temp$ix = ix + 1,
+							$temp$inside = inside,
+							$temp$maybeWallChar = maybeWallChar,
+							$temp$found = found,
+							$temp$remaining = t;
+						ix = $temp$ix;
+						inside = $temp$inside;
+						maybeWallChar = $temp$maybeWallChar;
+						found = $temp$found;
+						remaining = $temp$remaining;
+						continue findInsideHelper;
+					case 'F':
+						var $temp$ix = ix + 1,
+							$temp$inside = inside,
+							$temp$maybeWallChar = $elm$core$Maybe$Just(h),
+							$temp$found = found,
+							$temp$remaining = t;
+						ix = $temp$ix;
+						inside = $temp$inside;
+						maybeWallChar = $temp$maybeWallChar;
+						found = $temp$found;
+						remaining = $temp$remaining;
+						continue findInsideHelper;
+					case 'L':
+						var $temp$ix = ix + 1,
+							$temp$inside = inside,
+							$temp$maybeWallChar = $elm$core$Maybe$Just(h),
+							$temp$found = found,
+							$temp$remaining = t;
+						ix = $temp$ix;
+						inside = $temp$inside;
+						maybeWallChar = $temp$maybeWallChar;
+						found = $temp$found;
+						remaining = $temp$remaining;
+						continue findInsideHelper;
+					case '7':
+						if ((!maybeWallChar.$) && ('L' === maybeWallChar.a)) {
+							var $temp$ix = ix + 1,
+								$temp$inside = !inside,
+								$temp$maybeWallChar = $elm$core$Maybe$Nothing,
+								$temp$found = found,
+								$temp$remaining = t;
+							ix = $temp$ix;
+							inside = $temp$inside;
+							maybeWallChar = $temp$maybeWallChar;
+							found = $temp$found;
+							remaining = $temp$remaining;
+							continue findInsideHelper;
 						} else {
-							if (_Utils_cmp(lKey, rKey) > 0) {
-								return _Utils_Tuple2(
-									list,
-									A3(rightStep, rKey, rValue, result));
-							} else {
-								return _Utils_Tuple2(
-									rest,
-									A4(bothStep, lKey, lValue, rValue, result));
-							}
+							var $temp$ix = ix + 1,
+								$temp$inside = inside,
+								$temp$maybeWallChar = $elm$core$Maybe$Nothing,
+								$temp$found = found,
+								$temp$remaining = t;
+							ix = $temp$ix;
+							inside = $temp$inside;
+							maybeWallChar = $temp$maybeWallChar;
+							found = $temp$found;
+							remaining = $temp$remaining;
+							continue findInsideHelper;
 						}
-					}
+					case 'J':
+						if ((!maybeWallChar.$) && ('F' === maybeWallChar.a)) {
+							var $temp$ix = ix + 1,
+								$temp$inside = !inside,
+								$temp$maybeWallChar = $elm$core$Maybe$Nothing,
+								$temp$found = found,
+								$temp$remaining = t;
+							ix = $temp$ix;
+							inside = $temp$inside;
+							maybeWallChar = $temp$maybeWallChar;
+							found = $temp$found;
+							remaining = $temp$remaining;
+							continue findInsideHelper;
+						} else {
+							var $temp$ix = ix + 1,
+								$temp$inside = inside,
+								$temp$maybeWallChar = $elm$core$Maybe$Nothing,
+								$temp$found = found,
+								$temp$remaining = t;
+							ix = $temp$ix;
+							inside = $temp$inside;
+							maybeWallChar = $temp$maybeWallChar;
+							found = $temp$found;
+							remaining = $temp$remaining;
+							continue findInsideHelper;
+						}
+					default:
+						if (inside) {
+							var $temp$ix = ix + 1,
+								$temp$inside = inside,
+								$temp$maybeWallChar = maybeWallChar,
+								$temp$found = A2($elm$core$List$cons, ix, found),
+								$temp$remaining = t;
+							ix = $temp$ix;
+							inside = $temp$inside;
+							maybeWallChar = $temp$maybeWallChar;
+							found = $temp$found;
+							remaining = $temp$remaining;
+							continue findInsideHelper;
+						} else {
+							var $temp$ix = ix + 1,
+								$temp$inside = inside,
+								$temp$maybeWallChar = maybeWallChar,
+								$temp$found = found,
+								$temp$remaining = t;
+							ix = $temp$ix;
+							inside = $temp$inside;
+							maybeWallChar = $temp$maybeWallChar;
+							found = $temp$found;
+							remaining = $temp$remaining;
+							continue findInsideHelper;
+						}
 				}
-			});
-		var _v3 = A3(
-			$elm$core$Dict$foldl,
-			stepState,
-			_Utils_Tuple2(
-				$elm$core$Dict$toList(leftDict),
-				initialResult),
-			rightDict);
-		var leftovers = _v3.a;
-		var intermediateResult = _v3.b;
-		return A3(
-			$elm$core$List$foldl,
-			F2(
-				function (_v4, result) {
-					var k = _v4.a;
-					var v = _v4.b;
-					return A3(leftStep, k, v, result);
-				}),
-			intermediateResult,
-			leftovers);
-	});
-var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
-var $elm$time$Time$Name = function (a) {
-	return {$: 0, a: a};
-};
-var $elm$time$Time$Offset = function (a) {
-	return {$: 1, a: a};
-};
-var $elm$time$Time$Zone = F2(
-	function (a, b) {
-		return {$: 0, a: a, b: b};
-	});
-var $elm$time$Time$customZone = $elm$time$Time$Zone;
-var $elm$time$Time$setInterval = _Time_setInterval;
-var $elm$core$Process$spawn = _Scheduler_spawn;
-var $elm$time$Time$spawnHelp = F3(
-	function (router, intervals, processes) {
-		if (!intervals.b) {
-			return $elm$core$Task$succeed(processes);
-		} else {
-			var interval = intervals.a;
-			var rest = intervals.b;
-			var spawnTimer = $elm$core$Process$spawn(
-				A2(
-					$elm$time$Time$setInterval,
-					interval,
-					A2($elm$core$Platform$sendToSelf, router, interval)));
-			var spawnRest = function (id) {
-				return A3(
-					$elm$time$Time$spawnHelp,
-					router,
-					rest,
-					A3($elm$core$Dict$insert, interval, id, processes));
-			};
-			return A2($elm$core$Task$andThen, spawnRest, spawnTimer);
+			}
 		}
 	});
-var $elm$time$Time$onEffects = F3(
-	function (router, subs, _v0) {
-		var processes = _v0.aC;
-		var rightStep = F3(
-			function (_v6, id, _v7) {
-				var spawns = _v7.a;
-				var existing = _v7.b;
-				var kills = _v7.c;
-				return _Utils_Tuple3(
-					spawns,
-					existing,
-					A2(
-						$elm$core$Task$andThen,
-						function (_v5) {
-							return kills;
-						},
-						$elm$core$Process$kill(id)));
-			});
-		var newTaggers = A3($elm$core$List$foldl, $elm$time$Time$addMySub, $elm$core$Dict$empty, subs);
-		var leftStep = F3(
-			function (interval, taggers, _v4) {
-				var spawns = _v4.a;
-				var existing = _v4.b;
-				var kills = _v4.c;
-				return _Utils_Tuple3(
-					A2($elm$core$List$cons, interval, spawns),
-					existing,
-					kills);
-			});
-		var bothStep = F4(
-			function (interval, taggers, id, _v3) {
-				var spawns = _v3.a;
-				var existing = _v3.b;
-				var kills = _v3.c;
-				return _Utils_Tuple3(
-					spawns,
-					A3($elm$core$Dict$insert, interval, id, existing),
-					kills);
-			});
-		var _v1 = A6(
-			$elm$core$Dict$merge,
-			leftStep,
-			bothStep,
-			rightStep,
-			newTaggers,
-			processes,
-			_Utils_Tuple3(
-				_List_Nil,
-				$elm$core$Dict$empty,
-				$elm$core$Task$succeed(0)));
-		var spawnList = _v1.a;
-		var existingDict = _v1.b;
-		var killTask = _v1.c;
+var $elm$core$String$foldr = _String_foldr;
+var $elm$core$String$toList = function (string) {
+	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
+};
+var $author$project$Aoc10Pretty$findInside = function (s) {
+	return A5(
+		$author$project$Aoc10Pretty$findInsideHelper,
+		0,
+		false,
+		$elm$core$Maybe$Nothing,
+		_List_Nil,
+		$elm$core$String$toList(s));
+};
+var $elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (!maybeValue.$) {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $elm$core$Bitwise$and = _Bitwise_and;
+var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
+var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
+var $elm$core$Basics$ge = _Utils_ge;
+var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
+var $elm$core$Array$getHelp = F3(
+	function (shift, index, tree) {
+		getHelp:
+		while (true) {
+			var pos = $elm$core$Array$bitMask & (index >>> shift);
+			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+			if (!_v0.$) {
+				var subTree = _v0.a;
+				var $temp$shift = shift - $elm$core$Array$shiftStep,
+					$temp$index = index,
+					$temp$tree = subTree;
+				shift = $temp$shift;
+				index = $temp$index;
+				tree = $temp$tree;
+				continue getHelp;
+			} else {
+				var values = _v0.a;
+				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
+			}
+		}
+	});
+var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
+var $elm$core$Array$tailIndex = function (len) {
+	return (len >>> 5) << 5;
+};
+var $elm$core$Array$get = F2(
+	function (index, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
+			index,
+			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
+			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
+			A3($elm$core$Array$getHelp, startShift, index, tree)));
+	});
+var $tortus$elm_array_2d$Array2D$getRow = F2(
+	function (row, array2d) {
+		return A2($elm$core$Array$get, row, array2d.a);
+	});
+var $tortus$elm_array_2d$Array2D$get = F3(
+	function (row, col, array2d) {
 		return A2(
-			$elm$core$Task$andThen,
-			function (newProcesses) {
-				return $elm$core$Task$succeed(
-					A2($elm$time$Time$State, newTaggers, newProcesses));
+			$elm$core$Maybe$andThen,
+			$elm$core$Array$get(col),
+			A2($tortus$elm_array_2d$Array2D$getRow, row, array2d));
+	});
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
 			},
-			A2(
-				$elm$core$Task$andThen,
-				function (_v2) {
-					return A3($elm$time$Time$spawnHelp, router, spawnList, existingDict);
-				},
-				killTask));
+			xs);
 	});
-var $elm$time$Time$Posix = $elm$core$Basics$identity;
-var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
-var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
-var $elm$time$Time$onSelfMsg = F3(
-	function (router, interval, state) {
-		var _v0 = A2($elm$core$Dict$get, interval, state.aJ);
-		if (_v0.$ === 1) {
-			return $elm$core$Task$succeed(state);
+var $author$project$Aoc10Pretty$checkConnect = F5(
+	function (pipe, field, _v0, sourcePipes, targetPipes) {
+		var x = _v0.a;
+		var y = _v0.b;
+		if (A2($elm$core$List$member, pipe, sourcePipes)) {
+			var _v1 = A3($tortus$elm_array_2d$Array2D$get, y, x, field);
+			if (!_v1.$) {
+				var p = _v1.a;
+				return A2($elm$core$List$member, p, targetPipes) ? $elm$core$Maybe$Just(
+					_Utils_Tuple2(x, y)) : $elm$core$Maybe$Nothing;
+			} else {
+				return $elm$core$Maybe$Nothing;
+			}
 		} else {
-			var taggers = _v0.a;
-			var tellTaggers = function (time) {
-				return $elm$core$Task$sequence(
-					A2(
-						$elm$core$List$map,
-						function (tagger) {
-							return A2(
-								$elm$core$Platform$sendToApp,
-								router,
-								tagger(time));
-						},
-						taggers));
-			};
-			return A2(
-				$elm$core$Task$andThen,
-				function (_v1) {
-					return $elm$core$Task$succeed(state);
-				},
-				A2($elm$core$Task$andThen, tellTaggers, $elm$time$Time$now));
+			return $elm$core$Maybe$Nothing;
 		}
 	});
-var $elm$core$Basics$composeL = F3(
-	function (g, f, x) {
-		return g(
-			f(x));
+var $author$project$Aoc10Pretty$eastPipes = _List_fromArray(
+	['S', '-', 'L', 'F']);
+var $author$project$Aoc10Pretty$northPipes = _List_fromArray(
+	['S', '|', 'L', 'J']);
+var $author$project$Aoc10Pretty$southPipes = _List_fromArray(
+	['S', '|', '7', 'F']);
+var $author$project$Aoc10Pretty$westPipes = _List_fromArray(
+	['S', '-', 'J', '7']);
+var $author$project$Aoc10Pretty$findConnections = F2(
+	function (field, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var _v1 = A3($tortus$elm_array_2d$Array2D$get, y, x, field);
+		if (!_v1.$) {
+			var pipe = _v1.a;
+			return A2(
+				$elm$core$List$filterMap,
+				$elm$core$Basics$identity,
+				_List_fromArray(
+					[
+						A5(
+						$author$project$Aoc10Pretty$checkConnect,
+						pipe,
+						field,
+						_Utils_Tuple2(x, y - 1),
+						$author$project$Aoc10Pretty$northPipes,
+						$author$project$Aoc10Pretty$southPipes),
+						A5(
+						$author$project$Aoc10Pretty$checkConnect,
+						pipe,
+						field,
+						_Utils_Tuple2(x - 1, y),
+						$author$project$Aoc10Pretty$westPipes,
+						$author$project$Aoc10Pretty$eastPipes),
+						A5(
+						$author$project$Aoc10Pretty$checkConnect,
+						pipe,
+						field,
+						_Utils_Tuple2(x, y + 1),
+						$author$project$Aoc10Pretty$southPipes,
+						$author$project$Aoc10Pretty$northPipes),
+						A5(
+						$author$project$Aoc10Pretty$checkConnect,
+						pipe,
+						field,
+						_Utils_Tuple2(x + 1, y),
+						$author$project$Aoc10Pretty$eastPipes,
+						$author$project$Aoc10Pretty$westPipes)
+					]));
+		} else {
+			return _List_Nil;
+		}
 	});
-var $elm$time$Time$subMap = F2(
-	function (f, _v0) {
-		var interval = _v0.a;
-		var tagger = _v0.b;
-		return A2(
-			$elm$time$Time$Every,
-			interval,
-			A2($elm$core$Basics$composeL, f, tagger));
-	});
-_Platform_effectManagers['Time'] = _Platform_createManager($elm$time$Time$init, $elm$time$Time$onEffects, $elm$time$Time$onSelfMsg, 0, $elm$time$Time$subMap);
-var $elm$time$Time$subscription = _Platform_leaf('Time');
-var $elm$time$Time$every = F2(
-	function (interval, tagger) {
-		return $elm$time$Time$subscription(
-			A2($elm$time$Time$Every, interval, tagger));
-	});
-var $author$project$Aoc18$subscriptions = function (model) {
-	return A2(
-		$elm$time$Time$every,
-		$author$project$Aoc18$delay,
-		function (_v0) {
-			return $author$project$Aoc18$Tick;
-		});
-};
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
 		return A3(
@@ -5897,738 +5563,769 @@ var $elm$core$List$filter = F2(
 			_List_Nil,
 			list);
 	});
-var $elm$core$Dict$member = F2(
-	function (key, dict) {
-		var _v0 = A2($elm$core$Dict$get, key, dict);
-		if (!_v0.$) {
-			return true;
-		} else {
-			return false;
-		}
-	});
-var $elm$core$Set$member = F2(
-	function (key, _v0) {
-		var dict = _v0;
-		return A2($elm$core$Dict$member, key, dict);
-	});
-var $author$project$Aoc18$countTrenchCrossings = F4(
-	function (trench, _v0, alongside, crossings) {
-		countTrenchCrossings:
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$Aoc10Pretty$findLoopHelper = F4(
+	function (field, _v0, prev, positions) {
+		findLoopHelper:
 		while (true) {
 			var x = _v0.a;
 			var y = _v0.b;
-			if (y < 0) {
-				return crossings;
-			} else {
-				var right = _Utils_Tuple2(x + 1, y);
-				var pos = _Utils_Tuple2(x, y);
-				var next = _Utils_Tuple2(x, y - 1);
-				var left = _Utils_Tuple2(x - 1, y);
-				if (A2($elm$core$Set$member, pos, trench)) {
-					if (A2($elm$core$Set$member, left, trench) && A2($elm$core$Set$member, right, trench)) {
-						var $temp$trench = trench,
+			var _v1 = A3($tortus$elm_array_2d$Array2D$get, y, x, field);
+			if (!_v1.$) {
+				var pipe = _v1.a;
+				if (pipe === 'S') {
+					return positions;
+				} else {
+					var conns = A2(
+						$author$project$Aoc10Pretty$findConnections,
+						field,
+						_Utils_Tuple2(x, y));
+					var filtered = A2(
+						$elm$core$List$filter,
+						function (pos) {
+							return !_Utils_eq(pos, prev);
+						},
+						conns);
+					if (filtered.b && (!filtered.b.b)) {
+						var next = filtered.a;
+						var $temp$field = field,
 							$temp$_v0 = next,
-							$temp$alongside = 0,
-							$temp$crossings = crossings + 1;
-						trench = $temp$trench;
+							$temp$prev = _Utils_Tuple2(x, y),
+							$temp$positions = A2(
+							$elm$core$List$cons,
+							_Utils_Tuple2(x, y),
+							positions);
+						field = $temp$field;
 						_v0 = $temp$_v0;
-						alongside = $temp$alongside;
-						crossings = $temp$crossings;
-						continue countTrenchCrossings;
+						prev = $temp$prev;
+						positions = $temp$positions;
+						continue findLoopHelper;
 					} else {
-						if (A2($elm$core$Set$member, left, trench)) {
-							if (alongside < 0) {
-								var $temp$trench = trench,
-									$temp$_v0 = next,
-									$temp$alongside = 0,
-									$temp$crossings = crossings;
-								trench = $temp$trench;
-								_v0 = $temp$_v0;
-								alongside = $temp$alongside;
-								crossings = $temp$crossings;
-								continue countTrenchCrossings;
-							} else {
-								if (alongside > 0) {
-									var $temp$trench = trench,
-										$temp$_v0 = next,
-										$temp$alongside = 0,
-										$temp$crossings = crossings + 1;
-									trench = $temp$trench;
-									_v0 = $temp$_v0;
-									alongside = $temp$alongside;
-									crossings = $temp$crossings;
-									continue countTrenchCrossings;
-								} else {
-									var $temp$trench = trench,
-										$temp$_v0 = next,
-										$temp$alongside = -1,
-										$temp$crossings = crossings;
-									trench = $temp$trench;
-									_v0 = $temp$_v0;
-									alongside = $temp$alongside;
-									crossings = $temp$crossings;
-									continue countTrenchCrossings;
-								}
-							}
-						} else {
-							if (A2($elm$core$Set$member, right, trench)) {
-								if (alongside < 0) {
-									var $temp$trench = trench,
-										$temp$_v0 = next,
-										$temp$alongside = 0,
-										$temp$crossings = crossings + 1;
-									trench = $temp$trench;
-									_v0 = $temp$_v0;
-									alongside = $temp$alongside;
-									crossings = $temp$crossings;
-									continue countTrenchCrossings;
-								} else {
-									if (alongside > 0) {
-										var $temp$trench = trench,
-											$temp$_v0 = next,
-											$temp$alongside = 0,
-											$temp$crossings = crossings;
-										trench = $temp$trench;
-										_v0 = $temp$_v0;
-										alongside = $temp$alongside;
-										crossings = $temp$crossings;
-										continue countTrenchCrossings;
-									} else {
-										var $temp$trench = trench,
-											$temp$_v0 = next,
-											$temp$alongside = 1,
-											$temp$crossings = crossings;
-										trench = $temp$trench;
-										_v0 = $temp$_v0;
-										alongside = $temp$alongside;
-										crossings = $temp$crossings;
-										continue countTrenchCrossings;
-									}
-								}
-							} else {
-								var $temp$trench = trench,
-									$temp$_v0 = next,
-									$temp$alongside = alongside,
-									$temp$crossings = crossings;
-								trench = $temp$trench;
-								_v0 = $temp$_v0;
-								alongside = $temp$alongside;
-								crossings = $temp$crossings;
-								continue countTrenchCrossings;
-							}
-						}
+						return _List_fromArray(
+							[
+								_Utils_Tuple2(
+								$elm$core$List$length(conns),
+								$elm$core$List$length(filtered))
+							]);
+					}
+				}
+			} else {
+				return _List_fromArray(
+					[
+						_Utils_Tuple2(3, 3)
+					]);
+			}
+		}
+	});
+var $author$project$Aoc10Pretty$findLoop = F2(
+	function (startPos, field) {
+		var _v0 = A2($author$project$Aoc10Pretty$findConnections, field, startPos);
+		if ((_v0.b && _v0.b.b) && (!_v0.b.b.b)) {
+			var a = _v0.a;
+			var _v1 = _v0.b;
+			var b = _v1.a;
+			return A4(
+				$author$project$Aoc10Pretty$findLoopHelper,
+				field,
+				a,
+				startPos,
+				_List_fromArray(
+					[startPos]));
+		} else {
+			return _List_fromArray(
+				[
+					_Utils_Tuple2(1, 1)
+				]);
+		}
+	});
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $author$project$Aoc10Pretty$chooseReplacement = F2(
+	function (aOff, bOff) {
+		return (_Utils_eq(
+			aOff,
+			_Utils_Tuple2(0, -1)) && _Utils_eq(
+			bOff,
+			_Utils_Tuple2(-1, 0))) ? 'J' : ((_Utils_eq(
+			aOff,
+			_Utils_Tuple2(0, -1)) && _Utils_eq(
+			bOff,
+			_Utils_Tuple2(0, 1))) ? '|' : ((_Utils_eq(
+			aOff,
+			_Utils_Tuple2(0, -1)) && _Utils_eq(
+			bOff,
+			_Utils_Tuple2(1, 0))) ? 'L' : ((_Utils_eq(
+			aOff,
+			_Utils_Tuple2(-1, 0)) && _Utils_eq(
+			bOff,
+			_Utils_Tuple2(0, 1))) ? '7' : ((_Utils_eq(
+			aOff,
+			_Utils_Tuple2(-1, 0)) && _Utils_eq(
+			bOff,
+			_Utils_Tuple2(1, 0))) ? '-' : ((_Utils_eq(
+			aOff,
+			_Utils_Tuple2(0, 1)) && _Utils_eq(
+			bOff,
+			_Utils_Tuple2(1, 0))) ? 'F' : 'S')))));
+	});
+var $author$project$Aoc10Pretty$toOffset = F2(
+	function (_v0, _v1) {
+		var xStart = _v0.a;
+		var yStart = _v0.b;
+		var x = _v1.a;
+		var y = _v1.b;
+		return _Utils_Tuple2(x - xStart, y - yStart);
+	});
+var $author$project$Aoc10Pretty$findReplacement = F2(
+	function (startPos, field) {
+		var _v0 = A2($author$project$Aoc10Pretty$findConnections, field, startPos);
+		if ((_v0.b && _v0.b.b) && (!_v0.b.b.b)) {
+			var a = _v0.a;
+			var _v1 = _v0.b;
+			var b = _v1.a;
+			var bOff = A2($author$project$Aoc10Pretty$toOffset, startPos, b);
+			var aOff = A2($author$project$Aoc10Pretty$toOffset, startPos, a);
+			return A2($author$project$Aoc10Pretty$chooseReplacement, aOff, bOff);
+		} else {
+			return 'S';
+		}
+	});
+var $author$project$Aoc10Pretty$findStartPosHelper = F2(
+	function (field, indexes) {
+		findStartPosHelper:
+		while (true) {
+			if (!indexes.b) {
+				return $elm$core$Maybe$Just(
+					_Utils_Tuple2(7, 7));
+			} else {
+				var _v1 = indexes.a;
+				var x = _v1.a;
+				var y = _v1.b;
+				var rest = indexes.b;
+				var _v2 = A3($tortus$elm_array_2d$Array2D$get, y, x, field);
+				if (!_v2.$) {
+					var ch = _v2.a;
+					if (ch === 'S') {
+						return $elm$core$Maybe$Just(
+							_Utils_Tuple2(x, y));
+					} else {
+						var $temp$field = field,
+							$temp$indexes = rest;
+						field = $temp$field;
+						indexes = $temp$indexes;
+						continue findStartPosHelper;
 					}
 				} else {
-					var $temp$trench = trench,
-						$temp$_v0 = next,
-						$temp$alongside = 0,
-						$temp$crossings = crossings;
-					trench = $temp$trench;
-					_v0 = $temp$_v0;
-					alongside = $temp$alongside;
-					crossings = $temp$crossings;
-					continue countTrenchCrossings;
+					return $elm$core$Maybe$Just(
+						_Utils_Tuple2(x, y));
 				}
 			}
 		}
 	});
-var $elm$core$Basics$modBy = _Basics_modBy;
-var $author$project$Aoc18$isStartPointInsideTrench = F2(
-	function (trench, _v0) {
-		var x = _v0.a;
-		var y = _v0.b;
-		var crossings = A4(
-			$author$project$Aoc18$countTrenchCrossings,
-			trench,
-			_Utils_Tuple2(x, y),
-			0,
-			0);
-		return 1 === A2($elm$core$Basics$modBy, 2, crossings);
-	});
-var $author$project$Aoc18$findNeighbourPointInsideTrench = F2(
-	function (trench, _v0) {
-		var x = _v0.a;
-		var y = _v0.b;
-		var candidates = _List_fromArray(
-			[
-				_Utils_Tuple2(x, y - 1),
-				_Utils_Tuple2(x, y + 1),
-				_Utils_Tuple2(x - 1, y),
-				_Utils_Tuple2(x + 1, y)
-			]);
-		return A2(
-			$elm$core$Maybe$withDefault,
-			_Utils_Tuple2(x, y),
-			$elm$core$List$head(
-				A2(
-					$elm$core$List$filter,
-					$author$project$Aoc18$isStartPointInsideTrench(trench),
-					candidates)));
-	});
-var $elm$core$Basics$not = _Basics_not;
-var $elm$core$Basics$round = _Basics_round;
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
-};
 var $elm$core$List$concatMap = F2(
 	function (f, list) {
 		return $elm$core$List$concat(
 			A2($elm$core$List$map, f, list));
 	});
-var $elm$core$Dict$getMin = function (dict) {
-	getMin:
-	while (true) {
-		if ((dict.$ === -1) && (dict.d.$ === -1)) {
-			var left = dict.d;
-			var $temp$dict = left;
-			dict = $temp$dict;
-			continue getMin;
-		} else {
-			return dict;
-		}
-	}
+var $elm$core$Array$length = function (_v0) {
+	var len = _v0.a;
+	return len;
 };
-var $elm$core$Dict$moveRedLeft = function (dict) {
-	if (((dict.$ === -1) && (dict.d.$ === -1)) && (dict.e.$ === -1)) {
-		if ((dict.e.d.$ === -1) && (!dict.e.d.a)) {
-			var clr = dict.a;
-			var k = dict.b;
-			var v = dict.c;
-			var _v1 = dict.d;
-			var lClr = _v1.a;
-			var lK = _v1.b;
-			var lV = _v1.c;
-			var lLeft = _v1.d;
-			var lRight = _v1.e;
-			var _v2 = dict.e;
-			var rClr = _v2.a;
-			var rK = _v2.b;
-			var rV = _v2.c;
-			var rLeft = _v2.d;
-			var _v3 = rLeft.a;
-			var rlK = rLeft.b;
-			var rlV = rLeft.c;
-			var rlL = rLeft.d;
-			var rlR = rLeft.e;
-			var rRight = _v2.e;
-			return A5(
-				$elm$core$Dict$RBNode_elm_builtin,
-				0,
-				rlK,
-				rlV,
-				A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					1,
-					k,
-					v,
-					A5($elm$core$Dict$RBNode_elm_builtin, 0, lK, lV, lLeft, lRight),
-					rlL),
-				A5($elm$core$Dict$RBNode_elm_builtin, 1, rK, rV, rlR, rRight));
-		} else {
-			var clr = dict.a;
-			var k = dict.b;
-			var v = dict.c;
-			var _v4 = dict.d;
-			var lClr = _v4.a;
-			var lK = _v4.b;
-			var lV = _v4.c;
-			var lLeft = _v4.d;
-			var lRight = _v4.e;
-			var _v5 = dict.e;
-			var rClr = _v5.a;
-			var rK = _v5.b;
-			var rV = _v5.c;
-			var rLeft = _v5.d;
-			var rRight = _v5.e;
-			if (clr === 1) {
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					1,
-					k,
-					v,
-					A5($elm$core$Dict$RBNode_elm_builtin, 0, lK, lV, lLeft, lRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, 0, rK, rV, rLeft, rRight));
-			} else {
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					1,
-					k,
-					v,
-					A5($elm$core$Dict$RBNode_elm_builtin, 0, lK, lV, lLeft, lRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, 0, rK, rV, rLeft, rRight));
-			}
-		}
-	} else {
-		return dict;
-	}
+var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
+	return $elm$core$Array$length(array2d.a);
 };
-var $elm$core$Dict$moveRedRight = function (dict) {
-	if (((dict.$ === -1) && (dict.d.$ === -1)) && (dict.e.$ === -1)) {
-		if ((dict.d.d.$ === -1) && (!dict.d.d.a)) {
-			var clr = dict.a;
-			var k = dict.b;
-			var v = dict.c;
-			var _v1 = dict.d;
-			var lClr = _v1.a;
-			var lK = _v1.b;
-			var lV = _v1.c;
-			var _v2 = _v1.d;
-			var _v3 = _v2.a;
-			var llK = _v2.b;
-			var llV = _v2.c;
-			var llLeft = _v2.d;
-			var llRight = _v2.e;
-			var lRight = _v1.e;
-			var _v4 = dict.e;
-			var rClr = _v4.a;
-			var rK = _v4.b;
-			var rV = _v4.c;
-			var rLeft = _v4.d;
-			var rRight = _v4.e;
-			return A5(
-				$elm$core$Dict$RBNode_elm_builtin,
-				0,
-				lK,
-				lV,
-				A5($elm$core$Dict$RBNode_elm_builtin, 1, llK, llV, llLeft, llRight),
-				A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					1,
-					k,
-					v,
-					lRight,
-					A5($elm$core$Dict$RBNode_elm_builtin, 0, rK, rV, rLeft, rRight)));
-		} else {
-			var clr = dict.a;
-			var k = dict.b;
-			var v = dict.c;
-			var _v5 = dict.d;
-			var lClr = _v5.a;
-			var lK = _v5.b;
-			var lV = _v5.c;
-			var lLeft = _v5.d;
-			var lRight = _v5.e;
-			var _v6 = dict.e;
-			var rClr = _v6.a;
-			var rK = _v6.b;
-			var rV = _v6.c;
-			var rLeft = _v6.d;
-			var rRight = _v6.e;
-			if (clr === 1) {
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					1,
-					k,
-					v,
-					A5($elm$core$Dict$RBNode_elm_builtin, 0, lK, lV, lLeft, lRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, 0, rK, rV, rLeft, rRight));
-			} else {
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					1,
-					k,
-					v,
-					A5($elm$core$Dict$RBNode_elm_builtin, 0, lK, lV, lLeft, lRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, 0, rK, rV, rLeft, rRight));
-			}
-		}
-	} else {
-		return dict;
-	}
+var $author$project$Aoc10Pretty$getIndexes = function (field) {
+	var width = $tortus$elm_array_2d$Array2D$columns(field);
+	var height = $tortus$elm_array_2d$Array2D$rows(field);
+	return A2(
+		$elm$core$List$concatMap,
+		function (y) {
+			return A2(
+				$elm$core$List$map,
+				function (x) {
+					return _Utils_Tuple2(x, y);
+				},
+				A2($elm$core$List$range, 0, width - 1));
+		},
+		A2($elm$core$List$range, 0, height - 1));
 };
-var $elm$core$Dict$removeHelpPrepEQGT = F7(
-	function (targetKey, dict, color, key, value, left, right) {
-		if ((left.$ === -1) && (!left.a)) {
-			var _v1 = left.a;
-			var lK = left.b;
-			var lV = left.c;
-			var lLeft = left.d;
-			var lRight = left.e;
-			return A5(
-				$elm$core$Dict$RBNode_elm_builtin,
-				color,
-				lK,
-				lV,
-				lLeft,
-				A5($elm$core$Dict$RBNode_elm_builtin, 0, key, value, lRight, right));
-		} else {
-			_v2$2:
-			while (true) {
-				if ((right.$ === -1) && (right.a === 1)) {
-					if (right.d.$ === -1) {
-						if (right.d.a === 1) {
-							var _v3 = right.a;
-							var _v4 = right.d;
-							var _v5 = _v4.a;
-							return $elm$core$Dict$moveRedRight(dict);
-						} else {
-							break _v2$2;
-						}
-					} else {
-						var _v6 = right.a;
-						var _v7 = right.d;
-						return $elm$core$Dict$moveRedRight(dict);
-					}
-				} else {
-					break _v2$2;
-				}
-			}
-			return dict;
-		}
-	});
-var $elm$core$Dict$removeMin = function (dict) {
-	if ((dict.$ === -1) && (dict.d.$ === -1)) {
-		var color = dict.a;
-		var key = dict.b;
-		var value = dict.c;
-		var left = dict.d;
-		var lColor = left.a;
-		var lLeft = left.d;
-		var right = dict.e;
-		if (lColor === 1) {
-			if ((lLeft.$ === -1) && (!lLeft.a)) {
-				var _v3 = lLeft.a;
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					color,
-					key,
-					value,
-					$elm$core$Dict$removeMin(left),
-					right);
-			} else {
-				var _v4 = $elm$core$Dict$moveRedLeft(dict);
-				if (_v4.$ === -1) {
-					var nColor = _v4.a;
-					var nKey = _v4.b;
-					var nValue = _v4.c;
-					var nLeft = _v4.d;
-					var nRight = _v4.e;
-					return A5(
-						$elm$core$Dict$balance,
-						nColor,
-						nKey,
-						nValue,
-						$elm$core$Dict$removeMin(nLeft),
-						nRight);
-				} else {
-					return $elm$core$Dict$RBEmpty_elm_builtin;
-				}
-			}
-		} else {
-			return A5(
-				$elm$core$Dict$RBNode_elm_builtin,
-				color,
-				key,
-				value,
-				$elm$core$Dict$removeMin(left),
-				right);
-		}
-	} else {
-		return $elm$core$Dict$RBEmpty_elm_builtin;
-	}
+var $author$project$Aoc10Pretty$findStartPos = function (field) {
+	return A2(
+		$author$project$Aoc10Pretty$findStartPosHelper,
+		field,
+		$author$project$Aoc10Pretty$getIndexes(field));
 };
-var $elm$core$Dict$removeHelp = F2(
-	function (targetKey, dict) {
-		if (dict.$ === -2) {
-			return $elm$core$Dict$RBEmpty_elm_builtin;
-		} else {
-			var color = dict.a;
-			var key = dict.b;
-			var value = dict.c;
-			var left = dict.d;
-			var right = dict.e;
-			if (_Utils_cmp(targetKey, key) < 0) {
-				if ((left.$ === -1) && (left.a === 1)) {
-					var _v4 = left.a;
-					var lLeft = left.d;
-					if ((lLeft.$ === -1) && (!lLeft.a)) {
-						var _v6 = lLeft.a;
-						return A5(
-							$elm$core$Dict$RBNode_elm_builtin,
-							color,
-							key,
-							value,
-							A2($elm$core$Dict$removeHelp, targetKey, left),
-							right);
-					} else {
-						var _v7 = $elm$core$Dict$moveRedLeft(dict);
-						if (_v7.$ === -1) {
-							var nColor = _v7.a;
-							var nKey = _v7.b;
-							var nValue = _v7.c;
-							var nLeft = _v7.d;
-							var nRight = _v7.e;
-							return A5(
-								$elm$core$Dict$balance,
-								nColor,
-								nKey,
-								nValue,
-								A2($elm$core$Dict$removeHelp, targetKey, nLeft),
-								nRight);
-						} else {
-							return $elm$core$Dict$RBEmpty_elm_builtin;
-						}
-					}
+var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
+var $elm$core$Array$foldl = F3(
+	function (func, baseCase, _v0) {
+		var tree = _v0.c;
+		var tail = _v0.d;
+		var helper = F2(
+			function (node, acc) {
+				if (!node.$) {
+					var subTree = node.a;
+					return A3($elm$core$Elm$JsArray$foldl, helper, acc, subTree);
 				} else {
-					return A5(
-						$elm$core$Dict$RBNode_elm_builtin,
-						color,
-						key,
-						value,
-						A2($elm$core$Dict$removeHelp, targetKey, left),
-						right);
+					var values = node.a;
+					return A3($elm$core$Elm$JsArray$foldl, func, acc, values);
 				}
-			} else {
-				return A2(
-					$elm$core$Dict$removeHelpEQGT,
-					targetKey,
-					A7($elm$core$Dict$removeHelpPrepEQGT, targetKey, dict, color, key, value, left, right));
-			}
-		}
-	});
-var $elm$core$Dict$removeHelpEQGT = F2(
-	function (targetKey, dict) {
-		if (dict.$ === -1) {
-			var color = dict.a;
-			var key = dict.b;
-			var value = dict.c;
-			var left = dict.d;
-			var right = dict.e;
-			if (_Utils_eq(targetKey, key)) {
-				var _v1 = $elm$core$Dict$getMin(right);
-				if (_v1.$ === -1) {
-					var minKey = _v1.b;
-					var minValue = _v1.c;
-					return A5(
-						$elm$core$Dict$balance,
-						color,
-						minKey,
-						minValue,
-						left,
-						$elm$core$Dict$removeMin(right));
-				} else {
-					return $elm$core$Dict$RBEmpty_elm_builtin;
-				}
-			} else {
-				return A5(
-					$elm$core$Dict$balance,
-					color,
-					key,
-					value,
-					left,
-					A2($elm$core$Dict$removeHelp, targetKey, right));
-			}
-		} else {
-			return $elm$core$Dict$RBEmpty_elm_builtin;
-		}
-	});
-var $elm$core$Dict$remove = F2(
-	function (key, dict) {
-		var _v0 = A2($elm$core$Dict$removeHelp, key, dict);
-		if ((_v0.$ === -1) && (!_v0.a)) {
-			var _v1 = _v0.a;
-			var k = _v0.b;
-			var v = _v0.c;
-			var l = _v0.d;
-			var r = _v0.e;
-			return A5($elm$core$Dict$RBNode_elm_builtin, 1, k, v, l, r);
-		} else {
-			var x = _v0;
-			return x;
-		}
-	});
-var $elm$core$Dict$diff = F2(
-	function (t1, t2) {
+			});
 		return A3(
-			$elm$core$Dict$foldl,
-			F3(
-				function (k, v, t) {
-					return A2($elm$core$Dict$remove, k, t);
-				}),
-			t1,
-			t2);
+			$elm$core$Elm$JsArray$foldl,
+			func,
+			A3($elm$core$Elm$JsArray$foldl, helper, baseCase, tree),
+			tail);
 	});
-var $elm$core$Set$diff = F2(
-	function (_v0, _v1) {
-		var dict1 = _v0;
-		var dict2 = _v1;
-		return A2($elm$core$Dict$diff, dict1, dict2);
-	});
-var $elm$core$Dict$filter = F2(
-	function (isGood, dict) {
-		return A3(
-			$elm$core$Dict$foldl,
-			F3(
-				function (k, v, d) {
-					return A2(isGood, k, v) ? A3($elm$core$Dict$insert, k, v, d) : d;
-				}),
-			$elm$core$Dict$empty,
-			dict);
-	});
-var $elm$core$Set$filter = F2(
-	function (isGood, _v0) {
-		var dict = _v0;
-		return A2(
-			$elm$core$Dict$filter,
-			F2(
-				function (key, _v1) {
-					return isGood(key);
-				}),
-			dict);
-	});
-var $author$project$Aoc18$findNeighbourPositions = function (pos) {
-	var x = pos.a;
-	var y = pos.b;
-	return _List_fromArray(
-		[
-			_Utils_Tuple2(x - 1, y - 1),
-			_Utils_Tuple2(x, y - 1),
-			_Utils_Tuple2(x + 1, y - 1),
-			_Utils_Tuple2(x - 1, y),
-			_Utils_Tuple2(x + 1, y),
-			_Utils_Tuple2(x - 1, y + 1),
-			_Utils_Tuple2(x, y + 1),
-			_Utils_Tuple2(x + 1, y + 1)
-		]);
+var $elm$core$Array$isEmpty = function (_v0) {
+	var len = _v0.a;
+	return !len;
 };
-var $elm$core$Dict$isEmpty = function (dict) {
-	if (dict.$ === -2) {
-		return true;
-	} else {
-		return false;
-	}
+var $tortus$elm_array_2d$Array2D$ArrayHelpers$minRowLength = function (array) {
+	return $elm$core$Array$isEmpty(array) ? 0 : A3(
+		$elm$core$Array$foldl,
+		F2(
+			function (row, min) {
+				var rowLen = $elm$core$Array$length(row);
+				return _Utils_eq(min, -1) ? rowLen : ((_Utils_cmp(rowLen, min) < 0) ? rowLen : min);
+			}),
+		-1,
+		array);
 };
-var $elm$core$Set$isEmpty = function (_v0) {
-	var dict = _v0;
-	return $elm$core$Dict$isEmpty(dict);
-};
-var $author$project$Aoc18$isTrenchPoint = F2(
-	function (trench, pos) {
-		return A2($elm$core$Set$member, pos, trench);
+var $elm$core$Elm$JsArray$map = _JsArray_map;
+var $elm$core$Array$map = F2(
+	function (func, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		var helper = function (node) {
+			if (!node.$) {
+				var subTree = node.a;
+				return $elm$core$Array$SubTree(
+					A2($elm$core$Elm$JsArray$map, helper, subTree));
+			} else {
+				var values = node.a;
+				return $elm$core$Array$Leaf(
+					A2($elm$core$Elm$JsArray$map, func, values));
+			}
+		};
+		return A4(
+			$elm$core$Array$Array_elm_builtin,
+			len,
+			startShift,
+			A2($elm$core$Elm$JsArray$map, helper, tree),
+			A2($elm$core$Elm$JsArray$map, func, tail));
 	});
-var $author$project$Aoc18$isFreeSpace = F2(
-	function (trench, pos) {
-		return !A2($author$project$Aoc18$isTrenchPoint, trench, pos);
+var $elm$core$Elm$JsArray$appendN = _JsArray_appendN;
+var $elm$core$Elm$JsArray$slice = _JsArray_slice;
+var $elm$core$Array$appendHelpBuilder = F2(
+	function (tail, builder) {
+		var tailLen = $elm$core$Elm$JsArray$length(tail);
+		var notAppended = ($elm$core$Array$branchFactor - $elm$core$Elm$JsArray$length(builder.d)) - tailLen;
+		var appended = A3($elm$core$Elm$JsArray$appendN, $elm$core$Array$branchFactor, builder.d, tail);
+		return (notAppended < 0) ? {
+			e: A2(
+				$elm$core$List$cons,
+				$elm$core$Array$Leaf(appended),
+				builder.e),
+			b: builder.b + 1,
+			d: A3($elm$core$Elm$JsArray$slice, notAppended, tailLen, tail)
+		} : ((!notAppended) ? {
+			e: A2(
+				$elm$core$List$cons,
+				$elm$core$Array$Leaf(appended),
+				builder.e),
+			b: builder.b + 1,
+			d: $elm$core$Elm$JsArray$empty
+		} : {e: builder.e, b: builder.b, d: appended});
 	});
-var $elm$core$Basics$ge = _Utils_ge;
-var $author$project$Aoc18$isWithinBounds = F3(
-	function (width, height, _v0) {
-		var x = _v0.a;
-		var y = _v0.b;
-		return (x >= 0) && ((_Utils_cmp(x, width) < 0) && ((y >= 0) && (_Utils_cmp(y, height) < 0)));
-	});
-var $elm$core$Dict$sizeHelp = F2(
-	function (n, dict) {
-		sizeHelp:
+var $elm$core$List$drop = F2(
+	function (n, list) {
+		drop:
 		while (true) {
-			if (dict.$ === -2) {
-				return n;
+			if (n <= 0) {
+				return list;
 			} else {
-				var left = dict.d;
-				var right = dict.e;
-				var $temp$n = A2($elm$core$Dict$sizeHelp, n + 1, right),
-					$temp$dict = left;
-				n = $temp$n;
-				dict = $temp$dict;
-				continue sizeHelp;
+				if (!list.b) {
+					return list;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs;
+					n = $temp$n;
+					list = $temp$list;
+					continue drop;
+				}
 			}
 		}
 	});
-var $elm$core$Dict$size = function (dict) {
-	return A2($elm$core$Dict$sizeHelp, 0, dict);
-};
-var $elm$core$Set$size = function (_v0) {
-	var dict = _v0;
-	return $elm$core$Dict$size(dict);
-};
-var $elm$core$Dict$union = F2(
-	function (t1, t2) {
-		return A3($elm$core$Dict$foldl, $elm$core$Dict$insert, t2, t1);
+var $elm$core$Array$sliceLeft = F2(
+	function (from, array) {
+		var len = array.a;
+		var tree = array.c;
+		var tail = array.d;
+		if (!from) {
+			return array;
+		} else {
+			if (_Utils_cmp(
+				from,
+				$elm$core$Array$tailIndex(len)) > -1) {
+				return A4(
+					$elm$core$Array$Array_elm_builtin,
+					len - from,
+					$elm$core$Array$shiftStep,
+					$elm$core$Elm$JsArray$empty,
+					A3(
+						$elm$core$Elm$JsArray$slice,
+						from - $elm$core$Array$tailIndex(len),
+						$elm$core$Elm$JsArray$length(tail),
+						tail));
+			} else {
+				var skipNodes = (from / $elm$core$Array$branchFactor) | 0;
+				var helper = F2(
+					function (node, acc) {
+						if (!node.$) {
+							var subTree = node.a;
+							return A3($elm$core$Elm$JsArray$foldr, helper, acc, subTree);
+						} else {
+							var leaf = node.a;
+							return A2($elm$core$List$cons, leaf, acc);
+						}
+					});
+				var leafNodes = A3(
+					$elm$core$Elm$JsArray$foldr,
+					helper,
+					_List_fromArray(
+						[tail]),
+					tree);
+				var nodesToInsert = A2($elm$core$List$drop, skipNodes, leafNodes);
+				if (!nodesToInsert.b) {
+					return $elm$core$Array$empty;
+				} else {
+					var head = nodesToInsert.a;
+					var rest = nodesToInsert.b;
+					var firstSlice = from - (skipNodes * $elm$core$Array$branchFactor);
+					var initialBuilder = {
+						e: _List_Nil,
+						b: 0,
+						d: A3(
+							$elm$core$Elm$JsArray$slice,
+							firstSlice,
+							$elm$core$Elm$JsArray$length(head),
+							head)
+					};
+					return A2(
+						$elm$core$Array$builderToArray,
+						true,
+						A3($elm$core$List$foldl, $elm$core$Array$appendHelpBuilder, initialBuilder, rest));
+				}
+			}
+		}
 	});
-var $elm$core$Set$union = F2(
-	function (_v0, _v1) {
-		var dict1 = _v0;
-		var dict2 = _v1;
-		return A2($elm$core$Dict$union, dict1, dict2);
+var $elm$core$Array$fetchNewTail = F4(
+	function (shift, end, treeEnd, tree) {
+		fetchNewTail:
+		while (true) {
+			var pos = $elm$core$Array$bitMask & (treeEnd >>> shift);
+			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+			if (!_v0.$) {
+				var sub = _v0.a;
+				var $temp$shift = shift - $elm$core$Array$shiftStep,
+					$temp$end = end,
+					$temp$treeEnd = treeEnd,
+					$temp$tree = sub;
+				shift = $temp$shift;
+				end = $temp$end;
+				treeEnd = $temp$treeEnd;
+				tree = $temp$tree;
+				continue fetchNewTail;
+			} else {
+				var values = _v0.a;
+				return A3($elm$core$Elm$JsArray$slice, 0, $elm$core$Array$bitMask & end, values);
+			}
+		}
 	});
-var $author$project$Aoc18$updateBasin = function (basin) {
-	if ($elm$core$Set$isEmpty(basin.E)) {
-		return basin;
+var $elm$core$Array$hoistTree = F3(
+	function (oldShift, newShift, tree) {
+		hoistTree:
+		while (true) {
+			if ((_Utils_cmp(oldShift, newShift) < 1) || (!$elm$core$Elm$JsArray$length(tree))) {
+				return tree;
+			} else {
+				var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, 0, tree);
+				if (!_v0.$) {
+					var sub = _v0.a;
+					var $temp$oldShift = oldShift - $elm$core$Array$shiftStep,
+						$temp$newShift = newShift,
+						$temp$tree = sub;
+					oldShift = $temp$oldShift;
+					newShift = $temp$newShift;
+					tree = $temp$tree;
+					continue hoistTree;
+				} else {
+					return tree;
+				}
+			}
+		}
+	});
+var $elm$core$Elm$JsArray$unsafeSet = _JsArray_unsafeSet;
+var $elm$core$Array$sliceTree = F3(
+	function (shift, endIdx, tree) {
+		var lastPos = $elm$core$Array$bitMask & (endIdx >>> shift);
+		var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, lastPos, tree);
+		if (!_v0.$) {
+			var sub = _v0.a;
+			var newSub = A3($elm$core$Array$sliceTree, shift - $elm$core$Array$shiftStep, endIdx, sub);
+			return (!$elm$core$Elm$JsArray$length(newSub)) ? A3($elm$core$Elm$JsArray$slice, 0, lastPos, tree) : A3(
+				$elm$core$Elm$JsArray$unsafeSet,
+				lastPos,
+				$elm$core$Array$SubTree(newSub),
+				A3($elm$core$Elm$JsArray$slice, 0, lastPos + 1, tree));
+		} else {
+			return A3($elm$core$Elm$JsArray$slice, 0, lastPos, tree);
+		}
+	});
+var $elm$core$Array$sliceRight = F2(
+	function (end, array) {
+		var len = array.a;
+		var startShift = array.b;
+		var tree = array.c;
+		var tail = array.d;
+		if (_Utils_eq(end, len)) {
+			return array;
+		} else {
+			if (_Utils_cmp(
+				end,
+				$elm$core$Array$tailIndex(len)) > -1) {
+				return A4(
+					$elm$core$Array$Array_elm_builtin,
+					end,
+					startShift,
+					tree,
+					A3($elm$core$Elm$JsArray$slice, 0, $elm$core$Array$bitMask & end, tail));
+			} else {
+				var endIdx = $elm$core$Array$tailIndex(end);
+				var depth = $elm$core$Basics$floor(
+					A2(
+						$elm$core$Basics$logBase,
+						$elm$core$Array$branchFactor,
+						A2($elm$core$Basics$max, 1, endIdx - 1)));
+				var newShift = A2($elm$core$Basics$max, 5, depth * $elm$core$Array$shiftStep);
+				return A4(
+					$elm$core$Array$Array_elm_builtin,
+					end,
+					newShift,
+					A3(
+						$elm$core$Array$hoistTree,
+						startShift,
+						newShift,
+						A3($elm$core$Array$sliceTree, startShift, endIdx, tree)),
+					A4($elm$core$Array$fetchNewTail, startShift, end, endIdx, tree));
+			}
+		}
+	});
+var $elm$core$Array$translateIndex = F2(
+	function (index, _v0) {
+		var len = _v0.a;
+		var posIndex = (index < 0) ? (len + index) : index;
+		return (posIndex < 0) ? 0 : ((_Utils_cmp(posIndex, len) > 0) ? len : posIndex);
+	});
+var $elm$core$Array$slice = F3(
+	function (from, to, array) {
+		var correctTo = A2($elm$core$Array$translateIndex, to, array);
+		var correctFrom = A2($elm$core$Array$translateIndex, from, array);
+		return (_Utils_cmp(correctFrom, correctTo) > 0) ? $elm$core$Array$empty : A2(
+			$elm$core$Array$sliceLeft,
+			correctFrom,
+			A2($elm$core$Array$sliceRight, correctTo, array));
+	});
+var $tortus$elm_array_2d$Array2D$ArrayHelpers$truncateRows = F2(
+	function (columns, array) {
+		return A2(
+			$elm$core$Array$map,
+			function (row) {
+				return (_Utils_cmp(
+					$elm$core$Array$length(row),
+					columns) > 0) ? A3($elm$core$Array$slice, 0, columns, row) : row;
+			},
+			array);
+	});
+var $tortus$elm_array_2d$Array2D$ArrayHelpers$getMinColumnsAndTruncateRows = function (array) {
+	var columns = $tortus$elm_array_2d$Array2D$ArrayHelpers$minRowLength(array);
+	var normalizedData = A2($tortus$elm_array_2d$Array2D$ArrayHelpers$truncateRows, columns, array);
+	return _Utils_Tuple2(columns, normalizedData);
+};
+var $tortus$elm_array_2d$Array2D$fromArray = function (array) {
+	var _v0 = $tortus$elm_array_2d$Array2D$ArrayHelpers$getMinColumnsAndTruncateRows(array);
+	var initialColumns = _v0.a;
+	var normalizedData = _v0.b;
+	return {h: initialColumns, a: normalizedData};
+};
+var $elm$core$Array$fromListHelp = F3(
+	function (list, nodeList, nodeListSize) {
+		fromListHelp:
+		while (true) {
+			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
+			var jsArray = _v0.a;
+			var remainingItems = _v0.b;
+			if (_Utils_cmp(
+				$elm$core$Elm$JsArray$length(jsArray),
+				$elm$core$Array$branchFactor) < 0) {
+				return A2(
+					$elm$core$Array$builderToArray,
+					true,
+					{e: nodeList, b: nodeListSize, d: jsArray});
+			} else {
+				var $temp$list = remainingItems,
+					$temp$nodeList = A2(
+					$elm$core$List$cons,
+					$elm$core$Array$Leaf(jsArray),
+					nodeList),
+					$temp$nodeListSize = nodeListSize + 1;
+				list = $temp$list;
+				nodeList = $temp$nodeList;
+				nodeListSize = $temp$nodeListSize;
+				continue fromListHelp;
+			}
+		}
+	});
+var $elm$core$Array$fromList = function (list) {
+	if (!list.b) {
+		return $elm$core$Array$empty;
 	} else {
-		var trench = basin.t;
-		var explorationSet = basin.E;
-		var filledPoints = A2($elm$core$Set$union, basin.x, explorationSet);
-		var cubicMeters = basin.w ? ($elm$core$Set$size(trench) + $elm$core$Set$size(filledPoints)) : $elm$core$Set$size(filledPoints);
-		var addedPoints = $elm$core$Set$toList(
-			A2($elm$core$Set$diff, filledPoints, basin.x));
-		var exploreNext = A2(
-			$elm$core$Set$filter,
-			$author$project$Aoc18$isFreeSpace(trench),
-			A2(
-				$elm$core$Set$filter,
-				A2($author$project$Aoc18$isWithinBounds, basin.K, basin.F),
-				$elm$core$Set$fromList(
-					A2($elm$core$List$concatMap, $author$project$Aoc18$findNeighbourPositions, addedPoints))));
-		return {C: cubicMeters, E: exploreNext, w: basin.w, x: filledPoints, F: basin.F, N: basin.N, t: trench, K: basin.K};
+		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
 	}
 };
-var $author$project$Aoc18$updateModel = function (model) {
-	return _Utils_update(
-		model,
-		{
-			g: $author$project$Aoc18$updateBasin(model.g)
-		});
+var $tortus$elm_array_2d$Array2D$fromList = function (list) {
+	return $tortus$elm_array_2d$Array2D$fromArray(
+		$elm$core$Array$fromList(
+			A2($elm$core$List$map, $elm$core$Array$fromList, list)));
 };
-var $author$project$Aoc18$update = F2(
-	function (msg, model) {
-		switch (msg.$) {
-			case 1:
-				return model.H ? _Utils_Tuple2(
-					$author$project$Aoc18$updateModel(model),
-					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-			case 0:
-				var basin = model.g;
-				var replacement = function () {
-					if (model.H) {
-						return _Utils_update(
-							basin,
-							{C: 0, x: $elm$core$Set$empty});
-					} else {
-						var startPoint = A2($elm$core$Set$member, model.G, basin.t) ? A2($author$project$Aoc18$findNeighbourPointInsideTrench, basin.t, model.G) : model.G;
-						var fillInside = A2($author$project$Aoc18$isStartPointInsideTrench, basin.t, startPoint);
-						var explorationPoints = A2($elm$core$Set$insert, startPoint, $elm$core$Set$empty);
-						return _Utils_update(
-							basin,
-							{E: explorationPoints, w: fillInside, N: startPoint});
-					}
-				}();
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{g: replacement, H: !model.H}),
-					$elm$core$Platform$Cmd$none);
-			default:
-				var _v1 = msg.a;
+var $elm$core$String$fromList = _String_fromList;
+var $author$project$Aoc10Pretty$inputname = 'input';
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $elm$core$Array$setHelp = F4(
+	function (shift, index, value, tree) {
+		var pos = $elm$core$Array$bitMask & (index >>> shift);
+		var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+		if (!_v0.$) {
+			var subTree = _v0.a;
+			var newSub = A4($elm$core$Array$setHelp, shift - $elm$core$Array$shiftStep, index, value, subTree);
+			return A3(
+				$elm$core$Elm$JsArray$unsafeSet,
+				pos,
+				$elm$core$Array$SubTree(newSub),
+				tree);
+		} else {
+			var values = _v0.a;
+			var newLeaf = A3($elm$core$Elm$JsArray$unsafeSet, $elm$core$Array$bitMask & index, value, values);
+			return A3(
+				$elm$core$Elm$JsArray$unsafeSet,
+				pos,
+				$elm$core$Array$Leaf(newLeaf),
+				tree);
+		}
+	});
+var $elm$core$Array$set = F3(
+	function (index, value, array) {
+		var len = array.a;
+		var startShift = array.b;
+		var tree = array.c;
+		var tail = array.d;
+		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? array : ((_Utils_cmp(
+			index,
+			$elm$core$Array$tailIndex(len)) > -1) ? A4(
+			$elm$core$Array$Array_elm_builtin,
+			len,
+			startShift,
+			tree,
+			A3($elm$core$Elm$JsArray$unsafeSet, $elm$core$Array$bitMask & index, value, tail)) : A4(
+			$elm$core$Array$Array_elm_builtin,
+			len,
+			startShift,
+			A4($elm$core$Array$setHelp, startShift, index, value, tree),
+			tail));
+	});
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $tortus$elm_array_2d$Array2D$set = F4(
+	function (row, col, newValue, array2d) {
+		return A2(
+			$elm$core$Maybe$withDefault,
+			array2d,
+			A2(
+				$elm$core$Maybe$map,
+				function (rowAry) {
+					return _Utils_update(
+						array2d,
+						{
+							a: A3(
+								$elm$core$Array$set,
+								row,
+								A3($elm$core$Array$set, col, newValue, rowAry),
+								array2d.a)
+						});
+				},
+				A2($tortus$elm_array_2d$Array2D$getRow, row, array2d)));
+	});
+var $author$project$Aoc10Pretty$justLoop = F3(
+	function (tiles, field, loopField) {
+		justLoop:
+		while (true) {
+			if (!tiles.b) {
+				return loopField;
+			} else {
+				var _v1 = tiles.a;
 				var x = _v1.a;
 				var y = _v1.b;
-				var yInt = $elm$core$Basics$round(y / model.u);
-				var xInt = $elm$core$Basics$round(x / model.u);
-				var txt = '(' + ($elm$core$String$fromInt(xInt) + (', ' + ($elm$core$String$fromInt(yInt) + ')')));
-				var mousePoint = _Utils_Tuple2(xInt, yInt);
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{Z: txt, G: mousePoint}),
-					$elm$core$Platform$Cmd$none);
+				var rest = tiles.b;
+				var _v2 = A3($tortus$elm_array_2d$Array2D$get, y, x, field);
+				if (!_v2.$) {
+					var pipe = _v2.a;
+					var updated = A4($tortus$elm_array_2d$Array2D$set, y, x, pipe, loopField);
+					var $temp$tiles = rest,
+						$temp$field = field,
+						$temp$loopField = updated;
+					tiles = $temp$tiles;
+					field = $temp$field;
+					loopField = $temp$loopField;
+					continue justLoop;
+				} else {
+					return loopField;
+				}
+			}
 		}
+	});
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $elm$core$Array$repeat = F2(
+	function (n, e) {
+		return A2(
+			$elm$core$Array$initialize,
+			n,
+			function (_v0) {
+				return e;
+			});
+	});
+var $tortus$elm_array_2d$Array2D$repeat = F3(
+	function (numRows, numColumns, e) {
+		var row = A2($elm$core$Array$repeat, numColumns, e);
+		return {
+			h: numColumns,
+			a: A2($elm$core$Array$repeat, numRows, row)
+		};
+	});
+var $elm$core$String$replace = F3(
+	function (before, after, string) {
+		return A2(
+			$elm$core$String$join,
+			after,
+			A2($elm$core$String$split, before, string));
+	});
+var $author$project$Aoc10Pretty$replaceStart = F2(
+	function (startPos, field) {
+		var pipe = A2($author$project$Aoc10Pretty$findReplacement, startPos, field);
+		var _v0 = startPos;
+		var xStart = _v0.a;
+		var yStart = _v0.b;
+		return A4($tortus$elm_array_2d$Array2D$set, yStart, xStart, pipe, field);
+	});
+var $author$project$Aoc10Pretty$init = function (_v0) {
+	var sample = '...........\n.S-------7.\n.|F-----7|.\n.||.....||.\n.||.....||.\n.|L-7.F-J|.\n.|..|.|..|.\n.L--J.L--J.\n...........';
+	var input = '-7-|-J-F7F--7.|77.77FFJ7F77..7FJ-77-FF7FF-777F-77--L7FFJJF77FF|7F7F--FJ7-7-77-7-7.F-7--F7.F7F---7F7FF7FL|7-7-F--F7-FF7-|.|77LL-FFL7J7F-F-F7.\n|..FJ7F.LL|7L-J-LJ77F-J77.--F|FL7|LFLF|LL7||FJFJJ..L|FJ7.L777|L-JF7.LLJ7|L-JF7|-F|J7J7.||FJ|L--7L7---77..J7.7J7F-J-7J7J.L|-7||F7-L.LFLFJ7LJ7\nFF7|FFJF|F77J-||LL7-7-L|-7JJJ|7FF-7..|L-FJL7L7|JFF77|L--7FJL-7J.F|L-7L-F77|F|L777|L7-F-JLJFJ.F7|FJJLJJLL|7|.L|JLJ|.JJ|77.|LL-|-JLLJ7J.||7FLJ\nFJL7F-L-J7L-7.-JFJJ|JF|.|.|.-F7FL|.-.|..L-7|FJ|.JL77F|J-77||-F7FFJF-JF|||77|J.L|7--F-|F--7|F7||||F7|--7.-JF-7-.7J7F|.JJ--7FJF|.L.LLJ7FL---7|\nL7FJ||.|L77-|7LF|J.7|-J7|.FF.LJ.F|FF7|...|||L7L77J||7J.FJF7F7|L7|FJ7F--JL7L7LFF|J.F-7LJF7|||LJLJLJ|7-FJFJ|LJJLJ7J|-J7|.F7JF|L7-.F.|-LJ|F7||7\n|LL.|7FL-JL-LJF7JF7L7.LJJ--F.LF--F-J|F77FFJL-JFJF7|L---F7|||||FJ||F-JF-7FJF7-F-7FFJFJ-FJLJ|L-7F---JF-7JJ.F....LJ-L7J|77|.7|7|.L7LFJFJ.L-7JJ.\n-.|FL|.J--7LL.LF7-L-L-||.LFL-FJJ.|.F||F-7L---7L7|L7-|FL|LJ|||||FJLJF-J7LJJ||JL7L7|FJJ.L7F7L7FJL--7L|FJ7F||FJ7|-7J-LFJFJ|FF|LF-|JL-|7J|J..LLF\nL|LF7|FJF--7F7.LJ|7-7LLL|.|L|JF-77L-7F|FJF---JFJ|FJF77JL-7||LJ||F7FJFF-7F-JL7-L7||L--7FLJL7LJF--7L-JL7F-7JJ.LJ7LFJ|JF---7J|.F-7----JJJ-F7-J.\n|.-FJL7LFJ.JFF-|JLJ-F-|-|FJFJFJ.FL7F-7|L7L---7L-JL-J|F7F7||L7FJ||LJF7L7|L7F-J7FJLJF7FJF7F7L-7L7LL----J|FJLLF|..-J-7FJ|.F-J|7|F|.||LF|L---.|7\nF|F|F||F|F7.FJ||-7JJ|FFJ|F7|-L--LJFL7LJFJF7F-JF-7F--J|||LJL-JL7|L7L||FJ|L||LF-JF--JLJFJLJL-7|FJF77F7F-JL7-7FFL-|7|L-|-7FL-J|F7LF-L---7|7L.FF\nFJ|7-L|-.||F7|L|.J|||LLFJ|FF..FJLF7FJF7L-JLJF7L7LJF7.||L-----7LJFJFJ||FJFJL7L-7|F7JJFL7F7F7LJL-JL-JLJF7FJJLJ|J-JJ77|F-FJJ7FL-L.||.F-J-FJ|F7.\nLFLF.L|FJL-.L7L|7.|FL77LLJ.F-7F7-|||FJL---7FJL7L--J|FJL7FF-7JL-7L7|FJ||LL7FJF-JLJL7F7FJ|LJL----7F----J||77-FJJ.J-77J|J|7FJ-LFJF|-7L-7-||FJ|.\n-J||7--7--7FJ|-L-FF7LLF.|FFL7|||FJ|LJF77F7LJF-JF--7|L-7L7|FJF-7L7||L-JL-7||LL-7F--J||L-JJF--7F7||F7F7JLJF77|LLF7F||7L7||7|-LL.-JFF-7J-|J--7.\nLF-LJJ-JF|7FL777F-||7|LF7-F7|||LJFJF-JL7||-FJF7L-7LJF7|FJ||7|FJFJ||F----J|L7F7|L-7FJL7F-7L-7LJLJLJLJL---J|F7LFF7LL|J7.||77J|LFJL|J-J7.-7L|||\nF7J|..|-J-FJF77-F-||-F7||FJLJLJF-J-L--7LJ|FJFJL--JF-JLJL7||FJL7L7LJL--7F7L7LJLJF-J|F-JL7|F-JF---7F-------J||--|F7.||L--J.|F7-F7.||FJL-|7F7J7\nJL7-7F7.LJJFFF||JF||L|LJ|L--7F-JLF7|F7L-7|L7|F7F7LL-7F-7LJ||F7L7|F----J|L7|F--7L-7|L7F7||L--JF7J||F7LF-7F7||7LF7L|LJJ|..FJ--7L|-JLL-7.|LL|L-\n.FJJ|-|F-7L7.JJ-7J|L7L-7|F7FJL--7||FJ|F-JL-JLJ||L-7JLJ-L-7|LJL7LJ|F-7F-JFJLJF7L7FJL7||||L7F--JL7|||L7|FJ||||7-LF-F7J7|-|77-L77F.F--FJLL7LL-L\nFF7-||||.J7F-J7.LJL7L--JLJLJF7F-J||L7|L---7F-7LJF-JF7F7F7||JF7L-7LJFJL-7|F7FJ|-|L7FS||LJFJL--7FJ|||FJ||FJLJ|FF7F7.7J||.LF77.|||7F7.|7.FJ||L|\nJ||..F777LJLJ.|7||FL-----7F-J||F7||FJ|F7F7LJFJF-JF-JLJLJ||L7||F7|F-JF7FJ|||L7|FJFJL7LJF-J|F-7||FJ||L7|||F--JFJLJL7-F-77-|L7-|J|FF77J7.|7LJ.J\nL77F.L-L-7F7|-|LF-FF7F-77LJF7|LJLJ|L7|||||F7L7L-7L-7F-7FJ|FJ|LJLJL--J|L7LJL7|||FJ7FJF7L7F7L7|||L7|L7LJLJL7F7|F---JJL7L7FJFJ-|F7FJ|J7F|L7.7-|\n|.JL-J|L-.LJ--|7LF7||L7|F7FJLJF7F-JFJ||||||L7|F-JF7LJFJL-JL7L---7F---JFJF--J||||F-JFJL-J|L-J|||FJ|FJF----J|||L7F7|F|L7LJFJLF-J||FJ--LL-F77-J\n|F|7J|LFJ7FJJJL-L|LJ|7||||L-7FJ||F7L7||||||FJ||F7||F7L--7F-JF7-FJL---7L7|F-7|||LJF-JJFF7L--7||||FJL7|7F7F7|||FJ|L77F7L7FJJ-L-7||||7||7.LF|7.\nL-LF-LJL|LLJ|-|.LL-7L7||||F7LJFJ|||FJLJ||||L-JLJLJLJL7F7|L7FJL7L7F---JFJLJFJ|||F-JF-7FJ|F7FJLJLJ|F-JL-JLJLJLJL-JFJFJL-J|F7F--J||L7F7-F-.L|J.\nF.||.L.L|7JFJF|7LF7L7||||||L-7L7|||L--7||LJF--7F-----J||L7|L-7L7||F7F7L--7L7|||L-7L7|L7|||L--7F-J|F7F7F7F7F7F7F-JJL7F-7LJ|L--7||FJ|L7J|.FJ-|\nL77|F.LJL7FJ-F|7F|L-JLJ|||L-7L-J|||F--JLJF-JF7LJFF----JL-J|F7L7LJLJLJ|F--JFJ|LJF-JFJ|FJ||L7F-JL--J|||||LJLJLJLJF--7||FJF-JF7FJLJL-JFJFJ77J.F\n.L-LJFJ-||JL-F--LL7F7F7LJL7FL--7|||L----7|F7|L7F7L--7F---7LJL7L-7F---JL--7L-JF7|F7L7|L7LJFJL--7F-7|LJ|L-7F-7F7L|F-JLJL7L7J|||F-----JJF..F7F|\n|J-L-J-FFLFF.|J.|LLJLJL-7FJF7F-J|||F7F7FJLJ||FJ||F7LLJF7FJF7FJF-JL-7F7JF7L7F7||||L-JL7L-7L7F--J|JLJF7|F-J|FJ|L7||F7LF7L7L7|LJL-------7---7-F\nF77L--FJFJ|L-J.F|J.F----JL7||L-7LJ||LJ|L7F-J|L7||||F7FJ|L-J||LL-7F-J||FJL7||LJLJL-7F-JF-JFJL--7L7F-J|LJF7|L7L7LJLJL7|L7|FJ|F---------J7L-LJ.\nLLJ7F7LF-7L--F--F--JF7F7F7LJL7F|F-JL-7L7|L77L7||||||||FJF--JL7F7||JFJ|L7FJ|L-7-F7J|L-7L-7L-7LFJFJL7FJF7|||FJFJF7F-7|L7LJL7|L7F7F7F----7-|JL-\nF|F-J77LFJ7-7JFLL---JLJLJL-7FJFJL7|F7L7|L7L7FJLJLJ||LJL7L--7FJ|LJL-JFJFJL-JF-JFJ|FJF-JF7L-7L7L7|F7|L7||||||J|FJLJFJ|J|F7FJ|FJ|||LJF---J7..-J\nL--7F||L|F7L|.|F|LF--7F----JL7L-7|FJ|FJL7L7LJF----JL7F-JF--J|LL7F--7L7L7F--JF-JFJL7L--J|F7L7|F||||L7||LJLJL7||F7JL-JFJ|LJFJ|7|LJF-JF77L|7J|.\nLLL|7|F.|JJ.FF.J--L-7|L---7F7L7J||L7||F7|FJF-JF--7F7|L-7|F-7|F7|L7JL-J-|L7F7L-7L7FJF---J|L7|L-J||L7||L--7F7LJ||L7FF7L7L--JFJFJF-JF7|L-7||.LL\n-.-.|7LFJJ.F||F|.LFFJL---7LJ|FJFJL7||||LJL7|F7|F-J|LJF-JLJ-|||||FJF7F7FJFJ||F7L7||FJF-7|L7|L--7|L7|||F--J||F-JL7L7||L|F---JFL7|F7|||F-J7-F7.\n|-|-L|777--|-LFJ-F7L----7L--JL7|F7LJLJL7F7|||||L7FJF-JF-7F-JLJLJL7||||L7L-J||L7|LJ|FJFJF7||F--JL7|LJ|L--7|LJF-7|FJ||FJL7F7F7L|LJLJLJL--7-J7J\n|.|.LF7L7JFLF.|..|L----7L--7F7||||F-7F-J||||||L7||FJF7L7|L---7F--J||||F|F--JL7|L7FJ|FJ|||||L--7FJ|F-JFF7|L--JFJ||||LJF-J||||FJF----7F--J|.-7\n|-F7-J7JL777F|LF7L7F7F7L---J|LJLJLJFJ|F7|||||L7||||FJL7|L7F-7|L7F7||||FJL7F7FJ|FJ|FJ|F7||||F7FJ|FJ|F-7|LJF---JFJ|FJF-JF-JLJLJFJF--7|L-7JF7FF\n|LLJJ-LF-F77FF7|L7LJLJL----7|F-7F7FJJ||LJ||||F||||||F-JL7||7LJFJ||||||L-7||||.||FJ|FJ|||||LJ|L7|L7|L7||F7L-7F7L7||FJFFJF----7L-JF7||F7|-7|FJ\n|.FJ7-FL7|L7FJLJFJ.F7F7F---J||FJ||L-7LJF-J||L7LJ||||L7F-J|L--7|FJ||LJ|F-J||||FJ|L7|L-J|||L77|FJL-J|FJ|||L--J||FJLJL-7L7|-F7|L-7FJLJLJLJJ||77\n7-7F7.7LFL7|L--7|F7|||LJF7F7LJL-JL--JF7L-7|L-JF-J|||FJL7J|F-7|||FJ|F-JL7FJ|||L7L7||-F-J|L-JFJL--7FJ|FJ|L---7|||F----JFJL7|L--7|L-7LLLF-7-FF7\nJJFL--FFF-JL---JLJLJ|L--JLJL-7F------J|F7|L7JFJF7|||L7FJFJL7|||||FJ|F7FJL7|||FJFJ|L7L-7L-7|L7F--JL7|L7|F--7||LJ|F7LF7L7FJ|F--JL-7L7J-L7L--J|\nLF7|7-7JL7F--7F-7F-7L7F7F---7LJF-----7LJ|L7L7|FJ||||FJL7L7FJ|||||L7LJ|L7FJ|||L7|FJFJF-JF7|F-JL7F--JL7LJ|F7LJ|F-J||FJL-JL-JL7F-7FJFJ-F-JF7F-J\n7-L|7L|L|LJFFJ|||L7L7LJLJF-7L--JF---7|F7|FJFJ|L7||||L7FJ-|L7LJ|||FJF-JFJL7|||FJ|L7L7L-7|||L-7FJL--7FJF-J||F-JL--JLJF7F7F7F7LJFJL-JF7|F-JLJ7|\n||7|J.J-F7F7L7|FJFJLL--7FJLL7F-7|F--JLJ||L7L7L7|LJ||FJL-7|FJF-J||L7L-7L-7||LJL7L7L7L-7LJ|L7FJL-7F-JL7L7FJLJF-7F7F--JLJLJLJL7FJF7F7|LJL---7--\nJJFJL7JFJLJ|FLJL-J|F7F7LJF--J|-LJL-7F77LJ7|FJFJL-7||L7F7||L7|F7||FJF-JF7|||F--JFJFJF-J7FJFJL7F-JL-7FJFJ|F-7L7LJ|L---------7LJ-|LJLJF7F7F-J|7\n.||J||LL--7|F-7F--7|LJL-7|F--JF----J|L7F-7|L7L7F7|LJFJ|||L7|LJ|||L7L-7|||||L--7|7L7L--7L-J|FJL---7LJ7L-JL7L-JF7|F-7F7F7F--JF--JF-7FJ|||L7.L7\n-LL-J.-LF7||L7LJF7|L---7|LJF7.L--7F7|FJ|FJL-J7LJ|L7JL7||L7||F7|||FJF-J|||||FF7|L7FJF--JF---JF7F7FJJF77F-7|7F7|||L7|||||L---JF-7L7LJ|LJL-J-.|\nL|FJ7.LFJLJL7L--J||F7F-J|F7||F7F7LJLJ|7||7.F7F-7L7|F7||L7||LJ|LJLJFJF7||||L7|LJFJL7L-7LL7F7FJ||||F-JL-JFJL-JLJ||FJ|||||F7F-7L7|FJF7JJFJ.|FL7\n.F7LF-FL-7F7L----JLJLJF7LJLJLJLJL----JFJL7FJLJFJJLJ|LJ|-|||F7L-7F7L7||||||FJL-7L7L|F-JF-J|||FJ|||L----7L------JLJ|LJLJLJLJ||FJ|L-J|JJ7.|F|FF\nFLJ-|-F--J||F7F7F7F-7FJL--7F----------JF7LJF7FJF--7|F7|FJ||||F7LJ|FJ|LJ||LJ7F-JFJFJ|F-JF7|LJL7|||F7-F7L--------7F---------7|L7|F7FJ.LL.|||F|\nL..--7L-7FJLJLJLJLJ.LJF--7LJF---------7|L7FJ|L-JF-JLJ||L7||||||F7||FJF-JL--7L7FJ7L7||F7||||F-J|LJ||FJL--------7LJF-7F-----JL-J|||L77F-7-LFFJ\nJFJ|L||||L7LF---------JF7L--JF-------7|L7||||F-7L---7||FJ|LJ|||||||L7|F--7FJFJL-7-LJ||LJ|L7L-7L7FJLJF-7F-----7L--JFJL----7F-7JLJ|FJFL7|||LJJ\n.|-|-F-FL-JJ|F---------J|F7F-JF7F----JL7||L7|||L7F--J||L7L7FJ|||||L7|||F-JL7L7F7L7F-J|FFJFJF-JFJL--7|FJ|7F7F7L---7L------J|FJF-7LJF77|L-|.F-\n.LF|-||F---7LJF77F7FF---J|||F-J|L----7L|||FJ|L7FJL--7|L7L7||FJLJ||FJ||||F7FJJ||L7||F7|FJFJFL7FJF---J|L7|FJLJL----JF-------JL-JFJ7|||J7JLLL|J\nF-F-.FFJF-7|.FJL-JL-JF---JLJL-7L----7L7LJLJJL7|L7F--J|FJFJ||L--7|||FJLJLJ||F7|L7||LJLJL7|F--JL7L--7FJ7LJL--7F-----JF-------7F7L7F-JL-7L7LLF.\nL77-J|L-JFJL-JF7F7F--JF---7F-7L----7L7L-7F--7||.LJF77LJ7L7|L-7FJ|||L7F---J|||L-JLJF----J||F7F-JF7FJ|F-7F7F7LJF7F---JF7-F7F7LJ|FJL-7F-J||F7L7\nLJ||LJ-|JL----JLJ||F7JL--7LJFJF----J|L--J|F-JLJF--JL----7LJ7FJL7||L-JL---7LJL--7F-JF7F7FJLJLJF7||L-JL7LJLJL7FJ|L-7F-JL-JLJL7|||F7-||JFFL|7||\nL-F7FL7|LF-7F---7LJ||F---JF7L-JF---------J|F7F7|F-------JFF-JF-J|L7JLLF--JF7F--J|F-JLJ|L7F-77|LJL----JF7F7-LJ7|F7LJF---7F-7L7LJ|L-J|F77JLL.|\n.L|L777-FJFJL--7|F7||L----JL---JF-7F-----7LJLJ||L--------7|F7||7|FJ.F-L-7FJ|L7F7LJF---JFJL7L-JF-7F7F-7||||F7F7LJ|F7L--7||7L-JF7|F--J|L7777.7\nFF|FJF7FL7|F7F7||||||F7F-7F---7FL7LJF7F7|L7F-7LJF-7F-----J||LJ7-||J7FL|J||JL7LJL77L---7|F-JF-7|FJ|||FLJLJLJLJ|F7LJL7F-JLJF---JLJL7F7|FJF7--|\nF-J|-||-FJLJ||LJLJ||||||FJL--7|F7L-7|LJL-7LJF|F-JFJL7F---7||JLL-LJ7FF.|FLJJJ|F--JFF7JFJ|L--JF||L-J||F-----7F7LJL--7|L7F7FJF-7F7F7LJLJ|||L7-J\nL-7L-JL-JF-7LJF7F7LJLJLJL--7FJLJ|F7LJF--7L--7||F7L--J|F--JLJ777|LJ77|7LLL-FFJ|F-7FJL7L-JF----JL-7JLJL----7||L-----JL-J||L7|FLJLJ|F7F7L-JFJ7J\nLFJF7F7F7|FJF7|LJL7F--7F--7|L--7|||F7L-7|F--J|LJ|F---JL-7F|.|JF|-|.LF-.|.LFL7LJFJ|F7L7F-JF7F-7F7|F7F-----J|L---7F-----JL-JL---7.LJ||L7F7L-7|\n.L7|LJLJLJL7|LJ|F7LJF7LJF-JL-7FJLJ||L--JLJF-7|F7LJF7F7F-JJ-||-7|F----JF|-FF-JF7L7LJL7LJF-J||FJ|LJ|LJF7F--7L-7F7LJF7F-7F7F7F7F7L--7LJLLJL7FJ-\n-7LJF----7-LJF7FJL--JL-7L7F-7LJF-7|L------JFJ||L7FJLJLJF7-F777|F|.L7FLF|--L-7||FJJ|-L--JLFJ|L7|F-JF7|||F-JF7LJ|F7||L7LJLJ||LJL---JJ7|FJ|LJF|\nLL7|L-7F7L---JLJF7F-7F7L-J|7|F-J7|L---7F-7FJJLJFJL-----JL-JL-7LL|F||F.FJ7FJ-LJLJJLFF7F---JFJLLJL--JLJLJL--JL-7||LJL7L---7|L--7F--7JFJ7--L7--\n.|L-JF|||F--7F7FJ||7LJL7F-JFJ|F--JF7F7LJFJL-7F7L7F7F-----7F--J.LLL-|J-F7LFJ-L..L7.FJ|L--7FJ.F----7F-7F--7F---JLJF--JF---JL7F7LJF-JFF-J7LLL-J\n-L-7LFJ|LJF7LJ||FJ|F---J|F-JFJL---JLJL7-L--7LJ|-|||L--7F-JL--77LLL.7--J7-||7|7-||FL7|F7JLJF7L---7|L7|L-7|L---7F7L--7L7F7JFLJ|F-J7-LJ-JF7J|F.\n||7LLL-J|FJL--J|L7|L7F--JL--JF----7F-7L---7|F7L7LJ|F7FJL7F--7|7F7|7L-77L-777J|F--LJ|LJL--7||F7F-JL-JL-7||F-7FJ|L--7L7LJL7F-7|L7J7.|L|.7J.LFJ\nFJ77|LJJLL-7F7FJ7||FJ|F---7F-JF7F7LJ||F-7FJLJL7L-7||||-|||.LLJJFL--.FLJ-JJJ|JFL7L|.L--7F7LJLJLJF-7F--7LJLJ|LJFJF7FJ.L---J|FJL-JFJ-J--7L7-|J.\nF.F7-7F7LF7LJLJF7LJL-JL--7LJF7|LJL--7|L7LJF--7L--JLJ|L-7LJ-7F|-L.-77.J-F|.LLF|LFF7F7F7LJL-7F---JLLJF7L-----7FJFJLJF-7F7F7||F---7|.|L|7LF-F-7\nF7||7F||FJL---7||JF7-F7F7|F7|||F----JL-JF-JF7L-7F7F7L--J7|-LFJLJ-LFFJJ.F|..FJ|FF|LJLJL7F--J|F--7F--JL------J|FJF7.L7||||LJLJF-7L77|.F|7.||L-\nLFJL7FJ|L-7F-7LJL-JL7||||LJ||||L---7F7F7L7FJL--J|LJ|F7F7F77|.7-|7F7|7|F7LF-7L77LL--7F7LJF7FJL-7|L------7F--7|L-JL7FJLJLJF--7L7L7|7J--.|77|L|\n|L-7|L7|F7LJFJF----7||LJL-7LJLJF7F7LJLJL7||F7F--JF-J|LJLJL77.-7JL-L7-7JJ.-.F-|F-|LL||L7FJ||F--JL----7F7LJF-J|F---J|F----JF7L7L7LJ|7||F|LJ7L-\nLF-JL-JLJL7LL-JF7F-J||F--7L-7F7|LJ|F7F-7LJLJ||F7FJLFJF-7F-JL||.7F7.|L|JLLJ7F-||L-J7LJFJ||LJL---7F--7LJL--JF7|L----JL--7F7|L7L-JFF7F7--77-|77\n.L7F-7F7F7L----JLJF7LJL7FL-7LJ|L-7LJ|L7L7F7FJ||LJF7|FJJLJF|---7|7.J7-|7.L|FJ|LLJL-JJ.L7L7F-----J|F-JF7F7F7|||F-7F7F7F-J|||FJLF77|||||.|LJ|J-\nF.||FJ|LJ|F7F--7F7||F-7|F-7L-7|F7L-7L7|JLJ|L7|L--JLJL-7FF-7J.LFL77F---J---J.7J7.|F77FLL-J|F-----JL-7|LJLJLJLJL7LJLJLJF-JLJL--JL-JLJL77J77LJJ\n--LJL7|-FJ||L7FJ|LJ||.LJL7L-7||||F7L7|L-7-L-J|F----7F-J7L7L-7--7|-|.F7.L7F|-7||-FF-7-F7F7LJF-------J|F----7F-7L--7F7.|F----7F7F7F7F7L7-L7JFF\nLFLLFJL7L7|L7|L-JF7LJF---JF7LJLJLJL-JL-7|F-7FJL---7||JJFFL7FJ7F|J.|-LF--J-7FJJJ-LL7L-JLJL--JF7F7F7F7||F--7LJ||F--J||FJL---7LJLJLJ||L-J7.|FL.\n.JJ-|F-J-LJ.LJJF7|L7-L----JL-------7F77LJL7||F----JLJ-F-7FJ|.F77|.|7|FJFLLFL7L.FF7|F--------J||LJLJLJLJF7L--7LJF--JLJF7F-7L7F-77JLJLLL|FFFL7\nJJ.FLJF7|F7F7F7|LJFJF7F7F7F7F----77LJL7F7FJLJL--7F-7F7L7LJFJFJ|F7.||F7F77F777FF7||LJ7F--7|F77LJF-7|F7F-JL--7L7F|F----JLJJL7||FJ-7L|||..L7-..\n.7-|J.|L-JLJLJ|L-7L-JLJLJLJLJF--7L----J|||F--7F7LJFJ||J|F-J|L7LJ|7-F|LJL7|L7-FF7||F-7|F7|FJ|F7.L7|FJLJF7F7LL7L-JL--7F7F--7|LJL77|FFJ-JFF|L77\nFLFJ|-L------7L--JF7F7F--7F7FJF-JF-----JLJL-7LJ|F7L7|L7|L--7J|F-J77LL--7LJFJ-F|LJ|L7|LJ||L7|||F7||L--7|LJL7-L-7F---J||L7FJL--7L7F-7J.|FJJ7.7\n||L-J7LJ-F---JF7F7|||LJF-J||||L--JF-----7F-7L-7LJL-J|FJ|F--JFJL--7F7FF7|F7L7FFL-7L7|L7L||FJ||LJLJL7JFJ|F--JF7-|L----JL-JL7|F7L7LJFJLF-F-7--J\nF|L|-LJ.FJF7F-J||||LJF-JF7||L7F--7L----7|L7|F7L--7F7|L7|L7|FJF---J||FJLJ|L-JF7F7L7LJFJFJ|L7|L7F--7|FJFJL---JL7L-7F7F--7F7L-JL7|F7L--77F7J|.7\n7.FF7LLF|FJLJF-J|LJF7L7FJ||L-JL-7L---7FJ|FJLJ|F--J|LJFJL7|FJFJ-F-7||L--7L7F7|LJL7L-7L7L7L7||FJ|F-J|L-J|F7F7F7L-7|||L7FJ|L7F7FJ|||F--JJJ|LF-7\nL-LJL-|FLJF7FJF7|F-JL-JL7||F-7F-JF-7JLJF|L--7|L-7-|F-J|FJ|L7|F7|FJ||F7FJFJ||L--7L7J|FJ-L7LJ|L-JL-7L-77FJLJLJL7FJ|||FJL7L7||LJ7LJ|L-7F|LJ7F|-\nF-F-.-F-7FJLJFJLJ|F7F---JLJL7LJF-JFL---7|F--JL--JFJL--7L7L-JLJLJ|FJ|||L7|FJ|F7-L7|FJ|F7LL-7|F7|F7|F-JFJF--7F7LJJLJLJ-FJFJ|L---7|L--J-|.L7LLJ\n--7J-LL7LJF7FJF-7||LJF7F7F-7L--JF-----7||L-7F7F7FJF---JFJF------JL7LJ|FJ||FJ||F-J|L7||L---JLJL-J||L7.L7|F-J|L-------7L-JFL----JF7F7F7L|||LLJ\nL|FJFFLL--JLJFL7|LJF7||||L7L--7LL----7||L--J|LJ|L7L--7FJFJF7F-7FF7L-7|L7||L7||L-7|7||L---------7LJFJF7LJL--JF-------JF---7F7-F7|||LJ|-LJ7--F\nL-J-77.||J7LF--JL--JLJLJL7L--7|F7F---JLJF7F7L7FJ.|F--J|FJFJ||FJFJ|F7|L-J||FJ||F-J|FJ|F--7F-----JF7L-JL-7F---JLF-----7|F--J|L-J||LJF-J-7LF-7J\nFJ--|.-FJ.-JL7F-----7F7F7L---J|||L---7F7||||FJL7FJL7F7||FJFJ|L7|FJ||L--7||L-J||F7LJFJ|F-JL-7F7F7||F-7F7|L--7F7|F---7||L-7FJF--J|F-JJ.L7.|--7\n|FJ|.FJL--7F|LJ.F---J||||F---7LJL----J|||||||F-JL-7||LJ|L7L7|FJ|L7||LF7|||F--JLJL-7|FJL7F7F||LJLJ||-|||L--7LJLJL--7LJ|F-J|FJF7L||F7-F|7-J.|7\nL|-F||7.F7F-77F7L--7FJLJ||F--JF-------JLJLJLJL-7F-JLJF-JFJFJ|L7|FJ||FJ||LJL-7F7F--J|L7FJ|L-J|F---JL7LJL7F7L-------JF7||F-JL-JL-JLJL77L77L|L7\nL|FFLF77|FL7L-JL---J|F--J|L-7FJF-------7F7F7F7FJL---7|F7|FJ-L7LJ|FJ|L7|L7F--J|||F-7L-JL7L7F-JL7F7F7|F-7LJL-7F7JF7F7|||||F7F7F7F---7L77LL-77|\n-JFL||L7F7.L---7F7F7|L---JF7LJ7L---7FF7LJLJ||LJF7F7FJ||LJL7F7|F-JL7L7||FJ||F7||||FJF---J7LJF--J|LJLJL7L---7LJL-JLJLJLJ|||LJLJ|L--7L7L77J.|-F\n|.-FFL7LJL----7LJLJ||F----JL-------JFJL--7FJ|F-JLJ|L7LJF7FJ|||L7JFJFJ||L7|FJLJ|||L7|F--7F7.|F-7|F----JF7F7L-7F7F------J|L---7|F7FJ-L7L7----7\n7..7LLL---7F-7L7JF7LJL--7F7F7F7F---7|F---JL7|L---7L7|F-JLJ||||FJFJFJ||L7|LJF--JLJFJLJF-J|L7LJFJ|L7F7F7|LJL-7|||L7F7F7LFJF7F7|LJ|L7F7L-JFF7.|\nL7.J-|-JJ7||-L7L-JL-7F7FLJLJ||||F-7LJL----7LJF-7JL7||L7F-7FJLJ|.|FJF7L7||F-JF-77FJF7FJF7|FJF7|FJ7LJ||LJF7F7|LJL7LJLJL-JFJLJLJF7L7LJL-7F-7JF-\nFFF7.-7JLFLJF7L----7|||F7F7LLJLJL7|F-7F---JF7L7|F-J|L7||FJL--7L7|L7|L7||||F7L7|FJFJLJFJLJ|FJ|LJF7F7LJF-JLJ|L-7FJF-7F7F7L-7FF-JL7L----JL7L-77\n|7.-7.|.FL.FJL7F---JLJLJLJL7F7F7FJLJFJL---7|L7||L-7L-JLJL7F7.|FJ|FJL7LJ||LJ|FJ||FJF7.L-7FJL7L77|||L7.L---7|F-J|FJFJ|LJ|F7L7|F--JF--77F-JF-J-\n.L7|.L-7.|FJF7LJF-7F--7F7F-J|LJ|L--7L-----J|FJ||F7L--7F--J||FJL7||F7L-7||F-JL7|||||L7JFJ|F7|FJFJ||FJF7F7FJLJF7|L7L7L7FJ|L-J||LF7L7FJFL-7||.L\n.|||..FF--L-JL-7|FJ|F7LJ||F7L-7|F-7L7F7F-7-|L-J|||F--JL7F-J|L-7LJLJL7J||||LF7|LJL7L7|FJFJ|||L7L7||L7|LJ|L7FFJ|L-JFJFJL7L--7|L-JL-J|F-7FJL777\n-JLF.J-|FF7JF-7LJL-J|L--JLJ|F7||L7L-J|||FJFJF--J||L--7FJL-7||FJF7F--JFJLJL7|||F--JL||L7|FJLJFJL|||FJL-7|FL7L7L--7L-JF7L7F-J|F-----J|FJ|F-JL|\n|7JFF7F--JL7L7|LF--7L----7FJ||||FL-7FJ||L7|FJLF7||F7FJ|F7FJ|FJFJLJF-7L-7F-J||||F-7FJ|FJ||F7FJ|FJ||L7F-J|F-JFJF--JF7FJL7|L--JL-7-F7FJL7||F7F|\n-L7.L-L---7L-JL7L-7|F----JL-JLJL---J|FJL7|||F7|||||||FJ||L7||FJF7-|FJF7||F7|||||FJL7|L7|||LJF7L7|L7|L7FJL--JFJF7F|LJF7|L7F-7F-JFJLJF7LJLJ|77\n|.L|.FLJ.L|F7F7L-7||L-7F--7F7F7F---7|L7FJ||LJ|||||||||FJ|FJ||L7|L7||FJLJ||||LJ||L7FJL7|||L7FJ|FJL7||FJ|F7F-7L-JL-JF-J||FJ|FJL--JF--J|F7F7L-7\nFJJ|-|L|-7LJLJL-7||L-7LJF7LJLJLJF--JL7||L||F-J|LJ||||LJFJL7LJFJ|.LJ|L7F-J||L7J|L7LJF-J||L7||FJ|F7||LJFJ|||FJF--7F-JF-J|L7|L-7F-7|F-7|||||F7|\nL|FL-|-|JFJF----JLJF7L-7||F-77F7L7F-7||L7||L-7L-7||||F-JF7|F7L-JF--JFJ|F7|L7L7L-JF-JF7|L7|LJL-J|LJL7LL7|LJL7L7FJL-7L-7L7||F-JL7|LJFJ||||||LJ\nLF-J7|L||.|L-----7FJ|F7|||L7L-JL-J|FJ||FJ|L-7L7FJLJ|||F7||LJL--7L7F7|||||L7L7L--7L-7|||.|L-7F--JF7FJF-JL--7L7|L7F-JF7L-J||L-7FJ|F7|-LJ||||||\n.7JF-7-J-FF7F7F--J|FJ||LJL-JF---7FJL-J|L7L7FJFJL-7.|||||||F7F-7L7|||L7|||FJFJF7FJF-J|||FJF-J|F-7|||7L-7F-7L7||FJL--JL--7|L-7|L7LJ||FJ-LJLJ-7\nF7.FF-FJLFJLJLJF7FJL-JL-7F-7|F--JL7F--JFJ.|L7L7F7L7LJLJLJ||LJFJFJLJ|FJ||LJF|FJ|L7L7FJ||L7L7FJ|FJ||L-7FJL7|FJLJL7F7F---7||F7|L7L-7LJ----||LL|\nLJF-LJJ.FL--7F-JLJF7F-7FJ|FJ||F7F7|L--7L-7|FJFJ|L7L--7FF-JL-7L-JF--J|FJL7F-J|||FJFJ|FJL7L7|L7|L7||F7|L7FJLJ.F7FJ||L-7FJ|||||FJF-J.|.|.F-|7.L\n.L-7|-FF-F--J|F--7||L7LJFJL7|LJ|||L7F-JF-JLJ|L7L7|F-7L7|F7F7L-77L7F7|L7FJ|F7L7||FJFJL--JJ||7LJFLJ||||FJL----J||FJ|F7||FJ||LJL7L7J-7.L|JF|77|\n7.L-JF.L-L7F7||F7LJL7L-7L-7||F-J||FJ|F7L-----7L7|||L|FJLJ|||F7L77LJ|L7||FJ||FJ|||FJF7F---JL--7F--J|LJ|F7F7F-7|||-LJ||LJF|L77F|FJ|LF7|L.|7FL-\nLJ7FFJ7J|.||LJLJL--7|FFJF-JLJL-7||L7LJL7F--7FJ7LJ|L7LJF--J||||FJF77L-JLJL7|||-||||.|||F--7F7FJL--7L7FJ|||||FJ||L-7FJL--7L7L7FJL--7||J.L|LFFJ\nL|FFF.L7L-LJF------JL-JFJJF7F7FJ|L7L7FFJL77|L7F--JFJF-JF-7||||L-JL---7F--J||L7||||FJ||L7FJ||L-7F7|FJ|FJ||LJL7||F7|L-7F7|7L7|L7F--J||77F|7JLJ\n.F|FJ-LLJL|.L---7F7F-7FJF-JLJLJFJ||FJFJF7L7L-JL--7L7|F7|F|||||F7F--7FJL--7||FJLJLJL7LJFJL7|L-7||LJL7||FJ|F7FJ|LJ|L-7|||L-7|L7||7F7||F7-F7L|J\nF7J||-|F-JL7FLF7||||FJ|-L7F-7F7L-7||LL-JL7L---7F-JFJLJ||FJ|LJ|||L-7|L7F--J||L7F7JF7L-7L-7LJF7|||F-7|||L7LJ||FJF-JF-J||L7FJ|FJ|L-JLJLJL-JL7LF\n|LFL7F-7-7LLF-JLJ|LJL7|F-JL7LJL7FJLJF----JF7F-J|F7L-7FJ|L7L7.|||F-JL7||F7FJL7LJ|FJL--JF7L7FJLJ|LJFJ|LJ-L7FJLJ7|F7L-7||.|L7||FJF7F-7F----7|.|\nJ-JLF7F-.-7-L7F7FJJF7LJL-7FJ-F-JL-7.L-7F7FJ|L-7LJL7FJL7|FJFJFJ||L-7-||LJ|L-7|F7|L--7F-JL7|L--7L7-L7|7F7FJL--7FJ||F-JLJFJFJ|||FJ|L7LJJ.L|LJ7-\n|L-7J.|.F|J|LLJLJFFJ|F---J|F7|F7F7|F--J||L7L--J-F-JL-7||L7||L7||F7|FJL-7L-7|||LJF--JL--7||F--JFJF-JL-J|L7F7FJL7||L--7L|FJFJ||||L7L7.LLL7JF||\n|..|||-.||-7J-F--7L7|L-7F7LJ|||||||L--7|L7L----7|F7F7|||FJ|F-J|||||L7F7|F-J||L7JL-7F7F7|LJL--7|LL7F7F7L7||||F7|||F7FJFJL7L-JLJ-JL-J7F7F|||77\nJ.7.LFJ7LLF-7-L-7|L|L--J||F-JLJ||||F--JL7|F----JLJ||LJLJL7|L7FJLJLJFJ||||F7|L-JF--J||||L7-F--JL7FJ||||FJLJ|LJ|LJ||LJ-|F-J|LJLJ.L|L.|LJ-L7|L|\nFFF-.L.FJ-LJF---JL7L7F7FJ|L---7||||L-7F7||L-7F7F--JL---7FJ|FJL--7F7L-J|||||L7FFL--7|LJ|FJFJF-7FJ|FJLJ|L-7FJF-JF-JL-7LLJ7FF.L|LF-|-7|F||7LJF|\n---.7.F|JL|FL----7L-J|||7L7F7FJ|||L7FJ||||F7LJ|L--7F-7FJL7|L7F-7LJL7F-J|||L7L7F---JL-7|L7L7|FJL7|L7F-JF7|L7L7LL-7F7L7JJF777FJ-J|L7L77F7-7LLL\n||.FL.-|-77|F----JF-7||L7-LJ||-LJL7||FJ|||||F7|F--JL7|L7LLJ-LJ-L7F-J|F7|||FJFJ|F7F7F-JL7L7||L7FJ|FJL-7||L7|FJ77FJ|L7L7-FF7FLJ7J|JJ..F-7.J|JJ\n.7F7J7J.|JF-L--7F7|FJ||FJF--JL-7F-J|LJFJ|||||||L7F7FJ|FJJ.LF----JL7FJ|||LJL7|FJ||||L--7L7|LJ7||L|L7-FJ|L7|||L|F|FJJL-J..J77--F.7LF-J|LJ-LL--\nFJF|-|FFFJLF---J|||L7|||FJF-7F-J|F7L7F|FJ||||LJFJ||L7LJJ7F|L--7F7FJL7||L7JLLJ|FJLJL7F-JFLJ-F-JL7|FJFJFJFJ|LJ-F-J|J7|-J-|.|-.LF-LF7JFJ..F||..\nJ.LF.LL-|.LL-7F7|LJL|||||FJFJ|F-J||FJFJL7LJLJF-JFJ|FJJ|7F--F--J||L-7LJL7|JJL-||F7F-JL--7LJ.L-7FJ|L7L7L7L7L-7-L7FJ.|-.L-|F|.|J|L|||FJ777-LL77\nLF7L||-FFF.LLLJ||FF7||||LJJL7|L7FJ|L7L7FJJL|JL7FJFJL7.77L.FL-7FJ|F7|LJFLJ7..FLJ|LJF7F--J-7-F-J|L|FJFJFJFJF7|JJLJF7..F----L-7FL7-|7L|LF-.LLJ7\n.F|L|7-L-7J7J..LJ-|LJ|||7.LFJL7LJFJFJFJL77F|7LLJLL7FJ-L7FLJ.L||J||LJLF|7||7F-.L|F7||L-7JJF-L--J.LJLL-JJL-JLJ.F-L7LJ.|.|.||LJ7JJFL7F||JJFLLF|\nF|7.J|7...|F7F-JLF|F7|LJ-J7L-7|J7|FJFJF-J7JFJ|L|JLLJF|.L-|LJ|||FJL7|-L-|-LFL-7-LJLJ|F-JJ.J-JLJ-FJ.L|-L-7L.J--7|J.|.L7-7-LLJF|7F77.-L|-FF-F7J\n.||FL-J-77L-L|7.LF||||||7L7|-LJJ-|L7L7|J---JFL--.J||---..-|7LLJ|F7L-7JJ|7|||FFF7L|L|L7F--L7JLJ.F|7|LF7F-7L7F7LJ7F--|J.L.L|-LJ-J777LFL--JF-7.\n7.L7J7FFJFLL7L-FLFJ||L7-F7FJ7-|L|L7|-LJJ7LJL|JJ.|J|JF.LF.|L7LJLLJL--JL7J77.LJ||F-7JL7|J.7J|.|.F|FF-FJJ|F|.JLJ|.F-FF|.7.-|L-JF--JFJFJJ|J-FJL-\nJ.|7-F7.LLJL|.77LL-JL-J7F-JLL7|.F7LJ7FL-J.FL|.|-.7.F|F-7.-7JJ|FL||-||.|7|-7-JJ|LLLJ|LJ7FJ.JFFL7JL--J-F77J-F77F-|-F.77.L.LF77FJ|LF-7.FJL-LJ|.\n|.7L-|JL.LF777F|.|J|.JJ-|.-.|L.FFJJ||-L-|7L7JF7.7JFJLF.|J|||LF--JJ7.7.J-L||.|FL7||-L7L--7FLL-7|77F7J-|.J7.L7JLFL.LF7FF|.F7F|.FFJ|FJF||.7J7.J\n|7|.FJ.J-.L|JF-JFJ.|.|LFJ-|FJFF7JJ.||LL7--J|FLJ7.LF-J|7L7L7J.LJF|7L-7-|JJ.FF-FL7-L7L|JLFL7.|F7JF-J-7FL7L7-|J77|LFF-|--J-F77JFL|.|J7.L7-JLJ7|\n-F7-||7JFFL|L|.|F-7L7J7JFFF---L7JJ.7-.FFJ7F.|LFJ--J.F7JFJJ.F-7--77.F|J|FF7LJF--7J|L7.|.FJLF-7LFJ|-|F-77.LF----7LLJL||.LLJLJFF7J7|-77.-.LJF-J\nLJ--|J7.LJFJ7|7FJ---L77LLF7J7.FJ7F7L77.J.FLF-FJJ.FL.F--FJ.F-FF7J|7FFJFF|-7|JLL--7J-J7|7LF7LLF---7F7--F7F-JL-.|7LF|7F|--.FJ.FJ|7F|-L77|L7FL-J\n|JL-JJ-|.FJ-LL7LF7-F-JL--LJL|---|JLJJJ.|-JLLJ|J.FJ.FLLJJLJ-J|L-.LF-J-LJLLJ-7.L--L..LLJ-.LJJFJ---JL7J.LFJLF-J7.|-JJLJ.|J-JJ|L7J|.|.LL-7.|J.-J';
+	var debugText = '';
+	var data = ($author$project$Aoc10Pretty$inputname === 'sample') ? sample : input;
+	var lines = A2($elm$core$String$split, '\n', data);
+	var field = $tortus$elm_array_2d$Array2D$fromList(
+		A2($elm$core$List$map, $elm$core$String$toList, lines));
+	var rowCount = $tortus$elm_array_2d$Array2D$rows(field);
+	var startPos = A2(
+		$elm$core$Maybe$withDefault,
+		_Utils_Tuple2(0, 0),
+		$author$project$Aoc10Pretty$findStartPos(field));
+	var fieldWithoutS = A2($author$project$Aoc10Pretty$replaceStart, startPos, field);
+	var loop = A2($author$project$Aoc10Pretty$findLoop, startPos, field);
+	var replacement = A2($author$project$Aoc10Pretty$findReplacement, startPos, field);
+	var linesWithoutS = A2(
+		$elm$core$List$map,
+		A2(
+			$elm$core$String$replace,
+			'S',
+			$elm$core$String$fromList(
+				_List_fromArray(
+					[replacement]))),
+		lines);
+	var colCount = $tortus$elm_array_2d$Array2D$columns(field);
+	var emptyField = A3($tortus$elm_array_2d$Array2D$repeat, rowCount, colCount, ' ');
+	var loopField = A3($author$project$Aoc10Pretty$justLoop, loop, fieldWithoutS, emptyField);
+	var plainLines = A2(
+		$elm$core$List$map,
+		$elm$core$String$fromList,
+		A2(
+			$elm$core$List$map,
+			$elm$core$Array$toList,
+			A2(
+				$elm$core$List$filterMap,
+				function (rowNo) {
+					return A2($tortus$elm_array_2d$Array2D$getRow, rowNo, loopField);
+				},
+				A2($elm$core$List$range, 0, rowCount))));
+	var insideTiles = $elm$core$List$concat(
+		A2(
+			$elm$core$List$indexedMap,
+			F2(
+				function (y, line) {
+					return A2(
+						$elm$core$List$map,
+						function (x) {
+							return _Utils_Tuple2(x, y);
+						},
+						$author$project$Aoc10Pretty$findInside(line));
+				}),
+			plainLines));
+	var model = {
+		G: debugText,
+		Y: emptyField,
+		H: $elm$core$List$length(insideTiles),
+		I: insideTiles,
+		J: linesWithoutS,
+		K: loop,
+		Q: startPos,
+		R: ($elm$core$List$length(loop) / 2) | 0
+	};
+	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+};
+var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
+var $author$project$Aoc10Pretty$subscriptions = function (model) {
+	return $elm$core$Platform$Sub$none;
+};
+var $author$project$Aoc10Pretty$updateModel = function (model) {
+	return model;
+};
+var $author$project$Aoc10Pretty$update = F2(
+	function (msg, model) {
+		return _Utils_Tuple2(
+			$author$project$Aoc10Pretty$updateModel(model),
+			$elm$core$Platform$Cmd$none);
 	});
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$json$Json$Encode$string = _Json_wrap;
@@ -6653,155 +6350,69 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$Aoc18$Click = {$: 0};
-var $author$project$Aoc18$MouseMove = function (a) {
-	return {$: 2, a: a};
-};
-var $elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
-	});
-var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 0, a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $elm$svg$Svg$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions = {ac: true, af: false};
-var $elm$virtual_dom$VirtualDom$Custom = function (a) {
-	return {$: 3, a: a};
-};
-var $elm$html$Html$Events$custom = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Custom(decoder));
-	});
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$Event = F6(
-	function (keys, button, clientPos, offsetPos, pagePos, screenPos) {
-		return {aS: button, aV: clientPos, a8: keys, bc: offsetPos, bg: pagePos, bm: screenPos};
-	});
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$BackButton = 4;
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$ErrorButton = 0;
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$ForwardButton = 5;
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$MainButton = 1;
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$MiddleButton = 2;
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$SecondButton = 3;
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$buttonFromId = function (id) {
-	switch (id) {
-		case 0:
-			return 1;
-		case 1:
-			return 2;
-		case 2:
-			return 3;
-		case 3:
-			return 4;
-		case 4:
-			return 5;
-		default:
-			return 0;
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
 	}
 };
-var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$json$Json$Decode$int = _Json_decodeInt;
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$buttonDecoder = A2(
-	$elm$json$Json$Decode$map,
-	$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$buttonFromId,
-	A2($elm$json$Json$Decode$field, 'button', $elm$json$Json$Decode$int));
-var $elm$json$Json$Decode$float = _Json_decodeFloat;
-var $mpizenberg$elm_pointer_events$Internal$Decode$clientPos = A3(
-	$elm$json$Json$Decode$map2,
-	F2(
-		function (a, b) {
-			return _Utils_Tuple2(a, b);
-		}),
-	A2($elm$json$Json$Decode$field, 'clientX', $elm$json$Json$Decode$float),
-	A2($elm$json$Json$Decode$field, 'clientY', $elm$json$Json$Decode$float));
-var $mpizenberg$elm_pointer_events$Internal$Decode$Keys = F4(
-	function (alt, ctrl, meta, shift) {
-		return {aP: alt, aX: ctrl, a9: meta, bn: shift};
-	});
-var $elm$json$Json$Decode$bool = _Json_decodeBool;
-var $elm$json$Json$Decode$map4 = _Json_map4;
-var $mpizenberg$elm_pointer_events$Internal$Decode$keys = A5(
-	$elm$json$Json$Decode$map4,
-	$mpizenberg$elm_pointer_events$Internal$Decode$Keys,
-	A2($elm$json$Json$Decode$field, 'altKey', $elm$json$Json$Decode$bool),
-	A2($elm$json$Json$Decode$field, 'ctrlKey', $elm$json$Json$Decode$bool),
-	A2($elm$json$Json$Decode$field, 'metaKey', $elm$json$Json$Decode$bool),
-	A2($elm$json$Json$Decode$field, 'shiftKey', $elm$json$Json$Decode$bool));
-var $elm$json$Json$Decode$map6 = _Json_map6;
-var $mpizenberg$elm_pointer_events$Internal$Decode$offsetPos = A3(
-	$elm$json$Json$Decode$map2,
-	F2(
-		function (a, b) {
-			return _Utils_Tuple2(a, b);
-		}),
-	A2($elm$json$Json$Decode$field, 'offsetX', $elm$json$Json$Decode$float),
-	A2($elm$json$Json$Decode$field, 'offsetY', $elm$json$Json$Decode$float));
-var $mpizenberg$elm_pointer_events$Internal$Decode$pagePos = A3(
-	$elm$json$Json$Decode$map2,
-	F2(
-		function (a, b) {
-			return _Utils_Tuple2(a, b);
-		}),
-	A2($elm$json$Json$Decode$field, 'pageX', $elm$json$Json$Decode$float),
-	A2($elm$json$Json$Decode$field, 'pageY', $elm$json$Json$Decode$float));
-var $mpizenberg$elm_pointer_events$Internal$Decode$screenPos = A3(
-	$elm$json$Json$Decode$map2,
-	F2(
-		function (a, b) {
-			return _Utils_Tuple2(a, b);
-		}),
-	A2($elm$json$Json$Decode$field, 'screenX', $elm$json$Json$Decode$float),
-	A2($elm$json$Json$Decode$field, 'screenY', $elm$json$Json$Decode$float));
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$eventDecoder = A7($elm$json$Json$Decode$map6, $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$Event, $mpizenberg$elm_pointer_events$Internal$Decode$keys, $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$buttonDecoder, $mpizenberg$elm_pointer_events$Internal$Decode$clientPos, $mpizenberg$elm_pointer_events$Internal$Decode$offsetPos, $mpizenberg$elm_pointer_events$Internal$Decode$pagePos, $mpizenberg$elm_pointer_events$Internal$Decode$screenPos);
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions = F3(
-	function (event, options, tag) {
-		return A2(
-			$elm$html$Html$Events$custom,
-			event,
-			A2(
-				$elm$json$Json$Decode$map,
-				function (ev) {
-					return {
-						r: tag(ev),
-						ac: options.ac,
-						af: options.af
-					};
-				},
-				$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$eventDecoder));
-	});
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousemove', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
-var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
+var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$Attributes$fontFamily = _VirtualDom_attribute('font-family');
+var $elm$svg$Svg$Attributes$fontSize = _VirtualDom_attribute('font-size');
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
+var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
-var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
-var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
-var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
-var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
+var $author$project$Aoc10Pretty$unitSize = 4;
 var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
 var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
-var $author$project$Aoc18$toFilledBox = F3(
-	function (fillColor, unitSize, _v0) {
-		var xPos = _v0.a;
-		var yPos = _v0.b;
-		var yVal = unitSize * yPos;
-		var xVal = unitSize * xPos;
+var $author$project$Aoc10Pretty$toCharText = F3(
+	function (yPos, xPos, ch) {
+		var yOffset = 8;
+		var yVal = yOffset + (yPos * $author$project$Aoc10Pretty$unitSize);
+		var xOffset = 2;
+		var xVal = xOffset + (xPos * $author$project$Aoc10Pretty$unitSize);
+		return A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x(
+					$elm$core$String$fromInt(xVal)),
+					$elm$svg$Svg$Attributes$y(
+					$elm$core$String$fromInt(yVal)),
+					$elm$svg$Svg$Attributes$fontSize('9px'),
+					$elm$svg$Svg$Attributes$fontFamily('monospace')
+				]),
+			_List_fromArray(
+				[
+					$elm$svg$Svg$text(
+					$elm$core$String$fromChar(ch))
+				]));
+	});
+var $author$project$Aoc10Pretty$lineToCharTexts = F2(
+	function (y, line) {
+		return A2(
+			$elm$core$List$indexedMap,
+			$author$project$Aoc10Pretty$toCharText(y),
+			$elm$core$String$toList(line));
+	});
+var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$svg$Svg$Attributes$opacity = _VirtualDom_attribute('opacity');
+var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
+var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $author$project$Aoc10Pretty$toColoredBox = F2(
+	function (fillColor, _v0) {
+		var xStart = _v0.a;
+		var yStart = _v0.b;
+		var yVal = $author$project$Aoc10Pretty$unitSize * yStart;
+		var xVal = $author$project$Aoc10Pretty$unitSize * xStart;
 		return A2(
 			$elm$svg$Svg$rect,
 			_List_fromArray(
@@ -6811,71 +6422,260 @@ var $author$project$Aoc18$toFilledBox = F3(
 					$elm$svg$Svg$Attributes$y(
 					$elm$core$String$fromInt(yVal)),
 					$elm$svg$Svg$Attributes$width(
-					$elm$core$String$fromInt(unitSize)),
+					$elm$core$String$fromInt($author$project$Aoc10Pretty$unitSize)),
 					$elm$svg$Svg$Attributes$height(
-					$elm$core$String$fromInt(unitSize)),
+					$elm$core$String$fromInt($author$project$Aoc10Pretty$unitSize)),
+					$elm$svg$Svg$Attributes$opacity('0.8'),
 					$elm$svg$Svg$Attributes$fill(fillColor)
 				]),
 			_List_Nil);
 	});
-var $author$project$Aoc18$toTrenchBox = F2(
-	function (unitSize, _v0) {
-		var xPos = _v0.a;
-		var yPos = _v0.b;
-		var yVal = unitSize * yPos;
-		var xVal = unitSize * xPos;
+var $author$project$Aoc10Pretty$pipeStrokeWidth = '1';
+var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
+var $author$project$Aoc10Pretty$toOutlineBox = function (_v0) {
+	var xStart = _v0.a;
+	var yStart = _v0.b;
+	var yVal = $author$project$Aoc10Pretty$unitSize * yStart;
+	var xVal = $author$project$Aoc10Pretty$unitSize * xStart;
+	return A2(
+		$elm$svg$Svg$rect,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$x(
+				$elm$core$String$fromInt(xVal)),
+				$elm$svg$Svg$Attributes$y(
+				$elm$core$String$fromInt(yVal)),
+				$elm$svg$Svg$Attributes$width(
+				$elm$core$String$fromInt($author$project$Aoc10Pretty$unitSize)),
+				$elm$svg$Svg$Attributes$height(
+				$elm$core$String$fromInt($author$project$Aoc10Pretty$unitSize)),
+				$elm$svg$Svg$Attributes$strokeWidth($author$project$Aoc10Pretty$pipeStrokeWidth),
+				$elm$svg$Svg$Attributes$stroke('red'),
+				$elm$svg$Svg$Attributes$fill('None'),
+				$elm$svg$Svg$Attributes$opacity('0.8')
+			]),
+		_List_Nil);
+};
+var $elm$svg$Svg$line = $elm$svg$Svg$trustedNode('line');
+var $author$project$Aoc10Pretty$pipeColor = 'darkslategrey';
+var $elm$svg$Svg$Attributes$x1 = _VirtualDom_attribute('x1');
+var $elm$svg$Svg$Attributes$x2 = _VirtualDom_attribute('x2');
+var $elm$svg$Svg$Attributes$y1 = _VirtualDom_attribute('y1');
+var $elm$svg$Svg$Attributes$y2 = _VirtualDom_attribute('y2');
+var $author$project$Aoc10Pretty$toHorizontalPipe = F2(
+	function (yPos, xPos) {
+		var yCenter = (yPos * $author$project$Aoc10Pretty$unitSize) + (($author$project$Aoc10Pretty$unitSize / 2) | 0);
+		var xRight = (xPos + 1) * $author$project$Aoc10Pretty$unitSize;
+		var xLeft = xPos * $author$project$Aoc10Pretty$unitSize;
 		return A2(
-			$elm$svg$Svg$rect,
+			$elm$svg$Svg$line,
 			_List_fromArray(
 				[
-					$elm$svg$Svg$Attributes$x(
-					$elm$core$String$fromInt(xVal)),
-					$elm$svg$Svg$Attributes$y(
-					$elm$core$String$fromInt(yVal)),
-					$elm$svg$Svg$Attributes$width(
-					$elm$core$String$fromInt(unitSize)),
-					$elm$svg$Svg$Attributes$height(
-					$elm$core$String$fromInt(unitSize)),
-					$elm$svg$Svg$Attributes$fill('red')
+					$elm$svg$Svg$Attributes$x1(
+					$elm$core$String$fromInt(xLeft)),
+					$elm$svg$Svg$Attributes$x2(
+					$elm$core$String$fromInt(xRight)),
+					$elm$svg$Svg$Attributes$y1(
+					$elm$core$String$fromInt(yCenter)),
+					$elm$svg$Svg$Attributes$y2(
+					$elm$core$String$fromInt(yCenter)),
+					$elm$svg$Svg$Attributes$strokeWidth($author$project$Aoc10Pretty$pipeStrokeWidth),
+					$elm$svg$Svg$Attributes$stroke($author$project$Aoc10Pretty$pipeColor)
 				]),
 			_List_Nil);
 	});
+var $elm$svg$Svg$Attributes$points = _VirtualDom_attribute('points');
+var $elm$svg$Svg$polyline = $elm$svg$Svg$trustedNode('polyline');
+var $author$project$Aoc10Pretty$toNorthEastPipe = F2(
+	function (yPos, xPos) {
+		var yNorth = yPos * $author$project$Aoc10Pretty$unitSize;
+		var yCenter = (yPos * $author$project$Aoc10Pretty$unitSize) + (($author$project$Aoc10Pretty$unitSize / 2) | 0);
+		var xEast = (xPos + 1) * $author$project$Aoc10Pretty$unitSize;
+		var xCenter = (xPos * $author$project$Aoc10Pretty$unitSize) + (($author$project$Aoc10Pretty$unitSize / 2) | 0);
+		var northPt = $elm$core$String$fromInt(xCenter) + (',' + $elm$core$String$fromInt(yNorth));
+		var eastPt = $elm$core$String$fromInt(xEast) + (',' + $elm$core$String$fromInt(yCenter));
+		var centerPt = $elm$core$String$fromInt(xCenter) + (',' + $elm$core$String$fromInt(yCenter));
+		var pts = northPt + (' ' + (centerPt + (' ' + eastPt)));
+		return A2(
+			$elm$svg$Svg$polyline,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$points(pts),
+					$elm$svg$Svg$Attributes$fill('none'),
+					$elm$svg$Svg$Attributes$strokeWidth($author$project$Aoc10Pretty$pipeStrokeWidth),
+					$elm$svg$Svg$Attributes$stroke($author$project$Aoc10Pretty$pipeColor)
+				]),
+			_List_Nil);
+	});
+var $author$project$Aoc10Pretty$toNorthWestPipe = F2(
+	function (yPos, xPos) {
+		var yNorth = yPos * $author$project$Aoc10Pretty$unitSize;
+		var yCenter = (yPos * $author$project$Aoc10Pretty$unitSize) + (($author$project$Aoc10Pretty$unitSize / 2) | 0);
+		var xWest = xPos * $author$project$Aoc10Pretty$unitSize;
+		var xCenter = (xPos * $author$project$Aoc10Pretty$unitSize) + (($author$project$Aoc10Pretty$unitSize / 2) | 0);
+		var westPt = $elm$core$String$fromInt(xWest) + (',' + $elm$core$String$fromInt(yCenter));
+		var northPt = $elm$core$String$fromInt(xCenter) + (',' + $elm$core$String$fromInt(yNorth));
+		var centerPt = $elm$core$String$fromInt(xCenter) + (',' + $elm$core$String$fromInt(yCenter));
+		var pts = northPt + (' ' + (centerPt + (' ' + westPt)));
+		return A2(
+			$elm$svg$Svg$polyline,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$points(pts),
+					$elm$svg$Svg$Attributes$fill('none'),
+					$elm$svg$Svg$Attributes$strokeWidth($author$project$Aoc10Pretty$pipeStrokeWidth),
+					$elm$svg$Svg$Attributes$stroke($author$project$Aoc10Pretty$pipeColor)
+				]),
+			_List_Nil);
+	});
+var $author$project$Aoc10Pretty$toSouthEastPipe = F2(
+	function (yPos, xPos) {
+		var ySouth = (yPos + 1) * $author$project$Aoc10Pretty$unitSize;
+		var yCenter = (yPos * $author$project$Aoc10Pretty$unitSize) + (($author$project$Aoc10Pretty$unitSize / 2) | 0);
+		var xEast = (xPos + 1) * $author$project$Aoc10Pretty$unitSize;
+		var xCenter = (xPos * $author$project$Aoc10Pretty$unitSize) + (($author$project$Aoc10Pretty$unitSize / 2) | 0);
+		var southPt = $elm$core$String$fromInt(xCenter) + (',' + $elm$core$String$fromInt(ySouth));
+		var eastPt = $elm$core$String$fromInt(xEast) + (',' + $elm$core$String$fromInt(yCenter));
+		var centerPt = $elm$core$String$fromInt(xCenter) + (',' + $elm$core$String$fromInt(yCenter));
+		var pts = southPt + (' ' + (centerPt + (' ' + eastPt)));
+		return A2(
+			$elm$svg$Svg$polyline,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$points(pts),
+					$elm$svg$Svg$Attributes$fill('none'),
+					$elm$svg$Svg$Attributes$strokeWidth($author$project$Aoc10Pretty$pipeStrokeWidth),
+					$elm$svg$Svg$Attributes$stroke($author$project$Aoc10Pretty$pipeColor)
+				]),
+			_List_Nil);
+	});
+var $author$project$Aoc10Pretty$toSouthWestPipe = F2(
+	function (yPos, xPos) {
+		var ySouth = (yPos + 1) * $author$project$Aoc10Pretty$unitSize;
+		var yCenter = (yPos * $author$project$Aoc10Pretty$unitSize) + (($author$project$Aoc10Pretty$unitSize / 2) | 0);
+		var xWest = xPos * $author$project$Aoc10Pretty$unitSize;
+		var xCenter = (xPos * $author$project$Aoc10Pretty$unitSize) + (($author$project$Aoc10Pretty$unitSize / 2) | 0);
+		var westPt = $elm$core$String$fromInt(xWest) + (',' + $elm$core$String$fromInt(yCenter));
+		var southPt = $elm$core$String$fromInt(xCenter) + (',' + $elm$core$String$fromInt(ySouth));
+		var centerPt = $elm$core$String$fromInt(xCenter) + (',' + $elm$core$String$fromInt(yCenter));
+		var pts = southPt + (' ' + (centerPt + (' ' + westPt)));
+		return A2(
+			$elm$svg$Svg$polyline,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$points(pts),
+					$elm$svg$Svg$Attributes$fill('none'),
+					$elm$svg$Svg$Attributes$strokeWidth($author$project$Aoc10Pretty$pipeStrokeWidth),
+					$elm$svg$Svg$Attributes$stroke($author$project$Aoc10Pretty$pipeColor)
+				]),
+			_List_Nil);
+	});
+var $author$project$Aoc10Pretty$toVerticalPipe = F2(
+	function (yPos, xPos) {
+		var yTop = yPos * $author$project$Aoc10Pretty$unitSize;
+		var yBot = (yPos + 1) * $author$project$Aoc10Pretty$unitSize;
+		var xCenter = (xPos * $author$project$Aoc10Pretty$unitSize) + (($author$project$Aoc10Pretty$unitSize / 2) | 0);
+		return A2(
+			$elm$svg$Svg$line,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x1(
+					$elm$core$String$fromInt(xCenter)),
+					$elm$svg$Svg$Attributes$x2(
+					$elm$core$String$fromInt(xCenter)),
+					$elm$svg$Svg$Attributes$y1(
+					$elm$core$String$fromInt(yTop)),
+					$elm$svg$Svg$Attributes$y2(
+					$elm$core$String$fromInt(yBot)),
+					$elm$svg$Svg$Attributes$strokeWidth($author$project$Aoc10Pretty$pipeStrokeWidth),
+					$elm$svg$Svg$Attributes$stroke($author$project$Aoc10Pretty$pipeColor)
+				]),
+			_List_Nil);
+	});
+var $author$project$Aoc10Pretty$toPipeShape = F3(
+	function (yPos, xPos, ch) {
+		switch (ch) {
+			case '|':
+				return $elm$core$Maybe$Just(
+					A2($author$project$Aoc10Pretty$toVerticalPipe, yPos, xPos));
+			case '-':
+				return $elm$core$Maybe$Just(
+					A2($author$project$Aoc10Pretty$toHorizontalPipe, yPos, xPos));
+			case 'F':
+				return $elm$core$Maybe$Just(
+					A2($author$project$Aoc10Pretty$toSouthEastPipe, yPos, xPos));
+			case '7':
+				return $elm$core$Maybe$Just(
+					A2($author$project$Aoc10Pretty$toSouthWestPipe, yPos, xPos));
+			case 'L':
+				return $elm$core$Maybe$Just(
+					A2($author$project$Aoc10Pretty$toNorthEastPipe, yPos, xPos));
+			case 'J':
+				return $elm$core$Maybe$Just(
+					A2($author$project$Aoc10Pretty$toNorthWestPipe, yPos, xPos));
+			default:
+				return $elm$core$Maybe$Nothing;
+		}
+	});
+var $author$project$Aoc10Pretty$toPipeShapes = F2(
+	function (y, line) {
+		return A2(
+			$elm$core$List$filterMap,
+			$elm$core$Basics$identity,
+			A2(
+				$elm$core$List$indexedMap,
+				$author$project$Aoc10Pretty$toPipeShape(y),
+				$elm$core$String$toList(line)));
+	});
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
-var $author$project$Aoc18$toSvg = function (model) {
-	var trenchBoxes = A2(
+var $author$project$Aoc10Pretty$toSvg = function (model) {
+	var startBox = $author$project$Aoc10Pretty$toOutlineBox(model.Q);
+	var loop = model.K;
+	var loopBoxes = A2(
 		$elm$core$List$map,
-		$author$project$Aoc18$toTrenchBox(model.u),
-		$elm$core$Set$toList(model.g.t));
-	var svgWidth = $elm$core$String$fromInt(model.u * model.g.K);
-	var svgHeight = $elm$core$String$fromInt(model.u * model.g.F);
-	var fillColor = model.g.w ? 'orange' : 'gainsboro';
-	var filledBoxes = A2(
+		$author$project$Aoc10Pretty$toColoredBox('palegreen'),
+		loop);
+	var lines = model.J;
+	var numberOfChars = A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		A2(
+			$elm$core$Maybe$map,
+			$elm$core$String$length,
+			$elm$core$List$head(lines)));
+	var svgWidth = $elm$core$String$fromInt($author$project$Aoc10Pretty$unitSize * numberOfChars);
+	var numberOfLines = $elm$core$List$length(lines);
+	var svgHeight = $elm$core$String$fromInt($author$project$Aoc10Pretty$unitSize * numberOfLines);
+	var pipeShapes = $elm$core$List$concat(
+		A2($elm$core$List$indexedMap, $author$project$Aoc10Pretty$toPipeShapes, lines));
+	var insideBoxes = A2(
 		$elm$core$List$map,
-		A2($author$project$Aoc18$toFilledBox, fillColor, model.u),
-		$elm$core$Set$toList(model.g.x));
-	var elements = _Utils_ap(trenchBoxes, filledBoxes);
+		$author$project$Aoc10Pretty$toColoredBox('deepskyblue'),
+		model.I);
+	var elements = _Utils_ap(
+		insideBoxes,
+		_Utils_ap(
+			loopBoxes,
+			_Utils_ap(
+				pipeShapes,
+				_List_fromArray(
+					[startBox]))));
+	var charTexts = $elm$core$List$concat(
+		A2($elm$core$List$indexedMap, $author$project$Aoc10Pretty$lineToCharTexts, lines));
 	return A2(
 		$elm$svg$Svg$svg,
 		_List_fromArray(
 			[
 				$elm$svg$Svg$Attributes$viewBox('0 0 ' + (svgWidth + svgHeight)),
 				$elm$svg$Svg$Attributes$width(svgWidth),
-				$elm$svg$Svg$Attributes$height(svgHeight),
-				$elm$svg$Svg$Events$onClick($author$project$Aoc18$Click),
-				$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove(
-				A2(
-					$elm$core$Basics$composeR,
-					function ($) {
-						return $.bc;
-					},
-					$author$project$Aoc18$MouseMove)),
-				$elm$svg$Svg$Attributes$style('background-color:white')
+				$elm$svg$Svg$Attributes$height(svgHeight)
 			]),
 		elements);
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $author$project$Aoc18$view = function (model) {
-	var s = $author$project$Aoc18$toSvg(model);
+var $author$project$Aoc10Pretty$view = function (model) {
+	var s = $author$project$Aoc10Pretty$toSvg(model);
 	return A2(
 		$elm$html$Html$table,
 		_List_Nil,
@@ -6909,7 +6709,7 @@ var $author$project$Aoc18$view = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Day 18: Lavaduct Lagoon')
+										$elm$html$Html$text('Day 10: Pipe Maze')
 									]))
 							]))
 					])),
@@ -7001,8 +6801,8 @@ var $author$project$Aoc18$view = function (model) {
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '36px'),
-								A2($elm$html$Html$Attributes$style, 'padding', '24px')
+								A2($elm$html$Html$Attributes$style, 'font-size', '24px'),
+								A2($elm$html$Html$Attributes$style, 'padding', '16px')
 							]),
 						_List_fromArray(
 							[
@@ -7020,32 +6820,33 @@ var $author$project$Aoc18$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										(model.g.C > 0) ? ($elm$core$String$fromInt(model.g.C) + ' m³') : 'Click to start!')
+										$elm$core$String$fromInt(model.R))
 									])),
 								A2(
 								$elm$html$Html$div,
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('')
+										$elm$html$Html$text(
+										$elm$core$String$fromInt(model.H))
 									])),
 								A2(
 								$elm$html$Html$div,
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('')
+										$elm$html$Html$text(model.G)
 									]))
 							]))
 					]))
 			]));
 };
-var $author$project$Aoc18$main = $elm$browser$Browser$element(
-	{a6: $author$project$Aoc18$init, bo: $author$project$Aoc18$subscriptions, bu: $author$project$Aoc18$update, bv: $author$project$Aoc18$view});
-_Platform_export({'Aoc18':{'init':$author$project$Aoc18$main(
+var $author$project$Aoc10Pretty$main = $elm$browser$Browser$element(
+	{aD: $author$project$Aoc10Pretty$init, aJ: $author$project$Aoc10Pretty$subscriptions, aL: $author$project$Aoc10Pretty$update, aM: $author$project$Aoc10Pretty$view});
+_Platform_export({'Aoc10Pretty':{'init':$author$project$Aoc10Pretty$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
 
-  var app = Elm.Aoc18.init({ node: document.getElementById("elm") });
+  var app = Elm.Aoc10Pretty.init({ node: document.getElementById("elm") });
 }
 catch (e)
 {

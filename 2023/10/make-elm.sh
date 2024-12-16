@@ -1,0 +1,1 @@
+elm make --optimize src/Aoc10Pretty.elm --output=index.html
