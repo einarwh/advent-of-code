@@ -6,8 +6,6 @@ open System.IO
 open System.Collections.Generic
 
 module Maze =
-    let getRowCount (a : 'a[,]) = a.GetLength(0)
-    let getColumnCount (a : 'a[,]) = a.GetLength(1)
     let get (a : 'a[,]) (x, y) = 
         Array2D.get a y x
     let positions (a : 'a[,]) = 
@@ -27,7 +25,6 @@ type Path = {
 }
 
 type Distance = int64
-// type DistanceMap = Map<Path, int> 
 
 type PQ = PriorityQueue<Path * Distance, Distance>
 
@@ -40,13 +37,6 @@ let move dir (x, y) =
 
 let readLines =
     File.ReadAllLines >> Array.filter ((<>) String.Empty)
-
-let getPathInDirection (x, y) dir = 
-    match dir with 
-    | N -> { pos = (x, y - 1); dir = N }
-    | W -> { pos = (x - 1, y); dir = W } 
-    | S -> { pos = (x, y + 1); dir = S }
-    | E -> { pos = (x + 1, y); dir = E }
 
 let turnLeft dir = 
     match dir with 
