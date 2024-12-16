@@ -15,7 +15,7 @@ module Maze =
 
 type Dir = N | W | S | E
 
-type Pos = (int*int)
+type Pos = (int * int)
 
 type Maze = char[,]
 
@@ -102,7 +102,7 @@ let solve startPos (maze : Maze)  =
     |> List.sort
     |> List.head 
 
-let findStartPos (maze : Maze) : Pos = 
+let findStartPos maze = 
     let rec find positions = 
         match positions with 
         | [] -> failwith "?"
@@ -112,7 +112,6 @@ let findStartPos (maze : Maze) : Pos =
     find <| Maze.positions maze
 
 let run fileName =
-    let charAsInt ch = Char.GetNumericValue(ch) |> int
     let lines = readLines fileName |> Array.map (Seq.toArray)
     let maze = lines |> array2D
     let startPos = findStartPos maze 
