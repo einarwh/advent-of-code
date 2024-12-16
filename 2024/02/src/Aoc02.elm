@@ -1259,7 +1259,10 @@ view model =
     elements = model.reports |> List.concatMap toReportHtmlElement
   in 
     Html.table 
-      [ Html.Attributes.style "width" "1080px"]
+      [ 
+        Html.Attributes.style "width" "1080px"
+      , Html.Attributes.style "font-family" "Courier New"
+      ]
       [ Html.tr 
           [] 
           [ Html.td 
@@ -1312,7 +1315,7 @@ view model =
               [ Html.input 
                 [ Html.Attributes.type_ "checkbox", onClick ToggleDampener, Html.Attributes.checked model.useDampener ] 
                 []
-              , Html.label [] [ Html.text "Use dampener" ]
+              , Html.label [] [ Html.text " Use dampener" ]
             ] ]
       , Html.tr 
           []
@@ -1321,6 +1324,7 @@ view model =
               , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "24px"
+              , Html.Attributes.style "padding-top" "10px"
               , Html.Attributes.style "width" "200px" ] 
               [ 
                 Html.div [] [ Html.text (String.fromInt model.safeReports) ]
@@ -1333,7 +1337,7 @@ view model =
               , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" textFontSize
-              , Html.Attributes.style "padding" "20px"
+              , Html.Attributes.style "padding" "10px"
               , Html.Attributes.style "width" "200px" ] 
               [ 
                 Html.div [] elements
