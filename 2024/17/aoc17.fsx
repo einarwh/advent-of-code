@@ -159,7 +159,7 @@ let quine computer =
             let candidates = 
                 [ 0L .. 7L ] 
                 |> List.map (fun j -> a + j * offset)
-                |> List.choose (fun candidateA -> if checkTarget opIndex target candidateA then Some candidateA else None)
+                |> List.choose (fun ca -> if checkTarget opIndex target ca then Some ca else None)
             candidates |> List.tryPick (loop (ix + 1))
     let a0 = pow 8L ((int64 len) - 1L)
     match loop 1 a0 with 
