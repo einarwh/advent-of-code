@@ -5212,7 +5212,7 @@ var $elm$core$Task$perform = F2(
 		return $elm$core$Task$command(
 			A2($elm$core$Task$map, toMessage, task));
 	});
-var $elm$browser$Browser$element = _Browser_element;
+var $elm$browser$Browser$document = _Browser_document;
 var $author$project$Aoc12$SampleLarger = 3;
 var $elm$core$List$append = F2(
 	function (xs, ys) {
@@ -7104,7 +7104,7 @@ var $author$project$Aoc12$toSvg = function (model) {
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
-var $author$project$Aoc12$view = function (model) {
+var $author$project$Aoc12$viewBody = function (model) {
 	var textFontSize = '9px';
 	var s = $author$project$Aoc12$toSvg(model);
 	var numberOfPlots = $elm$core$List$length(model.K);
@@ -7150,8 +7150,8 @@ var $author$project$Aoc12$view = function (model) {
 							[
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '40px'),
-								A2($elm$html$Html$Attributes$style, 'padding', '20px')
+								A2($elm$html$Html$Attributes$style, 'font-size', '32px'),
+								A2($elm$html$Html$Attributes$style, 'padding', '10px')
 							]),
 						_List_fromArray(
 							[
@@ -7245,6 +7245,32 @@ var $author$project$Aoc12$view = function (model) {
 										$elm$html$Html$text('2020')
 									])),
 								$elm$html$Html$text('] ')
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'padding-bottom', '10px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$a,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$href('https://adventofcode.com/2024/day/12')
+									]),
+								_List_fromArray(
+									[
+										$elm$svg$Svg$text('https://adventofcode.com/2024/day/12')
+									]))
 							]))
 					])),
 				A2(
@@ -7547,7 +7573,16 @@ var $author$project$Aoc12$view = function (model) {
 					]))
 			]));
 };
-var $author$project$Aoc12$main = $elm$browser$Browser$element(
+var $author$project$Aoc12$view = function (model) {
+	return {
+		aV: _List_fromArray(
+			[
+				$author$project$Aoc12$viewBody(model)
+			]),
+		a7: 'Advent of Code 2024 | Day 12: Garden Groups'
+	};
+};
+var $author$project$Aoc12$main = $elm$browser$Browser$document(
 	{a0: $author$project$Aoc12$init, a6: $author$project$Aoc12$subscriptions, a8: $author$project$Aoc12$update, a9: $author$project$Aoc12$view});
 _Platform_export({'Aoc12':{'init':$author$project$Aoc12$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));

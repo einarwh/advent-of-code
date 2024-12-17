@@ -1,6 +1,6 @@
 module Aoc07 exposing (..)
 
-import Browser
+import Browser exposing (Document)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
@@ -14,12 +14,14 @@ defaultTickInterval = 10
 
 -- MAIN
 
+type DataSource = Input | Sample
+
 type alias Equation = (Int, List Int)
 
 type Op = Add | Mul | Con
 
 main =
-  Browser.element
+  Browser.document
     { init = init
     , view = view
     , update = update
@@ -31,7 +33,7 @@ type CheckedEquation = Balanced (String, Int) | Unbalanced String
 
 type alias Model = 
   { count : Int 
-  , useSample : Bool 
+  , dataSource : DataSource 
   , withConcat : Bool
   , equations : List (Int, List Int) 
   , checkedEquations : List CheckedEquation
@@ -58,8 +60,8 @@ parseEquation line =
     _ -> Nothing
 
 
-initEquations : Bool -> List (Int, List Int)
-initEquations useSample = 
+initEquations : DataSource -> List (Int, List Int)
+initEquations dataSource = 
   let 
     sample = """190: 10 19
 3267: 81 40 27
@@ -920,7 +922,10 @@ initEquations useSample =
 1482006348675: 95 5 416 84 6 49 75
 478820097: 7 5 7 33 9 4 2 47 3 4 7 29
 21691732214: 2 7 9 1 378 182 4 797 1""" 
-    data = if useSample then sample else input 
+    data = 
+      case dataSource of 
+        Sample -> sample 
+        Input -> input
     lines = data |> String.split "\n"
   in 
     lines |> List.filterMap parseEquation 
@@ -941,13 +946,13 @@ equationAsUnbalanced (testValue, numbers) =
   in 
     Unbalanced (testValueStr ++ ": " ++ numbersStr)
 
-initModel : Bool -> Bool -> Model
-initModel useSample withConcat =
+initModel : DataSource -> Bool -> Model
+initModel dataSource withConcat =
   let 
-    equations = initEquations useSample
+    equations = initEquations dataSource
     debug = equations |> List.length |> String.fromInt 
     model = { count = 0
-            , useSample = useSample
+            , dataSource = dataSource
             , withConcat = withConcat
             , equations = equations
             , checkedEquations = []
@@ -960,15 +965,15 @@ initModel useSample withConcat =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel False False, Cmd.none)
+  (initModel Input False, Cmd.none)
 
 -- UPDATE
 
-type Msg = Tick | Clear | Solve | ToggleConcat | ToggleSample
+type Msg = Tick | Clear | Solve | ToggleConcat | UseSample | UseInput 
 
 updateClear : Model -> Model
 updateClear model = 
-  initModel model.useSample model.withConcat
+  initModel model.dataSource model.withConcat
 
 concat : Int -> Int -> Int 
 concat a b = 
@@ -1066,14 +1071,15 @@ updateToggleConcat model =
   let
     withConcat = not model.withConcat
   in
-    initModel model.useSample withConcat
+    initModel model.dataSource withConcat
 
-updateToggleSample : Model -> Model
-updateToggleSample model = 
-  let
-    useSample = not model.useSample
-  in
-    initModel useSample model.withConcat
+updateUseSample : Model -> Model
+updateUseSample model = 
+  initModel Sample model.withConcat
+
+updateUseInput : Model -> Model
+updateUseInput model = 
+  initModel Input model.withConcat
 
 updateTick : Model -> Model 
 updateTick model =
@@ -1103,8 +1109,10 @@ update msg model =
       (updateSolve model, Cmd.none)
     ToggleConcat -> 
       (updateToggleConcat model, Cmd.none)
-    ToggleSample -> 
-      (updateToggleSample model, Cmd.none)
+    UseSample -> 
+      (updateUseSample model, Cmd.none)
+    UseInput -> 
+      (updateUseInput model, Cmd.none)
     Tick -> 
       (updateTick model, Cmd.none)
 
@@ -1142,11 +1150,19 @@ toCheckedEquationHtmlElement checked =
     Unbalanced s -> toUnbalancedHtmlElement s 
     Balanced (s, _) -> toBalancedHtmlElement s
 
-view : Model -> Html Msg
-view model =
+view : Model -> Document Msg
+view model = 
+  { title = "Advent of Code 2024 | Day 7: Bridge Repair"
+  , body = [ viewBody model ] }
+
+viewBody : Model -> Html Msg
+viewBody model =
   let
     commandsStr = ""
-    textFontSize = if model.useSample then "36px" else "14px"
+    textFontSize =
+      case model.dataSource of 
+        Sample -> "24px"
+        Input -> "14px"
     checkedElements = model.checkedEquations |> List.concatMap toCheckedEquationHtmlElement
     uncheckedElements = model.uncheckedEquations |> List.map equationAsString |> List.concatMap toUncheckedHtmlElement
     elements = List.append checkedElements uncheckedElements
@@ -1159,8 +1175,8 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "40px"
-              , Html.Attributes.style "padding" "20px"]
+              , Html.Attributes.style "font-size" "32px"
+              , Html.Attributes.style "padding" "10px"]
               [ Html.div [] [Html.text "Advent of Code 2024" ]
               , Html.div [] [Html.text "Day 7: Bridge Repair" ] ] ]
       , Html.tr 
@@ -1188,6 +1204,31 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
+              , Html.Attributes.style "padding-bottom" "10px" ]
+              [ Html.a 
+                [ Html.Attributes.href "https://adventofcode.com/2024/day/7" ] 
+                [ Html.text "https://adventofcode.com/2024/day/7" ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "16px" ]
+              [ 
+                Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseInput, Html.Attributes.checked (model.dataSource == Input) ] 
+                []
+              , Html.label [] [ Html.text "Input" ]
+              , Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseSample, Html.Attributes.checked (model.dataSource == Sample) ] 
+                []
+              , Html.label [] [ Html.text "Sample" ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Solve ] 
@@ -1195,9 +1236,6 @@ view model =
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Clear ] 
                 [ Html.text "Clear" ] 
-              , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick ToggleSample ] 
-                [ Html.text (if model.useSample then "Input" else "Sample") ]
             ] ]
       , Html.tr 
           []

@@ -5249,7 +5249,7 @@ var $elm$core$Task$perform = F2(
 		return $elm$core$Task$command(
 			A2($elm$core$Task$map, toMessage, task));
 	});
-var $elm$browser$Browser$element = _Browser_element;
+var $elm$browser$Browser$document = _Browser_document;
 var $author$project$Aoc15$SampleLarger = 2;
 var $author$project$Aoc15$Input = 0;
 var $author$project$Aoc15$defaultTickInterval = 10;
@@ -7204,7 +7204,7 @@ var $author$project$Aoc15$toWarehouseRows = function (warehouse) {
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
-var $author$project$Aoc15$view = function (model) {
+var $author$project$Aoc15$viewBody = function (model) {
 	var warehouse = model.z;
 	var textFontSize = model.N ? '12px' : '28px';
 	var rows = $author$project$Aoc15$toWarehouseRows(warehouse);
@@ -7597,7 +7597,16 @@ var $author$project$Aoc15$view = function (model) {
 					]))
 			]));
 };
-var $author$project$Aoc15$main = $elm$browser$Browser$element(
+var $author$project$Aoc15$view = function (model) {
+	return {
+		ax: _List_fromArray(
+			[
+				$author$project$Aoc15$viewBody(model)
+			]),
+		aL: 'Advent of Code 2024 | Day 15: Warehouse Woes'
+	};
+};
+var $author$project$Aoc15$main = $elm$browser$Browser$document(
 	{aE: $author$project$Aoc15$init, aK: $author$project$Aoc15$subscriptions, aM: $author$project$Aoc15$update, aN: $author$project$Aoc15$view});
 _Platform_export({'Aoc15':{'init':$author$project$Aoc15$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));

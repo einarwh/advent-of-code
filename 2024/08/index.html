@@ -5203,7 +5203,8 @@ var $elm$core$Task$perform = F2(
 		return $elm$core$Task$command(
 			A2($elm$core$Task$map, toMessage, task));
 	});
-var $elm$browser$Browser$element = _Browser_element;
+var $elm$browser$Browser$document = _Browser_document;
+var $author$project$Aoc08$Input = 0;
 var $elm$core$Set$Set_elm_builtin = $elm$core$Basics$identity;
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
@@ -5577,8 +5578,14 @@ var $elm$core$String$foldr = _String_foldr;
 var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
 };
-var $author$project$Aoc08$initBoard = function (useSample) {
-	var data = useSample ? $author$project$Aoc08$sample : $author$project$Aoc08$input;
+var $author$project$Aoc08$initBoard = function (dataSource) {
+	var data = function () {
+		if (dataSource === 1) {
+			return $author$project$Aoc08$sample;
+		} else {
+			return $author$project$Aoc08$input;
+		}
+	}();
 	return $tortus$elm_array_2d$Array2D$fromList(
 		A2(
 			$elm$core$List$map,
@@ -5586,15 +5593,15 @@ var $author$project$Aoc08$initBoard = function (useSample) {
 			A2($elm$core$String$split, '\n', data)));
 };
 var $author$project$Aoc08$initModel = F2(
-	function (withHarmonics, useSample) {
-		var board = $author$project$Aoc08$initBoard(useSample);
-		return {H: $elm$core$Set$empty, I: board, R: 0, T: '', _: 'blabl', v: useSample, x: withHarmonics};
+	function (withHarmonics, dataSource) {
+		var board = $author$project$Aoc08$initBoard(dataSource);
+		return {H: $elm$core$Set$empty, I: board, R: 0, t: dataSource, T: '', _: '?', s: withHarmonics};
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Aoc08$init = function (_v0) {
 	return _Utils_Tuple2(
-		A2($author$project$Aoc08$initModel, false, false),
+		A2($author$project$Aoc08$initModel, false, 0),
 		$elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -5603,7 +5610,7 @@ var $author$project$Aoc08$subscriptions = function (model) {
 	return $elm$core$Platform$Sub$none;
 };
 var $author$project$Aoc08$updateClear = function (model) {
-	return A2($author$project$Aoc08$initModel, model.x, model.v);
+	return A2($author$project$Aoc08$initModel, model.s, model.t);
 };
 var $elm$core$List$append = F2(
 	function (xs, ys) {
@@ -6032,7 +6039,7 @@ var $author$project$Aoc08$findAntinodesWithHarmonics = F2(
 	});
 var $author$project$Aoc08$updateSolve = function (model) {
 	var board = model.I;
-	var antinodeFinder = model.x ? $author$project$Aoc08$findAntinodesWithHarmonics : $author$project$Aoc08$findAntinodes;
+	var antinodeFinder = model.s ? $author$project$Aoc08$findAntinodesWithHarmonics : $author$project$Aoc08$findAntinodes;
 	var antinodes = A2($author$project$Aoc08$findAllAntinodes, antinodeFinder, board);
 	return _Utils_update(
 		model,
@@ -6040,12 +6047,15 @@ var $author$project$Aoc08$updateSolve = function (model) {
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc08$updateToggleHarmonics = function (model) {
-	var withHarmonics = !model.x;
-	return A2($author$project$Aoc08$initModel, withHarmonics, model.v);
+	var withHarmonics = !model.s;
+	return A2($author$project$Aoc08$initModel, withHarmonics, model.t);
 };
-var $author$project$Aoc08$updateToggleSample = function (model) {
-	var useSample = !model.v;
-	return A2($author$project$Aoc08$initModel, model.x, useSample);
+var $author$project$Aoc08$updateUseInput = function (model) {
+	return A2($author$project$Aoc08$initModel, model.s, 0);
+};
+var $author$project$Aoc08$Sample = 1;
+var $author$project$Aoc08$updateUseSample = function (model) {
+	return A2($author$project$Aoc08$initModel, model.s, 1);
 };
 var $author$project$Aoc08$update = F2(
 	function (msg, model) {
@@ -6060,7 +6070,11 @@ var $author$project$Aoc08$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 2:
 				return _Utils_Tuple2(
-					$author$project$Aoc08$updateToggleSample(model),
+					$author$project$Aoc08$updateUseSample(model),
+					$elm$core$Platform$Cmd$none);
+			case 3:
+				return _Utils_Tuple2(
+					$author$project$Aoc08$updateUseInput(model),
 					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(
@@ -6070,8 +6084,9 @@ var $author$project$Aoc08$update = F2(
 	});
 var $author$project$Aoc08$Clear = 0;
 var $author$project$Aoc08$Solve = 1;
-var $author$project$Aoc08$ToggleHarmonics = 3;
-var $author$project$Aoc08$ToggleSample = 2;
+var $author$project$Aoc08$ToggleHarmonics = 4;
+var $author$project$Aoc08$UseInput = 3;
+var $author$project$Aoc08$UseSample = 2;
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -6216,8 +6231,15 @@ var $author$project$Aoc08$toCharElement = F3(
 	});
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
-var $author$project$Aoc08$view = function (model) {
-	var textFontSize = model.v ? '32px' : '12px';
+var $author$project$Aoc08$viewBody = function (model) {
+	var textFontSize = function () {
+		var _v0 = model.t;
+		if (_v0 === 1) {
+			return '24px';
+		} else {
+			return '12px';
+		}
+	}();
 	var board = model.I;
 	var xs = A2(
 		$elm$core$List$range,
@@ -6284,8 +6306,8 @@ var $author$project$Aoc08$view = function (model) {
 							[
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '40px'),
-								A2($elm$html$Html$Attributes$style, 'padding', '20px')
+								A2($elm$html$Html$Attributes$style, 'font-size', '32px'),
+								A2($elm$html$Html$Attributes$style, 'padding', '10px')
 							]),
 						_List_fromArray(
 							[
@@ -6391,6 +6413,81 @@ var $author$project$Aoc08$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'padding-bottom', '10px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$a,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$href('https://adventofcode.com/2024/day/8')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('https://adventofcode.com/2024/day/8')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '16px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('radio'),
+										$elm$html$Html$Events$onClick(3),
+										$elm$html$Html$Attributes$checked(!model.t)
+									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Input')
+									])),
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('radio'),
+										$elm$html$Html$Events$onClick(2),
+										$elm$html$Html$Attributes$checked(model.t === 1)
+									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Sample')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'padding', '10px')
 							]),
 						_List_fromArray(
@@ -6416,18 +6513,6 @@ var $author$project$Aoc08$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text('Solve')
-									])),
-								A2(
-								$elm$html$Html$button,
-								_List_fromArray(
-									[
-										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick(2)
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text(
-										model.v ? 'Input' : 'Sample')
 									]))
 							]))
 					])),
@@ -6449,8 +6534,8 @@ var $author$project$Aoc08$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$type_('checkbox'),
-										$elm$html$Html$Events$onClick(3),
-										$elm$html$Html$Attributes$checked(model.x)
+										$elm$html$Html$Events$onClick(4),
+										$elm$html$Html$Attributes$checked(model.s)
 									]),
 								_List_Nil),
 								A2(
@@ -6512,7 +6597,16 @@ var $author$project$Aoc08$view = function (model) {
 					]))
 			]));
 };
-var $author$project$Aoc08$main = $elm$browser$Browser$element(
+var $author$project$Aoc08$view = function (model) {
+	return {
+		au: _List_fromArray(
+			[
+				$author$project$Aoc08$viewBody(model)
+			]),
+		aI: 'Advent of Code 2024 | Day 8: Resonant Collinearity'
+	};
+};
+var $author$project$Aoc08$main = $elm$browser$Browser$document(
 	{aB: $author$project$Aoc08$init, aH: $author$project$Aoc08$subscriptions, aJ: $author$project$Aoc08$update, aK: $author$project$Aoc08$view});
 _Platform_export({'Aoc08':{'init':$author$project$Aoc08$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));

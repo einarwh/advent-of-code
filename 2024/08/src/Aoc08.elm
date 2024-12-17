@@ -1,6 +1,6 @@
 module Aoc08 exposing (..)
 
-import Browser
+import Browser exposing (Document)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
@@ -13,7 +13,7 @@ import Html exposing (text)
 -- MAIN
 
 main =
-  Browser.element
+  Browser.document
     { init = init
     , view = view
     , update = update
@@ -21,12 +21,14 @@ main =
 
 -- MODEL
 
+type DataSource = Input | Sample
+
 type alias Pos = (Int, Int)
 
 type alias Model = 
   { board : Array2D Char
   , antinodes : Set (Int, Int)
-  , useSample : Bool
+  , dataSource : DataSource
   , withHarmonics : Bool 
   , message : String
   , counter : Int 
@@ -96,36 +98,40 @@ input = """..................................................
 ....................................D.............
 ....................7.......1....................."""
 
-initBoard : Bool -> Array2D Char
-initBoard useSample = 
+initBoard : DataSource -> Array2D Char
+initBoard dataSource = 
   let 
-    data = if useSample then sample else input 
+    data =
+      case dataSource of 
+        Sample -> sample
+        Input -> input
   in 
     data |> String.split "\n" |> List.map (String.toList) |> Array2D.fromList
 
-initModel : Bool -> Bool -> Model 
-initModel withHarmonics useSample = 
+initModel : Bool -> DataSource -> Model 
+initModel withHarmonics dataSource = 
   let 
-    board = initBoard useSample
+    board = initBoard dataSource
   in 
     { board = board
     , antinodes = Set.empty
-    , message = "blabl"
-    , useSample = useSample
+    , message = "?"
+    , dataSource = dataSource
     , withHarmonics = withHarmonics
     , counter = 0
     , debug = "" }
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel False False, Cmd.none)
+  (initModel False Input, Cmd.none)
 
 -- UPDATE
 
 type Msg = 
   Clear 
   | Solve 
-  | ToggleSample 
+  | UseSample 
+  | UseInput
   | ToggleHarmonics 
 
 getAllPositions : Array2D Char -> List Pos
@@ -138,7 +144,7 @@ getAllPositions board =
 
 updateClear : Model -> Model
 updateClear model = 
-  initModel model.withHarmonics model.useSample
+  initModel model.withHarmonics model.dataSource
 
 inBounds : Array2D Char -> (Int, Int) -> Bool
 inBounds board (x, y) = 
@@ -232,19 +238,20 @@ updateSolve model =
   in 
     { model | antinodes = antinodes }
 
-updateToggleSample : Model -> Model
-updateToggleSample model = 
-  let
-    useSample = not model.useSample
-  in
-    initModel model.withHarmonics useSample 
+updateUseSample : Model -> Model
+updateUseSample model = 
+  initModel model.withHarmonics Sample 
+
+updateUseInput : Model -> Model
+updateUseInput model = 
+  initModel model.withHarmonics Input 
 
 updateToggleHarmonics : Model -> Model
 updateToggleHarmonics model = 
   let
     withHarmonics = not model.withHarmonics
   in
-    initModel withHarmonics model.useSample 
+    initModel withHarmonics model.dataSource 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -253,8 +260,10 @@ update msg model =
       (updateClear model, Cmd.none)
     Solve -> 
       (updateSolve model, Cmd.none)
-    ToggleSample -> 
-      (updateToggleSample model, Cmd.none)
+    UseSample -> 
+      (updateUseSample model, Cmd.none)
+    UseInput -> 
+      (updateUseInput model, Cmd.none)
     ToggleHarmonics -> 
       (updateToggleHarmonics model, Cmd.none)
 
@@ -276,8 +285,13 @@ toCharElement board antinodes (x, y) =
         else 
           Html.text (String.fromChar ch) 
 
-view : Model -> Html Msg
-view model =
+view : Model -> Document Msg
+view model = 
+  { title = "Advent of Code 2024 | Day 8: Resonant Collinearity"
+  , body = [ viewBody model ] }
+
+viewBody : Model -> Html Msg
+viewBody model =
   let
     board = model.board 
     antinodes = model.antinodes
@@ -286,7 +300,10 @@ view model =
     nestedPositions = ys |> List.map (\y -> xs |> List.map (\x -> (x, y)))
     nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement board antinodes))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
-    textFontSize = if model.useSample then "32px" else "12px"
+    textFontSize = 
+      case model.dataSource of 
+        Sample -> "24px"
+        Input -> "12px"
     countStr = antinodes |> Set.size |> String.fromInt    
   in 
     Html.table 
@@ -297,8 +314,8 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "40px"
-              , Html.Attributes.style "padding" "20px"]
+              , Html.Attributes.style "font-size" "32px"
+              , Html.Attributes.style "padding" "10px"]
               [ Html.div [] [Html.text "Advent of Code 2024" ]
               , Html.div [] [Html.text "Day 8: Resonant Collinearity" ] ] ]
       , Html.tr 
@@ -326,6 +343,31 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
+              , Html.Attributes.style "padding-bottom" "10px" ]
+              [ Html.a 
+                [ Html.Attributes.href "https://adventofcode.com/2024/day/8" ] 
+                [ Html.text "https://adventofcode.com/2024/day/8" ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "16px" ]
+              [ 
+                Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseInput, Html.Attributes.checked (model.dataSource == Input) ] 
+                []
+              , Html.label [] [ Html.text "Input" ]
+              , Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseSample, Html.Attributes.checked (model.dataSource == Sample) ] 
+                []
+              , Html.label [] [ Html.text "Sample" ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Clear ] 
@@ -333,9 +375,6 @@ view model =
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Solve ] 
                 [ text "Solve" ] 
-              , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick ToggleSample ] 
-                [ Html.text (if model.useSample then "Input" else "Sample") ]
             ] ]
       , Html.tr 
           []

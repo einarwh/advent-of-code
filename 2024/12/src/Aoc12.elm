@@ -1,6 +1,6 @@
 module Aoc12 exposing (..)
 
-import Browser
+import Browser exposing (Document)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
@@ -17,7 +17,7 @@ defaultTickInterval = 100
 
 main : Program () Model Msg
 main =
-  Browser.element
+  Browser.document
     { init = init
     , view = view
     , update = update
@@ -756,8 +756,13 @@ toLineText line =
       in 
         "(" ++ x1s ++ "," ++ y1s ++ ")->(" ++ x2s ++ "," ++ y2s ++ ")"
 
-view : Model -> Html Msg
-view model =
+view : Model -> Document Msg
+view model = 
+  { title = "Advent of Code 2024 | Day 12: Garden Groups"
+  , body = [ viewBody model ] }
+
+viewBody : Model -> Html Msg
+viewBody model =
   let
     elements = []
     textFontSize = "9px"
@@ -776,8 +781,8 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "40px"
-              , Html.Attributes.style "padding" "20px"]
+              , Html.Attributes.style "font-size" "32px"
+              , Html.Attributes.style "padding" "10px"]
               [ Html.div [] [Html.text "Advent of Code 2024" ]
               , Html.div [] [Html.text "Day 12: Garden Groups" ] ] ]
       , Html.tr 
@@ -800,6 +805,15 @@ view model =
               , Html.text " ["
               , Html.a [ Html.Attributes.href "../../2020/"] [ Html.text "2020" ]
               , Html.text "] "
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "padding-bottom" "10px" ]
+              [ Html.a 
+                [ Html.Attributes.href "https://adventofcode.com/2024/day/12" ] 
+                [ text "https://adventofcode.com/2024/day/12" ]
             ] ]
       , Html.tr 
           []
@@ -875,14 +889,8 @@ view model =
                 Html.div [] [ Html.text ("Total plots: " ++ String.fromInt numberOfPlots) ]
               , Html.div [] [ Html.text ("Step number: " ++ String.fromInt model.step) ]
               , Html.div [] [ Html.text ("Finished plots: " ++ String.fromInt numberOfFinishedPlots) ]
-              -- , Html.div [] [ Html.text ("Perimeters: " ++ String.fromInt model.totalCost) ]
               , Html.div [] [ Html.text ("Fence cost: " ++ String.fromInt currentCost) ]
               , Html.div [] [ Html.text ("Bulk cost: " ++ String.fromInt currentCostDiscount) ]
-              -- , Html.div [] [ Html.text ("Debug: " ++ debugText) ]
-              -- , Html.div [] [ Html.text "Verticals" ]
-              -- , Html.div [] [ Html.text verticalsText ]
-              -- , Html.div [] [ Html.text "Horizontals" ]
-              -- , Html.div [] [ Html.text horizontalsText ]
               ] ]
       , Html.tr 
           []
