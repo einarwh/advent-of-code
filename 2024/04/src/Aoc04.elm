@@ -1,6 +1,6 @@
 module Aoc04 exposing (..)
 
-import Browser
+import Browser exposing (Document)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
@@ -16,7 +16,7 @@ defaultDelay = 1
 -- MAIN
 
 main =
-  Browser.element
+  Browser.document
     { init = init
     , view = view
     , update = update
@@ -24,19 +24,21 @@ main =
 
 -- MODEL
 
+type DataSource = Input | Sample
+
 type alias Pos = (Int, Int)
 
 type alias Model = 
   { found : Int 
   , board : Array2D Char
   , highlighted : Set Pos
-  , useSample : Bool 
+  , dataSource : DataSource 
   , lastCommandText : String
   , counter : Int 
   , debug : String }
 
-initBoard : Bool -> Array2D Char
-initBoard useSample = 
+initBoard : DataSource -> Array2D Char
+initBoard dataSource = 
   let 
     sample = """MMMSXXMASM
 MSAMXMSMSA
@@ -188,19 +190,23 @@ XAMXMAAASXXSASMSAMMMSXSMMXMXMMMMSAMXXSXSMMSAAMXMMASAMXXAAAXXAAASMSXXMSMMSMMMSMMM
 MSSMMSMMMMXSAMAMAXAAAASAAASASMSASASMMMAMXXXMMMXMMXMAMAMMSMMSSSMSAMXXMAMAXMAXMAXMXMMXSMSSMMSMAMAXMMSMMASMMAMSMSMSXMSAAMAMMSSMMXMAAMAXMMMMSMSM
 AXAAAMASXXAMAMXMXAMSMXMMSXSASAAXSXXAAXAMSAMXAAAXAASMMAAXMAXAAAAMMMXMMAMASMSMSAMSAMXAMXAMAAXMXMASXAXXSMSASASAAAMXXASMSMMSAAAXSAMSMMSXSAAAAAAA
 XSSMMSAMXMXSXMASXXXXXMAXXMMXMMMAXMSSMSASXSASXSSSSMXSSSSMSSMMSMMMAXMASXSMSAMXMXMSAXMASMSSMMSAMXXXMSMMAMXMSSSMSMSMXXMSXMXMMSSMSMMMSAMXSSSSMSMS""" 
-    data = if useSample then sample else input 
+    data = 
+      case dataSource of 
+        Sample -> sample 
+        Input -> input 
   in 
     data |> String.split "\n" |> List.map (String.toList) |> Array2D.fromList
 
 init : () -> (Model, Cmd Msg)
 init _ =
   let 
-    board = initBoard False
+    dataSource = Input 
+    board = initBoard dataSource
     model = { found = 0
             , board = board
             , highlighted = Set.empty
             , lastCommandText = "press play to start"
-            , useSample = False 
+            , dataSource = dataSource 
             , counter = 0
             , debug = "" }
   in 
@@ -208,14 +214,10 @@ init _ =
 
 -- UPDATE
 
-type Msg = Clear | Xmas | MasX | ToggleSample
+type Msg = Clear | Xmas | MasX | UseSample | UseInput
 
 updateClear : Model -> Model
 updateClear model = { model | highlighted = Set.empty, found = 0 } 
-
--- getByPos : Pos -> Array2D Char -> Maybe Char
--- getByPos (x, y) board = 
---   Array2D.get y x board
 
 findXmas : Array2D Char -> Pos -> (Pos -> Pos) -> List Pos
 findXmas board xpos move = 
@@ -283,12 +285,18 @@ updateMasX model =
   in
     { model | highlighted = (Set.fromList positions), found = found }
 
-updateToggleSample : Model -> Model
-updateToggleSample model = 
-  let
-    useSample = not model.useSample
-  in
-    { model | useSample = useSample, highlighted = Set.empty, found = 0, board = initBoard useSample } 
+updateDataSource : DataSource -> Model -> Model
+updateDataSource dataSource model = 
+  { model | dataSource = dataSource, highlighted = Set.empty, found = 0, board = initBoard dataSource } 
+
+
+updateUseSample : Model -> Model
+updateUseSample model = 
+  updateDataSource Sample model 
+
+updateUseInput : Model -> Model
+updateUseInput model = 
+  updateDataSource Input model 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -299,8 +307,10 @@ update msg model =
       (updateXmas model, Cmd.none)
     MasX -> 
       (updateMasX model, Cmd.none)
-    ToggleSample -> 
-      (updateToggleSample model, Cmd.none)
+    UseSample -> 
+      (updateUseSample model, Cmd.none)
+    UseInput -> 
+      (updateUseInput model, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -322,8 +332,13 @@ toCharElement model (x, y) =
           else 
             Html.text str 
 
-view : Model -> Html Msg
-view model =
+view : Model -> Document Msg
+view model = 
+  { title = "Advent of Code 2024 | Day 4: Ceres Search"
+  , body = [ viewBody model ] }
+
+viewBody : Model -> Html Msg
+viewBody model =
   let
     board = model.board 
     ys = List.range 0 (Array2D.rows board - 1)
@@ -332,7 +347,10 @@ view model =
     nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement model))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
     commandsStr = ""
-    textFontSize = if model.useSample then "32px" else "12px"
+    textFontSize =
+      case model.dataSource of 
+        Sample -> "32px"
+        Input -> "12px"
   in 
     Html.table 
       [ Html.Attributes.style "width" "1080px"
@@ -342,8 +360,8 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "40px"
-              , Html.Attributes.style "padding" "20px"]
+              , Html.Attributes.style "font-size" "32px"
+              , Html.Attributes.style "padding" "10px"]
               [ Html.div [] [Html.text "Advent of Code 2024" ]
               , Html.div [] [Html.text "Day 4: Ceres Search" ] ] ]
       , Html.tr 
@@ -371,6 +389,31 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
+              , Html.Attributes.style "padding-bottom" "10px" ]
+              [ Html.a 
+                [ Html.Attributes.href "https://adventofcode.com/2024/day/4" ] 
+                [ Html.text "https://adventofcode.com/2024/day/4" ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "16px" ]
+              [ 
+                Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseInput, Html.Attributes.checked (model.dataSource == Input) ] 
+                []
+              , Html.label [] [ Html.text "Input" ]
+              , Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseSample, Html.Attributes.checked (model.dataSource == Sample) ] 
+                []
+              , Html.label [] [ Html.text "Sample" ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Xmas ] 
@@ -381,9 +424,6 @@ view model =
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Clear ] 
                 [ Html.text "Clear" ] 
-              , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick ToggleSample ] 
-                [ Html.text (if model.useSample then "Input" else "Sample") ]
             ] ]
       , Html.tr 
           []

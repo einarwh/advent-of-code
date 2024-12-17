@@ -5166,7 +5166,7 @@ var $elm$core$Task$perform = F2(
 		return $elm$core$Task$command(
 			A2($elm$core$Task$map, toMessage, task));
 	});
-var $elm$browser$Browser$element = _Browser_element;
+var $elm$browser$Browser$document = _Browser_document;
 var $author$project$Aoc05$Input = 0;
 var $author$project$Aoc05$Plain = function (a) {
 	return {$: 1, a: a};
@@ -5578,7 +5578,7 @@ var $author$project$Aoc05$toRowHtmlElement = function (row) {
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
-var $author$project$Aoc05$view = function (model) {
+var $author$project$Aoc05$viewBody = function (model) {
 	var textFontSize = function () {
 		var _v0 = model.o;
 		if (!_v0) {
@@ -5609,8 +5609,8 @@ var $author$project$Aoc05$view = function (model) {
 							[
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '40px'),
-								A2($elm$html$Html$Attributes$style, 'padding', '20px')
+								A2($elm$html$Html$Attributes$style, 'font-size', '32px'),
+								A2($elm$html$Html$Attributes$style, 'padding', '10px')
 							]),
 						_List_fromArray(
 							[
@@ -5887,7 +5887,16 @@ var $author$project$Aoc05$view = function (model) {
 					]))
 			]));
 };
-var $author$project$Aoc05$main = $elm$browser$Browser$element(
+var $author$project$Aoc05$view = function (model) {
+	return {
+		av: _List_fromArray(
+			[
+				$author$project$Aoc05$viewBody(model)
+			]),
+		aJ: 'Advent of Code 2024 | Day 5: Print Queue'
+	};
+};
+var $author$project$Aoc05$main = $elm$browser$Browser$document(
 	{aC: $author$project$Aoc05$init, aI: $author$project$Aoc05$subscriptions, aK: $author$project$Aoc05$updateModel, aL: $author$project$Aoc05$view});
 _Platform_export({'Aoc05':{'init':$author$project$Aoc05$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));

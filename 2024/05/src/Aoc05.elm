@@ -1,6 +1,6 @@
 module Aoc05 exposing (..)
 
-import Browser
+import Browser exposing (Document)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
@@ -9,7 +9,7 @@ import Html.Events exposing (onClick)
 
 main : Program () Model Msg
 main =
-  Browser.element
+  Browser.document
     { init = init
     , view = view
     , update = updateModel
@@ -1600,9 +1600,6 @@ updateModel msg model =
     UseInput -> 
       (updateDataSource Input model, Cmd.none)
 
-    -- ToggleSample -> 
-    --   (updateToggleSample model, Cmd.none)
-
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
@@ -1629,8 +1626,13 @@ toRowHtmlElement row =
     Highlighted pages -> toHighlightedHtmlElement pages 
     Plain pages -> toPlainHtmlElement pages 
 
-view : Model -> Html Msg
-view model =
+view : Model -> Document Msg
+view model = 
+  { title = "Advent of Code 2024 | Day 5: Print Queue"
+  , body = [ viewBody model ] }
+
+viewBody : Model -> Html Msg
+viewBody model =
   let
     commandsStr = ""
     textFontSize = 
@@ -1647,8 +1649,8 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "40px"
-              , Html.Attributes.style "padding" "20px"]
+              , Html.Attributes.style "font-size" "32px"
+              , Html.Attributes.style "padding" "10px"]
               [ Html.div [] [Html.text "Advent of Code 2024" ]
               , Html.div [] [Html.text "Day 5: Print Queue" ] ] ]
       , Html.tr 

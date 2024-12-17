@@ -1,6 +1,6 @@
 module Aoc03 exposing (..)
 
-import Browser
+import Browser exposing (Document)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
@@ -14,7 +14,7 @@ defaultDelay = 1
 -- MAIN
 
 main =
-  Browser.element
+  Browser.document
     { init = init
     , view = view
     , update = update
@@ -361,8 +361,13 @@ toScannedHtmlElement segment =
     Instruction s -> toInstructionHtmlElement s
     Disabled s -> toDisabledHtmlElement s
 
-view : Model -> Html Msg
-view model =
+view : Model -> Document Msg
+view model = 
+  { title = "Advent of Code 2024 | Day 3: Mull It Over"
+  , body = [ viewBody model ] }
+
+viewBody : Model -> Html Msg
+viewBody model =
   let
     -- Need to move something according to position! Update function.
     scannedElements = model.scanned |> List.map toScannedHtmlElement
@@ -379,7 +384,7 @@ view model =
   in 
     Html.table 
       [ 
-        Html.Attributes.style "width" "500px"
+        Html.Attributes.style "width" "1080px"
       , Html.Attributes.style "font-family" "Courier New"
       ]
       [ Html.tr 
@@ -387,8 +392,8 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "40px"
-              , Html.Attributes.style "padding" "20px"]
+              , Html.Attributes.style "font-size" "32px"
+              , Html.Attributes.style "padding" "10px"]
               [ Html.div [] [Html.text "Advent of Code 2024" ]
               , Html.div [] [Html.text "Day 3: Mull It Over" ] ] ]
       , Html.tr 
@@ -411,6 +416,15 @@ view model =
               , Html.text " ["
               , Html.a [ Html.Attributes.href "../../2020/"] [ Html.text "2020" ]
               , Html.text "] "
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "padding-bottom" "10px" ]
+              [ Html.a 
+                [ Html.Attributes.href "https://adventofcode.com/2024/day/3" ] 
+                [ Html.text "https://adventofcode.com/2024/day/3" ]
             ] ]
       , Html.tr 
           []

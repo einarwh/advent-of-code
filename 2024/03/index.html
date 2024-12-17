@@ -5212,7 +5212,7 @@ var $elm$core$Task$perform = F2(
 		return $elm$core$Task$command(
 			A2($elm$core$Task$map, toMessage, task));
 	});
-var $elm$browser$Browser$element = _Browser_element;
+var $elm$browser$Browser$document = _Browser_document;
 var $author$project$Aoc03$Start = 0;
 var $author$project$Aoc03$defaultDelay = 1;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
@@ -6129,7 +6129,7 @@ var $author$project$Aoc03$toScannedHtmlElement = function (segment) {
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
-var $author$project$Aoc03$view = function (model) {
+var $author$project$Aoc03$viewBody = function (model) {
 	var scanningElements = $elm$core$String$isEmpty(model.a) ? _List_Nil : _List_fromArray(
 		[
 			$author$project$Aoc03$toInstructionHtmlElement(model.a)
@@ -6171,7 +6171,7 @@ var $author$project$Aoc03$view = function (model) {
 		$elm$html$Html$table,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'width', '500px'),
+				A2($elm$html$Html$Attributes$style, 'width', '1080px'),
 				A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New')
 			]),
 		_List_fromArray(
@@ -6187,8 +6187,8 @@ var $author$project$Aoc03$view = function (model) {
 							[
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '40px'),
-								A2($elm$html$Html$Attributes$style, 'padding', '20px')
+								A2($elm$html$Html$Attributes$style, 'font-size', '32px'),
+								A2($elm$html$Html$Attributes$style, 'padding', '10px')
 							]),
 						_List_fromArray(
 							[
@@ -6282,6 +6282,32 @@ var $author$project$Aoc03$view = function (model) {
 										$elm$html$Html$text('2020')
 									])),
 								$elm$html$Html$text('] ')
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'padding-bottom', '10px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$a,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$href('https://adventofcode.com/2024/day/3')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('https://adventofcode.com/2024/day/3')
+									]))
 							]))
 					])),
 				A2(
@@ -6450,7 +6476,16 @@ var $author$project$Aoc03$view = function (model) {
 					]))
 			]));
 };
-var $author$project$Aoc03$main = $elm$browser$Browser$element(
+var $author$project$Aoc03$view = function (model) {
+	return {
+		ax: _List_fromArray(
+			[
+				$author$project$Aoc03$viewBody(model)
+			]),
+		aL: 'Advent of Code 2024 | Day 3: Mull It Over'
+	};
+};
+var $author$project$Aoc03$main = $elm$browser$Browser$document(
 	{aE: $author$project$Aoc03$init, aK: $author$project$Aoc03$subscriptions, aM: $author$project$Aoc03$update, aN: $author$project$Aoc03$view});
 _Platform_export({'Aoc03':{'init':$author$project$Aoc03$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));

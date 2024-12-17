@@ -5249,7 +5249,8 @@ var $elm$core$Task$perform = F2(
 		return $elm$core$Task$command(
 			A2($elm$core$Task$map, toMessage, task));
 	});
-var $elm$browser$Browser$element = _Browser_element;
+var $elm$browser$Browser$document = _Browser_document;
+var $author$project$Aoc06$Input = 0;
 var $author$project$Aoc06$Part1 = 0;
 var $author$project$Aoc06$Forward = 1;
 var $author$project$Aoc06$N = 0;
@@ -5707,8 +5708,14 @@ var $elm$core$String$foldr = _String_foldr;
 var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
 };
-var $author$project$Aoc06$initBoard = function (useSample) {
-	var data = useSample ? $author$project$Aoc06$sample : $author$project$Aoc06$input;
+var $author$project$Aoc06$initBoard = function (dataSource) {
+	var data = function () {
+		if (dataSource === 1) {
+			return $author$project$Aoc06$sample;
+		} else {
+			return $author$project$Aoc06$input;
+		}
+	}();
 	return $tortus$elm_array_2d$Array2D$fromList(
 		A2(
 			$elm$core$List$map,
@@ -5939,9 +5946,9 @@ var $author$project$Aoc06$walk = F5(
 		}
 	});
 var $author$project$Aoc06$initModel = F2(
-	function (mode, useSample) {
+	function (mode, dataSource) {
 		var dir = 0;
-		var board = $author$project$Aoc06$initBoard(useSample);
+		var board = $author$project$Aoc06$initBoard(dataSource);
 		var startPos = $author$project$Aoc06$findStartPos(board);
 		var route = A5($author$project$Aoc06$walk, board, _List_Nil, 0, 1, startPos);
 		var candidateObstructions = A2(
@@ -5957,16 +5964,16 @@ var $author$project$Aoc06$initModel = F2(
 		var yStart = _v0.b;
 		var guardless = A4($tortus$elm_array_2d$Array2D$set, yStart, xStart, '.', board);
 		var msg = $elm$core$String$fromInt(xStart) + (',' + $elm$core$String$fromInt(yStart));
-		return {S: guardless, T: 100, A: false, B: candidateObstructions, ab: 0, ac: 0, ae: '', Q: false, D: dir, E: startPos, al: msg, v: mode, q: true, R: route, F: _List_Nil, y: $author$project$Aoc06$defaultTickInterval, t: useSample, P: $elm$core$Array$empty, I: vizBoard};
+		return {S: guardless, T: 100, A: false, B: candidateObstructions, ab: 0, ac: 0, q: dataSource, ae: '', Q: false, D: dir, E: startPos, al: msg, r: mode, s: true, R: route, F: _List_Nil, y: $author$project$Aoc06$defaultTickInterval, P: $elm$core$Array$empty, I: vizBoard};
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Aoc06$init = function (_v0) {
 	return _Utils_Tuple2(
-		A2($author$project$Aoc06$initModel, 0, false),
+		A2($author$project$Aoc06$initModel, 0, 0),
 		$elm$core$Platform$Cmd$none);
 };
-var $author$project$Aoc06$Calculate = 9;
+var $author$project$Aoc06$Calculate = 10;
 var $author$project$Aoc06$Tick = 0;
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$time$Time$Every = F2(
@@ -6384,7 +6391,7 @@ var $elm$time$Time$every = F2(
 	});
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc06$subscriptions = function (model) {
-	var tickSub = model.q ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = model.s ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
 		model.y,
 		function (_v1) {
@@ -6394,7 +6401,7 @@ var $author$project$Aoc06$subscriptions = function (model) {
 		$elm$time$Time$every,
 		model.T,
 		function (_v0) {
-			return 9;
+			return 10;
 		}) : $elm$core$Platform$Sub$none;
 	return $elm$core$Platform$Sub$batch(
 		_List_fromArray(
@@ -6781,7 +6788,7 @@ var $elm$core$List$take = F2(
 		return A3($elm$core$List$takeFast, 0, n, list);
 	});
 var $author$project$Aoc06$updateClear = function (model) {
-	return A2($author$project$Aoc06$initModel, model.v, model.t);
+	return A2($author$project$Aoc06$initModel, model.r, model.q);
 };
 var $author$project$Aoc06$Highlight = function (a) {
 	return {$: 0, a: a};
@@ -6843,25 +6850,28 @@ var $author$project$Aoc06$updateStep = function (model) {
 	} else {
 		return _Utils_update(
 			model,
-			{Q: true, q: true});
+			{Q: true, s: true});
 	}
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc06$updateTogglePlay = function (model) {
 	if (model.Q) {
-		var m = A2($author$project$Aoc06$initModel, model.v, model.t);
+		var m = A2($author$project$Aoc06$initModel, model.r, model.q);
 		return _Utils_update(
 			m,
-			{q: false});
+			{s: false});
 	} else {
 		return _Utils_update(
 			model,
-			{q: !model.q});
+			{s: !model.s});
 	}
 };
-var $author$project$Aoc06$updateToggleSample = function (model) {
-	var useSample = !model.t;
-	return A2($author$project$Aoc06$initModel, model.v, useSample);
+var $author$project$Aoc06$updateUseInput = function (model) {
+	return A2($author$project$Aoc06$initModel, model.r, 0);
+};
+var $author$project$Aoc06$Sample = 1;
+var $author$project$Aoc06$updateUseSample = function (model) {
+	return A2($author$project$Aoc06$initModel, model.r, 1);
 };
 var $author$project$Aoc06$update = F2(
 	function (msg, model) {
@@ -6890,14 +6900,14 @@ var $author$project$Aoc06$update = F2(
 						model,
 						{y: model.y * 2}),
 					$elm$core$Platform$Cmd$none);
-			case 7:
+			case 8:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{v: 0}),
+						{r: 0}),
 					$elm$core$Platform$Cmd$none);
-			case 8:
-				var freshModel = A2($author$project$Aoc06$initModel, 1, model.t);
+			case 9:
+				var freshModel = A2($author$project$Aoc06$initModel, 1, model.q);
 				var m = _Utils_update(
 					freshModel,
 					{A: true});
@@ -6908,7 +6918,11 @@ var $author$project$Aoc06$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 6:
 				return _Utils_Tuple2(
-					$author$project$Aoc06$updateToggleSample(model),
+					$author$project$Aoc06$updateUseSample(model),
+					$elm$core$Platform$Cmd$none);
+			case 7:
+				return _Utils_Tuple2(
+					$author$project$Aoc06$updateUseInput(model),
 					$elm$core$Platform$Cmd$none);
 			default:
 				var batchSize = 1;
@@ -6947,7 +6961,8 @@ var $author$project$Aoc06$Faster = 3;
 var $author$project$Aoc06$Slower = 4;
 var $author$project$Aoc06$Step = 1;
 var $author$project$Aoc06$TogglePlay = 2;
-var $author$project$Aoc06$ToggleSample = 6;
+var $author$project$Aoc06$UseInput = 7;
+var $author$project$Aoc06$UseSample = 6;
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -6968,6 +6983,15 @@ var $elm$core$List$append = F2(
 	});
 var $elm$html$Html$br = _VirtualDom_node('br');
 var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$core$Set$Set_elm_builtin = $elm$core$Basics$identity;
 var $elm$core$Set$empty = $elm$core$Dict$empty;
@@ -6985,6 +7009,8 @@ var $elm$html$Html$Attributes$href = function (url) {
 		'href',
 		_VirtualDom_noJavaScriptUri(url));
 };
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 0, a: a};
 };
@@ -7070,8 +7096,16 @@ var $author$project$Aoc06$toCharElement = F2(
 		}
 	});
 var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $author$project$Aoc06$view = function (model) {
-	var textFontSize = model.t ? '36px' : '9px';
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $author$project$Aoc06$viewBody = function (model) {
+	var textFontSize = function () {
+		var _v4 = model.q;
+		if (_v4 === 1) {
+			return '24px';
+		} else {
+			return '9px';
+		}
+	}();
 	var positionsVisited = $elm$core$Set$size(
 		$elm$core$Set$fromList(
 			A2(
@@ -7154,7 +7188,7 @@ var $author$project$Aoc06$view = function (model) {
 			var str = obsCountStr + (' candidates left, ' + (loopCountStr + ' verified'));
 			return _Utils_Tuple2('Calculating', str);
 		} else {
-			if (!model.v) {
+			if (!model.r) {
 				var t1 = '(' + ($elm$core$String$fromInt(xGuard) + (', ' + ($elm$core$String$fromInt(yGuard) + ')')));
 				return _Utils_Tuple2(
 					t1,
@@ -7188,7 +7222,7 @@ var $author$project$Aoc06$view = function (model) {
 							[
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '40px'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '32px'),
 								A2($elm$html$Html$Attributes$style, 'padding', '20px')
 							]),
 						_List_fromArray(
@@ -7295,32 +7329,68 @@ var $author$project$Aoc06$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'padding', '10px')
+								A2($elm$html$Html$Attributes$style, 'padding-bottom', '10px')
 							]),
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$button,
+								$elm$html$Html$a,
 								_List_fromArray(
 									[
-										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick(6)
+										$elm$html$Html$Attributes$href('https://adventofcode.com/2024/day/6')
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text(
-										model.t ? 'Input' : 'Sample')
+										$elm$html$Html$text('https://adventofcode.com/2024/day/6')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '16px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('radio'),
+										$elm$html$Html$Events$onClick(7),
+										$elm$html$Html$Attributes$checked(!model.q)
+									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Input')
 									])),
 								A2(
-								$elm$html$Html$button,
+								$elm$html$Html$input,
 								_List_fromArray(
 									[
-										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick(5)
+										$elm$html$Html$Attributes$type_('radio'),
+										$elm$html$Html$Events$onClick(6),
+										$elm$html$Html$Attributes$checked(model.q === 1)
 									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Clear')
+										$elm$html$Html$text('Sample')
 									]))
 							]))
 					])),
@@ -7343,6 +7413,17 @@ var $author$project$Aoc06$view = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick(5)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Clear')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
 										$elm$html$Html$Events$onClick(4)
 									]),
 								_List_fromArray(
@@ -7358,7 +7439,7 @@ var $author$project$Aoc06$view = function (model) {
 									]),
 								_List_fromArray(
 									[
-										model.q ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
+										model.s ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -7440,7 +7521,16 @@ var $author$project$Aoc06$view = function (model) {
 					]))
 			]));
 };
-var $author$project$Aoc06$main = $elm$browser$Browser$element(
+var $author$project$Aoc06$view = function (model) {
+	return {
+		aG: _List_fromArray(
+			[
+				$author$project$Aoc06$viewBody(model)
+			]),
+		aU: 'Advent of Code 2024 | Day 6: Guard Gallivant (Part 1)'
+	};
+};
+var $author$project$Aoc06$main = $elm$browser$Browser$document(
 	{aN: $author$project$Aoc06$init, aT: $author$project$Aoc06$subscriptions, aV: $author$project$Aoc06$update, aW: $author$project$Aoc06$view});
 _Platform_export({'Aoc06':{'init':$author$project$Aoc06$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));

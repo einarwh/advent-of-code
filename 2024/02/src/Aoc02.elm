@@ -1,6 +1,6 @@
 module Aoc02 exposing (..)
 
-import Browser
+import Browser exposing (Document)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
@@ -11,7 +11,7 @@ import Html exposing (text)
 -- MAIN
 
 main =
-  Browser.element
+  Browser.document
     { init = init
     , view = view
     , update = update
@@ -19,11 +19,13 @@ main =
 
 -- MODEL
 
+type DataSource = Input | Sample
+
 type Report = Unchecked (List Int) | Safe (List Int) | Dampened (List Int, Int) | Unsafe (List Int)
 
 type alias Model = 
   { safeReports : Int 
-  , useSample : Bool 
+  , dataSource : DataSource 
   , useDampener : Bool 
   , reports : List Report
   , lastCommandText : String
@@ -105,8 +107,8 @@ checkReportWithDampener report =
             Just ix -> Dampened (numbers, ix) 
     _ -> report 
 
-initReports : Bool -> List Report
-initReports useSample = 
+initReports : DataSource -> List Report
+initReports dataSource = 
   let 
     sample = """7 6 4 2 1
 1 2 7 8 9
@@ -1114,18 +1116,22 @@ initReports useSample =
 88 85 82 79 76 74 73 71
 31 33 34 35 38 41 42 43
 10 11 12 15 17 20 21""" 
-    data = if useSample then sample else input 
+    data = 
+      case dataSource of 
+        Sample -> sample
+        Input -> input 
   in 
     data |> String.split "\n" |> List.map (parseNumbers >> Unchecked)
 
 init : () -> (Model, Cmd Msg)
 init _ =
   let 
-    reports = initReports False
+    dataSource = Input
+    reports = initReports dataSource
     model = { safeReports = 0
             , reports = reports
             , lastCommandText = "press play to start"
-            , useSample = False
+            , dataSource = dataSource
             , useDampener = False
             , counter = 0
             , debug = "" }
@@ -1134,10 +1140,10 @@ init _ =
 
 -- UPDATE
 
-type Msg = Clear | Solve | ToggleDampener | ToggleSample
+type Msg = Clear | Solve | ToggleDampener | UseSample | UseInput
 
 updateClear : Model -> Model
-updateClear model = { model | reports = initReports model.useSample, safeReports = 0 } 
+updateClear model = { model | reports = initReports model.dataSource, safeReports = 0 } 
 
 countAsSafe : Report -> Int 
 countAsSafe report = 
@@ -1168,14 +1174,11 @@ updateToggleDampener model =
   let
     useDampener = not model.useDampener
   in
-    { model | useDampener = useDampener, reports = initReports model.useSample, safeReports = 0 } 
+    { model | useDampener = useDampener, reports = initReports model.dataSource, safeReports = 0 } 
 
-updateToggleSample : Model -> Model
-updateToggleSample model = 
-  let
-    useSample = not model.useSample
-  in
-    { model | useSample = useSample, safeReports = 0, reports = initReports useSample } 
+updateDataSource : DataSource -> Model -> Model
+updateDataSource dataSource model = 
+  { model | dataSource = dataSource, safeReports = 0, reports = initReports dataSource } 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -1186,8 +1189,10 @@ update msg model =
       (updateSolve model, Cmd.none)
     ToggleDampener -> 
       (updateToggleDampener model, Cmd.none)
-    ToggleSample -> 
-      (updateToggleSample model, Cmd.none)
+    UseSample -> 
+      (updateDataSource Sample model, Cmd.none)
+    UseInput -> 
+      (updateDataSource Input model, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -1251,11 +1256,19 @@ toReportHtmlElement report =
     Safe numbers -> toSafeHtmlElement numbers
     Dampened (numbers, index) -> toDampenedHtmlElement index numbers
 
-view : Model -> Html Msg
-view model =
+view : Model -> Document Msg
+view model = 
+  { title = "Advent of Code 2024 | Day 2: Red-Nosed Reports"
+  , body = [ viewBody model ] }
+
+viewBody : Model -> Html Msg
+viewBody model =
   let
     commandsStr = ""
-    textFontSize = if model.useSample then "36px" else "14px"
+    textFontSize = 
+      case model.dataSource of 
+        Sample -> "24px" 
+        Input -> "14px" 
     elements = model.reports |> List.concatMap toReportHtmlElement
   in 
     Html.table 
@@ -1268,8 +1281,8 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "40px"
-              , Html.Attributes.style "padding" "20px"]
+              , Html.Attributes.style "font-size" "32px"
+              , Html.Attributes.style "padding" "10px"]
               [ Html.div [] [Html.text "Advent of Code 2024" ]
               , Html.div [] [Html.text "Day 2: Red-Nosed Reports" ] ] ]
       , Html.tr 
@@ -1297,6 +1310,31 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
+              , Html.Attributes.style "padding-bottom" "10px" ]
+              [ Html.a 
+                [ Html.Attributes.href "https://adventofcode.com/2024/day/2" ] 
+                [ Html.text "https://adventofcode.com/2024/day/2" ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "16px" ]
+              [ 
+                Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseInput, Html.Attributes.checked (model.dataSource == Input) ] 
+                []
+              , Html.label [] [ Html.text "Input" ]
+              , Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseSample, Html.Attributes.checked (model.dataSource == Sample) ] 
+                []
+              , Html.label [] [ Html.text "Sample" ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Solve ] 
@@ -1304,9 +1342,6 @@ view model =
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Clear ] 
                 [ Html.text "Clear" ] 
-              , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick ToggleSample ] 
-                [ Html.text (if model.useSample then "Input" else "Sample") ]
             ] ]
       , Html.tr 
           []

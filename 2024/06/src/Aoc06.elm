@@ -1,6 +1,6 @@
 module Aoc06 exposing (..)
 
-import Browser
+import Browser exposing (Document)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
@@ -17,13 +17,15 @@ defaultTickInterval = 10
 -- MAIN
 
 main =
-  Browser.element
+  Browser.document
     { init = init
     , view = view
     , update = update
     , subscriptions = subscriptions }
 
 -- MODEL
+
+type DataSource = Input | Sample
 
 type alias Pos = (Int, Int)
 
@@ -49,7 +51,7 @@ type alias Model =
   , candidateObstructions : List Pos
   , verifiedLoops : Array Pos
   , currentLoopIndex : Int
-  , useSample : Bool
+  , dataSource : DataSource
   , paused : Bool 
   , finished : Bool 
   , tickInterval : Float 
@@ -202,10 +204,13 @@ input = """........#.............................................#.........#....
 ..#.......#........................#........................#.....................................................................
 ........................#...............................#.#.............#................................#..................#....."""
 
-initBoard : Bool -> Array2D Char
-initBoard useSample = 
+initBoard : DataSource -> Array2D Char
+initBoard dataSource = 
   let 
-    data = if useSample then sample else input 
+    data = 
+      case dataSource of 
+        Sample -> sample 
+        Input -> input 
   in 
     data |> String.split "\n" |> List.map (String.toList) |> Array2D.fromList
 
@@ -255,10 +260,10 @@ walk board visited dir move pos =
       _ -> -- Go ahead.
         walk board ((pos, dir, move) :: visited) dir Forward nextPos
 
-initModel : Mode -> Bool -> Model 
-initModel mode useSample = 
+initModel : Mode -> DataSource -> Model 
+initModel mode dataSource = 
   let 
-    board = initBoard useSample
+    board = initBoard dataSource
     startPos = findStartPos board 
     (xStart, yStart) = startPos
     guardless = board |> Array2D.set yStart xStart '.'
@@ -275,7 +280,7 @@ initModel mode useSample =
     , routeRemaining = route
     , routeWalked = []
     , message = msg
-    , useSample = useSample
+    , dataSource = dataSource
     , calculating = False 
     , candidateObstructions = candidateObstructions
     , verifiedLoops = Array.empty
@@ -290,7 +295,7 @@ initModel mode useSample =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel Part1 False, Cmd.none)
+  (initModel Part1 Input, Cmd.none)
 
 -- UPDATE
 
@@ -301,7 +306,8 @@ type Msg =
   | Faster 
   | Slower 
   | Clear 
-  | ToggleSample 
+  | UseSample 
+  | UseInput 
   | EnablePart1 
   | EnablePart2
   | Calculate
@@ -316,7 +322,7 @@ getAllPositions board =
 
 updateClear : Model -> Model
 updateClear model = 
-  initModel model.mode model.useSample
+  initModel model.mode model.dataSource
 
 updateStep : Model -> Model
 updateStep model = 
@@ -360,18 +366,19 @@ updateTogglePlay : Model -> Model
 updateTogglePlay model = 
   if model.finished then 
     let 
-      m = initModel model.mode model.useSample
+      m = initModel model.mode model.dataSource
     in 
       {m | paused = False }
   else 
     { model | paused = not model.paused }
 
-updateToggleSample : Model -> Model
-updateToggleSample model = 
-  let
-    useSample = not model.useSample
-  in
-    initModel model.mode useSample 
+updateUseSample : Model -> Model
+updateUseSample model = 
+  initModel model.mode Sample 
+
+updateUseInput : Model -> Model
+updateUseInput model = 
+  initModel model.mode Input 
 
 findLoop : List (Pos, Dir) -> Dir -> Pos -> Array2D Char -> Bool 
 findLoop visited dir pos board = 
@@ -410,14 +417,16 @@ update msg model =
       ({model | mode = Part1 }, Cmd.none)
     EnablePart2 -> 
       let 
-        freshModel = initModel Part2 model.useSample
+        freshModel = initModel Part2 model.dataSource
         m = { freshModel | calculating = True }
       in 
         (m, Cmd.none)
     TogglePlay -> 
       (updateTogglePlay model, Cmd.none)
-    ToggleSample -> 
-      (updateToggleSample model, Cmd.none)
+    UseSample -> 
+      (updateUseSample model, Cmd.none)
+    UseInput -> 
+      (updateUseInput model, Cmd.none)
     Calculate -> 
       let 
         batchSize = 1
@@ -487,8 +496,13 @@ toCharElement vizBoard (x, y) =
           Plain ch -> 
             Html.text (String.fromChar ch)
 
-view : Model -> Html Msg
-view model =
+view : Model -> Document Msg
+view model = 
+  { title = "Advent of Code 2024 | Day 6: Guard Gallivant (Part 1)"
+  , body = [ viewBody model ] }
+
+viewBody : Model -> Html Msg
+viewBody model =
   let
     guardChar = 
       case model.guardDir of 
@@ -504,7 +518,10 @@ view model =
     nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement board))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
     positionsVisited = model.routeWalked |> List.map (\(p, _, _) -> p) |> Set.fromList |> Set.size 
-    textFontSize = if model.useSample then "36px" else "9px"
+    textFontSize = 
+      case model.dataSource of 
+        Sample -> "24px"
+        Input -> "9px"
 
     (text1, text2) = 
       if model.calculating then 
@@ -530,7 +547,7 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "40px"
+              , Html.Attributes.style "font-size" "32px"
               , Html.Attributes.style "padding" "20px"]
               [ Html.div [] [Html.text "Advent of Code 2024" ]
               , Html.div [] [Html.text "Day 6: Guard Gallivant (Part 1)" ] ] ]
@@ -559,13 +576,26 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "padding" "10px" ]
-              [ Html.button 
-                [ Html.Attributes.style "width" "80px", onClick ToggleSample ] 
-                [ Html.text (if model.useSample then "Input" else "Sample") ]
-              , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Clear ] 
-                [ Html.text "Clear" ] 
+              , Html.Attributes.style "padding-bottom" "10px" ]
+              [ Html.a 
+                [ Html.Attributes.href "https://adventofcode.com/2024/day/6" ] 
+                [ Html.text "https://adventofcode.com/2024/day/6" ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "16px" ]
+              [ 
+                Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseInput, Html.Attributes.checked (model.dataSource == Input) ] 
+                []
+              , Html.label [] [ Html.text "Input" ]
+              , Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseSample, Html.Attributes.checked (model.dataSource == Sample) ] 
+                []
+              , Html.label [] [ Html.text "Sample" ]
             ] ]
       , Html.tr 
           []
@@ -573,6 +603,9 @@ view model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Clear ] 
+                [ Html.text "Clear"]
+              , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Slower ] 
                 [ text "Slower" ]
               , Html.button 
