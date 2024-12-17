@@ -59,24 +59,32 @@ let writeC value computer =
 let nextInstruction computer = 
     { computer with pointer = computer.pointer + 2L }
 
-let adv (computer : Computer) : Computer = 
+let division computer = 
     let operand = combo computer 
-    printfn "adv %d" operand
+    printfn "operand %d" operand
     let numerator = computer.regA 
     let denominator = int64 (Math.Pow(2.0, double operand))
     let result = numerator / denominator
     printfn "division %d %d" numerator denominator
+    result 
+
+let adv (computer : Computer) : Computer = 
+    printfn "adv"
     computer 
-    |> writeA result 
+    |> writeA (division computer) 
     |> nextInstruction
 
 let bdv computer = 
-    let operand = combo computer 
+    printfn "adv"
     computer 
+    |> writeB (division computer) 
+    |> nextInstruction
 
 let cdv computer = 
-    let operand = combo computer 
+    printfn "cdv"
     computer 
+    |> writeA (division computer) 
+    |> nextInstruction
 
 let bxl computer = 
     let operand = literal computer 
