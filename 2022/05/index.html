@@ -5212,8 +5212,8 @@ var $elm$core$Task$perform = F2(
 		return $elm$core$Task$command(
 			A2($elm$core$Task$map, toMessage, task));
 	});
-var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Aoc05$defaultDelay = 200;
+var $elm$browser$Browser$document = _Browser_document;
+var $author$project$Aoc05$defaultDelay = 100;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $elm$core$List$maybeCons = F3(
@@ -6530,13 +6530,14 @@ var $author$project$Aoc05$toSvg = function (stacks) {
 		lst);
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $author$project$Aoc05$view = function (model) {
+var $author$project$Aoc05$viewBody = function (model) {
 	var s = $author$project$Aoc05$toSvg(model.G);
 	var commandsStr = 'commands: ' + ($elm$core$String$fromInt(model.E) + (' of ' + $elm$core$String$fromInt(model.Q)));
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
 			[
+				A2($elm$html$Html$Attributes$style, 'width', '1080px'),
 				A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New')
 			]),
 		_List_fromArray(
@@ -6552,8 +6553,8 @@ var $author$project$Aoc05$view = function (model) {
 							[
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '40px'),
-								A2($elm$html$Html$Attributes$style, 'padding', '20px')
+								A2($elm$html$Html$Attributes$style, 'font-size', '32px'),
+								A2($elm$html$Html$Attributes$style, 'padding', '10px')
 							]),
 						_List_fromArray(
 							[
@@ -6647,6 +6648,32 @@ var $author$project$Aoc05$view = function (model) {
 										$elm$html$Html$text('2020')
 									])),
 								$elm$html$Html$text('] ')
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'padding-bottom', '10px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$a,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$href('https://adventofcode.com/2022/day/5')
+									]),
+								_List_fromArray(
+									[
+										$elm$svg$Svg$text('https://adventofcode.com/2022/day/5')
+									]))
 							]))
 					])),
 				A2(
@@ -6762,7 +6789,16 @@ var $author$project$Aoc05$view = function (model) {
 					]))
 			]));
 };
-var $author$project$Aoc05$main = $elm$browser$Browser$element(
+var $author$project$Aoc05$view = function (model) {
+	return {
+		az: _List_fromArray(
+			[
+				$author$project$Aoc05$viewBody(model)
+			]),
+		aN: 'Advent of Code 2022 | Day 5: Supply Stack'
+	};
+};
+var $author$project$Aoc05$main = $elm$browser$Browser$document(
 	{aG: $author$project$Aoc05$init, aM: $author$project$Aoc05$subscriptions, aO: $author$project$Aoc05$update, aP: $author$project$Aoc05$view});
 _Platform_export({'Aoc05':{'init':$author$project$Aoc05$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));

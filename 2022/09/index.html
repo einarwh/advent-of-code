@@ -5212,7 +5212,7 @@ var $elm$core$Task$perform = F2(
 		return $elm$core$Task$command(
 			A2($elm$core$Task$map, toMessage, task));
 	});
-var $elm$browser$Browser$element = _Browser_element;
+var $elm$browser$Browser$document = _Browser_document;
 var $elm$core$List$append = F2(
 	function (xs, ys) {
 		if (!ys.b) {
@@ -6271,7 +6271,7 @@ var $author$project$Aoc09$toLocalSvg = function (model) {
 		lst);
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $author$project$Aoc09$view = function (model) {
+var $author$project$Aoc09$viewBody = function (model) {
 	var visitedStr = 'visited: ' + $elm$core$String$fromInt(
 		$elm$core$Set$size(model.B));
 	var s = model.x ? $author$project$Aoc09$toLocalSvg(model) : $author$project$Aoc09$toGlobalSvg(model);
@@ -6285,6 +6285,7 @@ var $author$project$Aoc09$view = function (model) {
 		$elm$html$Html$table,
 		_List_fromArray(
 			[
+				A2($elm$html$Html$Attributes$style, 'width', '1080px'),
 				A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New')
 			]),
 		_List_fromArray(
@@ -6300,8 +6301,8 @@ var $author$project$Aoc09$view = function (model) {
 							[
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '40px'),
-								A2($elm$html$Html$Attributes$style, 'padding', '20px')
+								A2($elm$html$Html$Attributes$style, 'font-size', '32px'),
+								A2($elm$html$Html$Attributes$style, 'padding', '10px')
 							]),
 						_List_fromArray(
 							[
@@ -6395,6 +6396,32 @@ var $author$project$Aoc09$view = function (model) {
 										$elm$html$Html$text('2020')
 									])),
 								$elm$html$Html$text('] ')
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'padding-bottom', '10px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$a,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$href('https://adventofcode.com/2022/day/9')
+									]),
+								_List_fromArray(
+									[
+										$elm$svg$Svg$text('https://adventofcode.com/2022/day/9')
+									]))
 							]))
 					])),
 				A2(
@@ -6548,7 +6575,16 @@ var $author$project$Aoc09$view = function (model) {
 					]))
 			]));
 };
-var $author$project$Aoc09$main = $elm$browser$Browser$element(
+var $author$project$Aoc09$view = function (model) {
+	return {
+		at: _List_fromArray(
+			[
+				$author$project$Aoc09$viewBody(model)
+			]),
+		aH: 'Advent of Code 2022 | Day 9: Rope Bridge'
+	};
+};
+var $author$project$Aoc09$main = $elm$browser$Browser$document(
 	{aA: $author$project$Aoc09$init, aG: $author$project$Aoc09$subscriptions, aI: $author$project$Aoc09$update, aJ: $author$project$Aoc09$view});
 _Platform_export({'Aoc09':{'init':$author$project$Aoc09$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));

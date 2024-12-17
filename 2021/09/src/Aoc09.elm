@@ -1,6 +1,6 @@
 module Aoc09 exposing (..)
 
-import Browser
+import Browser exposing (Document)
 import Html exposing (Html)
 import Html.Attributes
 import Set exposing (Set)
@@ -17,7 +17,7 @@ cellSize = 6
 -- MAIN
 
 main =
-  Browser.element
+  Browser.document
     { init = init
     , view = view
     , update = update
@@ -241,8 +241,13 @@ toSvg model =
       ]
       rects
 
-view : Model -> Html Msg
-view model =
+view : Model -> Document Msg
+view model = 
+  { title = "Advent of Code 2021 | Day 9: Smoke Basin"
+  , body = [ viewBody model ] }
+
+viewBody : Model -> Html Msg
+viewBody model =
   let
     s = toSvg model
     riskLevelSumStr = "Risk level sum: " ++ String.fromInt model.riskLevelSum
@@ -253,16 +258,15 @@ view model =
     basinStr = "Basin product: " ++ threeLargestBasinsStr ++ " = " ++ String.fromInt basinProduct
   in 
     Html.table 
-      [ 
-        Html.Attributes.style "font-family" "Courier New"
-      ]
+      [ Html.Attributes.style "width" "1080px"
+      , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "40px"
-              , Html.Attributes.style "padding" "20px"]
+              , Html.Attributes.style "font-size" "32px"
+              , Html.Attributes.style "padding" "10px"]
               [ Html.div [] [Html.text "Advent of Code 2021" ]
               , Html.div [] [Html.text "Day 9: Smoke Basin" ] ] ]
       , Html.tr 
@@ -285,6 +289,15 @@ view model =
               , Html.text " ["
               , Html.a [ Html.Attributes.href "../../2020/"] [ Html.text "2020" ]
               , Html.text "] "
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "padding-bottom" "10px" ]
+              [ Html.a 
+                [ Html.Attributes.href "https://adventofcode.com/2021/day/9" ] 
+                [ text "https://adventofcode.com/2021/day/9" ]
             ] ]
       , Html.tr 
           []

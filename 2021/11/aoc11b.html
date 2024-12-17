@@ -5249,7 +5249,7 @@ var $elm$core$Task$perform = F2(
 		return $elm$core$Task$command(
 			A2($elm$core$Task$map, toMessage, task));
 	});
-var $elm$browser$Browser$element = _Browser_element;
+var $elm$browser$Browser$document = _Browser_document;
 var $elm$core$List$append = F2(
 	function (xs, ys) {
 		if (!ys.b) {
@@ -6206,6 +6206,7 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
@@ -6287,7 +6288,7 @@ var $author$project$Aoc11b$toSvg = function (model) {
 		octopusElements);
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $author$project$Aoc11b$view = function (model) {
+var $author$project$Aoc11b$viewBody = function (model) {
 	var totalStr = 'Flashed total: ' + $elm$core$String$fromInt(model.G);
 	var tickStr = 'Steps: ' + $elm$core$String$fromInt(model.B);
 	var s = $author$project$Aoc11b$toSvg(model);
@@ -6296,6 +6297,7 @@ var $author$project$Aoc11b$view = function (model) {
 		$elm$html$Html$table,
 		_List_fromArray(
 			[
+				A2($elm$html$Html$Attributes$style, 'width', '1080px'),
 				A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New')
 			]),
 		_List_fromArray(
@@ -6311,8 +6313,8 @@ var $author$project$Aoc11b$view = function (model) {
 							[
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '40px'),
-								A2($elm$html$Html$Attributes$style, 'padding', '20px')
+								A2($elm$html$Html$Attributes$style, 'font-size', '32px'),
+								A2($elm$html$Html$Attributes$style, 'padding', '10px')
 							]),
 						_List_fromArray(
 							[
@@ -6418,6 +6420,32 @@ var $author$project$Aoc11b$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'padding-bottom', '10px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$a,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$href('https://adventofcode.com/2021/day/11')
+									]),
+								_List_fromArray(
+									[
+										$elm$svg$Svg$text('https://adventofcode.com/2021/day/11')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
 								A2($elm$html$Html$Attributes$style, 'font-size', '20px'),
@@ -6458,7 +6486,16 @@ var $author$project$Aoc11b$view = function (model) {
 					]))
 			]));
 };
-var $author$project$Aoc11b$main = $elm$browser$Browser$element(
+var $author$project$Aoc11b$view = function (model) {
+	return {
+		at: _List_fromArray(
+			[
+				$author$project$Aoc11b$viewBody(model)
+			]),
+		aH: 'Advent of Code 2021 | Day 11: Dumbo Octopus (Part 2)'
+	};
+};
+var $author$project$Aoc11b$main = $elm$browser$Browser$document(
 	{aA: $author$project$Aoc11b$init, aG: $author$project$Aoc11b$subscriptions, aI: $author$project$Aoc11b$update, aJ: $author$project$Aoc11b$view});
 _Platform_export({'Aoc11b':{'init':$author$project$Aoc11b$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));

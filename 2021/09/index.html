@@ -5212,7 +5212,7 @@ var $elm$core$Task$perform = F2(
 		return $elm$core$Task$command(
 			A2($elm$core$Task$map, toMessage, task));
 	});
-var $elm$browser$Browser$element = _Browser_element;
+var $elm$browser$Browser$document = _Browser_document;
 var $elm$core$List$append = F2(
 	function (xs, ys) {
 		if (!ys.b) {
@@ -6563,6 +6563,7 @@ var $elm$core$List$take = F2(
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Aoc09$cellSize = 6;
 var $author$project$Aoc09$findCenterPosition = function (posList) {
 	var ySum = $elm$core$List$sum(
@@ -6586,7 +6587,6 @@ var $author$project$Aoc09$findCenterPosition = function (posList) {
 	var len = $elm$core$List$length(posList);
 	return _Utils_Tuple2((xSum / len) | 0, (ySum / len) | 0);
 };
-var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
 var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
@@ -6677,7 +6677,7 @@ var $author$project$Aoc09$toSvg = function (model) {
 		rects);
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $author$project$Aoc09$view = function (model) {
+var $author$project$Aoc09$viewBody = function (model) {
 	var s = $author$project$Aoc09$toSvg(model);
 	var riskLevelSumStr = 'Risk level sum: ' + $elm$core$String$fromInt(model.O);
 	var basinSizes = A2(
@@ -6701,6 +6701,7 @@ var $author$project$Aoc09$view = function (model) {
 		$elm$html$Html$table,
 		_List_fromArray(
 			[
+				A2($elm$html$Html$Attributes$style, 'width', '1080px'),
 				A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New')
 			]),
 		_List_fromArray(
@@ -6716,8 +6717,8 @@ var $author$project$Aoc09$view = function (model) {
 							[
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '40px'),
-								A2($elm$html$Html$Attributes$style, 'padding', '20px')
+								A2($elm$html$Html$Attributes$style, 'font-size', '32px'),
+								A2($elm$html$Html$Attributes$style, 'padding', '10px')
 							]),
 						_List_fromArray(
 							[
@@ -6823,6 +6824,32 @@ var $author$project$Aoc09$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'padding-bottom', '10px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$a,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$href('https://adventofcode.com/2021/day/9')
+									]),
+								_List_fromArray(
+									[
+										$elm$svg$Svg$text('https://adventofcode.com/2021/day/9')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'padding', '20px')
 							]),
@@ -6854,7 +6881,16 @@ var $author$project$Aoc09$view = function (model) {
 					]))
 			]));
 };
-var $author$project$Aoc09$main = $elm$browser$Browser$element(
+var $author$project$Aoc09$view = function (model) {
+	return {
+		av: _List_fromArray(
+			[
+				$author$project$Aoc09$viewBody(model)
+			]),
+		aJ: 'Advent of Code 2021 | Day 9: Smoke Basin'
+	};
+};
+var $author$project$Aoc09$main = $elm$browser$Browser$document(
 	{aC: $author$project$Aoc09$init, aI: $author$project$Aoc09$subscriptions, aK: $author$project$Aoc09$update, aL: $author$project$Aoc09$view});
 _Platform_export({'Aoc09':{'init':$author$project$Aoc09$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));

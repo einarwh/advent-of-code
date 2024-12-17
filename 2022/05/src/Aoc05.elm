@@ -1,6 +1,6 @@
 module Aoc05 exposing (..)
 
-import Browser
+import Browser exposing (Document)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
@@ -11,7 +11,7 @@ import Svg.Attributes exposing (..)
 import Time
 
 defaultDelay : Float
-defaultDelay = 200
+defaultDelay = 100
 
 crateSize : Int 
 crateSize = 10
@@ -19,7 +19,7 @@ crateSize = 10
 -- MAIN
 
 main =
-  Browser.element
+  Browser.document
     { init = init
     , view = view
     , update = update
@@ -830,23 +830,27 @@ toSvg stacks =
 --      , Svg.Attributes.style "background-color:lightblue" ]
       lst
 
-view : Model -> Html Msg
-view model =
+view : Model -> Document Msg
+view model = 
+  { title = "Advent of Code 2022 | Day 5: Supply Stack"
+  , body = [ viewBody model ] }
+
+viewBody : Model -> Html Msg
+viewBody model =
   let
     s = toSvg model.stacks
     commandsStr = "commands: " ++ String.fromInt model.counter ++ " of " ++ String.fromInt model.totalCommands
   in 
     Html.table 
-      [ 
-        Html.Attributes.style "font-family" "Courier New"
-      ]
+      [ Html.Attributes.style "width" "1080px"
+      , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "40px"
-              , Html.Attributes.style "padding" "20px"]
+              , Html.Attributes.style "font-size" "32px"
+              , Html.Attributes.style "padding" "10px"]
               [ Html.div [] [Html.text "Advent of Code 2022" ]
               , Html.div [] [Html.text "Day 5: Supply Stacks" ]] ]
       , Html.tr 
@@ -869,6 +873,15 @@ view model =
               , Html.text " ["
               , Html.a [ Html.Attributes.href "../../2020/"] [ Html.text "2020" ]
               , Html.text "] "
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "padding-bottom" "10px" ]
+              [ Html.a 
+                [ Html.Attributes.href "https://adventofcode.com/2022/day/5" ] 
+                [ text "https://adventofcode.com/2022/day/5" ]
             ] ]
       , Html.tr 
           []

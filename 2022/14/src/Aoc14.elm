@@ -3,7 +3,7 @@
 
 module Aoc14 exposing (..)
 
-import Browser
+import Browser exposing (Document)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
@@ -420,25 +420,29 @@ toSvg model =
       ]
       (floorElements ++ rockElements ++ sandElements ++ grainElements)
 
-viewHtml : Model -> Html Msg
-viewHtml model =
+view : Model -> Document Msg
+view model = 
+  { title = "Advent of Code 2022 | Day 14: Regolith Reservoir"
+  , body = [ viewBody model ] }
+
+viewBody : Model -> Html Msg
+viewBody model =
   let
     s = toSvg model
     debugStr = model.debug
     sandStr = model.sand |> Set.size |> String.fromInt
   in 
     Html.table 
-      [ 
-        Html.Attributes.style "font-family" "Courier New"
-      ]
+      [ Html.Attributes.style "width" "1080px"
+      , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "background-color" "white" 
-              , Html.Attributes.style "font-size" "40px"
-              , Html.Attributes.style "padding" "20px"]
+              , Html.Attributes.style "font-size" "32px"
+              , Html.Attributes.style "padding" "10px"]
               [ Html.div [] [Html.text "Advent of Code 2022" ]
               , Html.div [] [Html.text "Day 14: Regolith Reservoir" ] ] ]
       , Html.tr 
@@ -461,6 +465,15 @@ viewHtml model =
               , Html.text " ["
               , Html.a [ Html.Attributes.href "../../2020/"] [ Html.text "2020" ]
               , Html.text "] "
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "padding-bottom" "10px" ]
+              [ Html.a 
+                [ Html.Attributes.href "https://adventofcode.com/2022/day/14" ] 
+                [ text "https://adventofcode.com/2022/day/14" ]
             ] ]
       , Html.tr 
           []
@@ -497,9 +510,3 @@ viewHtml model =
                 [ Html.Attributes.style "width" "80px", onClick ToggleFloor ] 
                 [ if model.hasFloor then text "Void" else text "Floor" ] 
                 ] ] ] 
-
-view : Model -> Browser.Document Msg
-view model = 
-  { title = "Advent of Code 2022 - Day 14: Regolith Reservoir"
-  , body = [ viewHtml model ] }
-
