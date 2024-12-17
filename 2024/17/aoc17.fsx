@@ -17,10 +17,10 @@ let trim (input : string) = input.Trim()
 
 let split (splitter : string) (input : string) = input.Split(splitter)
 
-let parseRegister (s : string) : int64 =
+let parseRegister s =
     s |> split ": " |> Array.item 1 |> int64
 
-let parseProgram (s : string) : int64 array =
+let parseProgram s =
     s |> split ": " |> Array.item 1 |> split "," |> Array.map int64
 
 let parseComputer (arr : string array) =
@@ -149,7 +149,7 @@ let quine computer =
     let checkTarget opIndex target candidateA = 
         let p = execute { computer with regA = candidateA }
         p.[opIndex] = target 
-    let rec loop a ix = 
+    let rec loop ix a = 
         let opIndex = len - ix 
         if ix > len then 
             Some a
@@ -160,9 +160,9 @@ let quine computer =
                 [ 0L .. 7L ] 
                 |> List.map (fun j -> a + j * offset)
                 |> List.choose (fun candidateA -> if checkTarget opIndex target candidateA then Some candidateA else None)
-            candidates |> List.tryPick (fun (ca : int64) -> loop ca (ix + 1))
+            candidates |> List.tryPick (loop (ix + 1))
     let a0 = pow 8L ((int64 len) - 1L)
-    match loop a0 1 with 
+    match loop 1 a0 with 
     | Some a -> a 
     | None -> failwith ":("
 
