@@ -1,6 +1,6 @@
 module Aoc10 exposing (..)
 
-import Browser
+import Browser exposing (Document)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
@@ -16,7 +16,7 @@ unitSize = 9
 -- MAIN
 
 main =
-  Browser.element
+  Browser.document
     { init = init
     , view = view
     , update = update
@@ -475,20 +475,26 @@ toSvg model =
       -- , Svg.Attributes.style "background-color:lightblue" ]
       elements
 
-view : Model -> Html Msg
-view model =
+view : Model -> Document Msg
+view model = 
+  { title = "Advent of Code 2023 | Day 10: Pipe Maze"
+  , body = [ viewBody model ] }
+
+viewBody : Model -> Html Msg
+viewBody model =
   let
     s = toSvg model
   in 
     Html.table 
-      []
+      [ Html.Attributes.style "width" "1080px"
+      , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "40px"
-              , Html.Attributes.style "padding" "20px"]
+              , Html.Attributes.style "font-size" "32px"
+              , Html.Attributes.style "padding" "10px"]
               [ Html.div [] [Html.text "Advent of Code 2023" ]
               , Html.div [] [Html.text "Day 10: Pipe Maze" ]] ]
       , Html.tr 

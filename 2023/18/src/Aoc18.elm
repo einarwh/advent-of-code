@@ -1,6 +1,6 @@
 module Aoc18 exposing (..)
 
-import Browser
+import Browser exposing (Document)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events.Extra.Mouse exposing (..)
@@ -19,7 +19,7 @@ inputname = "input"
 -- MAIN
 
 main =
-  Browser.element
+  Browser.document
     { init = init
     , view = view
     , update = update
@@ -1078,20 +1078,26 @@ toSvg model =
       , Svg.Attributes.style "background-color:white" ]
       elements
 
-view : Model -> Html Msg
-view model =
+view : Model -> Document Msg
+view model = 
+  { title = "Advent of Code 2023 | Day 18: Lavaduct Lagoon"
+  , body = [ viewBody model ] }
+
+viewBody : Model -> Html Msg
+viewBody model =
   let
     s = toSvg model
   in 
     Html.table 
-      []
+      [ Html.Attributes.style "width" "1080px"
+      , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "36px"
-              , Html.Attributes.style "padding" "16px"]
+              , Html.Attributes.style "font-size" "32px"
+              , Html.Attributes.style "padding" "10px"]
               [ Html.div [] [Html.text "Advent of Code 2023" ]
               , Html.div [] [Html.text "Day 18: Lavaduct Lagoon" ]] ]
       , Html.tr 
@@ -1114,6 +1120,15 @@ view model =
               , Html.text " ["
               , Html.a [ Html.Attributes.href "../../2020/"] [ Html.text "2020" ]
               , Html.text "] "
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "padding-bottom" "10px" ]
+              [ Html.a 
+                [ Html.Attributes.href "https://adventofcode.com/2023/day/18" ] 
+                [ text "https://adventofcode.com/2023/day/18" ]
             ] ]
       , Html.tr 
           []

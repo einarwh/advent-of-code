@@ -5203,7 +5203,7 @@ var $elm$core$Task$perform = F2(
 		return $elm$core$Task$command(
 			A2($elm$core$Task$map, toMessage, task));
 	});
-var $elm$browser$Browser$element = _Browser_element;
+var $elm$browser$Browser$document = _Browser_document;
 var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
 	return array2d.h;
 };
@@ -6350,6 +6350,7 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$core$List$head = function (list) {
 	if (list.b) {
 		var x = list.a;
@@ -6366,7 +6367,6 @@ var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
 };
-var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
 var $author$project$Aoc10Pretty$unitSize = 4;
@@ -6674,11 +6674,15 @@ var $author$project$Aoc10Pretty$toSvg = function (model) {
 		elements);
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $author$project$Aoc10Pretty$view = function (model) {
+var $author$project$Aoc10Pretty$viewBody = function (model) {
 	var s = $author$project$Aoc10Pretty$toSvg(model);
 	return A2(
 		$elm$html$Html$table,
-		_List_Nil,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'width', '1080px'),
+				A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New')
+			]),
 		_List_fromArray(
 			[
 				A2(
@@ -6692,8 +6696,8 @@ var $author$project$Aoc10Pretty$view = function (model) {
 							[
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '36px'),
-								A2($elm$html$Html$Attributes$style, 'padding', '16px')
+								A2($elm$html$Html$Attributes$style, 'font-size', '32px'),
+								A2($elm$html$Html$Attributes$style, 'padding', '10px')
 							]),
 						_List_fromArray(
 							[
@@ -6799,6 +6803,32 @@ var $author$project$Aoc10Pretty$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'padding-bottom', '10px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$a,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$href('https://adventofcode.com/2023/day/10')
+									]),
+								_List_fromArray(
+									[
+										$elm$svg$Svg$text('https://adventofcode.com/2023/day/10')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
 								A2($elm$html$Html$Attributes$style, 'font-size', '24px'),
@@ -6841,7 +6871,16 @@ var $author$project$Aoc10Pretty$view = function (model) {
 					]))
 			]));
 };
-var $author$project$Aoc10Pretty$main = $elm$browser$Browser$element(
+var $author$project$Aoc10Pretty$view = function (model) {
+	return {
+		aw: _List_fromArray(
+			[
+				$author$project$Aoc10Pretty$viewBody(model)
+			]),
+		aK: 'Advent of Code 2023 | Day 10: Pipe Maze'
+	};
+};
+var $author$project$Aoc10Pretty$main = $elm$browser$Browser$document(
 	{aD: $author$project$Aoc10Pretty$init, aJ: $author$project$Aoc10Pretty$subscriptions, aL: $author$project$Aoc10Pretty$update, aM: $author$project$Aoc10Pretty$view});
 _Platform_export({'Aoc10Pretty':{'init':$author$project$Aoc10Pretty$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));

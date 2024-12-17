@@ -5212,7 +5212,7 @@ var $elm$core$Task$perform = F2(
 		return $elm$core$Task$command(
 			A2($elm$core$Task$map, toMessage, task));
 	});
-var $elm$browser$Browser$element = _Browser_element;
+var $elm$browser$Browser$document = _Browser_document;
 var $elm$core$Basics$min = F2(
 	function (x, y) {
 		return (_Utils_cmp(x, y) < 0) ? x : y;
@@ -6653,6 +6653,7 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Aoc18$Click = {$: 0};
 var $author$project$Aoc18$MouseMove = function (a) {
 	return {$: 2, a: a};
@@ -6874,11 +6875,15 @@ var $author$project$Aoc18$toSvg = function (model) {
 		elements);
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $author$project$Aoc18$view = function (model) {
+var $author$project$Aoc18$viewBody = function (model) {
 	var s = $author$project$Aoc18$toSvg(model);
 	return A2(
 		$elm$html$Html$table,
-		_List_Nil,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'width', '1080px'),
+				A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New')
+			]),
 		_List_fromArray(
 			[
 				A2(
@@ -6892,8 +6897,8 @@ var $author$project$Aoc18$view = function (model) {
 							[
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '36px'),
-								A2($elm$html$Html$Attributes$style, 'padding', '16px')
+								A2($elm$html$Html$Attributes$style, 'font-size', '32px'),
+								A2($elm$html$Html$Attributes$style, 'padding', '10px')
 							]),
 						_List_fromArray(
 							[
@@ -6999,6 +7004,32 @@ var $author$project$Aoc18$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'padding-bottom', '10px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$a,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$href('https://adventofcode.com/2023/day/18')
+									]),
+								_List_fromArray(
+									[
+										$elm$svg$Svg$text('https://adventofcode.com/2023/day/18')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
 								A2($elm$html$Html$Attributes$style, 'font-size', '36px'),
@@ -7040,7 +7071,16 @@ var $author$project$Aoc18$view = function (model) {
 					]))
 			]));
 };
-var $author$project$Aoc18$main = $elm$browser$Browser$element(
+var $author$project$Aoc18$view = function (model) {
+	return {
+		aR: _List_fromArray(
+			[
+				$author$project$Aoc18$viewBody(model)
+			]),
+		bs: 'Advent of Code 2023 | Day 18: Lavaduct Lagoon'
+	};
+};
+var $author$project$Aoc18$main = $elm$browser$Browser$document(
 	{a6: $author$project$Aoc18$init, bo: $author$project$Aoc18$subscriptions, bu: $author$project$Aoc18$update, bv: $author$project$Aoc18$view});
 _Platform_export({'Aoc18':{'init':$author$project$Aoc18$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
