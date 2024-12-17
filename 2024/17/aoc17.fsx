@@ -149,7 +149,7 @@ let quine computer =
     let checkTarget opIndex target candidateA = 
         let p = execute { computer with regA = candidateA }
         p.[opIndex] = target 
-    let rec loop (a : int64) (ix : int) : int64 option = 
+    let rec loop a ix = 
         let opIndex = len - ix 
         if ix > len then 
             Some a
