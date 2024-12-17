@@ -168,4 +168,4 @@ let run fileName =
     execute computer |> List.map string |> String.concat "," |> printfn "%s"
     0
 
-run "sample"
+run "input"
