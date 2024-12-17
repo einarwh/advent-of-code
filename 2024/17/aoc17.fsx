@@ -59,6 +59,9 @@ let writeC value computer =
 let nextInstruction computer = 
     { computer with pointer = computer.pointer + 2L }
 
+let jump target computer = 
+    { computer with pointer = target }
+
 let division computer = 
     let operand = combo computer 
     printfn "operand %d" operand
@@ -70,32 +73,48 @@ let division computer =
 
 let adv (computer : Computer) : Computer = 
     printfn "adv"
+    let result = division computer
     computer 
-    |> writeA (division computer) 
+    |> writeA result  
     |> nextInstruction
 
 let bdv computer = 
     printfn "adv"
+    let result = division computer
     computer 
-    |> writeB (division computer) 
+    |> writeB result  
     |> nextInstruction
 
 let cdv computer = 
     printfn "cdv"
+    let result = division computer
     computer 
-    |> writeA (division computer) 
+    |> writeC result  
     |> nextInstruction
 
 let bxl computer = 
     let operand = literal computer 
+    let regB = computer.regB 
+    let xor a b : int64 = a ^^^b 
+    let result = xor operand regB
     computer 
+    |> writeB result 
+    |> nextInstruction
 
 let bst computer = 
     let operand = combo computer 
-    computer 
+    let result = int64 (operand % 8L)
+    computer
+    |> writeB result
+    |> nextInstruction
 
 let jnz computer = 
-    computer 
+    let regA = computer.regA 
+    if regA = 0L then 
+        computer |> nextInstruction
+    else 
+        let target = literal computer 
+        computer |> jump target
 
 let bxc computer =
     computer 
