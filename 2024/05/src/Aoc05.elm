@@ -4,12 +4,10 @@ import Browser
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
-import Dict exposing (Dict)
-import Array exposing (Array)
-import Html exposing (text)
 
 -- MAIN
 
+main : Program () Model Msg
 main =
   Browser.element
     { init = init
@@ -19,10 +17,12 @@ main =
 
 -- MODEL
 
+type DataSource = Input | Sample
+
 type Row = Highlighted (List Int) | Plain (List Int)
 
 type alias Model = 
-  { useSample : Bool 
+  { dataSource : DataSource 
   , checkSorted : Bool 
   , rules : List (Int, Int)
   , updates : List (List Int)
@@ -54,8 +54,8 @@ parseUpdates : String -> List (List Int)
 parseUpdates s =
   s |> String.split "\n" |> List.map parseUpdate 
 
-initUpdates : Bool -> (List (Int, Int), List (List Int))
-initUpdates useSample = 
+initUpdates : DataSource -> (List (Int, Int), List (List Int))
+initUpdates dataSource = 
   let 
     sample = """47|53
 97|13
@@ -1465,7 +1465,10 @@ initUpdates useSample =
 36,49,16,99,54,95,32
 93,58,51,56,31,92,35,61,25,82,42,45,32
 37,16,86,85,11,78,53,39,73,31,59,98,82""" 
-    data = if useSample then sample else input 
+    data = 
+      case dataSource of 
+        Input -> input 
+        Sample -> sample
   in 
     case String.split "\n\n" data of 
       a :: b :: _ -> (parseRules a, parseUpdates b)
@@ -1474,14 +1477,15 @@ initUpdates useSample =
 init : () -> (Model, Cmd Msg)
 init _ =
   let 
-    (rules, updates) = initUpdates False
+    dataSource = Input
+    (rules, updates) = initUpdates dataSource
     rows = updates |> List.map Plain
     model = { sumOfMiddles = 0
             , rules = rules
             , updates = updates
             , rows = rows
             , lastCommandText = "press play to start"
-            , useSample = False
+            , dataSource = dataSource
             , checkSorted = True
             , counter = 0
             , debug = "" }
@@ -1490,12 +1494,12 @@ init _ =
 
 -- UPDATE
 
-type Msg = Clear | Sorted | Unsorted | ToggleSample
+type Msg = Clear | Sorted | Unsorted | UseSample | UseInput 
 
 updateClear : Model -> Model
 updateClear model =
   let 
-    (rules, updates) = initUpdates model.useSample
+    (rules, updates) = initUpdates model.dataSource
     rows = updates |> List.map Plain
   in 
     { model | rules = rules, updates = updates, rows = rows, sumOfMiddles = 0 } 
@@ -1566,23 +1570,21 @@ updateSolve model =
   else 
     updateSolveUnsorted model 
 
-updateToggleSample : Model -> Model
-updateToggleSample model = 
+updateDataSource : DataSource -> Model -> Model
+updateDataSource dataSource model = 
   let
-    useSample = not model.useSample
-    (rules, updates) = initUpdates useSample
+    (rules, updates) = initUpdates dataSource
     rows = updates |> List.map Plain
   in
-    { model | useSample = useSample, rules = rules, updates = updates, rows = rows, sumOfMiddles = 0 } 
+    { model | dataSource = dataSource, rules = rules, updates = updates, rows = rows, sumOfMiddles = 0 } 
 
 updateToggleSorted : Model -> Model
 updateToggleSorted model = 
   let
-    useSample = not model.useSample
-    (rules, updates) = initUpdates useSample
+    (rules, updates) = initUpdates model.dataSource
     rows = updates |> List.map Plain
   in
-    { model | useSample = useSample, rules = rules, updates = updates, rows = rows, sumOfMiddles = 0 } 
+    { model | rules = rules, updates = updates, rows = rows, sumOfMiddles = 0 } 
 
 updateModel : Msg -> Model -> (Model, Cmd Msg)
 updateModel msg model =
@@ -1593,13 +1595,18 @@ updateModel msg model =
       (updateSolveSorted model, Cmd.none)
     Unsorted -> 
       (updateSolveUnsorted model, Cmd.none)
-    ToggleSample -> 
-      (updateToggleSample model, Cmd.none)
+    UseSample -> 
+      (updateDataSource Sample model, Cmd.none)
+    UseInput -> 
+      (updateDataSource Input model, Cmd.none)
+
+    -- ToggleSample -> 
+    --   (updateToggleSample model, Cmd.none)
 
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
-subscriptions model = Sub.none
+subscriptions _ = Sub.none
 
 -- VIEW
 
@@ -1626,7 +1633,10 @@ view : Model -> Html Msg
 view model =
   let
     commandsStr = ""
-    textFontSize = if model.useSample then "36px" else "14px"
+    textFontSize = 
+      case model.dataSource of 
+        Input -> "14px"
+        Sample -> "36px"
     elements = model.rows |> List.concatMap toRowHtmlElement
   in 
     Html.table 
@@ -1666,6 +1676,22 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "16px" ]
+              [ 
+                Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseInput, Html.Attributes.checked (model.dataSource == Input) ] 
+                []
+              , Html.label [] [ Html.text "Input" ]
+              , Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseSample, Html.Attributes.checked (model.dataSource == Sample) ] 
+                []
+              , Html.label [] [ Html.text "Sample" ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Sorted ] 
@@ -1676,9 +1702,6 @@ view model =
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Clear ] 
                 [ Html.text "Clear" ] 
-              , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick ToggleSample ] 
-                [ Html.text (if model.useSample then "Input" else "Sample") ]
             ] ]
       , Html.tr 
           []
