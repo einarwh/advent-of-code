@@ -10,6 +10,7 @@ type Computer = {
     regC : int64
     pointer : int64
     program : int64 array 
+    outputs : int64 list 
 }
 
 let trim (input : string) = input.Trim()
@@ -27,7 +28,8 @@ let parseComputer (arr : string array) =
       regB = arr.[1] |> parseRegister 
       regC = arr.[2] |> parseRegister 
       pointer = 0L
-      program = arr.[4] |> parseProgram }
+      program = arr.[4] |> parseProgram
+      outputs = [] }
 
 let readOpcode computer : int = 
     let pt = computer.pointer
@@ -62,6 +64,9 @@ let nextInstruction computer =
 let jump target computer = 
     { computer with pointer = target }
 
+let output v computer = 
+    { computer with outputs = v :: computer.outputs }
+
 let division computer = 
     let operand = combo computer 
     printfn "operand %d" operand
@@ -70,6 +75,10 @@ let division computer =
     let result = numerator / denominator
     printfn "division %d %d" numerator denominator
     result 
+
+let xor v1 v2 : int64 = v1 ^^^ v2 
+
+let modulo v : int64 = v % 8L
 
 let adv (computer : Computer) : Computer = 
     printfn "adv"
@@ -95,7 +104,6 @@ let cdv computer =
 let bxl computer = 
     let operand = literal computer 
     let regB = computer.regB 
-    let xor a b : int64 = a ^^^b 
     let result = xor operand regB
     computer 
     |> writeB result 
@@ -103,7 +111,7 @@ let bxl computer =
 
 let bst computer = 
     let operand = combo computer 
-    let result = int64 (operand % 8L)
+    let result = modulo operand
     computer
     |> writeB result
     |> nextInstruction
@@ -117,11 +125,20 @@ let jnz computer =
         computer |> jump target
 
 let bxc computer =
+    let _ = literal computer // legacy
+    let regB = computer.regB 
+    let regC = computer.regC 
+    let result = xor regB regC
     computer 
+    |> writeB result 
+    |> nextInstruction
 
 let out computer = 
     let operand = combo computer 
+    let result = modulo operand 
     computer 
+    |> output result 
+    |> nextInstruction
 
 let execute (computer : Computer) = 
     let computer' : Computer = 
