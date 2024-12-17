@@ -1,0 +1,4 @@
+program length 16
+
+findQuine
+Some 108107566389757L

@@ -1,4 +1,4 @@
-// Advent of Code 2024. Day 17
+// Advent of Code 2024. Day 17: 
 // dotnet fsi aoc17.fsx
 
 open System
@@ -145,7 +145,7 @@ let out computer =
 
 let rec execute (computer : Computer) =
     match readOpcode computer with
-    | None -> computer.outputs |> List.rev
+    | None -> computer.outputs |> List.rev |> List.toArray
     | Some opcode ->
         // printfn "execute, read opcode %d at %d" opcode computer.pointer
         let c =
@@ -161,11 +161,74 @@ let rec execute (computer : Computer) =
             | _ -> failwith "?"
         c |> execute
 
+let printProgram program = 
+    program |> Array.map string |> String.concat "," |> printfn "%s"
+
+let findShifts computer = 
+    let len = Array.length computer.program
+    let rec loop shifts c = 
+        // printfn "loop %d shifts" shifts
+        let n = 1L <<< shifts
+        // printfn "n = %d" n 
+        let p = execute { computer with regA = n }
+        printProgram p
+        if Array.length p < len then 
+            loop (shifts + 1) c 
+        else 
+            shifts
+    loop 1 computer
+
+
+let quine computer = 
+    printfn "\nquine"
+    let len = computer.program |> Array.length 
+    let rec loop shifts value = 
+        let exec ix = 
+            let a = value + ix <<< shifts
+            execute { computer with regA = a }
+        [0L .. 7L] 
+        |> List.map (fun i -> exec i)
+        |> List.filter (fun p -> p |> Array.length = len)
+        |> List.filter (fun )
+        |> List.iter (printfn "%A")
+
+    let outputs = computer.program |> Array.rev
+    let shifts = findShifts computer 
+    printfn "%d" shifts 
+    loop shifts 0 
+    0
+
 let run fileName =
     let text = File.ReadAllText fileName |> trim |> split "\n"
     let computer = parseComputer text
     // computer |> printfn "%A"
-    execute computer |> List.map string |> String.concat "," |> printfn "%s"
-    0
+    // execute computer |> Array.map string |> String.concat "," |> printfn "%s"
+    // let startValue = 35184372000000L
+    let startValue = 281474980000000L
+    let shifts = findShifts computer
+    printfn "shifts %d" shifts
+    (1L <<< shifts) |> printfn "%d"
+    (2L <<< shifts) |> printfn "%d"
+    (3L <<< shifts) |> printfn "%d"
+    (4L <<< shifts) |> printfn "%d"
+    (5L <<< shifts) |> printfn "%d"
+    (6L <<< shifts) |> printfn "%d"
+    (7L <<< shifts) |> printfn "%d"
+    (8L <<< shifts) |> printfn "%d"
+
+    execute { computer with regA = (1L <<< shifts) } |> printProgram 
+    execute { computer with regA = (2L <<< shifts) } |> printProgram 
+    execute { computer with regA = (3L <<< shifts) } |> printProgram 
+    execute { computer with regA = (4L <<< shifts) } |> printProgram 
+    execute { computer with regA = (5L <<< shifts) } |> printProgram 
+    execute { computer with regA = (6L <<< shifts) } |> printProgram 
+    execute { computer with regA = (7L <<< shifts) } |> printProgram 
+    // execute { computer with regA = (0 <<< shifts) } |> printProgram 
+    
+    printProgram computer.program
+
+    quine computer 
+    // quine startValue computer |> printfn "%d" 
+    0 
 
 run "input"

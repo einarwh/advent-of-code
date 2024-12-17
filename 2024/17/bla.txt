@@ -1,0 +1,105 @@
+program length 6
+a0 32768
+target0: 0
+offset0: 32768L
+Number: 0
+Number: 0
+Number: 0
+98304L
+target1: 3
+offset1 4096L
+Number: 3
+98304L
+target2: 4
+offset2 512L
+Number: 0
+Number: 0
+Number: 0
+Number: 0
+Number: 0
+Number: 0
+
+findQuine
+
+Loop with a=32768L, index=1
+target=0
+offset=32768
+
+Loop with a=32768L, index=2
+target=3
+offset=4096
+
+Loop with a=65536L, index=2
+target=3
+offset=4096
+
+Loop with a=98304L, index=2
+target=3
+offset=4096
+
+Loop with a=98304L, index=3
+target=4
+offset=512
+
+Loop with a=102400L, index=3
+target=4
+offset=512
+
+Loop with a=106496L, index=3
+target=4
+offset=512
+
+Loop with a=110592L, index=3
+target=4
+offset=512
+
+Loop with a=114688L, index=3
+target=4
+offset=512
+
+Loop with a=114688L, index=4
+target=5
+offset=64
+
+Loop with a=115200L, index=4
+target=5
+offset=64
+
+Loop with a=115712L, index=4
+target=5
+offset=64
+
+Loop with a=116224L, index=4
+target=5
+offset=64
+
+Loop with a=116736L, index=4
+target=5
+offset=64
+
+Loop with a=117248L, index=4
+target=5
+offset=64
+
+Loop with a=117248L, index=5
+target=3
+offset=8
+
+Loop with a=117312L, index=5
+target=3
+offset=8
+
+Loop with a=117376L, index=5
+target=3
+offset=8
+
+Loop with a=117440L, index=5
+target=3
+offset=8
+
+Loop with a=117440L, index=6
+target=0
+offset=1
+
+Loop with a=117440L, index=7
+Some 117440L
