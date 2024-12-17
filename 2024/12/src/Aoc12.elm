@@ -5,11 +5,9 @@ import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
 import Dict exposing (Dict)
-import Array exposing (Array)
 import Set exposing (Set)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
-import List.Extra
 import Time
 
 defaultTickInterval : Float
@@ -17,6 +15,7 @@ defaultTickInterval = 100
 
 -- MAIN
 
+main : Program () Model Msg
 main =
   Browser.element
     { init = init
@@ -82,11 +81,13 @@ type alias Model =
   , tickInterval : Float 
   , message : String }
 
+sample : String
 sample = """AAAA
 BBCD
 BBCC
 EEEC"""
 
+sampleAbba : String
 sampleAbba = """AAAAAA
 AAABBA
 AAABBA
@@ -94,12 +95,14 @@ ABBAAA
 ABBAAA
 AAAAAA"""
 
+sampleEShape : String
 sampleEShape = """EEEEE
 EXXXX
 EEEEE
 EXXXX
 EEEEE"""
 
+sampleLarger : String
 sampleLarger = """RRRRIICCFF
 RRRRIICCCF
 VVRRRCCFFF
@@ -474,8 +477,8 @@ countCorners verticals horizontals =
   in 
     fixed |> List.length  
 
-toPlotInfo : Int -> (Plant, (Plot, PlotSequence, List (List Border))) -> PlotInfo 
-toPlotInfo index (plant, (plot, seq, borderSeq)) = 
+toPlotInfo : (Plant, (Plot, PlotSequence, List (List Border))) -> PlotInfo 
+toPlotInfo (plant, (plot, seq, borderSeq)) = 
   let 
     asVertical border = 
       case border of 
@@ -485,18 +488,14 @@ toPlotInfo index (plant, (plot, seq, borderSeq)) =
       case border of 
         Horizontal b -> Just b 
         _ -> Nothing 
-    totalSteps = List.length seq 
     area = Set.size plot
     plantColor = getPlantColor plant
     borders = borderSeq |> List.concat
-    borderCount = List.length borders 
     distinctBorders = distinct borders
-    distinctBorderCount  = List.length distinctBorders 
     perimeter = List.length distinctBorders
     verticals = distinctBorders |> List.filterMap asVertical
     horizontals = distinctBorders |> List.filterMap asHorizontal
     sections = countCorners verticals horizontals
-    -- debug = "Border count: " ++ String.fromInt borderCount ++ " vs Distinct border count: " ++ String.fromInt distinctBorderCount
     lineSequence = borderSeq |> List.reverse |> List.map (List.map toBorderLine)
     borderLines = lineSequence |> List.concat
     debug = "?"
@@ -528,7 +527,7 @@ initModel dataSource =
       rowStr |> String.toList |> List.indexedMap (\x ch -> ((x, y), ch)) 
     garden = rows |> List.indexedMap createRowTuples |> List.concat |> Dict.fromList
     plotList = findAllPlots garden 
-    plotInfoList = plotList |> List.indexedMap toPlotInfo 
+    plotInfoList = plotList |> List.map toPlotInfo 
     maxSteps = plotInfoList |> List.map (\pi -> pi.totalSteps) |> List.maximum |> Maybe.withDefault 0
     totalCost = plotInfoList |> List.map (\pi -> pi.fenceCost) |> List.sum 
     totalCostDiscount = plotInfoList |> List.map (\pi -> pi.fenceCostDiscount) |> List.sum 
@@ -597,7 +596,7 @@ updateTogglePlay model =
     { model | paused = not model.paused }
 
 updateUseInput : Model -> Model
-updateUseInput model = 
+updateUseInput _ = 
   initModel Input 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -730,9 +729,7 @@ toSvg model =
     svgWidth = (toFloat 4 + plantSize.width * toFloat model.colCount) |> String.fromFloat 
     svgHeight = (toFloat 4 + plantSize.height * toFloat model.rowCount) |> String.fromFloat 
     step = model.step 
-    plotInfoList = model.plotInfoList 
     elements = model.plotInfoList |> List.concatMap (toPlotSvgElements step plantSize)
-    rects = []
     viewBoxStr = [ "-1", "-1", svgWidth, svgHeight ] |> String.join " "
     fontFamilyAttr = "font-family:Source Code Pro,monospace"
     fontSizeAttr = "font-size:" ++ fontSize
@@ -765,8 +762,6 @@ view model =
     elements = []
     textFontSize = "9px"
     s = toSvg model 
-    verticalsText = model.plotInfoList |> List.concatMap (\pi -> pi.verticals |> List.map toLineText) |> List.sort |> String.join "\n"
-    horizontalsText = model.plotInfoList |> List.concatMap (\pi -> pi.horizontals |> List.map toLineText) |> List.sort |> String.join "\n"
     numberOfPlots = model.plotInfoList |> List.length
     finishedPlotInfoList = model.plotInfoList |> List.filter (\pi -> pi.totalSteps <= model.step)
     numberOfFinishedPlots = finishedPlotInfoList |> List.length
