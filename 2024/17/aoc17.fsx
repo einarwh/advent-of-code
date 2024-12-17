@@ -1,4 +1,4 @@
-// Advent of Code 2024. Day 17: 
+// Advent of Code 2024. Day 17: Chronospatial Computer.
 // dotnet fsi aoc17.fsx
 
 open System
@@ -31,7 +31,7 @@ let parseComputer (arr : string array) =
       program = arr.[4] |> parseProgram
       outputs = [] }
 
-let readOpcode computer : int option =
+let tryReadOpcode computer =
     let pt = computer.pointer
     if pt < Array.length computer.program then
         computer.program.[int pt] |> int |> Some
@@ -70,84 +70,64 @@ let jump target computer =
 let output v computer =
     { computer with outputs = v :: computer.outputs }
 
+let rec pow x y = if y < 1L then 1L else x * pow x (y - 1L)
+
 let division computer =
-    let operand = combo computer
-    // printfn "operand %d" operand
     let numerator = computer.regA
-    let denominator = int64 (Math.Pow(2.0, double operand))
-    let result = numerator / denominator
-    // printfn "division %d %d" numerator denominator
-    result
+    let denominator = pow 2 (combo computer)
+    numerator / denominator
 
 let xor v1 v2 : int64 = v1 ^^^ v2
 
 let modulo v : int64 = v % 8L
 
 let adv (computer : Computer) : Computer =
-    // printfn "adv"
-    let result = division computer
     computer
-    |> writeA result
+    |> writeA (division computer)
     |> nextInstruction
 
 let bdv computer =
-    // printfn "adv"
-    let result = division computer
     computer
-    |> writeB result
+    |> writeB (division computer)
     |> nextInstruction
 
 let cdv computer =
-    // printfn "cdv"
-    let result = division computer
     computer
-    |> writeC result
+    |> writeC (division computer)
     |> nextInstruction
 
 let bxl computer =
-    let operand = literal computer
-    let regB = computer.regB
-    let result = xor operand regB
     computer
-    |> writeB result
+    |> writeB (xor (literal computer) computer.regB)
     |> nextInstruction
 
 let bst computer =
-    let operand = combo computer
-    let result = modulo operand
     computer
-    |> writeB result
+    |> writeB (modulo (combo computer))
     |> nextInstruction
 
 let jnz computer =
-    let regA = computer.regA
-    if regA = 0L then
+    if computer.regA = 0L then
         computer |> nextInstruction
     else
-        let target = literal computer
-        computer |> jump target
+        computer |> jump (literal computer)
 
 let bxc computer =
     let _ = literal computer // legacy
-    let regB = computer.regB
-    let regC = computer.regC
-    let result = xor regB regC
     computer
-    |> writeB result
+    |> writeB (xor computer.regB computer.regC)
     |> nextInstruction
 
 let out computer =
-    let operand = combo computer
-    let result = modulo operand
     computer
-    |> output result
+    |> output (modulo (combo computer))
     |> nextInstruction
 
-let rec execute (computer : Computer) =
-    match readOpcode computer with
-    | None -> computer.outputs |> List.rev |> List.toArray
+let rec execute computer =
+    match tryReadOpcode computer with
+    | None ->
+        computer.outputs |> List.rev |> List.toArray 
     | Some opcode ->
-        // printfn "execute, read opcode %d at %d" opcode computer.pointer
         let c =
             match opcode with
             | 0 -> adv computer
@@ -164,71 +144,32 @@ let rec execute (computer : Computer) =
 let printProgram program = 
     program |> Array.map string |> String.concat "," |> printfn "%s"
 
-let findShifts computer = 
-    let len = Array.length computer.program
-    let rec loop shifts c = 
-        // printfn "loop %d shifts" shifts
-        let n = 1L <<< shifts
-        // printfn "n = %d" n 
-        let p = execute { computer with regA = n }
-        printProgram p
-        if Array.length p < len then 
-            loop (shifts + 1) c 
-        else 
-            shifts
-    loop 1 computer
-
-
 let quine computer = 
-    printfn "\nquine"
-    let len = computer.program |> Array.length 
-    let rec loop shifts value = 
-        let exec ix = 
-            let a = value + ix <<< shifts
-            execute { computer with regA = a }
-        [0L .. 7L] 
-        |> List.map (fun i -> exec i)
-        |> List.filter (fun p -> p |> Array.length = len)
-        |> List.filter (fun )
-        |> List.iter (printfn "%A")
-
-    let outputs = computer.program |> Array.rev
-    let shifts = findShifts computer 
-    printfn "%d" shifts 
-    loop shifts 0 
-    0
+    let len = computer.program |> Array.length
+    let checkTarget opIndex target candidateA = 
+        let p = execute { computer with regA = candidateA }
+        p.[opIndex] = target 
+    let rec loop (a : int64) (ix : int) : int64 option = 
+        let opIndex = len - ix 
+        if ix > len then 
+            Some a
+        else 
+            let target = computer.program[opIndex]
+            let offset = pow 8L ((int64 len) - (int64 ix))
+            let candidates = 
+                [ 0L .. 7L ] 
+                |> List.map (fun j -> a + j * offset)
+                |> List.choose (fun candidateA -> if checkTarget opIndex target candidateA then Some candidateA else None)
+            candidates |> List.tryPick (fun (ca : int64) -> loop ca (ix + 1))
+    let a0 = pow 8L ((int64 len) - 1L)
+    match loop a0 1 with 
+    | Some a -> a 
+    | None -> failwith ":("
 
 let run fileName =
     let text = File.ReadAllText fileName |> trim |> split "\n"
     let computer = parseComputer text
-    // computer |> printfn "%A"
-    // execute computer |> Array.map string |> String.concat "," |> printfn "%s"
-    // let startValue = 35184372000000L
-    let startValue = 281474980000000L
-    let shifts = findShifts computer
-    printfn "shifts %d" shifts
-    (1L <<< shifts) |> printfn "%d"
-    (2L <<< shifts) |> printfn "%d"
-    (3L <<< shifts) |> printfn "%d"
-    (4L <<< shifts) |> printfn "%d"
-    (5L <<< shifts) |> printfn "%d"
-    (6L <<< shifts) |> printfn "%d"
-    (7L <<< shifts) |> printfn "%d"
-    (8L <<< shifts) |> printfn "%d"
-
-    execute { computer with regA = (1L <<< shifts) } |> printProgram 
-    execute { computer with regA = (2L <<< shifts) } |> printProgram 
-    execute { computer with regA = (3L <<< shifts) } |> printProgram 
-    execute { computer with regA = (4L <<< shifts) } |> printProgram 
-    execute { computer with regA = (5L <<< shifts) } |> printProgram 
-    execute { computer with regA = (6L <<< shifts) } |> printProgram 
-    execute { computer with regA = (7L <<< shifts) } |> printProgram 
-    // execute { computer with regA = (0 <<< shifts) } |> printProgram 
-    
-    printProgram computer.program
-
-    quine computer 
-    // quine startValue computer |> printfn "%d" 
-    0 
+    computer |> execute |> printProgram 
+    computer |> quine |> printfn "%d"
 
 run "input"
