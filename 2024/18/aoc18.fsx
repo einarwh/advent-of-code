@@ -7,9 +7,7 @@ open System.Collections.Generic
 
 type Pos = (int*int)
 
-type Distance = int
-
-type PQ = PriorityQueue<Pos * Distance, Distance>
+type PQ = PriorityQueue<Pos * int, int>
 
 let trim (input : string) = input.Trim()
 
@@ -56,7 +54,6 @@ let solve dim corrupted =
     let startPos = (0, 0)
     let endPos = (dim, dim)
     let rec loop (visited, q : PQ) =
-        // printfn "loop - visited %d - queue %d" (Set.count visited) (q.Count)
         if q.Count = 0 then None
         else
             let (pos, distance) = q.Dequeue()
@@ -80,16 +77,28 @@ let solve1 dim byteCount corrupted =
     |> Set.ofList 
     |> solve dim 
     |> Option.get 
-    |> printfn "%d"
 
-// let findBlocker dim0 
+let findBlocker (dim : int) (byteCount0 : int) (allCorrupted : Pos list) = 
+    let rec loop minByteCount maxByteCount byteCount = 
+        let diff = maxByteCount - minByteCount
+        if diff = 1 then minByteCount
+        else 
+            let corrupted = allCorrupted |> List.take byteCount |> Set.ofList
+            let nextByteCount = minByteCount + (diff / 2)
+            match solve dim corrupted with 
+            | Some distance ->
+                loop byteCount maxByteCount nextByteCount 
+            | None -> 
+                loop minByteCount byteCount nextByteCount
+    let lastByteCount = loop byteCount0 (List.length allCorrupted) byteCount0
+    let (x, y) = allCorrupted |> List.skip lastByteCount |> List.head
+    sprintf "%d,%d" x y 
 
-let run dim byteCount fileName =
+let run (dim : int) (byteCount : int) (fileName : string) =
     let lines = readLines fileName
     let corrupted = lines |> List.choose parsePos 
-    // corrupted |> printfn "%A"
-    // visualize dim corrupted
-    solve1 dim byteCount corrupted
+    solve1 dim byteCount corrupted |> printfn "%d"
+    findBlocker dim byteCount corrupted |> printfn "%s"
 
 // run 6 12 "sample"
 run 70 1024 "input"
