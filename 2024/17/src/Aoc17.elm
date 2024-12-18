@@ -1,4 +1,4 @@
-module Aoc02 exposing (..)
+module Aoc17 exposing (..)
 
 import Browser exposing (Document)
 import Html exposing (Html)
@@ -59,12 +59,19 @@ checkReport report =
       if isSafe numbers then Safe numbers else Unsafe numbers
     _ -> report 
 
+-- let permute report = 
+--     let len = report |> List.length 
+--     let indexedReport = report |> List.indexed
+--     let keepDifferent i (ix, n) = if i = ix then None else Some n
+--     [0 .. len - 1] |> List.map (fun i -> indexedReport |> List.choose (keepDifferent i))
+
 permute : List Int -> List (List Int)
 permute numbers = 
   let 
     len = numbers |> List.length 
     indexes = List.range 0 (len - 1)
     indexedNumbers = numbers |> List.indexedMap (\ix n -> (ix, n))
+    keepDifferent i (ix, n) = if i == ix then Nothing else Just n 
   in 
     indexes |> List.map (\i -> indexedNumbers |> List.filterMap (\(ix, n) -> if i == ix then Nothing else Just n)) 
 
