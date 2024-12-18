@@ -1,6 +1,6 @@
 module Aoc11 exposing (..)
 
-import Browser
+import Browser exposing (Document)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
@@ -10,25 +10,22 @@ import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Time
 
-delay : Float
-delay = 50
-
-maxSteps : Int 
-maxSteps = 100
-
 octopusRadius : Int
 octopusRadius = 20
 
 -- MAIN
 
+main : Program () Model Msg
 main =
-  Browser.element
+  Browser.document
     { init = init
     , view = view
     , update = update
     , subscriptions = subscriptions }
 
 -- MODEL
+
+type DataSource = Tiny | Sample | Input
 
 type alias Grid = 
   { width : Int 
@@ -39,8 +36,12 @@ type alias Position = (Int, Int)
 
 type alias Model = 
   { grid : Grid
+  , dataSource : DataSource
   , paused : Bool
-  , counter : Int 
+  , stopAfter100Steps : Bool
+  , stopWhenAllFlash : Bool
+  , tickInterval : Float
+  , steps : Int 
   , total : Int
   , last : Int
   , debug : String }
@@ -57,17 +58,23 @@ lookupEnergyLevel pos grid =
       in 
         Array.get ix grid.array
 
+pos2str : ( Int, Int ) -> String
 pos2str pos = 
   case pos of 
     (x, y) -> "(" ++ String.fromInt x ++ "," ++ String.fromInt y ++ ")"
 
-init : () -> (Model, Cmd Msg)
-init _ =
+initModel : Bool -> Bool -> DataSource -> Model
+initModel stopAfter100Steps stopWhenAllFlash dataSource =
   let 
-    -- smallSample = "11111\n19991\n19191\n19991\n11111"
-    -- sample = "5483143223\n2745854711\n5264556173\n6141336146\n6357385478\n4167524645\n2176841721\n6882881134\n4846848554\n5283751526"
+    tiny = "11111\n19991\n19191\n19991\n11111"
+    sample = "5483143223\n2745854711\n5264556173\n6141336146\n6357385478\n4167524645\n2176841721\n6882881134\n4846848554\n5283751526"
     input = "1224346384\n5621128587\n6388426546\n1556247756\n1451811573\n1832388122\n2748545647\n2582877432\n3185643871\n2224876627" 
-    lines = String.lines input 
+    data = 
+      case dataSource of 
+        Sample -> sample 
+        Input -> input
+        Tiny -> tiny
+    lines = String.lines data 
     numberLines = 
       lines 
       |> List.map (String.toList)
@@ -83,17 +90,25 @@ init _ =
            , height = rowCount }
 
     model = { grid = grid
-            , paused = False
-            , counter = 0
+            , dataSource = dataSource
+            , paused = True
+            , stopAfter100Steps = stopAfter100Steps
+            , stopWhenAllFlash = stopWhenAllFlash
+            , tickInterval = 100
+            , steps = 0
             , total = 0
             , last = 0
             , debug = "..."}
   in 
-    (model, Cmd.none)
+    model
+
+init : () -> (Model, Cmd Msg)
+init _ = 
+  (initModel True True Input, Cmd.none)
 
 -- UPDATE
 
-type Msg = Tick | Step
+type Msg = Tick | Step | TogglePlay | Faster | Slower | Clear | UseTiny | UseSample | UseInput | ToggleStopAfter100Steps | ToggleStopWhenAllFlash
 
 incrementArray : Array Int -> Array Int 
 incrementArray arr = 
@@ -157,9 +172,13 @@ cascade width height flashing flashed arr =
           updatedFlashing = flashingPositions ++ flashing |> Set.fromList |> Set.toList
         in
           cascade width height updatedFlashing (Set.insert pos flashed) incrementedArr
-        
-updateModel : Model -> Model
-updateModel model =
+
+updateClear : Model -> Model
+updateClear model =
+  initModel model.stopAfter100Steps model.stopWhenAllFlash model.dataSource
+
+updateStep : Model -> Model
+updateStep model =
   let
     grid = model.grid
     incremented = incrementArray grid.array
@@ -167,27 +186,65 @@ updateModel model =
     flashing = flashingIndexes |> List.map (index2pos grid.width)
     (arr, flashCount) = cascade grid.width grid.height flashing Set.empty incremented
     updatedGrid = { grid | array = arr |> resetFlashedArray } 
-    steps = model.counter + 1
+    steps = model.steps + 1
     --paused = steps >= maxSteps
-    paused = flashCount == Array.length updatedGrid.array
+    pauseAfter100Steps = model.stopAfter100Steps && steps == 100
+    pauseWhenAllFlash = model.stopWhenAllFlash && (flashCount == Array.length updatedGrid.array)
+    paused = model.paused || pauseAfter100Steps || pauseWhenAllFlash
   in
-    { model | grid = updatedGrid, counter = steps, paused = paused, total = model.total + flashCount, last = flashCount, debug = "Flashing: " ++ (flashing |> List.length |> String.fromInt) }
+    { model | grid = updatedGrid, steps = steps, paused = paused, total = model.total + flashCount, last = flashCount, debug = "Flashing: " ++ (flashing |> List.length |> String.fromInt) }
+
+updateTogglePlay : Model -> Model
+updateTogglePlay model =
+  if model.paused then 
+    { model | paused = False } |> updateStep
+  else 
+    { model | paused = True }
+
+updateDataSource : DataSource -> Model -> Model 
+updateDataSource dataSource model = 
+  initModel model.stopAfter100Steps model.stopWhenAllFlash dataSource
+
+updateToggleStopAfter100Steps : Model -> Model
+updateToggleStopAfter100Steps model = 
+  { model | stopAfter100Steps = not model.stopAfter100Steps }
+
+updateToggleStopWhenAllFlash : Model -> Model
+updateToggleStopWhenAllFlash model = 
+  { model | stopWhenAllFlash = not model.stopWhenAllFlash }
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Tick ->
-      (updateModel model, Cmd.none)
-    Step -> 
-      (updateModel model, Cmd.none)
-
+      (updateStep model, Cmd.none)
+    Step ->
+      (updateStep model, Cmd.none)
+    TogglePlay ->
+      (updateTogglePlay model, Cmd.none)
+    Faster -> 
+      ({model | tickInterval = model.tickInterval / 2 }, Cmd.none)
+    Slower -> 
+      ({model | tickInterval = model.tickInterval * 2 }, Cmd.none)
+    Clear -> 
+        (updateClear model, Cmd.none)
+    UseTiny ->
+      (updateDataSource Tiny model, Cmd.none)
+    UseSample ->
+      (updateDataSource Sample model, Cmd.none)
+    UseInput ->
+      (updateDataSource Input model, Cmd.none)
+    ToggleStopAfter100Steps ->
+      (updateToggleStopAfter100Steps model, Cmd.none)
+    ToggleStopWhenAllFlash ->
+      (updateToggleStopWhenAllFlash model, Cmd.none)
 
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
   if model.paused then Sub.none 
-  else Time.every delay (\_ -> Tick)
+  else Time.every model.tickInterval (\_ -> Tick)
 
 -- VIEW
   
@@ -251,33 +308,133 @@ toSvg model =
   let 
     grid = model.grid 
     octopusElements = grid.array |> Array.indexedMap (\ix energy -> toOctopusElement (index2pos grid.width ix) energy) |> Array.toList
+    w = model.grid.width 
+    h = model.grid.height
+    svgWidth = String.fromInt (2 * octopusRadius * w)
+    svgHeight = String.fromInt (2 * octopusRadius * h)
+    viewBoxStr = "0 0 " ++ svgWidth ++ " " ++ svgHeight
   in 
     svg
-      [ viewBox "0 0 400 400"
-      , width "400"
-      , height "400"
+      [ viewBox viewBoxStr
+      , width svgWidth
+      , height svgHeight
       ]
       octopusElements
 
-view : Model -> Html Msg
-view model =
+view : Model -> Document Msg
+view model = 
+  { title = "Advent of Code 2021 | Day 11: Dumbo Octopus"
+  , body = [ viewBody model ] }
+
+viewBody : Model -> Html Msg
+viewBody model =
   let
     s = toSvg model
-    totalStr = "Flashed total: " ++ String.fromInt model.total
-    lastStr = "Flashed last: " ++ String.fromInt model.last
-    tickStr = "Steps: " ++ String.fromInt model.counter
+    totalStr = "Total: " ++ String.fromInt model.total
+    lastStr = "Flashing: " ++ String.fromInt model.last
+    tickStr = "Steps: " ++ String.fromInt model.steps
   in 
     Html.table 
-      []
+      [ Html.Attributes.style "width" "1080px"
+      , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "40px"
-              , Html.Attributes.style "padding" "20px"]
+              , Html.Attributes.style "font-size" "32px"
+              , Html.Attributes.style "padding" "10px"]
               [ Html.div [] [Html.text "Advent of Code 2021" ]
-              , Html.div [] [Html.text "Day 11: Dumbo Octopus" ]] ]
+              , Html.div [] [Html.text "Day 11: Dumbo Octopus" ] ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "padding-bottom" "10px" ]
+              [ Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2024/"] [ Html.text "2024" ]
+              , Html.text "] " 
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2023/"] [ Html.text "2023" ]
+              , Html.text "] "
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2022/"] [ Html.text "2022" ]
+              , Html.text "] "
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2021/"] [ Html.text "2021" ]
+              , Html.text "] "
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2020/"] [ Html.text "2020" ]
+              , Html.text "] "
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "padding-bottom" "10px" ]
+              [ Html.a 
+                [ Html.Attributes.href "https://adventofcode.com/2021/day/11" ] 
+                [ text "https://adventofcode.com/2021/day/11" ]
+            ] ]
+      , Html.tr
+          []
+          [ Html.td
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "16px" ]
+              [
+                Html.input
+                [ Html.Attributes.type_ "radio", onClick UseInput, Html.Attributes.checked (model.dataSource == Input) ]
+                []
+              , Html.label [] [ Html.text "Input" ]
+              , Html.input
+                [ Html.Attributes.type_ "radio", onClick UseSample, Html.Attributes.checked (model.dataSource == Sample) ]
+                []
+              , Html.label [] [ Html.text "Sample" ]
+              , Html.input
+                [ Html.Attributes.type_ "radio", onClick UseTiny, Html.Attributes.checked (model.dataSource == Tiny) ]
+                []
+              , Html.label [] [ Html.text "Tiny" ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "padding" "10px" ]
+              [ Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Clear ] 
+                [ Html.text "Reset"]
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Slower ] 
+                [ text "Slower" ]
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick TogglePlay ] 
+                [ if model.paused then text "Play" else text "Pause" ] 
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Faster ] 
+                [ text "Faster" ]
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Step ] 
+                [ Html.text "Step" ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center" ]
+              [ Html.input 
+                [ Html.Attributes.type_ "checkbox", onClick ToggleStopAfter100Steps, Html.Attributes.checked model.stopAfter100Steps ] 
+                []
+              , Html.label [] [ Html.text " Stop after 100 steps" ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center" ]
+              [ Html.input 
+                [ Html.Attributes.type_ "checkbox", onClick ToggleStopWhenAllFlash, Html.Attributes.checked model.stopWhenAllFlash ] 
+                []
+              , Html.label [] [ Html.text " Stop when all flash" ]
+            ] ]
       , Html.tr 
           []
           [ Html.td 
@@ -285,15 +442,16 @@ view model =
               , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "20px"
-              , Html.Attributes.style "padding" "20px"] 
-              [ Html.div [ Html.Attributes.align "center" ] [ s ] 
-              , Html.div [] [ Html.text tickStr ]
+              , Html.Attributes.style "padding" "10px"] 
+              [ Html.div [] [ Html.text tickStr ]
               , Html.div [] [ Html.text lastStr ]
               , Html.div [] [ Html.text totalStr ]
---              , Html.div [] [ Html.text model.debug ]
               ] ]
       , Html.tr 
           []
           [ Html.td 
-              []
-              [ Html.button [ onClick Step ] [ text "Step" ] ] ] ]
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "background-color" "white" 
+              , Html.Attributes.style "font-family" "Courier New" ] 
+              [ Html.div [ Html.Attributes.align "center" ] [ s ] 
+              ] ] ]
