@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.R.D === region.W.D)
+	if (region.V.H === region._.H)
 	{
-		return 'on line ' + region.R.D;
+		return 'on line ' + region.V.H;
 	}
-	return 'on lines ' + region.R.D + ' through ' + region.W.D;
+	return 'on lines ' + region.V.H + ' through ' + region._.H;
 }
 
 
@@ -1871,9 +1871,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aA,
-		impl.aI,
-		impl.aG,
+		impl.aE,
+		impl.aM,
+		impl.aK,
 		function() { return function() {} }
 	);
 });
@@ -2733,9 +2733,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		o: func(record.o),
-		S: record.S,
-		P: record.P
+		p: func(record.p),
+		W: record.W,
+		T: record.T
 	}
 });
 
@@ -3003,11 +3003,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.o;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.S;
+		var message = !tag ? value : tag < 3 ? value.a : value.p;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.W;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.P) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.T) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3957,11 +3957,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aA,
-		impl.aI,
-		impl.aG,
+		impl.aE,
+		impl.aM,
+		impl.aK,
 		function(sendToApp, initialModel) {
-			var view = impl.aJ;
+			var view = impl.aN;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3993,12 +3993,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aA,
-		impl.aI,
-		impl.aG,
+		impl.aE,
+		impl.aM,
+		impl.aK,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.Q && impl.Q(sendToApp)
-			var view = impl.aJ;
+			var divertHrefToApp = impl.U && impl.U(sendToApp)
+			var view = impl.aN;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -4006,12 +4006,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.at);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.ax);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.aH) && (_VirtualDom_doc.title = title = doc.aH);
+				(title !== doc.aL) && (_VirtualDom_doc.title = title = doc.aL);
 			});
 		}
 	);
@@ -4067,12 +4067,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aC;
-	var onUrlRequest = impl.aD;
+	var onUrlChange = impl.aG;
+	var onUrlRequest = impl.aH;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		Q: function(sendToApp)
+		U: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4088,9 +4088,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.ah === next.ah
-							&& curr.Z === next.Z
-							&& curr.ae.a === next.ae.a
+							&& curr.al === next.al
+							&& curr.ac === next.ac
+							&& curr.ai.a === next.ai.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4098,13 +4098,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aA: function(flags)
+		aE: function(flags)
 		{
-			return A3(impl.aA, flags, _Browser_getUrl(), key);
+			return A3(impl.aE, flags, _Browser_getUrl(), key);
 		},
-		aJ: impl.aJ,
-		aI: impl.aI,
-		aG: impl.aG
+		aN: impl.aN,
+		aM: impl.aM,
+		aK: impl.aK
 	});
 }
 
@@ -4170,17 +4170,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { ay: 'hidden', au: 'visibilitychange' }
+		? { aC: 'hidden', ay: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { ay: 'mozHidden', au: 'mozvisibilitychange' }
+		? { aC: 'mozHidden', ay: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { ay: 'msHidden', au: 'msvisibilitychange' }
+		? { aC: 'msHidden', ay: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { ay: 'webkitHidden', au: 'webkitvisibilitychange' }
-		: { ay: 'hidden', au: 'visibilitychange' };
+		? { aC: 'webkitHidden', ay: 'webkitvisibilitychange' }
+		: { aC: 'hidden', ay: 'visibilitychange' };
 }
 
 
@@ -4261,12 +4261,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		al: _Browser_getScene(),
-		ao: {
-			ap: _Browser_window.pageXOffset,
-			aq: _Browser_window.pageYOffset,
-			z: _Browser_doc.documentElement.clientWidth,
-			M: _Browser_doc.documentElement.clientHeight
+		ap: _Browser_getScene(),
+		as: {
+			at: _Browser_window.pageXOffset,
+			au: _Browser_window.pageYOffset,
+			B: _Browser_doc.documentElement.clientWidth,
+			O: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4276,8 +4276,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		z: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		M: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		B: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		O: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4300,15 +4300,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			al: {
-				z: node.scrollWidth,
-				M: node.scrollHeight
+			ap: {
+				B: node.scrollWidth,
+				O: node.scrollHeight
 			},
-			ao: {
-				ap: node.scrollLeft,
-				aq: node.scrollTop,
-				z: node.clientWidth,
-				M: node.clientHeight
+			as: {
+				at: node.scrollLeft,
+				au: node.scrollTop,
+				B: node.clientWidth,
+				O: node.clientHeight
 			}
 		};
 	});
@@ -4338,18 +4338,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			al: _Browser_getScene(),
-			ao: {
-				ap: x,
-				aq: y,
-				z: _Browser_doc.documentElement.clientWidth,
-				M: _Browser_doc.documentElement.clientHeight
+			ap: _Browser_getScene(),
+			as: {
+				at: x,
+				au: y,
+				B: _Browser_doc.documentElement.clientWidth,
+				O: _Browser_doc.documentElement.clientHeight
 			},
-			aw: {
-				ap: x + rect.left,
-				aq: y + rect.top,
-				z: rect.width,
-				M: rect.height
+			aA: {
+				at: x + rect.left,
+				au: y + rect.top,
+				B: rect.width,
+				O: rect.height
 			}
 		};
 	});
@@ -4971,7 +4971,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {Y: fragment, Z: host, ac: path, ae: port_, ah: protocol, ai: query};
+		return {ab: fragment, ac: host, ag: path, ai: port_, al: protocol, am: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5250,6 +5250,7 @@ var $elm$core$Task$perform = F2(
 			A2($elm$core$Task$map, toMessage, task));
 	});
 var $elm$browser$Browser$document = _Browser_document;
+var $author$project$Aoc11b$Input = 2;
 var $elm$core$List$append = F2(
 	function (xs, ys) {
 		if (!ys.b) {
@@ -5306,8 +5307,6 @@ var $elm$core$List$head = function (list) {
 	}
 };
 var $elm$core$String$lines = _String_lines;
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
@@ -5332,38 +5331,57 @@ var $elm$core$String$foldr = _String_foldr;
 var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
 };
+var $author$project$Aoc11b$initModel = F3(
+	function (stopAfter100Steps, stopWhenAllFlash, dataSource) {
+		var tiny = '11111\n19991\n19191\n19991\n11111';
+		var sample = '5483143223\n2745854711\n5264556173\n6141336146\n6357385478\n4167524645\n2176841721\n6882881134\n4846848554\n5283751526';
+		var input = '1224346384\n5621128587\n6388426546\n1556247756\n1451811573\n1832388122\n2748545647\n2582877432\n3185643871\n2224876627';
+		var data = function () {
+			switch (dataSource) {
+				case 1:
+					return sample;
+				case 2:
+					return input;
+				default:
+					return tiny;
+			}
+		}();
+		var lines = $elm$core$String$lines(data);
+		var numberLines = A2(
+			$elm$core$List$map,
+			$elm$core$List$map($author$project$Aoc11b$toEnergyLevel),
+			A2($elm$core$List$map, $elm$core$String$toList, lines));
+		var rowCount = $elm$core$List$length(numberLines);
+		var colCount = function () {
+			var _v0 = $elm$core$List$head(numberLines);
+			if (_v0.$ === 1) {
+				return 0;
+			} else {
+				var h = _v0.a;
+				return $elm$core$List$length(h);
+			}
+		}();
+		var arr = $elm$core$Array$fromList(
+			$elm$core$List$concat(numberLines));
+		var grid = {u: arr, O: rowCount, B: colCount};
+		var model = {C: dataSource, Q: '...', w: grid, P: 0, m: true, I: 0, r: stopAfter100Steps, s: stopWhenAllFlash, z: 100, L: 0};
+		return model;
+	});
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Aoc11b$init = function (_v0) {
-	var input = '1224346384\n5621128587\n6388426546\n1556247756\n1451811573\n1832388122\n2748545647\n2582877432\n3185643871\n2224876627';
-	var lines = $elm$core$String$lines(input);
-	var numberLines = A2(
-		$elm$core$List$map,
-		$elm$core$List$map($author$project$Aoc11b$toEnergyLevel),
-		A2($elm$core$List$map, $elm$core$String$toList, lines));
-	var rowCount = $elm$core$List$length(numberLines);
-	var colCount = function () {
-		var _v1 = $elm$core$List$head(numberLines);
-		if (_v1.$ === 1) {
-			return 0;
-		} else {
-			var h = _v1.a;
-			return $elm$core$List$length(h);
-		}
-	}();
-	var arr = $elm$core$Array$fromList(
-		$elm$core$List$concat(numberLines));
-	var grid = {r: arr, M: rowCount, z: colCount};
-	var model = {B: 0, L: '...', C: grid, J: 0, K: false, G: 0};
-	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+	return _Utils_Tuple2(
+		A3($author$project$Aoc11b$initModel, true, true, 2),
+		$elm$core$Platform$Cmd$none);
 };
 var $author$project$Aoc11b$Tick = 0;
-var $author$project$Aoc11b$delay = 50;
 var $elm$time$Time$Every = F2(
 	function (a, b) {
 		return {$: 0, a: a, b: b};
 	});
 var $elm$time$Time$State = F2(
 	function (taggers, processes) {
-		return {ag: processes, an: taggers};
+		return {ak: processes, ar: taggers};
 	});
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
@@ -5655,7 +5673,7 @@ var $elm$time$Time$spawnHelp = F3(
 	});
 var $elm$time$Time$onEffects = F3(
 	function (router, subs, _v0) {
-		var processes = _v0.ag;
+		var processes = _v0.ak;
 		var rightStep = F3(
 			function (_v6, id, _v7) {
 				var spawns = _v7.a;
@@ -5724,7 +5742,7 @@ var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
 var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $elm$time$Time$onSelfMsg = F3(
 	function (router, interval, state) {
-		var _v0 = A2($elm$core$Dict$get, interval, state.an);
+		var _v0 = A2($elm$core$Dict$get, interval, state.ar);
 		if (_v0.$ === 1) {
 			return $elm$core$Task$succeed(state);
 		} else {
@@ -5773,13 +5791,22 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc11b$subscriptions = function (model) {
-	return model.K ? $elm$core$Platform$Sub$none : A2(
+	return model.m ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		$author$project$Aoc11b$delay,
+		model.z,
 		function (_v0) {
 			return 0;
 		});
 };
+var $author$project$Aoc11b$Sample = 1;
+var $author$project$Aoc11b$Tiny = 0;
+var $author$project$Aoc11b$updateClear = function (model) {
+	return A3($author$project$Aoc11b$initModel, model.r, model.s, model.C);
+};
+var $author$project$Aoc11b$updateDataSource = F2(
+	function (dataSource, model) {
+		return A3($author$project$Aoc11b$initModel, model.r, model.s, dataSource);
+	});
 var $elm$core$Set$Set_elm_builtin = $elm$core$Basics$identity;
 var $elm$core$Set$empty = $elm$core$Dict$empty;
 var $elm$core$Set$insert = F2(
@@ -6145,44 +6172,122 @@ var $author$project$Aoc11b$resetFlashedArray = function (arr) {
 		},
 		arr);
 };
-var $author$project$Aoc11b$updateModel = function (model) {
-	var steps = model.B + 1;
-	var grid = model.C;
-	var incremented = $author$project$Aoc11b$incrementArray(grid.r);
+var $author$project$Aoc11b$updateStep = function (model) {
+	var steps = model.I + 1;
+	var pauseAfter100Steps = model.r && (steps === 100);
+	var grid = model.w;
+	var incremented = $author$project$Aoc11b$incrementArray(grid.u);
 	var flashingIndexes = $author$project$Aoc11b$findFlashingIndexes(incremented);
 	var flashing = A2(
 		$elm$core$List$map,
-		$author$project$Aoc11b$index2pos(grid.z),
+		$author$project$Aoc11b$index2pos(grid.B),
 		flashingIndexes);
-	var _v0 = A5($author$project$Aoc11b$cascade, grid.z, grid.M, flashing, $elm$core$Set$empty, incremented);
+	var _v0 = A5($author$project$Aoc11b$cascade, grid.B, grid.O, flashing, $elm$core$Set$empty, incremented);
 	var arr = _v0.a;
 	var flashCount = _v0.b;
 	var updatedGrid = _Utils_update(
 		grid,
 		{
-			r: $author$project$Aoc11b$resetFlashedArray(arr)
+			u: $author$project$Aoc11b$resetFlashedArray(arr)
 		});
-	var paused = _Utils_eq(
+	var pauseWhenAllFlash = model.s && _Utils_eq(
 		flashCount,
-		$elm$core$Array$length(updatedGrid.r));
+		$elm$core$Array$length(updatedGrid.u));
+	var paused = model.m || (pauseAfter100Steps || pauseWhenAllFlash);
 	return _Utils_update(
 		model,
 		{
-			B: steps,
-			L: 'Flashing: ' + $elm$core$String$fromInt(
+			Q: 'Flashing: ' + $elm$core$String$fromInt(
 				$elm$core$List$length(flashing)),
-			C: updatedGrid,
-			J: flashCount,
-			K: paused,
-			G: model.G + flashCount
+			w: updatedGrid,
+			P: flashCount,
+			m: paused,
+			I: steps,
+			L: model.L + flashCount
 		});
+};
+var $author$project$Aoc11b$updateTogglePlay = function (model) {
+	return model.m ? $author$project$Aoc11b$updateStep(
+		_Utils_update(
+			model,
+			{m: false})) : _Utils_update(
+		model,
+		{m: true});
+};
+var $elm$core$Basics$not = _Basics_not;
+var $author$project$Aoc11b$updateToggleStopAfter100Steps = function (model) {
+	return _Utils_update(
+		model,
+		{r: !model.r});
+};
+var $author$project$Aoc11b$updateToggleStopWhenAllFlash = function (model) {
+	return _Utils_update(
+		model,
+		{s: !model.s});
 };
 var $author$project$Aoc11b$update = F2(
 	function (msg, model) {
-		return _Utils_Tuple2(
-			$author$project$Aoc11b$updateModel(model),
-			$elm$core$Platform$Cmd$none);
+		switch (msg) {
+			case 0:
+				return _Utils_Tuple2(
+					$author$project$Aoc11b$updateStep(model),
+					$elm$core$Platform$Cmd$none);
+			case 1:
+				return _Utils_Tuple2(
+					$author$project$Aoc11b$updateStep(model),
+					$elm$core$Platform$Cmd$none);
+			case 2:
+				return _Utils_Tuple2(
+					$author$project$Aoc11b$updateTogglePlay(model),
+					$elm$core$Platform$Cmd$none);
+			case 3:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{z: model.z / 2}),
+					$elm$core$Platform$Cmd$none);
+			case 4:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{z: model.z * 2}),
+					$elm$core$Platform$Cmd$none);
+			case 5:
+				return _Utils_Tuple2(
+					$author$project$Aoc11b$updateClear(model),
+					$elm$core$Platform$Cmd$none);
+			case 6:
+				return _Utils_Tuple2(
+					A2($author$project$Aoc11b$updateDataSource, 0, model),
+					$elm$core$Platform$Cmd$none);
+			case 7:
+				return _Utils_Tuple2(
+					A2($author$project$Aoc11b$updateDataSource, 1, model),
+					$elm$core$Platform$Cmd$none);
+			case 8:
+				return _Utils_Tuple2(
+					A2($author$project$Aoc11b$updateDataSource, 2, model),
+					$elm$core$Platform$Cmd$none);
+			case 9:
+				return _Utils_Tuple2(
+					$author$project$Aoc11b$updateToggleStopAfter100Steps(model),
+					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					$author$project$Aoc11b$updateToggleStopWhenAllFlash(model),
+					$elm$core$Platform$Cmd$none);
+		}
 	});
+var $author$project$Aoc11b$Clear = 5;
+var $author$project$Aoc11b$Faster = 3;
+var $author$project$Aoc11b$Slower = 4;
+var $author$project$Aoc11b$Step = 1;
+var $author$project$Aoc11b$TogglePlay = 2;
+var $author$project$Aoc11b$ToggleStopAfter100Steps = 9;
+var $author$project$Aoc11b$ToggleStopWhenAllFlash = 10;
+var $author$project$Aoc11b$UseInput = 8;
+var $author$project$Aoc11b$UseSample = 7;
+var $author$project$Aoc11b$UseTiny = 6;
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -6193,12 +6298,41 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$align = $elm$html$Html$Attributes$stringProperty('align');
+var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$Attributes$href = function (url) {
 	return A2(
 		$elm$html$Html$Attributes$stringProperty,
 		'href',
 		_VirtualDom_noJavaScriptUri(url));
+};
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$label = _VirtualDom_node('label');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 0, a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
 };
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
@@ -6208,13 +6342,13 @@ var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $author$project$Aoc11b$octopusRadius = 20;
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
 var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
 var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
-var $author$project$Aoc11b$octopusRadius = 20;
 var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
 var $author$project$Aoc11b$toColor = function (n) {
 	switch (n) {
@@ -6265,7 +6399,12 @@ var $author$project$Aoc11b$toOctopusElement = F2(
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $author$project$Aoc11b$toSvg = function (model) {
-	var grid = model.C;
+	var w = model.w.B;
+	var svgWidth = $elm$core$String$fromInt((2 * $author$project$Aoc11b$octopusRadius) * w);
+	var h = model.w.O;
+	var svgHeight = $elm$core$String$fromInt((2 * $author$project$Aoc11b$octopusRadius) * h);
+	var viewBoxStr = '0 0 ' + (svgWidth + (' ' + svgHeight));
+	var grid = model.w;
 	var octopusElements = $elm$core$Array$toList(
 		A2(
 			$elm$core$Array$indexedMap,
@@ -6273,26 +6412,27 @@ var $author$project$Aoc11b$toSvg = function (model) {
 				function (ix, energy) {
 					return A2(
 						$author$project$Aoc11b$toOctopusElement,
-						A2($author$project$Aoc11b$index2pos, grid.z, ix),
+						A2($author$project$Aoc11b$index2pos, grid.B, ix),
 						energy);
 				}),
-			grid.r));
+			grid.u));
 	return A2(
 		$elm$svg$Svg$svg,
 		_List_fromArray(
 			[
-				$elm$svg$Svg$Attributes$viewBox('0 0 400 400'),
-				$elm$svg$Svg$Attributes$width('400'),
-				$elm$svg$Svg$Attributes$height('400')
+				$elm$svg$Svg$Attributes$viewBox(viewBoxStr),
+				$elm$svg$Svg$Attributes$width(svgWidth),
+				$elm$svg$Svg$Attributes$height(svgHeight)
 			]),
 		octopusElements);
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Aoc11b$viewBody = function (model) {
-	var totalStr = 'Flashed total: ' + $elm$core$String$fromInt(model.G);
-	var tickStr = 'Steps: ' + $elm$core$String$fromInt(model.B);
+	var totalStr = 'Total: ' + $elm$core$String$fromInt(model.L);
+	var tickStr = 'Steps: ' + $elm$core$String$fromInt(model.I);
 	var s = $author$project$Aoc11b$toSvg(model);
-	var lastStr = 'Flashed last: ' + $elm$core$String$fromInt(model.J);
+	var lastStr = 'Flashing: ' + $elm$core$String$fromInt(model.P);
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
@@ -6446,21 +6586,211 @@ var $author$project$Aoc11b$viewBody = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '20px'),
-								A2($elm$html$Html$Attributes$style, 'padding', '20px')
+								A2($elm$html$Html$Attributes$style, 'font-size', '16px')
 							]),
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$div,
+								$elm$html$Html$input,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$align('center')
+										$elm$html$Html$Attributes$type_('radio'),
+										$elm$html$Html$Events$onClick(8),
+										$elm$html$Html$Attributes$checked(model.C === 2)
+									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Input')
+									])),
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('radio'),
+										$elm$html$Html$Events$onClick(7),
+										$elm$html$Html$Attributes$checked(model.C === 1)
+									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Sample')
+									])),
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('radio'),
+										$elm$html$Html$Events$onClick(6),
+										$elm$html$Html$Attributes$checked(!model.C)
+									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Tiny')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'padding', '10px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick(5)
 									]),
 								_List_fromArray(
-									[s])),
+									[
+										$elm$html$Html$text('Reset')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick(4)
+									]),
+								_List_fromArray(
+									[
+										$elm$svg$Svg$text('Slower')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick(2)
+									]),
+								_List_fromArray(
+									[
+										model.m ? $elm$svg$Svg$text('Play') : $elm$svg$Svg$text('Pause')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick(3)
+									]),
+								_List_fromArray(
+									[
+										$elm$svg$Svg$text('Faster')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick(1)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Step')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('checkbox'),
+										$elm$html$Html$Events$onClick(9),
+										$elm$html$Html$Attributes$checked(model.r)
+									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(' Stop after 100 steps')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('checkbox'),
+										$elm$html$Html$Events$onClick(10),
+										$elm$html$Html$Attributes$checked(model.s)
+									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(' Stop when all flash')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '20px'),
+								A2($elm$html$Html$Attributes$style, 'padding', '10px')
+							]),
+						_List_fromArray(
+							[
 								A2(
 								$elm$html$Html$div,
 								_List_Nil,
@@ -6483,20 +6813,45 @@ var $author$project$Aoc11b$viewBody = function (model) {
 										$elm$html$Html$text(totalStr)
 									]))
 							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$align('center')
+									]),
+								_List_fromArray(
+									[s]))
+							]))
 					]))
 			]));
 };
 var $author$project$Aoc11b$view = function (model) {
 	return {
-		at: _List_fromArray(
+		ax: _List_fromArray(
 			[
 				$author$project$Aoc11b$viewBody(model)
 			]),
-		aH: 'Advent of Code 2021 | Day 11: Dumbo Octopus (Part 2)'
+		aL: 'Advent of Code 2021 | Day 11: Dumbo Octopus'
 	};
 };
 var $author$project$Aoc11b$main = $elm$browser$Browser$document(
-	{aA: $author$project$Aoc11b$init, aG: $author$project$Aoc11b$subscriptions, aI: $author$project$Aoc11b$update, aJ: $author$project$Aoc11b$view});
+	{aE: $author$project$Aoc11b$init, aK: $author$project$Aoc11b$subscriptions, aM: $author$project$Aoc11b$update, aN: $author$project$Aoc11b$view});
 _Platform_export({'Aoc11b':{'init':$author$project$Aoc11b$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
 
