@@ -5220,7 +5220,7 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$document = _Browser_document;
 var $author$project$Aoc12$Input = {$: 'Input'};
-var $author$project$Aoc12$MoveWaypoint = {$: 'MoveWaypoint'};
+var $author$project$Aoc12$MoveBoat = {$: 'MoveBoat'};
 var $author$project$Aoc12$East = {$: 'East'};
 var $author$project$Aoc12$E = function (a) {
 	return {$: 'E', a: a};
@@ -5331,7 +5331,7 @@ var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Aoc12$init = function (_v0) {
 	return _Utils_Tuple2(
-		A2($author$project$Aoc12$initModel, $author$project$Aoc12$MoveWaypoint, $author$project$Aoc12$Input),
+		A2($author$project$Aoc12$initModel, $author$project$Aoc12$MoveBoat, $author$project$Aoc12$Input),
 		$elm$core$Platform$Cmd$none);
 };
 var $author$project$Aoc12$Tick = {$: 'Tick'};
@@ -5761,7 +5761,7 @@ var $author$project$Aoc12$subscriptions = function (model) {
 		});
 	return tickSub;
 };
-var $author$project$Aoc12$MoveBoat = {$: 'MoveBoat'};
+var $author$project$Aoc12$MoveWaypoint = {$: 'MoveWaypoint'};
 var $author$project$Aoc12$Sample = {$: 'Sample'};
 var $author$project$Aoc12$updateClear = function (model) {
 	return A2($author$project$Aoc12$initModel, model.strategy, model.dataSource);

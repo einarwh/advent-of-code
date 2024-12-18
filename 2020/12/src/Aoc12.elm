@@ -111,7 +111,7 @@ initModel strategy dataSource =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel MoveWaypoint Input, Cmd.none)
+  (initModel MoveBoat Input, Cmd.none)
 
 -- UPDATE
 
