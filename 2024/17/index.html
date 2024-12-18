@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.L.A === region.R.A)
+	if (region.R.A === region.X.A)
 	{
-		return 'on line ' + region.L.A;
+		return 'on line ' + region.R.A;
 	}
-	return 'on lines ' + region.L.A + ' through ' + region.R.A;
+	return 'on lines ' + region.R.A + ' through ' + region.X.A;
 }
 
 
@@ -2734,8 +2734,8 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
 		o: func(record.o),
-		M: record.M,
-		J: record.J
+		S: record.S,
+		P: record.P
 	}
 });
 
@@ -3004,10 +3004,10 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 
 		var value = result.a;
 		var message = !tag ? value : tag < 3 ? value.a : value.o;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.M;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.S;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.J) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.P) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3997,7 +3997,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 		impl.aL,
 		impl.aJ,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.K && impl.K(sendToApp)
+			var divertHrefToApp = impl.Q && impl.Q(sendToApp)
 			var view = impl.aM;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
@@ -4072,7 +4072,7 @@ function _Browser_application(impl)
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		K: function(sendToApp)
+		Q: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4088,9 +4088,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.ag === next.ag
-							&& curr.V === next.V
-							&& curr.ac.a === next.ac.a
+							&& curr.aj === next.aj
+							&& curr.aa === next.aa
+							&& curr.ag.a === next.ag.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4266,7 +4266,7 @@ function _Browser_getViewport()
 			as: _Browser_window.pageXOffset,
 			at: _Browser_window.pageYOffset,
 			ar: _Browser_doc.documentElement.clientWidth,
-			U: _Browser_doc.documentElement.clientHeight
+			_: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4277,7 +4277,7 @@ function _Browser_getScene()
 	var elem = _Browser_doc.documentElement;
 	return {
 		ar: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		U: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		_: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4302,13 +4302,13 @@ function _Browser_getViewportOf(id)
 		return {
 			an: {
 				ar: node.scrollWidth,
-				U: node.scrollHeight
+				_: node.scrollHeight
 			},
 			aq: {
 				as: node.scrollLeft,
 				at: node.scrollTop,
 				ar: node.clientWidth,
-				U: node.clientHeight
+				_: node.clientHeight
 			}
 		};
 	});
@@ -4343,13 +4343,13 @@ function _Browser_getElement(id)
 				as: x,
 				at: y,
 				ar: _Browser_doc.documentElement.clientWidth,
-				U: _Browser_doc.documentElement.clientHeight
+				_: _Browser_doc.documentElement.clientHeight
 			},
 			az: {
 				as: x + rect.left,
 				at: y + rect.top,
 				ar: rect.width,
-				U: rect.height
+				_: rect.height
 			}
 		};
 	});
@@ -4430,6 +4430,43 @@ function _Time_getZoneName()
 		callback(_Scheduler_succeed(name));
 	});
 }
+
+
+
+var _Bitwise_and = F2(function(a, b)
+{
+	return a & b;
+});
+
+var _Bitwise_or = F2(function(a, b)
+{
+	return a | b;
+});
+
+var _Bitwise_xor = F2(function(a, b)
+{
+	return a ^ b;
+});
+
+function _Bitwise_complement(a)
+{
+	return ~a;
+};
+
+var _Bitwise_shiftLeftBy = F2(function(offset, a)
+{
+	return a << offset;
+});
+
+var _Bitwise_shiftRightBy = F2(function(offset, a)
+{
+	return a >> offset;
+});
+
+var _Bitwise_shiftRightZfBy = F2(function(offset, a)
+{
+	return a >>> offset;
+});
 var $elm$core$Basics$EQ = 1;
 var $elm$core$Basics$GT = 2;
 var $elm$core$Basics$LT = 0;
@@ -4934,7 +4971,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {T: fragment, V: host, _: path, ac: port_, ag: protocol, ah: query};
+		return {Z: fragment, aa: host, ae: path, ag: port_, aj: protocol, ak: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5214,6 +5251,121 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$document = _Browser_document;
 var $author$project$Aoc17$Input = 0;
+var $elm$core$String$lines = _String_lines;
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (!_v0.$) {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $elm$core$Array$fromListHelp = F3(
+	function (list, nodeList, nodeListSize) {
+		fromListHelp:
+		while (true) {
+			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
+			var jsArray = _v0.a;
+			var remainingItems = _v0.b;
+			if (_Utils_cmp(
+				$elm$core$Elm$JsArray$length(jsArray),
+				$elm$core$Array$branchFactor) < 0) {
+				return A2(
+					$elm$core$Array$builderToArray,
+					true,
+					{d: nodeList, a: nodeListSize, c: jsArray});
+			} else {
+				var $temp$list = remainingItems,
+					$temp$nodeList = A2(
+					$elm$core$List$cons,
+					$elm$core$Array$Leaf(jsArray),
+					nodeList),
+					$temp$nodeListSize = nodeListSize + 1;
+				list = $temp$list;
+				nodeList = $temp$nodeList;
+				nodeListSize = $temp$nodeListSize;
+				continue fromListHelp;
+			}
+		}
+	});
+var $elm$core$Array$fromList = function (list) {
+	if (!list.b) {
+		return $elm$core$Array$empty;
+	} else {
+		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
+	}
+};
+var $author$project$Aoc17$parseProgram = function (s) {
+	var _v0 = A2($elm$core$String$split, ': ', s);
+	if ((_v0.b && _v0.b.b) && (!_v0.b.b.b)) {
+		var _v1 = _v0.b;
+		var str = _v1.a;
+		return $elm$core$Array$fromList(
+			A2(
+				$elm$core$List$filterMap,
+				$elm$core$String$toInt,
+				A2($elm$core$String$split, ',', str)));
+	} else {
+		return $elm$core$Array$fromList(
+			_List_fromArray(
+				[0]));
+	}
+};
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Aoc17$parseRegister = function (s) {
+	var _v0 = A2($elm$core$String$split, ': ', s);
+	if ((_v0.b && _v0.b.b) && (!_v0.b.b.b)) {
+		var _v1 = _v0.b;
+		var str = _v1.a;
+		return A2(
+			$elm$core$Maybe$withDefault,
+			0,
+			$elm$core$String$toInt(str));
+	} else {
+		return 0;
+	}
+};
+var $author$project$Aoc17$parseComputer = function (data) {
+	var _v0 = $elm$core$String$lines(data);
+	if (((((_v0.b && _v0.b.b) && _v0.b.b.b) && _v0.b.b.b.b) && _v0.b.b.b.b.b) && (!_v0.b.b.b.b.b.b)) {
+		var a = _v0.a;
+		var _v1 = _v0.b;
+		var b = _v1.a;
+		var _v2 = _v1.b;
+		var c = _v2.a;
+		var _v3 = _v2.b;
+		var _v4 = _v3.b;
+		var p = _v4.a;
+		return {
+			N: _List_Nil,
+			O: 0,
+			H: $author$project$Aoc17$parseProgram(p),
+			I: $author$project$Aoc17$parseRegister(a),
+			J: $author$project$Aoc17$parseRegister(b),
+			K: $author$project$Aoc17$parseRegister(c)
+		};
+	} else {
+		return {N: _List_Nil, O: 0, H: $elm$core$Array$empty, I: 0, J: 0, K: 0};
+	}
+};
 var $author$project$Aoc17$initComputer = function (dataSource) {
 	var sample2 = 'Register A: 2024\nRegister B: 0\nRegister C: 0\n\nProgram: 0,3,5,4,3,0';
 	var sample = 'Register A: 729\nRegister B: 0\nRegister C: 0\n\nProgram: 0,1,5,4,3,0';
@@ -5225,11 +5377,12 @@ var $author$project$Aoc17$initComputer = function (dataSource) {
 			return input;
 		}
 	}();
-	return {Z: _List_Nil, ab: 0, af: $elm$core$Array$empty, ai: 0, aj: 0, ak: 0};
+	var computer = $author$project$Aoc17$parseComputer(data);
+	return computer;
 };
 var $author$project$Aoc17$initModel = function (dataSource) {
 	var computer = $author$project$Aoc17$initComputer(dataSource);
-	var model = {F: '', G: computer, v: dataSource, Q: ''};
+	var model = {F: '', G: computer, v: dataSource, W: ''};
 	return model;
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
@@ -5249,7 +5402,7 @@ var $elm$time$Time$Every = F2(
 	});
 var $elm$time$Time$State = F2(
 	function (taggers, processes) {
-		return {ae: processes, ap: taggers};
+		return {ai: processes, ap: taggers};
 	});
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
@@ -5541,7 +5694,7 @@ var $elm$time$Time$spawnHelp = F3(
 	});
 var $elm$time$Time$onEffects = F3(
 	function (router, subs, _v0) {
-		var processes = _v0.ae;
+		var processes = _v0.ai;
 		var rightStep = F3(
 			function (_v6, id, _v7) {
 				var spawns = _v7.a;
@@ -5659,7 +5812,7 @@ var $elm$time$Time$every = F2(
 var $author$project$Aoc17$subscriptions = function (model) {
 	var lightBackgroundTick = A2(
 		$elm$time$Time$every,
-		1377,
+		1977,
 		function (_v2) {
 			return 6;
 		});
@@ -5671,7 +5824,7 @@ var $author$project$Aoc17$subscriptions = function (model) {
 		});
 	var darkBackgroundTick = A2(
 		$elm$time$Time$every,
-		1277,
+		1777,
 		function (_v0) {
 			return 5;
 		});
@@ -5793,16 +5946,280 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
-var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$line = $elm$svg$Svg$trustedNode('line');
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
+var $elm$core$Bitwise$and = _Bitwise_and;
+var $elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
+var $elm$core$String$repeatHelp = F3(
+	function (n, chunk, result) {
+		return (n <= 0) ? result : A3(
+			$elm$core$String$repeatHelp,
+			n >> 1,
+			_Utils_ap(chunk, chunk),
+			(!(n & 1)) ? result : _Utils_ap(result, chunk));
+	});
+var $elm$core$String$repeat = F2(
+	function (n, chunk) {
+		return A3($elm$core$String$repeatHelp, n, chunk, '');
+	});
+var $elm$core$String$padLeft = F3(
+	function (n, _char, string) {
+		return _Utils_ap(
+			A2(
+				$elm$core$String$repeat,
+				n - $elm$core$String$length(string),
+				$elm$core$String$fromChar(_char)),
+			string);
+	});
+var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
+var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
+var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
+var $elm$svg$Svg$Attributes$x1 = _VirtualDom_attribute('x1');
+var $elm$svg$Svg$Attributes$x2 = _VirtualDom_attribute('x2');
+var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
+var $elm$svg$Svg$Attributes$y1 = _VirtualDom_attribute('y1');
+var $elm$svg$Svg$Attributes$y2 = _VirtualDom_attribute('y2');
 var $author$project$Aoc17$toSvg = function (model) {
-	var svgWidth = $elm$core$String$fromInt(600);
+	var textStroke = 'black';
+	var textFill = '#F28C28';
+	var svgWidth = $elm$core$String$fromInt(800);
 	var svgHeight = $elm$core$String$fromInt(400);
 	var viewBoxStr = '0 0 ' + (svgWidth + (' ' + svgHeight));
+	var regCLabel = A2(
+		$elm$svg$Svg$text_,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$x('20'),
+				$elm$svg$Svg$Attributes$y('142'),
+				$elm$svg$Svg$Attributes$stroke(textStroke),
+				$elm$svg$Svg$Attributes$fill(textFill)
+			]),
+		_List_fromArray(
+			[
+				$elm$svg$Svg$text('C')
+			]));
+	var regCBox = A2(
+		$elm$svg$Svg$rect,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$x('60'),
+				$elm$svg$Svg$Attributes$y('110'),
+				$elm$svg$Svg$Attributes$width('720'),
+				$elm$svg$Svg$Attributes$height('40'),
+				$elm$svg$Svg$Attributes$strokeWidth('2px'),
+				$elm$svg$Svg$Attributes$stroke('black'),
+				$elm$svg$Svg$Attributes$fill('none')
+			]),
+		_List_Nil);
+	var regBLabel = A2(
+		$elm$svg$Svg$text_,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$x('20'),
+				$elm$svg$Svg$Attributes$y('92'),
+				$elm$svg$Svg$Attributes$stroke(textStroke),
+				$elm$svg$Svg$Attributes$fill(textFill)
+			]),
+		_List_fromArray(
+			[
+				$elm$svg$Svg$text('B')
+			]));
+	var regBBox = A2(
+		$elm$svg$Svg$rect,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$x('60'),
+				$elm$svg$Svg$Attributes$y('60'),
+				$elm$svg$Svg$Attributes$width('720'),
+				$elm$svg$Svg$Attributes$height('40'),
+				$elm$svg$Svg$Attributes$strokeWidth('2px'),
+				$elm$svg$Svg$Attributes$stroke('black'),
+				$elm$svg$Svg$Attributes$fill('none')
+			]),
+		_List_Nil);
+	var regALabel = A2(
+		$elm$svg$Svg$text_,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$x('20'),
+				$elm$svg$Svg$Attributes$y('42'),
+				$elm$svg$Svg$Attributes$stroke(textStroke),
+				$elm$svg$Svg$Attributes$fill(textFill)
+			]),
+		_List_fromArray(
+			[
+				$elm$svg$Svg$text('A')
+			]));
+	var regABox = A2(
+		$elm$svg$Svg$rect,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$x('60'),
+				$elm$svg$Svg$Attributes$y('10'),
+				$elm$svg$Svg$Attributes$width('720'),
+				$elm$svg$Svg$Attributes$height('40'),
+				$elm$svg$Svg$Attributes$strokeWidth('2px'),
+				$elm$svg$Svg$Attributes$stroke('black'),
+				$elm$svg$Svg$Attributes$fill('none')
+			]),
+		_List_Nil);
+	var programLabel = A2(
+		$elm$svg$Svg$text_,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$x('20'),
+				$elm$svg$Svg$Attributes$y('192'),
+				$elm$svg$Svg$Attributes$stroke(textStroke),
+				$elm$svg$Svg$Attributes$fill(textFill)
+			]),
+		_List_fromArray(
+			[
+				$elm$svg$Svg$text('P')
+			]));
+	var programBox = A2(
+		$elm$svg$Svg$rect,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$x('60'),
+				$elm$svg$Svg$Attributes$y('160'),
+				$elm$svg$Svg$Attributes$width('720'),
+				$elm$svg$Svg$Attributes$height('80'),
+				$elm$svg$Svg$Attributes$strokeWidth('2px'),
+				$elm$svg$Svg$Attributes$stroke('black'),
+				$elm$svg$Svg$Attributes$fill('none')
+			]),
+		_List_Nil);
+	var pointerPosition = 70;
+	var pointerPositionStr = $elm$core$String$fromInt(pointerPosition);
+	var pointer = 15;
+	var paddings = 1 + (2 * pointer);
+	var pointerText = A3($elm$core$String$padLeft, paddings, ' ', '^');
+	var pointerHat = A2(
+		$elm$svg$Svg$text_,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$x('70'),
+				$elm$svg$Svg$Attributes$y('232'),
+				$elm$svg$Svg$Attributes$style('white-space:pre'),
+				$elm$svg$Svg$Attributes$stroke(textStroke),
+				$elm$svg$Svg$Attributes$fill(textFill)
+			]),
+		_List_fromArray(
+			[
+				$elm$svg$Svg$text(pointerText)
+			]));
+	var outputsBox = A2(
+		$elm$svg$Svg$rect,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$x('60'),
+				$elm$svg$Svg$Attributes$y('250'),
+				$elm$svg$Svg$Attributes$width('720'),
+				$elm$svg$Svg$Attributes$height('140'),
+				$elm$svg$Svg$Attributes$strokeWidth('2px'),
+				$elm$svg$Svg$Attributes$stroke('black'),
+				$elm$svg$Svg$Attributes$fill('none')
+			]),
+		_List_Nil);
+	var midLine = A2(
+		$elm$svg$Svg$line,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$x1('0'),
+				$elm$svg$Svg$Attributes$y1('250'),
+				$elm$svg$Svg$Attributes$x2('800'),
+				$elm$svg$Svg$Attributes$y2('250'),
+				$elm$svg$Svg$Attributes$strokeWidth('2px'),
+				$elm$svg$Svg$Attributes$stroke('black')
+			]),
+		_List_Nil);
+	var computer = model.G;
+	var programStr = A2(
+		$elm$core$String$join,
+		',',
+		A2(
+			$elm$core$List$map,
+			$elm$core$String$fromInt,
+			$elm$core$Array$toList(computer.H)));
+	var programValue = A2(
+		$elm$svg$Svg$text_,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$x('70'),
+				$elm$svg$Svg$Attributes$y('192'),
+				$elm$svg$Svg$Attributes$stroke(textStroke),
+				$elm$svg$Svg$Attributes$fill(textFill)
+			]),
+		_List_fromArray(
+			[
+				$elm$svg$Svg$text(programStr)
+			]));
+	var regAValue = A2(
+		$elm$svg$Svg$text_,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$x('70'),
+				$elm$svg$Svg$Attributes$y('42'),
+				$elm$svg$Svg$Attributes$stroke(textStroke),
+				$elm$svg$Svg$Attributes$fill(textFill)
+			]),
+		_List_fromArray(
+			[
+				$elm$svg$Svg$text(
+				$elm$core$String$fromInt(computer.I))
+			]));
+	var regBValue = A2(
+		$elm$svg$Svg$text_,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$x('70'),
+				$elm$svg$Svg$Attributes$y('92'),
+				$elm$svg$Svg$Attributes$stroke(textStroke),
+				$elm$svg$Svg$Attributes$fill(textFill)
+			]),
+		_List_fromArray(
+			[
+				$elm$svg$Svg$text(
+				$elm$core$String$fromInt(computer.J))
+			]));
+	var regCValue = A2(
+		$elm$svg$Svg$text_,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$x('70'),
+				$elm$svg$Svg$Attributes$y('142, stroke textStroke, fill textFill')
+			]),
+		_List_fromArray(
+			[
+				$elm$svg$Svg$text(
+				$elm$core$String$fromInt(computer.K))
+			]));
+	var borderElement = A2(
+		$elm$svg$Svg$rect,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$x('0'),
+				$elm$svg$Svg$Attributes$y('0'),
+				$elm$svg$Svg$Attributes$width(svgWidth),
+				$elm$svg$Svg$Attributes$height(svgHeight),
+				$elm$svg$Svg$Attributes$strokeWidth('4px'),
+				$elm$svg$Svg$Attributes$stroke('black'),
+				$elm$svg$Svg$Attributes$fill('none')
+			]),
+		_List_Nil);
 	var backgroundColor = model.F;
 	return A2(
 		$elm$svg$Svg$svg,
@@ -5813,7 +6230,8 @@ var $author$project$Aoc17$toSvg = function (model) {
 				$elm$svg$Svg$Attributes$height(svgHeight),
 				$elm$svg$Svg$Attributes$style('background-color:' + backgroundColor)
 			]),
-		_List_Nil);
+		_List_fromArray(
+			[borderElement, regALabel, regAValue, regABox, regBLabel, regBValue, regBBox, regCLabel, regCValue, regCBox, programLabel, programValue, programBox, pointerHat, outputsBox]));
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
@@ -6097,8 +6515,8 @@ var $author$project$Aoc17$viewBody = function (model) {
 							[
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
-								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', textFontSize),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'Source Code Pro, monospace'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '32px'),
 								A2($elm$html$Html$Attributes$style, 'padding', '10px'),
 								A2($elm$html$Html$Attributes$style, 'width', '200px')
 							]),

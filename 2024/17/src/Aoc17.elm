@@ -42,16 +42,47 @@ type alias Model =
   , backgroundColor : String 
   , debug : String }
 
-parseNumbers : String -> List Int 
-parseNumbers line = 
-  line |> String.split " " |> List.filterMap String.toInt
+-- parseNumbers : String -> List Int 
+-- parseNumbers line = 
+--   line |> String.split " " |> List.filterMap String.toInt
 
-pairwise : List a -> List (a, a) 
-pairwise lst = 
-  case lst of 
-    x :: y :: rest -> 
-      (x, y) :: pairwise (y :: rest)
-    _ -> []
+-- pairwise : List a -> List (a, a) 
+-- pairwise lst = 
+--   case lst of 
+--     x :: y :: rest -> 
+--       (x, y) :: pairwise (y :: rest)
+--     _ -> []
+
+parseRegister : String -> Int 
+parseRegister s = 
+  case s |> String.split ": " of 
+    [_, str] -> str |> String.toInt |> Maybe.withDefault 0 
+    _ -> 0 
+
+parseProgram : String -> Array Int 
+parseProgram s = 
+  case s |> String.split ": " of 
+    [_, str] -> 
+      str |> String.split "," |> List.filterMap (String.toInt) |> Array.fromList
+    _ -> [0] |> Array.fromList 
+
+parseComputer : String -> Computer 
+parseComputer data = 
+  case String.lines data of 
+    [a, b, c, _, p] -> 
+      { regA = parseRegister a 
+      , regB = parseRegister b 
+      , regC = parseRegister c 
+      , pointer = 0
+      , program = parseProgram p
+      , outputs = [] }
+    _ -> 
+      { regA = 0
+      , regB = 0 
+      , regC = 0 
+      , pointer = 0 
+      , program = Array.empty 
+      , outputs = [] } 
 
 initComputer : DataSource -> Computer
 initComputer dataSource = 
@@ -75,13 +106,9 @@ Program: 2,4,1,3,7,5,4,1,1,3,0,3,5,5,3,0"""
       case dataSource of 
         Sample -> sample
         Input -> input 
+    computer = parseComputer data 
   in 
-    { regA = 0
-    , regB = 0 
-    , regC = 0 
-    , pointer = 0 
-    , program = Array.empty 
-    , outputs = [] } 
+    computer
 
 initModel : DataSource -> Model 
 initModel dataSource = 
@@ -150,8 +177,8 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
   let
     defaultBackgroundTick = Time.every 277 (\_ -> DefaultBackgroundTick)
-    darkBackgroundTick = Time.every 1277 (\_ -> DarkBackgroundTick)
-    lightBackgroundTick = Time.every 1377 (\_ -> LightBackgroundTick)
+    darkBackgroundTick = Time.every 1777 (\_ -> DarkBackgroundTick)
+    lightBackgroundTick = Time.every 1977 (\_ -> LightBackgroundTick)
   in
     Sub.batch 
     [ defaultBackgroundTick
@@ -210,18 +237,45 @@ toDampenedHtmlElement index numbers =
 toSvg : Model -> Html Msg 
 toSvg model = 
   let 
-    svgWidth = String.fromInt (600)
+    svgWidth = String.fromInt (800)
     svgHeight = String.fromInt (400)
     viewBoxStr = "0 0 " ++ svgWidth ++ " " ++ svgHeight
     backgroundColor = model.backgroundColor
+    computer = model.computer
+    programStr = computer.program |> Array.toList |> List.map String.fromInt |> String.join ","
+    textStroke = "black"
+    textFill = "#F28C28"
+    pointer = 15
+    paddings = 1 + 2 * pointer
+    pointerPosition = 70
+    pointerPositionStr = String.fromInt pointerPosition
+    pointerText = String.padLeft paddings ' ' "^"
+    borderElement = rect [ x "0", y "0", width svgWidth, height svgHeight, strokeWidth "4px", stroke "black", fill "none" ] [] 
+    regABox = rect [ x "60", y "10", width "720", height "40", strokeWidth "2px", stroke "black", fill "none" ] [] 
+    regALabel = text_ [ x "20", y "42", stroke textStroke, fill textFill ] [ Svg.text "A" ]
+    regAValue = text_ [ x "70", y "42", stroke textStroke, fill textFill ] [ Svg.text (String.fromInt computer.regA) ]
+    regBBox = rect [ x "60", y "60", width "720", height "40", strokeWidth "2px", stroke "black", fill "none" ] [] 
+    regBLabel = text_ [ x "20", y "92", stroke textStroke, fill textFill ] [ Svg.text "B" ]
+    regBValue = text_ [ x "70", y "92", stroke textStroke, fill textFill ] [ Svg.text (String.fromInt computer.regB) ]
+    regCBox = rect [ x "60", y "110", width "720", height "40", strokeWidth "2px", stroke "black", fill "none" ] [] 
+    regCLabel = text_ [ x "20", y "142", stroke textStroke, fill textFill ] [ Svg.text "C" ]
+    regCValue = text_ [ x "70", y "142, stroke textStroke, fill textFill" ] [ Svg.text (String.fromInt computer.regC) ]
+    programBox = rect [ x "60", y "160", width "720", height "80", strokeWidth "2px", stroke "black", fill "none" ] [] 
+    programLabel = text_ [ x "20", y "192", stroke textStroke, fill textFill ] [ Svg.text "P" ]
+    programValue = text_ [ x "70", y "192", stroke textStroke, fill textFill ] [ Svg.text programStr ]
+
+    midLine = line [ x1 "0", y1 "250", x2 "800", y2 "250", strokeWidth "2px", stroke "black" ] []
+    pointerHat = text_ [ x "70", y "232", Svg.Attributes.style "white-space:pre", stroke textStroke, fill textFill ] [ Svg.text pointerText ]
+    outputsBox = rect [ x "60", y "250", width "720", height "140", strokeWidth "2px", stroke "black", fill "none" ] [] 
   in 
     svg
       [ viewBox viewBoxStr
       , width svgWidth
       , height svgHeight
       , Svg.Attributes.style ("background-color:" ++ backgroundColor)
+      -- , Svg.Attributes.style ("color:" ++ "#F28C28")
       ]
-      []
+      [ borderElement, regALabel, regAValue, regABox, regBLabel, regBValue, regBBox, regCLabel, regCValue, regCBox, programLabel, programValue, programBox, pointerHat, outputsBox ]
 
 view : Model -> Document Msg
 view model = 
@@ -328,8 +382,8 @@ viewBody model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "background-color" "white" 
-              , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" textFontSize
+              , Html.Attributes.style "font-family" "Source Code Pro, monospace"
+              , Html.Attributes.style "font-size" "32px"
               , Html.Attributes.style "padding" "10px"
               , Html.Attributes.style "width" "200px" ] 
               [ 
