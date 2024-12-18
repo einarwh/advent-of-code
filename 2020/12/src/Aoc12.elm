@@ -111,7 +111,7 @@ initModel strategy dataSource =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel MoveBoat Input, Cmd.none)
+  (initModel MoveWaypoint Input, Cmd.none)
 
 -- UPDATE
 
@@ -330,18 +330,27 @@ toPolylineElement translate positions =
         positions |> List.map str |> String.join " "
   in
     polyline 
-      [ stroke "gray"
+      [ stroke "#606060"
       , strokeWidth "1"
       , fill "None"
       , points s ] []
 
-toShipElement : (Float -> Float) -> Position -> Svg msg 
-toShipElement translate (xval, yval) = 
+toCircleElement : (Float -> Float) -> Position -> Svg msg 
+toCircleElement translate (xVal, yVal) = 
+  let
+    xStr = xVal |> toFloat |> translate |> String.fromFloat
+    yStr = yVal |> toFloat |> translate |> String.fromFloat
+    rStr = String.fromInt 3
+  in
+    circle [ cx xStr, cy yStr, r rStr, fill "none", stroke "red" ] []
+
+toShipElement : (Float -> Float) -> (Float, Float) -> Position -> Svg msg 
+toShipElement translate (dx, dy) (xval, yval) = 
   let 
-    -- xStr = String.fromFloat (calc xval - 14.75)
-    -- yStr = String.fromFloat (800 - (calc yval + 35.00))
-    xStr = xval |> toFloat |> (\x -> x - 0.75) |> translate |> String.fromFloat 
-    yStr = yval |> toFloat |> (\y -> y - 1.86) |> translate |> String.fromFloat 
+    xf = toFloat xval + dx 
+    yf = toFloat yval + dy 
+    xStr = xf |> translate |> String.fromFloat 
+    yStr = yf |> translate |> String.fromFloat 
   in 
     svg [ version "1.0", x xStr, y yStr, width "14.75pt", height "20.00pt", viewBox "0 0 1259.000000 1280.000000", preserveAspectRatio "xMidYMid meet" ] [ metadata [] [ text "Created by potrace 1.15, written by Peter Selinger 2001-2017" ], g [ transform "translate(0.000000,1280.000000) scale(0.100000,-0.100000)", fill "#000000", stroke "none" ] [ Svg.path [ d "M4692 12785 c-117 -33 -219 -119 -274 -233 -31 -63 -33 -73 -33 -177 0 -102 2 -114 31 -175 17 -36 52 -88 77 -116 l47 -52 0 -4428 0 -4429 -2205 -3 -2206 -2 118 -138 c294 -344 529 -598 868 -938 610 -612 1134 -1054 1670 -1409 652 -432 1178 -641 1697 -676 274 -19 728 -4 1093 37 1577 173 3471 893 5410 2057 509 305 1181 752 1544 1026 l55 41 -3755 2 -3754 3 -3 4430 -2 4429 29 31 c119 126 160 289 111 436 -41 120 -113 201 -227 256 -61 29 -87 36 -155 39 -54 3 -101 -1 -136 -11z" ] [], Svg.path [ d "M5452 11888 c452 -2355 623 -3791 605 -5068 -8 -507 -26 -771 -83 -1160 -90 -620 -263 -1182 -498 -1622 l-72 -135 3126 -6 c1718 -3 3127 -4 3129 -1 12 12 -301 700 -520 1139 -654 1315 -1394 2476 -2338 3665 -804 1013 -1851 2099 -2956 3066 -201 176 -433 374 -438 374 -2 0 18 -114 45 -252z" ] [], Svg.path [ d "M4220 9345 c0 -29 -82 -368 -126 -524 -277 -971 -745 -1794 -1468 -2580 -353 -384 -693 -695 -1496 -1366 -567 -474 -836 -707 -1030 -893 l-95 -91 2113 -1 2112 0 0 2735 c0 1504 -2 2735 -5 2735 -3 0 -5 -7 -5 -15z" ] [] ] ]
 
@@ -364,14 +373,14 @@ viewBody model =
         Nothing -> "?"
         Just prev -> instructionAsString prev
     maxxyStr = String.fromInt model.maxxy
-    scaleFactor = 
+    (scaleFactor, shipOffset) = 
       case (model.dataSource, model.strategy) of 
-        (Input, MoveBoat) -> 0.125
-        (Input, MoveWaypoint) -> 0.0025
-        (Sample, MoveBoat) -> 10.00
-        (Sample, MoveWaypoint) -> 0.75
+        (Input, MoveBoat) -> (0.100, (-76.0, -185.0))
+        (Input, MoveWaypoint) -> (0.0025, (-3030.0, -7400.0))
+        (Sample, MoveBoat) -> (10.00, (-0.76, -1.84))
+        (Sample, MoveWaypoint) -> (0.75, (-10.1, -24.6))
     translate n = n * scaleFactor
-    shipElements = [ toShipElement translate model.ship ]
+    shipElements = [ toShipElement translate shipOffset model.ship ]
     lineElement = toPolylineElement translate model.visited
     elements = lineElement :: shipElements
     viewBoxStr = [ "-200", "-200", "400", "400" ] |> String.join " "
@@ -479,11 +488,11 @@ viewBody model =
               , Html.Attributes.style "font-size" "24px"
               , Html.Attributes.style "padding" "10px"]
               [ 
-                Html.div [] [ Html.text ("Distance: " ++ distanceStr) ]
-              , Html.div [] [ Html.text ("Ship: " ++ shipStr) ]
-              , Html.div [] [ Html.text ("Waypoint: " ++ waypointStr) ]
-              , Html.div [] [ Html.text ("Instruction: " ++ instStr) ]
-              , Html.div [] [ Html.text ("Maxxy: " ++ maxxyStr) ]
+                Html.div [] [ Html.text (distanceStr) ]
+            --   , Html.div [] [ Html.text ("Ship: " ++ shipStr) ]
+            --   , Html.div [] [ Html.text ("Waypoint: " ++ waypointStr) ]
+              , Html.div [] [ Html.text (instStr) ]
+            --   , Html.div [] [ Html.text ("Maxxy: " ++ maxxyStr) ]
               ] ]
       , Html.tr 
           []
@@ -491,5 +500,5 @@ viewBody model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "padding" "10px"] 
-              [ svg [ viewBox viewBoxStr, width dimStr, height dimStr ] elements 
+              [ svg [ viewBox viewBoxStr, width dimStr, height dimStr, Svg.Attributes.style "background-color:lightblue" ] elements 
               ] ] ]

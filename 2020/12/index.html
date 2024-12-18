@@ -5220,7 +5220,7 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$document = _Browser_document;
 var $author$project$Aoc12$Input = {$: 'Input'};
-var $author$project$Aoc12$MoveBoat = {$: 'MoveBoat'};
+var $author$project$Aoc12$MoveWaypoint = {$: 'MoveWaypoint'};
 var $author$project$Aoc12$East = {$: 'East'};
 var $author$project$Aoc12$E = function (a) {
 	return {$: 'E', a: a};
@@ -5331,7 +5331,7 @@ var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Aoc12$init = function (_v0) {
 	return _Utils_Tuple2(
-		A2($author$project$Aoc12$initModel, $author$project$Aoc12$MoveBoat, $author$project$Aoc12$Input),
+		A2($author$project$Aoc12$initModel, $author$project$Aoc12$MoveWaypoint, $author$project$Aoc12$Input),
 		$elm$core$Platform$Cmd$none);
 };
 var $author$project$Aoc12$Tick = {$: 'Tick'};
@@ -5761,7 +5761,7 @@ var $author$project$Aoc12$subscriptions = function (model) {
 		});
 	return tickSub;
 };
-var $author$project$Aoc12$MoveWaypoint = {$: 'MoveWaypoint'};
+var $author$project$Aoc12$MoveBoat = {$: 'MoveBoat'};
 var $author$project$Aoc12$Sample = {$: 'Sample'};
 var $author$project$Aoc12$updateClear = function (model) {
 	return A2($author$project$Aoc12$initModel, model.strategy, model.dataSource);
@@ -6259,6 +6259,7 @@ var $elm$core$Tuple$second = function (_v0) {
 };
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$html$Html$table = _VirtualDom_node('table');
@@ -6291,7 +6292,7 @@ var $author$project$Aoc12$toPolylineElement = F2(
 			$elm$svg$Svg$polyline,
 			_List_fromArray(
 				[
-					$elm$svg$Svg$Attributes$stroke('gray'),
+					$elm$svg$Svg$Attributes$stroke('#606060'),
 					$elm$svg$Svg$Attributes$strokeWidth('1'),
 					$elm$svg$Svg$Attributes$fill('None'),
 					$elm$svg$Svg$Attributes$points(s)
@@ -6309,20 +6310,18 @@ var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
 var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
-var $author$project$Aoc12$toShipElement = F2(
-	function (translate, _v0) {
-		var xval = _v0.a;
-		var yval = _v0.b;
+var $author$project$Aoc12$toShipElement = F3(
+	function (translate, _v0, _v1) {
+		var dx = _v0.a;
+		var dy = _v0.b;
+		var xval = _v1.a;
+		var yval = _v1.b;
+		var yf = yval + dy;
 		var yStr = $elm$core$String$fromFloat(
-			translate(
-				function (y) {
-					return y - 1.86;
-				}(yval)));
+			translate(yf));
+		var xf = xval + dx;
 		var xStr = $elm$core$String$fromFloat(
-			translate(
-				function (x) {
-					return x - 0.75;
-				}(xval)));
+			translate(xf));
 		return A2(
 			$elm$svg$Svg$svg,
 			_List_fromArray(
@@ -6388,53 +6387,63 @@ var $author$project$Aoc12$viewBody = function (model) {
 		_List_fromArray(
 			['-200', '-200', '400', '400']));
 	var shipStr = '(' + ($elm$core$String$fromInt(model.ship.a) + (', ' + ($elm$core$String$fromInt(model.ship.b) + ')')));
-	var scaleFactor = function () {
+	var maxxyStr = $elm$core$String$fromInt(model.maxxy);
+	var instStr = function () {
+		var _v10 = model.prevInstruction;
+		if (_v10.$ === 'Nothing') {
+			return '?';
+		} else {
+			var prev = _v10.a;
+			return $author$project$Aoc12$instructionAsString(prev);
+		}
+	}();
+	var dist = $author$project$Aoc12$distance(model.ship);
+	var distanceStr = $elm$core$String$fromInt(dist);
+	var dim = 400;
+	var dimStr = $elm$core$String$fromInt(dim);
+	var _v0 = function () {
 		var _v1 = _Utils_Tuple2(model.dataSource, model.strategy);
 		if (_v1.a.$ === 'Input') {
 			if (_v1.b.$ === 'MoveBoat') {
 				var _v2 = _v1.a;
 				var _v3 = _v1.b;
-				return 0.125;
+				return _Utils_Tuple2(
+					0.100,
+					_Utils_Tuple2(-76.0, -185.0));
 			} else {
 				var _v4 = _v1.a;
 				var _v5 = _v1.b;
-				return 0.0025;
+				return _Utils_Tuple2(
+					0.0025,
+					_Utils_Tuple2(-3030.0, -7400.0));
 			}
 		} else {
 			if (_v1.b.$ === 'MoveBoat') {
 				var _v6 = _v1.a;
 				var _v7 = _v1.b;
-				return 10.00;
+				return _Utils_Tuple2(
+					10.00,
+					_Utils_Tuple2(-0.76, -1.84));
 			} else {
 				var _v8 = _v1.a;
 				var _v9 = _v1.b;
-				return 0.75;
+				return _Utils_Tuple2(
+					0.75,
+					_Utils_Tuple2(-10.1, -24.6));
 			}
 		}
 	}();
+	var scaleFactor = _v0.a;
+	var shipOffset = _v0.b;
 	var translate = function (n) {
 		return n * scaleFactor;
 	};
+	var lineElement = A2($author$project$Aoc12$toPolylineElement, translate, model.visited);
 	var shipElements = _List_fromArray(
 		[
-			A2($author$project$Aoc12$toShipElement, translate, model.ship)
+			A3($author$project$Aoc12$toShipElement, translate, shipOffset, model.ship)
 		]);
-	var maxxyStr = $elm$core$String$fromInt(model.maxxy);
-	var lineElement = A2($author$project$Aoc12$toPolylineElement, translate, model.visited);
-	var instStr = function () {
-		var _v0 = model.prevInstruction;
-		if (_v0.$ === 'Nothing') {
-			return '?';
-		} else {
-			var prev = _v0.a;
-			return $author$project$Aoc12$instructionAsString(prev);
-		}
-	}();
 	var elements = A2($elm$core$List$cons, lineElement, shipElements);
-	var dist = $author$project$Aoc12$distance(model.ship);
-	var distanceStr = $elm$core$String$fromInt(dist);
-	var dim = 400;
-	var dimStr = $elm$core$String$fromInt(dim);
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
@@ -6772,35 +6781,14 @@ var $author$project$Aoc12$viewBody = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Distance: ' + distanceStr)
+										$elm$html$Html$text(distanceStr)
 									])),
 								A2(
 								$elm$html$Html$div,
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Ship: ' + shipStr)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Waypoint: ' + waypointStr)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Instruction: ' + instStr)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Maxxy: ' + maxxyStr)
+										$elm$html$Html$text(instStr)
 									]))
 							]))
 					])),
@@ -6825,7 +6813,8 @@ var $author$project$Aoc12$viewBody = function (model) {
 									[
 										$elm$svg$Svg$Attributes$viewBox(viewBoxStr),
 										$elm$svg$Svg$Attributes$width(dimStr),
-										$elm$svg$Svg$Attributes$height(dimStr)
+										$elm$svg$Svg$Attributes$height(dimStr),
+										$elm$svg$Svg$Attributes$style('background-color:lightblue')
 									]),
 								elements)
 							]))
