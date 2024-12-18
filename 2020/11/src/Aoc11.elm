@@ -413,8 +413,8 @@ type alias Circle =
 toSeatColor : Status -> String
 toSeatColor status =
   case status of
-    Empty -> "darkgreen"
-    Occupied -> "darkred"
+    Empty -> "#228B22"
+    Occupied -> "#D70040"
 
 toMaybeCircle : Int -> Pos -> Space -> Maybe Circle
 toMaybeCircle radius pos space =
