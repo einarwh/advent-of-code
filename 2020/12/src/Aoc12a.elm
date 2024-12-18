@@ -88,36 +88,36 @@ init _ =
 
 type Msg = Tick
 
-north : Steps -> (Position, Direction) -> (Position, Direction)
-north steps ((x,y), dir) = ((x, y-steps), dir)
+moveBoatNorth : Steps -> (Position, Direction) -> (Position, Direction)
+moveBoatNorth steps ((x,y), dir) = ((x, y-steps), dir)
 
-west : Steps -> (Position, Direction) -> (Position, Direction)
-west steps ((x,y), dir) = ((x-steps, y), dir)
+moveBoatWest : Steps -> (Position, Direction) -> (Position, Direction)
+moveBoatWest steps ((x,y), dir) = ((x-steps, y), dir)
 
-south : Steps -> (Position, Direction) -> (Position, Direction)
-south steps ((x,y), dir) = ((x, y+steps), dir)
+moveBoatSouth : Steps -> (Position, Direction) -> (Position, Direction)
+moveBoatSouth steps ((x,y), dir) = ((x, y+steps), dir)
 
-east : Steps -> (Position, Direction) -> (Position, Direction)
-east steps ((x,y), dir) = ((x+steps, y), dir)
+moveBoatEast : Steps -> (Position, Direction) -> (Position, Direction)
+moveBoatEast steps ((x,y), dir) = ((x+steps, y), dir)
 
-forward : Steps -> (Position, Direction) -> (Position, Direction)
-forward steps (pos, dir) =
+moveBoatForward : Steps -> (Position, Direction) -> (Position, Direction)
+moveBoatForward steps (pos, dir) =
     case dir of
-      North -> north steps (pos, dir)
-      West -> west steps (pos, dir)
-      South -> south steps (pos, dir)
-      East -> east steps (pos, dir)
+      North -> moveBoatNorth steps (pos, dir)
+      West -> moveBoatWest steps (pos, dir)
+      South -> moveBoatSouth steps (pos, dir)
+      East -> moveBoatEast steps (pos, dir)
 
-rotateLeft : Direction -> Direction
-rotateLeft dir =
+turnBoatLeftOnce : Direction -> Direction
+turnBoatLeftOnce dir =
     case dir of
       North -> West
       West -> South
       South -> East
       East -> North
 
-rotateRight : Direction -> Direction
-rotateRight dir =
+turnBoatRightOnce : Direction -> Direction
+turnBoatRightOnce dir =
     case dir of
       North -> East
       West -> North
@@ -129,24 +129,24 @@ times n fn =
   if n < 1 then identity 
   else fn >> times (n - 1) fn 
 
-left : Int -> (Position, Direction) -> (Position, Direction)
-left n (pos, dir) =
-  (pos, dir |> times n rotateLeft)
+turnBoatLeft : Int -> (Position, Direction) -> (Position, Direction)
+turnBoatLeft n (pos, dir) =
+  (pos, dir |> times n turnBoatLeftOnce)
 
-right : Int -> (Position, Direction) -> (Position, Direction)
-right n (pos, dir) =
-  (pos, dir |> times n rotateRight)
+turnBoatRight : Int -> (Position, Direction) -> (Position, Direction)
+turnBoatRight n (pos, dir) =
+  (pos, dir |> times n turnBoatRightOnce)
 
-move : Instruction -> (Position, Direction) -> (Position, Direction)
-move inst = 
+moveBoat : Instruction -> (Position, Direction) -> (Position, Direction)
+moveBoat inst = 
   case inst of 
-    N steps -> north steps 
-    S steps -> south steps 
-    W steps -> west steps 
-    E steps -> east steps 
-    L rotations -> left rotations
-    R rotations -> right rotations 
-    F steps -> forward steps     
+    N steps -> moveBoatNorth steps 
+    S steps -> moveBoatSouth steps 
+    W steps -> moveBoatWest steps 
+    E steps -> moveBoatEast steps 
+    L rotations -> turnBoatLeft rotations
+    R rotations -> turnBoatRight rotations 
+    F steps -> moveBoatForward steps
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -158,7 +158,7 @@ update msg model =
             [] -> model 
             inst :: rest -> 
               let 
-                (pos, dir) = move inst (model.pos, model.dir)
+                (pos, dir) = moveBoat inst (model.pos, model.dir)
               in 
                 { pos = pos
                 , dir = dir 

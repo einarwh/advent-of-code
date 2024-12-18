@@ -330,12 +330,6 @@ evolveLayout : Evolve -> Layout -> Layout
 evolveLayout evolveSeat layout =
   layout |> Array.indexedMap (evolveRow evolveSeat layout)
 
--- evolve1 : Layout -> Layout
--- evolve1 = evolveLayout evolveSeatDirectNeighbors
-
--- evolve2 : Layout -> Layout
--- evolve2 = evolveLayout evolveSeatInDirection
-
 getEvolver : Strategy -> Layout -> Layout
 getEvolver strategy =
   case strategy of
@@ -476,8 +470,8 @@ viewBody model =
           [ Html.td
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "40px"
-              , Html.Attributes.style "padding" "20px"]
+              , Html.Attributes.style "font-size" "32px"
+              , Html.Attributes.style "padding" "10px"]
               [ Html.div [] [Html.text "Advent of Code 2020" ]
               , Html.div [] [Html.text "Day 11: Seating System" ] ] ]
       , Html.tr
@@ -533,7 +527,7 @@ viewBody model =
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Clear ] 
-                [ Html.text "Clear"]
+                [ Html.text "Reset"]
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Slower ] 
                 [ text "Slower" ]
