@@ -78,7 +78,7 @@ let solve1 dim byteCount corrupted =
     |> solve dim 
     |> Option.get 
 
-let findBlocker (dim : int) (byteCount0 : int) (allCorrupted : Pos list) = 
+let findBlocker dim byteCount0 allCorrupted = 
     let rec loop minByteCount maxByteCount byteCount = 
         let diff = maxByteCount - minByteCount
         if diff = 1 then minByteCount
@@ -94,7 +94,7 @@ let findBlocker (dim : int) (byteCount0 : int) (allCorrupted : Pos list) =
     let (x, y) = allCorrupted |> List.skip lastByteCount |> List.head
     sprintf "%d,%d" x y 
 
-let run (dim : int) (byteCount : int) (fileName : string) =
+let run dim byteCount fileName =
     let lines = readLines fileName
     let corrupted = lines |> List.choose parsePos 
     solve1 dim byteCount corrupted |> printfn "%d"
