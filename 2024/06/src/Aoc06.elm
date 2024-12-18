@@ -630,17 +630,6 @@ viewBody model =
                 Html.div [] [ Html.text text1 ]
               , Html.div [] [ Html.text text2 ]
               ] ]
-      -- , Html.tr 
-      --     []
-      --     [ Html.td 
-      --         [ Html.Attributes.align "center"
-      --         , Html.Attributes.style "background-color" "white" 
-      --         , Html.Attributes.style "font-family" "Courier New"
-      --         , Html.Attributes.style "font-size" "24px"
-      --         , Html.Attributes.style "width" "200px" ] 
-      --         [ 
-      --           Html.div [] [ Html.text model.message ]
-      --         ] ]
       , Html.tr 
           []
           [ Html.td 

@@ -1,19 +1,17 @@
-module Aoc11b exposing (..)
+module Aoc11 exposing (..)
 
 import Browser exposing (Document)
 import Html exposing (Html)
 import Html.Attributes
+import Html.Events exposing (onClick)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Task
 import Time
 import Array exposing (Array)
 
-delay : Float
-delay = 250
-
-radius : Int 
-radius = 5
+defaultTickInterval : Float
+defaultTickInterval = 250
 
 id : a -> a
 id x = x
@@ -29,33 +27,51 @@ main =
 
 -- MODEL
 
+type DataSource = Sample | Input
+type Strategy = Adjacent | Direction
 type Status = Empty | Occupied
 type Space = Seat Status | Floor
-type alias Row = Array Space 
+type alias Row = Array Space
 type alias Layout = Array Row
 type alias Point = (Int, Int)
 type alias Move = Point -> Point
 type alias Look = Move -> Layout -> Point -> Space
 type alias Evolve = Layout -> Int -> Int -> Status -> Status
 
-type alias Model = 
-  { layout : Layout }
+type alias Model =
+  { layout : Layout
+  , dataSource : DataSource
+  , strategy : Strategy
+  , evolver : Layout -> Layout
+  , paused : Bool
+  , finished : Bool
+  , tickInterval : Float }
 
 toSpace : Char -> Space
 toSpace ch =
   case ch of
-    'L' -> Seat Empty 
+    'L' -> Seat Empty
     '#' -> Seat Occupied
-    _ -> Floor 
-    
+    _ -> Floor
+
 toSpaceRow : String -> Row
-toSpaceRow s = 
+toSpaceRow s =
   s |> String.toList |> List.map toSpace |> Array.fromList
 
-init : () -> (Model, Cmd Msg)
-init _ =
+initModel : Strategy -> DataSource -> Model
+initModel strategy dataSource =
   let
-    strs = [ "LLLLL.LLL.LLLLLLLLLLLLLLL.LLLLLLLLL.LLLLLLLLLLLLL.LLLLLLL.LLLLLLL.LLLLL.LLLLLLLLLLLLLLLLLLL.LLLLL"
+    samp = [ "L.LL.LL.LL"
+           , "LLLLLLL.LL"
+           , "L.L.L..L.."
+           , "LLLL.LL.LL"
+           , "L.LL.LL.LL"
+           , "L.LLLLL.LL"
+           , "..L.L....."
+           , "LLLLLLLLLL"
+           , "L.LLLLLL.L"
+           , "L.LLLLL.LL" ]
+    inpt = [ "LLLLL.LLL.LLLLLLLLLLLLLLL.LLLLLLLLL.LLLLLLLLLLLLL.LLLLLLL.LLLLLLL.LLLLL.LLLLLLLLLLLLLLLLLLL.LLLLL"
            , "LLLLLLLLL.LLLLLLLLLLLLLLL.LLLLL.LLLLLLLLLLLLLLLLLLLLLLLLL.LLLLLLL.LLLLL.LLLLLL.L.LLLL.LLL.L.LLLLL"
            , "LLLLLLLLL.LLLLLL.L.LLLLLL.LLLLLLLLL.LLLL...LLLLLL.LLLLLLL.LLLLLLL.LLLLLLLLLLLLLLLLLLL.LLLLL.LLLLL"
            , "LLLLLLLLLLLLLLLLLLLLLLLLL.LLLLLLLLLLLLLLLLLLLLLLL.LLLLLLL.LLLLLLLLLLLLL.L.LLLLLL.LLLLLLLLLLLLLLLL"
@@ -147,52 +163,66 @@ init _ =
            , "LLLLLLLLL.LLLLLL.LLLLLLLL.LLL.LLLLL.LLLLLLLLLLLLL.LLLLLLLLLLLLLLL.LLLLL.LLLLLLLLLLLLLLLLLLL.LL.LL"
            , "LLLLLLLLL.LLLLLLLLLLLLLLL.LLLLLLLLLLLLLLLLLL.LLLL.LLLLLLL.LLLLLLL.LLLLL.LLLLLLLL.LLLL.LLLLLL.LLLL"
            , "LLLLLLLLLLLLLLLL.LLLLLLL..LLLLLLLLLLLLLLL.LLLLLLLLLLLLLLLL.LLLL.L..LLLL.L.LLLLL..LLLL.LLLLL.LLLLL" ]
+    strs =
+      case dataSource of
+        Input -> inpt
+        Sample -> samp
     layout = strs |> List.map toSpaceRow |> Array.fromList
-  in 
-  ({ layout = layout }, Cmd.none)
+  in
+    { strategy = strategy
+    , dataSource = dataSource
+    , layout = layout
+    , evolver = getEvolver strategy
+    , paused = True
+    , finished = False
+    , tickInterval = defaultTickInterval }
+
+init : () -> (Model, Cmd Msg)
+init _ =
+  (initModel Adjacent Input, Cmd.none)
 
 -- UPDATE
 
-type Msg = Tick
+type Msg = Tick | Clear | TogglePlay | Step | Faster | Slower | UseSample | UseInput | UseAdjacent | UseDirection
 
 rowCount : Layout -> Int
 rowCount = Array.length
 
 colCount : Layout -> Int
-colCount layout = 
-  layout 
-  |> Array.get 0 
-  |> Maybe.withDefault Array.empty 
-  |> Array.length 
+colCount layout =
+  layout
+  |> Array.get 0
+  |> Maybe.withDefault Array.empty
+  |> Array.length
 
 check : Layout -> Point -> Maybe Space
-check layout (rowNo, colNo) = 
-  if rowNo >= 0 && rowNo < rowCount layout then 
-    let 
+check layout (rowNo, colNo) =
+  if rowNo >= 0 && rowNo < rowCount layout then
+    let
       row = layout |> Array.get rowNo |> Maybe.withDefault Array.empty
     in
-      if colNo >= 0 && colNo < colCount layout then 
+      if colNo >= 0 && colNo < colCount layout then
         row |> Array.get colNo
-      else 
-        Nothing 
-  else 
+      else
+        Nothing
+  else
     Nothing
 
 lookAt : Look
-lookAt dir layout (rowNo, colNo) = 
+lookAt dir layout (rowNo, colNo) =
   check layout (dir (rowNo, colNo)) |> Maybe.withDefault Floor
 
-lookDir : Look 
-lookDir dir layout xy = 
-  let 
+lookDir : Look
+lookDir dir layout xy =
+  let
     next = dir xy
-  in 
-    case check layout next of 
+  in
+    case check layout next of
       Nothing -> Floor
-      Just space -> 
-        case space of 
-          Seat status -> Seat status 
-          Floor -> lookDir dir layout next           
+      Just space ->
+        case space of
+          Seat status -> Seat status
+          Floor -> lookDir dir layout next
 
 north : Move
 north (x, y) = (x, y-1)
@@ -203,204 +233,261 @@ west (x, y) = (x-1, y)
 south : Move
 south (x, y) = (x, y+1)
 
-east : Move 
+east : Move
 east (x, y) = (x+1, y)
 
-findPositions : Look -> Layout -> Int -> Int -> List Space 
-findPositions look layout rowNo colNo = 
-  [ look (north >> west) layout (rowNo, colNo) 
-  , look north layout (rowNo, colNo) 
-  , look (north >> east) layout (rowNo, colNo) 
-  , look west layout (rowNo, colNo) 
-  , look east layout (rowNo, colNo) 
-  , look (south >> west) layout (rowNo, colNo) 
-  , look south layout (rowNo, colNo) 
+findPositions : Look -> Layout -> Int -> Int -> List Space
+findPositions look layout rowNo colNo =
+  [ look (north >> west) layout (rowNo, colNo)
+  , look north layout (rowNo, colNo)
+  , look (north >> east) layout (rowNo, colNo)
+  , look west layout (rowNo, colNo)
+  , look east layout (rowNo, colNo)
+  , look (south >> west) layout (rowNo, colNo)
+  , look south layout (rowNo, colNo)
   , look (south >> east) layout (rowNo, colNo) ]
-  
-spaceToStatus : Space -> Maybe Status 
-spaceToStatus space = 
+
+spaceToStatus : Space -> Maybe Status
+spaceToStatus space =
   case space of
-    Seat status -> Just status 
+    Seat status -> Just status
     Floor -> Nothing
 
 findSeats : Look -> Layout -> Int -> Int -> List Status
-findSeats look layout rowNo colNo = 
+findSeats look layout rowNo colNo =
   findPositions look layout rowNo colNo |> List.filterMap spaceToStatus
-    
-countSeat : Status -> Int 
-countSeat status = 
-  case status of 
-    Empty -> 0 
+
+countSeat : Status -> Int
+countSeat status =
+  case status of
+    Empty -> 0
     Occupied -> 1
 
-countOccupiedSeats : List Status -> Int 
-countOccupiedSeats seats = 
+countOccupiedSeats : List Status -> Int
+countOccupiedSeats seats =
     seats
     |> List.map countSeat
     |> List.sum
 
-countOccupiedSpaces : List Space -> Int 
-countOccupiedSpaces spaces = 
-  let 
+countOccupiedSpaces : List Space -> Int
+countOccupiedSpaces spaces =
+  let
     count space =
-      case space of 
+      case space of
         Seat seat -> countSeat seat
         Floor -> 0
-  in 
+  in
     spaces
     |> List.map count
     |> List.sum
 
-countOccupiedRow : Row -> Int 
-countOccupiedRow row = 
-  row 
+countOccupiedRow : Row -> Int
+countOccupiedRow row =
+  row
   |> Array.toList
-  |> countOccupiedSpaces 
+  |> countOccupiedSpaces
 
-countOccupiedTotal : Layout -> Int 
-countOccupiedTotal layout = 
-  layout 
+countOccupiedTotal : Layout -> Int
+countOccupiedTotal layout =
+  layout
   |> Array.toList
-  |> List.map countOccupiedRow 
+  |> List.map countOccupiedRow
   |> List.sum
 
 countOccupiedSeatsSeen : Look -> Layout -> Int -> Int -> Int
-countOccupiedSeatsSeen look layout rowNo colNo = 
+countOccupiedSeatsSeen look layout rowNo colNo =
   findSeats look layout rowNo colNo |> countOccupiedSeats
-  
+
 evolveSeatDirectNeighbors : Evolve
 evolveSeatDirectNeighbors layout rowNo colNo seat =
-  let 
+  let
     occupied = countOccupiedSeatsSeen lookAt layout rowNo colNo
   in
-    case seat of 
-      Empty -> if occupied == 0 then Occupied else Empty 
+    case seat of
+      Empty -> if occupied == 0 then Occupied else Empty
       Occupied -> if occupied >= 4 then Empty else Occupied
 
 evolveSeatInDirection : Evolve
 evolveSeatInDirection layout rowNo colNo seat =
-  let 
+  let
     occupied = countOccupiedSeatsSeen lookDir layout rowNo colNo
   in
-    case seat of 
-      Empty -> if occupied == 0 then Occupied else Empty 
+    case seat of
+      Empty -> if occupied == 0 then Occupied else Empty
       Occupied -> if occupied >= 5 then Empty else Occupied
 
 evolveSpace : Evolve -> Layout -> Int -> Int -> Space -> Space
-evolveSpace evolveSeat layout rowNo colNo space = 
-  case space of 
+evolveSpace evolveSeat layout rowNo colNo space =
+  case space of
     Seat status -> Seat (evolveSeat layout rowNo colNo status)
     Floor -> Floor
 
-evolveRow : Evolve -> Layout -> Int -> Row -> Row 
-evolveRow evolveSeat layout rowNo row = 
+evolveRow : Evolve -> Layout -> Int -> Row -> Row
+evolveRow evolveSeat layout rowNo row =
   row |> Array.indexedMap (evolveSpace evolveSeat layout rowNo)
 
-evolveLayout : Evolve -> Layout -> Layout 
+evolveLayout : Evolve -> Layout -> Layout
 evolveLayout evolveSeat layout =
   layout |> Array.indexedMap (evolveRow evolveSeat layout)
 
-evolve1 : Layout -> Layout 
-evolve1 = evolveLayout evolveSeatDirectNeighbors
+-- evolve1 : Layout -> Layout
+-- evolve1 = evolveLayout evolveSeatDirectNeighbors
 
-evolve2 : Layout -> Layout 
-evolve2 = evolveLayout evolveSeatInDirection
+-- evolve2 : Layout -> Layout
+-- evolve2 = evolveLayout evolveSeatInDirection
+
+getEvolver : Strategy -> Layout -> Layout
+getEvolver strategy =
+  case strategy of
+    Adjacent -> evolveLayout evolveSeatDirectNeighbors
+    Direction -> evolveLayout evolveSeatInDirection
+
+updateClear : Model -> Model
+updateClear model =
+  initModel model.strategy model.dataSource
+
+updateStep model =
+  if model.finished then model 
+  else 
+    let
+      evolvedLayout = model.evolver model.layout
+      finished = evolvedLayout == model.layout
+      paused = model.paused || finished
+    in
+      { model | layout = evolvedLayout, finished = finished, paused = paused }
+
+updateTogglePlay model =
+  if model.finished then 
+    let 
+      m = initModel model.strategy model.dataSource
+    in 
+      {m | paused = False }
+  else 
+    { model | paused = not model.paused }
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Tick ->
-      ({ layout = evolve2 model.layout }, Cmd.none)
+      (updateStep model, Cmd.none)
+    Step ->
+      (updateStep model, Cmd.none)
+    Faster -> 
+      ({model | tickInterval = model.tickInterval / 2 }, Cmd.none)
+    Slower -> 
+      ({model | tickInterval = model.tickInterval * 2 }, Cmd.none)
+    Clear ->
+      (updateClear model, Cmd.none)
+    TogglePlay ->
+      (updateTogglePlay model, Cmd.none)
+    UseSample ->
+      (initModel model.strategy Sample, Cmd.none)
+    UseInput ->
+      (initModel model.strategy Input, Cmd.none)
+    UseAdjacent ->
+      (initModel Adjacent model.dataSource, Cmd.none)
+    UseDirection ->
+      (initModel Direction model.dataSource, Cmd.none)
 
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Time.every delay (\_ -> Tick)
+  let
+    tickSub = if model.paused then Sub.none else Time.every model.tickInterval (\_ -> Tick)
+  in
+    tickSub
 
 -- VIEW
 
-type alias Pos = 
+type alias Pos =
   { x : Int
   , y : Int }
 
-type alias Circle = 
-  { x : Int 
-  , y : Int 
-  , r : Int 
+type alias Circle =
+  { x : Int
+  , y : Int
+  , r : Int
   , color : String }
-  
-toSeatColor : Status -> String 
-toSeatColor status = 
-  case status of 
+
+toSeatColor : Status -> String
+toSeatColor status =
+  case status of
     Empty -> "darkgreen"
     Occupied -> "darkred"
-  
-toMaybeCircle : Pos -> Space -> Maybe Circle 
-toMaybeCircle pos space = 
-  case space of 
-    Seat seat -> 
-      let circle = { x = pos.x, y = pos.y, r = radius, color = toSeatColor seat }
-      in 
-        Just circle      
-    Floor -> Nothing   
 
-toCircleList : Int -> List Space -> List Circle
-toCircleList rowNo spaces = 
-  spaces 
-  |> List.indexedMap (\ix -> \space -> toMaybeCircle {x=ix*2*radius+radius,y=rowNo*2*radius+radius} space)
+toMaybeCircle : Int -> Pos -> Space -> Maybe Circle
+toMaybeCircle radius pos space =
+  case space of
+    Seat seat ->
+      let circle = { x = pos.x, y = pos.y, r = radius, color = toSeatColor seat }
+      in
+        Just circle
+    Floor -> Nothing
+
+toCircleList : Int -> Int -> List Space -> List Circle
+toCircleList radius rowNo spaces =
+  spaces
+  |> List.indexedMap (\ix -> \space -> toMaybeCircle radius {x=ix*2*radius+radius,y=rowNo*2*radius+radius} space)
   |> List.filterMap id
-  
-toCircles : Layout -> List Circle
-toCircles layout = 
-  layout 
-  |> Array.map Array.toList 
+
+toCircles : Int -> Layout -> List Circle
+toCircles radius layout =
+  layout
+  |> Array.map Array.toList
   |> Array.toList
-  |> List.indexedMap toCircleList |> List.concat   
+  |> List.indexedMap (toCircleList radius) |> List.concat
 
 toCircleElement : Circle -> Svg msg
-toCircleElement c = 
-  let 
-    xStr = String.fromInt c.x 
-    yStr = String.fromInt c.y 
-    rStr = String.fromInt c.r 
+toCircleElement c =
+  let
+    xStr = String.fromInt c.x
+    yStr = String.fromInt c.y
+    rStr = String.fromInt c.r
     colorStr = c.color
-  in 
+  in
     circle [ cx xStr, cy yStr, r rStr, fill colorStr ] []
 
 view : Model -> Document Msg
-view model = 
-  { title = "Advent of Code 2020 | Day 11: Seating System (Part 2)"
+view model =
+  { title = "Advent of Code 2020 | Day 11: Seating System"
   , body = [ viewBody model ] }
 
 viewBody : Model -> Html Msg
 viewBody model =
   let
-    circles = model.layout |> toCircles
+    radius = 
+      case model.dataSource of 
+        Sample -> 10 
+        Input -> 5
+    circles = model.layout |> toCircles radius
     elements = circles |> List.map toCircleElement
     occupied = countOccupiedTotal model.layout
-    countStr = occupied |> String.fromInt    
-  in 
-    Html.table 
+    countStr = occupied |> String.fromInt
+    widthUnit = 2 * radius
+    svgWidth = (rowCount model.layout * widthUnit) |> String.fromInt
+    svgHeight = svgWidth
+  in
+    Html.table
       [ Html.Attributes.style "width" "1080px"
       , Html.Attributes.style "font-family" "Courier New" ]
-      [ Html.tr 
-          [] 
-          [ Html.td 
+      [ Html.tr
+          []
+          [ Html.td
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "40px"
               , Html.Attributes.style "padding" "20px"]
               [ Html.div [] [Html.text "Advent of Code 2020" ]
-              , Html.div [] [Html.text "Day 11: Seating System (Part 2)" ] ] ]
-      , Html.tr 
+              , Html.div [] [Html.text "Day 11: Seating System" ] ] ]
+      , Html.tr
           []
-          [ Html.td 
+          [ Html.td
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding-bottom" "10px" ]
               [ Html.text " ["
               , Html.a [ Html.Attributes.href "../../2024/"] [ Html.text "2024" ]
-              , Html.text "] " 
+              , Html.text "] "
               , Html.text " ["
               , Html.a [ Html.Attributes.href "../../2023/"] [ Html.text "2023" ]
               , Html.text "] "
@@ -414,27 +501,80 @@ viewBody model =
               , Html.a [ Html.Attributes.href "../../2020/"] [ Html.text "2020" ]
               , Html.text "] "
             ] ]
+      , Html.tr
+          []
+          [ Html.td
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "padding-bottom" "10px" ]
+              [ Html.a
+                [ Html.Attributes.href "https://adventofcode.com/2020/day/11" ]
+                [ text "https://adventofcode.com/2020/day/11" ]
+            ] ]
+      , Html.tr
+          []
+          [ Html.td
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "16px" ]
+              [
+                Html.input
+                [ Html.Attributes.type_ "radio", onClick UseInput, Html.Attributes.checked (model.dataSource == Input) ]
+                []
+              , Html.label [] [ Html.text "Input" ]
+              , Html.input
+                [ Html.Attributes.type_ "radio", onClick UseSample, Html.Attributes.checked (model.dataSource == Sample) ]
+                []
+              , Html.label [] [ Html.text "Sample" ]
+            ] ]
       , Html.tr 
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "padding-bottom" "10px" ]
-              [ Html.a 
-                [ Html.Attributes.href "https://adventofcode.com/2020/day/11" ] 
-                [ text "https://adventofcode.com/2020/day/11" ]
+              , Html.Attributes.style "padding" "10px" ]
+              [ Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Clear ] 
+                [ Html.text "Clear"]
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Slower ] 
+                [ text "Slower" ]
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick TogglePlay ] 
+                [ if model.paused then text "Solve" else text "Pause" ] 
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Faster ] 
+                [ text "Faster" ]
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Step ] 
+                [ Html.text "Step" ]
             ] ]
-      , Html.tr 
-          [] 
-          [ Html.td 
+      , Html.tr
+          []
+          [ Html.td
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "16px" ]
+              [
+                Html.input
+                [ Html.Attributes.type_ "radio", onClick UseAdjacent, Html.Attributes.checked (model.strategy == Adjacent) ]
+                []
+              , Html.label [] [ Html.text "Adjacent" ]
+              , Html.input
+                [ Html.Attributes.type_ "radio", onClick UseDirection, Html.Attributes.checked (model.strategy == Direction) ]
+                []
+              , Html.label [] [ Html.text "Direction" ]
+            ] ]
+      , Html.tr
+          []
+          [ Html.td
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "32px"
               , Html.Attributes.style "padding" "10px"]
               [ text countStr ] ]
-      , Html.tr 
+      , Html.tr
           []
-          [ Html.td 
+          [ Html.td
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
-              , Html.Attributes.style "padding" "20px"] 
-              [ svg [ width "900", height "900" ] elements ] ] ]
+              , Html.Attributes.style "background-color" "white"
+              , Html.Attributes.style "padding" "10px"]
+              [ svg [ width svgWidth, height svgHeight ] elements ] ] ]
