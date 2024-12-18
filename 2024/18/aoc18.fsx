@@ -30,7 +30,7 @@ let getAllPositions dim =
     [for x in [0..colCount-1] do for y in [0..rowCount-1] -> (x, y)]
 
 let visualize dim corrupted =
-    let range = [ 0 .. (dim - 1) ]
+    let range = [ 0 .. dim ]
     let createRow y = 
         range 
         |> List.map (fun x -> if Set.contains (x, y) corrupted then '#' else '.')
@@ -40,6 +40,11 @@ let visualize dim corrupted =
     |> List.map (createRow)
     |> join "\n"
     |> printfn "%s"
+
+let solve dim corrupted = 
+    let startPos = (0, 0)
+    let endPos = (dim, dim)
+    0
 
 let run dim byteCount fileName = 
     let lines = readLines fileName
