@@ -4,11 +4,18 @@ import Browser exposing (Document)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
+import Svg exposing (..)
+import Svg.Attributes exposing (..)
 import Dict exposing (Dict)
 import Array exposing (Array)
 import Html exposing (text)
+import Time
 
 -- MAIN
+
+defaultBackgroundColor = "#808080"
+lightBackgroundColor = "#989898"
+darkBackgroundColor = "#696969"
 
 main =
   Browser.document
@@ -31,7 +38,8 @@ type alias Computer =
 
 type alias Model = 
   { computer : Computer 
-  , dataSource : DataSource 
+  , dataSource : DataSource
+  , backgroundColor : String 
   , debug : String }
 
 parseNumbers : String -> List Int 
@@ -81,6 +89,7 @@ initModel dataSource =
     computer = initComputer dataSource
     model = { computer = computer
             , dataSource = dataSource
+            , backgroundColor = ""
             , debug = "" }
   in 
     model 
@@ -91,7 +100,14 @@ init _ =
 
 -- UPDATE
 
-type Msg = Clear | Solve | UseSample | UseInput
+type Msg = 
+  Clear 
+  | Solve 
+  | UseSample 
+  | UseInput
+  | DefaultBackgroundTick
+  | DarkBackgroundTick 
+  | LightBackgroundTick 
 
 updateClear : Model -> Model
 updateClear model = 
@@ -105,6 +121,11 @@ updateDataSource : DataSource -> Model -> Model
 updateDataSource dataSource model = 
   { model | dataSource = dataSource, computer = initComputer dataSource } 
 
+updateBackgroundColor : String -> Model -> Model
+updateBackgroundColor color model = 
+  { model | backgroundColor = color } 
+
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
@@ -116,11 +137,26 @@ update msg model =
       (updateDataSource Sample model, Cmd.none)
     UseInput -> 
       (updateDataSource Input model, Cmd.none)
+    DefaultBackgroundTick -> 
+      (updateBackgroundColor defaultBackgroundColor model, Cmd.none)
+    DarkBackgroundTick -> 
+      (updateBackgroundColor darkBackgroundColor model, Cmd.none)
+    LightBackgroundTick -> 
+      (updateBackgroundColor lightBackgroundColor model, Cmd.none)
 
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
-subscriptions model = Sub.none
+subscriptions model =
+  let
+    defaultBackgroundTick = Time.every 277 (\_ -> DefaultBackgroundTick)
+    darkBackgroundTick = Time.every 1277 (\_ -> DarkBackgroundTick)
+    lightBackgroundTick = Time.every 1377 (\_ -> LightBackgroundTick)
+  in
+    Sub.batch 
+    [ defaultBackgroundTick
+    , darkBackgroundTick
+    , lightBackgroundTick ]
 
 -- VIEW
 
@@ -171,6 +207,21 @@ toDampenedHtmlElement index numbers =
   in 
     [ spanElementBefore, spanElementDropped, spanElementAfter, breakElement ]
 
+toSvg : Model -> Html Msg 
+toSvg model = 
+  let 
+    svgWidth = String.fromInt (600)
+    svgHeight = String.fromInt (400)
+    viewBoxStr = "0 0 " ++ svgWidth ++ " " ++ svgHeight
+    backgroundColor = model.backgroundColor
+  in 
+    svg
+      [ viewBox viewBoxStr
+      , width svgWidth
+      , height svgHeight
+      , Svg.Attributes.style ("background-color:" ++ backgroundColor)
+      ]
+      []
 
 view : Model -> Document Msg
 view model = 
@@ -186,6 +237,7 @@ viewBody model =
         Sample -> "24px" 
         Input -> "14px" 
     elements = []
+    s = toSvg model 
   in 
     Html.table 
       [ 
@@ -281,5 +333,5 @@ viewBody model =
               , Html.Attributes.style "padding" "10px"
               , Html.Attributes.style "width" "200px" ] 
               [ 
-                Html.div [] elements
+                Html.div [] [ s ]
               ] ] ]

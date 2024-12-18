@@ -6,11 +6,11 @@ import Html.Attributes
 import Html.Events exposing (onClick)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
-import Task
 import Time
 
 -- MAIN
 
+main : Program () Model Msg
 main =
   Browser.document
     { init = init
