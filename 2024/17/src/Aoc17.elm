@@ -1,6 +1,7 @@
 module Aoc17 exposing (..)
 
 import Browser exposing (Document)
+import BigInt exposing (BigInt)
 import Bitwise
 import Html exposing (Html)
 import Html.Attributes
@@ -27,21 +28,21 @@ main =
 
 -- MODEL
 
-type DataSource = Input | Sample
+type DataSource = Input | Sample | Quine 
 
 type BootStatus = Booting Float | Booted
 
 type alias Computer =
-  { regA : Int
-  , regB : Int
-  , regC : Int
+  { regA : BigInt
+  , regB : BigInt
+  , regC : BigInt
   , pointer : Int
   , program : Array Int
   , outputs : List Int }
 
 type alias Model =
   { computer : Computer
-  , initialA : Int
+  , initialA : BigInt
   , overwrittenA : String 
   , step : Int 
   , dataSource : DataSource
@@ -54,18 +55,18 @@ type alias Model =
   , lightBackgroundTickInterval : Float
   , debug : String }
 
-parseRegister : String -> Int
+parseRegister : String -> BigInt
 parseRegister s =
   case s |> String.split ": " of
-    [_, str] -> str |> String.toInt |> Maybe.withDefault 0
-    _ -> 0
+    [_, str] -> str |> BigInt.fromIntString |> Maybe.withDefault (BigInt.fromInt 0)
+    _ -> BigInt.fromInt 0
 
 parseProgram : String -> Array Int
 parseProgram s =
   case s |> String.split ": " of
     [_, str] ->
       str |> String.split "," |> List.filterMap (String.toInt) |> Array.fromList
-    _ -> [0] |> Array.fromList
+    _ -> [] |> Array.fromList
 
 parseComputer : String -> Computer
 parseComputer data =
@@ -78,9 +79,9 @@ parseComputer data =
       , program = parseProgram p
       , outputs = [] }
     _ ->
-      { regA = 0
-      , regB = 0
-      , regC = 0
+      { regA = BigInt.fromInt 0
+      , regB = BigInt.fromInt 0
+      , regC = BigInt.fromInt 0
       , pointer = 0
       , program = Array.empty
       , outputs = [] }
@@ -103,10 +104,16 @@ Register B: 0
 Register C: 0
 
 Program: 2,4,1,3,7,5,4,1,1,3,0,3,5,5,3,0"""
+    quine = """Register A: 108107566389757
+Register B: 0
+Register C: 0
+
+Program: 2,4,1,3,7,5,4,1,1,3,0,3,5,5,3,0"""
     data =
       case dataSource of
         Sample -> sample
         Input -> input
+        Quine -> quine
     computer = parseComputer data
   in
     computer
@@ -133,7 +140,7 @@ initModel bootStatus dataSource =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel Booted Input, Cmd.none)
+  (initModel Booted Quine, Cmd.none)
   -- (initModel (Booting 0) Input, Cmd.none)
 
 -- UPDATE
@@ -165,31 +172,37 @@ literal computer =
   let 
     pt = computer.pointer 
   in 
-    computer.program |> Array.get (pt + 1) |> Maybe.withDefault 0 
+    computer.program |> Array.get (pt + 1) |> Maybe.withDefault 0
 
-combo : Computer -> Int 
+shrinkInt : BigInt -> Int 
+shrinkInt big = 
+  case big |> BigInt.toString |> String.toInt of 
+    Nothing -> 0
+    Just n -> n 
+
+combo : Computer -> BigInt 
 combo computer =
   case literal computer of
-    0 -> 0
-    1 -> 1
-    2 -> 2
-    3 -> 3
+    0 -> BigInt.fromInt 0
+    1 -> BigInt.fromInt 1
+    2 -> BigInt.fromInt 2
+    3 -> BigInt.fromInt 3
     4 -> computer.regA
     5 -> computer.regB
     6 -> computer.regC
-    _ -> 0
+    _ -> BigInt.fromInt 0
 
 pow x y = if y < 1 then 1 else x * pow x (y - 1)
 
-writeA : Int -> Computer -> Computer 
+writeA : BigInt -> Computer -> Computer 
 writeA value computer = 
   { computer | regA = value }
 
-writeB : Int -> Computer -> Computer 
+writeB : BigInt -> Computer -> Computer 
 writeB value computer = 
   { computer | regB = value }
 
-writeC : Int -> Computer -> Computer 
+writeC : BigInt -> Computer -> Computer 
 writeC value computer = 
   { computer | regC = value }
 
@@ -205,13 +218,74 @@ output : Int -> Computer -> Computer
 output value computer =
     { computer | outputs = value :: computer.outputs }
 
-division : Computer -> Int 
+zip : List a -> List b -> List (a, b) 
+zip lst1 lst2 = 
+  case (lst1, lst2) of 
+    ((h1 :: r1), (h2 :: r2)) -> (h1, h2) :: zip r1 r2 
+    _ -> []
+
+zipWithDefaults : a -> b -> List a -> List b -> List (a, b) 
+zipWithDefaults a b lst1 lst2 = 
+  case (lst1, lst2) of 
+    ((h1 :: r1), (h2 :: r2)) -> (h1, h2) :: zipWithDefaults a b r1 r2 
+    ((h1 :: r1), []) -> (h1, b) :: zipWithDefaults a b r1 []
+    ([], (h2 :: r2)) -> (a, h2) :: zipWithDefaults a b [] r2 
+    ([], []) -> []
+
+toBitsLoop : BigInt -> BigInt -> BigInt -> List BigInt -> List BigInt 
+toBitsLoop big0 big2 n result = 
+  if BigInt.gt n big0 then 
+    let 
+      (divResult, remResult) = BigInt.divmod n big2 |> Maybe.withDefault (big0, big0)
+    in 
+      toBitsLoop big0 big2 divResult (remResult :: result)
+  else 
+    result |> List.reverse
+
+toBits : BigInt -> List BigInt 
+toBits n =
+  let 
+    big0 = BigInt.fromInt 0
+    big2 = BigInt.fromInt 2
+  in 
+    toBitsLoop big0 big2 n [] 
+
+fromBitsLoop : BigInt -> BigInt -> List BigInt -> BigInt 
+fromBitsLoop big0 big2 bits = 
+  bits 
+  |> List.indexedMap (\ix b -> BigInt.mul b (BigInt.pow big2 (BigInt.fromInt ix)))
+  |> List.foldl (BigInt.add) big0 
+
+fromBits : List BigInt -> BigInt 
+fromBits bits = 
+  let 
+    big0 = BigInt.fromInt 0
+    big2 = BigInt.fromInt 2
+  in 
+    fromBitsLoop big0 big2 bits
+
+bitXor : (BigInt, BigInt) -> BigInt 
+bitXor (bit1, bit2) = 
+  if bit1 == bit2 then BigInt.fromInt 0 else BigInt.fromInt 1 
+
+bigXor : BigInt -> BigInt -> BigInt 
+bigXor a b =
+  let
+    abits = toBits a 
+    bbits = toBits b 
+    big0 = BigInt.fromInt 0
+    zipped = zipWithDefaults big0 big0 abits bbits
+    bits = zipped |> List.map bitXor
+  in 
+    bits |> fromBits
+
+division : Computer -> BigInt 
 division computer =
   let 
-    numerator = toFloat <| computer.regA
-    denominator = toFloat <| pow 2 (combo computer)
+    numerator = computer.regA
+    denominator = BigInt.pow (BigInt.fromInt 2) (combo computer)
   in 
-    (numerator / denominator) |> floor
+    BigInt.div numerator denominator 
 
 adv : Computer -> Computer 
 adv computer = 
@@ -234,32 +308,33 @@ cdv computer =
 bxl : Computer -> Computer 
 bxl computer =
   computer
-  |> writeB (Bitwise.xor (literal computer) computer.regB)
+  |> writeB (bigXor (BigInt.fromInt (literal computer)) (computer.regB))
   |> nextInstruction
 
 bst : Computer -> Computer 
 bst computer =
   computer
-  |> writeB (combo computer |> modBy 8)
+  |> writeB (combo computer |> BigInt.modBy (BigInt.fromInt 8) |> Maybe.withDefault (BigInt.fromInt 0))
   |> nextInstruction
 
 jnz : Computer -> Computer 
 jnz computer =
-  if computer.regA == 0 then
+  if computer.regA == BigInt.fromInt 0 then
     computer |> nextInstruction
   else
+
     computer |> jump (literal computer)
 
 bxc : Computer -> Computer
 bxc computer =
   computer
-  |> writeB (Bitwise.xor computer.regB computer.regC)
+  |> writeB (bigXor (computer.regB) (computer.regC))
   |> nextInstruction
 
 out : Computer -> Computer 
 out computer =
   computer
-  |> output (combo computer |> modBy 8)
+  |> output (combo computer |> BigInt.modBy (BigInt.fromInt 8) |> Maybe.withDefault (BigInt.fromInt 0) |> shrinkInt)
   |> nextInstruction
 
 executeOpcode : Int -> Computer -> Computer 
@@ -331,7 +406,7 @@ updateOverwriteRegA overwrittenA model =
     let computer = model.computer in 
       { model | overwrittenA = "", computer = { computer | regA = model.initialA } }
   else 
-    case overwrittenA |> String.toInt of 
+    case overwrittenA |> BigInt.fromIntString of 
       Just a -> 
         let 
           computer = model.computer 
@@ -438,6 +513,7 @@ toDampenedHtmlElement index numbers =
   in
     [ spanElementBefore, spanElementDropped, spanElementAfter, breakElement ]
 
+toBootedElements : Model -> List (Svg Msg)
 toBootedElements model =
   let
     svgWidth = String.fromInt (800)
@@ -459,13 +535,13 @@ toBootedElements model =
     borderElement = rect [ x "0", y "0", width svgWidth, height svgHeight, strokeWidth "4px", stroke "black", fill "none" ] []
     regABox = rect [ x "60", y "10", width "720", height "40", strokeWidth "2px", stroke "black", fill "white", fillOpacity "0.2" ] []
     regALabel = text_ [ x "20", y "42", stroke textStroke, fill textFill ] [ Svg.text "A" ]
-    regAValue = text_ [ x "70", y "42", stroke textStroke, fill textFill ] [ Svg.text (String.fromInt computer.regA) ]
+    regAValue = text_ [ x "70", y "42", stroke textStroke, fill textFill ] [ Svg.text (BigInt.toString computer.regA) ]
     regBBox = rect [ x "60", y "60", width "720", height "40", strokeWidth "2px", stroke "black", fill "white", fillOpacity "0.2" ] []
     regBLabel = text_ [ x "20", y "92", stroke textStroke, fill textFill ] [ Svg.text "B" ]
-    regBValue = text_ [ x "70", y "92", stroke textStroke, fill textFill ] [ Svg.text (String.fromInt computer.regB) ]
+    regBValue = text_ [ x "70", y "92", stroke textStroke, fill textFill ] [ Svg.text (BigInt.toString computer.regB) ]
     regCBox = rect [ x "60", y "110", width "720", height "40", strokeWidth "2px", stroke "black", fill "white", fillOpacity "0.2" ] []
     regCLabel = text_ [ x "20", y "142", stroke textStroke, fill textFill ] [ Svg.text "C" ]
-    regCValue = text_ [ x "70", y "142", stroke textStroke, fill textFill ] [ Svg.text (String.fromInt computer.regC) ]
+    regCValue = text_ [ x "70", y "142", stroke textStroke, fill textFill ] [ Svg.text (BigInt.toString computer.regC) ]
     programBox = rect [ x "60", y "160", width "720", height "80", strokeWidth "2px", stroke "black", fill "white", fillOpacity "0.2" ] []
     programLabel = text_ [ x "20", y "192", stroke textStroke, fill textFill ] [ Svg.text "P" ]
     programValue = text_ [ x "70", y "192", stroke textStroke, fill textFill ] [ Svg.text programStr ]
@@ -533,12 +609,39 @@ viewBody model =
       case model.dataSource of
         Sample -> "24px"
         Input -> "14px"
+        Quine -> "14px"
     elements = []
     s = toSvg model
     qval = toFloat 108107566389757
     denom = toFloat (pow 2 6)
     res = qval / denom |> floor
-    debugStr = String.fromInt res 
+    litcom = 3
+    regB = BigInt.fromInt 6 
+    -- (BigInt.fromInt (Bitwise.xor (literal computer) (computer.regB |> shrinkInt)))
+    (divVal, remVal) = (BigInt.divmod (BigInt.fromInt 13) (BigInt.fromInt 2)) |> Maybe.withDefault (BigInt.fromInt 0, BigInt.fromInt 0)
+    debugStr1 = BigInt.toString (BigInt.modBy (BigInt.fromInt 13) (BigInt.fromInt 2) |> Maybe.withDefault (BigInt.fromInt -100))
+    debugStr2 = BigInt.toString (BigInt.modBy (BigInt.fromInt 2) (BigInt.fromInt 13) |> Maybe.withDefault (BigInt.fromInt -100))
+    debugStr3 = "(" ++ BigInt.toString divVal ++ "," ++ BigInt.toString remVal ++ ")"
+    debugStr4 = (bigXor (BigInt.fromInt 177) (BigInt.fromInt 377)) |> BigInt.toString
+    debugStr5 = (Bitwise.xor 177 377) |> String.fromInt
+    debugStr6 = (BigInt.fromInt 177) |> toBits |> List.map (BigInt.toString) |> String.join " "
+    debugStr7 = (BigInt.fromInt 377) |> toBits |> List.map (BigInt.toString) |> String.join " "
+    debugStr8 = (BigInt.fromInt 13) |> toBits |> List.map (BigInt.toString) |> String.join " "
+    debugStr9 = if BigInt.gt (BigInt.fromInt 13) (BigInt.fromInt 7) then "13" else "7"
+    big0 = BigInt.fromInt 0
+    abits = toBits (BigInt.fromInt 177)
+    bbits = toBits (BigInt.fromInt 377)
+    zipped = zipWithDefaults big0 big0 abits bbits
+    xored = zipped |> List.map bitXor
+    xoredStr = xored |> List.map (BigInt.toString) |> String.join " "
+    multed = xored |> List.indexedMap (\ix b -> BigInt.mul b (BigInt.pow (BigInt.fromInt 2) (BigInt.fromInt ix)))
+
+    reconstructStr = xored |> fromBitsLoop (BigInt.fromInt 0) (BigInt.fromInt 2) |> BigInt.toString
+    zippedStr = zipped |> List.map (\(a, b) -> "(" ++ BigInt.toString a ++ ", " ++ BigInt.toString b ++ ")") |> String.join ":"
+    -- debugStr = String.fromInt (Bitwise.xor litcom (shrinkInt regB))
+    numerator = BigInt.fromInt 108107566389757
+    denominator = BigInt.pow (BigInt.fromInt 2) (BigInt.fromInt 6)
+    divResult = BigInt.div numerator denominator 
   in
     Html.table
       [
@@ -637,7 +740,21 @@ viewBody model =
                     , onInput OverwriteRegA ] 
                     []
               , Html.div [] [ Html.text commandsStr ]
-              , Html.div [] [ Html.text debugStr ]
+              , Html.div [] [ Html.text ("DebugStr1 " ++ debugStr1) ]
+              , Html.div [] [ Html.text ("DebugStr2 " ++ debugStr2) ]
+              , Html.div [] [ Html.text ("DebugStr3 " ++ debugStr3) ]
+              , Html.div [] [ Html.text ("DebugStr4 (bigXor) " ++ debugStr4) ]
+              , Html.div [] [ Html.text ("DebugStr5 (intXor) " ++ debugStr5) ]
+              , Html.div [] [ Html.text ("DebugStr6 (177 as bits) " ++ debugStr6 ++ " *") ]
+              , Html.div [] [ Html.text ("DebugStr7 (377 as bits) " ++ debugStr7) ]
+              , Html.div [] [ Html.text ("DebugStr8 (13 as bits) " ++ debugStr8) ]
+              , Html.div [] [ Html.text ("DebugStr9 (gt?) " ++ debugStr9) ]
+              , Html.div [] [ Html.text ("zipped " ++ zippedStr) ]
+              , Html.div [] [ Html.text ("xored " ++ xoredStr) ]
+              , Html.div [] [ Html.text ("recons " ++ reconstructStr) ]
+              , Html.div [] [ Html.text ("numerator: " ++ BigInt.toString numerator) ]
+              , Html.div [] [ Html.text ("denominator: " ++ BigInt.toString denominator) ]
+              , Html.div [] [ Html.text ("divResult: " ++ BigInt.toString divResult) ]
               , Html.div [] [ Html.text (String.fromFloat qval) ]
               , Html.div [] [ Html.text ("Step: " ++ (String.fromInt model.step)) ]
               ] ]
