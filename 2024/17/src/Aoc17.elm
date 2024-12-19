@@ -4,7 +4,7 @@ import Browser exposing (Document)
 import Bitwise
 import Html exposing (Html)
 import Html.Attributes
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Dict exposing (Dict)
@@ -41,6 +41,9 @@ type alias Computer =
 
 type alias Model =
   { computer : Computer
+  , initialA : Int
+  , overwrittenA : String 
+  , step : Int 
   , dataSource : DataSource
   , backgroundColor : String
   , paused : Bool 
@@ -114,6 +117,9 @@ initModel bootStatus dataSource =
     computer = initComputer dataSource
     model = { computer = computer
             , dataSource = dataSource
+            , initialA = computer.regA
+            , overwrittenA = ""
+            , step = 0
             , backgroundColor = defaultBackgroundColor
             , bootStatus = bootStatus
             , paused = True 
@@ -145,7 +151,7 @@ type Msg =
   | DefaultBackgroundTick
   | DarkBackgroundTick
   | LightBackgroundTick
-
+  | OverwriteRegA String
 
 tryReadOpcode : Computer -> Maybe Int 
 tryReadOpcode computer = 
@@ -173,6 +179,8 @@ combo computer =
     6 -> computer.regC
     _ -> 0
 
+pow x y = if y < 1 then 1 else x * pow x (y - 1)
+
 writeA : Int -> Computer -> Computer 
 writeA value computer = 
   { computer | regA = value }
@@ -197,16 +205,13 @@ output : Int -> Computer -> Computer
 output value computer =
     { computer | outputs = value :: computer.outputs }
 
-mymod v = 
-  modBy v 8
-
 division : Computer -> Int 
 division computer =
   let 
-    numerator = computer.regA
-    denominator = 2^(combo computer)
+    numerator = toFloat <| computer.regA
+    denominator = toFloat <| pow 2 (combo computer)
   in 
-    numerator // denominator
+    (numerator / denominator) |> floor
 
 adv : Computer -> Computer 
 adv computer = 
@@ -286,7 +291,7 @@ updateProgramFinished model =
 
 updateProgramRunning : Computer -> Model -> Model
 updateProgramRunning computer model = 
-  { model | computer = computer } 
+  { model | computer = computer, step = model.step + 1 } 
 
 updateStep : Model -> Model
 updateStep model =
@@ -320,6 +325,21 @@ updateTogglePlay : Model -> Model
 updateTogglePlay model = 
   { model | paused = not model.paused }
 
+updateOverwriteRegA : String -> Model -> Model
+updateOverwriteRegA overwrittenA model = 
+  if String.isEmpty overwrittenA then 
+    let computer = model.computer in 
+      { model | overwrittenA = "", computer = { computer | regA = model.initialA } }
+  else 
+    case overwrittenA |> String.toInt of 
+      Just a -> 
+        let 
+          computer = model.computer 
+        in 
+          { model | overwrittenA = overwrittenA, computer = { computer | regA = a } }
+      Nothing -> 
+        model
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
@@ -347,6 +367,8 @@ update msg model =
       (updateBackgroundColor darkBackgroundColor { model | darkBackgroundTickInterval = 1377 }, Cmd.none)
     LightBackgroundTick ->
       (updateBackgroundColor lightBackgroundColor { model | lightBackgroundTickInterval = 7977 }, Cmd.none)
+    OverwriteRegA overwrittenA -> 
+      (updateOverwriteRegA overwrittenA model, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -513,6 +535,10 @@ viewBody model =
         Input -> "14px"
     elements = []
     s = toSvg model
+    qval = toFloat 108107566389757
+    denom = toFloat (pow 2 6)
+    res = qval / denom |> floor
+    debugStr = String.fromInt res 
   in
     Html.table
       [
@@ -605,7 +631,15 @@ viewBody model =
               , Html.Attributes.style "padding-top" "10px"
               , Html.Attributes.style "width" "200px" ]
               [
-                Html.div [] [ Html.text commandsStr ]
+                  Html.input 
+                    [ Html.Attributes.placeholder "Overwrite register A"
+                    , Html.Attributes.value model.overwrittenA
+                    , onInput OverwriteRegA ] 
+                    []
+              , Html.div [] [ Html.text commandsStr ]
+              , Html.div [] [ Html.text debugStr ]
+              , Html.div [] [ Html.text (String.fromFloat qval) ]
+              , Html.div [] [ Html.text ("Step: " ++ (String.fromInt model.step)) ]
               ] ]
       , Html.tr
           []
