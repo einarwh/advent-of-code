@@ -43,7 +43,9 @@ type alias Model =
   { computer : Computer
   , dataSource : DataSource
   , backgroundColor : String
+  , paused : Bool 
   , bootStatus : BootStatus
+  , tickInterval : Float
   , bootTickInterval : Float
   , darkBackgroundTickInterval : Float
   , lightBackgroundTickInterval : Float
@@ -114,6 +116,8 @@ initModel bootStatus dataSource =
             , dataSource = dataSource
             , backgroundColor = defaultBackgroundColor
             , bootStatus = bootStatus
+            , paused = True 
+            , tickInterval = 200
             , bootTickInterval = 1000
             , darkBackgroundTickInterval = 177
             , lightBackgroundTickInterval = 477
@@ -130,7 +134,11 @@ init _ =
 
 type Msg =
   Clear
-  | Solve
+  | Tick 
+  | TogglePlay
+  | Faster
+  | Slower
+  | Step
   | UseSample
   | UseInput
   | BootTick
@@ -249,13 +257,42 @@ out computer =
   |> output (combo computer |> modBy 8)
   |> nextInstruction
 
+executeOpcode : Int -> Computer -> Computer 
+executeOpcode opcode computer = 
+  case opcode of
+    0 -> adv computer
+    1 -> bxl computer
+    2 -> bst computer
+    3 -> jnz computer
+    4 -> bxc computer
+    5 -> out computer
+    6 -> bdv computer
+    7 -> cdv computer
+    _ -> computer
+
+executeInstruction : Computer -> Maybe Computer 
+executeInstruction computer = 
+  case tryReadOpcode computer of
+    Nothing -> Nothing 
+    Just opcode -> Just (executeOpcode opcode computer)
+
 updateClear : Model -> Model
 updateClear model =
-  model
+  initModel (Booting 0) model.dataSource
 
-updateSolve : Model -> Model
-updateSolve model =
-  model
+updateProgramFinished : Model -> Model
+updateProgramFinished model = 
+  { model | paused = True } 
+
+updateProgramRunning : Computer -> Model -> Model
+updateProgramRunning computer model = 
+  { model | computer = computer } 
+
+updateStep : Model -> Model
+updateStep model =
+  case model.computer |> executeInstruction of 
+    Nothing -> updateProgramFinished model 
+    Just computer -> updateProgramRunning computer model 
 
 updateDataSource : DataSource -> Model -> Model
 updateDataSource dataSource model =
@@ -279,13 +316,25 @@ updateBootTick model =
   in
     { model | bootStatus = bootStatus }
 
+updateTogglePlay : Model -> Model
+updateTogglePlay model = 
+  { model | paused = not model.paused }
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Clear ->
       (updateClear model, Cmd.none)
-    Solve ->
-      (updateSolve model, Cmd.none)
+    Step ->
+      (updateStep model, Cmd.none)
+    Tick ->
+      (updateStep model, Cmd.none)
+    Faster -> 
+      ({model | tickInterval = model.tickInterval / 2 }, Cmd.none)
+    Slower -> 
+      ({model | tickInterval = model.tickInterval * 2 }, Cmd.none)
+    TogglePlay -> 
+      (updateTogglePlay model, Cmd.none)
     UseSample ->
       (updateDataSource Sample model, Cmd.none)
     UseInput ->
@@ -304,16 +353,16 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
   let
-    bootTick =
+    tick =
       case model.bootStatus of
-        Booted -> Sub.none
+        Booted -> if model.paused then Sub.none else Time.every model.tickInterval (\_ -> Tick)
         Booting _ -> Time.every model.bootTickInterval (\_ -> BootTick)
     defaultBackgroundTick = Time.every 277 (\_ -> DefaultBackgroundTick)
     darkBackgroundTick = Time.every model.darkBackgroundTickInterval (\_ -> DarkBackgroundTick)
     lightBackgroundTick = Time.every model.lightBackgroundTickInterval (\_ -> LightBackgroundTick)
   in
     Sub.batch
-    [ bootTick
+    [ tick
     , defaultBackgroundTick
     , darkBackgroundTick
     , lightBackgroundTick ]
@@ -379,7 +428,12 @@ toBootedElements model =
     paddings = 1 + 2 * pointer
     pointerPosition = 70
     pointerPositionStr = String.fromInt pointerPosition
-    pointerText = String.padLeft paddings ' ' "^"
+    pointerText = 
+      if pointer < Array.length computer.program then 
+        String.padLeft paddings ' ' "^"
+      else 
+        ""
+    outputsText = computer.outputs |> List.reverse |> List.map (String.fromInt) |> String.join ","
     borderElement = rect [ x "0", y "0", width svgWidth, height svgHeight, strokeWidth "4px", stroke "black", fill "none" ] []
     regABox = rect [ x "60", y "10", width "720", height "40", strokeWidth "2px", stroke "black", fill "white", fillOpacity "0.2" ] []
     regALabel = text_ [ x "20", y "42", stroke textStroke, fill textFill ] [ Svg.text "A" ]
@@ -395,8 +449,9 @@ toBootedElements model =
     programValue = text_ [ x "70", y "192", stroke textStroke, fill textFill ] [ Svg.text programStr ]
     pointerHat = text_ [ x "70", y "232", Svg.Attributes.style "white-space:pre", stroke textStroke, fill textFill ] [ Svg.text pointerText ]
     outputsBox = rect [ x "60", y "250", width "720", height "140", strokeWidth "2px", stroke "black", fill "white", fillOpacity "0.2" ] []
+    outputsValue = text_ [ x "70", y "282", stroke textStroke, fill textFill ] [ Svg.text outputsText ]
   in
-    [ borderElement, regALabel, regAValue, regABox, regBLabel, regBValue, regBBox, regCLabel, regCValue, regCBox, programLabel, programValue, programBox, pointerHat, outputsBox ]
+    [ borderElement, regALabel, regABox, regAValue, regBLabel, regBBox, regBValue, regCLabel, regCBox, regCValue, programLabel, programBox, programValue, pointerHat, outputsBox, outputsValue ]
 
 toBootingElements model ticks =
   let
@@ -519,17 +574,26 @@ viewBody model =
                 []
               , Html.label [] [ Html.text "Sample" ]
             ] ]
-      , Html.tr
+      , Html.tr 
           []
-          [ Html.td
+          [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px" ]
-              [ Html.button
-                [ Html.Attributes.style "width" "80px", onClick Solve ]
-                [ Html.text "Solve" ]
-              , Html.button
-                [ Html.Attributes.style "width" "80px", onClick Clear ]
-                [ Html.text "Clear" ]
+              [ Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Clear ] 
+                [ Html.text "Reboot" ]
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Slower ] 
+                [ Html.text "Turtle" ]
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick TogglePlay ] 
+                [ if model.paused then Html.text "Run" else Html.text "Halt" ] 
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Faster ] 
+                [ Html.text "Turbo" ]
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Step ] 
+                [ Html.text "Step" ]
             ] ]
       , Html.tr
           []
