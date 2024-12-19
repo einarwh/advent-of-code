@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.V.C === region.aa.C)
+	if (region.V.H === region.aa.H)
 	{
-		return 'on line ' + region.V.C;
+		return 'on line ' + region.V.H;
 	}
-	return 'on lines ' + region.V.C + ' through ' + region.aa.C;
+	return 'on lines ' + region.V.H + ' through ' + region.aa.H;
 }
 
 
@@ -2733,7 +2733,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		p: func(record.p),
+		q: func(record.q),
 		W: record.W,
 		T: record.T
 	}
@@ -3003,7 +3003,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.p;
+		var message = !tag ? value : tag < 3 ? value.a : value.q;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.W;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -5250,9 +5250,7 @@ var $elm$core$Task$perform = F2(
 			A2($elm$core$Task$map, toMessage, task));
 	});
 var $elm$browser$Browser$document = _Browser_document;
-var $author$project$Aoc17$Booting = function (a) {
-	return {$: 0, a: a};
-};
+var $author$project$Aoc17$Booted = {$: 1};
 var $author$project$Aoc17$Input = 0;
 var $author$project$Aoc17$defaultBackgroundColor = '#808080';
 var $elm$core$String$lines = _String_lines;
@@ -5359,15 +5357,15 @@ var $author$project$Aoc17$parseComputer = function (data) {
 		var _v4 = _v3.b;
 		var p = _v4.a;
 		return {
-			S: _List_Nil,
-			L: 0,
-			M: $author$project$Aoc17$parseProgram(p),
-			N: $author$project$Aoc17$parseRegister(a),
-			O: $author$project$Aoc17$parseRegister(b),
-			P: $author$project$Aoc17$parseRegister(c)
+			I: _List_Nil,
+			m: 0,
+			D: $author$project$Aoc17$parseProgram(p),
+			s: $author$project$Aoc17$parseRegister(a),
+			t: $author$project$Aoc17$parseRegister(b),
+			z: $author$project$Aoc17$parseRegister(c)
 		};
 	} else {
-		return {S: _List_Nil, L: 0, M: $elm$core$Array$empty, N: 0, O: 0, P: 0};
+		return {I: _List_Nil, m: 0, D: $elm$core$Array$empty, s: 0, t: 0, z: 0};
 	}
 };
 var $author$project$Aoc17$initComputer = function (dataSource) {
@@ -5387,17 +5385,14 @@ var $author$project$Aoc17$initComputer = function (dataSource) {
 var $author$project$Aoc17$initModel = F2(
 	function (bootStatus, dataSource) {
 		var computer = $author$project$Aoc17$initComputer(dataSource);
-		var model = {H: $author$project$Aoc17$defaultBackgroundColor, s: bootStatus, o: 1000, I: computer, J: 177, x: dataSource, _: '', K: 477};
+		var model = {N: $author$project$Aoc17$defaultBackgroundColor, v: bootStatus, p: 1000, O: computer, P: 177, B: dataSource, _: '', Q: 477};
 		return model;
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Aoc17$init = function (_v0) {
 	return _Utils_Tuple2(
-		A2(
-			$author$project$Aoc17$initModel,
-			$author$project$Aoc17$Booting(0),
-			0),
+		A2($author$project$Aoc17$initModel, $author$project$Aoc17$Booted, 0),
 		$elm$core$Platform$Cmd$none);
 };
 var $author$project$Aoc17$BootTick = 4;
@@ -5822,7 +5817,7 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc17$subscriptions = function (model) {
 	var lightBackgroundTick = A2(
 		$elm$time$Time$every,
-		model.K,
+		model.Q,
 		function (_v4) {
 			return 7;
 		});
@@ -5834,18 +5829,18 @@ var $author$project$Aoc17$subscriptions = function (model) {
 		});
 	var darkBackgroundTick = A2(
 		$elm$time$Time$every,
-		model.J,
+		model.P,
 		function (_v2) {
 			return 6;
 		});
 	var bootTick = function () {
-		var _v0 = model.s;
+		var _v0 = model.v;
 		if (_v0.$ === 1) {
 			return $elm$core$Platform$Sub$none;
 		} else {
 			return A2(
 				$elm$time$Time$every,
-				model.o,
+				model.p,
 				function (_v1) {
 					return 4;
 				});
@@ -5862,22 +5857,24 @@ var $author$project$Aoc17$updateBackgroundColor = F2(
 	function (color, model) {
 		return _Utils_update(
 			model,
-			{H: color});
+			{N: color});
 	});
-var $author$project$Aoc17$Booted = {$: 1};
+var $author$project$Aoc17$Booting = function (a) {
+	return {$: 0, a: a};
+};
 var $author$project$Aoc17$updateBootTick = function (model) {
 	var bootStatus = function () {
-		var _v0 = model.s;
+		var _v0 = model.v;
 		if (!_v0.$) {
 			var ticks = _v0.a;
-			return (_Utils_cmp(ticks, 10 * model.o) < 1) ? $author$project$Aoc17$Booting(ticks + model.o) : $author$project$Aoc17$Booted;
+			return (_Utils_cmp(ticks, 8 * model.p) < 1) ? $author$project$Aoc17$Booting(ticks + model.p) : $author$project$Aoc17$Booted;
 		} else {
 			return $author$project$Aoc17$Booted;
 		}
 	}();
 	return _Utils_update(
 		model,
-		{s: bootStatus});
+		{v: bootStatus});
 };
 var $author$project$Aoc17$updateClear = function (model) {
 	return model;
@@ -5887,8 +5884,8 @@ var $author$project$Aoc17$updateDataSource = F2(
 		return _Utils_update(
 			model,
 			{
-				I: $author$project$Aoc17$initComputer(dataSource),
-				x: dataSource
+				O: $author$project$Aoc17$initComputer(dataSource),
+				B: dataSource
 			});
 	});
 var $author$project$Aoc17$updateSolve = function (model) {
@@ -5928,7 +5925,7 @@ var $author$project$Aoc17$update = F2(
 						$author$project$Aoc17$darkBackgroundColor,
 						_Utils_update(
 							model,
-							{J: 1377})),
+							{P: 1377})),
 					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(
@@ -5937,7 +5934,7 @@ var $author$project$Aoc17$update = F2(
 						$author$project$Aoc17$lightBackgroundColor,
 						_Utils_update(
 							model,
-							{K: 7977})),
+							{Q: 7977})),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
@@ -6003,6 +6000,7 @@ var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$svg$Svg$Attributes$fillOpacity = _VirtualDom_attribute('fill-opacity');
 var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
@@ -6066,7 +6064,8 @@ var $author$project$Aoc17$toBootedElements = function (model) {
 				$elm$svg$Svg$Attributes$height('40'),
 				$elm$svg$Svg$Attributes$strokeWidth('2px'),
 				$elm$svg$Svg$Attributes$stroke('black'),
-				$elm$svg$Svg$Attributes$fill('none')
+				$elm$svg$Svg$Attributes$fill('white'),
+				$elm$svg$Svg$Attributes$fillOpacity('0.2')
 			]),
 		_List_Nil);
 	var regBLabel = A2(
@@ -6092,7 +6091,8 @@ var $author$project$Aoc17$toBootedElements = function (model) {
 				$elm$svg$Svg$Attributes$height('40'),
 				$elm$svg$Svg$Attributes$strokeWidth('2px'),
 				$elm$svg$Svg$Attributes$stroke('black'),
-				$elm$svg$Svg$Attributes$fill('none')
+				$elm$svg$Svg$Attributes$fill('white'),
+				$elm$svg$Svg$Attributes$fillOpacity('0.2')
 			]),
 		_List_Nil);
 	var regALabel = A2(
@@ -6118,7 +6118,8 @@ var $author$project$Aoc17$toBootedElements = function (model) {
 				$elm$svg$Svg$Attributes$height('40'),
 				$elm$svg$Svg$Attributes$strokeWidth('2px'),
 				$elm$svg$Svg$Attributes$stroke('black'),
-				$elm$svg$Svg$Attributes$fill('none')
+				$elm$svg$Svg$Attributes$fill('white'),
+				$elm$svg$Svg$Attributes$fillOpacity('0.2')
 			]),
 		_List_Nil);
 	var programLabel = A2(
@@ -6144,7 +6145,8 @@ var $author$project$Aoc17$toBootedElements = function (model) {
 				$elm$svg$Svg$Attributes$height('80'),
 				$elm$svg$Svg$Attributes$strokeWidth('2px'),
 				$elm$svg$Svg$Attributes$stroke('black'),
-				$elm$svg$Svg$Attributes$fill('none')
+				$elm$svg$Svg$Attributes$fill('white'),
+				$elm$svg$Svg$Attributes$fillOpacity('0.2')
 			]),
 		_List_Nil);
 	var pointerPosition = 70;
@@ -6159,11 +6161,12 @@ var $author$project$Aoc17$toBootedElements = function (model) {
 				$elm$svg$Svg$Attributes$height('140'),
 				$elm$svg$Svg$Attributes$strokeWidth('2px'),
 				$elm$svg$Svg$Attributes$stroke('black'),
-				$elm$svg$Svg$Attributes$fill('none')
+				$elm$svg$Svg$Attributes$fill('white'),
+				$elm$svg$Svg$Attributes$fillOpacity('0.2')
 			]),
 		_List_Nil);
-	var computer = model.I;
-	var pointer = computer.L;
+	var computer = model.O;
+	var pointer = computer.m;
 	var paddings = 1 + (2 * pointer);
 	var pointerText = A3($elm$core$String$padLeft, paddings, ' ', '^');
 	var pointerHat = A2(
@@ -6186,7 +6189,7 @@ var $author$project$Aoc17$toBootedElements = function (model) {
 		A2(
 			$elm$core$List$map,
 			$elm$core$String$fromInt,
-			$elm$core$Array$toList(computer.M)));
+			$elm$core$Array$toList(computer.D)));
 	var programValue = A2(
 		$elm$svg$Svg$text_,
 		_List_fromArray(
@@ -6212,7 +6215,7 @@ var $author$project$Aoc17$toBootedElements = function (model) {
 		_List_fromArray(
 			[
 				$elm$svg$Svg$text(
-				$elm$core$String$fromInt(computer.N))
+				$elm$core$String$fromInt(computer.s))
 			]));
 	var regBValue = A2(
 		$elm$svg$Svg$text_,
@@ -6226,7 +6229,7 @@ var $author$project$Aoc17$toBootedElements = function (model) {
 		_List_fromArray(
 			[
 				$elm$svg$Svg$text(
-				$elm$core$String$fromInt(computer.O))
+				$elm$core$String$fromInt(computer.t))
 			]));
 	var regCValue = A2(
 		$elm$svg$Svg$text_,
@@ -6240,7 +6243,7 @@ var $author$project$Aoc17$toBootedElements = function (model) {
 		_List_fromArray(
 			[
 				$elm$svg$Svg$text(
-				$elm$core$String$fromInt(computer.P))
+				$elm$core$String$fromInt(computer.z))
 			]));
 	var borderElement = A2(
 		$elm$svg$Svg$rect,
@@ -6275,7 +6278,7 @@ var $author$project$Aoc17$toBootingElements = F2(
 		var svgHeight = $elm$core$String$fromInt(400);
 		var dots = A2(
 			$elm$core$String$repeat,
-			$elm$core$Basics$floor(ticks / model.o) - 4,
+			$elm$core$Basics$floor(ticks / model.p) - 4,
 			'.');
 		var debuggerText = A2(
 			$elm$svg$Svg$text_,
@@ -6335,8 +6338,8 @@ var $author$project$Aoc17$toBootingElements = F2(
 			_List_fromArray(
 				[
 					$elm$core$Maybe$Just(criticalText),
-					(_Utils_cmp(ticks, 2 * model.o) > -1) ? $elm$core$Maybe$Just(bootstrappingText) : $elm$core$Maybe$Nothing,
-					(_Utils_cmp(ticks, 4 * model.o) > -1) ? $elm$core$Maybe$Just(debuggerText) : $elm$core$Maybe$Nothing
+					(_Utils_cmp(ticks, 2 * model.p) > -1) ? $elm$core$Maybe$Just(bootstrappingText) : $elm$core$Maybe$Nothing,
+					(_Utils_cmp(ticks, 4 * model.p) > -1) ? $elm$core$Maybe$Just(debuggerText) : $elm$core$Maybe$Nothing
 				]));
 		return A2(
 			$elm$core$List$append,
@@ -6350,7 +6353,7 @@ var $author$project$Aoc17$toSvg = function (model) {
 	var svgHeight = $elm$core$String$fromInt(400);
 	var viewBoxStr = '0 0 ' + (svgWidth + (' ' + svgHeight));
 	var elements = function () {
-		var _v0 = model.s;
+		var _v0 = model.v;
 		if (!_v0.$) {
 			var ticks = _v0.a;
 			return A2($author$project$Aoc17$toBootingElements, model, ticks);
@@ -6358,7 +6361,7 @@ var $author$project$Aoc17$toSvg = function (model) {
 			return $author$project$Aoc17$toBootedElements(model);
 		}
 	}();
-	var backgroundColor = model.H;
+	var backgroundColor = model.N;
 	return A2(
 		$elm$svg$Svg$svg,
 		_List_fromArray(
@@ -6374,7 +6377,7 @@ var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Aoc17$viewBody = function (model) {
 	var textFontSize = function () {
-		var _v1 = model.x;
+		var _v1 = model.B;
 		if (_v1 === 1) {
 			return '24px';
 		} else {
@@ -6384,7 +6387,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 	var s = $author$project$Aoc17$toSvg(model);
 	var elements = _List_Nil;
 	var commandsStr = function () {
-		var _v0 = model.s;
+		var _v0 = model.v;
 		if (!_v0.$) {
 			var ticks = _v0.a;
 			return $elm$core$String$fromFloat(ticks);
@@ -6556,7 +6559,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(3),
-										$elm$html$Html$Attributes$checked(!model.x)
+										$elm$html$Html$Attributes$checked(!model.B)
 									]),
 								_List_Nil),
 								A2(
@@ -6572,7 +6575,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(2),
-										$elm$html$Html$Attributes$checked(model.x === 1)
+										$elm$html$Html$Attributes$checked(model.B === 1)
 									]),
 								_List_Nil),
 								A2(

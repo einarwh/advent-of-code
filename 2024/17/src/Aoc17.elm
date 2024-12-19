@@ -1,6 +1,7 @@
 module Aoc17 exposing (..)
 
 import Browser exposing (Document)
+import Bitwise
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
@@ -122,7 +123,8 @@ initModel bootStatus dataSource =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel (Booting 0) Input, Cmd.none)
+  (initModel Booted Input, Cmd.none)
+  -- (initModel (Booting 0) Input, Cmd.none)
 
 -- UPDATE
 
@@ -135,6 +137,117 @@ type Msg =
   | DefaultBackgroundTick
   | DarkBackgroundTick
   | LightBackgroundTick
+
+
+tryReadOpcode : Computer -> Maybe Int 
+tryReadOpcode computer = 
+  let 
+    pt = computer.pointer 
+  in 
+    computer.program |> Array.get pt
+
+literal : Computer -> Int
+literal computer = 
+  let 
+    pt = computer.pointer 
+  in 
+    computer.program |> Array.get (pt + 1) |> Maybe.withDefault 0 
+
+combo : Computer -> Int 
+combo computer =
+  case literal computer of
+    0 -> 0
+    1 -> 1
+    2 -> 2
+    3 -> 3
+    4 -> computer.regA
+    5 -> computer.regB
+    6 -> computer.regC
+    _ -> 0
+
+writeA : Int -> Computer -> Computer 
+writeA value computer = 
+  { computer | regA = value }
+
+writeB : Int -> Computer -> Computer 
+writeB value computer = 
+  { computer | regB = value }
+
+writeC : Int -> Computer -> Computer 
+writeC value computer = 
+  { computer | regC = value }
+
+nextInstruction : Computer -> Computer 
+nextInstruction computer =
+    { computer | pointer = computer.pointer + 2 }
+
+jump : Int -> Computer -> Computer  
+jump target computer =
+  { computer | pointer = target }
+
+output : Int -> Computer -> Computer 
+output value computer =
+    { computer | outputs = value :: computer.outputs }
+
+mymod v = 
+  modBy v 8
+
+division : Computer -> Int 
+division computer =
+  let 
+    numerator = computer.regA
+    denominator = 2^(combo computer)
+  in 
+    numerator // denominator
+
+adv : Computer -> Computer 
+adv computer = 
+  computer
+  |> writeA (division computer)
+  |> nextInstruction
+
+bdv : Computer -> Computer 
+bdv computer =
+  computer
+  |> writeB (division computer)
+  |> nextInstruction
+
+cdv : Computer -> Computer 
+cdv computer =
+  computer
+  |> writeC (division computer)
+  |> nextInstruction
+
+bxl : Computer -> Computer 
+bxl computer =
+  computer
+  |> writeB (Bitwise.xor (literal computer) computer.regB)
+  |> nextInstruction
+
+bst : Computer -> Computer 
+bst computer =
+  computer
+  |> writeB (combo computer |> modBy 8)
+  |> nextInstruction
+
+jnz : Computer -> Computer 
+jnz computer =
+  if computer.regA == 0 then
+    computer |> nextInstruction
+  else
+    computer |> jump (literal computer)
+
+bxc : Computer -> Computer
+bxc computer =
+  computer
+  |> writeB (Bitwise.xor computer.regB computer.regC)
+  |> nextInstruction
+
+out : Computer -> Computer 
+out computer =
+  computer
+  |> output (combo computer |> modBy 8)
+  |> nextInstruction
 
 updateClear : Model -> Model
 updateClear model =
@@ -158,7 +271,7 @@ updateBootTick model =
     bootStatus =
       case model.bootStatus of
         Booting ticks ->
-          if ticks <= 10 * model.bootTickInterval then
+          if ticks <= 8 * model.bootTickInterval then
             Booting (ticks + model.bootTickInterval)
           else
             Booted
@@ -268,20 +381,20 @@ toBootedElements model =
     pointerPositionStr = String.fromInt pointerPosition
     pointerText = String.padLeft paddings ' ' "^"
     borderElement = rect [ x "0", y "0", width svgWidth, height svgHeight, strokeWidth "4px", stroke "black", fill "none" ] []
-    regABox = rect [ x "60", y "10", width "720", height "40", strokeWidth "2px", stroke "black", fill "none" ] []
+    regABox = rect [ x "60", y "10", width "720", height "40", strokeWidth "2px", stroke "black", fill "white", fillOpacity "0.2" ] []
     regALabel = text_ [ x "20", y "42", stroke textStroke, fill textFill ] [ Svg.text "A" ]
     regAValue = text_ [ x "70", y "42", stroke textStroke, fill textFill ] [ Svg.text (String.fromInt computer.regA) ]
-    regBBox = rect [ x "60", y "60", width "720", height "40", strokeWidth "2px", stroke "black", fill "none" ] []
+    regBBox = rect [ x "60", y "60", width "720", height "40", strokeWidth "2px", stroke "black", fill "white", fillOpacity "0.2" ] []
     regBLabel = text_ [ x "20", y "92", stroke textStroke, fill textFill ] [ Svg.text "B" ]
     regBValue = text_ [ x "70", y "92", stroke textStroke, fill textFill ] [ Svg.text (String.fromInt computer.regB) ]
-    regCBox = rect [ x "60", y "110", width "720", height "40", strokeWidth "2px", stroke "black", fill "none" ] []
+    regCBox = rect [ x "60", y "110", width "720", height "40", strokeWidth "2px", stroke "black", fill "white", fillOpacity "0.2" ] []
     regCLabel = text_ [ x "20", y "142", stroke textStroke, fill textFill ] [ Svg.text "C" ]
     regCValue = text_ [ x "70", y "142", stroke textStroke, fill textFill ] [ Svg.text (String.fromInt computer.regC) ]
-    programBox = rect [ x "60", y "160", width "720", height "80", strokeWidth "2px", stroke "black", fill "none" ] []
+    programBox = rect [ x "60", y "160", width "720", height "80", strokeWidth "2px", stroke "black", fill "white", fillOpacity "0.2" ] []
     programLabel = text_ [ x "20", y "192", stroke textStroke, fill textFill ] [ Svg.text "P" ]
     programValue = text_ [ x "70", y "192", stroke textStroke, fill textFill ] [ Svg.text programStr ]
     pointerHat = text_ [ x "70", y "232", Svg.Attributes.style "white-space:pre", stroke textStroke, fill textFill ] [ Svg.text pointerText ]
-    outputsBox = rect [ x "60", y "250", width "720", height "140", strokeWidth "2px", stroke "black", fill "none" ] []
+    outputsBox = rect [ x "60", y "250", width "720", height "140", strokeWidth "2px", stroke "black", fill "white", fillOpacity "0.2" ] []
   in
     [ borderElement, regALabel, regAValue, regABox, regBLabel, regBValue, regBBox, regCLabel, regCValue, regCBox, programLabel, programValue, programBox, pointerHat, outputsBox ]
 

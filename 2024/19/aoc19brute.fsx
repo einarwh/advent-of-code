@@ -50,7 +50,7 @@ let buildTrie allTowels =
     loop allTowels []
 
 let findSubstringIndexes pattern startIndex rootNodes : int list =
-    printfn "findSubstringIndexes for pattern %s with startIndex %d" pattern startIndex
+    // printfn "findSubstringIndexes for pattern %s with startIndex %d" pattern startIndex
     let rec loop (ix : int) (nodes : Node list) (substringIndexes : int list) =
         if ix < String.length pattern then
             match nodes |> List.tryFind (fun n -> n.c = pattern.[ix]) with
@@ -62,58 +62,41 @@ let findSubstringIndexes pattern startIndex rootNodes : int list =
         else substringIndexes
     loop startIndex rootNodes []
 
-let checkPattern rootNodes (pattern : string) =
-    printfn "\ncheckPattern: %A" pattern
-    let rec loop prevIx ix =
-        printfn "loop %d" ix
-        if ix >= String.length pattern then
-            printfn "pattern done!"
-            true
-        else
-            printfn "ix: %d - find match for pattern %A" ix (pattern.Substring(ix))
-            let indexes = findSubstringIndexes pattern ix rootNodes
-            indexes |> printfn "substring indexes at %d: %A" ix
-            indexes |> List.map (fun i -> pattern.Substring(ix, i + 1)) |> printfn "%A"
+// let rec checkPattern (towels : string list) (pattern : string) =
+//     if String.length pattern = 0 then true 
+//     else 
+//         // printfn "checkPattern %A" pattern
+//         let candidates = towels |> List.filter (fun t -> pattern.StartsWith(t))
+//         // printfn "%A" candidates
+//         candidates |> List.exists (fun c -> checkPattern towels (pattern.Substring(String.length c)))
 
-            if indexes |> List.isEmpty then
-                false
-            else
-                indexes |> List.exists (fun i -> loop ix (ix + i + 1))
-    loop 0 0
+let checkPattern (towels : string list) (pattern : string) (impossible : Set<string>) =
+    printfn "checkPattern %s" pattern
+    let rec loop (towels : string list) (pattern : string) = 
+        if String.length pattern = 0 then 
+            true 
+        else 
+            // printfn "checkPattern %A" pattern
+            let candidates = towels |> List.filter (fun t -> pattern.StartsWith(t))
+            // printfn "%A" candidates
+            candidates |> List.exists (fun c -> loop towels (pattern.Substring(String.length c)))
+    loop towels pattern
+
+let solve towels patterns = 
+    let rec loop (patterns : string list) (impossible : Set<string>) = 
+
+
 
 let run fileName =
     let text = File.ReadAllText fileName |> trim |> split "\n\n"
     let towels = text.[0] |> split ", " |> Array.toList |> List.sort
     let patterns = text.[1] |> split "\n" |> Array.toList
-    towels |> List.iter (printfn "Towel %A")
-    // patterns |> printfn "%A"
-    let rootNodes = buildTrie towels
-    // printfn "%A" rootNodes
-    // let nodes = []
-    // let n1 = insertTowel "bwu" nodes
-    // printfn "%A" n1
-    // let n2 = insertTowel "br" n1
-    // printfn "%A" n2
-    // let pattern1 = "brwrr"
-    // let foo = findSubstringIndexes pattern1 0 rootNodes
-    // printfn "%A" foo
-    // "brwrr" |> checkPattern rootNodes |> printfn "%A"
-    // let check pattern =
-    //     let result = pattern |> checkPattern rootNodes
-    //     printfn "pattern %A: %b" pattern result
-    // "brwrr" |> check
-    // "bggr" |> check
-    // "gbbr" |> check
-    // "rrbgbr" |> check
-    // "ubwu" |> check
-    // "bwurrg" |> check
-    // "brgr" |> check
-    // "bbrgwb" |> check
-    let possible = patterns |> List.filter (checkPattern rootNodes) |> List.length
+    let possible = patterns |> List.filter (checkPattern towels) |> List.length
     printfn "%d" possible
 
     // let lines = readLines fileName
     // lines |> printfn "%A"
+    // "brwrr" |> checkPattern towels |> printfn "%A"
     0
 
 run "input"
