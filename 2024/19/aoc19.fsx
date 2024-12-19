@@ -41,13 +41,22 @@ let insertTowel (towel : string) (trie : Node list) =
                 replace { node with children = loop restChars node.children } nodes 
     loop (towel |> Seq.toList) trie 
 
+let buildTrie allTowels = 
+    let rec loop towels nodes = 
+        match towels with 
+        | [] -> nodes 
+        | t :: rest ->
+            nodes |> insertTowel t |> loop rest 
+    loop allTowels []
+
 let run fileName = 
     let text = File.ReadAllText fileName |> trim |> split "\n\n"
-    let towels = text.[0] |> split "\n" |> Array.toList
+    let towels = text.[0] |> split ", " |> Array.toList
     let patterns = text.[1] |> split "\n" |> Array.toList
     towels |> printfn "%A"
     patterns |> printfn "%A"
     let nodes = buildTrie towels 
+    printfn "%A" nodes
     // let nodes = []
     // let n1 = insertTowel "bwu" nodes
     // printfn "%A" n1
@@ -58,5 +67,6 @@ let run fileName =
 
     // let lines = readLines fileName
     // lines |> printfn "%A"
+    0
 
 run "sample"
