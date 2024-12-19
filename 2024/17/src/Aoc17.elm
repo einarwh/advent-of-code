@@ -28,65 +28,60 @@ main =
 
 type DataSource = Input | Sample
 
-type alias Computer = 
-  { regA : Int 
-  , regB : Int 
-  , regC : Int 
-  , pointer : Int 
-  , program : Array Int 
+type BootStatus = Booting Float | Booted
+
+type alias Computer =
+  { regA : Int
+  , regB : Int
+  , regC : Int
+  , pointer : Int
+  , program : Array Int
   , outputs : List Int }
 
-type alias Model = 
-  { computer : Computer 
+type alias Model =
+  { computer : Computer
   , dataSource : DataSource
-  , backgroundColor : String 
+  , backgroundColor : String
+  , bootStatus : BootStatus
+  , bootTickInterval : Float
+  , darkBackgroundTickInterval : Float
+  , lightBackgroundTickInterval : Float
   , debug : String }
 
--- parseNumbers : String -> List Int 
--- parseNumbers line = 
---   line |> String.split " " |> List.filterMap String.toInt
+parseRegister : String -> Int
+parseRegister s =
+  case s |> String.split ": " of
+    [_, str] -> str |> String.toInt |> Maybe.withDefault 0
+    _ -> 0
 
--- pairwise : List a -> List (a, a) 
--- pairwise lst = 
---   case lst of 
---     x :: y :: rest -> 
---       (x, y) :: pairwise (y :: rest)
---     _ -> []
-
-parseRegister : String -> Int 
-parseRegister s = 
-  case s |> String.split ": " of 
-    [_, str] -> str |> String.toInt |> Maybe.withDefault 0 
-    _ -> 0 
-
-parseProgram : String -> Array Int 
-parseProgram s = 
-  case s |> String.split ": " of 
-    [_, str] -> 
+parseProgram : String -> Array Int
+parseProgram s =
+  case s |> String.split ": " of
+    [_, str] ->
       str |> String.split "," |> List.filterMap (String.toInt) |> Array.fromList
-    _ -> [0] |> Array.fromList 
+    _ -> [0] |> Array.fromList
 
-parseComputer : String -> Computer 
-parseComputer data = 
-  case String.lines data of 
-    [a, b, c, _, p] -> 
-      { regA = parseRegister a 
-      , regB = parseRegister b 
-      , regC = parseRegister c 
+parseComputer : String -> Computer
+parseComputer data =
+  case String.lines data of
+    [a, b, c, _, p] ->
+      { regA = parseRegister a
+      , regB = parseRegister b
+      , regC = parseRegister c
       , pointer = 0
       , program = parseProgram p
       , outputs = [] }
-    _ -> 
+    _ ->
       { regA = 0
-      , regB = 0 
-      , regC = 0 
-      , pointer = 0 
-      , program = Array.empty 
-      , outputs = [] } 
+      , regB = 0
+      , regC = 0
+      , pointer = 0
+      , program = Array.empty
+      , outputs = [] }
 
 initComputer : DataSource -> Computer
-initComputer dataSource = 
-  let 
+initComputer dataSource =
+  let
     sample = """Register A: 729
 Register B: 0
 Register C: 0
@@ -101,220 +96,278 @@ Program: 0,3,5,4,3,0"""
 Register B: 0
 Register C: 0
 
-Program: 2,4,1,3,7,5,4,1,1,3,0,3,5,5,3,0""" 
-    data = 
-      case dataSource of 
+Program: 2,4,1,3,7,5,4,1,1,3,0,3,5,5,3,0"""
+    data =
+      case dataSource of
         Sample -> sample
-        Input -> input 
-    computer = parseComputer data 
-  in 
+        Input -> input
+    computer = parseComputer data
+  in
     computer
 
-initModel : DataSource -> Model 
-initModel dataSource = 
-  let 
+initModel : BootStatus -> DataSource -> Model
+initModel bootStatus dataSource =
+  let
     computer = initComputer dataSource
     model = { computer = computer
             , dataSource = dataSource
-            , backgroundColor = ""
+            , backgroundColor = defaultBackgroundColor
+            , bootStatus = bootStatus
+            , bootTickInterval = 1000
+            , darkBackgroundTickInterval = 177
+            , lightBackgroundTickInterval = 477
             , debug = "" }
-  in 
-    model 
+  in
+    model
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel Input, Cmd.none)
+  (initModel (Booting 0) Input, Cmd.none)
 
 -- UPDATE
 
-type Msg = 
-  Clear 
-  | Solve 
-  | UseSample 
+type Msg =
+  Clear
+  | Solve
+  | UseSample
   | UseInput
+  | BootTick
   | DefaultBackgroundTick
-  | DarkBackgroundTick 
-  | LightBackgroundTick 
+  | DarkBackgroundTick
+  | LightBackgroundTick
 
 updateClear : Model -> Model
-updateClear model = 
+updateClear model =
   model
 
 updateSolve : Model -> Model
-updateSolve model = 
-  model 
+updateSolve model =
+  model
 
 updateDataSource : DataSource -> Model -> Model
-updateDataSource dataSource model = 
-  { model | dataSource = dataSource, computer = initComputer dataSource } 
+updateDataSource dataSource model =
+  { model | dataSource = dataSource, computer = initComputer dataSource }
 
 updateBackgroundColor : String -> Model -> Model
-updateBackgroundColor color model = 
-  { model | backgroundColor = color } 
+updateBackgroundColor color model =
+  { model | backgroundColor = color }
 
+updateBootTick : Model -> Model
+updateBootTick model =
+  let
+    bootStatus =
+      case model.bootStatus of
+        Booting ticks ->
+          if ticks <= 10 * model.bootTickInterval then
+            Booting (ticks + model.bootTickInterval)
+          else
+            Booted
+        Booted -> Booted
+  in
+    { model | bootStatus = bootStatus }
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    Clear -> 
+    Clear ->
       (updateClear model, Cmd.none)
-    Solve -> 
+    Solve ->
       (updateSolve model, Cmd.none)
-    UseSample -> 
+    UseSample ->
       (updateDataSource Sample model, Cmd.none)
-    UseInput -> 
+    UseInput ->
       (updateDataSource Input model, Cmd.none)
-    DefaultBackgroundTick -> 
+    BootTick ->
+      (updateBootTick model, Cmd.none)
+    DefaultBackgroundTick ->
       (updateBackgroundColor defaultBackgroundColor model, Cmd.none)
-    DarkBackgroundTick -> 
-      (updateBackgroundColor darkBackgroundColor model, Cmd.none)
-    LightBackgroundTick -> 
-      (updateBackgroundColor lightBackgroundColor model, Cmd.none)
+    DarkBackgroundTick ->
+      (updateBackgroundColor darkBackgroundColor { model | darkBackgroundTickInterval = 1377 }, Cmd.none)
+    LightBackgroundTick ->
+      (updateBackgroundColor lightBackgroundColor { model | lightBackgroundTickInterval = 7977 }, Cmd.none)
 
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
   let
+    bootTick =
+      case model.bootStatus of
+        Booted -> Sub.none
+        Booting _ -> Time.every model.bootTickInterval (\_ -> BootTick)
     defaultBackgroundTick = Time.every 277 (\_ -> DefaultBackgroundTick)
-    darkBackgroundTick = Time.every 1777 (\_ -> DarkBackgroundTick)
-    lightBackgroundTick = Time.every 1977 (\_ -> LightBackgroundTick)
+    darkBackgroundTick = Time.every model.darkBackgroundTickInterval (\_ -> DarkBackgroundTick)
+    lightBackgroundTick = Time.every model.lightBackgroundTickInterval (\_ -> LightBackgroundTick)
   in
-    Sub.batch 
-    [ defaultBackgroundTick
+    Sub.batch
+    [ bootTick
+    , defaultBackgroundTick
     , darkBackgroundTick
     , lightBackgroundTick ]
 
 -- VIEW
 
-toUncheckedHtmlElement : List Int -> List (Html Msg) 
+toUncheckedHtmlElement : List Int -> List (Html Msg)
 toUncheckedHtmlElement numbers =
   [ numbers |> List.map String.fromInt |> String.join " " |> Html.text, Html.br [] [] ]
 
-toUnsafeHtmlElement : List Int -> List (Html Msg) 
+toUnsafeHtmlElement : List Int -> List (Html Msg)
 toUnsafeHtmlElement numbers =
-  let 
+  let
     str = numbers |> List.map String.fromInt |> String.join " "
-    textElement = Html.text str 
+    textElement = Html.text str
     spanElement = Html.span [ Html.Attributes.style "background-color" "#FAA0A0" ] [ textElement ]
-  in 
+  in
     [ spanElement, Html.br [] [] ]
 
-toSafeHtmlElement : List Int -> List (Html Msg) 
+toSafeHtmlElement : List Int -> List (Html Msg)
 toSafeHtmlElement numbers =
-  let 
+  let
     str = numbers |> List.map String.fromInt |> String.join " "
-    textElement = Html.text str 
+    textElement = Html.text str
     spanElement = Html.span [ Html.Attributes.style "background-color" "#AFE1AF" ] [ textElement ]
-  in 
+  in
     [ spanElement, Html.br [] [] ]
 
-toDampenedHtmlElement : Int -> List Int -> List (Html Msg) 
+toDampenedHtmlElement : Int -> List Int -> List (Html Msg)
 toDampenedHtmlElement index numbers =
-  let 
+  let
     before = numbers |> List.take index
-    fromIndex = numbers |> List.drop index 
-    dropped = fromIndex |> List.take 1 
-    after = fromIndex |> List.drop 1 
-    strBefore = before |> List.map String.fromInt |> String.join " " 
-    textElementBefore = Html.text (String.append strBefore " ") 
+    fromIndex = numbers |> List.drop index
+    dropped = fromIndex |> List.take 1
+    after = fromIndex |> List.drop 1
+    strBefore = before |> List.map String.fromInt |> String.join " "
+    textElementBefore = Html.text (String.append strBefore " ")
     spanElementBefore = Html.span [ Html.Attributes.style "background-color" "#AFE1AF" ] [ textElementBefore ]
     strAfter = after |> List.map String.fromInt |> String.join " "
-    textElementAfter = Html.text (String.append " " strAfter) 
+    textElementAfter = Html.text (String.append " " strAfter)
     spanElementAfter = Html.span [ Html.Attributes.style "background-color" "#AFE1AF" ] [ textElementAfter ]
     strDropped = dropped |> List.map String.fromInt |> String.join " "
-    textElementDropped = Html.text strDropped 
-    spanElementDropped = 
-      Html.span 
+    textElementDropped = Html.text strDropped
+    spanElementDropped =
+      Html.span
         [ Html.Attributes.style "background-color" "#AFE1AF"
         , Html.Attributes.style "color" "#808080"
-        , Html.Attributes.style "text-decoration-line" "line-through"] 
+        , Html.Attributes.style "text-decoration-line" "line-through"]
         [ textElementDropped ]
     breakElement = Html.br [] []
-  in 
+  in
     [ spanElementBefore, spanElementDropped, spanElementAfter, breakElement ]
 
-toSvg : Model -> Html Msg 
-toSvg model = 
-  let 
+toBootedElements model =
+  let
     svgWidth = String.fromInt (800)
     svgHeight = String.fromInt (400)
-    viewBoxStr = "0 0 " ++ svgWidth ++ " " ++ svgHeight
-    backgroundColor = model.backgroundColor
     computer = model.computer
     programStr = computer.program |> Array.toList |> List.map String.fromInt |> String.join ","
     textStroke = "black"
     textFill = "#F28C28"
-    pointer = 15
+    pointer = computer.pointer
     paddings = 1 + 2 * pointer
     pointerPosition = 70
     pointerPositionStr = String.fromInt pointerPosition
     pointerText = String.padLeft paddings ' ' "^"
-    borderElement = rect [ x "0", y "0", width svgWidth, height svgHeight, strokeWidth "4px", stroke "black", fill "none" ] [] 
-    regABox = rect [ x "60", y "10", width "720", height "40", strokeWidth "2px", stroke "black", fill "none" ] [] 
+    borderElement = rect [ x "0", y "0", width svgWidth, height svgHeight, strokeWidth "4px", stroke "black", fill "none" ] []
+    regABox = rect [ x "60", y "10", width "720", height "40", strokeWidth "2px", stroke "black", fill "none" ] []
     regALabel = text_ [ x "20", y "42", stroke textStroke, fill textFill ] [ Svg.text "A" ]
     regAValue = text_ [ x "70", y "42", stroke textStroke, fill textFill ] [ Svg.text (String.fromInt computer.regA) ]
-    regBBox = rect [ x "60", y "60", width "720", height "40", strokeWidth "2px", stroke "black", fill "none" ] [] 
+    regBBox = rect [ x "60", y "60", width "720", height "40", strokeWidth "2px", stroke "black", fill "none" ] []
     regBLabel = text_ [ x "20", y "92", stroke textStroke, fill textFill ] [ Svg.text "B" ]
     regBValue = text_ [ x "70", y "92", stroke textStroke, fill textFill ] [ Svg.text (String.fromInt computer.regB) ]
-    regCBox = rect [ x "60", y "110", width "720", height "40", strokeWidth "2px", stroke "black", fill "none" ] [] 
+    regCBox = rect [ x "60", y "110", width "720", height "40", strokeWidth "2px", stroke "black", fill "none" ] []
     regCLabel = text_ [ x "20", y "142", stroke textStroke, fill textFill ] [ Svg.text "C" ]
-    regCValue = text_ [ x "70", y "142, stroke textStroke, fill textFill" ] [ Svg.text (String.fromInt computer.regC) ]
-    programBox = rect [ x "60", y "160", width "720", height "80", strokeWidth "2px", stroke "black", fill "none" ] [] 
+    regCValue = text_ [ x "70", y "142", stroke textStroke, fill textFill ] [ Svg.text (String.fromInt computer.regC) ]
+    programBox = rect [ x "60", y "160", width "720", height "80", strokeWidth "2px", stroke "black", fill "none" ] []
     programLabel = text_ [ x "20", y "192", stroke textStroke, fill textFill ] [ Svg.text "P" ]
     programValue = text_ [ x "70", y "192", stroke textStroke, fill textFill ] [ Svg.text programStr ]
-
-    midLine = line [ x1 "0", y1 "250", x2 "800", y2 "250", strokeWidth "2px", stroke "black" ] []
     pointerHat = text_ [ x "70", y "232", Svg.Attributes.style "white-space:pre", stroke textStroke, fill textFill ] [ Svg.text pointerText ]
-    outputsBox = rect [ x "60", y "250", width "720", height "140", strokeWidth "2px", stroke "black", fill "none" ] [] 
-  in 
+    outputsBox = rect [ x "60", y "250", width "720", height "140", strokeWidth "2px", stroke "black", fill "none" ] []
+  in
+    [ borderElement, regALabel, regAValue, regABox, regBLabel, regBValue, regBBox, regCLabel, regCValue, regCBox, programLabel, programValue, programBox, pointerHat, outputsBox ]
+
+toBootingElements model ticks =
+  let
+    svgWidth = String.fromInt (800)
+    svgHeight = String.fromInt (400)
+    textStroke = "black"
+    textFill = "#F28C28"
+    -- ticksStr = String.fromFloat ticks
+    criticalText = text_ [ x "20", y "42", stroke textStroke, fill textFill ] [ Svg.text ("Situation critical!") ]
+    bootstrappingText = text_ [ x "20", y "92", stroke textStroke, fill textFill ] [ Svg.text "Bootstrapping process failed." ]
+    dots = String.repeat (floor (ticks / model.bootTickInterval) - 4) "."
+    debuggerText = text_ [ x "20", y "142", stroke textStroke, fill textFill ] [ Svg.text ("Initializing debugger" ++ dots) ]
+    textElements =
+      [ Just criticalText
+      , if ticks >= 2 * model.bootTickInterval then Just bootstrappingText else Nothing
+      , if ticks >= 4 * model.bootTickInterval then Just debuggerText else Nothing ]
+      |> List.filterMap identity
+    borderElement = rect [ x "0", y "0", width svgWidth, height svgHeight, strokeWidth "4px", stroke "black", fill "none" ] []
+  in
+    List.append textElements [ borderElement ]
+
+toSvg : Model -> Html Msg
+toSvg model =
+  let
+    svgWidth = String.fromInt (800)
+    svgHeight = String.fromInt (400)
+    viewBoxStr = "0 0 " ++ svgWidth ++ " " ++ svgHeight
+    backgroundColor = model.backgroundColor
+    elements =
+      case model.bootStatus of
+        Booting ticks ->
+          toBootingElements model ticks
+        Booted ->
+          toBootedElements model
+  in
     svg
       [ viewBox viewBoxStr
       , width svgWidth
       , height svgHeight
       , Svg.Attributes.style ("background-color:" ++ backgroundColor)
-      -- , Svg.Attributes.style ("color:" ++ "#F28C28")
       ]
-      [ borderElement, regALabel, regAValue, regABox, regBLabel, regBValue, regBBox, regCLabel, regCValue, regCBox, programLabel, programValue, programBox, pointerHat, outputsBox ]
+      elements
 
 view : Model -> Document Msg
-view model = 
+view model =
   { title = "Advent of Code 2024 | Day 17: Chronospatial Computer"
   , body = [ viewBody model ] }
 
 viewBody : Model -> Html Msg
 viewBody model =
   let
-    commandsStr = ""
-    textFontSize = 
-      case model.dataSource of 
-        Sample -> "24px" 
-        Input -> "14px" 
+    commandsStr =
+      case model.bootStatus of
+        Booting ticks -> String.fromFloat ticks
+        Booted -> "booted"
+    textFontSize =
+      case model.dataSource of
+        Sample -> "24px"
+        Input -> "14px"
     elements = []
-    s = toSvg model 
-  in 
-    Html.table 
-      [ 
+    s = toSvg model
+  in
+    Html.table
+      [
         Html.Attributes.style "width" "1080px"
       , Html.Attributes.style "font-family" "Courier New"
       ]
-      [ Html.tr 
-          [] 
-          [ Html.td 
+      [ Html.tr
+          []
+          [ Html.td
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "32px"
               , Html.Attributes.style "padding" "10px"]
               [ Html.div [] [Html.text "Advent of Code 2024" ]
               , Html.div [] [Html.text "Day 17: Chronospatial Computer" ] ] ]
-      , Html.tr 
+      , Html.tr
           []
-          [ Html.td 
+          [ Html.td
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding-bottom" "10px" ]
               [ Html.text " ["
               , Html.a [ Html.Attributes.href "../../2024/"] [ Html.text "2024" ]
-              , Html.text "] " 
+              , Html.text "] "
               , Html.text " ["
               , Html.a [ Html.Attributes.href "../../2023/"] [ Html.text "2023" ]
               , Html.text "] "
@@ -328,64 +381,64 @@ viewBody model =
               , Html.a [ Html.Attributes.href "../../2020/"] [ Html.text "2020" ]
               , Html.text "] "
             ] ]
-      , Html.tr 
+      , Html.tr
           []
-          [ Html.td 
+          [ Html.td
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding-bottom" "10px" ]
-              [ Html.a 
-                [ Html.Attributes.href "https://adventofcode.com/2024/day/17" ] 
+              [ Html.a
+                [ Html.Attributes.href "https://adventofcode.com/2024/day/17" ]
                 [ Html.text "https://adventofcode.com/2024/day/17" ]
             ] ]
-      , Html.tr 
+      , Html.tr
           []
-          [ Html.td 
+          [ Html.td
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "16px" ]
-              [ 
-                Html.input 
-                [ Html.Attributes.type_ "radio", onClick UseInput, Html.Attributes.checked (model.dataSource == Input) ] 
+              [
+                Html.input
+                [ Html.Attributes.type_ "radio", onClick UseInput, Html.Attributes.checked (model.dataSource == Input) ]
                 []
               , Html.label [] [ Html.text "Input" ]
-              , Html.input 
-                [ Html.Attributes.type_ "radio", onClick UseSample, Html.Attributes.checked (model.dataSource == Sample) ] 
+              , Html.input
+                [ Html.Attributes.type_ "radio", onClick UseSample, Html.Attributes.checked (model.dataSource == Sample) ]
                 []
               , Html.label [] [ Html.text "Sample" ]
             ] ]
-      , Html.tr 
+      , Html.tr
           []
-          [ Html.td 
+          [ Html.td
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px" ]
-              [ Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Solve ] 
+              [ Html.button
+                [ Html.Attributes.style "width" "80px", onClick Solve ]
                 [ Html.text "Solve" ]
-              , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Clear ] 
-                [ Html.text "Clear" ] 
+              , Html.button
+                [ Html.Attributes.style "width" "80px", onClick Clear ]
+                [ Html.text "Clear" ]
             ] ]
-      , Html.tr 
+      , Html.tr
           []
-          [ Html.td 
+          [ Html.td
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
+              , Html.Attributes.style "background-color" "white"
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "24px"
               , Html.Attributes.style "padding-top" "10px"
-              , Html.Attributes.style "width" "200px" ] 
-              [ 
+              , Html.Attributes.style "width" "200px" ]
+              [
                 Html.div [] [ Html.text commandsStr ]
               ] ]
-      , Html.tr 
+      , Html.tr
           []
-          [ Html.td 
+          [ Html.td
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
+              , Html.Attributes.style "background-color" "white"
               , Html.Attributes.style "font-family" "Source Code Pro, monospace"
               , Html.Attributes.style "font-size" "32px"
               , Html.Attributes.style "padding" "10px"
-              , Html.Attributes.style "width" "200px" ] 
-              [ 
+              , Html.Attributes.style "width" "200px" ]
+              [
                 Html.div [] [ s ]
               ] ] ]

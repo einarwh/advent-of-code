@@ -71,7 +71,7 @@ let solve dim corrupted =
     queue.Enqueue((startPos, 0), 0)
     loop (Set.empty |> Set.add startPos, queue)
 
-let solve1 dim byteCount corrupted = 
+let findMinSteps dim byteCount corrupted = 
     corrupted 
     |> List.take byteCount 
     |> Set.ofList 
@@ -97,8 +97,8 @@ let findBlocker dim byteCount0 allCorrupted =
 let run dim byteCount fileName =
     let lines = readLines fileName
     let corrupted = lines |> List.choose parsePos 
-    solve1 dim byteCount corrupted |> printfn "%d"
-    findBlocker dim byteCount corrupted |> printfn "%s"
+    corrupted |> findMinSteps dim byteCount |> printfn "%d"
+    corrupted |> findBlocker dim byteCount |> printfn "%s"
 
 // run 6 12 "sample"
 run 70 1024 "input"
