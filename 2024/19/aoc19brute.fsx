@@ -19,17 +19,18 @@ let memoize f =
 
 let createChecker towels =
     fun recur pattern -> 
-        if String.length pattern = 0 then true 
+        if String.length pattern = 0 then 1L 
         else 
             let candidates = towels |> List.filter (startsWith pattern)
-            candidates |> List.exists (fun c -> recur (pattern.Substring(String.length c)))
+            candidates |> List.sumBy (fun c -> recur (pattern.Substring(String.length c)))
 
 let run fileName =
     let text = File.ReadAllText fileName |> trim |> split "\n\n"
     let towels = text.[0] |> split ", " |> Array.toList |> List.sort
     let patterns = text.[1] |> split "\n" |> Array.toList
     let checkPattern = memoize (createChecker towels)
-    let possible = patterns |> List.filter checkPattern |> List.length
-    printfn "%d" possible
+    let results = patterns |> List.map checkPattern
+    results |> List.filter ((<) 0L) |> List.length |> printfn "%d"
+    results |> List.sum |> printfn "%d"
 
 run "input"
