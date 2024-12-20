@@ -2,7 +2,6 @@ module Aoc17 exposing (..)
 
 import Browser exposing (Document)
 import BigInt exposing (BigInt)
-import Bitwise
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick, onInput)
@@ -52,7 +51,7 @@ type alias Computer =
 
 type alias Model =
   { computer : Computer
-  , initialA : BigInt
+  , loadedA : BigInt
   , overwrittenA : String 
   , step : Int 
   , dataSource : DataSource
@@ -136,7 +135,7 @@ initModel deviceStatus dataSource =
     computer = initComputer dataSource
     model = { computer = computer
             , dataSource = dataSource
-            , initialA = computer.regA
+            , loadedA = computer.regA
             , overwrittenA = ""
             , step = 0
             , backgroundColor = defaultBackgroundColor
@@ -462,11 +461,11 @@ updateReboot model =
 
 updateReset : Model -> Model
 updateReset model =
-  let
-    computer = model.computer 
-    c = { computer | pointer = 0, outputs = [] }
-  in
-    { model | computer = c}
+  let 
+    m = initModel Booted model.dataSource
+    c = m.computer 
+  in 
+    { m | overwrittenA = "", loadedA = model.loadedA, computer = { c | regA = model.loadedA } }
 
 updateProgramFinished : Model -> Model
 updateProgramFinished model = 
@@ -513,7 +512,7 @@ updateTogglePlay model =
       computer = m.computer 
       c = { computer | regA = model.computer.regA }
     in
-      { m | paused = False, overwrittenA = model.overwrittenA, computer = c }
+      { m | paused = False, overwrittenA = model.overwrittenA, computer = c, loadedA = model.loadedA }
   else
     { model | paused = not model.paused }
 
@@ -521,7 +520,7 @@ updateOverwriteRegA : String -> Model -> Model
 updateOverwriteRegA overwrittenA model = 
   if String.isEmpty overwrittenA then 
     let computer = model.computer in 
-      { model | overwrittenA = "", computer = { computer | regA = model.initialA } }
+      { model | overwrittenA = "", computer = { computer | regA = model.loadedA } }
   else 
     case overwrittenA |> BigInt.fromIntString of 
       Just a -> 
@@ -604,8 +603,8 @@ subscriptions model =
 toBootedElements : Model -> List (Svg Msg)
 toBootedElements model =
   let
-    svgWidth = String.fromInt (800)
-    svgHeight = String.fromInt (400)
+    svgWidth = String.fromInt (794)
+    svgHeight = String.fromInt (386)
     computer = model.computer
     programStr = computer.program |> Array.toList |> List.map String.fromInt |> String.join ","
     textStroke = "black"
@@ -617,31 +616,52 @@ toBootedElements model =
         String.padLeft paddings ' ' "^"
       else 
         ""
-    outputsText = computer.outputs |> List.reverse |> List.map (String.fromInt) |> String.join ","
+    outputs = computer.outputs |> List.reverse
+    charsPerOutputLine = 18
+    outputs1 = outputs |> List.take charsPerOutputLine 
+    outputs1Left = outputs |> List.drop charsPerOutputLine 
+    outputs2 = outputs1Left |> List.take charsPerOutputLine
+    outputs2Left = outputs1Left |> List.drop charsPerOutputLine 
+    outputs3 = outputs2Left |> List.take charsPerOutputLine 
+    outputs3Left = outputs2Left |> List.drop charsPerOutputLine
+    outputsText1 = outputs1 |> List.map (String.fromInt) |> String.join ","
+    outputsText11 = if List.isEmpty outputs1Left then outputsText1 else outputsText1 ++ ","
+    outputsText2 = outputs2 |> List.map (String.fromInt) |> String.join ","
+    outputsText22 = if List.isEmpty outputs2Left then outputsText2 else outputsText2 ++ ","
+    outputsText3 = outputs3 |> List.map (String.fromInt) |> String.join ","
+    outputsText33 = if List.isEmpty outputs3Left then outputsText3 else outputsText3 ++ ","
     borderElement = rect [ x "0", y "0", width svgWidth, height svgHeight, strokeWidth "4px", stroke "black", fill "none" ] []
-    regABox = rect [ x "60", y "10", width "720", height "40", strokeWidth "2px", stroke "black", fill "white", fillOpacity "0.2" ] []
+    regABox = rect [ x "60", y "10", width "714", height "40", strokeWidth "2px", stroke "black", fill "white", fillOpacity "0.2" ] []
     regALabel = text_ [ x "20", y "42", stroke textStroke, fill textFill ] [ Svg.text "A" ]
-    regAValue = text_ [ x "70", y "42", stroke textStroke, fill textFill ] [ Svg.text (BigInt.toString computer.regA) ]
-    regBBox = rect [ x "60", y "60", width "720", height "40", strokeWidth "2px", stroke "black", fill "white", fillOpacity "0.2" ] []
+    regAText0 = BigInt.toString computer.regA
+    regAText = if String.length regAText0 > 36 then (String.left 33 regAText0) ++ "..." else regAText0
+    regAValue = text_ [ x "70", y "42", stroke textStroke, fill textFill ] [ Svg.text regAText ]
+    regBBox = rect [ x "60", y "60", width "714", height "40", strokeWidth "2px", stroke "black", fill "white", fillOpacity "0.2" ] []
     regBLabel = text_ [ x "20", y "92", stroke textStroke, fill textFill ] [ Svg.text "B" ]
-    regBValue = text_ [ x "70", y "92", stroke textStroke, fill textFill ] [ Svg.text (BigInt.toString computer.regB) ]
-    regCBox = rect [ x "60", y "110", width "720", height "40", strokeWidth "2px", stroke "black", fill "white", fillOpacity "0.2" ] []
+    regBText0 = BigInt.toString computer.regB
+    regBText = if String.length regBText0 > 36 then (String.left 33 regBText0) ++ "..." else regBText0
+    regBValue = text_ [ x "70", y "92", stroke textStroke, fill textFill ] [ Svg.text regBText ]
+    regCBox = rect [ x "60", y "110", width "714", height "40", strokeWidth "2px", stroke "black", fill "white", fillOpacity "0.2" ] []
     regCLabel = text_ [ x "20", y "142", stroke textStroke, fill textFill ] [ Svg.text "C" ]
-    regCValue = text_ [ x "70", y "142", stroke textStroke, fill textFill ] [ Svg.text (BigInt.toString computer.regC) ]
-    programBox = rect [ x "60", y "160", width "720", height "80", strokeWidth "2px", stroke "black", fill "white", fillOpacity "0.2" ] []
+    regCText0 = BigInt.toString computer.regC
+    regCText = if String.length regCText0 > 36 then (String.left 33 regCText0) ++ "..." else regCText0
+    regCValue = text_ [ x "70", y "142", stroke textStroke, fill textFill ] [ Svg.text regCText]
+    programBox = rect [ x "60", y "160", width "714", height "80", strokeWidth "2px", stroke "black", fill "white", fillOpacity "0.2" ] []
     programLabel = text_ [ x "20", y "192", stroke textStroke, fill textFill ] [ Svg.text "P" ]
     programValue = text_ [ x "70", y "192", stroke textStroke, fill textFill ] [ Svg.text programStr ]
     pointerHat = text_ [ x "70", y "232", Svg.Attributes.style "white-space:pre", stroke textStroke, fill textFill ] [ Svg.text pointerText ]
-    outputsBox = rect [ x "60", y "250", width "720", height "140", strokeWidth "2px", stroke "black", fill "white", fillOpacity "0.2" ] []
-    outputsValue = text_ [ x "70", y "282", stroke textStroke, fill textFill ] [ Svg.text outputsText ]
+    outputsBox = rect [ x "60", y "250", width "714", height "126", strokeWidth "2px", stroke "black", fill "white", fillOpacity "0.2" ] []
+    outputsValue1 = text_ [ x "70", y "282", stroke textStroke, fill textFill ] [ Svg.text outputsText11 ]
+    outputsValue2 = text_ [ x "70", y "322", stroke textStroke, fill textFill ] [ Svg.text outputsText22 ]
+    outputsValue3 = text_ [ x "70", y "362", stroke textStroke, fill textFill ] [ Svg.text outputsText33 ]
   in
-    [ borderElement, regALabel, regABox, regAValue, regBLabel, regBBox, regBValue, regCLabel, regCBox, regCValue, programLabel, programBox, programValue, pointerHat, outputsBox, outputsValue ]
+    [ borderElement, regALabel, regABox, regAValue, regBLabel, regBBox, regBValue, regCLabel, regCBox, regCValue, programLabel, programBox, programValue, pointerHat, outputsBox, outputsValue1, outputsValue2, outputsValue3 ]
 
 toBlackoutElements : a -> b -> List (Svg msg)
 toBlackoutElements model ticks =
   let
-    svgWidth = String.fromInt (800)
-    svgHeight = String.fromInt (400)
+    svgWidth = String.fromInt (794)
+    svgHeight = String.fromInt (386)
     borderElement = rect [ x "0", y "0", width svgWidth, height svgHeight, strokeWidth "4px", stroke "black", fill "black" ] []
   in
     [ borderElement ]
@@ -649,8 +669,8 @@ toBlackoutElements model ticks =
 toBootingElements : Model -> Float -> List (Svg msg)
 toBootingElements model ticks =
   let
-    svgWidth = String.fromInt (800)
-    svgHeight = String.fromInt (400)
+    svgWidth = String.fromInt (794)
+    svgHeight = String.fromInt (386)
     textStroke = "black"
     textFill = "#F28C28"
     -- ticksStr = String.fromFloat ticks
@@ -670,8 +690,8 @@ toBootingElements model ticks =
 toSvg : Model -> Html Msg
 toSvg model =
   let
-    svgWidth = String.fromInt (800)
-    svgHeight = String.fromInt (400)
+    svgWidth = String.fromInt (794)
+    svgHeight = String.fromInt (386)
     viewBoxStr = "0 0 " ++ svgWidth ++ " " ++ svgHeight
     backgroundColor = model.backgroundColor
     elements =
@@ -825,10 +845,9 @@ viewBody model =
                 Html.div [] [ Html.text "Overwrite A" ]
               , Html.input 
                     [ 
-                      -- Html.Attributes.placeholder "Overwrite register A"
                       Html.Attributes.value model.overwrittenA
                     , onInput OverwriteRegA
-                    , Html.Attributes.disabled isBooting ] 
+                    , Html.Attributes.disabled (isBooting || not model.paused) ] 
                     []
               -- , Html.div [] [ Html.text commandsStr ]
               -- , Html.div [] [ Html.text ("Step: " ++ (String.fromInt model.step)) ]
