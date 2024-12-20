@@ -2733,7 +2733,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		v: func(record.v),
+		w: func(record.w),
 		ad: record.ad,
 		aa: record.aa
 	}
@@ -3003,7 +3003,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.v;
+		var message = !tag ? value : tag < 3 ? value.a : value.w;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.ad;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -5988,7 +5988,7 @@ var $author$project$Aoc17$parseComputer = function (data) {
 		var p = _v4.a;
 		return {
 			J: _List_Nil,
-			p: 0,
+			q: 0,
 			y: $author$project$Aoc17$parseProgram(p),
 			g: $author$project$Aoc17$parseRegister(a),
 			z: $author$project$Aoc17$parseRegister(b),
@@ -5997,7 +5997,7 @@ var $author$project$Aoc17$parseComputer = function (data) {
 	} else {
 		return {
 			J: _List_Nil,
-			p: 0,
+			q: 0,
 			y: $elm$core$Array$empty,
 			g: $cmditch$elm_bigint$BigInt$fromInt(0),
 			z: $cmditch$elm_bigint$BigInt$fromInt(0),
@@ -6022,7 +6022,7 @@ var $author$project$Aoc17$initComputer = function (dataSource) {
 var $author$project$Aoc17$initModel = F2(
 	function (deviceStatus, dataSource) {
 		var computer = $author$project$Aoc17$initComputer(dataSource);
-		var model = {N: $author$project$Aoc17$defaultBackgroundColor, T: 1111, s: 1000, e: computer, U: 177, t: dataSource, ai: '', B: deviceStatus, V: false, W: 477, u: computer.g, w: '', o: true, X: 0, G: 200};
+		var model = {N: $author$project$Aoc17$defaultBackgroundColor, T: 1111, t: 1000, e: computer, U: 177, u: dataSource, ai: '', B: deviceStatus, V: false, W: 477, v: computer.g, o: '', p: true, X: 0, G: 200};
 		return model;
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
@@ -6454,7 +6454,7 @@ var $author$project$Aoc17$subscriptions = function (model) {
 	var tick = function () {
 		var _v3 = model.B;
 		if (_v3.$ === 1) {
-			return model.o ? $elm$core$Platform$Sub$none : A2(
+			return model.p ? $elm$core$Platform$Sub$none : A2(
 				$elm$time$Time$every,
 				model.G,
 				function (_v4) {
@@ -6466,7 +6466,7 @@ var $author$project$Aoc17$subscriptions = function (model) {
 					[
 						A2(
 						$elm$time$Time$every,
-						model.s,
+						model.t,
 						function (_v5) {
 							return $author$project$Aoc17$BootTick;
 						}),
@@ -6517,7 +6517,7 @@ var $author$project$Aoc17$updateBootTick = function (model) {
 		var _v0 = model.B;
 		if (!_v0.$) {
 			var ticks = _v0.a;
-			return (_Utils_cmp(ticks, 6 * model.s) < 1) ? $author$project$Aoc17$Booting(ticks + model.s) : $author$project$Aoc17$Booted;
+			return (_Utils_cmp(ticks, 6 * model.t) < 1) ? $author$project$Aoc17$Booting(ticks + model.t) : $author$project$Aoc17$Booted;
 		} else {
 			return $author$project$Aoc17$Booted;
 		}
@@ -6532,7 +6532,8 @@ var $author$project$Aoc17$updateDataSource = F2(
 			model,
 			{
 				e: $author$project$Aoc17$initComputer(dataSource),
-				t: dataSource
+				u: dataSource,
+				o: ''
 			});
 	});
 var $author$project$Aoc17$updateOverwriteRegA = F2(
@@ -6544,8 +6545,8 @@ var $author$project$Aoc17$updateOverwriteRegA = F2(
 				{
 					e: _Utils_update(
 						computer,
-						{g: model.u}),
-					w: ''
+						{g: model.v}),
+					o: ''
 				});
 		} else {
 			var _v0 = $cmditch$elm_bigint$BigInt$fromIntString(overwrittenA);
@@ -6558,7 +6559,7 @@ var $author$project$Aoc17$updateOverwriteRegA = F2(
 						e: _Utils_update(
 							computer,
 							{g: a}),
-						w: overwrittenA
+						o: overwrittenA
 					});
 			} else {
 				return model;
@@ -6569,19 +6570,19 @@ var $author$project$Aoc17$updateReboot = function (model) {
 	return A2(
 		$author$project$Aoc17$initModel,
 		$author$project$Aoc17$Booting(0),
-		model.t);
+		model.u);
 };
 var $author$project$Aoc17$updateReset = function (model) {
-	var m = A2($author$project$Aoc17$initModel, $author$project$Aoc17$Booted, model.t);
+	var m = A2($author$project$Aoc17$initModel, $author$project$Aoc17$Booted, model.u);
 	var c = m.e;
 	return _Utils_update(
 		m,
 		{
 			e: _Utils_update(
 				c,
-				{g: model.u}),
-			u: model.u,
-			w: ''
+				{g: model.v}),
+			v: model.v,
+			o: ''
 		});
 };
 var $elm$core$Bitwise$and = _Bitwise_and;
@@ -6627,7 +6628,7 @@ var $elm$core$Array$get = F2(
 			A3($elm$core$Array$getHelp, startShift, index, tree)));
 	});
 var $author$project$Aoc17$literal = function (computer) {
-	var pt = computer.p;
+	var pt = computer.q;
 	return A2(
 		$elm$core$Maybe$withDefault,
 		0,
@@ -7161,7 +7162,7 @@ var $author$project$Aoc17$division = function (computer) {
 var $author$project$Aoc17$nextInstruction = function (computer) {
 	return _Utils_update(
 		computer,
-		{p: computer.p + 2});
+		{q: computer.q + 2});
 };
 var $author$project$Aoc17$writeA = F2(
 	function (value, computer) {
@@ -7355,7 +7356,7 @@ var $author$project$Aoc17$jump = F2(
 	function (target, computer) {
 		return _Utils_update(
 			computer,
-			{p: target});
+			{q: target});
 	});
 var $author$project$Aoc17$jnz = function (computer) {
 	return _Utils_eq(
@@ -7481,7 +7482,7 @@ var $author$project$Aoc17$executeOpcode = F2(
 		}
 	});
 var $author$project$Aoc17$tryReadOpcode = function (computer) {
-	var pt = computer.p;
+	var pt = computer.q;
 	return A2($elm$core$Array$get, pt, computer.y);
 };
 var $author$project$Aoc17$executeInstruction = function (computer) {
@@ -7497,7 +7498,7 @@ var $author$project$Aoc17$executeInstruction = function (computer) {
 var $author$project$Aoc17$updateProgramFinished = function (model) {
 	return _Utils_update(
 		model,
-		{V: true, o: true});
+		{V: true, p: true});
 };
 var $author$project$Aoc17$updateProgramRunning = F2(
 	function (computer, model) {
@@ -7516,18 +7517,18 @@ var $author$project$Aoc17$updateStep = function (model) {
 };
 var $author$project$Aoc17$updateTogglePlay = function (model) {
 	if (model.V) {
-		var m = A2($author$project$Aoc17$initModel, $author$project$Aoc17$Booted, model.t);
+		var m = A2($author$project$Aoc17$initModel, $author$project$Aoc17$Booted, model.u);
 		var computer = m.e;
 		var c = _Utils_update(
 			computer,
 			{g: model.e.g});
 		return _Utils_update(
 			m,
-			{e: c, u: model.u, w: model.w, o: false});
+			{e: c, v: model.v, o: model.o, p: false});
 	} else {
 		return _Utils_update(
 			model,
-			{o: !model.o});
+			{p: !model.p});
 	}
 };
 var $author$project$Aoc17$update = F2(
@@ -7874,7 +7875,7 @@ var $author$project$Aoc17$toBootedElements = function (model) {
 		_List_Nil);
 	var computer = model.e;
 	var outputs = $elm$core$List$reverse(computer.J);
-	var pointer = computer.p;
+	var pointer = computer.q;
 	var paddings = 1 + (2 * pointer);
 	var pointerText = (_Utils_cmp(
 		pointer,
@@ -8051,7 +8052,7 @@ var $author$project$Aoc17$toBootingElements = F2(
 		var svgHeight = $elm$core$String$fromInt(386);
 		var dots = A2(
 			$elm$core$String$repeat,
-			$elm$core$Basics$floor(ticks / model.s) - 4,
+			$elm$core$Basics$floor(ticks / model.t) - 4,
 			'.');
 		var debuggerText = A2(
 			$elm$svg$Svg$text_,
@@ -8111,8 +8112,8 @@ var $author$project$Aoc17$toBootingElements = F2(
 			_List_fromArray(
 				[
 					$elm$core$Maybe$Just(criticalText),
-					(_Utils_cmp(ticks, 2 * model.s) > -1) ? $elm$core$Maybe$Just(bootstrappingText) : $elm$core$Maybe$Nothing,
-					(_Utils_cmp(ticks, 4 * model.s) > -1) ? $elm$core$Maybe$Just(debuggerText) : $elm$core$Maybe$Nothing
+					(_Utils_cmp(ticks, 2 * model.t) > -1) ? $elm$core$Maybe$Just(bootstrappingText) : $elm$core$Maybe$Nothing,
+					(_Utils_cmp(ticks, 4 * model.t) > -1) ? $elm$core$Maybe$Just(debuggerText) : $elm$core$Maybe$Nothing
 				]));
 		return A2(
 			$elm$core$List$append,
@@ -8326,7 +8327,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick($author$project$Aoc17$UseInput),
-										$elm$html$Html$Attributes$checked(!model.t)
+										$elm$html$Html$Attributes$checked(!model.u)
 									]),
 								_List_Nil),
 								A2(
@@ -8342,7 +8343,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick($author$project$Aoc17$UseSample),
-										$elm$html$Html$Attributes$checked(model.t === 1)
+										$elm$html$Html$Attributes$checked(model.u === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -8429,7 +8430,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 									]),
 								_List_fromArray(
 									[
-										model.o ? $elm$html$Html$text('Run') : $elm$html$Html$text('Halt')
+										model.p ? $elm$html$Html$text('Run') : $elm$html$Html$text('Halt')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -8486,9 +8487,9 @@ var $author$project$Aoc17$viewBody = function (model) {
 								$elm$html$Html$input,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$value(model.w),
+										$elm$html$Html$Attributes$value(model.o),
 										$elm$html$Html$Events$onInput($author$project$Aoc17$OverwriteRegA),
-										$elm$html$Html$Attributes$disabled(isBooting || (!model.o))
+										$elm$html$Html$Attributes$disabled(isBooting || (!model.p))
 									]),
 								_List_Nil)
 							]))

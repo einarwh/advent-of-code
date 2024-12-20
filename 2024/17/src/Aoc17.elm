@@ -483,7 +483,7 @@ updateStep model =
 
 updateDataSource : DataSource -> Model -> Model
 updateDataSource dataSource model =
-  { model | dataSource = dataSource, computer = initComputer dataSource }
+  { model | dataSource = dataSource, computer = initComputer dataSource, overwrittenA = "" }
 
 updateBackgroundColor : String -> Model -> Model
 updateBackgroundColor color model =
