@@ -9,9 +9,7 @@ let trim (input : string) = input.Trim()
 
 let split (splitter : string) (input : string) = input.Split(splitter)
 
-let startsWith (input : string) (prefix : string) = input.StartsWith(prefix)
-
-let substring n (input : string) = input.Substring(n)
+let isPrefixOf (input : string) (prefix : string) = input.StartsWith(prefix)
 
 let memoize f =
     let cache = ConcurrentDictionary()
@@ -24,8 +22,8 @@ let createChecker towels =
         if String.length pattern = 0 then 1L 
         else 
             towels 
-            |> List.filter (startsWith pattern)
-            |> List.sumBy (fun c -> recur (pattern |> substring (String.length c)))
+            |> List.filter (isPrefixOf pattern)
+            |> List.sumBy (fun c -> recur (pattern.Substring(String.length c)))
 
 let run fileName =
     let text = File.ReadAllText fileName |> trim |> split "\n\n"
