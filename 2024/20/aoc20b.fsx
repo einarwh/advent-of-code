@@ -4,6 +4,7 @@
 open System
 open System.IO
 open System.Collections.Generic
+open System.Diagnostics 
 
 module Array2D =
     let inBounds (a : 'a[,]) (x, y) =
@@ -30,25 +31,12 @@ type Distance = int
 type PQ = PriorityQueue<Pos * Distance * (Pos * Distance) list, Distance>
 
 let getNeighbours (x, y) =
-    [ (x, y - 1)
-      (x - 1, y)
-      (x, y + 1)
-      (x + 1, y) ]
-
-let move dir (x, y) =
-    match dir with
-    | N -> (x, y - 1)
-    | W -> (x - 1, y)
-    | S -> (x, y + 1)
-    | E -> (x + 1, y)
-
-let isPosFree racetrack pos  =
-    '#' <> Array2D.getPos racetrack pos
+    [ (x, y - 1); (x - 1, y); (x, y + 1); (x + 1, y) ]
 
 let isWall racetrack pos  =
     '#' = Array2D.getPos racetrack pos
 
-let solve (startPos : Pos) (racetrack : Racetrack)  =
+let race (startPos : Pos) (racetrack : Racetrack)  =
     let rec loop (visited : Set<Pos>, q : PQ) =
         if q.Count = 0 then []
         else
@@ -73,9 +61,7 @@ let solve (startPos : Pos) (racetrack : Racetrack)  =
                 failwith (sprintf "%c" ch)
     let queue = PQ()
     queue.Enqueue((startPos, 0, []), 0)
-    let results = loop (Set.empty, queue)
-    results |> List.rev
-    // results |> printfn "%A"
+    loop (Set.empty, queue) |> List.rev 
 
 let findStartPos (racetrack : Racetrack) : Pos =
     let rec find positions =
@@ -86,13 +72,6 @@ let findStartPos (racetrack : Racetrack) : Pos =
             else find rest
     find <| Array2D.positions racetrack
 
-let getReachables (x, y) : Pos list=
-    [ (x, y-2)
-      (x-1, y-1); (x+1, y-1)
-      (x-2, y); (x+2, y)
-      (x-1, y+1); (x+1, y+1)
-      (x, y+2) ]
-
 let getReachablesInDuration (cheatDuration : int) (x, y) : Pos list=
     let chooser (x, y) (dx, dy) = 
         let len = abs dx + abs dy 
@@ -101,43 +80,30 @@ let getReachablesInDuration (cheatDuration : int) (x, y) : Pos list=
     range |> List.collect (fun dy -> range |> List.choose (fun dx -> chooser (x, y) (dx, dy)))
 
 let posDiff (x1, y1) (x2, y2) = 
-    let dx = abs (x2 - x1)
-    let dy = abs (y2 - y1)
-    dx + dy 
+    abs (x2 - x1) + abs (y2 - y1) 
 
-let findCheatsAt cheatDuration (posDistMap : Map<Pos, Distance>) (pos, dist) =
-    let reachables = getReachablesInDuration cheatDuration pos
-    let onRoute = reachables |> List.choose (fun (p : Pos) -> Map.tryFind p posDistMap |> Option.map (fun d -> (p, d)))
-    reachables
+let findCheats cheatDuration (posDistMap : Map<Pos, Distance>) (pos, dist) =
+    getReachablesInDuration cheatDuration pos
     |> List.choose (fun (p : Pos) -> Map.tryFind p posDistMap |> Option.map (fun d -> (p, d - dist)))
     |> List.choose (fun (p, diff) -> if diff - (posDiff pos p) > 0 then Some (pos, p, diff - (posDiff pos p)) else None)
 
 let readLines =
     File.ReadAllLines >> Array.filter ((<>) String.Empty)
 
-let run cheatDuration fileName =
+let solve cheatDuration posDistList = 
+    let stopwatch = Stopwatch.StartNew()
+    let posDistMap = Map.ofList posDistList
+    let result = posDistList |> List.collect (findCheats cheatDuration posDistMap) |> List.sortBy (fun (p1, p2, saved) -> saved) |> List.rev
+    let savings = result |> List.map (fun (_, _, saved) -> saved)
+    savings |> List.filter (fun saved -> saved >= 100) |> List.length |> printfn "%d"
+    printfn "%A ms" stopwatch.Elapsed.TotalMilliseconds
+
+let run fileName =
     let lines = readLines fileName |> Array.map (Seq.toArray)
-    // printfn "%A" lines
     let racetrack = lines |> array2D
     let startPos = findStartPos racetrack
-    printfn "%A" startPos
-    let posDistList = solve startPos racetrack
-    // printfn "LIST %A" posDistList
-    // printfn "%A" (findReachable (3, 3) |> List.sort)
-    let posDistMap = Map.ofList posDistList
-    // printfn "MAP %A" posDistMap
+    let posDistList = race startPos racetrack
+    posDistList |> solve 2 
+    posDistList |> solve 20
 
-    let result = posDistList |> List.collect (findCheatsAt cheatDuration posDistMap) |> List.sortBy (fun (p1, p2, saved) -> saved) |> List.rev
-    let savings = result |> List.map (fun (_, _, saved) -> saved)
-    let bigSavings = savings |> List.filter (fun saved -> saved >= 100) |> List.length
-
-    printfn "%d" bigSavings
-    // getReachables (0, 0) |> printfn "%A"
-    // getReachablesInDuration 2 (0, 0) |> printfn "%A"
-
-
-    // lines |> printfn "%A"
-    0
-
-// run 2 "input"
-run 20 "input"
+run "input"
