@@ -23,111 +23,39 @@
                                        children = [{ c = 'b'
                                                      terminal = true
                                                      children = [] }] }]
-
-checkPattern: "brwrr"
-ix: 0 - find match for pattern "brwrr"
-substring indexes at 0: [1; 0]
 ["br"; "b"]
-ix: 2 - find match for pattern "wrr"
-substring indexes at 2: [1]
 ["wr"]
-ix: 4 - find match for pattern "r"
-substring indexes at 4: [0]
 ["r"]
 pattern "brwrr": true
-
-checkPattern: "bggr"
-ix: 0 - find match for pattern "bggr"
-substring indexes at 0: [0]
 ["b"]
-ix: 1 - find match for pattern "ggr"
-substring indexes at 1: [0]
 ["g"]
-ix: 2 - find match for pattern "gr"
-substring indexes at 2: [0]
 ["g"]
-ix: 3 - find match for pattern "r"
-substring indexes at 3: [0]
 ["r"]
 pattern "bggr": true
-
-checkPattern: "gbbr"
-ix: 0 - find match for pattern "gbbr"
-substring indexes at 0: [1; 0]
 ["gb"; "g"]
-ix: 2 - find match for pattern "br"
-substring indexes at 2: [1; 0]
 ["br"; "b"]
 pattern "gbbr": true
-
-checkPattern: "rrbgbr"
-ix: 0 - find match for pattern "rrbgbr"
-substring indexes at 0: [0]
 ["r"]
-ix: 1 - find match for pattern "rbgbr"
-substring indexes at 1: [1; 0]
 ["rb"; "r"]
-ix: 3 - find match for pattern "gbr"
-substring indexes at 3: [1; 0]
 ["gb"; "g"]
-ix: 5 - find match for pattern "r"
-substring indexes at 5: [0]
 ["r"]
 pattern "rrbgbr": true
-
-checkPattern: "ubwu"
-ix: 0 - find match for pattern "ubwu"
-substring indexes at 0: []
 []
 pattern "ubwu": false
-
-checkPattern: "bwurrg"
-ix: 0 - find match for pattern "bwurrg"
-substring indexes at 0: [2; 0]
 ["bwu"; "b"]
-ix: 3 - find match for pattern "rrg"
-substring indexes at 3: [0]
 ["r"]
-ix: 4 - find match for pattern "rg"
-substring indexes at 4: [0]
 ["r"]
-ix: 5 - find match for pattern "g"
-substring indexes at 5: [0]
 ["g"]
 pattern "bwurrg": true
-
-checkPattern: "brgr"
-ix: 0 - find match for pattern "brgr"
-substring indexes at 0: [1; 0]
 ["br"; "b"]
-ix: 2 - find match for pattern "gr"
-substring indexes at 2: [0]
 ["g"]
-ix: 3 - find match for pattern "r"
-substring indexes at 3: [0]
 ["r"]
 pattern "brgr": true
-
-checkPattern: "bbrgwb"
-ix: 0 - find match for pattern "bbrgwb"
-substring indexes at 0: [0]
 ["b"]
-ix: 1 - find match for pattern "brgwb"
-substring indexes at 1: [1; 0]
 ["br"; "b"]
-ix: 3 - find match for pattern "gwb"
-substring indexes at 3: [0]
 ["g"]
-ix: 4 - find match for pattern "wb"
-substring indexes at 4: []
 []
-ix: 2 - find match for pattern "rgwb"
-substring indexes at 2: [0]
 ["r"]
-ix: 3 - find match for pattern "gwb"
-substring indexes at 3: [0]
 ["g"]
-ix: 4 - find match for pattern "wb"
-substring indexes at 4: []
 []
 pattern "bbrgwb": false

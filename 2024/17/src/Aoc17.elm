@@ -18,6 +18,7 @@ import Time
 defaultBackgroundColor = "#808080"
 lightBackgroundColor = "#989898"
 darkBackgroundColor = "#696969"
+blackoutColor = "#404040"
 
 main =
   Browser.document
@@ -51,6 +52,7 @@ type alias Model =
   , bootStatus : BootStatus
   , tickInterval : Float
   , bootTickInterval : Float
+  , blackoutTickInterval : Float
   , darkBackgroundTickInterval : Float
   , lightBackgroundTickInterval : Float
   , debug : String }
@@ -104,7 +106,7 @@ Register B: 0
 Register C: 0
 
 Program: 2,4,1,3,7,5,4,1,1,3,0,3,5,5,3,0"""
-    quine = """Register A: 108107566389757
+    quineData = """Register A: 108107566389757
 Register B: 0
 Register C: 0
 
@@ -113,7 +115,7 @@ Program: 2,4,1,3,7,5,4,1,1,3,0,3,5,5,3,0"""
       case dataSource of
         Sample -> sample
         Input -> input
-        Quine -> quine
+        Quine -> quineData
     computer = parseComputer data
   in
     computer
@@ -132,6 +134,7 @@ initModel bootStatus dataSource =
             , paused = True 
             , tickInterval = 200
             , bootTickInterval = 1000
+            , blackoutTickInterval = 1111
             , darkBackgroundTickInterval = 177
             , lightBackgroundTickInterval = 477
             , debug = "" }
@@ -155,6 +158,7 @@ type Msg =
   | UseSample
   | UseInput
   | BootTick
+  | BlackoutTick
   | DefaultBackgroundTick
   | DarkBackgroundTick
   | LightBackgroundTick
@@ -356,6 +360,89 @@ executeInstruction computer =
     Nothing -> Nothing 
     Just opcode -> Just (executeOpcode opcode computer)
 
+-- let quine computer = 
+--     let len = computer.program |> Array.length
+--     let checkTarget opIndex target candidateA = 
+--         let p = execute { computer with regA = candidateA }
+--         p.[opIndex] = target 
+--     let rec loop ix a = 
+--         let opIndex = len - ix 
+--         if ix > len then 
+--             Some a
+--         else 
+--             let target = computer.program[opIndex]
+--             let offset = pow 8L ((int64 len) - (int64 ix))
+--             let candidates = 
+--                 [ 0L .. 7L ] 
+--                 |> List.map (fun j -> a + j * offset)
+--                 |> List.choose (fun ca -> if checkTarget opIndex target ca then Some ca else None)
+--             candidates |> List.tryPick (loop (ix + 1))
+--     let a0 = pow 8L ((int64 len) - 1L)
+--     match loop 1 a0 with 
+--     | Some a -> a 
+--     | None -> failwith ":("
+
+checkTarget : Computer -> Int -> Int -> BigInt -> Bool 
+checkTarget computer opIndex target candidateA = 
+  let 
+    maybeComputer = executeInstruction { computer | regA = candidateA }
+  in 
+    case maybeComputer of 
+      Just c -> 
+        case Array.get opIndex c.program of 
+          Just n -> n == target
+          Nothing -> False 
+      Nothing -> False 
+
+tryPick : (a -> Maybe a) -> List a -> Maybe a 
+tryPick chooser lst = 
+  case lst of 
+    [] -> Nothing 
+    a :: rest ->
+      case chooser a of 
+        Nothing -> tryPick chooser rest 
+        Just result -> Just result  
+
+quineLoop : Int -> Int -> Computer -> BigInt -> Maybe BigInt 
+quineLoop len ix computer a = 
+  let
+    opIndex = len - ix 
+    big8 = BigInt.fromInt 8
+    bigLen = BigInt.fromInt len 
+    bigIx = BigInt.fromInt ix 
+  in
+    if ix > len then 
+      Just a 
+    else 
+      let
+        target = Array.get opIndex computer.program |> Maybe.withDefault 0
+        offset = BigInt.pow big8 (BigInt.sub bigLen bigIx) 
+        candidates = 
+          List.range 0 7 
+          |> List.map (BigInt.fromInt)
+          |> List.map (\j -> BigInt.add a (BigInt.mul j offset))
+          |> List.filterMap (\ca -> if checkTarget computer opIndex target ca then Just ca else Nothing)
+      in
+        candidates
+        |> tryPick (\ca -> quineLoop len (ix + 1) computer ca)
+
+    -- let a0 = pow 8L ((int64 len) - 1L)
+    -- match loop 1 a0 with 
+    -- | Some a -> a 
+    -- | None -> failwith ":("
+
+
+quine : Int -> Computer -> Maybe BigInt  
+quine len computer = 
+  let
+    big1 = BigInt.fromInt 1
+    big8 = BigInt.fromInt 8
+    bigLen = BigInt.fromInt len 
+ 
+    a0 = BigInt.pow big8 (BigInt.sub bigLen big1)
+  in
+    quineLoop len 1 computer a0
+
 updateClear : Model -> Model
 updateClear model =
   initModel (Booting 0) model.dataSource
@@ -436,6 +523,8 @@ update msg model =
       (updateDataSource Input model, Cmd.none)
     BootTick ->
       (updateBootTick model, Cmd.none)
+    BlackoutTick ->
+      (updateBackgroundColor blackoutColor model, Cmd.none)
     DefaultBackgroundTick ->
       (updateBackgroundColor defaultBackgroundColor model, Cmd.none)
     DarkBackgroundTick ->
@@ -453,7 +542,7 @@ subscriptions model =
     tick =
       case model.bootStatus of
         Booted -> if model.paused then Sub.none else Time.every model.tickInterval (\_ -> Tick)
-        Booting _ -> Time.every model.bootTickInterval (\_ -> BootTick)
+        Booting _ -> Sub.batch [ Time.every model.bootTickInterval (\_ -> BootTick), Time.every model.blackoutTickInterval (\_ -> BlackoutTick) ]
     defaultBackgroundTick = Time.every 277 (\_ -> DefaultBackgroundTick)
     darkBackgroundTick = Time.every model.darkBackgroundTickInterval (\_ -> DarkBackgroundTick)
     lightBackgroundTick = Time.every model.lightBackgroundTickInterval (\_ -> LightBackgroundTick)
@@ -466,53 +555,6 @@ subscriptions model =
 
 -- VIEW
 
-toUncheckedHtmlElement : List Int -> List (Html Msg)
-toUncheckedHtmlElement numbers =
-  [ numbers |> List.map String.fromInt |> String.join " " |> Html.text, Html.br [] [] ]
-
-toUnsafeHtmlElement : List Int -> List (Html Msg)
-toUnsafeHtmlElement numbers =
-  let
-    str = numbers |> List.map String.fromInt |> String.join " "
-    textElement = Html.text str
-    spanElement = Html.span [ Html.Attributes.style "background-color" "#FAA0A0" ] [ textElement ]
-  in
-    [ spanElement, Html.br [] [] ]
-
-toSafeHtmlElement : List Int -> List (Html Msg)
-toSafeHtmlElement numbers =
-  let
-    str = numbers |> List.map String.fromInt |> String.join " "
-    textElement = Html.text str
-    spanElement = Html.span [ Html.Attributes.style "background-color" "#AFE1AF" ] [ textElement ]
-  in
-    [ spanElement, Html.br [] [] ]
-
-toDampenedHtmlElement : Int -> List Int -> List (Html Msg)
-toDampenedHtmlElement index numbers =
-  let
-    before = numbers |> List.take index
-    fromIndex = numbers |> List.drop index
-    dropped = fromIndex |> List.take 1
-    after = fromIndex |> List.drop 1
-    strBefore = before |> List.map String.fromInt |> String.join " "
-    textElementBefore = Html.text (String.append strBefore " ")
-    spanElementBefore = Html.span [ Html.Attributes.style "background-color" "#AFE1AF" ] [ textElementBefore ]
-    strAfter = after |> List.map String.fromInt |> String.join " "
-    textElementAfter = Html.text (String.append " " strAfter)
-    spanElementAfter = Html.span [ Html.Attributes.style "background-color" "#AFE1AF" ] [ textElementAfter ]
-    strDropped = dropped |> List.map String.fromInt |> String.join " "
-    textElementDropped = Html.text strDropped
-    spanElementDropped =
-      Html.span
-        [ Html.Attributes.style "background-color" "#AFE1AF"
-        , Html.Attributes.style "color" "#808080"
-        , Html.Attributes.style "text-decoration-line" "line-through"]
-        [ textElementDropped ]
-    breakElement = Html.br [] []
-  in
-    [ spanElementBefore, spanElementDropped, spanElementAfter, breakElement ]
-
 toBootedElements : Model -> List (Svg Msg)
 toBootedElements model =
   let
@@ -524,8 +566,6 @@ toBootedElements model =
     textFill = "#F28C28"
     pointer = computer.pointer
     paddings = 1 + 2 * pointer
-    pointerPosition = 70
-    pointerPositionStr = String.fromInt pointerPosition
     pointerText = 
       if pointer < Array.length computer.program then 
         String.padLeft paddings ' ' "^"
@@ -551,6 +591,16 @@ toBootedElements model =
   in
     [ borderElement, regALabel, regABox, regAValue, regBLabel, regBBox, regBValue, regCLabel, regCBox, regCValue, programLabel, programBox, programValue, pointerHat, outputsBox, outputsValue ]
 
+toBlackoutElements : a -> b -> List (Svg msg)
+toBlackoutElements model ticks =
+  let
+    svgWidth = String.fromInt (800)
+    svgHeight = String.fromInt (400)
+    borderElement = rect [ x "0", y "0", width svgWidth, height svgHeight, strokeWidth "4px", stroke "black", fill "black" ] []
+  in
+    [ borderElement ]
+
+toBootingElements : Model -> Float -> List (Svg msg)
 toBootingElements model ticks =
   let
     svgWidth = String.fromInt (800)
@@ -581,7 +631,10 @@ toSvg model =
     elements =
       case model.bootStatus of
         Booting ticks ->
-          toBootingElements model ticks
+          if model.backgroundColor == blackoutColor && ((floor ticks // floor model.blackoutTickInterval) |> modBy 2) == 0 then 
+            toBlackoutElements model ticks
+          else 
+            toBootingElements model ticks
         Booted ->
           toBootedElements model
   in
@@ -734,28 +787,30 @@ viewBody model =
               , Html.Attributes.style "padding-top" "10px"
               , Html.Attributes.style "width" "200px" ]
               [
-                  Html.input 
-                    [ Html.Attributes.placeholder "Overwrite register A"
-                    , Html.Attributes.value model.overwrittenA
+                Html.div [] [ Html.text "Overwrite A" ]
+              , Html.input 
+                    [ 
+                      -- Html.Attributes.placeholder "Overwrite register A"
+                      Html.Attributes.value model.overwrittenA
                     , onInput OverwriteRegA ] 
                     []
               , Html.div [] [ Html.text commandsStr ]
-              , Html.div [] [ Html.text ("DebugStr1 " ++ debugStr1) ]
-              , Html.div [] [ Html.text ("DebugStr2 " ++ debugStr2) ]
-              , Html.div [] [ Html.text ("DebugStr3 " ++ debugStr3) ]
-              , Html.div [] [ Html.text ("DebugStr4 (bigXor) " ++ debugStr4) ]
-              , Html.div [] [ Html.text ("DebugStr5 (intXor) " ++ debugStr5) ]
-              , Html.div [] [ Html.text ("DebugStr6 (177 as bits) " ++ debugStr6 ++ " *") ]
-              , Html.div [] [ Html.text ("DebugStr7 (377 as bits) " ++ debugStr7) ]
-              , Html.div [] [ Html.text ("DebugStr8 (13 as bits) " ++ debugStr8) ]
-              , Html.div [] [ Html.text ("DebugStr9 (gt?) " ++ debugStr9) ]
-              , Html.div [] [ Html.text ("zipped " ++ zippedStr) ]
-              , Html.div [] [ Html.text ("xored " ++ xoredStr) ]
-              , Html.div [] [ Html.text ("recons " ++ reconstructStr) ]
-              , Html.div [] [ Html.text ("numerator: " ++ BigInt.toString numerator) ]
-              , Html.div [] [ Html.text ("denominator: " ++ BigInt.toString denominator) ]
-              , Html.div [] [ Html.text ("divResult: " ++ BigInt.toString divResult) ]
-              , Html.div [] [ Html.text (String.fromFloat qval) ]
+              -- , Html.div [] [ Html.text ("DebugStr1 " ++ debugStr1) ]
+              -- , Html.div [] [ Html.text ("DebugStr2 " ++ debugStr2) ]
+              -- , Html.div [] [ Html.text ("DebugStr3 " ++ debugStr3) ]
+              -- , Html.div [] [ Html.text ("DebugStr4 (bigXor) " ++ debugStr4) ]
+              -- , Html.div [] [ Html.text ("DebugStr5 (intXor) " ++ debugStr5) ]
+              -- , Html.div [] [ Html.text ("DebugStr6 (177 as bits) " ++ debugStr6 ++ " *") ]
+              -- , Html.div [] [ Html.text ("DebugStr7 (377 as bits) " ++ debugStr7) ]
+              -- , Html.div [] [ Html.text ("DebugStr8 (13 as bits) " ++ debugStr8) ]
+              -- , Html.div [] [ Html.text ("DebugStr9 (gt?) " ++ debugStr9) ]
+              -- , Html.div [] [ Html.text ("zipped " ++ zippedStr) ]
+              -- , Html.div [] [ Html.text ("xored " ++ xoredStr) ]
+              -- , Html.div [] [ Html.text ("recons " ++ reconstructStr) ]
+              -- , Html.div [] [ Html.text ("numerator: " ++ BigInt.toString numerator) ]
+              -- , Html.div [] [ Html.text ("denominator: " ++ BigInt.toString denominator) ]
+              -- , Html.div [] [ Html.text ("divResult: " ++ BigInt.toString divResult) ]
+              -- , Html.div [] [ Html.text (String.fromFloat qval) ]
               , Html.div [] [ Html.text ("Step: " ++ (String.fromInt model.step)) ]
               ] ]
       , Html.tr
