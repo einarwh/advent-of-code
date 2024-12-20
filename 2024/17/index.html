@@ -1871,9 +1871,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aR,
-		impl.a1,
-		impl.a$,
+		impl.aS,
+		impl.a2,
+		impl.a0,
 		function() { return function() {} }
 	);
 });
@@ -3957,11 +3957,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aR,
-		impl.a1,
-		impl.a$,
+		impl.aS,
+		impl.a2,
+		impl.a0,
 		function(sendToApp, initialModel) {
-			var view = impl.a2;
+			var view = impl.a3;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3993,12 +3993,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aR,
-		impl.a1,
-		impl.a$,
+		impl.aS,
+		impl.a2,
+		impl.a0,
 		function(sendToApp, initialModel) {
 			var divertHrefToApp = impl.aa && impl.aa(sendToApp)
-			var view = impl.a2;
+			var view = impl.a3;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -4011,7 +4011,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.a0) && (_VirtualDom_doc.title = title = doc.a0);
+				(title !== doc.a1) && (_VirtualDom_doc.title = title = doc.a1);
 			});
 		}
 	);
@@ -4067,8 +4067,8 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aW;
-	var onUrlRequest = impl.aX;
+	var onUrlChange = impl.aX;
+	var onUrlRequest = impl.aY;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
@@ -4098,13 +4098,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aR: function(flags)
+		aS: function(flags)
 		{
-			return A3(impl.aR, flags, _Browser_getUrl(), key);
+			return A3(impl.aS, flags, _Browser_getUrl(), key);
 		},
+		a3: impl.a3,
 		a2: impl.a2,
-		a1: impl.a1,
-		a$: impl.a$
+		a0: impl.a0
 	});
 }
 
@@ -4170,17 +4170,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aO: 'hidden', aK: 'visibilitychange' }
+		? { aP: 'hidden', aK: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aO: 'mozHidden', aK: 'mozvisibilitychange' }
+		? { aP: 'mozHidden', aK: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aO: 'msHidden', aK: 'msvisibilitychange' }
+		? { aP: 'msHidden', aK: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aO: 'webkitHidden', aK: 'webkitvisibilitychange' }
-		: { aO: 'hidden', aK: 'visibilitychange' };
+		? { aP: 'webkitHidden', aK: 'webkitvisibilitychange' }
+		: { aP: 'hidden', aK: 'visibilitychange' };
 }
 
 
@@ -4393,7 +4393,7 @@ var _Regex_never = /.^/;
 var _Regex_fromStringWith = F2(function(options, string)
 {
 	var flags = 'g';
-	if (options.aT) { flags += 'm'; }
+	if (options.aU) { flags += 'm'; }
 	if (options.aJ) { flags += 'i'; }
 
 	try
@@ -5651,7 +5651,7 @@ var $elm$core$Basics$composeR = F3(
 	});
 var $elm$regex$Regex$Match = F4(
 	function (match, index, number, submatches) {
-		return {aQ: index, aS: match, aV: number, a_: submatches};
+		return {aR: index, aT: match, aW: number, a$: submatches};
 	});
 var $elm$regex$Regex$contains = _Regex_contains;
 var $elm_community$list_extra$List$Extra$dropWhile = F2(
@@ -5692,7 +5692,7 @@ var $elm$regex$Regex$fromStringWith = _Regex_fromStringWith;
 var $elm$regex$Regex$fromString = function (string) {
 	return A2(
 		$elm$regex$Regex$fromStringWith,
-		{aJ: false, aT: false},
+		{aJ: false, aU: false},
 		string);
 };
 var $elm$core$List$drop = F2(
@@ -6022,9 +6022,9 @@ var $author$project$Aoc17$initComputer = function (dataSource) {
 	return computer;
 };
 var $author$project$Aoc17$initModel = F2(
-	function (bootStatus, dataSource) {
+	function (deviceStatus, dataSource) {
 		var computer = $author$project$Aoc17$initComputer(dataSource);
-		var model = {L: $author$project$Aoc17$defaultBackgroundColor, T: 1111, x: bootStatus, s: 1000, e: computer, U: 177, y: dataSource, ah: '', X: computer.h, V: 477, N: '', B: true, O: 0, E: 200};
+		var model = {L: $author$project$Aoc17$defaultBackgroundColor, T: 1111, s: 1000, e: computer, U: 177, x: dataSource, ah: '', y: deviceStatus, X: computer.h, V: 477, N: '', B: true, O: 0, E: 200};
 		return model;
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
@@ -6451,31 +6451,34 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc17$subscriptions = function (model) {
 	var tick = function () {
-		var _v3 = model.x;
-		if (_v3.$ === 1) {
-			return model.B ? $elm$core$Platform$Sub$none : A2(
-				$elm$time$Time$every,
-				model.E,
-				function (_v4) {
-					return $author$project$Aoc17$Tick;
-				});
-		} else {
-			return $elm$core$Platform$Sub$batch(
-				_List_fromArray(
-					[
-						A2(
-						$elm$time$Time$every,
-						model.s,
-						function (_v5) {
-							return $author$project$Aoc17$BootTick;
-						}),
-						A2(
-						$elm$time$Time$every,
-						model.T,
-						function (_v6) {
-							return $author$project$Aoc17$BlackoutTick;
-						})
-					]));
+		var _v3 = model.y;
+		switch (_v3.$) {
+			case 1:
+				return model.B ? $elm$core$Platform$Sub$none : A2(
+					$elm$time$Time$every,
+					model.E,
+					function (_v4) {
+						return $author$project$Aoc17$Tick;
+					});
+			case 0:
+				return $elm$core$Platform$Sub$batch(
+					_List_fromArray(
+						[
+							A2(
+							$elm$time$Time$every,
+							model.s,
+							function (_v5) {
+								return $author$project$Aoc17$BootTick;
+							}),
+							A2(
+							$elm$time$Time$every,
+							model.T,
+							function (_v6) {
+								return $author$project$Aoc17$BlackoutTick;
+							})
+						]));
+			default:
+				return $elm$core$Platform$Sub$none;
 		}
 	}();
 	var lightBackgroundTick = A2(
@@ -6513,25 +6516,32 @@ var $author$project$Aoc17$updateBackgroundColor = F2(
 var $author$project$Aoc17$Booting = function (a) {
 	return {$: 0, a: a};
 };
+var $author$project$Aoc17$Quining = function (a) {
+	return {$: 2, a: a};
+};
 var $author$project$Aoc17$updateBootTick = function (model) {
-	var bootStatus = function () {
-		var _v0 = model.x;
-		if (!_v0.$) {
-			var ticks = _v0.a;
-			return (_Utils_cmp(ticks, 6 * model.s) < 1) ? $author$project$Aoc17$Booting(ticks + model.s) : $author$project$Aoc17$Booted;
-		} else {
-			return $author$project$Aoc17$Booted;
+	var deviceStatus = function () {
+		var _v0 = model.y;
+		switch (_v0.$) {
+			case 0:
+				var ticks = _v0.a;
+				return (_Utils_cmp(ticks, 6 * model.s) < 1) ? $author$project$Aoc17$Booting(ticks + model.s) : $author$project$Aoc17$Booted;
+			case 1:
+				return $author$project$Aoc17$Booted;
+			default:
+				var qm = _v0.a;
+				return $author$project$Aoc17$Quining(qm);
 		}
 	}();
 	return _Utils_update(
 		model,
-		{x: bootStatus});
+		{y: deviceStatus});
 };
 var $author$project$Aoc17$updateClear = function (model) {
 	return A2(
 		$author$project$Aoc17$initModel,
 		$author$project$Aoc17$Booting(0),
-		model.y);
+		model.x);
 };
 var $author$project$Aoc17$updateDataSource = F2(
 	function (dataSource, model) {
@@ -6539,7 +6549,7 @@ var $author$project$Aoc17$updateDataSource = F2(
 			model,
 			{
 				e: $author$project$Aoc17$initComputer(dataSource),
-				y: dataSource
+				x: dataSource
 			});
 	});
 var $elm$core$Array$length = function (_v0) {
@@ -7730,7 +7740,6 @@ var $author$project$Aoc17$update = F2(
 	});
 var $author$project$Aoc17$Clear = {$: 0};
 var $author$project$Aoc17$Faster = {$: 3};
-var $author$project$Aoc17$FindQuine = {$: 14};
 var $author$project$Aoc17$OverwriteRegA = function (a) {
 	return {$: 13, a: a};
 };
@@ -8199,15 +8208,18 @@ var $author$project$Aoc17$toSvg = function (model) {
 	var svgHeight = $elm$core$String$fromInt(400);
 	var viewBoxStr = '0 0 ' + (svgWidth + (' ' + svgHeight));
 	var elements = function () {
-		var _v0 = model.x;
-		if (!_v0.$) {
-			var ticks = _v0.a;
-			return (_Utils_eq(model.L, $author$project$Aoc17$blackoutColor) && (!A2(
-				$elm$core$Basics$modBy,
-				2,
-				($elm$core$Basics$floor(ticks) / $elm$core$Basics$floor(model.T)) | 0))) ? A2($author$project$Aoc17$toBlackoutElements, model, ticks) : A2($author$project$Aoc17$toBootingElements, model, ticks);
-		} else {
-			return $author$project$Aoc17$toBootedElements(model);
+		var _v0 = model.y;
+		switch (_v0.$) {
+			case 0:
+				var ticks = _v0.a;
+				return (_Utils_eq(model.L, $author$project$Aoc17$blackoutColor) && (!A2(
+					$elm$core$Basics$modBy,
+					2,
+					($elm$core$Basics$floor(ticks) / $elm$core$Basics$floor(model.T)) | 0))) ? A2($author$project$Aoc17$toBlackoutElements, model, ticks) : A2($author$project$Aoc17$toBootingElements, model, ticks);
+			case 1:
+				return $author$project$Aoc17$toBootedElements(model);
+			default:
+				return $author$project$Aoc17$toBootedElements(model);
 		}
 	}();
 	var backgroundColor = model.L;
@@ -8228,7 +8240,7 @@ var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('
 var $elm$core$Bitwise$xor = _Bitwise_xor;
 var $author$project$Aoc17$viewBody = function (model) {
 	var textFontSize = function () {
-		var _v3 = model.y;
+		var _v3 = model.x;
 		switch (_v3) {
 			case 1:
 				return '24px';
@@ -8293,12 +8305,15 @@ var $author$project$Aoc17$viewBody = function (model) {
 			$cmditch$elm_bigint$BigInt$fromInt(177),
 			$cmditch$elm_bigint$BigInt$fromInt(377)));
 	var commandsStr = function () {
-		var _v2 = model.x;
-		if (!_v2.$) {
-			var ticks = _v2.a;
-			return $elm$core$String$fromFloat(ticks);
-		} else {
-			return 'booted';
+		var _v2 = model.y;
+		switch (_v2.$) {
+			case 0:
+				var ticks = _v2.a;
+				return $elm$core$String$fromFloat(ticks);
+			case 1:
+				return 'booted';
+			default:
+				return 'quining';
 		}
 	}();
 	var bigLen = $cmditch$elm_bigint$BigInt$fromInt(len);
@@ -8557,7 +8572,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick($author$project$Aoc17$UseInput),
-										$elm$html$Html$Attributes$checked(!model.y)
+										$elm$html$Html$Attributes$checked(!model.x)
 									]),
 								_List_Nil),
 								A2(
@@ -8573,7 +8588,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick($author$project$Aoc17$UseSample),
-										$elm$html$Html$Attributes$checked(model.y === 1)
+										$elm$html$Html$Attributes$checked(model.x === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -8609,17 +8624,6 @@ var $author$project$Aoc17$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text('Reboot')
-									])),
-								A2(
-								$elm$html$Html$button,
-								_List_fromArray(
-									[
-										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Aoc17$FindQuine)
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Quine')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -8705,34 +8709,6 @@ var $author$project$Aoc17$viewBody = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(commandsStr)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('DebugStr1 ' + debugStr1)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('DebugStr2 ' + debugStr2)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('DebugStr3 ' + debugStr3)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
 										$elm$html$Html$text(
 										'Step: ' + $elm$core$String$fromInt(model.O))
 									]))
@@ -8771,11 +8747,11 @@ var $author$project$Aoc17$view = function (model) {
 			[
 				$author$project$Aoc17$viewBody(model)
 			]),
-		a0: 'Advent of Code 2024 | Day 17: Chronospatial Computer'
+		a1: 'Advent of Code 2024 | Day 17: Chronospatial Computer'
 	};
 };
 var $author$project$Aoc17$main = $elm$browser$Browser$document(
-	{aR: $author$project$Aoc17$init, a$: $author$project$Aoc17$subscriptions, a1: $author$project$Aoc17$update, a2: $author$project$Aoc17$view});
+	{aS: $author$project$Aoc17$init, a0: $author$project$Aoc17$subscriptions, a2: $author$project$Aoc17$update, a3: $author$project$Aoc17$view});
 _Platform_export({'Aoc17':{'init':$author$project$Aoc17$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
 

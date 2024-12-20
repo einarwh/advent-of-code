@@ -31,7 +31,10 @@ main =
 
 type DataSource = Input | Sample | Quine 
 
-type BootStatus = Booting Float | Booted
+type DeviceStatus = Booting Float | Booted | Quining QuiningModel 
+
+type alias QuiningModel = 
+  { foo : Int }
 
 type alias Computer =
   { regA : BigInt
@@ -49,7 +52,7 @@ type alias Model =
   , dataSource : DataSource
   , backgroundColor : String
   , paused : Bool 
-  , bootStatus : BootStatus
+  , deviceStatus : DeviceStatus
   , tickInterval : Float
   , bootTickInterval : Float
   , blackoutTickInterval : Float
@@ -120,8 +123,8 @@ Program: 2,4,1,3,7,5,4,1,1,3,0,3,5,5,3,0"""
   in
     computer
 
-initModel : BootStatus -> DataSource -> Model
-initModel bootStatus dataSource =
+initModel : DeviceStatus -> DataSource -> Model
+initModel deviceStatus dataSource =
   let
     computer = initComputer dataSource
     model = { computer = computer
@@ -130,7 +133,7 @@ initModel bootStatus dataSource =
             , overwrittenA = ""
             , step = 0
             , backgroundColor = defaultBackgroundColor
-            , bootStatus = bootStatus
+            , deviceStatus = deviceStatus
             , paused = True 
             , tickInterval = 200
             , bootTickInterval = 1000
@@ -473,16 +476,17 @@ updateBackgroundColor color model =
 updateBootTick : Model -> Model
 updateBootTick model =
   let
-    bootStatus =
-      case model.bootStatus of
+    deviceStatus =
+      case model.deviceStatus of
         Booting ticks ->
           if ticks <= 6 * model.bootTickInterval then
             Booting (ticks + model.bootTickInterval)
           else
             Booted
         Booted -> Booted
+        Quining qm -> Quining qm
   in
-    { model | bootStatus = bootStatus }
+    { model | deviceStatus = deviceStatus }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -554,9 +558,10 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
   let
     tick =
-      case model.bootStatus of
+      case model.deviceStatus of
         Booted -> if model.paused then Sub.none else Time.every model.tickInterval (\_ -> Tick)
         Booting _ -> Sub.batch [ Time.every model.bootTickInterval (\_ -> BootTick), Time.every model.blackoutTickInterval (\_ -> BlackoutTick) ]
+        Quining _ -> Sub.none
     defaultBackgroundTick = Time.every 277 (\_ -> DefaultBackgroundTick)
     darkBackgroundTick = Time.every model.darkBackgroundTickInterval (\_ -> DarkBackgroundTick)
     lightBackgroundTick = Time.every model.lightBackgroundTickInterval (\_ -> LightBackgroundTick)
@@ -643,7 +648,7 @@ toSvg model =
     viewBoxStr = "0 0 " ++ svgWidth ++ " " ++ svgHeight
     backgroundColor = model.backgroundColor
     elements =
-      case model.bootStatus of
+      case model.deviceStatus of
         Booting ticks ->
           if model.backgroundColor == blackoutColor && ((floor ticks // floor model.blackoutTickInterval) |> modBy 2) == 0 then 
             toBlackoutElements model ticks
@@ -651,6 +656,8 @@ toSvg model =
             toBootingElements model ticks
         Booted ->
           toBootedElements model
+        Quining _ -> 
+          toBootedElements model 
   in
     svg
       [ viewBox viewBoxStr
@@ -669,9 +676,10 @@ viewBody : Model -> Html Msg
 viewBody model =
   let
     commandsStr =
-      case model.bootStatus of
+      case model.deviceStatus of
         Booting ticks -> String.fromFloat ticks
         Booted -> "booted"
+        Quining _ -> "quining"
     textFontSize =
       case model.dataSource of
         Sample -> "24px"
@@ -798,9 +806,9 @@ viewBody model =
               [ Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Clear ] 
                 [ Html.text "Reboot" ]
-              , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick FindQuine ] 
-                [ Html.text "Quine" ]
+              -- , Html.button 
+              --   [ Html.Attributes.style "width" "80px", onClick FindQuine ] 
+              --   [ Html.text "Quine" ]
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Slower ] 
                 [ Html.text "Turtle" ]
@@ -831,10 +839,10 @@ viewBody model =
                       Html.Attributes.value model.overwrittenA
                     , onInput OverwriteRegA ] 
                     []
-              , Html.div [] [ Html.text commandsStr ]
-              , Html.div [] [ Html.text ("DebugStr1 " ++ debugStr1) ]
-              , Html.div [] [ Html.text ("DebugStr2 " ++ debugStr2) ]
-              , Html.div [] [ Html.text ("DebugStr3 " ++ debugStr3) ]
+              -- , Html.div [] [ Html.text commandsStr ]
+              -- , Html.div [] [ Html.text ("DebugStr1 " ++ debugStr1) ]
+              -- , Html.div [] [ Html.text ("DebugStr2 " ++ debugStr2) ]
+              -- , Html.div [] [ Html.text ("DebugStr3 " ++ debugStr3) ]
               -- , Html.div [] [ Html.text ("DebugStr4 (bigXor) " ++ debugStr4) ]
               -- , Html.div [] [ Html.text ("DebugStr5 (intXor) " ++ debugStr5) ]
               -- , Html.div [] [ Html.text ("DebugStr6 (177 as bits) " ++ debugStr6 ++ " *") ]
