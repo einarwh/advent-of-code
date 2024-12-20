@@ -18,17 +18,9 @@ module Array2D =
         let colCount = a.GetLength(1)
         [for x in [0..colCount-1] do for y in [0..rowCount-1] -> (x, y)]
 
-type Dir = N | W | S | E
-
 type Pos = (int * int)
 
-type Racetrack = char[,]
-
-type Path = { pos : Pos; dir : Dir }
-
-type Distance = int
-
-type PQ = PriorityQueue<Pos * Distance * (Pos * Distance) list, Distance>
+type PQ = PriorityQueue<Pos * int * (Pos * int) list, int>
 
 let getNeighbours (x, y) =
     [ (x, y - 1); (x - 1, y); (x, y + 1); (x + 1, y) ]
@@ -36,8 +28,8 @@ let getNeighbours (x, y) =
 let isWall racetrack pos  =
     '#' = Array2D.getPos racetrack pos
 
-let race (startPos : Pos) (racetrack : Racetrack)  =
-    let rec loop (visited : Set<Pos>, q : PQ) =
+let race startPos racetrack =
+    let rec loop (visited, q : PQ) =
         if q.Count = 0 then []
         else
             let (pos, distance, posDistList) = q.Dequeue()
@@ -63,16 +55,10 @@ let race (startPos : Pos) (racetrack : Racetrack)  =
     queue.Enqueue((startPos, 0, []), 0)
     loop (Set.empty, queue) |> List.rev 
 
-let findStartPos (racetrack : Racetrack) : Pos =
-    let rec find positions =
-        match positions with
-        | [] -> failwith "?"
-        | pos :: rest ->
-            if (Array2D.getPos racetrack pos) = 'S' then pos
-            else find rest
-    find <| Array2D.positions racetrack
+let findStartPos racetrack =
+    racetrack |> Array2D.positions |> List.find (fun pos -> (Array2D.getPos racetrack pos) = 'S')
 
-let getReachablesInDuration (cheatDuration : int) (x, y) : Pos list=
+let getReachablesInDuration cheatDuration (x, y) =
     let chooser (x, y) (dx, dy) = 
         let len = abs dx + abs dy 
         if len > 0 && len <= cheatDuration then Some (x + dx, y + dy) else None 
@@ -82,21 +68,22 @@ let getReachablesInDuration (cheatDuration : int) (x, y) : Pos list=
 let posDiff (x1, y1) (x2, y2) = 
     abs (x2 - x1) + abs (y2 - y1) 
 
-let findCheats cheatDuration (posDistMap : Map<Pos, Distance>) (pos, dist) =
+let findCheats cheatDuration posDistMap (pos, dist) =
+    let diffChooser (p, cheatDiff) = 
+        let diff = cheatDiff - posDiff pos p 
+        if diff > 0 then Some diff else None
     getReachablesInDuration cheatDuration pos
-    |> List.choose (fun (p : Pos) -> Map.tryFind p posDistMap |> Option.map (fun d -> (p, d - dist)))
-    |> List.choose (fun (p, diff) -> if diff - (posDiff pos p) > 0 then Some (pos, p, diff - (posDiff pos p)) else None)
+    |> List.choose (fun p -> Map.tryFind p posDistMap |> Option.map (fun d -> (p, d - dist)))
+    |> List.choose (diffChooser)
 
 let readLines =
     File.ReadAllLines >> Array.filter ((<>) String.Empty)
 
 let solve cheatDuration posDistList = 
     let stopwatch = Stopwatch.StartNew()
-    let posDistMap = Map.ofList posDistList
-    let result = posDistList |> List.collect (findCheats cheatDuration posDistMap) |> List.sortBy (fun (p1, p2, saved) -> saved) |> List.rev
-    let savings = result |> List.map (fun (_, _, saved) -> saved)
-    savings |> List.filter (fun saved -> saved >= 100) |> List.length |> printfn "%d"
-    printfn "%A ms" stopwatch.Elapsed.TotalMilliseconds
+    let savings = posDistList |> List.collect (findCheats cheatDuration (Map.ofList posDistList)) 
+    let count = savings |> List.filter ((<=) 100) |> List.length 
+    printfn "%d (%d ms)" count (int stopwatch.Elapsed.TotalMilliseconds)
 
 let run fileName =
     let lines = readLines fileName |> Array.map (Seq.toArray)

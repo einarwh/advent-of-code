@@ -5352,7 +5352,7 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$document = _Browser_document;
 var $author$project$Aoc17$Booted = {$: 1};
-var $author$project$Aoc17$Quine = 2;
+var $author$project$Aoc17$Input = 0;
 var $author$project$Aoc17$defaultBackgroundColor = '#808080';
 var $cmditch$elm_bigint$BigInt$BigIntNotNormalised = F2(
 	function (a, b) {
@@ -5987,7 +5987,7 @@ var $author$project$Aoc17$parseComputer = function (data) {
 		return {
 			H: _List_Nil,
 			p: 0,
-			n: $author$project$Aoc17$parseProgram(p),
+			k: $author$project$Aoc17$parseProgram(p),
 			h: $author$project$Aoc17$parseRegister(a),
 			v: $author$project$Aoc17$parseRegister(b),
 			D: $author$project$Aoc17$parseRegister(c)
@@ -5996,7 +5996,7 @@ var $author$project$Aoc17$parseComputer = function (data) {
 		return {
 			H: _List_Nil,
 			p: 0,
-			n: $elm$core$Array$empty,
+			k: $elm$core$Array$empty,
 			h: $cmditch$elm_bigint$BigInt$fromInt(0),
 			v: $cmditch$elm_bigint$BigInt$fromInt(0),
 			D: $cmditch$elm_bigint$BigInt$fromInt(0)
@@ -6024,14 +6024,14 @@ var $author$project$Aoc17$initComputer = function (dataSource) {
 var $author$project$Aoc17$initModel = F2(
 	function (bootStatus, dataSource) {
 		var computer = $author$project$Aoc17$initComputer(dataSource);
-		var model = {L: $author$project$Aoc17$defaultBackgroundColor, T: 1111, x: bootStatus, s: 1000, f: computer, U: 177, y: dataSource, ah: '', X: computer.h, V: 477, N: '', B: true, O: 0, E: 200};
+		var model = {L: $author$project$Aoc17$defaultBackgroundColor, T: 1111, x: bootStatus, s: 1000, e: computer, U: 177, y: dataSource, ah: '', X: computer.h, V: 477, N: '', B: true, O: 0, E: 200};
 		return model;
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Aoc17$init = function (_v0) {
 	return _Utils_Tuple2(
-		A2($author$project$Aoc17$initModel, $author$project$Aoc17$Booted, 2),
+		A2($author$project$Aoc17$initModel, $author$project$Aoc17$Booted, 0),
 		$elm$core$Platform$Cmd$none);
 };
 var $author$project$Aoc17$BlackoutTick = {$: 9};
@@ -6500,7 +6500,6 @@ var $author$project$Aoc17$subscriptions = function (model) {
 		_List_fromArray(
 			[tick, defaultBackgroundTick, darkBackgroundTick, lightBackgroundTick]));
 };
-var $author$project$Aoc17$Input = 0;
 var $author$project$Aoc17$Sample = 1;
 var $author$project$Aoc17$blackoutColor = '#404040';
 var $author$project$Aoc17$darkBackgroundColor = '#696969';
@@ -6519,7 +6518,7 @@ var $author$project$Aoc17$updateBootTick = function (model) {
 		var _v0 = model.x;
 		if (!_v0.$) {
 			var ticks = _v0.a;
-			return (_Utils_cmp(ticks, 8 * model.s) < 1) ? $author$project$Aoc17$Booting(ticks + model.s) : $author$project$Aoc17$Booted;
+			return (_Utils_cmp(ticks, 6 * model.s) < 1) ? $author$project$Aoc17$Booting(ticks + model.s) : $author$project$Aoc17$Booted;
 		} else {
 			return $author$project$Aoc17$Booted;
 		}
@@ -6539,7 +6538,7 @@ var $author$project$Aoc17$updateDataSource = F2(
 		return _Utils_update(
 			model,
 			{
-				f: $author$project$Aoc17$initComputer(dataSource),
+				e: $author$project$Aoc17$initComputer(dataSource),
 				y: dataSource
 			});
 	});
@@ -7090,7 +7089,7 @@ var $author$project$Aoc17$literal = function (computer) {
 	return A2(
 		$elm$core$Maybe$withDefault,
 		0,
-		A2($elm$core$Array$get, pt + 1, computer.n));
+		A2($elm$core$Array$get, pt + 1, computer.k));
 };
 var $author$project$Aoc17$combo = function (computer) {
 	var _v0 = $author$project$Aoc17$literal(computer);
@@ -7445,7 +7444,7 @@ var $author$project$Aoc17$executeOpcode = F2(
 	});
 var $author$project$Aoc17$tryReadOpcode = function (computer) {
 	var pt = computer.p;
-	return A2($elm$core$Array$get, pt, computer.n);
+	return A2($elm$core$Array$get, pt, computer.k);
 };
 var $author$project$Aoc17$executeInstruction = function (computer) {
 	var _v0 = $author$project$Aoc17$tryReadOpcode(computer);
@@ -7457,21 +7456,30 @@ var $author$project$Aoc17$executeInstruction = function (computer) {
 			A2($author$project$Aoc17$executeOpcode, opcode, computer));
 	}
 };
+var $author$project$Aoc17$execute = function (computer) {
+	execute:
+	while (true) {
+		var _v0 = $author$project$Aoc17$executeInstruction(computer);
+		if (_v0.$ === 1) {
+			return computer.k;
+		} else {
+			var c = _v0.a;
+			var $temp$computer = c;
+			computer = $temp$computer;
+			continue execute;
+		}
+	}
+};
 var $author$project$Aoc17$checkTarget = F4(
 	function (computer, opIndex, target, candidateA) {
-		var maybeComputer = $author$project$Aoc17$executeInstruction(
+		var program = $author$project$Aoc17$execute(
 			_Utils_update(
 				computer,
 				{h: candidateA}));
-		if (!maybeComputer.$) {
-			var c = maybeComputer.a;
-			var _v1 = A2($elm$core$Array$get, opIndex, c.n);
-			if (!_v1.$) {
-				var n = _v1.a;
-				return _Utils_eq(n, target);
-			} else {
-				return false;
-			}
+		var _v0 = A2($elm$core$Array$get, opIndex, program);
+		if (!_v0.$) {
+			var n = _v0.a;
+			return _Utils_eq(n, target);
 		} else {
 			return false;
 		}
@@ -7499,19 +7507,20 @@ var $author$project$Aoc17$tryPick = F2(
 			}
 		}
 	});
-var $author$project$Aoc17$quineLoop = F4(
-	function (len, ix, computer, a) {
+var $author$project$Aoc17$quineLoop = F5(
+	function (len, ix, computer, sequence, a) {
 		var opIndex = len - ix;
 		var bigLen = $cmditch$elm_bigint$BigInt$fromInt(len);
 		var bigIx = $cmditch$elm_bigint$BigInt$fromInt(ix);
 		var big8 = $cmditch$elm_bigint$BigInt$fromInt(8);
 		if (_Utils_cmp(ix, len) > 0) {
-			return $elm$core$Maybe$Just(a);
+			return $elm$core$Maybe$Just(
+				_Utils_Tuple2(a, sequence));
 		} else {
 			var target = A2(
 				$elm$core$Maybe$withDefault,
-				0,
-				A2($elm$core$Array$get, opIndex, computer.n));
+				99999999,
+				A2($elm$core$Array$get, opIndex, computer.k));
 			var offset = A2(
 				$cmditch$elm_bigint$BigInt$pow,
 				big8,
@@ -7536,13 +7545,19 @@ var $author$project$Aoc17$quineLoop = F4(
 			return A2(
 				$author$project$Aoc17$tryPick,
 				function (ca) {
-					return A4($author$project$Aoc17$quineLoop, len, ix + 1, computer, ca);
+					return A5(
+						$author$project$Aoc17$quineLoop,
+						len,
+						ix + 1,
+						computer,
+						A2($elm$core$List$cons, ca, sequence),
+						ca);
 				},
 				candidates);
 		}
 	});
 var $author$project$Aoc17$quine = function (computer) {
-	var len = $elm$core$Array$length(computer.n);
+	var len = $elm$core$Array$length(computer.k);
 	var bigLen = $cmditch$elm_bigint$BigInt$fromInt(len);
 	var big8 = $cmditch$elm_bigint$BigInt$fromInt(8);
 	var big1 = $cmditch$elm_bigint$BigInt$fromInt(1);
@@ -7550,17 +7565,27 @@ var $author$project$Aoc17$quine = function (computer) {
 		$cmditch$elm_bigint$BigInt$pow,
 		big8,
 		A2($cmditch$elm_bigint$BigInt$sub, bigLen, big1));
-	return A4($author$project$Aoc17$quineLoop, len, 1, computer, a0);
+	var result = A5(
+		$author$project$Aoc17$quineLoop,
+		len,
+		1,
+		computer,
+		_List_fromArray(
+			[a0]),
+		a0);
+	return result;
 };
 var $author$project$Aoc17$updateFindQuine = function (model) {
-	var _v0 = $author$project$Aoc17$quine(model.f);
+	var _v0 = $author$project$Aoc17$quine(model.e);
 	if (!_v0.$) {
-		var a = _v0.a;
-		var computer = model.f;
+		var _v1 = _v0.a;
+		var a = _v1.a;
+		var sequence = _v1.b;
+		var computer = model.e;
 		return _Utils_update(
 			model,
 			{
-				f: _Utils_update(
+				e: _Utils_update(
 					computer,
 					{h: a})
 			});
@@ -7571,11 +7596,11 @@ var $author$project$Aoc17$updateFindQuine = function (model) {
 var $author$project$Aoc17$updateOverwriteRegA = F2(
 	function (overwrittenA, model) {
 		if ($elm$core$String$isEmpty(overwrittenA)) {
-			var computer = model.f;
+			var computer = model.e;
 			return _Utils_update(
 				model,
 				{
-					f: _Utils_update(
+					e: _Utils_update(
 						computer,
 						{h: model.X}),
 					N: ''
@@ -7584,11 +7609,11 @@ var $author$project$Aoc17$updateOverwriteRegA = F2(
 			var _v0 = $cmditch$elm_bigint$BigInt$fromIntString(overwrittenA);
 			if (!_v0.$) {
 				var a = _v0.a;
-				var computer = model.f;
+				var computer = model.e;
 				return _Utils_update(
 					model,
 					{
-						f: _Utils_update(
+						e: _Utils_update(
 							computer,
 							{h: a}),
 						N: overwrittenA
@@ -7607,10 +7632,10 @@ var $author$project$Aoc17$updateProgramRunning = F2(
 	function (computer, model) {
 		return _Utils_update(
 			model,
-			{f: computer, O: model.O + 1});
+			{e: computer, O: model.O + 1});
 	});
 var $author$project$Aoc17$updateStep = function (model) {
-	var _v0 = $author$project$Aoc17$executeInstruction(model.f);
+	var _v0 = $author$project$Aoc17$executeInstruction(model.e);
 	if (_v0.$ === 1) {
 		return $author$project$Aoc17$updateProgramFinished(model);
 	} else {
@@ -7965,7 +7990,7 @@ var $author$project$Aoc17$toBootedElements = function (model) {
 				$elm$svg$Svg$Attributes$fillOpacity('0.2')
 			]),
 		_List_Nil);
-	var computer = model.f;
+	var computer = model.e;
 	var outputsText = A2(
 		$elm$core$String$join,
 		',',
@@ -7990,7 +8015,7 @@ var $author$project$Aoc17$toBootedElements = function (model) {
 	var paddings = 1 + (2 * pointer);
 	var pointerText = (_Utils_cmp(
 		pointer,
-		$elm$core$Array$length(computer.n)) < 0) ? A3($elm$core$String$padLeft, paddings, ' ', '^') : '';
+		$elm$core$Array$length(computer.k)) < 0) ? A3($elm$core$String$padLeft, paddings, ' ', '^') : '';
 	var pointerHat = A2(
 		$elm$svg$Svg$text_,
 		_List_fromArray(
@@ -8011,7 +8036,7 @@ var $author$project$Aoc17$toBootedElements = function (model) {
 		A2(
 			$elm$core$List$map,
 			$elm$core$String$fromInt,
-			$elm$core$Array$toList(computer.n)));
+			$elm$core$Array$toList(computer.k)));
 	var programValue = A2(
 		$elm$svg$Svg$text_,
 		_List_fromArray(
@@ -8218,6 +8243,13 @@ var $author$project$Aoc17$viewBody = function (model) {
 	var qval = 108107566389757;
 	var numerator = $cmditch$elm_bigint$BigInt$fromInt(108107566389757);
 	var litcom = 3;
+	var len = $elm$core$Array$length(model.e.k);
+	var ix = 1;
+	var opIndex = len - ix;
+	var target = A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		A2($elm$core$Array$get, opIndex, model.e.k));
 	var elements = _List_Nil;
 	var denominator = A2(
 		$cmditch$elm_bigint$BigInt$pow,
@@ -8260,22 +8292,6 @@ var $author$project$Aoc17$viewBody = function (model) {
 			$author$project$Aoc17$bigXor,
 			$cmditch$elm_bigint$BigInt$fromInt(177),
 			$cmditch$elm_bigint$BigInt$fromInt(377)));
-	var debugStr2 = $cmditch$elm_bigint$BigInt$toString(
-		A2(
-			$elm$core$Maybe$withDefault,
-			$cmditch$elm_bigint$BigInt$fromInt(-100),
-			A2(
-				$cmditch$elm_bigint$BigInt$modBy,
-				$cmditch$elm_bigint$BigInt$fromInt(2),
-				$cmditch$elm_bigint$BigInt$fromInt(13))));
-	var debugStr1 = $cmditch$elm_bigint$BigInt$toString(
-		A2(
-			$elm$core$Maybe$withDefault,
-			$cmditch$elm_bigint$BigInt$fromInt(-100),
-			A2(
-				$cmditch$elm_bigint$BigInt$modBy,
-				$cmditch$elm_bigint$BigInt$fromInt(13),
-				$cmditch$elm_bigint$BigInt$fromInt(2))));
 	var commandsStr = function () {
 		var _v2 = model.x;
 		if (!_v2.$) {
@@ -8285,6 +8301,19 @@ var $author$project$Aoc17$viewBody = function (model) {
 			return 'booted';
 		}
 	}();
+	var bigLen = $cmditch$elm_bigint$BigInt$fromInt(len);
+	var bigIx = $cmditch$elm_bigint$BigInt$fromInt(ix);
+	var big8 = $cmditch$elm_bigint$BigInt$fromInt(8);
+	var offset = A2(
+		$cmditch$elm_bigint$BigInt$pow,
+		big8,
+		A2($cmditch$elm_bigint$BigInt$sub, bigLen, bigIx));
+	var big1 = $cmditch$elm_bigint$BigInt$fromInt(1);
+	var debugStr1 = $cmditch$elm_bigint$BigInt$toString(
+		A2(
+			$cmditch$elm_bigint$BigInt$pow,
+			big8,
+			A2($cmditch$elm_bigint$BigInt$sub, bigLen, big1)));
 	var big0 = $cmditch$elm_bigint$BigInt$fromInt(0);
 	var bbits = $author$project$Aoc17$toBits(
 		$cmditch$elm_bigint$BigInt$fromInt(377));
@@ -8295,14 +8324,14 @@ var $author$project$Aoc17$viewBody = function (model) {
 	var multed = A2(
 		$elm$core$List$indexedMap,
 		F2(
-			function (ix, b) {
+			function (i, b) {
 				return A2(
 					$cmditch$elm_bigint$BigInt$mul,
 					b,
 					A2(
 						$cmditch$elm_bigint$BigInt$pow,
 						$cmditch$elm_bigint$BigInt$fromInt(2),
-						$cmditch$elm_bigint$BigInt$fromInt(ix)));
+						$cmditch$elm_bigint$BigInt$fromInt(i)));
 			}),
 		xored);
 	var reconstructStr = $cmditch$elm_bigint$BigInt$toString(
@@ -8326,6 +8355,33 @@ var $author$project$Aoc17$viewBody = function (model) {
 				return '(' + ($cmditch$elm_bigint$BigInt$toString(a) + (', ' + ($cmditch$elm_bigint$BigInt$toString(b) + ')')));
 			},
 			zipped));
+	var a0 = A2(
+		$cmditch$elm_bigint$BigInt$pow,
+		big8,
+		A2($cmditch$elm_bigint$BigInt$sub, bigLen, big1));
+	var candidates = A2(
+		$elm$core$List$filterMap,
+		function (ca) {
+			return A4($author$project$Aoc17$checkTarget, model.e, opIndex, target, ca) ? $elm$core$Maybe$Just(ca) : $elm$core$Maybe$Nothing;
+		},
+		A2(
+			$elm$core$List$map,
+			function (j) {
+				return A2(
+					$cmditch$elm_bigint$BigInt$add,
+					a0,
+					A2($cmditch$elm_bigint$BigInt$mul, j, offset));
+			},
+			A2(
+				$elm$core$List$map,
+				$cmditch$elm_bigint$BigInt$fromInt,
+				A2($elm$core$List$range, 0, 7))));
+	var debugStr2 = $elm$core$String$fromInt(
+		$elm$core$List$length(candidates));
+	var debugStr3 = A2(
+		$elm$core$String$join,
+		' || ',
+		A2($elm$core$List$map, $cmditch$elm_bigint$BigInt$toString, candidates));
 	var _v0 = A2(
 		$elm$core$Maybe$withDefault,
 		_Utils_Tuple2(
@@ -8337,7 +8393,6 @@ var $author$project$Aoc17$viewBody = function (model) {
 			$cmditch$elm_bigint$BigInt$fromInt(2)));
 	var divVal = _v0.a;
 	var remVal = _v0.b;
-	var debugStr3 = '(' + ($cmditch$elm_bigint$BigInt$toString(divVal) + (',' + ($cmditch$elm_bigint$BigInt$toString(remVal) + ')')));
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
@@ -8651,6 +8706,27 @@ var $author$project$Aoc17$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(commandsStr)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('DebugStr1 ' + debugStr1)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('DebugStr2 ' + debugStr2)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('DebugStr3 ' + debugStr3)
 									])),
 								A2(
 								$elm$html$Html$div,

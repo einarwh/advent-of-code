@@ -143,7 +143,7 @@ initModel bootStatus dataSource =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel Booted Quine, Cmd.none)
+  (initModel Booted Input, Cmd.none)
   -- (initModel (Booting 0) Input, Cmd.none)
 
 -- UPDATE
@@ -197,6 +197,7 @@ combo computer =
     6 -> computer.regC
     _ -> BigInt.fromInt 0
 
+pow : number -> number -> number
 pow x y = if y < 1 then 1 else x * pow x (y - 1)
 
 writeA : BigInt -> Computer -> Computer 
@@ -361,6 +362,12 @@ executeInstruction computer =
     Nothing -> Nothing 
     Just opcode -> Just (executeOpcode opcode computer)
 
+execute : Computer -> Array Int 
+execute computer = 
+  case executeInstruction computer of 
+    Nothing -> computer.program
+    Just c -> execute c  
+
 -- let quine computer = 
 --     let len = computer.program |> Array.length
 --     let checkTarget opIndex target candidateA = 
@@ -386,16 +393,13 @@ executeInstruction computer =
 checkTarget : Computer -> Int -> Int -> BigInt -> Bool 
 checkTarget computer opIndex target candidateA = 
   let 
-    maybeComputer = executeInstruction { computer | regA = candidateA }
+    program = execute { computer | regA = candidateA }
   in 
-    case maybeComputer of 
-      Just c -> 
-        case Array.get opIndex c.program of 
-          Just n -> n == target
-          Nothing -> False 
+    case Array.get opIndex program of 
+      Just n -> n == target
       Nothing -> False 
 
-tryPick : (a -> Maybe a) -> List a -> Maybe a 
+tryPick : (a -> Maybe (a, List a)) -> List a -> Maybe (a, List a) 
 tryPick chooser lst = 
   case lst of 
     [] -> Nothing 
@@ -404,8 +408,8 @@ tryPick chooser lst =
         Nothing -> tryPick chooser rest 
         Just result -> Just result  
 
-quineLoop : Int -> Int -> Computer -> BigInt -> Maybe BigInt 
-quineLoop len ix computer a = 
+quineLoop : Int -> Int -> Computer -> List BigInt -> BigInt -> Maybe (BigInt, List BigInt) 
+quineLoop len ix computer sequence a = 
   let
     opIndex = len - ix 
     big8 = BigInt.fromInt 8
@@ -413,10 +417,10 @@ quineLoop len ix computer a =
     bigIx = BigInt.fromInt ix 
   in
     if ix > len then 
-      Just a 
+      Just (a, sequence) 
     else 
       let
-        target = Array.get opIndex computer.program |> Maybe.withDefault 0
+        target = Array.get opIndex computer.program |> Maybe.withDefault 99999999
         offset = BigInt.pow big8 (BigInt.sub bigLen bigIx) 
         candidates = 
           List.range 0 7 
@@ -425,15 +429,9 @@ quineLoop len ix computer a =
           |> List.filterMap (\ca -> if checkTarget computer opIndex target ca then Just ca else Nothing)
       in
         candidates
-        |> tryPick (\ca -> quineLoop len (ix + 1) computer ca)
+        |> tryPick (\ca -> quineLoop len (ix + 1) computer (ca :: sequence) ca)
 
-    -- let a0 = pow 8L ((int64 len) - 1L)
-    -- match loop 1 a0 with 
-    -- | Some a -> a 
-    -- | None -> failwith ":("
-
-
-quine : Computer -> Maybe BigInt  
+quine : Computer -> Maybe (BigInt, List BigInt)  
 quine computer = 
   let
     len = computer.program |> Array.length
@@ -442,8 +440,9 @@ quine computer =
     bigLen = BigInt.fromInt len 
  
     a0 = BigInt.pow big8 (BigInt.sub bigLen big1)
+    result = quineLoop len 1 computer [a0] a0
   in
-    quineLoop len 1 computer a0
+    result
 
 updateClear : Model -> Model
 updateClear model =
@@ -477,7 +476,7 @@ updateBootTick model =
     bootStatus =
       case model.bootStatus of
         Booting ticks ->
-          if ticks <= 8 * model.bootTickInterval then
+          if ticks <= 6 * model.bootTickInterval then
             Booting (ticks + model.bootTickInterval)
           else
             Booted
@@ -507,7 +506,7 @@ updateOverwriteRegA overwrittenA model =
 updateFindQuine : Model -> Model
 updateFindQuine model = 
   case quine model.computer of 
-    Just a -> 
+    Just (a, sequence) -> 
       let
         computer = model.computer 
       in
@@ -687,9 +686,29 @@ viewBody model =
     regB = BigInt.fromInt 6 
     -- (BigInt.fromInt (Bitwise.xor (literal computer) (computer.regB |> shrinkInt)))
     (divVal, remVal) = (BigInt.divmod (BigInt.fromInt 13) (BigInt.fromInt 2)) |> Maybe.withDefault (BigInt.fromInt 0, BigInt.fromInt 0)
-    debugStr1 = BigInt.toString (BigInt.modBy (BigInt.fromInt 13) (BigInt.fromInt 2) |> Maybe.withDefault (BigInt.fromInt -100))
-    debugStr2 = BigInt.toString (BigInt.modBy (BigInt.fromInt 2) (BigInt.fromInt 13) |> Maybe.withDefault (BigInt.fromInt -100))
-    debugStr3 = "(" ++ BigInt.toString divVal ++ "," ++ BigInt.toString remVal ++ ")"
+    big1 = BigInt.fromInt 1
+    big8 = BigInt.fromInt 8
+    len = model.computer.program |> Array.length
+    bigLen = BigInt.fromInt len 
+    ix = 1
+    bigIx = BigInt.fromInt ix
+    opIndex = len - ix 
+    target = Array.get opIndex model.computer.program |> Maybe.withDefault 0
+    offset = BigInt.pow big8 (BigInt.sub bigLen bigIx) 
+    a0 = BigInt.pow big8 (BigInt.sub bigLen big1)
+    -- a = a0
+    candidates = 
+          List.range 0 7 
+          |> List.map (BigInt.fromInt)
+          |> List.map (\j -> BigInt.add a0 (BigInt.mul j offset))
+          |> List.filterMap (\ca -> if checkTarget model.computer opIndex target ca then Just ca else Nothing)
+    debugStr3 = candidates |> List.map (BigInt.toString) |> String.join " || "
+    debugStr2 = List.length candidates |> String.fromInt 
+ 
+    debugStr1 = BigInt.pow big8 (BigInt.sub bigLen big1) |> BigInt.toString
+    -- debugStr1 = BigInt.toString (BigInt.modBy (BigInt.fromInt 13) (BigInt.fromInt 2) |> Maybe.withDefault (BigInt.fromInt -100))
+    -- debugStr2 = BigInt.toString (BigInt.modBy (BigInt.fromInt 2) (BigInt.fromInt 13) |> Maybe.withDefault (BigInt.fromInt -100))
+    -- debugStr3 = "(" ++ BigInt.toString divVal ++ "," ++ BigInt.toString remVal ++ ")"
     debugStr4 = (bigXor (BigInt.fromInt 177) (BigInt.fromInt 377)) |> BigInt.toString
     debugStr5 = (Bitwise.xor 177 377) |> String.fromInt
     debugStr6 = (BigInt.fromInt 177) |> toBits |> List.map (BigInt.toString) |> String.join " "
@@ -702,7 +721,7 @@ viewBody model =
     zipped = zipWithDefaults big0 big0 abits bbits
     xored = zipped |> List.map bitXor
     xoredStr = xored |> List.map (BigInt.toString) |> String.join " "
-    multed = xored |> List.indexedMap (\ix b -> BigInt.mul b (BigInt.pow (BigInt.fromInt 2) (BigInt.fromInt ix)))
+    multed = xored |> List.indexedMap (\i b -> BigInt.mul b (BigInt.pow (BigInt.fromInt 2) (BigInt.fromInt i)))
 
     reconstructStr = xored |> fromBitsLoop (BigInt.fromInt 0) (BigInt.fromInt 2) |> BigInt.toString
     zippedStr = zipped |> List.map (\(a, b) -> "(" ++ BigInt.toString a ++ ", " ++ BigInt.toString b ++ ")") |> String.join ":"
@@ -813,9 +832,9 @@ viewBody model =
                     , onInput OverwriteRegA ] 
                     []
               , Html.div [] [ Html.text commandsStr ]
-              -- , Html.div [] [ Html.text ("DebugStr1 " ++ debugStr1) ]
-              -- , Html.div [] [ Html.text ("DebugStr2 " ++ debugStr2) ]
-              -- , Html.div [] [ Html.text ("DebugStr3 " ++ debugStr3) ]
+              , Html.div [] [ Html.text ("DebugStr1 " ++ debugStr1) ]
+              , Html.div [] [ Html.text ("DebugStr2 " ++ debugStr2) ]
+              , Html.div [] [ Html.text ("DebugStr3 " ++ debugStr3) ]
               -- , Html.div [] [ Html.text ("DebugStr4 (bigXor) " ++ debugStr4) ]
               -- , Html.div [] [ Html.text ("DebugStr5 (intXor) " ++ debugStr5) ]
               -- , Html.div [] [ Html.text ("DebugStr6 (177 as bits) " ++ debugStr6 ++ " *") ]
