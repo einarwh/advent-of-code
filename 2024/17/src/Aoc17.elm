@@ -163,6 +163,7 @@ type Msg =
   | DarkBackgroundTick
   | LightBackgroundTick
   | OverwriteRegA String
+  | FindQuine 
 
 tryReadOpcode : Computer -> Maybe Int 
 tryReadOpcode computer = 
@@ -432,9 +433,10 @@ quineLoop len ix computer a =
     -- | None -> failwith ":("
 
 
-quine : Int -> Computer -> Maybe BigInt  
-quine len computer = 
+quine : Computer -> Maybe BigInt  
+quine computer = 
   let
+    len = computer.program |> Array.length
     big1 = BigInt.fromInt 1
     big8 = BigInt.fromInt 8
     bigLen = BigInt.fromInt len 
@@ -502,6 +504,17 @@ updateOverwriteRegA overwrittenA model =
       Nothing -> 
         model
 
+updateFindQuine : Model -> Model
+updateFindQuine model = 
+  case quine model.computer of 
+    Just a -> 
+      let
+        computer = model.computer 
+      in
+        { model | computer = { computer | regA = a } }
+    Nothing -> 
+      model 
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
@@ -533,6 +546,8 @@ update msg model =
       (updateBackgroundColor lightBackgroundColor { model | lightBackgroundTickInterval = 7977 }, Cmd.none)
     OverwriteRegA overwrittenA -> 
       (updateOverwriteRegA overwrittenA model, Cmd.none)
+    FindQuine -> 
+      (updateFindQuine model, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -764,6 +779,9 @@ viewBody model =
               [ Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Clear ] 
                 [ Html.text "Reboot" ]
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick FindQuine ] 
+                [ Html.text "Quine" ]
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Slower ] 
                 [ Html.text "Turtle" ]
