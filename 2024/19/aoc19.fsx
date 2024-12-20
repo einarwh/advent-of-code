@@ -11,6 +11,8 @@ let split (splitter : string) (input : string) = input.Split(splitter)
 
 let startsWith (input : string) (prefix : string) = input.StartsWith(prefix)
 
+let substring n (input : string) = input.Substring(n)
+
 let memoize f =
     let cache = ConcurrentDictionary()
     let rec recur x =
@@ -23,7 +25,7 @@ let createChecker towels =
         else 
             towels 
             |> List.filter (startsWith pattern)
-            |> List.sumBy (fun c -> recur (pattern.Substring(String.length c)))
+            |> List.sumBy (fun c -> recur (pattern |> substring (String.length c)))
 
 let run fileName =
     let text = File.ReadAllText fileName |> trim |> split "\n\n"
