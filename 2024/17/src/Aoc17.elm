@@ -29,9 +29,15 @@ main =
 
 -- MODEL
 
-type DataSource = Input | Sample | Quine 
+type DataSource = 
+  Input 
+  | Sample 
+  -- | Quine 
 
-type DeviceStatus = Booting Float | Booted | Quining QuiningModel 
+type DeviceStatus = 
+  Booting Float 
+  | Booted 
+  -- | Quining QuiningModel 
 
 type alias QuiningModel = 
   { foo : Int }
@@ -52,6 +58,7 @@ type alias Model =
   , dataSource : DataSource
   , backgroundColor : String
   , paused : Bool 
+  , finished : Bool 
   , deviceStatus : DeviceStatus
   , tickInterval : Float
   , bootTickInterval : Float
@@ -109,16 +116,16 @@ Register B: 0
 Register C: 0
 
 Program: 2,4,1,3,7,5,4,1,1,3,0,3,5,5,3,0"""
-    quineData = """Register A: 108107566389757
-Register B: 0
-Register C: 0
+--     quineData = """Register A: 108107566389757
+-- Register B: 0
+-- Register C: 0
 
-Program: 2,4,1,3,7,5,4,1,1,3,0,3,5,5,3,0"""
+-- Program: 2,4,1,3,7,5,4,1,1,3,0,3,5,5,3,0"""
     data =
       case dataSource of
         Sample -> sample
         Input -> input
-        Quine -> quineData
+        -- Quine -> quineData
     computer = parseComputer data
   in
     computer
@@ -135,6 +142,7 @@ initModel deviceStatus dataSource =
             , backgroundColor = defaultBackgroundColor
             , deviceStatus = deviceStatus
             , paused = True 
+            , finished = False
             , tickInterval = 200
             , bootTickInterval = 1000
             , blackoutTickInterval = 1111
@@ -146,13 +154,14 @@ initModel deviceStatus dataSource =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel Booted Input, Cmd.none)
-  -- (initModel (Booting 0) Input, Cmd.none)
+  -- (initModel Booted Input, Cmd.none)
+  (initModel (Booting 0) Input, Cmd.none)
 
 -- UPDATE
 
 type Msg =
-  Clear
+  Reboot 
+  | Reset 
   | Tick 
   | TogglePlay
   | Faster
@@ -166,7 +175,7 @@ type Msg =
   | DarkBackgroundTick
   | LightBackgroundTick
   | OverwriteRegA String
-  | FindQuine 
+  -- | FindQuine 
 
 tryReadOpcode : Computer -> Maybe Int 
 tryReadOpcode computer = 
@@ -393,67 +402,75 @@ execute computer =
 --     | Some a -> a 
 --     | None -> failwith ":("
 
-checkTarget : Computer -> Int -> Int -> BigInt -> Bool 
-checkTarget computer opIndex target candidateA = 
-  let 
-    program = execute { computer | regA = candidateA }
-  in 
-    case Array.get opIndex program of 
-      Just n -> n == target
-      Nothing -> False 
+-- checkTarget : Computer -> Int -> Int -> BigInt -> Bool 
+-- checkTarget computer opIndex target candidateA = 
+--   let 
+--     program = execute { computer | regA = candidateA }
+--   in 
+--     case Array.get opIndex program of 
+--       Just n -> n == target
+--       Nothing -> False 
 
-tryPick : (a -> Maybe (a, List a)) -> List a -> Maybe (a, List a) 
-tryPick chooser lst = 
-  case lst of 
-    [] -> Nothing 
-    a :: rest ->
-      case chooser a of 
-        Nothing -> tryPick chooser rest 
-        Just result -> Just result  
+-- tryPick : (a -> Maybe (a, List a)) -> List a -> Maybe (a, List a) 
+-- tryPick chooser lst = 
+--   case lst of 
+--     [] -> Nothing 
+--     a :: rest ->
+--       case chooser a of 
+--         Nothing -> tryPick chooser rest 
+--         Just result -> Just result  
 
-quineLoop : Int -> Int -> Computer -> List BigInt -> BigInt -> Maybe (BigInt, List BigInt) 
-quineLoop len ix computer sequence a = 
-  let
-    opIndex = len - ix 
-    big8 = BigInt.fromInt 8
-    bigLen = BigInt.fromInt len 
-    bigIx = BigInt.fromInt ix 
-  in
-    if ix > len then 
-      Just (a, sequence) 
-    else 
-      let
-        target = Array.get opIndex computer.program |> Maybe.withDefault 99999999
-        offset = BigInt.pow big8 (BigInt.sub bigLen bigIx) 
-        candidates = 
-          List.range 0 7 
-          |> List.map (BigInt.fromInt)
-          |> List.map (\j -> BigInt.add a (BigInt.mul j offset))
-          |> List.filterMap (\ca -> if checkTarget computer opIndex target ca then Just ca else Nothing)
-      in
-        candidates
-        |> tryPick (\ca -> quineLoop len (ix + 1) computer (ca :: sequence) ca)
+-- quineLoop : Int -> Int -> Computer -> List BigInt -> BigInt -> Maybe (BigInt, List BigInt) 
+-- quineLoop len ix computer sequence a = 
+--   let
+--     opIndex = len - ix 
+--     big8 = BigInt.fromInt 8
+--     bigLen = BigInt.fromInt len 
+--     bigIx = BigInt.fromInt ix 
+--   in
+--     if ix > len then 
+--       Just (a, sequence) 
+--     else 
+--       let
+--         target = Array.get opIndex computer.program |> Maybe.withDefault 99999999
+--         offset = BigInt.pow big8 (BigInt.sub bigLen bigIx) 
+--         candidates = 
+--           List.range 0 7 
+--           |> List.map (BigInt.fromInt)
+--           |> List.map (\j -> BigInt.add a (BigInt.mul j offset))
+--           |> List.filterMap (\ca -> if checkTarget computer opIndex target ca then Just ca else Nothing)
+--       in
+--         candidates
+--         |> tryPick (\ca -> quineLoop len (ix + 1) computer (ca :: sequence) ca)
 
-quine : Computer -> Maybe (BigInt, List BigInt)  
-quine computer = 
-  let
-    len = computer.program |> Array.length
-    big1 = BigInt.fromInt 1
-    big8 = BigInt.fromInt 8
-    bigLen = BigInt.fromInt len 
+-- quine : Computer -> Maybe (BigInt, List BigInt)  
+-- quine computer = 
+--   let
+--     len = computer.program |> Array.length
+--     big1 = BigInt.fromInt 1
+--     big8 = BigInt.fromInt 8
+--     bigLen = BigInt.fromInt len 
  
-    a0 = BigInt.pow big8 (BigInt.sub bigLen big1)
-    result = quineLoop len 1 computer [a0] a0
-  in
-    result
+--     a0 = BigInt.pow big8 (BigInt.sub bigLen big1)
+--     result = quineLoop len 1 computer [a0] a0
+--   in
+--     result
 
-updateClear : Model -> Model
-updateClear model =
+updateReboot : Model -> Model
+updateReboot model =
   initModel (Booting 0) model.dataSource
+
+updateReset : Model -> Model
+updateReset model =
+  let
+    computer = model.computer 
+    c = { computer | pointer = 0, outputs = [] }
+  in
+    { model | computer = c}
 
 updateProgramFinished : Model -> Model
 updateProgramFinished model = 
-  { model | paused = True } 
+  { model | paused = True, finished = True  } 
 
 updateProgramRunning : Computer -> Model -> Model
 updateProgramRunning computer model = 
@@ -484,13 +501,21 @@ updateBootTick model =
           else
             Booted
         Booted -> Booted
-        Quining qm -> Quining qm
+        -- Quining qm -> Quining qm
   in
     { model | deviceStatus = deviceStatus }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
-  { model | paused = not model.paused }
+  if model.finished then 
+    let
+      m = initModel Booted model.dataSource 
+      computer = m.computer 
+      c = { computer | regA = model.computer.regA }
+    in
+      { m | paused = False, overwrittenA = model.overwrittenA, computer = c }
+  else
+    { model | paused = not model.paused }
 
 updateOverwriteRegA : String -> Model -> Model
 updateOverwriteRegA overwrittenA model = 
@@ -507,22 +532,24 @@ updateOverwriteRegA overwrittenA model =
       Nothing -> 
         model
 
-updateFindQuine : Model -> Model
-updateFindQuine model = 
-  case quine model.computer of 
-    Just (a, sequence) -> 
-      let
-        computer = model.computer 
-      in
-        { model | computer = { computer | regA = a } }
-    Nothing -> 
-      model 
+-- updateFindQuine : Model -> Model
+-- updateFindQuine model = 
+--   case quine model.computer of 
+--     Just (a, sequence) -> 
+--       let
+--         computer = model.computer 
+--       in
+--         { model | computer = { computer | regA = a } }
+--     Nothing -> 
+--       model 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    Clear ->
-      (updateClear model, Cmd.none)
+    Reboot ->
+      (updateReboot model, Cmd.none)
+    Reset ->
+      (updateReset model, Cmd.none)
     Step ->
       (updateStep model, Cmd.none)
     Tick ->
@@ -549,8 +576,8 @@ update msg model =
       (updateBackgroundColor lightBackgroundColor { model | lightBackgroundTickInterval = 7977 }, Cmd.none)
     OverwriteRegA overwrittenA -> 
       (updateOverwriteRegA overwrittenA model, Cmd.none)
-    FindQuine -> 
-      (updateFindQuine model, Cmd.none)
+    -- FindQuine -> 
+    --   (updateFindQuine model, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -561,7 +588,7 @@ subscriptions model =
       case model.deviceStatus of
         Booted -> if model.paused then Sub.none else Time.every model.tickInterval (\_ -> Tick)
         Booting _ -> Sub.batch [ Time.every model.bootTickInterval (\_ -> BootTick), Time.every model.blackoutTickInterval (\_ -> BlackoutTick) ]
-        Quining _ -> Sub.none
+        -- Quining _ -> Sub.none
     defaultBackgroundTick = Time.every 277 (\_ -> DefaultBackgroundTick)
     darkBackgroundTick = Time.every model.darkBackgroundTickInterval (\_ -> DarkBackgroundTick)
     lightBackgroundTick = Time.every model.lightBackgroundTickInterval (\_ -> LightBackgroundTick)
@@ -656,8 +683,8 @@ toSvg model =
             toBootingElements model ticks
         Booted ->
           toBootedElements model
-        Quining _ -> 
-          toBootedElements model 
+        -- Quining _ -> 
+        --   toBootedElements model 
   in
     svg
       [ viewBox viewBoxStr
@@ -675,68 +702,11 @@ view model =
 viewBody : Model -> Html Msg
 viewBody model =
   let
-    commandsStr =
-      case model.deviceStatus of
-        Booting ticks -> String.fromFloat ticks
-        Booted -> "booted"
-        Quining _ -> "quining"
-    textFontSize =
-      case model.dataSource of
-        Sample -> "24px"
-        Input -> "14px"
-        Quine -> "14px"
-    elements = []
     s = toSvg model
-    qval = toFloat 108107566389757
-    denom = toFloat (pow 2 6)
-    res = qval / denom |> floor
-    litcom = 3
-    regB = BigInt.fromInt 6 
-    -- (BigInt.fromInt (Bitwise.xor (literal computer) (computer.regB |> shrinkInt)))
-    (divVal, remVal) = (BigInt.divmod (BigInt.fromInt 13) (BigInt.fromInt 2)) |> Maybe.withDefault (BigInt.fromInt 0, BigInt.fromInt 0)
-    big1 = BigInt.fromInt 1
-    big8 = BigInt.fromInt 8
-    len = model.computer.program |> Array.length
-    bigLen = BigInt.fromInt len 
-    ix = 1
-    bigIx = BigInt.fromInt ix
-    opIndex = len - ix 
-    target = Array.get opIndex model.computer.program |> Maybe.withDefault 0
-    offset = BigInt.pow big8 (BigInt.sub bigLen bigIx) 
-    a0 = BigInt.pow big8 (BigInt.sub bigLen big1)
-    -- a = a0
-    candidates = 
-          List.range 0 7 
-          |> List.map (BigInt.fromInt)
-          |> List.map (\j -> BigInt.add a0 (BigInt.mul j offset))
-          |> List.filterMap (\ca -> if checkTarget model.computer opIndex target ca then Just ca else Nothing)
-    debugStr3 = candidates |> List.map (BigInt.toString) |> String.join " || "
-    debugStr2 = List.length candidates |> String.fromInt 
- 
-    debugStr1 = BigInt.pow big8 (BigInt.sub bigLen big1) |> BigInt.toString
-    -- debugStr1 = BigInt.toString (BigInt.modBy (BigInt.fromInt 13) (BigInt.fromInt 2) |> Maybe.withDefault (BigInt.fromInt -100))
-    -- debugStr2 = BigInt.toString (BigInt.modBy (BigInt.fromInt 2) (BigInt.fromInt 13) |> Maybe.withDefault (BigInt.fromInt -100))
-    -- debugStr3 = "(" ++ BigInt.toString divVal ++ "," ++ BigInt.toString remVal ++ ")"
-    debugStr4 = (bigXor (BigInt.fromInt 177) (BigInt.fromInt 377)) |> BigInt.toString
-    debugStr5 = (Bitwise.xor 177 377) |> String.fromInt
-    debugStr6 = (BigInt.fromInt 177) |> toBits |> List.map (BigInt.toString) |> String.join " "
-    debugStr7 = (BigInt.fromInt 377) |> toBits |> List.map (BigInt.toString) |> String.join " "
-    debugStr8 = (BigInt.fromInt 13) |> toBits |> List.map (BigInt.toString) |> String.join " "
-    debugStr9 = if BigInt.gt (BigInt.fromInt 13) (BigInt.fromInt 7) then "13" else "7"
-    big0 = BigInt.fromInt 0
-    abits = toBits (BigInt.fromInt 177)
-    bbits = toBits (BigInt.fromInt 377)
-    zipped = zipWithDefaults big0 big0 abits bbits
-    xored = zipped |> List.map bitXor
-    xoredStr = xored |> List.map (BigInt.toString) |> String.join " "
-    multed = xored |> List.indexedMap (\i b -> BigInt.mul b (BigInt.pow (BigInt.fromInt 2) (BigInt.fromInt i)))
-
-    reconstructStr = xored |> fromBitsLoop (BigInt.fromInt 0) (BigInt.fromInt 2) |> BigInt.toString
-    zippedStr = zipped |> List.map (\(a, b) -> "(" ++ BigInt.toString a ++ ", " ++ BigInt.toString b ++ ")") |> String.join ":"
-    -- debugStr = String.fromInt (Bitwise.xor litcom (shrinkInt regB))
-    numerator = BigInt.fromInt 108107566389757
-    denominator = BigInt.pow (BigInt.fromInt 2) (BigInt.fromInt 6)
-    divResult = BigInt.div numerator denominator 
+    isBooting = 
+      case model.deviceStatus of 
+        Booting _ -> True 
+        _ -> False 
   in
     Html.table
       [
@@ -804,22 +774,42 @@ viewBody model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Clear ] 
+                [ Html.Attributes.style "width" "80px"
+                , onClick Reboot ] 
                 [ Html.text "Reboot" ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "padding" "10px" ]
+              [ Html.button 
+                [ Html.Attributes.style "width" "80px"
+                , onClick Reset
+                , Html.Attributes.disabled isBooting ] 
+                [ Html.text "Reset" ]
               -- , Html.button 
               --   [ Html.Attributes.style "width" "80px", onClick FindQuine ] 
               --   [ Html.text "Quine" ]
               , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Slower ] 
+                [ Html.Attributes.style "width" "80px"
+                , onClick Slower
+                , Html.Attributes.disabled isBooting ] 
                 [ Html.text "Turtle" ]
               , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick TogglePlay ] 
+                [ Html.Attributes.style "width" "80px"
+                , onClick TogglePlay 
+                , Html.Attributes.disabled isBooting ]  
                 [ if model.paused then Html.text "Run" else Html.text "Halt" ] 
               , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Faster ] 
+                [ Html.Attributes.style "width" "80px"
+                , onClick Faster 
+                , Html.Attributes.disabled isBooting ] 
                 [ Html.text "Turbo" ]
               , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Step ] 
+                [ Html.Attributes.style "width" "80px"
+                , onClick Step 
+                , Html.Attributes.disabled isBooting ] 
                 [ Html.text "Step" ]
             ] ]
       , Html.tr
@@ -837,26 +827,11 @@ viewBody model =
                     [ 
                       -- Html.Attributes.placeholder "Overwrite register A"
                       Html.Attributes.value model.overwrittenA
-                    , onInput OverwriteRegA ] 
+                    , onInput OverwriteRegA
+                    , Html.Attributes.disabled isBooting ] 
                     []
               -- , Html.div [] [ Html.text commandsStr ]
-              -- , Html.div [] [ Html.text ("DebugStr1 " ++ debugStr1) ]
-              -- , Html.div [] [ Html.text ("DebugStr2 " ++ debugStr2) ]
-              -- , Html.div [] [ Html.text ("DebugStr3 " ++ debugStr3) ]
-              -- , Html.div [] [ Html.text ("DebugStr4 (bigXor) " ++ debugStr4) ]
-              -- , Html.div [] [ Html.text ("DebugStr5 (intXor) " ++ debugStr5) ]
-              -- , Html.div [] [ Html.text ("DebugStr6 (177 as bits) " ++ debugStr6 ++ " *") ]
-              -- , Html.div [] [ Html.text ("DebugStr7 (377 as bits) " ++ debugStr7) ]
-              -- , Html.div [] [ Html.text ("DebugStr8 (13 as bits) " ++ debugStr8) ]
-              -- , Html.div [] [ Html.text ("DebugStr9 (gt?) " ++ debugStr9) ]
-              -- , Html.div [] [ Html.text ("zipped " ++ zippedStr) ]
-              -- , Html.div [] [ Html.text ("xored " ++ xoredStr) ]
-              -- , Html.div [] [ Html.text ("recons " ++ reconstructStr) ]
-              -- , Html.div [] [ Html.text ("numerator: " ++ BigInt.toString numerator) ]
-              -- , Html.div [] [ Html.text ("denominator: " ++ BigInt.toString denominator) ]
-              -- , Html.div [] [ Html.text ("divResult: " ++ BigInt.toString divResult) ]
-              -- , Html.div [] [ Html.text (String.fromFloat qval) ]
-              , Html.div [] [ Html.text ("Step: " ++ (String.fromInt model.step)) ]
+              -- , Html.div [] [ Html.text ("Step: " ++ (String.fromInt model.step)) ]
               ] ]
       , Html.tr
           []
