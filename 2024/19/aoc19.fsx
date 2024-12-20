@@ -21,8 +21,9 @@ let createChecker towels =
     fun recur pattern -> 
         if String.length pattern = 0 then 1L 
         else 
-            let candidates = towels |> List.filter (startsWith pattern)
-            candidates |> List.sumBy (fun c -> recur (pattern.Substring(String.length c)))
+            towels 
+            |> List.filter (startsWith pattern)
+            |> List.sumBy (fun c -> recur (pattern.Substring(String.length c)))
 
 let run fileName =
     let text = File.ReadAllText fileName |> trim |> split "\n\n"
