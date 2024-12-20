@@ -9,18 +9,20 @@ let trim (input : string) = input.Trim()
 
 let split (splitter : string) (input : string) = input.Split(splitter)
 
+let startsWith (input : string) (prefix : string) = input.StartsWith(prefix)
+
 let memoize f =
     let cache = ConcurrentDictionary()
-    let rec rf x =
-        cache.GetOrAdd(x, lazy f rf x).Value
-    rf
+    let rec recur x =
+        cache.GetOrAdd(x, lazy f recur x).Value
+    recur
 
-let createChecker (towels : string list) =
-    fun recursive pattern -> 
+let createChecker towels =
+    fun recur pattern -> 
         if String.length pattern = 0 then true 
         else 
-            let candidates = towels |> List.filter (fun t -> pattern.StartsWith(t))
-            candidates |> List.exists (fun c -> recursive (pattern.Substring(String.length c)))
+            let candidates = towels |> List.filter (startsWith pattern)
+            candidates |> List.exists (fun c -> recur (pattern.Substring(String.length c)))
 
 let run fileName =
     let text = File.ReadAllText fileName |> trim |> split "\n\n"
