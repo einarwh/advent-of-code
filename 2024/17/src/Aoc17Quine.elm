@@ -362,8 +362,8 @@ out computer =
   |> output (combo computer |> BigInt.modBy (BigInt.fromInt 8) |> Maybe.withDefault (BigInt.fromInt 0) |> shrinkInt)
   |> nextInstruction
 
-executeOpcode : Int -> Computer -> Computer 
-executeOpcode opcode computer = 
+executeOpcode : Computer -> Int -> Computer 
+executeOpcode computer opcode = 
   case opcode of
     0 -> adv computer
     1 -> bxl computer
@@ -377,9 +377,7 @@ executeOpcode opcode computer =
 
 executeInstruction : Computer -> Maybe Computer 
 executeInstruction computer = 
-  case tryReadOpcode computer of
-    Nothing -> Nothing 
-    Just opcode -> Just (executeOpcode opcode computer)
+  computer |> tryReadOpcode |> Maybe.map (executeOpcode computer)
 
 execute : Computer -> Array Int 
 execute computer = 

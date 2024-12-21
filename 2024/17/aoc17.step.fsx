@@ -13,6 +13,16 @@ type Computer = {
     outputs : int64 list
 }
 
+type QuineCalculationInfo = 
+  { index : int; a : int64 }
+
+type QuineInfo = 
+  { steps : int; pending : QuineCalculationInfo list }
+
+type QuineModel  = 
+  Done of int64
+  | Ongoing of QuineInfo 
+
 let trim (input : string) = input.Trim()
 
 let split (splitter : string) (input : string) = input.Split(splitter)
@@ -70,7 +80,7 @@ let jump target computer =
 let output v computer =
     { computer with outputs = v :: computer.outputs }
 
-let rec pow x y = if y < 1L then 1L else x * pow x (y - 1L)
+let rec pow x y : int64 = if y < 1L then 1L else x * pow x (y - 1L)
 
 let division computer =
     let numerator = computer.regA
@@ -167,10 +177,74 @@ let quine computer =
     | Some a -> a 
     | None -> failwith ":("
 
+
+// checkTarget : Computer -> Int -> Int -> BigInt -> Bool 
+// checkTarget computer opIndex target candidateA = 
+//   let 
+//     program = execute { computer | regA = candidateA }
+//   in 
+//     case Array.get opIndex program of 
+//       Just n -> n == target
+//       Nothing -> False 
+
+let checkTarget (computer : Computer) (opIndex : int) (target : int64) (candidateA : int64) : bool = 
+  let program = execute { computer with regA = candidateA }
+  let n = program.[opIndex]
+  n = target 
+
+let add a b = a + b 
+let mul a b = a * b
+let sub a b = a - b 
+
+let quineStep (steps : int) (pending : QuineCalculationInfo list) (qci : QuineCalculationInfo) (computer : Computer) : QuineModel = 
+  let a = qci.a 
+  let ix = qci.index
+  let len = computer.program |> Array.length
+  let opIndex = len - ix 
+  let big8 = int64 8
+  let bigLen = int64 len 
+  let bigIx = int64 ix 
+  if ix > len then 
+    Done a 
+  else 
+    let target = Array.get computer.program opIndex 
+    let offset = pow big8 (sub bigLen bigIx)
+    let candidates = 
+        [ 0L .. 7L ] 
+        |> List.map (fun j -> add a (mul (int64 j) offset))
+        |> List.choose (fun ca -> if checkTarget computer opIndex target ca then Some { index = (ix + 1); a = ca } else None)
+    let nextPending = List.append candidates pending
+    Ongoing { steps = steps + 1; pending = nextPending }
+
+let quineA0 (computer : Computer) : int64 = 
+  let len = computer.program |> Array.length
+  let big1 = int64 1
+  let big8 = int64 8
+  let bigLen = int64 len 
+  let a0 = pow big8 (sub bigLen big1)
+  a0
+
 let run fileName =
     let text = File.ReadAllText fileName |> trim |> split "\n"
     let computer = parseComputer text
     computer |> execute |> printProgram 
     computer |> quine |> printfn "%d"
+    //
+    printfn "%A" computer
+    let len = computer.program |> Array.length
+    let big1 = int64 1
+    let big8 = int64 8
+    let bigLen = int64 len 
+    let a0 = pow big8 (sub bigLen big1)
+    printfn "%A" a0
+    let qci = { index = 1; a = quineA0 computer }
+    let qi = { steps = 0; pending = [ qci ] }
+    let qm = Ongoing qi
+    match qi.pending with 
+    | [] -> printfn "nothing pending"
+    | qci :: rest -> 
+        let nextQm = quineStep qi.steps rest qci computer 
+        printfn "%A" nextQm
+    0
 
 run "input"

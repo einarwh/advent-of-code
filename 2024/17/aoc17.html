@@ -7541,7 +7541,7 @@ var $author$project$Aoc17Quine$out = function (computer) {
 			computer));
 };
 var $author$project$Aoc17Quine$executeOpcode = F2(
-	function (opcode, computer) {
+	function (computer, opcode) {
 		switch (opcode) {
 			case 0:
 				return $author$project$Aoc17Quine$adv(computer);
@@ -7568,14 +7568,10 @@ var $author$project$Aoc17Quine$tryReadOpcode = function (computer) {
 	return A2($elm$core$Array$get, pt, computer.program);
 };
 var $author$project$Aoc17Quine$executeInstruction = function (computer) {
-	var _v0 = $author$project$Aoc17Quine$tryReadOpcode(computer);
-	if (_v0.$ === 'Nothing') {
-		return $elm$core$Maybe$Nothing;
-	} else {
-		var opcode = _v0.a;
-		return $elm$core$Maybe$Just(
-			A2($author$project$Aoc17Quine$executeOpcode, opcode, computer));
-	}
+	return A2(
+		$elm$core$Maybe$map,
+		$author$project$Aoc17Quine$executeOpcode(computer),
+		$author$project$Aoc17Quine$tryReadOpcode(computer));
 };
 var $author$project$Aoc17Quine$execute = function (computer) {
 	execute:
