@@ -38,8 +38,11 @@ type DeviceStatus =
   | Booted 
   | Quining QuineModel 
 
+type alias QuineCalculationInfo = 
+  { index : Int, a : BigInt }
+
 type alias QuineInfo = 
-  { programLength : Int }
+  { steps : Int, pending : List QuineCalculationInfo }
 
 type QuineModel  = 
   Done BigInt 
@@ -179,6 +182,7 @@ type Msg =
   | LightBackgroundTick
   | OverwriteRegA String
   | FindQuine 
+  | QuineTick
 
 tryReadOpcode : Computer -> Maybe Int 
 tryReadOpcode computer = 
@@ -423,16 +427,19 @@ tryPick chooser lst =
         Nothing -> tryPick chooser rest 
         Just result -> Just result  
 
-quineStep : Int -> Int -> Computer -> BigInt -> Maybe BigInt 
-quineStep len ix computer a = 
+quineStep : Int -> List QuineCalculationInfo -> QuineCalculationInfo -> Computer -> QuineModel 
+quineStep steps pending qci computer = 
   let
+    a = qci.a 
+    ix = qci.index
+    len = computer.program |> Array.length
     opIndex = len - ix 
     big8 = BigInt.fromInt 8
     bigLen = BigInt.fromInt len 
     bigIx = BigInt.fromInt ix 
   in
     if ix > len then 
-      Just a 
+      Done a 
     else 
       let
         target = Array.get opIndex computer.program |> Maybe.withDefault 99999999
@@ -441,13 +448,26 @@ quineStep len ix computer a =
           List.range 0 7 
           |> List.map (BigInt.fromInt)
           |> List.map (\j -> BigInt.add a (BigInt.mul j offset))
-          |> List.filterMap (\ca -> if checkTarget computer opIndex target ca then Just ca else Nothing)
+          |> List.filterMap (\ca -> if checkTarget computer opIndex target ca then Just { index = (ix + 1), a = ca } else Nothing)
+        nextPending = List.append candidates pending
       in
-        candidates
-        |> tryPick (\ca -> quineStep len (ix + 1) computer ca)
+        Ongoing { steps = steps + 1, pending = nextPending }
 
-quine : Computer -> Maybe BigInt  
-quine computer = 
+-- quine : Computer -> Maybe BigInt  
+-- quine computer = 
+--   let
+--     len = computer.program |> Array.length
+--     big1 = BigInt.fromInt 1
+--     big8 = BigInt.fromInt 8
+--     bigLen = BigInt.fromInt len 
+ 
+--     a0 = BigInt.pow big8 (BigInt.sub bigLen big1)
+--     result = quineStep len 1 computer a0
+--   in
+--     result
+
+quineA0 : Computer -> BigInt  
+quineA0 computer = 
   let
     len = computer.program |> Array.length
     big1 = BigInt.fromInt 1
@@ -455,9 +475,8 @@ quine computer =
     bigLen = BigInt.fromInt len 
  
     a0 = BigInt.pow big8 (BigInt.sub bigLen big1)
-    result = quineStep len 1 computer a0
   in
-    result
+    a0
 
 updateReboot : Model -> Model
 updateReboot model =
@@ -537,14 +556,43 @@ updateOverwriteRegA overwrittenA model =
 
 updateFindQuine : Model -> Model
 updateFindQuine model = 
-  case quine model.computer of 
-    Just a -> 
-      let
-        computer = model.computer 
-      in
-        { model | computer = { computer | regA = a } }
-    Nothing -> 
-      model 
+  let
+    qci = { index = 1, a = quineA0 model.computer }
+    deviceStatus = Quining (Ongoing { steps = 0, pending = [ qci ] })
+    str = "index: " ++ String.fromInt (qci.index) ++ " a0: " ++ BigInt.toString (qci.a)
+  in 
+    { model | deviceStatus = deviceStatus, debug = "Initiating quine find... " ++ str }
+
+updateQuineStep : Model -> Model
+updateQuineStep model = 
+  let 
+    computer = model.computer 
+  in 
+      case model.deviceStatus of 
+        Booting _ -> { model | debug = "Also booting" } 
+        Booted -> { model | debug = "Also booted" } 
+        Quining qm -> 
+          case qm of 
+            Done a -> 
+              let
+                nextDeviceStatus = Booted
+                nextComputer = { computer | regA = a }
+              in
+                { model | deviceStatus = nextDeviceStatus, computer = nextComputer, debug = "quining done " ++ (BigInt.toString a) }
+            Ongoing qi -> 
+              case qi.pending of 
+                [] -> { model | debug = "nothing pending?" }
+                qci :: rest ->
+                  let 
+                    nextQm = quineStep qi.steps rest qci computer 
+                    nextDeviceStatus = Quining nextQm
+                    pendingCount = 
+                      case nextQm of 
+                        Ongoing nextQi -> nextQi.pending |> List.length |> String.fromInt 
+                        _ -> "."
+                  in 
+                    { model | deviceStatus = nextDeviceStatus, debug = "keeps on quining " ++ BigInt.toString qci.a ++ " pending: " ++ pendingCount } 
+              
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -581,6 +629,9 @@ update msg model =
       (updateOverwriteRegA overwrittenA model, Cmd.none)
     FindQuine -> 
       (updateFindQuine model, Cmd.none)
+    QuineTick -> 
+      (updateQuineStep model, Cmd.none)
+    --   ({ model | debug = "tick..." }, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -591,7 +642,7 @@ subscriptions model =
       case model.deviceStatus of
         Booted -> if model.paused then Sub.none else Time.every model.tickInterval (\_ -> Tick)
         Booting _ -> Sub.batch [ Time.every model.bootTickInterval (\_ -> BootTick), Time.every model.blackoutTickInterval (\_ -> BlackoutTick) ]
-        Quining _ -> Sub.none
+        Quining _ -> Time.every 100 (\_ -> QuineTick)
     defaultBackgroundTick = Time.every 277 (\_ -> DefaultBackgroundTick)
     darkBackgroundTick = Time.every model.darkBackgroundTickInterval (\_ -> DarkBackgroundTick)
     lightBackgroundTick = Time.every model.lightBackgroundTickInterval (\_ -> LightBackgroundTick)
@@ -727,6 +778,16 @@ viewBody : Model -> Html Msg
 viewBody model =
   let
     s = toSvg model
+    debugStr = model.debug
+    message = 
+      case model.deviceStatus of 
+        Booting ticks -> "Booting"
+        Booted -> "Booted"
+        Quining qm -> 
+          case qm of 
+            Done a -> "Quining - Done: " ++ BigInt.toString a
+            Ongoing qi -> 
+              "Quining - steps " ++ (String.fromInt qi.steps)
     isBooting = 
       case model.deviceStatus of 
         Booting _ -> True 
@@ -853,7 +914,8 @@ viewBody model =
                     , onInput OverwriteRegA
                     , Html.Attributes.disabled (isBooting || not model.paused) ] 
                     []
-              -- , Html.div [] [ Html.text commandsStr ]
+              , Html.div [] [ Html.text ("Debug : " ++ debugStr) ]
+              , Html.div [] [ Html.text ("Message : " ++ message) ]
               -- , Html.div [] [ Html.text ("Step: " ++ (String.fromInt model.step)) ]
               ] ]
       , Html.tr

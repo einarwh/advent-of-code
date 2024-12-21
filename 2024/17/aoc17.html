@@ -6053,6 +6053,7 @@ var $author$project$Aoc17Quine$BootTick = {$: 'BootTick'};
 var $author$project$Aoc17Quine$DarkBackgroundTick = {$: 'DarkBackgroundTick'};
 var $author$project$Aoc17Quine$DefaultBackgroundTick = {$: 'DefaultBackgroundTick'};
 var $author$project$Aoc17Quine$LightBackgroundTick = {$: 'LightBackgroundTick'};
+var $author$project$Aoc17Quine$QuineTick = {$: 'QuineTick'};
 var $author$project$Aoc17Quine$Tick = {$: 'Tick'};
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$time$Time$Every = F2(
@@ -6494,7 +6495,12 @@ var $author$project$Aoc17Quine$subscriptions = function (model) {
 							})
 						]));
 			default:
-				return $elm$core$Platform$Sub$none;
+				return A2(
+					$elm$time$Time$every,
+					100,
+					function (_v7) {
+						return $author$project$Aoc17Quine$QuineTick;
+					});
 		}
 	}();
 	var lightBackgroundTick = A2(
@@ -6563,6 +6569,9 @@ var $author$project$Aoc17Quine$updateDataSource = F2(
 				overwrittenA: ''
 			});
 	});
+var $author$project$Aoc17Quine$Ongoing = function (a) {
+	return {$: 'Ongoing', a: a};
+};
 var $elm$core$Array$length = function (_v0) {
 	var len = _v0.a;
 	return len;
@@ -7082,7 +7091,139 @@ var $cmditch$elm_bigint$BigInt$pow = F2(
 	function (base, exp) {
 		return A3($cmditch$elm_bigint$BigInt$powHelp, $cmditch$elm_bigint$BigInt$one, base, exp);
 	});
+var $author$project$Aoc17Quine$quineA0 = function (computer) {
+	var len = $elm$core$Array$length(computer.program);
+	var bigLen = $cmditch$elm_bigint$BigInt$fromInt(len);
+	var big8 = $cmditch$elm_bigint$BigInt$fromInt(8);
+	var big1 = $cmditch$elm_bigint$BigInt$fromInt(1);
+	var a0 = A2(
+		$cmditch$elm_bigint$BigInt$pow,
+		big8,
+		A2($cmditch$elm_bigint$BigInt$sub, bigLen, big1));
+	return a0;
+};
+var $elm$core$String$concat = function (strings) {
+	return A2($elm$core$String$join, '', strings);
+};
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
 var $elm$core$Bitwise$and = _Bitwise_and;
+var $elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
+var $elm$core$String$repeatHelp = F3(
+	function (n, chunk, result) {
+		return (n <= 0) ? result : A3(
+			$elm$core$String$repeatHelp,
+			n >> 1,
+			_Utils_ap(chunk, chunk),
+			(!(n & 1)) ? result : _Utils_ap(result, chunk));
+	});
+var $elm$core$String$repeat = F2(
+	function (n, chunk) {
+		return A3($elm$core$String$repeatHelp, n, chunk, '');
+	});
+var $elm$core$String$padLeft = F3(
+	function (n, _char, string) {
+		return _Utils_ap(
+			A2(
+				$elm$core$String$repeat,
+				n - $elm$core$String$length(string),
+				$elm$core$String$fromChar(_char)),
+			string);
+	});
+var $cmditch$elm_bigint$BigInt$fillZeroes = A2(
+	$elm$core$Basics$composeL,
+	A2(
+		$elm$core$String$padLeft,
+		$cmditch$elm_bigint$Constants$maxDigitMagnitude,
+		_Utils_chr('0')),
+	$elm$core$String$fromInt);
+var $cmditch$elm_bigint$BigInt$revMagnitudeToString = function (_v0) {
+	var digits = _v0.a;
+	var _v1 = $elm$core$List$reverse(digits);
+	if (!_v1.b) {
+		return '0';
+	} else {
+		var x = _v1.a;
+		var xs = _v1.b;
+		return $elm$core$String$concat(
+			A2(
+				$elm$core$List$cons,
+				$elm$core$String$fromInt(x),
+				A2($elm$core$List$map, $cmditch$elm_bigint$BigInt$fillZeroes, xs)));
+	}
+};
+var $cmditch$elm_bigint$BigInt$toString = function (bigInt) {
+	switch (bigInt.$) {
+		case 'Zer':
+			return '0';
+		case 'Pos':
+			var mag = bigInt.a;
+			return $cmditch$elm_bigint$BigInt$revMagnitudeToString(mag);
+		default:
+			var mag = bigInt.a;
+			return '-' + $cmditch$elm_bigint$BigInt$revMagnitudeToString(mag);
+	}
+};
+var $author$project$Aoc17Quine$updateFindQuine = function (model) {
+	var qci = {
+		a: $author$project$Aoc17Quine$quineA0(model.computer),
+		index: 1
+	};
+	var str = 'index: ' + ($elm$core$String$fromInt(qci.index) + (' a0: ' + $cmditch$elm_bigint$BigInt$toString(qci.a)));
+	var deviceStatus = $author$project$Aoc17Quine$Quining(
+		$author$project$Aoc17Quine$Ongoing(
+			{
+				pending: _List_fromArray(
+					[qci]),
+				steps: 0
+			}));
+	return _Utils_update(
+		model,
+		{debug: 'Initiating quine find... ' + str, deviceStatus: deviceStatus});
+};
+var $author$project$Aoc17Quine$updateOverwriteRegA = F2(
+	function (overwrittenA, model) {
+		if ($elm$core$String$isEmpty(overwrittenA)) {
+			var computer = model.computer;
+			return _Utils_update(
+				model,
+				{
+					computer: _Utils_update(
+						computer,
+						{regA: model.loadedA}),
+					overwrittenA: ''
+				});
+		} else {
+			var _v0 = $cmditch$elm_bigint$BigInt$fromIntString(overwrittenA);
+			if (_v0.$ === 'Just') {
+				var a = _v0.a;
+				var computer = model.computer;
+				return _Utils_update(
+					model,
+					{
+						computer: _Utils_update(
+							computer,
+							{regA: a}),
+						overwrittenA: overwrittenA
+					});
+			} else {
+				return model;
+			}
+		}
+	});
+var $author$project$Aoc17Quine$Done = function (a) {
+	return {$: 'Done', a: a};
+};
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
 var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
 var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
 var $elm$core$Basics$ge = _Utils_ge;
@@ -7375,69 +7516,6 @@ var $author$project$Aoc17Quine$output = F2(
 				outputs: A2($elm$core$List$cons, value, computer.outputs)
 			});
 	});
-var $elm$core$String$concat = function (strings) {
-	return A2($elm$core$String$join, '', strings);
-};
-var $elm$core$String$cons = _String_cons;
-var $elm$core$String$fromChar = function (_char) {
-	return A2($elm$core$String$cons, _char, '');
-};
-var $elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
-var $elm$core$String$repeatHelp = F3(
-	function (n, chunk, result) {
-		return (n <= 0) ? result : A3(
-			$elm$core$String$repeatHelp,
-			n >> 1,
-			_Utils_ap(chunk, chunk),
-			(!(n & 1)) ? result : _Utils_ap(result, chunk));
-	});
-var $elm$core$String$repeat = F2(
-	function (n, chunk) {
-		return A3($elm$core$String$repeatHelp, n, chunk, '');
-	});
-var $elm$core$String$padLeft = F3(
-	function (n, _char, string) {
-		return _Utils_ap(
-			A2(
-				$elm$core$String$repeat,
-				n - $elm$core$String$length(string),
-				$elm$core$String$fromChar(_char)),
-			string);
-	});
-var $cmditch$elm_bigint$BigInt$fillZeroes = A2(
-	$elm$core$Basics$composeL,
-	A2(
-		$elm$core$String$padLeft,
-		$cmditch$elm_bigint$Constants$maxDigitMagnitude,
-		_Utils_chr('0')),
-	$elm$core$String$fromInt);
-var $cmditch$elm_bigint$BigInt$revMagnitudeToString = function (_v0) {
-	var digits = _v0.a;
-	var _v1 = $elm$core$List$reverse(digits);
-	if (!_v1.b) {
-		return '0';
-	} else {
-		var x = _v1.a;
-		var xs = _v1.b;
-		return $elm$core$String$concat(
-			A2(
-				$elm$core$List$cons,
-				$elm$core$String$fromInt(x),
-				A2($elm$core$List$map, $cmditch$elm_bigint$BigInt$fillZeroes, xs)));
-	}
-};
-var $cmditch$elm_bigint$BigInt$toString = function (bigInt) {
-	switch (bigInt.$) {
-		case 'Zer':
-			return '0';
-		case 'Pos':
-			var mag = bigInt.a;
-			return $cmditch$elm_bigint$BigInt$revMagnitudeToString(mag);
-		default:
-			var mag = bigInt.a;
-			return '-' + $cmditch$elm_bigint$BigInt$revMagnitudeToString(mag);
-	}
-};
 var $author$project$Aoc17Quine$shrinkInt = function (big) {
 	var _v0 = $elm$core$String$toInt(
 		$cmditch$elm_bigint$BigInt$toString(big));
@@ -7527,37 +7605,17 @@ var $author$project$Aoc17Quine$checkTarget = F4(
 			return false;
 		}
 	});
-var $author$project$Aoc17Quine$tryPick = F2(
-	function (chooser, lst) {
-		tryPick:
-		while (true) {
-			if (!lst.b) {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var a = lst.a;
-				var rest = lst.b;
-				var _v1 = chooser(a);
-				if (_v1.$ === 'Nothing') {
-					var $temp$chooser = chooser,
-						$temp$lst = rest;
-					chooser = $temp$chooser;
-					lst = $temp$lst;
-					continue tryPick;
-				} else {
-					var result = _v1.a;
-					return $elm$core$Maybe$Just(result);
-				}
-			}
-		}
-	});
 var $author$project$Aoc17Quine$quineStep = F4(
-	function (len, ix, computer, a) {
+	function (steps, pending, qci, computer) {
+		var len = $elm$core$Array$length(computer.program);
+		var ix = qci.index;
 		var opIndex = len - ix;
 		var bigLen = $cmditch$elm_bigint$BigInt$fromInt(len);
 		var bigIx = $cmditch$elm_bigint$BigInt$fromInt(ix);
 		var big8 = $cmditch$elm_bigint$BigInt$fromInt(8);
+		var a = qci.a;
 		if (_Utils_cmp(ix, len) > 0) {
-			return $elm$core$Maybe$Just(a);
+			return $author$project$Aoc17Quine$Done(a);
 		} else {
 			var target = A2(
 				$elm$core$Maybe$withDefault,
@@ -7570,7 +7628,8 @@ var $author$project$Aoc17Quine$quineStep = F4(
 			var candidates = A2(
 				$elm$core$List$filterMap,
 				function (ca) {
-					return A4($author$project$Aoc17Quine$checkTarget, computer, opIndex, target, ca) ? $elm$core$Maybe$Just(ca) : $elm$core$Maybe$Nothing;
+					return A4($author$project$Aoc17Quine$checkTarget, computer, opIndex, target, ca) ? $elm$core$Maybe$Just(
+						{a: ca, index: ix + 1}) : $elm$core$Maybe$Nothing;
 				},
 				A2(
 					$elm$core$List$map,
@@ -7584,72 +7643,69 @@ var $author$project$Aoc17Quine$quineStep = F4(
 						$elm$core$List$map,
 						$cmditch$elm_bigint$BigInt$fromInt,
 						A2($elm$core$List$range, 0, 7))));
-			return A2(
-				$author$project$Aoc17Quine$tryPick,
-				function (ca) {
-					return A4($author$project$Aoc17Quine$quineStep, len, ix + 1, computer, ca);
-				},
-				candidates);
+			var nextPending = A2($elm$core$List$append, candidates, pending);
+			return $author$project$Aoc17Quine$Ongoing(
+				{pending: nextPending, steps: steps + 1});
 		}
 	});
-var $author$project$Aoc17Quine$quine = function (computer) {
-	var len = $elm$core$Array$length(computer.program);
-	var bigLen = $cmditch$elm_bigint$BigInt$fromInt(len);
-	var big8 = $cmditch$elm_bigint$BigInt$fromInt(8);
-	var big1 = $cmditch$elm_bigint$BigInt$fromInt(1);
-	var a0 = A2(
-		$cmditch$elm_bigint$BigInt$pow,
-		big8,
-		A2($cmditch$elm_bigint$BigInt$sub, bigLen, big1));
-	var result = A4($author$project$Aoc17Quine$quineStep, len, 1, computer, a0);
-	return result;
-};
-var $author$project$Aoc17Quine$updateFindQuine = function (model) {
-	var _v0 = $author$project$Aoc17Quine$quine(model.computer);
-	if (_v0.$ === 'Just') {
-		var a = _v0.a;
-		var computer = model.computer;
-		return _Utils_update(
-			model,
-			{
-				computer: _Utils_update(
-					computer,
-					{regA: a})
-			});
-	} else {
-		return model;
-	}
-};
-var $author$project$Aoc17Quine$updateOverwriteRegA = F2(
-	function (overwrittenA, model) {
-		if ($elm$core$String$isEmpty(overwrittenA)) {
-			var computer = model.computer;
+var $author$project$Aoc17Quine$updateQuineStep = function (model) {
+	var computer = model.computer;
+	var _v0 = model.deviceStatus;
+	switch (_v0.$) {
+		case 'Booting':
 			return _Utils_update(
 				model,
-				{
-					computer: _Utils_update(
-						computer,
-						{regA: model.loadedA}),
-					overwrittenA: ''
-				});
-		} else {
-			var _v0 = $cmditch$elm_bigint$BigInt$fromIntString(overwrittenA);
-			if (_v0.$ === 'Just') {
-				var a = _v0.a;
-				var computer = model.computer;
+				{debug: 'Also booting'});
+		case 'Booted':
+			return _Utils_update(
+				model,
+				{debug: 'Also booted'});
+		default:
+			var qm = _v0.a;
+			if (qm.$ === 'Done') {
+				var a = qm.a;
+				var nextDeviceStatus = $author$project$Aoc17Quine$Booted;
+				var nextComputer = _Utils_update(
+					computer,
+					{regA: a});
 				return _Utils_update(
 					model,
 					{
-						computer: _Utils_update(
-							computer,
-							{regA: a}),
-						overwrittenA: overwrittenA
+						computer: nextComputer,
+						debug: 'quining done ' + $cmditch$elm_bigint$BigInt$toString(a),
+						deviceStatus: nextDeviceStatus
 					});
 			} else {
-				return model;
+				var qi = qm.a;
+				var _v2 = qi.pending;
+				if (!_v2.b) {
+					return _Utils_update(
+						model,
+						{debug: 'nothing pending?'});
+				} else {
+					var qci = _v2.a;
+					var rest = _v2.b;
+					var nextQm = A4($author$project$Aoc17Quine$quineStep, qi.steps, rest, qci, computer);
+					var pendingCount = function () {
+						if (nextQm.$ === 'Ongoing') {
+							var nextQi = nextQm.a;
+							return $elm$core$String$fromInt(
+								$elm$core$List$length(nextQi.pending));
+						} else {
+							return '.';
+						}
+					}();
+					var nextDeviceStatus = $author$project$Aoc17Quine$Quining(nextQm);
+					return _Utils_update(
+						model,
+						{
+							debug: 'keeps on quining ' + ($cmditch$elm_bigint$BigInt$toString(qci.a) + (' pending: ' + pendingCount)),
+							deviceStatus: nextDeviceStatus
+						});
+				}
 			}
-		}
-	});
+	}
+};
 var $author$project$Aoc17Quine$updateReboot = function (model) {
 	return A2(
 		$author$project$Aoc17Quine$initModel,
@@ -7783,9 +7839,13 @@ var $author$project$Aoc17Quine$update = F2(
 				return _Utils_Tuple2(
 					A2($author$project$Aoc17Quine$updateOverwriteRegA, overwrittenA, model),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'FindQuine':
 				return _Utils_Tuple2(
 					$author$project$Aoc17Quine$updateFindQuine(model),
+					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					$author$project$Aoc17Quine$updateQuineStep(model),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
@@ -8215,14 +8275,6 @@ var $author$project$Aoc17Quine$toBootedElements = function (model) {
 	return _List_fromArray(
 		[borderElement, regALabel, regABox, regAValue, regBLabel, regBBox, regBValue, regCLabel, regCBox, regCValue, programLabel, programBox, programValue, pointerHat, outputsBox, outputsValue1, outputsValue2, outputsValue3]);
 };
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
 var $author$project$Aoc17Quine$toBootingElements = F2(
 	function (model, ticks) {
 		var textStroke = 'black';
@@ -8337,6 +8389,25 @@ var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Aoc17Quine$viewBody = function (model) {
 	var s = $author$project$Aoc17Quine$toSvg(model);
+	var message = function () {
+		var _v1 = model.deviceStatus;
+		switch (_v1.$) {
+			case 'Booting':
+				var ticks = _v1.a;
+				return 'Booting';
+			case 'Booted':
+				return 'Booted';
+			default:
+				var qm = _v1.a;
+				if (qm.$ === 'Done') {
+					var a = qm.a;
+					return 'Quining - Done: ' + $cmditch$elm_bigint$BigInt$toString(a);
+				} else {
+					var qi = qm.a;
+					return 'Quining - steps ' + $elm$core$String$fromInt(qi.steps);
+				}
+		}
+	}();
 	var isBooting = function () {
 		var _v0 = model.deviceStatus;
 		if (_v0.$ === 'Booting') {
@@ -8345,6 +8416,7 @@ var $author$project$Aoc17Quine$viewBody = function (model) {
 			return false;
 		}
 	}();
+	var debugStr = model.debug;
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
@@ -8686,7 +8758,21 @@ var $author$project$Aoc17Quine$viewBody = function (model) {
 										$elm$html$Html$Events$onInput($author$project$Aoc17Quine$OverwriteRegA),
 										$elm$html$Html$Attributes$disabled(isBooting || (!model.paused))
 									]),
-								_List_Nil)
+								_List_Nil),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Debug : ' + debugStr)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Message : ' + message)
+									]))
 							]))
 					])),
 				A2(
