@@ -203,16 +203,21 @@ let quineStep (steps : int) (pending : QuineCalculationInfo list) (qci : QuineCa
   let opIndex = len - ix 
   let big8 = int64 8
   let bigLen = int64 len 
-  let bigIx = int64 ix 
+  let bigIx = int64 ix
+  printfn "quineStep..." 
+  printfn "a %A" a 
   if ix > len then 
     Done a 
   else 
     let target = Array.get computer.program opIndex 
+    printfn "target %A" target
     let offset = pow big8 (sub bigLen bigIx)
+    printfn "offset %A" offset
     let candidates = 
         [ 0L .. 7L ] 
         |> List.map (fun j -> add a (mul (int64 j) offset))
         |> List.choose (fun ca -> if checkTarget computer opIndex target ca then Some { index = (ix + 1); a = ca } else None)
+    printfn "candidates: %A" candidates
     let nextPending = List.append candidates pending
     Ongoing { steps = steps + 1; pending = nextPending }
 
@@ -236,7 +241,7 @@ let run fileName =
     let big8 = int64 8
     let bigLen = int64 len 
     let a0 = pow big8 (sub bigLen big1)
-    printfn "%A" a0
+    printfn "a0 %A" a0
     let qci = { index = 1; a = quineA0 computer }
     let qi = { steps = 0; pending = [ qci ] }
     let qm = Ongoing qi

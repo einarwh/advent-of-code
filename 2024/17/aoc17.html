@@ -7578,7 +7578,8 @@ var $author$project$Aoc17Quine$execute = function (computer) {
 	while (true) {
 		var _v0 = $author$project$Aoc17Quine$executeInstruction(computer);
 		if (_v0.$ === 'Nothing') {
-			return computer.program;
+			return $elm$core$Array$fromList(
+				$elm$core$List$reverse(computer.outputs));
 		} else {
 			var c = _v0.a;
 			var $temp$computer = c;
@@ -7601,8 +7602,16 @@ var $author$project$Aoc17Quine$checkTarget = F4(
 			return false;
 		}
 	});
-var $author$project$Aoc17Quine$quineStep = F4(
-	function (steps, pending, qci, computer) {
+var $author$project$Aoc17Quine$writeLog = F2(
+	function (line, log) {
+		return A2(
+			$elm$core$List$append,
+			log,
+			_List_fromArray(
+				[line]));
+	});
+var $author$project$Aoc17Quine$quineStep = F5(
+	function (log, steps, pending, qci, computer) {
 		var len = $elm$core$Array$length(computer.program);
 		var ix = qci.index;
 		var opIndex = len - ix;
@@ -7610,8 +7619,14 @@ var $author$project$Aoc17Quine$quineStep = F4(
 		var bigIx = $cmditch$elm_bigint$BigInt$fromInt(ix);
 		var big8 = $cmditch$elm_bigint$BigInt$fromInt(8);
 		var a = qci.a;
+		var log1 = A2(
+			$author$project$Aoc17Quine$writeLog,
+			'quineStep with a=' + ($cmditch$elm_bigint$BigInt$toString(a) + (' ix=' + $elm$core$String$fromInt(ix))),
+			log);
 		if (_Utils_cmp(ix, len) > 0) {
-			return $author$project$Aoc17Quine$Done(a);
+			return _Utils_Tuple2(
+				$author$project$Aoc17Quine$Done(a),
+				A2($author$project$Aoc17Quine$writeLog, 'done', log1));
 		} else {
 			var target = A2(
 				$elm$core$Maybe$withDefault,
@@ -7621,6 +7636,14 @@ var $author$project$Aoc17Quine$quineStep = F4(
 				$cmditch$elm_bigint$BigInt$pow,
 				big8,
 				A2($cmditch$elm_bigint$BigInt$sub, bigLen, bigIx));
+			var log2 = A2(
+				$author$project$Aoc17Quine$writeLog,
+				'target=' + $elm$core$String$fromInt(target),
+				log1);
+			var log3 = A2(
+				$author$project$Aoc17Quine$writeLog,
+				'offset=' + $cmditch$elm_bigint$BigInt$toString(offset),
+				log2);
 			var candidates = A2(
 				$elm$core$List$filterMap,
 				function (ca) {
@@ -7639,12 +7662,20 @@ var $author$project$Aoc17Quine$quineStep = F4(
 						$elm$core$List$map,
 						$cmditch$elm_bigint$BigInt$fromInt,
 						A2($elm$core$List$range, 0, 7))));
+			var log4 = A2(
+				$author$project$Aoc17Quine$writeLog,
+				'candidate count=' + $elm$core$String$fromInt(
+					$elm$core$List$length(candidates)),
+				log3);
 			var nextPending = A2($elm$core$List$append, candidates, pending);
-			return $author$project$Aoc17Quine$Ongoing(
-				{pending: nextPending, steps: steps + 1});
+			return _Utils_Tuple2(
+				$author$project$Aoc17Quine$Ongoing(
+					{pending: nextPending, steps: steps + 1}),
+				log4);
 		}
 	});
 var $author$project$Aoc17Quine$updateQuineStep = function (model) {
+	var log = _List_Nil;
 	var computer = model.computer;
 	var _v0 = model.deviceStatus;
 	switch (_v0.$) {
@@ -7681,7 +7712,11 @@ var $author$project$Aoc17Quine$updateQuineStep = function (model) {
 				} else {
 					var qci = _v2.a;
 					var rest = _v2.b;
-					var nextQm = A4($author$project$Aoc17Quine$quineStep, qi.steps, rest, qci, computer);
+					var _v3 = A5($author$project$Aoc17Quine$quineStep, log, qi.steps, rest, qci, computer);
+					var nextQm = _v3.a;
+					var log1 = _v3.b;
+					var debugStr = A2($elm$core$String$join, ' | ', log1);
+					var nextDeviceStatus = $author$project$Aoc17Quine$Quining(nextQm);
 					var pendingCount = function () {
 						if (nextQm.$ === 'Ongoing') {
 							var nextQi = nextQm.a;
@@ -7691,13 +7726,9 @@ var $author$project$Aoc17Quine$updateQuineStep = function (model) {
 							return '.';
 						}
 					}();
-					var nextDeviceStatus = $author$project$Aoc17Quine$Quining(nextQm);
 					return _Utils_update(
 						model,
-						{
-							debug: 'keeps on quining ' + ($cmditch$elm_bigint$BigInt$toString(qci.a) + (' pending: ' + pendingCount)),
-							deviceStatus: nextDeviceStatus
-						});
+						{debug: 'keeps on quining ' + debugStr, deviceStatus: nextDeviceStatus});
 				}
 			}
 	}

@@ -28,6 +28,8 @@ main =
 
 -- MODEL
 
+type alias Log = List String
+
 type DataSource = 
   Input 
   | Sample 
@@ -72,6 +74,9 @@ type alias Model =
   , darkBackgroundTickInterval : Float
   , lightBackgroundTickInterval : Float
   , debug : String }
+
+writeLog : String -> Log -> Log 
+writeLog line log = List.append log [ line ]
 
 parseRegister : String -> BigInt
 parseRegister s =
@@ -382,7 +387,7 @@ executeInstruction computer =
 execute : Computer -> Array Int 
 execute computer = 
   case executeInstruction computer of 
-    Nothing -> computer.program
+    Nothing -> computer.outputs |> List.reverse |> Array.fromList
     Just c -> execute c  
 
 -- let quine computer = 
@@ -425,11 +430,12 @@ tryPick chooser lst =
         Nothing -> tryPick chooser rest 
         Just result -> Just result  
 
-quineStep : Int -> List QuineCalculationInfo -> QuineCalculationInfo -> Computer -> QuineModel 
-quineStep steps pending qci computer = 
+quineStep : Log -> Int -> List QuineCalculationInfo -> QuineCalculationInfo -> Computer -> (QuineModel, Log) 
+quineStep log steps pending qci computer = 
   let
     a = qci.a 
     ix = qci.index
+    log1 = log |> writeLog ("quineStep with a=" ++ (BigInt.toString a) ++ " ix=" ++ (String.fromInt ix))
     len = computer.program |> Array.length
     opIndex = len - ix 
     big8 = BigInt.fromInt 8
@@ -437,19 +443,22 @@ quineStep steps pending qci computer =
     bigIx = BigInt.fromInt ix 
   in
     if ix > len then 
-      Done a 
+      (Done a, log1 |> writeLog "done") 
     else 
       let
         target = Array.get opIndex computer.program |> Maybe.withDefault 99999999
+        log2 = log1 |> writeLog ("target=" ++ String.fromInt target)
         offset = BigInt.pow big8 (BigInt.sub bigLen bigIx) 
+        log3 = log2 |> writeLog ("offset=" ++ BigInt.toString offset)
         candidates = 
           List.range 0 7 
           |> List.map (BigInt.fromInt)
           |> List.map (\j -> BigInt.add a (BigInt.mul j offset))
           |> List.filterMap (\ca -> if checkTarget computer opIndex target ca then Just { index = (ix + 1), a = ca } else Nothing)
+        log4 = log3 |> writeLog ("candidate count=" ++ String.fromInt (List.length candidates))
         nextPending = List.append candidates pending
       in
-        Ongoing { steps = steps + 1, pending = nextPending }
+        (Ongoing { steps = steps + 1, pending = nextPending }, log4)
 
 -- quine : Computer -> Maybe BigInt  
 -- quine computer = 
@@ -565,6 +574,7 @@ updateQuineStep : Model -> Model
 updateQuineStep model = 
   let 
     computer = model.computer 
+    log = []
   in 
       case model.deviceStatus of 
         Booting _ -> { model | debug = "Also booting" } 
@@ -582,14 +592,15 @@ updateQuineStep model =
                 [] -> { model | debug = "nothing pending?" }
                 qci :: rest ->
                   let 
-                    nextQm = quineStep qi.steps rest qci computer 
+                    (nextQm, log1) = quineStep log qi.steps rest qci computer 
                     nextDeviceStatus = Quining nextQm
                     pendingCount = 
                       case nextQm of 
                         Ongoing nextQi -> nextQi.pending |> List.length |> String.fromInt 
                         _ -> "."
+                    debugStr = log1 |> String.join " | "
                   in 
-                    { model | deviceStatus = nextDeviceStatus, debug = "keeps on quining " ++ BigInt.toString qci.a ++ " pending: " ++ pendingCount } 
+                    { model | deviceStatus = nextDeviceStatus, debug = "keeps on quining " ++ debugStr } 
               
 
 update : Msg -> Model -> (Model, Cmd Msg)
