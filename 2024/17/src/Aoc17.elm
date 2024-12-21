@@ -60,8 +60,8 @@ type alias Computer =
 type alias Model =
   { loadedComputer : Computer
   , computer : Computer
-  , loadedA : BigInt
-  , overwrittenA : String 
+  , overwrittenA : Maybe BigInt 
+  , overwritingA : String
   , step : Int 
   , dataSource : DataSource
   , backgroundColor : String
@@ -140,8 +140,8 @@ initModel deviceStatus dataSource =
     model = { loadedComputer = computer
             , computer = computer
             , dataSource = dataSource
-            , loadedA = computer.regA
-            , overwrittenA = ""
+            , overwrittenA = Nothing
+            , overwritingA = ""
             , step = 0
             , backgroundColor = defaultBackgroundColor
             , deviceStatus = deviceStatus
@@ -452,9 +452,8 @@ updateReset : Model -> Model
 updateReset model =
   let 
     m = initModel Booted model.dataSource
-    c = m.computer 
   in 
-    { m | overwrittenA = "", loadedA = model.loadedA, computer = { c | regA = model.loadedA } }
+    m 
 
 updateProgramFinished : Model -> Model
 updateProgramFinished model = 
@@ -473,9 +472,12 @@ updateStep model =
 updateDataSource : DataSource -> Model -> Model
 updateDataSource dataSource model =
   let
-    computer = initComputer dataSource 
+    deviceStatus = 
+      case model.deviceStatus of 
+        Quining _ -> Booted 
+        _ -> model.deviceStatus
   in
-    { model | dataSource = dataSource, loadedComputer = computer, computer = computer, overwrittenA = "" }
+    initModel deviceStatus dataSource
 
 updateBackgroundColor : String -> Model -> Model
 updateBackgroundColor color model =
@@ -504,22 +506,25 @@ updateTogglePlay model =
       computer = m.computer 
       c = { computer | regA = model.computer.regA }
     in
-      { m | paused = False, overwrittenA = model.overwrittenA, computer = c, loadedA = model.loadedA }
+      { m | paused = False, overwrittenA = model.overwrittenA, computer = c }
   else
     { model | paused = not model.paused }
 
 updateOverwriteRegA : String -> Model -> Model
-updateOverwriteRegA overwrittenA model = 
-  if String.isEmpty overwrittenA then 
-    let computer = model.computer in 
-      { model | overwrittenA = "", computer = { computer | regA = model.loadedA } }
+updateOverwriteRegA aStr model = 
+  if String.isEmpty aStr then 
+    let 
+      computer = model.computer 
+      regA = model.overwrittenA |> Maybe.withDefault (BigInt.fromInt 0) 
+    in 
+      { model | overwritingA = "", overwrittenA = Nothing, computer = { computer | regA = regA } }
   else 
-    case overwrittenA |> BigInt.fromIntString of 
+    case aStr |> BigInt.fromIntString of 
       Just a -> 
         let 
           computer = model.computer 
         in 
-          { model | overwrittenA = overwrittenA, computer = { computer | regA = a } }
+          { model | overwrittenA = Just model.computer.regA, overwritingA = aStr, computer = { computer | regA = a } }
       Nothing -> 
         model
 
@@ -530,9 +535,8 @@ updateFindQuine model =
     qci = { index = 1, a = quineA0 computer }
     cmp = { computer | regA = qci.a }
     deviceStatus = Quining (Ongoing { steps = 0, pending = [ (qci, cmp) ] })
-    str = "index: " ++ String.fromInt (qci.index) ++ " a0: " ++ BigInt.toString (qci.a)
   in 
-    { model | computer = computer, deviceStatus = deviceStatus, debug = "Initiating quine find... " ++ str }
+    updateQuineStep { model | computer = computer, deviceStatus = deviceStatus }
 
 updateQuineStep : Model -> Model
 updateQuineStep model = 
@@ -875,7 +879,7 @@ viewBody model =
                 Html.div [] [ Html.text "Overwrite A" ]
               , Html.input 
                     [ 
-                      Html.Attributes.value model.overwrittenA
+                      Html.Attributes.value model.overwritingA
                     , onInput OverwriteRegA
                     , Html.Attributes.disabled (not isBooted || not model.paused) ] 
                     []

@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.ai.Q === region.ao.Q)
+	if (region.ah.O === region.ao.O)
 	{
-		return 'on line ' + region.ai.Q;
+		return 'on line ' + region.ah.O;
 	}
-	return 'on lines ' + region.ai.Q + ' through ' + region.ao.Q;
+	return 'on lines ' + region.ah.O + ' through ' + region.ao.O;
 }
 
 
@@ -2733,9 +2733,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		A: func(record.A),
-		aj: record.aj,
-		ag: record.ag
+		y: func(record.y),
+		ai: record.ai,
+		af: record.af
 	}
 });
 
@@ -3003,11 +3003,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.A;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.aj;
+		var message = !tag ? value : tag < 3 ? value.a : value.y;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.ai;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.ag) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.af) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3997,7 +3997,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 		impl.a6,
 		impl.a4,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.ah && impl.ah(sendToApp)
+			var divertHrefToApp = impl.ag && impl.ag(sendToApp)
 			var view = impl.a7;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
@@ -4072,7 +4072,7 @@ function _Browser_application(impl)
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		ah: function(sendToApp)
+		ag: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4977,22 +4977,22 @@ var $elm$core$Array$builderToArray = F2(
 		if (!builder.a) {
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
-				$elm$core$Elm$JsArray$length(builder.e),
+				$elm$core$Elm$JsArray$length(builder.c),
 				$elm$core$Array$shiftStep,
 				$elm$core$Elm$JsArray$empty,
-				builder.e);
+				builder.c);
 		} else {
 			var treeLen = builder.a * $elm$core$Array$branchFactor;
 			var depth = $elm$core$Basics$floor(
 				A2($elm$core$Basics$logBase, $elm$core$Array$branchFactor, treeLen - 1));
-			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.f) : builder.f;
+			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.d) : builder.d;
 			var tree = A2($elm$core$Array$treeFromBuilder, correctNodeList, builder.a);
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
-				$elm$core$Elm$JsArray$length(builder.e) + treeLen,
+				$elm$core$Elm$JsArray$length(builder.c) + treeLen,
 				A2($elm$core$Basics$max, 5, depth * $elm$core$Array$shiftStep),
 				tree,
-				builder.e);
+				builder.c);
 		}
 	});
 var $elm$core$Basics$idiv = _Basics_idiv;
@@ -5005,7 +5005,7 @@ var $elm$core$Array$initializeHelp = F5(
 				return A2(
 					$elm$core$Array$builderToArray,
 					false,
-					{f: nodeList, a: (len / $elm$core$Array$branchFactor) | 0, e: tail});
+					{d: nodeList, a: (len / $elm$core$Array$branchFactor) | 0, c: tail});
 			} else {
 				var leaf = $elm$core$Array$Leaf(
 					A3($elm$core$Elm$JsArray$initialize, $elm$core$Array$branchFactor, fromIndex, fn));
@@ -5579,7 +5579,7 @@ var $elm$core$Array$fromListHelp = F3(
 				return A2(
 					$elm$core$Array$builderToArray,
 					true,
-					{f: nodeList, a: nodeListSize, e: jsArray});
+					{d: nodeList, a: nodeListSize, c: jsArray});
 			} else {
 				var $temp$list = remainingItems,
 					$temp$nodeList = A2(
@@ -5653,7 +5653,7 @@ var $elm$core$Basics$composeR = F3(
 	});
 var $elm$regex$Regex$Match = F4(
 	function (match, index, number, submatches) {
-		return {P: index, aX: match, a_: number, a3: submatches};
+		return {X: index, aX: match, a_: number, a3: submatches};
 	});
 var $elm$regex$Regex$contains = _Regex_contains;
 var $elm_community$list_extra$List$Extra$dropWhile = F2(
@@ -5987,21 +5987,21 @@ var $author$project$Aoc17$parseComputer = function (data) {
 		var _v4 = _v3.b;
 		var p = _v4.a;
 		return {
-			E: _List_Nil,
-			u: 0,
+			C: _List_Nil,
+			s: 0,
 			m: $author$project$Aoc17$parseProgram(p),
-			d: $author$project$Aoc17$parseRegister(a),
+			e: $author$project$Aoc17$parseRegister(a),
 			p: $author$project$Aoc17$parseRegister(b),
-			v: $author$project$Aoc17$parseRegister(c)
+			t: $author$project$Aoc17$parseRegister(c)
 		};
 	} else {
 		return {
-			E: _List_Nil,
-			u: 0,
+			C: _List_Nil,
+			s: 0,
 			m: $elm$core$Array$empty,
-			d: $cmditch$elm_bigint$BigInt$fromInt(0),
+			e: $cmditch$elm_bigint$BigInt$fromInt(0),
 			p: $cmditch$elm_bigint$BigInt$fromInt(0),
-			v: $cmditch$elm_bigint$BigInt$fromInt(0)
+			t: $cmditch$elm_bigint$BigInt$fromInt(0)
 		};
 	}
 };
@@ -6025,7 +6025,7 @@ var $author$project$Aoc17$initComputer = function (dataSource) {
 var $author$project$Aoc17$initModel = F2(
 	function (deviceStatus, dataSource) {
 		var computer = $author$project$Aoc17$initComputer(dataSource);
-		var model = {O: $author$project$Aoc17$defaultBackgroundColor, W: 1111, y: 1000, c: computer, X: 177, q: dataSource, ac: '', i: deviceStatus, Y: false, Z: 477, z: computer.d, R: computer, s: '', t: true, aa: 0, H: 200};
+		var model = {N: $author$project$Aoc17$defaultBackgroundColor, U: 1111, w: 1000, f: computer, V: 177, x: dataSource, an: '', h: deviceStatus, W: false, Y: 477, Z: computer, P: '', D: $elm$core$Maybe$Nothing, r: true, aa: 0, G: 200};
 		return model;
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
@@ -6456,12 +6456,12 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc17$subscriptions = function (model) {
 	var tick = function () {
-		var _v3 = model.i;
+		var _v3 = model.h;
 		switch (_v3.$) {
 			case 1:
-				return model.t ? $elm$core$Platform$Sub$none : A2(
+				return model.r ? $elm$core$Platform$Sub$none : A2(
 					$elm$time$Time$every,
-					model.H,
+					model.G,
 					function (_v4) {
 						return $author$project$Aoc17$Tick;
 					});
@@ -6471,13 +6471,13 @@ var $author$project$Aoc17$subscriptions = function (model) {
 						[
 							A2(
 							$elm$time$Time$every,
-							model.y,
+							model.w,
 							function (_v5) {
 								return $author$project$Aoc17$BootTick;
 							}),
 							A2(
 							$elm$time$Time$every,
-							model.W,
+							model.U,
 							function (_v6) {
 								return $author$project$Aoc17$BlackoutTick;
 							})
@@ -6493,7 +6493,7 @@ var $author$project$Aoc17$subscriptions = function (model) {
 	}();
 	var lightBackgroundTick = A2(
 		$elm$time$Time$every,
-		model.Z,
+		model.Y,
 		function (_v2) {
 			return $author$project$Aoc17$LightBackgroundTick;
 		});
@@ -6505,7 +6505,7 @@ var $author$project$Aoc17$subscriptions = function (model) {
 		});
 	var darkBackgroundTick = A2(
 		$elm$time$Time$every,
-		model.X,
+		model.V,
 		function (_v0) {
 			return $author$project$Aoc17$DarkBackgroundTick;
 		});
@@ -6520,7 +6520,7 @@ var $author$project$Aoc17$updateBackgroundColor = F2(
 	function (color, model) {
 		return _Utils_update(
 			model,
-			{O: color});
+			{N: color});
 	});
 var $author$project$Aoc17$Booted = {$: 1};
 var $author$project$Aoc17$Quining = function (a) {
@@ -6528,11 +6528,11 @@ var $author$project$Aoc17$Quining = function (a) {
 };
 var $author$project$Aoc17$updateBootTick = function (model) {
 	var deviceStatus = function () {
-		var _v0 = model.i;
+		var _v0 = model.h;
 		switch (_v0.$) {
 			case 0:
 				var ticks = _v0.a;
-				return (_Utils_cmp(ticks, 6 * model.y) < 1) ? $author$project$Aoc17$Booting(ticks + model.y) : $author$project$Aoc17$Booted;
+				return (_Utils_cmp(ticks, 6 * model.w) < 1) ? $author$project$Aoc17$Booting(ticks + model.w) : $author$project$Aoc17$Booted;
 			case 1:
 				return $author$project$Aoc17$Booted;
 			default:
@@ -6542,14 +6542,19 @@ var $author$project$Aoc17$updateBootTick = function (model) {
 	}();
 	return _Utils_update(
 		model,
-		{i: deviceStatus});
+		{h: deviceStatus});
 };
 var $author$project$Aoc17$updateDataSource = F2(
 	function (dataSource, model) {
-		var computer = $author$project$Aoc17$initComputer(dataSource);
-		return _Utils_update(
-			model,
-			{c: computer, q: dataSource, R: computer, s: ''});
+		var deviceStatus = function () {
+			var _v0 = model.h;
+			if (_v0.$ === 2) {
+				return $author$project$Aoc17$Booted;
+			} else {
+				return model.h;
+			}
+		}();
+		return A2($author$project$Aoc17$initModel, deviceStatus, dataSource);
 	});
 var $author$project$Aoc17$Ongoing = function (a) {
 	return {$: 1, a: a};
@@ -7065,120 +7070,6 @@ var $author$project$Aoc17$quineA0 = function (computer) {
 		A2($cmditch$elm_bigint$BigInt$sub, bigLen, big1));
 	return a0;
 };
-var $elm$core$String$concat = function (strings) {
-	return A2($elm$core$String$join, '', strings);
-};
-var $elm$core$String$cons = _String_cons;
-var $elm$core$String$fromChar = function (_char) {
-	return A2($elm$core$String$cons, _char, '');
-};
-var $elm$core$Bitwise$and = _Bitwise_and;
-var $elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
-var $elm$core$String$repeatHelp = F3(
-	function (n, chunk, result) {
-		return (n <= 0) ? result : A3(
-			$elm$core$String$repeatHelp,
-			n >> 1,
-			_Utils_ap(chunk, chunk),
-			(!(n & 1)) ? result : _Utils_ap(result, chunk));
-	});
-var $elm$core$String$repeat = F2(
-	function (n, chunk) {
-		return A3($elm$core$String$repeatHelp, n, chunk, '');
-	});
-var $elm$core$String$padLeft = F3(
-	function (n, _char, string) {
-		return _Utils_ap(
-			A2(
-				$elm$core$String$repeat,
-				n - $elm$core$String$length(string),
-				$elm$core$String$fromChar(_char)),
-			string);
-	});
-var $cmditch$elm_bigint$BigInt$fillZeroes = A2(
-	$elm$core$Basics$composeL,
-	A2($elm$core$String$padLeft, $cmditch$elm_bigint$Constants$maxDigitMagnitude, '0'),
-	$elm$core$String$fromInt);
-var $cmditch$elm_bigint$BigInt$revMagnitudeToString = function (_v0) {
-	var digits = _v0;
-	var _v1 = $elm$core$List$reverse(digits);
-	if (!_v1.b) {
-		return '0';
-	} else {
-		var x = _v1.a;
-		var xs = _v1.b;
-		return $elm$core$String$concat(
-			A2(
-				$elm$core$List$cons,
-				$elm$core$String$fromInt(x),
-				A2($elm$core$List$map, $cmditch$elm_bigint$BigInt$fillZeroes, xs)));
-	}
-};
-var $cmditch$elm_bigint$BigInt$toString = function (bigInt) {
-	switch (bigInt.$) {
-		case 2:
-			return '0';
-		case 0:
-			var mag = bigInt.a;
-			return $cmditch$elm_bigint$BigInt$revMagnitudeToString(mag);
-		default:
-			var mag = bigInt.a;
-			return '-' + $cmditch$elm_bigint$BigInt$revMagnitudeToString(mag);
-	}
-};
-var $author$project$Aoc17$updateFindQuine = function (model) {
-	var computer = model.R;
-	var qci = {
-		J: $author$project$Aoc17$quineA0(computer),
-		P: 1
-	};
-	var str = 'index: ' + ($elm$core$String$fromInt(qci.P) + (' a0: ' + $cmditch$elm_bigint$BigInt$toString(qci.J)));
-	var cmp = _Utils_update(
-		computer,
-		{d: qci.J});
-	var deviceStatus = $author$project$Aoc17$Quining(
-		$author$project$Aoc17$Ongoing(
-			{
-				_: _List_fromArray(
-					[
-						_Utils_Tuple2(qci, cmp)
-					]),
-				ab: 0
-			}));
-	return _Utils_update(
-		model,
-		{c: computer, ac: 'Initiating quine find... ' + str, i: deviceStatus});
-};
-var $author$project$Aoc17$updateOverwriteRegA = F2(
-	function (overwrittenA, model) {
-		if ($elm$core$String$isEmpty(overwrittenA)) {
-			var computer = model.c;
-			return _Utils_update(
-				model,
-				{
-					c: _Utils_update(
-						computer,
-						{d: model.z}),
-					s: ''
-				});
-		} else {
-			var _v0 = $cmditch$elm_bigint$BigInt$fromIntString(overwrittenA);
-			if (!_v0.$) {
-				var a = _v0.a;
-				var computer = model.c;
-				return _Utils_update(
-					model,
-					{
-						c: _Utils_update(
-							computer,
-							{d: a}),
-						s: overwrittenA
-					});
-			} else {
-				return model;
-			}
-		}
-	});
 var $author$project$Aoc17$Done = function (a) {
 	return {$: 0, a: a};
 };
@@ -7190,6 +7081,7 @@ var $elm$core$List$append = F2(
 			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
 		}
 	});
+var $elm$core$Bitwise$and = _Bitwise_and;
 var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
 var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
 var $elm$core$Basics$ge = _Utils_ge;
@@ -7232,7 +7124,7 @@ var $elm$core$Array$get = F2(
 			A3($elm$core$Array$getHelp, startShift, index, tree)));
 	});
 var $author$project$Aoc17$literal = function (computer) {
-	var pt = computer.u;
+	var pt = computer.s;
 	return A2(
 		$elm$core$Maybe$withDefault,
 		0,
@@ -7250,17 +7142,17 @@ var $author$project$Aoc17$combo = function (computer) {
 		case 3:
 			return $cmditch$elm_bigint$BigInt$fromInt(3);
 		case 4:
-			return computer.d;
+			return computer.e;
 		case 5:
 			return computer.p;
 		case 6:
-			return computer.v;
+			return computer.t;
 		default:
 			return $cmditch$elm_bigint$BigInt$fromInt(0);
 	}
 };
 var $author$project$Aoc17$division = function (computer) {
-	var numerator = computer.d;
+	var numerator = computer.e;
 	var denominator = A2(
 		$cmditch$elm_bigint$BigInt$pow,
 		$cmditch$elm_bigint$BigInt$fromInt(2),
@@ -7270,13 +7162,13 @@ var $author$project$Aoc17$division = function (computer) {
 var $author$project$Aoc17$nextInstruction = function (computer) {
 	return _Utils_update(
 		computer,
-		{u: computer.u + 2});
+		{s: computer.s + 2});
 };
 var $author$project$Aoc17$writeA = F2(
 	function (value, computer) {
 		return _Utils_update(
 			computer,
-			{d: value});
+			{e: value});
 	});
 var $author$project$Aoc17$adv = function (computer) {
 	return $author$project$Aoc17$nextInstruction(
@@ -7433,7 +7325,7 @@ var $author$project$Aoc17$bxc = function (computer) {
 	return $author$project$Aoc17$nextInstruction(
 		A2(
 			$author$project$Aoc17$writeB,
-			A2($author$project$Aoc17$bigXor, computer.p, computer.v),
+			A2($author$project$Aoc17$bigXor, computer.p, computer.t),
 			computer));
 };
 var $author$project$Aoc17$bxl = function (computer) {
@@ -7451,7 +7343,7 @@ var $author$project$Aoc17$writeC = F2(
 	function (value, computer) {
 		return _Utils_update(
 			computer,
-			{v: value});
+			{t: value});
 	});
 var $author$project$Aoc17$cdv = function (computer) {
 	return $author$project$Aoc17$nextInstruction(
@@ -7464,11 +7356,11 @@ var $author$project$Aoc17$jump = F2(
 	function (target, computer) {
 		return _Utils_update(
 			computer,
-			{u: target});
+			{s: target});
 	});
 var $author$project$Aoc17$jnz = function (computer) {
 	return _Utils_eq(
-		computer.d,
+		computer.e,
 		$cmditch$elm_bigint$BigInt$fromInt(0)) ? $author$project$Aoc17$nextInstruction(computer) : A2(
 		$author$project$Aoc17$jump,
 		$author$project$Aoc17$literal(computer),
@@ -7479,9 +7371,69 @@ var $author$project$Aoc17$output = F2(
 		return _Utils_update(
 			computer,
 			{
-				E: A2($elm$core$List$cons, value, computer.E)
+				C: A2($elm$core$List$cons, value, computer.C)
 			});
 	});
+var $elm$core$String$concat = function (strings) {
+	return A2($elm$core$String$join, '', strings);
+};
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
+var $elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
+var $elm$core$String$repeatHelp = F3(
+	function (n, chunk, result) {
+		return (n <= 0) ? result : A3(
+			$elm$core$String$repeatHelp,
+			n >> 1,
+			_Utils_ap(chunk, chunk),
+			(!(n & 1)) ? result : _Utils_ap(result, chunk));
+	});
+var $elm$core$String$repeat = F2(
+	function (n, chunk) {
+		return A3($elm$core$String$repeatHelp, n, chunk, '');
+	});
+var $elm$core$String$padLeft = F3(
+	function (n, _char, string) {
+		return _Utils_ap(
+			A2(
+				$elm$core$String$repeat,
+				n - $elm$core$String$length(string),
+				$elm$core$String$fromChar(_char)),
+			string);
+	});
+var $cmditch$elm_bigint$BigInt$fillZeroes = A2(
+	$elm$core$Basics$composeL,
+	A2($elm$core$String$padLeft, $cmditch$elm_bigint$Constants$maxDigitMagnitude, '0'),
+	$elm$core$String$fromInt);
+var $cmditch$elm_bigint$BigInt$revMagnitudeToString = function (_v0) {
+	var digits = _v0;
+	var _v1 = $elm$core$List$reverse(digits);
+	if (!_v1.b) {
+		return '0';
+	} else {
+		var x = _v1.a;
+		var xs = _v1.b;
+		return $elm$core$String$concat(
+			A2(
+				$elm$core$List$cons,
+				$elm$core$String$fromInt(x),
+				A2($elm$core$List$map, $cmditch$elm_bigint$BigInt$fillZeroes, xs)));
+	}
+};
+var $cmditch$elm_bigint$BigInt$toString = function (bigInt) {
+	switch (bigInt.$) {
+		case 2:
+			return '0';
+		case 0:
+			var mag = bigInt.a;
+			return $cmditch$elm_bigint$BigInt$revMagnitudeToString(mag);
+		default:
+			var mag = bigInt.a;
+			return '-' + $cmditch$elm_bigint$BigInt$revMagnitudeToString(mag);
+	}
+};
 var $author$project$Aoc17$shrinkInt = function (big) {
 	var _v0 = $elm$core$String$toInt(
 		$cmditch$elm_bigint$BigInt$toString(big));
@@ -7530,7 +7482,7 @@ var $author$project$Aoc17$executeOpcode = F2(
 		}
 	});
 var $author$project$Aoc17$tryReadOpcode = function (computer) {
-	var pt = computer.u;
+	var pt = computer.s;
 	return A2($elm$core$Array$get, pt, computer.m);
 };
 var $author$project$Aoc17$executeInstruction = function (computer) {
@@ -7559,9 +7511,9 @@ var $author$project$Aoc17$checkTarget = F4(
 		var c = $author$project$Aoc17$execute(
 			_Utils_update(
 				computer,
-				{d: candidateA}));
+				{e: candidateA}));
 		var program = $elm$core$Array$fromList(
-			$elm$core$List$reverse(c.E));
+			$elm$core$List$reverse(c.C));
 		var sameLength = _Utils_eq(
 			$elm$core$Array$length(p),
 			$elm$core$Array$length(program));
@@ -7570,7 +7522,7 @@ var $author$project$Aoc17$checkTarget = F4(
 			var n = _v0.a;
 			var cmp = _Utils_update(
 				c,
-				{d: candidateA, p: computer.p, v: computer.v});
+				{e: candidateA, p: computer.p, t: computer.t});
 			return (sameLength && _Utils_eq(n, target)) ? $elm$core$Maybe$Just(cmp) : $elm$core$Maybe$Nothing;
 		} else {
 			return $elm$core$Maybe$Nothing;
@@ -7579,12 +7531,12 @@ var $author$project$Aoc17$checkTarget = F4(
 var $author$project$Aoc17$quineStep = F4(
 	function (steps, pending, qci, computer) {
 		var len = $elm$core$Array$length(computer.m);
-		var ix = qci.P;
+		var ix = qci.X;
 		var opIndex = len - ix;
 		var bigLen = $cmditch$elm_bigint$BigInt$fromInt(len);
 		var bigIx = $cmditch$elm_bigint$BigInt$fromInt(ix);
 		var big8 = $cmditch$elm_bigint$BigInt$fromInt(8);
-		var a = qci.J;
+		var a = qci.L;
 		if (_Utils_cmp(ix, len) > 0) {
 			return $author$project$Aoc17$Done(a);
 		} else {
@@ -7603,7 +7555,7 @@ var $author$project$Aoc17$quineStep = F4(
 						$elm$core$Maybe$map,
 						function (c) {
 							return _Utils_Tuple2(
-								{J: ca, P: ix + 1},
+								{L: ca, X: ix + 1},
 								c);
 						},
 						A4($author$project$Aoc17$checkTarget, computer, opIndex, target, ca));
@@ -7626,8 +7578,8 @@ var $author$project$Aoc17$quineStep = F4(
 		}
 	});
 var $author$project$Aoc17$updateQuineStep = function (model) {
-	var computer = model.R;
-	var _v0 = model.i;
+	var computer = model.Z;
+	var _v0 = model.h;
 	switch (_v0.$) {
 		case 0:
 			return model;
@@ -7640,17 +7592,17 @@ var $author$project$Aoc17$updateQuineStep = function (model) {
 				var nextDeviceStatus = $author$project$Aoc17$Booted;
 				var nextComputer = _Utils_update(
 					computer,
-					{d: a});
+					{e: a});
 				return _Utils_update(
 					model,
-					{c: nextComputer, i: nextDeviceStatus});
+					{f: nextComputer, h: nextDeviceStatus});
 			} else {
 				var qi = qm.a;
 				var _v2 = qi._;
 				if (!_v2.b) {
 					return _Utils_update(
 						model,
-						{i: $author$project$Aoc17$Booted});
+						{h: $author$project$Aoc17$Booted});
 				} else {
 					var _v3 = _v2.a;
 					var qci = _v3.a;
@@ -7660,43 +7612,93 @@ var $author$project$Aoc17$updateQuineStep = function (model) {
 					var nextDeviceStatus = $author$project$Aoc17$Quining(nextQm);
 					return _Utils_update(
 						model,
-						{c: cmp, i: nextDeviceStatus});
+						{f: cmp, h: nextDeviceStatus});
 				}
 			}
 	}
 };
+var $author$project$Aoc17$updateFindQuine = function (model) {
+	var computer = model.Z;
+	var qci = {
+		L: $author$project$Aoc17$quineA0(computer),
+		X: 1
+	};
+	var cmp = _Utils_update(
+		computer,
+		{e: qci.L});
+	var deviceStatus = $author$project$Aoc17$Quining(
+		$author$project$Aoc17$Ongoing(
+			{
+				_: _List_fromArray(
+					[
+						_Utils_Tuple2(qci, cmp)
+					]),
+				ab: 0
+			}));
+	return $author$project$Aoc17$updateQuineStep(
+		_Utils_update(
+			model,
+			{f: computer, h: deviceStatus}));
+};
+var $author$project$Aoc17$updateOverwriteRegA = F2(
+	function (aStr, model) {
+		if ($elm$core$String$isEmpty(aStr)) {
+			var regA = A2(
+				$elm$core$Maybe$withDefault,
+				$cmditch$elm_bigint$BigInt$fromInt(0),
+				model.D);
+			var computer = model.f;
+			return _Utils_update(
+				model,
+				{
+					f: _Utils_update(
+						computer,
+						{e: regA}),
+					P: '',
+					D: $elm$core$Maybe$Nothing
+				});
+		} else {
+			var _v0 = $cmditch$elm_bigint$BigInt$fromIntString(aStr);
+			if (!_v0.$) {
+				var a = _v0.a;
+				var computer = model.f;
+				return _Utils_update(
+					model,
+					{
+						f: _Utils_update(
+							computer,
+							{e: a}),
+						P: aStr,
+						D: $elm$core$Maybe$Just(model.f.e)
+					});
+			} else {
+				return model;
+			}
+		}
+	});
 var $author$project$Aoc17$updateReboot = function (model) {
 	return A2(
 		$author$project$Aoc17$initModel,
 		$author$project$Aoc17$Booting(0),
-		model.q);
+		model.x);
 };
 var $author$project$Aoc17$updateReset = function (model) {
-	var m = A2($author$project$Aoc17$initModel, $author$project$Aoc17$Booted, model.q);
-	var c = m.c;
-	return _Utils_update(
-		m,
-		{
-			c: _Utils_update(
-				c,
-				{d: model.z}),
-			z: model.z,
-			s: ''
-		});
+	var m = A2($author$project$Aoc17$initModel, $author$project$Aoc17$Booted, model.x);
+	return m;
 };
 var $author$project$Aoc17$updateProgramFinished = function (model) {
 	return _Utils_update(
 		model,
-		{Y: true, t: true});
+		{W: true, r: true});
 };
 var $author$project$Aoc17$updateProgramRunning = F2(
 	function (computer, model) {
 		return _Utils_update(
 			model,
-			{c: computer, aa: model.aa + 1});
+			{f: computer, aa: model.aa + 1});
 	});
 var $author$project$Aoc17$updateStep = function (model) {
-	var _v0 = $author$project$Aoc17$executeInstruction(model.c);
+	var _v0 = $author$project$Aoc17$executeInstruction(model.f);
 	if (_v0.$ === 1) {
 		return $author$project$Aoc17$updateProgramFinished(model);
 	} else {
@@ -7705,19 +7707,19 @@ var $author$project$Aoc17$updateStep = function (model) {
 	}
 };
 var $author$project$Aoc17$updateTogglePlay = function (model) {
-	if (model.Y) {
-		var m = A2($author$project$Aoc17$initModel, $author$project$Aoc17$Booted, model.q);
-		var computer = m.c;
+	if (model.W) {
+		var m = A2($author$project$Aoc17$initModel, $author$project$Aoc17$Booted, model.x);
+		var computer = m.f;
 		var c = _Utils_update(
 			computer,
-			{d: model.c.d});
+			{e: model.f.e});
 		return _Utils_update(
 			m,
-			{c: c, z: model.z, s: model.s, t: false});
+			{f: c, D: model.D, r: false});
 	} else {
 		return _Utils_update(
 			model,
-			{t: !model.t});
+			{r: !model.r});
 	}
 };
 var $author$project$Aoc17$update = F2(
@@ -7743,13 +7745,13 @@ var $author$project$Aoc17$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{H: model.H / 2}),
+						{G: model.G / 2}),
 					$elm$core$Platform$Cmd$none);
 			case 5:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{H: model.H * 2}),
+						{G: model.G * 2}),
 					$elm$core$Platform$Cmd$none);
 			case 3:
 				return _Utils_Tuple2(
@@ -7779,7 +7781,7 @@ var $author$project$Aoc17$update = F2(
 						$author$project$Aoc17$darkBackgroundColor,
 						_Utils_update(
 							model,
-							{X: 1377})),
+							{V: 1377})),
 					$elm$core$Platform$Cmd$none);
 			case 12:
 				return _Utils_Tuple2(
@@ -7788,7 +7790,7 @@ var $author$project$Aoc17$update = F2(
 						$author$project$Aoc17$lightBackgroundColor,
 						_Utils_update(
 							model,
-							{Z: 7977})),
+							{Y: 7977})),
 					$elm$core$Platform$Cmd$none);
 			case 13:
 				var overwrittenA = msg.a;
@@ -8067,9 +8069,9 @@ var $author$project$Aoc17$toBootedElements = function (model) {
 				$elm$svg$Svg$Attributes$fillOpacity('0.2')
 			]),
 		_List_Nil);
-	var computer = model.c;
-	var outputs = $elm$core$List$reverse(computer.E);
-	var pointer = computer.u;
+	var computer = model.f;
+	var outputs = $elm$core$List$reverse(computer.C);
+	var pointer = computer.s;
 	var paddings = 1 + (2 * pointer);
 	var pointerText = (_Utils_cmp(
 		pointer,
@@ -8108,7 +8110,7 @@ var $author$project$Aoc17$toBootedElements = function (model) {
 			[
 				$elm$svg$Svg$text(programStr)
 			]));
-	var regAText0 = $cmditch$elm_bigint$BigInt$toString(computer.d);
+	var regAText0 = $cmditch$elm_bigint$BigInt$toString(computer.e);
 	var regAText = ($elm$core$String$length(regAText0) > 36) ? (A2($elm$core$String$left, 33, regAText0) + '...') : regAText0;
 	var regAValue = A2(
 		$elm$svg$Svg$text_,
@@ -8138,7 +8140,7 @@ var $author$project$Aoc17$toBootedElements = function (model) {
 			[
 				$elm$svg$Svg$text(regBText)
 			]));
-	var regCText0 = $cmditch$elm_bigint$BigInt$toString(computer.v);
+	var regCText0 = $cmditch$elm_bigint$BigInt$toString(computer.t);
 	var regCText = ($elm$core$String$length(regCText0) > 36) ? (A2($elm$core$String$left, 33, regCText0) + '...') : regCText0;
 	var regCValue = A2(
 		$elm$svg$Svg$text_,
@@ -8238,7 +8240,7 @@ var $author$project$Aoc17$toBootingElements = F2(
 		var svgHeight = $elm$core$String$fromInt(386);
 		var dots = A2(
 			$elm$core$String$repeat,
-			$elm$core$Basics$floor(ticks / model.y) - 4,
+			$elm$core$Basics$floor(ticks / model.w) - 4,
 			'.');
 		var debuggerText = A2(
 			$elm$svg$Svg$text_,
@@ -8298,8 +8300,8 @@ var $author$project$Aoc17$toBootingElements = F2(
 			_List_fromArray(
 				[
 					$elm$core$Maybe$Just(criticalText),
-					(_Utils_cmp(ticks, 2 * model.y) > -1) ? $elm$core$Maybe$Just(bootstrappingText) : $elm$core$Maybe$Nothing,
-					(_Utils_cmp(ticks, 4 * model.y) > -1) ? $elm$core$Maybe$Just(debuggerText) : $elm$core$Maybe$Nothing
+					(_Utils_cmp(ticks, 2 * model.w) > -1) ? $elm$core$Maybe$Just(bootstrappingText) : $elm$core$Maybe$Nothing,
+					(_Utils_cmp(ticks, 4 * model.w) > -1) ? $elm$core$Maybe$Just(debuggerText) : $elm$core$Maybe$Nothing
 				]));
 		return A2(
 			$elm$core$List$append,
@@ -8313,21 +8315,21 @@ var $author$project$Aoc17$toSvg = function (model) {
 	var svgHeight = $elm$core$String$fromInt(386);
 	var viewBoxStr = '0 0 ' + (svgWidth + (' ' + svgHeight));
 	var elements = function () {
-		var _v0 = model.i;
+		var _v0 = model.h;
 		switch (_v0.$) {
 			case 0:
 				var ticks = _v0.a;
-				return (_Utils_eq(model.O, $author$project$Aoc17$blackoutColor) && (!A2(
+				return (_Utils_eq(model.N, $author$project$Aoc17$blackoutColor) && (!A2(
 					$elm$core$Basics$modBy,
 					2,
-					($elm$core$Basics$floor(ticks) / $elm$core$Basics$floor(model.W)) | 0))) ? A2($author$project$Aoc17$toBlackoutElements, model, ticks) : A2($author$project$Aoc17$toBootingElements, model, ticks);
+					($elm$core$Basics$floor(ticks) / $elm$core$Basics$floor(model.U)) | 0))) ? A2($author$project$Aoc17$toBlackoutElements, model, ticks) : A2($author$project$Aoc17$toBootingElements, model, ticks);
 			case 1:
 				return $author$project$Aoc17$toBootedElements(model);
 			default:
 				return $author$project$Aoc17$toBootedElements(model);
 		}
 	}();
-	var backgroundColor = model.O;
+	var backgroundColor = model.N;
 	return A2(
 		$elm$svg$Svg$svg,
 		_List_fromArray(
@@ -8345,7 +8347,7 @@ var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('
 var $author$project$Aoc17$viewBody = function (model) {
 	var s = $author$project$Aoc17$toSvg(model);
 	var isBooted = function () {
-		var _v0 = model.i;
+		var _v0 = model.h;
 		if (_v0.$ === 1) {
 			return true;
 		} else {
@@ -8517,7 +8519,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(
 										$author$project$Aoc17$UseDataSource(0)),
-										$elm$html$Html$Attributes$checked(!model.q)
+										$elm$html$Html$Attributes$checked(!model.x)
 									]),
 								_List_Nil),
 								A2(
@@ -8534,7 +8536,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(
 										$author$project$Aoc17$UseDataSource(1)),
-										$elm$html$Html$Attributes$checked(model.q === 1)
+										$elm$html$Html$Attributes$checked(model.x === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -8551,7 +8553,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(
 										$author$project$Aoc17$UseDataSource(2)),
-										$elm$html$Html$Attributes$checked(model.q === 2)
+										$elm$html$Html$Attributes$checked(model.x === 2)
 									]),
 								_List_Nil),
 								A2(
@@ -8650,7 +8652,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 									]),
 								_List_fromArray(
 									[
-										model.t ? $elm$html$Html$text('Run') : $elm$html$Html$text('Halt')
+										model.r ? $elm$html$Html$text('Run') : $elm$html$Html$text('Halt')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -8707,9 +8709,9 @@ var $author$project$Aoc17$viewBody = function (model) {
 								$elm$html$Html$input,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$value(model.s),
+										$elm$html$Html$Attributes$value(model.P),
 										$elm$html$Html$Events$onInput($author$project$Aoc17$OverwriteRegA),
-										$elm$html$Html$Attributes$disabled((!isBooted) || (!model.t))
+										$elm$html$Html$Attributes$disabled((!isBooted) || (!model.r))
 									]),
 								_List_Nil)
 							]))
