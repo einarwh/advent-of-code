@@ -6038,7 +6038,7 @@ var $author$project$Aoc17Quine$initComputer = function (dataSource) {
 var $author$project$Aoc17Quine$initModel = F2(
 	function (deviceStatus, dataSource) {
 		var computer = $author$project$Aoc17Quine$initComputer(dataSource);
-		var model = {backgroundColor: $author$project$Aoc17Quine$defaultBackgroundColor, blackoutTickInterval: 1111, bootTickInterval: 1000, computer: computer, darkBackgroundTickInterval: 177, dataSource: dataSource, debug: '', deviceStatus: deviceStatus, finished: false, lightBackgroundTickInterval: 477, loadedA: computer.regA, overwrittenA: '', paused: true, step: 0, tickInterval: 200};
+		var model = {backgroundColor: $author$project$Aoc17Quine$defaultBackgroundColor, blackoutTickInterval: 1111, bootTickInterval: 1000, computer: computer, darkBackgroundTickInterval: 177, dataSource: dataSource, debug: '', deviceStatus: deviceStatus, finished: false, lightBackgroundTickInterval: 477, loadedA: computer.regA, loadedComputer: computer, overwrittenA: '', paused: true, step: 0, tickInterval: 200};
 		return model;
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
@@ -6497,7 +6497,7 @@ var $author$project$Aoc17Quine$subscriptions = function (model) {
 			default:
 				return A2(
 					$elm$time$Time$every,
-					100,
+					1000,
 					function (_v7) {
 						return $author$project$Aoc17Quine$QuineTick;
 					});
@@ -7167,16 +7167,22 @@ var $cmditch$elm_bigint$BigInt$toString = function (bigInt) {
 	}
 };
 var $author$project$Aoc17Quine$updateFindQuine = function (model) {
+	var computer = model.computer;
 	var qci = {
-		a: $author$project$Aoc17Quine$quineA0(model.computer),
+		a: $author$project$Aoc17Quine$quineA0(computer),
 		index: 1
 	};
 	var str = 'index: ' + ($elm$core$String$fromInt(qci.index) + (' a0: ' + $cmditch$elm_bigint$BigInt$toString(qci.a)));
+	var cmp = _Utils_update(
+		computer,
+		{regA: qci.a});
 	var deviceStatus = $author$project$Aoc17Quine$Quining(
 		$author$project$Aoc17Quine$Ongoing(
 			{
 				pending: _List_fromArray(
-					[qci]),
+					[
+						_Utils_Tuple2(qci, cmp)
+					]),
 				steps: 0
 			}));
 	return _Utils_update(
@@ -7578,8 +7584,7 @@ var $author$project$Aoc17Quine$execute = function (computer) {
 	while (true) {
 		var _v0 = $author$project$Aoc17Quine$executeInstruction(computer);
 		if (_v0.$ === 'Nothing') {
-			return $elm$core$Array$fromList(
-				$elm$core$List$reverse(computer.outputs));
+			return computer;
 		} else {
 			var c = _v0.a;
 			var $temp$computer = c;
@@ -7590,16 +7595,21 @@ var $author$project$Aoc17Quine$execute = function (computer) {
 };
 var $author$project$Aoc17Quine$checkTarget = F4(
 	function (computer, opIndex, target, candidateA) {
-		var program = $author$project$Aoc17Quine$execute(
+		var c = $author$project$Aoc17Quine$execute(
 			_Utils_update(
 				computer,
 				{regA: candidateA}));
+		var program = $elm$core$Array$fromList(
+			$elm$core$List$reverse(c.outputs));
 		var _v0 = A2($elm$core$Array$get, opIndex, program);
 		if (_v0.$ === 'Just') {
 			var n = _v0.a;
-			return _Utils_eq(n, target);
+			var cmp = _Utils_update(
+				c,
+				{regA: candidateA, regB: computer.regB, regC: computer.regC});
+			return _Utils_eq(n, target) ? $elm$core$Maybe$Just(cmp) : $elm$core$Maybe$Nothing;
 		} else {
-			return false;
+			return $elm$core$Maybe$Nothing;
 		}
 	});
 var $author$project$Aoc17Quine$writeLog = F2(
@@ -7647,8 +7657,14 @@ var $author$project$Aoc17Quine$quineStep = F5(
 			var candidates = A2(
 				$elm$core$List$filterMap,
 				function (ca) {
-					return A4($author$project$Aoc17Quine$checkTarget, computer, opIndex, target, ca) ? $elm$core$Maybe$Just(
-						{a: ca, index: ix + 1}) : $elm$core$Maybe$Nothing;
+					return A2(
+						$elm$core$Maybe$map,
+						function (c) {
+							return _Utils_Tuple2(
+								{a: ca, index: ix + 1},
+								c);
+						},
+						A4($author$project$Aoc17Quine$checkTarget, computer, opIndex, target, ca));
 				},
 				A2(
 					$elm$core$List$map,
@@ -7676,17 +7692,13 @@ var $author$project$Aoc17Quine$quineStep = F5(
 	});
 var $author$project$Aoc17Quine$updateQuineStep = function (model) {
 	var log = _List_Nil;
-	var computer = model.computer;
+	var computer = model.loadedComputer;
 	var _v0 = model.deviceStatus;
 	switch (_v0.$) {
 		case 'Booting':
-			return _Utils_update(
-				model,
-				{debug: 'Also booting'});
+			return model;
 		case 'Booted':
-			return _Utils_update(
-				model,
-				{debug: 'Also booted'});
+			return model;
 		default:
 			var qm = _v0.a;
 			if (qm.$ === 'Done') {
@@ -7697,38 +7709,24 @@ var $author$project$Aoc17Quine$updateQuineStep = function (model) {
 					{regA: a});
 				return _Utils_update(
 					model,
-					{
-						computer: nextComputer,
-						debug: 'quining done ' + $cmditch$elm_bigint$BigInt$toString(a),
-						deviceStatus: nextDeviceStatus
-					});
+					{computer: nextComputer, deviceStatus: nextDeviceStatus});
 			} else {
 				var qi = qm.a;
 				var _v2 = qi.pending;
 				if (!_v2.b) {
-					return _Utils_update(
-						model,
-						{debug: 'nothing pending?'});
+					return model;
 				} else {
-					var qci = _v2.a;
+					var _v3 = _v2.a;
+					var qci = _v3.a;
+					var cmp = _v3.b;
 					var rest = _v2.b;
-					var _v3 = A5($author$project$Aoc17Quine$quineStep, log, qi.steps, rest, qci, computer);
-					var nextQm = _v3.a;
-					var log1 = _v3.b;
-					var debugStr = A2($elm$core$String$join, ' | ', log1);
+					var _v4 = A5($author$project$Aoc17Quine$quineStep, log, qi.steps, rest, qci, computer);
+					var nextQm = _v4.a;
+					var log1 = _v4.b;
 					var nextDeviceStatus = $author$project$Aoc17Quine$Quining(nextQm);
-					var pendingCount = function () {
-						if (nextQm.$ === 'Ongoing') {
-							var nextQi = nextQm.a;
-							return $elm$core$String$fromInt(
-								$elm$core$List$length(nextQi.pending));
-						} else {
-							return '.';
-						}
-					}();
 					return _Utils_update(
 						model,
-						{debug: 'keeps on quining ' + debugStr, deviceStatus: nextDeviceStatus});
+						{computer: cmp, deviceStatus: nextDeviceStatus});
 				}
 			}
 	}
@@ -8416,34 +8414,14 @@ var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Aoc17Quine$viewBody = function (model) {
 	var s = $author$project$Aoc17Quine$toSvg(model);
-	var message = function () {
-		var _v1 = model.deviceStatus;
-		switch (_v1.$) {
-			case 'Booting':
-				var ticks = _v1.a;
-				return 'Booting';
-			case 'Booted':
-				return 'Booted';
-			default:
-				var qm = _v1.a;
-				if (qm.$ === 'Done') {
-					var a = qm.a;
-					return 'Quining - Done: ' + $cmditch$elm_bigint$BigInt$toString(a);
-				} else {
-					var qi = qm.a;
-					return 'Quining - steps ' + $elm$core$String$fromInt(qi.steps);
-				}
-		}
-	}();
-	var isBooting = function () {
+	var isBooted = function () {
 		var _v0 = model.deviceStatus;
-		if (_v0.$ === 'Booting') {
+		if (_v0.$ === 'Booted') {
 			return true;
 		} else {
 			return false;
 		}
 	}();
-	var debugStr = model.debug;
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
@@ -8668,7 +8646,8 @@ var $author$project$Aoc17Quine$viewBody = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Aoc17Quine$FindQuine)
+										$elm$html$Html$Events$onClick($author$project$Aoc17Quine$FindQuine),
+										$elm$html$Html$Attributes$disabled(!isBooted)
 									]),
 								_List_fromArray(
 									[
@@ -8696,7 +8675,7 @@ var $author$project$Aoc17Quine$viewBody = function (model) {
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
 										$elm$html$Html$Events$onClick($author$project$Aoc17Quine$Reset),
-										$elm$html$Html$Attributes$disabled(isBooting)
+										$elm$html$Html$Attributes$disabled(!isBooted)
 									]),
 								_List_fromArray(
 									[
@@ -8708,7 +8687,7 @@ var $author$project$Aoc17Quine$viewBody = function (model) {
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
 										$elm$html$Html$Events$onClick($author$project$Aoc17Quine$Slower),
-										$elm$html$Html$Attributes$disabled(isBooting)
+										$elm$html$Html$Attributes$disabled(!isBooted)
 									]),
 								_List_fromArray(
 									[
@@ -8720,7 +8699,7 @@ var $author$project$Aoc17Quine$viewBody = function (model) {
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
 										$elm$html$Html$Events$onClick($author$project$Aoc17Quine$TogglePlay),
-										$elm$html$Html$Attributes$disabled(isBooting)
+										$elm$html$Html$Attributes$disabled(!isBooted)
 									]),
 								_List_fromArray(
 									[
@@ -8732,7 +8711,7 @@ var $author$project$Aoc17Quine$viewBody = function (model) {
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
 										$elm$html$Html$Events$onClick($author$project$Aoc17Quine$Faster),
-										$elm$html$Html$Attributes$disabled(isBooting)
+										$elm$html$Html$Attributes$disabled(!isBooted)
 									]),
 								_List_fromArray(
 									[
@@ -8744,7 +8723,7 @@ var $author$project$Aoc17Quine$viewBody = function (model) {
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
 										$elm$html$Html$Events$onClick($author$project$Aoc17Quine$Step),
-										$elm$html$Html$Attributes$disabled(isBooting)
+										$elm$html$Html$Attributes$disabled(!isBooted)
 									]),
 								_List_fromArray(
 									[
@@ -8783,23 +8762,9 @@ var $author$project$Aoc17Quine$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$value(model.overwrittenA),
 										$elm$html$Html$Events$onInput($author$project$Aoc17Quine$OverwriteRegA),
-										$elm$html$Html$Attributes$disabled(isBooting || (!model.paused))
+										$elm$html$Html$Attributes$disabled((!isBooted) || (!model.paused))
 									]),
-								_List_Nil),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Debug : ' + debugStr)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Message : ' + message)
-									]))
+								_List_Nil)
 							]))
 					])),
 				A2(
