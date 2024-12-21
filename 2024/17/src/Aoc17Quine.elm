@@ -1,4 +1,4 @@
-module Aoc17Quine exposing (..)
+module Aoc17 exposing (..)
 
 import Browser exposing (Document)
 import BigInt exposing (BigInt)
@@ -75,9 +75,6 @@ type alias Model =
   , darkBackgroundTickInterval : Float
   , lightBackgroundTickInterval : Float
   , debug : String }
-
-writeLog : String -> Log -> Log 
-writeLog line log = List.append log [ line ]
 
 parseRegister : String -> BigInt
 parseRegister s =
@@ -167,8 +164,8 @@ initModel deviceStatus dataSource =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel Booted Input, Cmd.none)
---   (initModel (Booting 0) Input, Cmd.none)
+--   (initModel Booted Input, Cmd.none)
+  (initModel (Booting 0) Input, Cmd.none)
 
 -- UPDATE
 
@@ -437,12 +434,11 @@ tryPick chooser lst =
         Nothing -> tryPick chooser rest 
         Just result -> Just result  
 
-quineStep : Log -> Int -> List (QuineCalculationInfo, Computer) -> QuineCalculationInfo -> Computer -> (QuineModel, Log) 
-quineStep log steps pending qci computer = 
+quineStep : Int -> List (QuineCalculationInfo, Computer) -> QuineCalculationInfo -> Computer -> QuineModel 
+quineStep steps pending qci computer = 
   let
     a = qci.a 
     ix = qci.index
-    log1 = log |> writeLog ("quineStep with a=" ++ (BigInt.toString a) ++ " ix=" ++ (String.fromInt ix))
     len = computer.program |> Array.length
     opIndex = len - ix 
     big8 = BigInt.fromInt 8
@@ -450,22 +446,19 @@ quineStep log steps pending qci computer =
     bigIx = BigInt.fromInt ix 
   in
     if ix > len then 
-      (Done a, log1 |> writeLog "done") 
+      Done a
     else 
       let
         target = Array.get opIndex computer.program |> Maybe.withDefault 99999999
-        log2 = log1 |> writeLog ("target=" ++ String.fromInt target)
         offset = BigInt.pow big8 (BigInt.sub bigLen bigIx) 
-        log3 = log2 |> writeLog ("offset=" ++ BigInt.toString offset)
         candidates = 
           List.range 0 7 
           |> List.map (BigInt.fromInt)
           |> List.map (\j -> BigInt.add a (BigInt.mul j offset))
           |> List.filterMap (\ca -> checkTarget computer opIndex target ca |> Maybe.map (\c -> ({ index = (ix + 1), a = ca }, c)))
-        log4 = log3 |> writeLog ("candidate count=" ++ String.fromInt (List.length candidates))
         nextPending = List.append candidates pending
       in
-        (Ongoing { steps = steps + 1, pending = nextPending }, log4)
+        Ongoing { steps = steps + 1, pending = nextPending }
 
 -- quine : Computer -> Maybe BigInt  
 -- quine computer = 
@@ -583,7 +576,6 @@ updateQuineStep : Model -> Model
 updateQuineStep model = 
   let 
     computer = model.loadedComputer 
-    log = []
   in 
       case model.deviceStatus of 
         Booting _ -> model 
@@ -601,7 +593,7 @@ updateQuineStep model =
                 [] -> model 
                 (qci, cmp) :: rest ->
                   let 
-                    (nextQm, log1) = quineStep log qi.steps rest qci computer 
+                    nextQm = quineStep qi.steps rest qci computer 
                     nextDeviceStatus = Quining nextQm
                   in 
                     { model | computer = cmp, deviceStatus = nextDeviceStatus } 

@@ -5357,7 +5357,9 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$document = _Browser_document;
-var $author$project$Aoc17Quine$Booted = {$: 'Booted'};
+var $author$project$Aoc17Quine$Booting = function (a) {
+	return {$: 'Booting', a: a};
+};
 var $author$project$Aoc17Quine$Input = {$: 'Input'};
 var $author$project$Aoc17Quine$defaultBackgroundColor = '#808080';
 var $cmditch$elm_bigint$BigInt$BigIntNotNormalised = F2(
@@ -6045,7 +6047,10 @@ var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Aoc17Quine$init = function (_v0) {
 	return _Utils_Tuple2(
-		A2($author$project$Aoc17Quine$initModel, $author$project$Aoc17Quine$Booted, $author$project$Aoc17Quine$Input),
+		A2(
+			$author$project$Aoc17Quine$initModel,
+			$author$project$Aoc17Quine$Booting(0),
+			$author$project$Aoc17Quine$Input),
 		$elm$core$Platform$Cmd$none);
 };
 var $author$project$Aoc17Quine$BlackoutTick = {$: 'BlackoutTick'};
@@ -6535,9 +6540,7 @@ var $author$project$Aoc17Quine$updateBackgroundColor = F2(
 			model,
 			{backgroundColor: color});
 	});
-var $author$project$Aoc17Quine$Booting = function (a) {
-	return {$: 'Booting', a: a};
-};
+var $author$project$Aoc17Quine$Booted = {$: 'Booted'};
 var $author$project$Aoc17Quine$Quining = function (a) {
 	return {$: 'Quining', a: a};
 };
@@ -7612,16 +7615,8 @@ var $author$project$Aoc17Quine$checkTarget = F4(
 			return $elm$core$Maybe$Nothing;
 		}
 	});
-var $author$project$Aoc17Quine$writeLog = F2(
-	function (line, log) {
-		return A2(
-			$elm$core$List$append,
-			log,
-			_List_fromArray(
-				[line]));
-	});
-var $author$project$Aoc17Quine$quineStep = F5(
-	function (log, steps, pending, qci, computer) {
+var $author$project$Aoc17Quine$quineStep = F4(
+	function (steps, pending, qci, computer) {
 		var len = $elm$core$Array$length(computer.program);
 		var ix = qci.index;
 		var opIndex = len - ix;
@@ -7629,14 +7624,8 @@ var $author$project$Aoc17Quine$quineStep = F5(
 		var bigIx = $cmditch$elm_bigint$BigInt$fromInt(ix);
 		var big8 = $cmditch$elm_bigint$BigInt$fromInt(8);
 		var a = qci.a;
-		var log1 = A2(
-			$author$project$Aoc17Quine$writeLog,
-			'quineStep with a=' + ($cmditch$elm_bigint$BigInt$toString(a) + (' ix=' + $elm$core$String$fromInt(ix))),
-			log);
 		if (_Utils_cmp(ix, len) > 0) {
-			return _Utils_Tuple2(
-				$author$project$Aoc17Quine$Done(a),
-				A2($author$project$Aoc17Quine$writeLog, 'done', log1));
+			return $author$project$Aoc17Quine$Done(a);
 		} else {
 			var target = A2(
 				$elm$core$Maybe$withDefault,
@@ -7646,14 +7635,6 @@ var $author$project$Aoc17Quine$quineStep = F5(
 				$cmditch$elm_bigint$BigInt$pow,
 				big8,
 				A2($cmditch$elm_bigint$BigInt$sub, bigLen, bigIx));
-			var log2 = A2(
-				$author$project$Aoc17Quine$writeLog,
-				'target=' + $elm$core$String$fromInt(target),
-				log1);
-			var log3 = A2(
-				$author$project$Aoc17Quine$writeLog,
-				'offset=' + $cmditch$elm_bigint$BigInt$toString(offset),
-				log2);
 			var candidates = A2(
 				$elm$core$List$filterMap,
 				function (ca) {
@@ -7678,20 +7659,12 @@ var $author$project$Aoc17Quine$quineStep = F5(
 						$elm$core$List$map,
 						$cmditch$elm_bigint$BigInt$fromInt,
 						A2($elm$core$List$range, 0, 7))));
-			var log4 = A2(
-				$author$project$Aoc17Quine$writeLog,
-				'candidate count=' + $elm$core$String$fromInt(
-					$elm$core$List$length(candidates)),
-				log3);
 			var nextPending = A2($elm$core$List$append, candidates, pending);
-			return _Utils_Tuple2(
-				$author$project$Aoc17Quine$Ongoing(
-					{pending: nextPending, steps: steps + 1}),
-				log4);
+			return $author$project$Aoc17Quine$Ongoing(
+				{pending: nextPending, steps: steps + 1});
 		}
 	});
 var $author$project$Aoc17Quine$updateQuineStep = function (model) {
-	var log = _List_Nil;
 	var computer = model.loadedComputer;
 	var _v0 = model.deviceStatus;
 	switch (_v0.$) {
@@ -7720,9 +7693,7 @@ var $author$project$Aoc17Quine$updateQuineStep = function (model) {
 					var qci = _v3.a;
 					var cmp = _v3.b;
 					var rest = _v2.b;
-					var _v4 = A5($author$project$Aoc17Quine$quineStep, log, qi.steps, rest, qci, computer);
-					var nextQm = _v4.a;
-					var log1 = _v4.b;
+					var nextQm = A4($author$project$Aoc17Quine$quineStep, qi.steps, rest, qci, computer);
 					var nextDeviceStatus = $author$project$Aoc17Quine$Quining(nextQm);
 					return _Utils_update(
 						model,

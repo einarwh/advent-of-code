@@ -7,7 +7,6 @@ import Html.Attributes
 import Html.Events exposing (onClick, onInput)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
-import Dict exposing (Dict)
 import Array exposing (Array)
 import Html exposing (text)
 import Time
@@ -28,18 +27,27 @@ main =
 
 -- MODEL
 
+type alias Log = List String
+
 type DataSource = 
   Input 
   | Sample 
-  -- | Quine 
+  | Sample2 
 
 type DeviceStatus = 
   Booting Float 
   | Booted 
-  -- | Quining QuiningModel 
+  | Quining QuineModel 
 
-type alias QuiningModel = 
-  { foo : Int }
+type alias QuineCalculationInfo = 
+  { index : Int, a : BigInt }
+
+type alias QuineInfo = 
+  { steps : Int, pending : List (QuineCalculationInfo, Computer) }
+
+type QuineModel  = 
+  Done BigInt 
+  | Ongoing QuineInfo 
 
 type alias Computer =
   { regA : BigInt
@@ -50,7 +58,8 @@ type alias Computer =
   , outputs : List Int }
 
 type alias Model =
-  { computer : Computer
+  { loadedComputer : Computer
+  , computer : Computer
   , loadedA : BigInt
   , overwrittenA : String 
   , step : Int 
@@ -115,16 +124,11 @@ Register B: 0
 Register C: 0
 
 Program: 2,4,1,3,7,5,4,1,1,3,0,3,5,5,3,0"""
---     quineData = """Register A: 108107566389757
--- Register B: 0
--- Register C: 0
-
--- Program: 2,4,1,3,7,5,4,1,1,3,0,3,5,5,3,0"""
     data =
       case dataSource of
         Sample -> sample
+        Sample2 -> sample2
         Input -> input
-        -- Quine -> quineData
     computer = parseComputer data
   in
     computer
@@ -133,7 +137,8 @@ initModel : DeviceStatus -> DataSource -> Model
 initModel deviceStatus dataSource =
   let
     computer = initComputer dataSource
-    model = { computer = computer
+    model = { loadedComputer = computer
+            , computer = computer
             , dataSource = dataSource
             , loadedA = computer.regA
             , overwrittenA = ""
@@ -153,7 +158,7 @@ initModel deviceStatus dataSource =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  -- (initModel Booted Input, Cmd.none)
+--   (initModel Booted Input, Cmd.none)
   (initModel (Booting 0) Input, Cmd.none)
 
 -- UPDATE
@@ -166,15 +171,15 @@ type Msg =
   | Faster
   | Slower
   | Step
-  | UseSample
-  | UseInput
+  | UseDataSource DataSource
   | BootTick
   | BlackoutTick
   | DefaultBackgroundTick
   | DarkBackgroundTick
   | LightBackgroundTick
   | OverwriteRegA String
-  -- | FindQuine 
+  | FindQuine 
+  | QuineTick
 
 tryReadOpcode : Computer -> Maybe Int 
 tryReadOpcode computer = 
@@ -354,8 +359,8 @@ out computer =
   |> output (combo computer |> BigInt.modBy (BigInt.fromInt 8) |> Maybe.withDefault (BigInt.fromInt 0) |> shrinkInt)
   |> nextInstruction
 
-executeOpcode : Int -> Computer -> Computer 
-executeOpcode opcode computer = 
+executeOpcode : Computer -> Int -> Computer 
+executeOpcode computer opcode = 
   case opcode of
     0 -> adv computer
     1 -> bxl computer
@@ -369,91 +374,75 @@ executeOpcode opcode computer =
 
 executeInstruction : Computer -> Maybe Computer 
 executeInstruction computer = 
-  case tryReadOpcode computer of
-    Nothing -> Nothing 
-    Just opcode -> Just (executeOpcode opcode computer)
+  computer |> tryReadOpcode |> Maybe.map (executeOpcode computer)
 
-execute : Computer -> Array Int 
+execute : Computer -> Computer 
 execute computer = 
   case executeInstruction computer of 
-    Nothing -> computer.program
+    Nothing -> computer 
     Just c -> execute c  
 
--- let quine computer = 
---     let len = computer.program |> Array.length
---     let checkTarget opIndex target candidateA = 
---         let p = execute { computer with regA = candidateA }
---         p.[opIndex] = target 
---     let rec loop ix a = 
---         let opIndex = len - ix 
---         if ix > len then 
---             Some a
---         else 
---             let target = computer.program[opIndex]
---             let offset = pow 8L ((int64 len) - (int64 ix))
---             let candidates = 
---                 [ 0L .. 7L ] 
---                 |> List.map (fun j -> a + j * offset)
---                 |> List.choose (fun ca -> if checkTarget opIndex target ca then Some ca else None)
---             candidates |> List.tryPick (loop (ix + 1))
---     let a0 = pow 8L ((int64 len) - 1L)
---     match loop 1 a0 with 
---     | Some a -> a 
---     | None -> failwith ":("
+checkTarget : Computer -> Int -> Int -> BigInt -> Maybe Computer 
+checkTarget computer opIndex target candidateA = 
+  let 
+    c = execute { computer | regA = candidateA }
+    p = computer.program
+    program = c.outputs |> List.reverse |> Array.fromList
+    sameLength = Array.length p == Array.length program
+  in 
+    case Array.get opIndex program of 
+      Just n -> 
+        let cmp = {c | regA = candidateA, regB = computer.regB, regC = computer.regC }
+        in 
+          if sameLength && n == target then Just cmp else Nothing
+      Nothing -> Nothing 
 
--- checkTarget : Computer -> Int -> Int -> BigInt -> Bool 
--- checkTarget computer opIndex target candidateA = 
---   let 
---     program = execute { computer | regA = candidateA }
---   in 
---     case Array.get opIndex program of 
---       Just n -> n == target
---       Nothing -> False 
+tryPick : (a -> Maybe a) -> List a -> Maybe a
+tryPick chooser lst = 
+  case lst of 
+    [] -> Nothing 
+    a :: rest ->
+      case chooser a of 
+        Nothing -> tryPick chooser rest 
+        Just result -> Just result  
 
--- tryPick : (a -> Maybe (a, List a)) -> List a -> Maybe (a, List a) 
--- tryPick chooser lst = 
---   case lst of 
---     [] -> Nothing 
---     a :: rest ->
---       case chooser a of 
---         Nothing -> tryPick chooser rest 
---         Just result -> Just result  
+quineStep : Int -> List (QuineCalculationInfo, Computer) -> QuineCalculationInfo -> Computer -> QuineModel 
+quineStep steps pending qci computer = 
+  let
+    a = qci.a 
+    ix = qci.index
+    len = computer.program |> Array.length
+    opIndex = len - ix 
+    big8 = BigInt.fromInt 8
+    bigLen = BigInt.fromInt len 
+    bigIx = BigInt.fromInt ix 
+  in
+    if ix > len then 
+      Done a
+    else 
+      let
+        target = Array.get opIndex computer.program |> Maybe.withDefault 99999999
+        offset = BigInt.pow big8 (BigInt.sub bigLen bigIx) 
+        candidates = 
+          List.range 0 7 
+          |> List.map (BigInt.fromInt)
+          |> List.map (\j -> BigInt.add a (BigInt.mul j offset))
+          |> List.filterMap (\ca -> checkTarget computer opIndex target ca |> Maybe.map (\c -> ({ index = (ix + 1), a = ca }, c)))
+        nextPending = List.append candidates pending
+      in
+        Ongoing { steps = steps + 1, pending = nextPending }
 
--- quineLoop : Int -> Int -> Computer -> List BigInt -> BigInt -> Maybe (BigInt, List BigInt) 
--- quineLoop len ix computer sequence a = 
---   let
---     opIndex = len - ix 
---     big8 = BigInt.fromInt 8
---     bigLen = BigInt.fromInt len 
---     bigIx = BigInt.fromInt ix 
---   in
---     if ix > len then 
---       Just (a, sequence) 
---     else 
---       let
---         target = Array.get opIndex computer.program |> Maybe.withDefault 99999999
---         offset = BigInt.pow big8 (BigInt.sub bigLen bigIx) 
---         candidates = 
---           List.range 0 7 
---           |> List.map (BigInt.fromInt)
---           |> List.map (\j -> BigInt.add a (BigInt.mul j offset))
---           |> List.filterMap (\ca -> if checkTarget computer opIndex target ca then Just ca else Nothing)
---       in
---         candidates
---         |> tryPick (\ca -> quineLoop len (ix + 1) computer (ca :: sequence) ca)
-
--- quine : Computer -> Maybe (BigInt, List BigInt)  
--- quine computer = 
---   let
---     len = computer.program |> Array.length
---     big1 = BigInt.fromInt 1
---     big8 = BigInt.fromInt 8
---     bigLen = BigInt.fromInt len 
+quineA0 : Computer -> BigInt  
+quineA0 computer = 
+  let
+    len = computer.program |> Array.length
+    big1 = BigInt.fromInt 1
+    big8 = BigInt.fromInt 8
+    bigLen = BigInt.fromInt len 
  
---     a0 = BigInt.pow big8 (BigInt.sub bigLen big1)
---     result = quineLoop len 1 computer [a0] a0
---   in
---     result
+    a0 = BigInt.pow big8 (BigInt.sub bigLen big1)
+  in
+    a0
 
 updateReboot : Model -> Model
 updateReboot model =
@@ -483,7 +472,10 @@ updateStep model =
 
 updateDataSource : DataSource -> Model -> Model
 updateDataSource dataSource model =
-  { model | dataSource = dataSource, computer = initComputer dataSource, overwrittenA = "" }
+  let
+    computer = initComputer dataSource 
+  in
+    { model | dataSource = dataSource, loadedComputer = computer, computer = computer, overwrittenA = "" }
 
 updateBackgroundColor : String -> Model -> Model
 updateBackgroundColor color model =
@@ -500,7 +492,7 @@ updateBootTick model =
           else
             Booted
         Booted -> Booted
-        -- Quining qm -> Quining qm
+        Quining qm -> Quining qm
   in
     { model | deviceStatus = deviceStatus }
 
@@ -531,16 +523,43 @@ updateOverwriteRegA overwrittenA model =
       Nothing -> 
         model
 
--- updateFindQuine : Model -> Model
--- updateFindQuine model = 
---   case quine model.computer of 
---     Just (a, sequence) -> 
---       let
---         computer = model.computer 
---       in
---         { model | computer = { computer | regA = a } }
---     Nothing -> 
---       model 
+updateFindQuine : Model -> Model
+updateFindQuine model = 
+  let
+    computer = model.loadedComputer
+    qci = { index = 1, a = quineA0 computer }
+    cmp = { computer | regA = qci.a }
+    deviceStatus = Quining (Ongoing { steps = 0, pending = [ (qci, cmp) ] })
+    str = "index: " ++ String.fromInt (qci.index) ++ " a0: " ++ BigInt.toString (qci.a)
+  in 
+    { model | computer = computer, deviceStatus = deviceStatus, debug = "Initiating quine find... " ++ str }
+
+updateQuineStep : Model -> Model
+updateQuineStep model = 
+  let 
+    computer = model.loadedComputer 
+  in 
+      case model.deviceStatus of 
+        Booting _ -> model 
+        Booted -> model 
+        Quining qm -> 
+          case qm of 
+            Done a -> 
+              let
+                nextDeviceStatus = Booted
+                nextComputer = { computer | regA = a }
+              in
+                { model | deviceStatus = nextDeviceStatus, computer = nextComputer }
+            Ongoing qi -> 
+              case qi.pending of 
+                [] -> { model | deviceStatus = Booted } 
+                (qci, cmp) :: rest ->
+                  let 
+                    nextQm = quineStep qi.steps rest qci computer 
+                    nextDeviceStatus = Quining nextQm
+                  in 
+                    { model | computer = cmp, deviceStatus = nextDeviceStatus } 
+              
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -559,10 +578,8 @@ update msg model =
       ({model | tickInterval = model.tickInterval * 2 }, Cmd.none)
     TogglePlay -> 
       (updateTogglePlay model, Cmd.none)
-    UseSample ->
-      (updateDataSource Sample model, Cmd.none)
-    UseInput ->
-      (updateDataSource Input model, Cmd.none)
+    UseDataSource dataSource ->
+      (updateDataSource dataSource model, Cmd.none)
     BootTick ->
       (updateBootTick model, Cmd.none)
     BlackoutTick ->
@@ -575,8 +592,10 @@ update msg model =
       (updateBackgroundColor lightBackgroundColor { model | lightBackgroundTickInterval = 7977 }, Cmd.none)
     OverwriteRegA overwrittenA -> 
       (updateOverwriteRegA overwrittenA model, Cmd.none)
-    -- FindQuine -> 
-    --   (updateFindQuine model, Cmd.none)
+    FindQuine -> 
+      (updateFindQuine model, Cmd.none)
+    QuineTick -> 
+      (updateQuineStep model, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -587,7 +606,7 @@ subscriptions model =
       case model.deviceStatus of
         Booted -> if model.paused then Sub.none else Time.every model.tickInterval (\_ -> Tick)
         Booting _ -> Sub.batch [ Time.every model.bootTickInterval (\_ -> BootTick), Time.every model.blackoutTickInterval (\_ -> BlackoutTick) ]
-        -- Quining _ -> Sub.none
+        Quining _ -> Time.every 1000 (\_ -> QuineTick)
     defaultBackgroundTick = Time.every 277 (\_ -> DefaultBackgroundTick)
     darkBackgroundTick = Time.every model.darkBackgroundTickInterval (\_ -> DarkBackgroundTick)
     lightBackgroundTick = Time.every model.lightBackgroundTickInterval (\_ -> LightBackgroundTick)
@@ -703,8 +722,8 @@ toSvg model =
             toBootingElements model ticks
         Booted ->
           toBootedElements model
-        -- Quining _ -> 
-        --   toBootedElements model 
+        Quining _ -> 
+          toBootedElements model 
   in
     svg
       [ viewBox viewBoxStr
@@ -723,10 +742,15 @@ viewBody : Model -> Html Msg
 viewBody model =
   let
     s = toSvg model
-    isBooting = 
+    isBooted = 
       case model.deviceStatus of 
-        Booting _ -> True 
+        Booted -> True 
         _ -> False 
+    
+    -- isBooting = 
+    --   case model.deviceStatus of 
+    --     Booting _ -> True 
+    --     _ -> False 
   in
     Html.table
       [
@@ -780,13 +804,17 @@ viewBody model =
               , Html.Attributes.style "font-size" "16px" ]
               [
                 Html.input
-                [ Html.Attributes.type_ "radio", onClick UseInput, Html.Attributes.checked (model.dataSource == Input) ]
+                [ Html.Attributes.type_ "radio", onClick (UseDataSource Input), Html.Attributes.checked (model.dataSource == Input) ]
                 []
               , Html.label [] [ Html.text "Input" ]
               , Html.input
-                [ Html.Attributes.type_ "radio", onClick UseSample, Html.Attributes.checked (model.dataSource == Sample) ]
+                [ Html.Attributes.type_ "radio", onClick (UseDataSource Sample), Html.Attributes.checked (model.dataSource == Sample) ]
                 []
               , Html.label [] [ Html.text "Sample" ]
+              , Html.input
+                [ Html.Attributes.type_ "radio", onClick (UseDataSource Sample2), Html.Attributes.checked (model.dataSource == Sample2) ]
+                []
+              , Html.label [] [ Html.text "Sample 2" ]
             ] ]
       , Html.tr 
           []
@@ -797,6 +825,11 @@ viewBody model =
                 [ Html.Attributes.style "width" "80px"
                 , onClick Reboot ] 
                 [ Html.text "Reboot" ]
+            , Html.button 
+                [ Html.Attributes.style "width" "80px"
+                , onClick FindQuine
+                , Html.Attributes.disabled (not isBooted) ] 
+                [ Html.text "Quine" ]
             ] ]
       , Html.tr 
           []
@@ -806,30 +839,27 @@ viewBody model =
               [ Html.button 
                 [ Html.Attributes.style "width" "80px"
                 , onClick Reset
-                , Html.Attributes.disabled isBooting ] 
+                , Html.Attributes.disabled (not isBooted) ] 
                 [ Html.text "Reset" ]
-              -- , Html.button 
-              --   [ Html.Attributes.style "width" "80px", onClick FindQuine ] 
-              --   [ Html.text "Quine" ]
               , Html.button 
                 [ Html.Attributes.style "width" "80px"
                 , onClick Slower
-                , Html.Attributes.disabled isBooting ] 
+                , Html.Attributes.disabled (not isBooted) ] 
                 [ Html.text "Turtle" ]
               , Html.button 
                 [ Html.Attributes.style "width" "80px"
                 , onClick TogglePlay 
-                , Html.Attributes.disabled isBooting ]  
+                , Html.Attributes.disabled (not isBooted) ]  
                 [ if model.paused then Html.text "Run" else Html.text "Halt" ] 
               , Html.button 
                 [ Html.Attributes.style "width" "80px"
                 , onClick Faster 
-                , Html.Attributes.disabled isBooting ] 
+                , Html.Attributes.disabled (not isBooted) ] 
                 [ Html.text "Turbo" ]
               , Html.button 
                 [ Html.Attributes.style "width" "80px"
                 , onClick Step 
-                , Html.Attributes.disabled isBooting ] 
+                , Html.Attributes.disabled (not isBooted) ] 
                 [ Html.text "Step" ]
             ] ]
       , Html.tr
@@ -847,9 +877,10 @@ viewBody model =
                     [ 
                       Html.Attributes.value model.overwrittenA
                     , onInput OverwriteRegA
-                    , Html.Attributes.disabled (isBooting || not model.paused) ] 
+                    , Html.Attributes.disabled (not isBooted || not model.paused) ] 
                     []
-              -- , Html.div [] [ Html.text commandsStr ]
+            --   , Html.div [] [ Html.text ("Debug : " ++ debugStr) ]
+            --   , Html.div [] [ Html.text ("Message : " ++ message) ]
               -- , Html.div [] [ Html.text ("Step: " ++ (String.fromInt model.step)) ]
               ] ]
       , Html.tr
