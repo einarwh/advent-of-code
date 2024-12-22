@@ -16,7 +16,8 @@ let lookupNumericKeypad (source, target) : string=
     | ('A', '7') -> "^^^<<A"
     | ('A', '8') -> "^^^<A"
     | ('A', '9') -> "^^^A"
-    | ('0', 'A') -> "^A" 
+
+    | ('0', 'A') -> ">A" 
     | ('0', '1') -> "^<A"
     | ('0', '2') -> "^A"
     | ('0', '3') -> "^>A"
@@ -26,6 +27,7 @@ let lookupNumericKeypad (source, target) : string=
     | ('0', '7') -> "^^^<A"
     | ('0', '8') -> "^^^A"
     | ('0', '9') -> "^^^>A"
+
     | ('1', 'A') -> ">>vA"
     | ('1', '0') -> ">vA"
     | ('1', '2') -> ">A"
@@ -36,6 +38,7 @@ let lookupNumericKeypad (source, target) : string=
     | ('1', '7') -> "^^A"
     | ('1', '8') -> "^^>A"
     | ('1', '9') -> "^^>>A"
+
     | ('2', 'A') -> ">vA"
     | ('2', '0') -> "vA"
     | ('2', '1') -> "<A"
@@ -46,6 +49,17 @@ let lookupNumericKeypad (source, target) : string=
     | ('2', '7') -> "^^<A"
     | ('2', '8') -> "^^A"
     | ('2', '9') -> "^^>A"
+
+// +---+---+---+
+// | 7 | 8 | 9 |
+// +---+---+---+
+// | 4 | 5 | 6 |
+// +---+---+---+
+// | 1 | 2 | 3 |
+// +---+---+---+
+//     | 0 | A |
+//     +---+---+
+
     | ('3', 'A') -> "vA"
     | ('3', '0') -> "<vA"
     | ('3', '1') -> "<<A"
@@ -56,6 +70,7 @@ let lookupNumericKeypad (source, target) : string=
     | ('3', '7') -> "^^<<A"
     | ('3', '8') -> "^^<A"
     | ('3', '9') -> "^^A"
+
     | ('4', 'A') -> ">>vvA"
     | ('4', '0') -> ">vvA"
     | ('4', '1') -> "vA"
@@ -66,6 +81,7 @@ let lookupNumericKeypad (source, target) : string=
     | ('4', '7') -> "^A"
     | ('4', '8') -> "^>A"
     | ('4', '9') -> "^>>A"
+
     | ('5', 'A') -> ">vvA"
     | ('5', '0') -> "vvA"
     | ('5', '1') -> "<vA"
@@ -76,6 +92,7 @@ let lookupNumericKeypad (source, target) : string=
     | ('5', '7') -> "^<A"
     | ('5', '8') -> "^A"
     | ('5', '9') -> "^>A"
+
     | ('6', 'A') -> "vvA"
     | ('6', '0') -> "<vvA"
     | ('6', '1') -> "<<vA"
@@ -86,6 +103,7 @@ let lookupNumericKeypad (source, target) : string=
     | ('6', '7') -> "^<<A"
     | ('6', '8') -> "^<A"
     | ('6', '9') -> "^A"
+
     | ('7', 'A') -> ">>vvvA"
     | ('7', '0') -> ">vvvA"
     | ('7', '1') -> "vvA"
@@ -96,6 +114,7 @@ let lookupNumericKeypad (source, target) : string=
     | ('7', '6') -> ">>vA"
     | ('7', '8') -> ">A"
     | ('7', '9') -> ">>A"
+
     | ('8', 'A') -> ">vvvA"
     | ('8', '0') -> "vvvA"
     | ('8', '1') -> "<vvA"
@@ -106,6 +125,7 @@ let lookupNumericKeypad (source, target) : string=
     | ('8', '6') -> ">vA"
     | ('8', '7') -> "<A"
     | ('8', '9') -> ">A"
+
     | ('9', 'A') -> "vvvA"
     | ('9', '0') -> "<vvvA"
     | ('9', '1') -> "<<vvA"
@@ -116,6 +136,7 @@ let lookupNumericKeypad (source, target) : string=
     | ('9', '6') -> "vA"
     | ('9', '7') -> "<<A"
     | ('9', '8') -> "<A"
+
     | _ -> "A"
 
 let lookupDirectionalKeypad (source, target) = 
@@ -158,13 +179,15 @@ let rec getKeypresses lookups code =
     match lookups with 
     | [] -> code 
     | lookup :: rest -> 
-        code 
-        |> prependA 
-        |> Seq.toList 
-        |> List.pairwise 
-        |> List.map lookup 
-        |> String.concat ""
-        |> getKeypresses rest 
+        let result = 
+            code 
+            |> prependA 
+            |> Seq.toList 
+            |> List.pairwise 
+            |> List.map lookup 
+            |> String.concat ""
+        printfn "%s" result
+        result |> getKeypresses rest 
 
 let parseNumeric (code : string) = 
     code.Substring(0, 3) |> int 
@@ -172,15 +195,17 @@ let parseNumeric (code : string) =
 let complexity code = 
     let numeric = code |> parseNumeric
     let lookups = [ lookupNumericKeypad; lookupDirectionalKeypad; lookupDirectionalKeypad ]
-    let length = code |> getKeypresses lookups |> String.length 
+    let keypresses = code |> getKeypresses lookups 
+    printfn "%s: %s" code keypresses
+    let length = keypresses |> String.length 
+    // printfn "(%d * %d)" length numeric 
     numeric * length 
 
 let run fileName = 
     let codes = readLines fileName
     codes |> printfn "%A"
-    ('A', '0') |> lookupNumericKeypad |> printfn "%A"
-    let code = "029A"
-    code |> complexity |> printfn "%d"
+    codes |> List.map complexity |> List.sum |> printfn "%d"
+    // "029A" |> complexity |> printfn "%A"
     // code |> getKeypresses lookups |> printfn "%s"
 
     // code 
@@ -203,12 +228,29 @@ run "sample"
 
 // <vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A
 // v<<A>>^A<A>AvA<^AA>A<vAAA>^A
+// <A ^A >^^A vvvA
+// 029A
+
+// <A ^A ^^>A vvvA
 // v<<A>>^A<A>A<AAv>A^Av<AAA>^A
-// <A^A>^^AvvvA
-// <A^A^^>AvvvA
+// v<A<AA>>^AvAA<^A>Av<<A>>^AvA^Av<<A>>^AAv<A>A^A<A>Av<A<A>>^AAAvA<^A>A
+
+// 029A: v<A<AA>>^AvAA<^A>Av<<A>>^AvA^Av<<A>>^AAv<A>A^A<A>Av<A<A>>^AAAvA<^A>A
 
 
 // <vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A
 // v<A<AA>>^AvAA<^A>Av<<A>>^AvA^Av<<A>>^AAv<A>A^A<A>Av<A<A>>^AAAvA<^A>A
 // 029A
 
+// 029A: v<A<AA>>^AvAA<^A>Av<<A>>^AvA^Av<<A>>^AAv<A>A^A<A>Av<A<A>>^AAAvA<^A>A
+// 980A: v<<A>>^AAAvA^Av<A<AA>>^AvAA<^A>Av<A<A>>^AAAvA<^A>Av<<A>>^AvA^A
+// 980A: <v<A>>^AAAvA^A<vA<AA>>^AvAA<^A>A<v<A>A>^AAAvA<^A>A<vA>^A<A>A
+// 179A: v<<A>>^Av<A<A>>^AAvAA<^A>Av<<A>>^AAvA^Av<A>^AA<A>Av<A<A>>^AAAvA<^A>A
+// 456A: v<<A>>^AAv<A<A>>^AAvAA<^A>Av<A>^A<A>Av<A>^A<A>Av<A<A>>^AAvA<^A>A
+// 379A: v<<A>>^AvA^Av<<A>>^AAv<A<A>>^AAvAA<^A>Av<A>^AA<A>Av<A<A>>^AAAvA<^A>A
+
+
+// 029A: <vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A
+// 179A: <v<A>>^A<vA<A>>^AAvAA<^A>A<v<A>>^AAvA^A<vA>^AA<A>A<v<A>A>^AAAvA<^A>A
+// 456A: <v<A>>^AA<vA<A>>^AAvAA<^A>A<vA>^A<A>A<vA>^A<A>A<v<A>A>^AAvA<^A>A
+// 379A: <v<A>>^AvA^A<vA<AA>>^AAvA<^A>AAvA^A<vA>^AA<A>A<v<A>A>^AAAvA<^A>A
