@@ -23,16 +23,12 @@ let readLines =
 
 let solveLine (signals : Set<char> list, outputs : Set<char> list) = 
     let sizeMap = signals |> List.groupBy (Set.count) |> Map.ofList 
-    printfn "%A" sizeMap
-    let digitMap = 
-        Map.empty 
-        |> Map.add 1 (Map.find 2 sizeMap |> List.head)
-        |> Map.add 4 (Map.find 4 sizeMap |> List.head)
-        |> Map.add 7 (Map.find 3 sizeMap |> List.head)
-        |> Map.add 8 (Map.find 7 sizeMap |> List.head)
-    let one = digitMap |> Map.find 1 
-    let four = digitMap |> Map.find 4
-    
+    let getBySize n = sizeMap |> Map.find n |> List.head 
+    let one = getBySize 2
+    let four = getBySize 4
+    let seven = getBySize 3
+    let eight = getBySize 7
+
     let sizeSixDigits = sizeMap |> Map.find 6 
     let six = sizeSixDigits |> List.find (fun digit -> 1 = (Set.intersect digit one |> Set.count))
     let nine = sizeSixDigits |> List.find (fun digit -> 4 = (Set.intersect digit four |> Set.count))
@@ -46,7 +42,15 @@ let solveLine (signals : Set<char> list, outputs : Set<char> list) =
     printfn "6: %A" six
     printfn "9: %A" nine
     printfn "0: %A" zero
-    0
+    let lookup = 
+        [ (zero, 0); (one, 1); (two, 2); (three, 3); (four, 4); (five, 5); (six, 6); (seven, 7); (eight, 8); (nine, 9) ]
+        |> Map.ofList 
+
+    let digits = outputs |> List.map (fun digit -> Map.find digit lookup) 
+    let red = digits |> List.reduce (fun a b -> 10 * a + b)
+    printfn "%A" digits
+    printfn "%d" red
+    lookup
 
 let run fileName = 
     let lines = readLines fileName |> List.map parseLine 
