@@ -32,6 +32,21 @@ let rec applyTransformations transformations positions =
         |> List.distinct
         |> applyTransformations rest 
 
+let createRow (posSet : Set<int*int>) (xRange : int list) (y : int) = 
+    xRange |> List.map (fun x -> if Set.contains (x, y) posSet then "#" else ".") |> String.concat ""
+
+let draw positions = 
+    let posSet = positions |> Set.ofList 
+    let xs = positions |> List.map fst 
+    let ys = positions |> List.map snd
+    let xMin = xs |> List.min 
+    let xMax = xs |> List.max 
+    let yMin = ys |> List.min 
+    let yMax = ys |> List.max 
+    let yRange = [yMin .. yMax]
+    let xRange = [xMin .. xMax]
+    yRange |> List.map (createRow posSet xRange) |> List.iter (printfn "%s")
+
 let run fileName = 
     let text = File.ReadAllText fileName |> trim |> split "\n\n"
     let positions = 
@@ -40,6 +55,15 @@ let run fileName =
         text.[1] |> split "\n" |> Array.toList |> List.map parseTransformation
     let t = List.head transformations
     positions |> List.map t |> List.distinct |> List.length |> printfn "%d"
-    0
+    positions |> applyTransformations transformations |> draw
 
 run "input"
+
+// ###..#..#..##..#....###...##..###...##.
+// #..#.#..#.#..#.#....#..#.#..#.#..#.#..#
+// #..#.####.#..#.#....#..#.#....#..#.#..#
+// ###..#..#.####.#....###..#....###..####
+// #.#..#..#.#..#.#....#.#..#..#.#.#..#..#
+// #..#.#..#.#..#.####.#..#..##..#..#.#..#
+
+// RHALRCRA
