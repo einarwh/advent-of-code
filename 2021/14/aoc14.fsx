@@ -41,7 +41,7 @@ let join lst =
         h @ (rest |> List.collect (List.tail))
     
 let rec loop inserter times elements = 
-    printfn "%A" elements 
+    // printfn "%A" elements 
     if times < 1 then elements 
     else 
         elements 
@@ -59,11 +59,18 @@ let run fileName =
     pairs |> insert insertionFunction |> join |> printfn "%A"
 
     let polymer10 = template |> Seq.toList |> loop insertionFunction 10 
-    
+    let counted = polymer10 |> List.countBy id 
+    let counts = counted |> List.map snd 
+    let minCount = counts |> List.min 
+    let maxCount = counts |> List.max 
+    let answer = (List.max counts - List.min counts)
+    printfn "%d" answer
+
+    let polymer20 = template |> Seq.toList |> loop insertionFunction 20 
 
     0
 
-run "sample"
+run "input"
 
 // ['N'; 'C'; 'N'; 'B'; 'C'; 'H'; 'B']
 // NCNBCHB
