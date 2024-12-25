@@ -22,7 +22,7 @@ let parseRule (s : string) : ComposableRule =
         fun fn (a, b) -> if (a, b) = (x, y) then [(a, e); (e, b)] else fn (a, b)
     | _ -> failwith "?"
 
-let createInsertionFunction (s : string) : Rule = 
+let createInsertionFunction s = 
     let rules = s |> split "\n" |> Array.toList |> List.map parseRule
     let initFunction (a, b) = [(a, b)]
     List.foldBack (fun rule fn -> rule fn) rules initFunction
@@ -33,8 +33,8 @@ let rec insert insertionFunction pairs =
     | p :: rest -> 
         (insertionFunction p) :: (insert insertionFunction rest)
 
-let polymerization (inserter : Rule) (countedPairs : (Pair * int64) list) : (Pair * int64) list = 
-    let rec loop (countedPairs : (Pair * int64) list) : (Pair * int64) list = 
+let polymerization inserter countedPairs  = 
+    let rec loop countedPairs = 
         match countedPairs with 
         | [] -> []
         | (pair, count) :: rest -> 
@@ -43,7 +43,7 @@ let polymerization (inserter : Rule) (countedPairs : (Pair * int64) list) : (Pai
     let cps = loop countedPairs
     cps |> List.groupBy (fst) |> List.map (fun (p, lst) -> (p, lst |> List.map snd |> List.sum))
 
-let rec solve (times : int) (inserter : Rule) (countedPairs : (Pair * int64) list) = 
+let rec solve times inserter countedPairs = 
     let rec loop times countedPairs = 
         if times > 0 then 
             loop (times - 1) (polymerization inserter countedPairs)
@@ -55,7 +55,7 @@ let rec solve (times : int) (inserter : Rule) (countedPairs : (Pair * int64) lis
     let sum lst = lst |> List.map (fun (ch, lst) -> (ch, lst |> List.map snd |> List.sum))
     let lst = 
         List.zip (fstList |> sum |> List.sort) (sndList |> sum |> List.sort) 
-        |> List.map (fun ((ch1, n1), (ch2, n2)) -> max n1 n2)
+        |> List.map (fun ((_, n1), (_, n2)) -> max n1 n2)
     let minVal = lst |> List.min
     let maxVal = lst |> List.max 
     maxVal - minVal 
