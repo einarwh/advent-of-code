@@ -23,12 +23,9 @@ let parseRule (s : string) : ComposableRule =
     | _ -> failwith "?"
 
 let createInsertionFunction (s : string) : Rule = 
-    let rules : ComposableRule list = s |> split "\n" |> Array.toList |> List.map parseRule
-    // 'T -> 'State -> 'State
-    let folder (rule : ComposableRule) (fn : Rule) : Rule = 
-        rule fn 
+    let rules = s |> split "\n" |> Array.toList |> List.map parseRule
     let initFunction (a, b) = [(a, b)]
-    List.foldBack folder rules initFunction
+    List.foldBack (fun rule fn -> rule fn) rules initFunction
 
 let rec insert insertionFunction pairs = 
     match pairs with 
