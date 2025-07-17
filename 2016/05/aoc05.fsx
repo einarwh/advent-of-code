@@ -18,23 +18,23 @@ let toHexHash (input : string) =
     use md5 = MD5.Create()
     input |> Encoding.ASCII.GetBytes |> md5.ComputeHash |> Convert.ToHexString
 
-let rec hack (charsFound : char list) (charsLeft : int) (index : int) (doorId : string) = 
-    if charsLeft > 0 then 
-        let input = doorId + index.ToString()
-        let hash = toHexHash input
-        if hash.StartsWith "00000" then 
-            // printfn "%d" index
-            let ch = Char.ToLower(hash[5])
-            printf "%c" ch
-            hack (ch :: charsFound) (charsLeft - 1) (index + 1) doorId 
+let hack1 (doorId : string) = 
+    let rec fn (charsFound : char list) (charsLeft : int) (index : int) (doorId : string) = 
+        if charsLeft > 0 then 
+            let input = doorId + index.ToString()
+            let hash = toHexHash input
+            if hash.StartsWith "00000" then 
+                let ch = Char.ToLower(hash[5])
+                printf "%c" ch
+                fn (ch :: charsFound) (charsLeft - 1) (index + 1) doorId 
+            else 
+                fn charsFound charsLeft (index + 1) doorId 
         else 
-            hack charsFound charsLeft (index + 1) doorId 
-    else 
-        charsFound |> List.rev |> fun chars -> new string(chars |> List.toArray) |> fun s -> s.ToLower()
+            printfn ""
+    fn [] 8 0 doorId
 
 let run fileName = 
     let text = readText fileName
-    hack [] 8 0 text 
-    |> printfn "%s"
+    hack1 text
 
-run "sample"
+run "input"
