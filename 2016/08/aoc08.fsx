@@ -21,10 +21,6 @@ module Screen =
         Array2D.get screen y x
     let set (screen : bool[,]) (x, y) (value : bool) =
         Array2D.set screen y x value
-    let positions (a : 'a[,]) = 
-        let rowCount = a.GetLength(0)
-        let colCount = a.GetLength(1)
-        [for x in [0..colCount-1] do for y in [0..rowCount-1] -> (x, y)]
     let rect (screen : bool[,]) (w, h) = 
         let rectPositions = 
             [for x in [0..w-1] do for y in [0..h-1] -> (x, y)]
@@ -44,6 +40,20 @@ module Screen =
                 let y' =  (y + steps) % h 
                 set screen (x, y') v
         [0 .. h-1] |> List.iter rot
+    let rotateRow (screen : bool[,]) (y : int) (steps : int) = 
+        let w = width screen
+        let row = [|0 .. w-1|] |> Array.map (fun x -> get screen (x, y))
+        let rot (x : int) =
+            if x < Array.length row then 
+                let v = Array.get row x
+                let x' =  (x + steps) % w
+                set screen (x', y) v
+        [0 .. w-1] |> List.iter rot
+    let countLit (screen : bool[,]) = 
+        let w = width screen
+        let h = height screen
+        let posList = [for x in [0..w-1] do for y in [0..h-1] -> (x, y)]
+        posList |> List.filter (fun pos -> get screen pos) |> List.length
 
 let tryParseRect (s : string) : Operation option = 
     let m = Regex.Match(s, "^rect (\d+)x(\d+)$")
@@ -93,18 +103,24 @@ let visualize screen =
     |> List.map createRow |> String.concat "\n" |> printfn "%s"
     printfn ""
 
+let execute screen operations = 
+    let rec fn ops = 
+        match ops with 
+        | [] -> () 
+        | op :: rest ->
+            match op with 
+            | Rect (w, h) -> Screen.rect screen (w, h)
+            | Row (y, steps) -> Screen.rotateRow screen y steps
+            | Column (x, steps) -> Screen.rotateColumn screen x steps 
+            fn rest 
+    fn operations
+
 let run fileName = 
     let lines = readLines fileName
     let operations = lines |> List.choose tryParse
-    operations |> printfn "%A"
-    // let screen = Screen.create 50 6 
-    let screen = Screen.create 7 3
+    let screen = Screen.create 50 6 
+    execute screen operations
+    Screen.countLit screen |> printfn "%d"
     visualize screen
-    Screen.rect screen (3, 2)
-    visualize screen
-    Screen.rotateColumn screen 1 1
-    visualize screen
-     
-    
 
-run "sample"
+run "input"
