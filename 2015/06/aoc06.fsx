@@ -37,31 +37,30 @@ module Screen =
         let posList = [for x in [0..w-1] do for y in [0..h-1] -> (x, y)]
         posList |> List.filter (fun pos -> get screen pos) |> List.length
 
-
-let tryParseToggle (s : string) : Instruction option =
-    let m = Regex.Match(s, "^toggle (\d+),(\d+) through (\d+),(\d+)$")
+let tryParseRect (s : string) : Rect option =
+    let m = Regex.Match(s, "(\d+),(\d+) through (\d+),(\d+)$")
     if m.Success then
         let read (index : int) = m.Groups.[index].Value |> int
-        Some <| Toggle ((read 1, read 2), (read 3, read 4))
+        Some ((read 1, read 2), (read 3, read 4))
     else
+        None
+
+let tryParseToggle (s : string) : Instruction option =
+    if s.StartsWith "toggle" then 
+        s |> tryParseRect |> Option.map Toggle
+    else 
         None
 
 let tryParseTurnOn (s : string) : Instruction option =
-    let m = Regex.Match(s, "^turn on (\d+),(\d+) through (\d+),(\d+)$")
-    if m.Success then
-        let read (index : int) = m.Groups.[index].Value |> int
-        Some <| TurnOn ((read 1, read 2), (read 3, read 4))
-    else
+    if s.StartsWith "turn on" then 
+        s |> tryParseRect |> Option.map TurnOn
+    else 
         None
-
 let tryParseTurnOff (s : string) : Instruction option =
-    let m = Regex.Match(s, "^turn off (\d+),(\d+) through (\d+),(\d+)$")
-    if m.Success then
-        let read (index : int) = m.Groups.[index].Value |> int
-        Some <| TurnOn ((read 1, read 2), (read 3, read 4))
-    else
+    if s.StartsWith "turn off" then 
+        s |> tryParseRect |> Option.map TurnOff
+    else 
         None
-
 let tryParse (s : string) = 
     tryParseToggle s
     |> Option.orElse (tryParseTurnOn s)
