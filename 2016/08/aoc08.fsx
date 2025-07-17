@@ -10,6 +10,8 @@ type Operation =
     | RotateColumn of int*int
 
 module Screen = 
+    let create width height = 
+        Array2D.create height width false
     let width screen = 
         Array2D.length2 screen
     let height screen = 
