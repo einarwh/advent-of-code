@@ -23,6 +23,15 @@ let moveSimpleKeypad (x, y) (move : Move) =
     | L -> (max 0 (x - 1), y)
     | R -> (min 2 (x + 1), y) 
 
+let moveComplexKeypad (x, y) (move : Move) = 
+    let (x', y') = 
+        match move with 
+        | U -> (x, y - 1)
+        | D -> (x, y + 1)
+        | L -> (x - 1, y)
+        | R -> (x + 1, y) 
+    if abs x' + abs y' > 2 then (x, y) else (x', y')
+
 let makeMoves (move : int*int -> Move -> int*int) (pos : int * int) (moves : Move list) = 
     let rec fn pos moves = 
         match moves with 
@@ -31,17 +40,34 @@ let makeMoves (move : int*int -> Move -> int*int) (pos : int * int) (moves : Mov
             fn (move pos h) rest  
     fn pos moves
 
-let toPart1Button (x, y) = 
+let toButtonPart1 (x, y) = 
     y * 3 + x + 1 |> string
 
-let findCode (move : int*int -> Move -> int*int) (toButton : int*int -> string) (movesList : Move list list) = 
+let toButtonPart2 (x, y) = 
+    match (x, y) with 
+    | (0, -2)  -> "1"
+    | (-1, -1) -> "2"
+    | (0, -1)  -> "3"
+    | (1, -1)  -> "4"
+    | (-2, 0) -> "5"
+    | (-1, 0)  -> "6"
+    | (0, 0)  -> "7"
+    | (1, 0)  -> "8"
+    | (2, 0)  -> "9"
+    | (-1, 1)  -> "A"
+    | (0, 1)  -> "B"
+    | (1, 1)  -> "C"
+    | (0, 2)  -> "D"
+    | _ -> failwith "out of bounds"
+
+let findCode (startPos : int*int) (move : int*int -> Move -> int*int) (toButton : int*int -> string) (movesList : Move list list) = 
     let rec fn (pos : int * int) (acc : (int * int) list) (lst : Move list list) = 
         match lst with 
         | [] -> acc |> List.rev |> List.map toButton |> String.concat ""
         | h :: rest -> 
             let pos' = makeMoves move pos h 
             fn pos' (pos' :: acc) rest
-    fn (1, 1) [] movesList
+    fn startPos [] movesList
 
 let readLines = 
     File.ReadAllLines
@@ -51,6 +77,7 @@ let readLines =
 let run fileName = 
     let lines = readLines fileName
     let movesList = lines |> List.map toMoves
-    movesList |> findCode moveSimpleKeypad toPart1Button |> printfn "%A"
+    movesList |> findCode (1, 1) moveSimpleKeypad toButtonPart1 |> printfn "%A"
+    movesList |> findCode (-2, 0) moveComplexKeypad toButtonPart2 |> printfn "%A"
 
-run "sample"
+run "input"
