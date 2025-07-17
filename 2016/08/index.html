@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.R.H === region.Y.H)
+	if (region.S.H === region.Z.H)
 	{
-		return 'on line ' + region.R.H;
+		return 'on line ' + region.S.H;
 	}
-	return 'on lines ' + region.R.H + ' through ' + region.Y.H;
+	return 'on lines ' + region.S.H + ' through ' + region.Z.H;
 }
 
 
@@ -1871,9 +1871,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aE,
-		impl.aM,
-		impl.aK,
+		impl.aF,
+		impl.aN,
+		impl.aL,
 		function() { return function() {} }
 	);
 });
@@ -2734,8 +2734,8 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
 		q: func(record.q),
-		S: record.S,
-		P: record.P
+		T: record.T,
+		Q: record.Q
 	}
 });
 
@@ -3004,10 +3004,10 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 
 		var value = result.a;
 		var message = !tag ? value : tag < 3 ? value.a : value.q;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.S;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.T;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.P) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.Q) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3957,11 +3957,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aE,
-		impl.aM,
-		impl.aK,
+		impl.aF,
+		impl.aN,
+		impl.aL,
 		function(sendToApp, initialModel) {
-			var view = impl.aN;
+			var view = impl.aO;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3993,12 +3993,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aE,
-		impl.aM,
-		impl.aK,
+		impl.aF,
+		impl.aN,
+		impl.aL,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.Q && impl.Q(sendToApp)
-			var view = impl.aN;
+			var divertHrefToApp = impl.R && impl.R(sendToApp)
+			var view = impl.aO;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -4006,12 +4006,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.ax);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.ay);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.aL) && (_VirtualDom_doc.title = title = doc.aL);
+				(title !== doc.aM) && (_VirtualDom_doc.title = title = doc.aM);
 			});
 		}
 	);
@@ -4067,12 +4067,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aG;
-	var onUrlRequest = impl.aH;
+	var onUrlChange = impl.aH;
+	var onUrlRequest = impl.aI;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		Q: function(sendToApp)
+		R: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4088,9 +4088,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.ak === next.ak
-							&& curr.ab === next.ab
-							&& curr.ah.a === next.ah.a
+							&& curr.al === next.al
+							&& curr.ac === next.ac
+							&& curr.ai.a === next.ai.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4098,13 +4098,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aE: function(flags)
+		aF: function(flags)
 		{
-			return A3(impl.aE, flags, _Browser_getUrl(), key);
+			return A3(impl.aF, flags, _Browser_getUrl(), key);
 		},
+		aO: impl.aO,
 		aN: impl.aN,
-		aM: impl.aM,
-		aK: impl.aK
+		aL: impl.aL
 	});
 }
 
@@ -4170,17 +4170,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aC: 'hidden', ay: 'visibilitychange' }
+		? { aD: 'hidden', az: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aC: 'mozHidden', ay: 'mozvisibilitychange' }
+		? { aD: 'mozHidden', az: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aC: 'msHidden', ay: 'msvisibilitychange' }
+		? { aD: 'msHidden', az: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aC: 'webkitHidden', ay: 'webkitvisibilitychange' }
-		: { aC: 'hidden', ay: 'visibilitychange' };
+		? { aD: 'webkitHidden', az: 'webkitvisibilitychange' }
+		: { aD: 'hidden', az: 'visibilitychange' };
 }
 
 
@@ -4261,12 +4261,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		ao: _Browser_getScene(),
-		ar: {
-			at: _Browser_window.pageXOffset,
-			au: _Browser_window.pageYOffset,
-			as: _Browser_doc.documentElement.clientWidth,
-			aa: _Browser_doc.documentElement.clientHeight
+		ap: _Browser_getScene(),
+		as: {
+			au: _Browser_window.pageXOffset,
+			av: _Browser_window.pageYOffset,
+			at: _Browser_doc.documentElement.clientWidth,
+			ab: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4276,8 +4276,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		as: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		aa: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		at: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		ab: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4300,15 +4300,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			ao: {
-				as: node.scrollWidth,
-				aa: node.scrollHeight
+			ap: {
+				at: node.scrollWidth,
+				ab: node.scrollHeight
 			},
-			ar: {
-				at: node.scrollLeft,
-				au: node.scrollTop,
-				as: node.clientWidth,
-				aa: node.clientHeight
+			as: {
+				au: node.scrollLeft,
+				av: node.scrollTop,
+				at: node.clientWidth,
+				ab: node.clientHeight
 			}
 		};
 	});
@@ -4338,18 +4338,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			ao: _Browser_getScene(),
-			ar: {
-				at: x,
-				au: y,
-				as: _Browser_doc.documentElement.clientWidth,
-				aa: _Browser_doc.documentElement.clientHeight
+			ap: _Browser_getScene(),
+			as: {
+				au: x,
+				av: y,
+				at: _Browser_doc.documentElement.clientWidth,
+				ab: _Browser_doc.documentElement.clientHeight
 			},
-			aA: {
-				at: x + rect.left,
-				au: y + rect.top,
-				as: rect.width,
-				aa: rect.height
+			aB: {
+				au: x + rect.left,
+				av: y + rect.top,
+				at: rect.width,
+				ab: rect.height
 			}
 		};
 	});
@@ -4971,7 +4971,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {_: fragment, ab: host, af: path, ah: port_, ak: protocol, al: query};
+		return {aa: fragment, ac: host, ag: path, ai: port_, al: protocol, am: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5251,7 +5251,146 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$document = _Browser_document;
 var $author$project$Aoc08$Input = 0;
-var $author$project$Aoc08$defaultDelay = 1;
+var $author$project$Aoc08$defaultDelay = 1000;
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (!_v0.$) {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $author$project$Aoc08$Rect = function (a) {
+	return {$: 0, a: a};
+};
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $author$project$Aoc08$tryParseDim = function (s) {
+	var parts = A2($elm$core$String$split, 'x', s);
+	if (parts.b && parts.b.b) {
+		var wStr = parts.a;
+		var _v1 = parts.b;
+		var hStr = _v1.a;
+		var _v2 = _Utils_Tuple2(
+			$elm$core$String$toInt(wStr),
+			$elm$core$String$toInt(hStr));
+		if ((!_v2.a.$) && (!_v2.b.$)) {
+			var w = _v2.a.a;
+			var h = _v2.b.a;
+			return $elm$core$Maybe$Just(
+				_Utils_Tuple2(w, h));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Aoc08$tryParseRect = function (s) {
+	if (A2($elm$core$String$startsWith, 'rect', s)) {
+		var parts = A2($elm$core$String$split, ' ', s);
+		if (parts.b && parts.b.b) {
+			var _v1 = parts.b;
+			var dim = _v1.a;
+			return A2(
+				$elm$core$Maybe$map,
+				$author$project$Aoc08$Rect,
+				$author$project$Aoc08$tryParseDim(dim));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Aoc08$RotateColumn = function (a) {
+	return {$: 2, a: a};
+};
+var $author$project$Aoc08$tryParseRotate = function (s) {
+	var _v0 = A2($elm$core$String$split, ' ', s);
+	if ((((_v0.b && _v0.b.b) && _v0.b.b.b) && _v0.b.b.b.b) && _v0.b.b.b.b.b) {
+		var _v1 = _v0.b;
+		var _v2 = _v1.b;
+		var eqStr = _v2.a;
+		var _v3 = _v2.b;
+		var _v4 = _v3.b;
+		var stepStr = _v4.a;
+		var _v5 = A2($elm$core$String$split, '=', eqStr);
+		if (_v5.b && _v5.b.b) {
+			var _v6 = _v5.b;
+			var indexStr = _v6.a;
+			var _v7 = _Utils_Tuple2(
+				$elm$core$String$toInt(indexStr),
+				$elm$core$String$toInt(stepStr));
+			if ((!_v7.a.$) && (!_v7.b.$)) {
+				var index = _v7.a.a;
+				var step = _v7.b.a;
+				return $elm$core$Maybe$Just(
+					_Utils_Tuple2(index, step));
+			} else {
+				return $elm$core$Maybe$Nothing;
+			}
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Aoc08$tryParseRotateColumn = function (s) {
+	return A2($elm$core$String$startsWith, 'rotate column', s) ? A2(
+		$elm$core$Maybe$map,
+		$author$project$Aoc08$RotateColumn,
+		$author$project$Aoc08$tryParseRotate(s)) : $elm$core$Maybe$Nothing;
+};
+var $author$project$Aoc08$RotateRow = function (a) {
+	return {$: 1, a: a};
+};
+var $author$project$Aoc08$tryParseRotateRow = function (s) {
+	return A2($elm$core$String$startsWith, 'rotate row', s) ? A2(
+		$elm$core$Maybe$map,
+		$author$project$Aoc08$RotateRow,
+		$author$project$Aoc08$tryParseRotate(s)) : $elm$core$Maybe$Nothing;
+};
+var $author$project$Aoc08$parseOp = function (s) {
+	var _v0 = $author$project$Aoc08$tryParseRect(s);
+	if (!_v0.$) {
+		var op = _v0.a;
+		return $elm$core$Maybe$Just(op);
+	} else {
+		var _v1 = $author$project$Aoc08$tryParseRotateRow(s);
+		if (!_v1.$) {
+			var op = _v1.a;
+			return $elm$core$Maybe$Just(op);
+		} else {
+			return $author$project$Aoc08$tryParseRotateColumn(s);
+		}
+	}
+};
+var $author$project$Aoc08$parseOperations = function (s) {
+	return A2(
+		$elm$core$List$filterMap,
+		$author$project$Aoc08$parseOp,
+		A2($elm$core$String$split, '\n', s));
+};
 var $author$project$Aoc08$initOperations = function (dataSource) {
 	var sample = 'rect 3x2\nrotate column x=1 by 1\nrotate row y=0 by 4\nrotate column x=1 by 1';
 	var input = 'rect 1x1\nrotate row y=0 by 7\nrect 1x1\nrotate row y=0 by 5\nrect 1x1\nrotate row y=0 by 5\nrect 1x1\nrotate row y=0 by 2\nrect 1x1\nrotate row y=0 by 3\nrect 1x1\nrotate row y=0 by 5\nrect 1x1\nrotate row y=0 by 3\nrect 1x1\nrotate row y=0 by 2\nrect 1x1\nrotate row y=0 by 3\nrect 2x1\nrotate row y=0 by 7\nrect 6x1\nrotate row y=0 by 3\nrect 2x1\nrotate row y=0 by 2\nrect 1x2\nrotate row y=1 by 10\nrotate row y=0 by 3\nrotate column x=0 by 1\nrect 2x1\nrotate column x=20 by 1\nrotate column x=15 by 1\nrotate column x=5 by 1\nrotate row y=1 by 5\nrotate row y=0 by 2\nrect 1x2\nrotate row y=0 by 5\nrotate column x=0 by 1\nrect 4x1\nrotate row y=2 by 15\nrotate row y=0 by 5\nrotate column x=0 by 1\nrect 4x1\nrotate row y=2 by 5\nrotate row y=0 by 5\nrotate column x=0 by 1\nrect 4x1\nrotate row y=2 by 10\nrotate row y=0 by 10\nrotate column x=8 by 1\nrotate column x=5 by 1\nrotate column x=0 by 1\nrect 9x1\nrotate column x=27 by 1\nrotate row y=0 by 5\nrotate column x=0 by 1\nrect 4x1\nrotate column x=42 by 1\nrotate column x=40 by 1\nrotate column x=22 by 1\nrotate column x=17 by 1\nrotate column x=12 by 1\nrotate column x=7 by 1\nrotate column x=2 by 1\nrotate row y=3 by 10\nrotate row y=2 by 5\nrotate row y=1 by 3\nrotate row y=0 by 10\nrect 1x4\nrotate column x=37 by 2\nrotate row y=3 by 18\nrotate row y=2 by 30\nrotate row y=1 by 7\nrotate row y=0 by 2\nrotate column x=13 by 3\nrotate column x=12 by 1\nrotate column x=10 by 1\nrotate column x=7 by 1\nrotate column x=6 by 3\nrotate column x=5 by 1\nrotate column x=3 by 3\nrotate column x=2 by 1\nrotate column x=0 by 1\nrect 14x1\nrotate column x=38 by 3\nrotate row y=3 by 12\nrotate row y=2 by 10\nrotate row y=0 by 10\nrotate column x=7 by 1\nrotate column x=5 by 1\nrotate column x=2 by 1\nrotate column x=0 by 1\nrect 9x1\nrotate row y=4 by 20\nrotate row y=3 by 25\nrotate row y=2 by 10\nrotate row y=0 by 15\nrotate column x=12 by 1\nrotate column x=10 by 1\nrotate column x=8 by 3\nrotate column x=7 by 1\nrotate column x=5 by 1\nrotate column x=3 by 3\nrotate column x=2 by 1\nrotate column x=0 by 1\nrect 14x1\nrotate column x=34 by 1\nrotate row y=1 by 45\nrotate column x=47 by 1\nrotate column x=42 by 1\nrotate column x=19 by 1\nrotate column x=9 by 2\nrotate row y=4 by 7\nrotate row y=3 by 20\nrotate row y=0 by 7\nrotate column x=5 by 1\nrotate column x=3 by 1\nrotate column x=2 by 1\nrotate column x=0 by 1\nrect 6x1\nrotate row y=4 by 8\nrotate row y=3 by 5\nrotate row y=1 by 5\nrotate column x=5 by 1\nrotate column x=4 by 1\nrotate column x=3 by 2\nrotate column x=2 by 1\nrotate column x=1 by 3\nrotate column x=0 by 1\nrect 6x1\nrotate column x=36 by 3\nrotate column x=25 by 3\nrotate column x=18 by 3\nrotate column x=11 by 3\nrotate column x=3 by 4\nrotate row y=4 by 5\nrotate row y=3 by 5\nrotate row y=2 by 8\nrotate row y=1 by 8\nrotate row y=0 by 3\nrotate column x=3 by 4\nrotate column x=0 by 4\nrect 4x4\nrotate row y=4 by 10\nrotate row y=3 by 20\nrotate row y=1 by 10\nrotate row y=0 by 10\nrotate column x=8 by 1\nrotate column x=7 by 1\nrotate column x=6 by 1\nrotate column x=5 by 1\nrotate column x=3 by 1\nrotate column x=2 by 1\nrotate column x=1 by 1\nrotate column x=0 by 1\nrect 9x1\nrotate row y=0 by 40\nrotate column x=44 by 1\nrotate column x=35 by 5\nrotate column x=18 by 5\nrotate column x=15 by 3\nrotate column x=10 by 5\nrotate row y=5 by 15\nrotate row y=4 by 10\nrotate row y=3 by 40\nrotate row y=2 by 20\nrotate row y=1 by 45\nrotate row y=0 by 35\nrotate column x=48 by 1\nrotate column x=47 by 5\nrotate column x=46 by 5\nrotate column x=45 by 1\nrotate column x=43 by 1\nrotate column x=40 by 1\nrotate column x=38 by 2\nrotate column x=37 by 3\nrotate column x=36 by 2\nrotate column x=32 by 2\nrotate column x=31 by 2\nrotate column x=28 by 1\nrotate column x=23 by 3\nrotate column x=22 by 3\nrotate column x=21 by 5\nrotate column x=20 by 1\nrotate column x=18 by 1\nrotate column x=17 by 3\nrotate column x=13 by 1\nrotate column x=10 by 1\nrotate column x=8 by 1\nrotate column x=7 by 5\nrotate column x=6 by 5\nrotate column x=5 by 1\nrotate column x=3 by 5\nrotate column x=2 by 5\nrotate column x=1 by 5';
@@ -5262,7 +5401,7 @@ var $author$project$Aoc08$initOperations = function (dataSource) {
 			return input;
 		}
 	}();
-	return _List_Nil;
+	return $author$project$Aoc08$parseOperations(data);
 };
 var $tortus$elm_array_2d$Array2D$initialize = F3(
 	function (numRows, numColumns, f) {
@@ -5299,14 +5438,18 @@ var $author$project$Aoc08$initScreen = function (dataSource) {
 			};
 		});
 };
+var $author$project$Aoc08$initModel = function (dataSource) {
+	var screen = $author$project$Aoc08$initScreen(dataSource);
+	var operations = $author$project$Aoc08$initOperations(dataSource);
+	var model = {W: 0, A: dataSource, Y: '', u: $author$project$Aoc08$defaultDelay, C: 'press play to start', M: 0, D: operations, r: true, N: $elm$core$Maybe$Nothing, y: screen};
+	return model;
+};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Aoc08$init = function (_v0) {
-	var dataSource = 0;
-	var operations = $author$project$Aoc08$initOperations(dataSource);
-	var screen = $author$project$Aoc08$initScreen(dataSource);
-	var model = {V: 0, G: dataSource, X: '', u: $author$project$Aoc08$defaultDelay, B: 'press play to start', I: 0, C: operations, r: true, y: screen};
-	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+	return _Utils_Tuple2(
+		$author$project$Aoc08$initModel(0),
+		$elm$core$Platform$Cmd$none);
 };
 var $author$project$Aoc08$Tick = 0;
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -5316,7 +5459,7 @@ var $elm$time$Time$Every = F2(
 	});
 var $elm$time$Time$State = F2(
 	function (taggers, processes) {
-		return {aj: processes, aq: taggers};
+		return {ak: processes, ar: taggers};
 	});
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
@@ -5608,7 +5751,7 @@ var $elm$time$Time$spawnHelp = F3(
 	});
 var $elm$time$Time$onEffects = F3(
 	function (router, subs, _v0) {
-		var processes = _v0.aj;
+		var processes = _v0.ak;
 		var rightStep = F3(
 			function (_v6, id, _v7) {
 				var spawns = _v7.a;
@@ -5677,7 +5820,7 @@ var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
 var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $elm$time$Time$onSelfMsg = F3(
 	function (router, interval, state) {
-		var _v0 = A2($elm$core$Dict$get, interval, state.aq);
+		var _v0 = A2($elm$core$Dict$get, interval, state.ar);
 		if (_v0.$ === 1) {
 			return $elm$core$Task$succeed(state);
 		} else {
@@ -5737,9 +5880,7 @@ var $author$project$Aoc08$subscriptions = function (model) {
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc08$updateClear = function (model) {
-	return _Utils_update(
-		model,
-		{I: 0});
+	return $author$project$Aoc08$initModel(model.A);
 };
 var $elm$core$List$append = F2(
 	function (xs, ys) {
@@ -5818,16 +5959,6 @@ var $elm$core$Array$get = F2(
 var $tortus$elm_array_2d$Array2D$getRow = F2(
 	function (row, array2d) {
 		return A2($elm$core$Array$get, row, array2d.a);
-	});
-var $elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (!maybe.$) {
-			var value = maybe.a;
-			return $elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
 	});
 var $elm$core$Elm$JsArray$unsafeSet = _JsArray_unsafeSet;
 var $elm$core$Array$setHelp = F4(
@@ -5923,6 +6054,109 @@ var $author$project$Aoc08$rect = F2(
 		var posList = A2($author$project$Aoc08$getPositions, w, h);
 		return A2($author$project$Aoc08$turnOn, posList, screen);
 	});
+var $elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (!maybeValue.$) {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $tortus$elm_array_2d$Array2D$get = F3(
+	function (row, col, array2d) {
+		return A2(
+			$elm$core$Maybe$andThen,
+			$elm$core$Array$get(col),
+			A2($tortus$elm_array_2d$Array2D$getRow, row, array2d));
+	});
+var $elm$core$Basics$modBy = _Basics_modBy;
+var $author$project$Aoc08$rotateColumnLoop = F6(
+	function (rows, x, y, steps, originalScreen, currentScreen) {
+		rotateColumnLoop:
+		while (true) {
+			if (_Utils_cmp(y, rows) < 0) {
+				var yRot = A2($elm$core$Basics$modBy, rows, y + steps);
+				var maybeValue = A3($tortus$elm_array_2d$Array2D$get, y, x, originalScreen);
+				if (!maybeValue.$) {
+					var v = maybeValue.a;
+					var nextScreen = A4($tortus$elm_array_2d$Array2D$set, yRot, x, v, currentScreen);
+					var $temp$rows = rows,
+						$temp$x = x,
+						$temp$y = y + 1,
+						$temp$steps = steps,
+						$temp$originalScreen = originalScreen,
+						$temp$currentScreen = nextScreen;
+					rows = $temp$rows;
+					x = $temp$x;
+					y = $temp$y;
+					steps = $temp$steps;
+					originalScreen = $temp$originalScreen;
+					currentScreen = $temp$currentScreen;
+					continue rotateColumnLoop;
+				} else {
+					return currentScreen;
+				}
+			} else {
+				return currentScreen;
+			}
+		}
+	});
+var $elm$core$Array$length = function (_v0) {
+	var len = _v0.a;
+	return len;
+};
+var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
+	return $elm$core$Array$length(array2d.a);
+};
+var $author$project$Aoc08$rotateColumn = F2(
+	function (_v0, screen) {
+		var x = _v0.a;
+		var steps = _v0.b;
+		var rows = $tortus$elm_array_2d$Array2D$rows(screen);
+		return A6($author$project$Aoc08$rotateColumnLoop, rows, x, 0, steps, screen, screen);
+	});
+var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
+	return array2d.h;
+};
+var $author$project$Aoc08$rotateRowLoop = F6(
+	function (columns, x, y, steps, originalScreen, currentScreen) {
+		rotateRowLoop:
+		while (true) {
+			if (_Utils_cmp(x, columns) < 0) {
+				var xRot = A2($elm$core$Basics$modBy, columns, x + steps);
+				var maybeValue = A3($tortus$elm_array_2d$Array2D$get, y, x, originalScreen);
+				if (!maybeValue.$) {
+					var v = maybeValue.a;
+					var nextScreen = A4($tortus$elm_array_2d$Array2D$set, y, xRot, v, currentScreen);
+					var $temp$columns = columns,
+						$temp$x = x + 1,
+						$temp$y = y,
+						$temp$steps = steps,
+						$temp$originalScreen = originalScreen,
+						$temp$currentScreen = nextScreen;
+					columns = $temp$columns;
+					x = $temp$x;
+					y = $temp$y;
+					steps = $temp$steps;
+					originalScreen = $temp$originalScreen;
+					currentScreen = $temp$currentScreen;
+					continue rotateRowLoop;
+				} else {
+					return currentScreen;
+				}
+			} else {
+				return currentScreen;
+			}
+		}
+	});
+var $author$project$Aoc08$rotateRow = F2(
+	function (_v0, screen) {
+		var y = _v0.a;
+		var steps = _v0.b;
+		var columns = $tortus$elm_array_2d$Array2D$columns(screen);
+		return A6($author$project$Aoc08$rotateRowLoop, columns, 0, y, steps, screen, screen);
+	});
 var $author$project$Aoc08$execute = F2(
 	function (op, screen) {
 		switch (op.$) {
@@ -5938,28 +6172,39 @@ var $author$project$Aoc08$execute = F2(
 				var _v2 = op.a;
 				var y = _v2.a;
 				var steps = _v2.b;
-				return screen;
+				return A2(
+					$author$project$Aoc08$rotateRow,
+					_Utils_Tuple2(y, steps),
+					screen);
 			default:
 				var _v3 = op.a;
 				var x = _v3.a;
 				var steps = _v3.b;
-				return screen;
+				return A2(
+					$author$project$Aoc08$rotateColumn,
+					_Utils_Tuple2(x, steps),
+					screen);
 		}
 	});
 var $author$project$Aoc08$updateModel = function (model) {
-	var ops = model.C;
-	var _v0 = model.C;
+	var ops = model.D;
+	var _v0 = model.D;
 	if (!_v0.b) {
 		return _Utils_update(
 			model,
-			{B: 'done', r: true});
+			{C: 'done', r: true});
 	} else {
 		var op = _v0.a;
 		var rest = _v0.b;
 		var screen = A2($author$project$Aoc08$execute, op, model.y);
 		return _Utils_update(
 			model,
-			{B: 'updated', C: rest, y: screen});
+			{
+				C: 'updated',
+				D: rest,
+				N: $elm$core$Maybe$Just(op),
+				y: screen
+			});
 	}
 };
 var $author$project$Aoc08$updateDataSource = F2(
@@ -5967,9 +6212,9 @@ var $author$project$Aoc08$updateDataSource = F2(
 		return _Utils_update(
 			model,
 			{
-				G: dataSource,
-				I: 0,
-				C: $author$project$Aoc08$initOperations(dataSource),
+				A: dataSource,
+				M: 0,
+				D: $author$project$Aoc08$initOperations(dataSource),
 				y: $author$project$Aoc08$initScreen(dataSource)
 			});
 	});
@@ -6001,7 +6246,7 @@ var $author$project$Aoc08$update = F2(
 					_Utils_update(
 						model,
 						{
-							B: model.r ? runningText : 'press play to resume',
+							C: model.r ? runningText : 'press play to resume',
 							r: !model.r
 						}),
 					$elm$core$Platform$Cmd$none);
@@ -6055,9 +6300,6 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 			$elm$json$Json$Encode$bool(bool));
 	});
 var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
-var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
-	return array2d.h;
-};
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$Attributes$href = function (url) {
 	return A2(
@@ -6084,35 +6326,12 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
-var $elm$core$Array$length = function (_v0) {
-	var len = _v0.a;
-	return len;
-};
-var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
-	return $elm$core$Array$length(array2d.a);
-};
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$core$Maybe$andThen = F2(
-	function (callback, maybeValue) {
-		if (!maybeValue.$) {
-			var value = maybeValue.a;
-			return callback(value);
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $tortus$elm_array_2d$Array2D$get = F3(
-	function (row, col, array2d) {
-		return A2(
-			$elm$core$Maybe$andThen,
-			$elm$core$Array$get(col),
-			A2($tortus$elm_array_2d$Array2D$getRow, row, array2d));
-	});
 var $author$project$Aoc08$toCharElement = F2(
 	function (model, _v0) {
 		var x = _v0.a;
@@ -6137,6 +6356,32 @@ var $author$project$Aoc08$viewBody = function (model) {
 		$elm$core$List$range,
 		0,
 		$tortus$elm_array_2d$Array2D$rows(screen) - 1);
+	var s = 'rotate row y=0 by 4';
+	var opStr = function () {
+		var _v9 = model.N;
+		if (_v9.$ === 1) {
+			return '';
+		} else {
+			var op = _v9.a;
+			switch (op.$) {
+				case 0:
+					var _v11 = op.a;
+					var w = _v11.a;
+					var h = _v11.b;
+					return 'rect ' + ($elm$core$String$fromInt(w) + ('x' + $elm$core$String$fromInt(h)));
+				case 1:
+					var _v12 = op.a;
+					var index = _v12.a;
+					var steps = _v12.b;
+					return 'rotate row y=' + ($elm$core$String$fromInt(index) + (' by ' + $elm$core$String$fromInt(steps)));
+				default:
+					var _v13 = op.a;
+					var index = _v13.a;
+					var steps = _v13.b;
+					return 'rotate column x=' + ($elm$core$String$fromInt(index) + (' by ' + $elm$core$String$fromInt(steps)));
+			}
+		}
+	}();
 	var nestedPositions = A2(
 		$elm$core$List$map,
 		function (y) {
@@ -6171,7 +6416,43 @@ var $author$project$Aoc08$viewBody = function (model) {
 			}),
 		_List_Nil,
 		nestedElements);
-	var commandsStr = model.B;
+	var debuggStr = function () {
+		var _v7 = $author$project$Aoc08$tryParseRotate(s);
+		if (!_v7.$) {
+			var _v8 = _v7.a;
+			var index = _v8.a;
+			var steps = _v8.b;
+			return $elm$core$String$fromInt(index) + ('->' + $elm$core$String$fromInt(steps));
+		} else {
+			return '.......';
+		}
+	}();
+	var debugStr = function () {
+		if (A2($elm$core$String$startsWith, 'rotate row', s)) {
+			var _v0 = A2($elm$core$String$split, ' ', s);
+			if ((((_v0.b && _v0.b.b) && _v0.b.b.b) && _v0.b.b.b.b) && _v0.b.b.b.b.b) {
+				var _v1 = _v0.b;
+				var _v2 = _v1.b;
+				var eqStr = _v2.a;
+				var _v3 = _v2.b;
+				var _v4 = _v3.b;
+				var stepStr = _v4.a;
+				var _v5 = A2($elm$core$String$split, '=', eqStr);
+				if (_v5.b && _v5.b.b) {
+					var _v6 = _v5.b;
+					var indexStr = _v6.a;
+					return indexStr + ('_' + stepStr);
+				} else {
+					return '...';
+				}
+			} else {
+				return '?';
+			}
+		} else {
+			return '??';
+		}
+	}();
+	var commandsStr = model.C;
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
@@ -6336,7 +6617,7 @@ var $author$project$Aoc08$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(7),
-										$elm$html$Html$Attributes$checked(!model.G)
+										$elm$html$Html$Attributes$checked(!model.A)
 									]),
 								_List_Nil),
 								A2(
@@ -6352,7 +6633,7 @@ var $author$project$Aoc08$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(6),
-										$elm$html$Html$Attributes$checked(model.G === 1)
+										$elm$html$Html$Attributes$checked(model.A === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -6458,7 +6739,7 @@ var $author$project$Aoc08$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										$elm$core$String$fromInt(model.I))
+										$elm$core$String$fromInt(model.M))
 									])),
 								A2(
 								$elm$html$Html$div,
@@ -6466,6 +6747,27 @@ var $author$project$Aoc08$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(commandsStr)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(debugStr)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(debuggStr)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(opStr)
 									]))
 							]))
 					])),
@@ -6494,15 +6796,15 @@ var $author$project$Aoc08$viewBody = function (model) {
 };
 var $author$project$Aoc08$view = function (model) {
 	return {
-		ax: _List_fromArray(
+		ay: _List_fromArray(
 			[
 				$author$project$Aoc08$viewBody(model)
 			]),
-		aL: 'Advent of Code 2016 | Day 8: Two-Factor Authentication'
+		aM: 'Advent of Code 2016 | Day 8: Two-Factor Authentication'
 	};
 };
 var $author$project$Aoc08$main = $elm$browser$Browser$document(
-	{aE: $author$project$Aoc08$init, aK: $author$project$Aoc08$subscriptions, aM: $author$project$Aoc08$update, aN: $author$project$Aoc08$view});
+	{aF: $author$project$Aoc08$init, aL: $author$project$Aoc08$subscriptions, aN: $author$project$Aoc08$update, aO: $author$project$Aoc08$view});
 _Platform_export({'Aoc08':{'init':$author$project$Aoc08$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
 

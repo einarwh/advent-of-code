@@ -12,7 +12,7 @@ import Html exposing (text)
 import Time
 
 defaultDelay : Float
-defaultDelay = 1
+defaultDelay = 1000
 
 -- MAIN
 
@@ -36,6 +36,7 @@ type Operation = Rect (Int, Int) | RotateRow (Int, Int) | RotateColumn (Int, Int
 type alias Model = 
   { lit : Int 
   , screen : Screen
+  , prevOperation : Maybe Operation
   , operations : List Operation 
   , dataSource : DataSource 
   , delay : Float
@@ -43,6 +44,74 @@ type alias Model =
   , lastCommandText : String
   , counter : Int 
   , debug : String }
+
+tryParseDim : String -> Maybe (Int, Int)
+tryParseDim s = 
+  let 
+    parts = s |> String.split "x"
+  in 
+    case parts of 
+      wStr :: hStr :: _ -> 
+        case (String.toInt wStr, String.toInt hStr) of 
+          (Just w, Just h) -> Just (w, h)
+          _ -> Nothing
+      _ -> Nothing 
+
+tryParseRect : String -> Maybe Operation
+tryParseRect s = 
+  -- rect 3x2
+  if s |> String.startsWith "rect" then 
+    let 
+      parts = s |> String.split " "
+    in 
+      case parts of 
+        _ :: dim :: _ -> tryParseDim dim |> Maybe.map Rect
+        _ -> Nothing 
+  else 
+    Nothing
+
+tryParseRotate : String -> Maybe (Int, Int)
+tryParseRotate s = 
+  -- rotate ... y=0 by 4
+  case s |> String.split " " of 
+    _ :: _ :: eqStr :: _ :: stepStr :: _ -> 
+      case eqStr |> String.split "=" of 
+        _ :: indexStr :: _ -> 
+          case (String.toInt indexStr, String.toInt stepStr) of 
+            (Just index, Just step) -> Just (index, step)
+            _ -> Nothing
+        _ -> Nothing
+    _ -> Nothing 
+
+tryParseRotateRow : String -> Maybe Operation
+tryParseRotateRow s = 
+  -- rotate row y=0 by 4
+  if s |> String.startsWith "rotate row" then 
+    s |> tryParseRotate |> Maybe.map RotateRow
+  else 
+    Nothing
+
+tryParseRotateColumn : String -> Maybe Operation
+tryParseRotateColumn s = 
+  -- rotate column x=1 by 1
+  if s |> String.startsWith "rotate column" then 
+    s |> tryParseRotate |> Maybe.map RotateColumn
+  else 
+    Nothing
+
+parseOp : String -> Maybe Operation 
+parseOp s = 
+  case s |> tryParseRect of 
+    Just op -> Just op 
+    Nothing -> 
+      case s |> tryParseRotateRow of 
+        Just op -> Just op 
+        Nothing -> 
+          s |> tryParseRotateColumn 
+
+parseOperations : String -> List Operation
+parseOperations s = 
+  s |> String.split "\n" |> List.filterMap parseOp
 
 initOperations : DataSource -> List Operation
 initOperations dataSource = 
@@ -250,7 +319,7 @@ rotate column x=1 by 5"""
         Sample -> sample
         Input -> input
   in 
-    []
+    parseOperations data 
 
 initScreen : DataSource -> Screen
 initScreen dataSource = 
@@ -262,14 +331,14 @@ initScreen dataSource =
   in 
     Array2D.initialize rows cols (\y -> \x -> False)  
 
-init : () -> (Model, Cmd Msg)
-init _ =
+initModel : DataSource -> Model 
+initModel dataSource = 
   let 
-    dataSource = Input 
     operations = initOperations dataSource 
     screen = initScreen dataSource
     model = { lit = 0
             , operations = operations
+            , prevOperation = Nothing
             , screen = screen
             , delay = defaultDelay
             , paused = True
@@ -278,14 +347,18 @@ init _ =
             , counter = 0
             , debug = "" }
   in 
-    (model, Cmd.none)
+    model
 
--- UPDATE
+init : () -> (Model, Cmd Msg)
+init _ =
+  (initModel Input, Cmd.none)
+
+-- UPDATE 
 
 type Msg = Tick | Step | TogglePlay | Faster | Slower | Clear | UseSample | UseInput
 
 updateClear : Model -> Model
-updateClear model = { model | lit = 0 } 
+updateClear model = initModel model.dataSource
 
 updateDataSource : DataSource -> Model -> Model
 updateDataSource dataSource model = 
@@ -321,17 +394,67 @@ rect (w, h) screen =
   in 
     turnOn posList screen
 
+rotateRowLoop : Int -> Int -> Int -> Int -> Screen -> Screen -> Screen 
+rotateRowLoop columns x y steps originalScreen currentScreen = 
+  if x < columns then 
+    let 
+      maybeValue = Array2D.get y x originalScreen 
+      xRot = (x + steps) |> modBy columns
+    in 
+      case maybeValue of 
+        Just v -> 
+          let 
+            nextScreen = Array2D.set y xRot v currentScreen 
+          in
+            rotateRowLoop columns (x + 1) y steps originalScreen nextScreen 
+        Nothing ->
+          -- Should never happen...
+          currentScreen
+  else 
+    currentScreen
+
+rotateRow : (Int, Int) -> Screen -> Screen 
+rotateRow (y, steps) screen = 
+  let 
+    columns = Array2D.columns screen 
+  in 
+    rotateRowLoop columns 0 y steps screen screen 
+
+rotateColumnLoop : Int -> Int -> Int -> Int -> Screen -> Screen -> Screen 
+rotateColumnLoop rows x y steps originalScreen currentScreen = 
+  if y < rows then 
+    let 
+      maybeValue = Array2D.get y x originalScreen 
+      yRot = (y + steps) |> modBy rows
+    in 
+      case maybeValue of 
+        Just v -> 
+          let 
+            nextScreen = Array2D.set yRot x v currentScreen 
+          in
+            rotateColumnLoop rows x (y + 1) steps originalScreen nextScreen 
+        Nothing ->
+          -- Should never happen...
+          currentScreen
+  else 
+    currentScreen
+
+rotateColumn : (Int, Int) -> Screen -> Screen 
+rotateColumn (x, steps) screen = 
+  let 
+    rows = Array2D.rows screen 
+  in 
+    rotateColumnLoop rows x 0 steps screen screen
+
 execute : Operation -> Screen -> Screen  
 execute op screen = 
   case op of 
     Rect (w, h) -> 
       rect (w, h) screen 
     RotateRow (y, steps) -> 
-      screen
-      -- rotateRow (y, steps)
+      rotateRow (y, steps) screen
     RotateColumn (x, steps) -> 
-      screen
-      -- rotateCol (x, steps)
+      rotateColumn (x, steps) screen
 
 updateModel : Model -> Model
 updateModel model = 
@@ -344,7 +467,7 @@ updateModel model =
         let
           screen = execute op model.screen 
         in 
-          { model | screen = screen, operations = rest, lastCommandText = "updated" }
+          { model | screen = screen, prevOperation = Just op, operations = rest, lastCommandText = "updated" }
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -402,6 +525,32 @@ viewBody model =
     nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement model))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
     commandsStr = model.lastCommandText
+    s = "rotate row y=0 by 4"
+    opStr = 
+      case model.prevOperation of 
+        Nothing -> ""
+        Just op -> 
+          case op of 
+            Rect (w, h) -> "rect " ++ String.fromInt w ++ "x" ++ String.fromInt h
+            RotateRow (index, steps) -> "rotate row y=" ++ String.fromInt index ++ " by " ++ String.fromInt steps
+            RotateColumn (index, steps) -> "rotate column x=" ++ String.fromInt index ++ " by " ++ String.fromInt steps
+    debuggStr = 
+      case tryParseRotate s of 
+        Just (index, steps) -> 
+          String.fromInt index ++ "->" ++ String.fromInt steps 
+        Nothing -> 
+          "......."
+    debugStr =
+        if s |> String.startsWith "rotate row" then 
+          case s |> String.split " " of 
+            _ :: _ :: eqStr :: _ :: stepStr :: _ -> 
+              case eqStr |> String.split "=" of 
+                _ :: indexStr :: _ -> 
+                  indexStr ++ "_" ++ stepStr 
+                _ -> "..."
+            _ -> "?"
+        else 
+          "??"
   in 
     Html.table 
       [ Html.Attributes.style "width" "1080px"
@@ -493,6 +642,9 @@ viewBody model =
               [ 
                 Html.div [] [ Html.text (String.fromInt model.lit) ]
               , Html.div [] [ Html.text commandsStr ]
+              , Html.div [] [ Html.text debugStr ]
+              , Html.div [] [ Html.text debuggStr ]
+              , Html.div [] [ Html.text opStr ]
               ] ]
       , Html.tr 
           []
