@@ -3,6 +3,7 @@
 
 open System
 open System.IO
+open System.Linq
 open System.Text
 open System.Security.Cryptography
 
@@ -33,8 +34,32 @@ let hack1 (doorId : string) =
             printfn ""
     fn [] 8 0 doorId
 
+let hack2 (doorId : string) = 
+    let rec fn (chars : char array) (charsLeft : int) (index : int) (doorId : string) = 
+        if charsLeft > 0 then 
+            let input = doorId + index.ToString()
+            let hash = toHexHash input
+            if hash.StartsWith "00000" then 
+                let pos = hash[5] |> Char.GetNumericValue |> int 
+                let ch = Char.ToLower(hash[6])
+                let left = 
+                    if pos >= 0 && pos < 8 && chars[pos] = '_' then 
+                        chars[pos] <- ch
+                        new string(chars) |> printfn "%s"
+                        charsLeft - 1
+                    else 
+                        charsLeft 
+                fn chars left (index + 1) doorId
+            else 
+                fn chars charsLeft (index + 1) doorId 
+        else 
+            printfn ""
+    let chars = Enumerable.Repeat('_', 8).ToArray();
+    fn chars chars.Length 0 doorId
+
 let run fileName = 
     let text = readText fileName
-    hack1 text
+    // hack1 text
+    hack2 text
 
 run "input"
