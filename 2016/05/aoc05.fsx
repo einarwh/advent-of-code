@@ -59,7 +59,7 @@ let hack2 (doorId : string) =
 
 let run fileName = 
     let text = readText fileName
-    // hack1 text
+    hack1 text
     hack2 text
 
 run "input"
