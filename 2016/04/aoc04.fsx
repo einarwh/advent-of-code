@@ -1,4 +1,4 @@
-// Advent of Code 2016. Day 04
+// Advent of Code 2016. Day 04: Security Through Obscurity.
 // dotnet fsi aoc04.fsx
 
 open System
@@ -39,7 +39,7 @@ let toChecksum (name : string) =
 let isRealRoom room = 
     room.checksum = toChecksum room.name
 
-let rotateNaive rotations ch = 
+let rotate rotations ch = 
     let aCode = int 'a'
     let zCode = int 'z'
     let rec fn (n : int) (charCode : int) = 
@@ -50,21 +50,23 @@ let rotateNaive rotations ch =
             char charCode 
     fn rotations ch
 
-let decrypt room = 
+let decrypt (rotations : int) (name : string) = 
+    name 
+    |> Seq.toArray 
+    |> Array.map (fun ch -> if ch = '-' then ' ' else rotate rotations (int ch))
+    |> fun chars -> new string (chars)
+
+let checkObjectStorage (room : Room) : Room option = 
     let rotations = room.sectorId % 26
-    let decryptName (name : string) = 
-        name 
-        |> Seq.toArray 
-        |> Array.map (fun ch -> if ch = '-' then ' ' else rotateNaive rotations (int ch))
-        |> fun chars -> new string (chars)
-    let decrypted = decryptName room.name
-    printfn "%A" decrypted
+    let decrypted = decrypt rotations room.name
+    if decrypted.StartsWith "northpole" then Some room else None 
 
 let run fileName = 
     let lines = readLines fileName
     let rooms = lines |> List.choose check
     let realRooms = rooms |> List.filter isRealRoom
     realRooms |> List.map (fun r -> r.sectorId) |> List.sum |> printfn "%d"
-    realRooms |> List.map decrypt 
+    let objectStorage = realRooms |> List.pick checkObjectStorage
+    objectStorage.sectorId |> printfn "%d" 
 
 run "input"
