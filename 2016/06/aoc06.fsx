@@ -1,4 +1,4 @@
-// Advent of Code 2016. Day 06
+// Advent of Code 2016. Day 06: Signals and Noise.
 // dotnet fsi aoc06.fsx
 
 open System
@@ -18,4 +18,4 @@ let run fileName =
     let text = readText fileName
     text |> printfn "%s"
 
-run "input"
+run "sample"
