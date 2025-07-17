@@ -14,6 +14,30 @@ type Instruction =
     | TurnOn of Rect
     | TurnOff of Rect
 
+module Screen = 
+    let create width height = 
+        Array2D.create height width false
+    let width screen = 
+        Array2D.length2 screen
+    let height screen = 
+        Array2D.length1 screen
+    let get (screen : bool[,]) (x, y) =
+        Array2D.get screen y x
+    let set (screen : bool[,]) (x, y) (value : bool) =
+        Array2D.set screen y x value
+    let toggle (screen : bool[,]) (rect : Rect) =
+        screen 
+    let turnOn (screen : bool[,]) (rect : Rect) =
+        screen 
+    let turnOff (screen : bool[,]) (rect : Rect) =
+        screen 
+    let countLit (screen : bool[,]) = 
+        let w = width screen
+        let h = height screen
+        let posList = [for x in [0..w-1] do for y in [0..h-1] -> (x, y)]
+        posList |> List.filter (fun pos -> get screen pos) |> List.length
+
+
 let tryParseToggle (s : string) : Instruction option =
     let m = Regex.Match(s, "^toggle (\d+),(\d+) through (\d+),(\d+)$")
     if m.Success then
