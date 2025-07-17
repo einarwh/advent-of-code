@@ -15,35 +15,38 @@ let containsAbba (s : string) =
             if isAbba ss then true 
             else 
                 fn (s.Substring(1))
-    fn s 
-
-let readText fileName = 
-    File.ReadAllText(fileName).Trim()
+    let result = fn s 
+    // printfn "containsAbba? %s %b" s result
+    result
 
 let readLines = 
     File.ReadAllLines
     >> Array.filter (fun line -> line <> String.Empty)
     >> Array.toList
 
-let checkAbba (s : string) = 
-    if containsAbba s then printfn "%s contains ABBA" s else printfn "%s does not contain ABBA" s
-
 let checkTls (s : string) = 
-    let rec check (strs : string list) (insideBrackets : bool)
+    // printfn "check IP %s" s
+    let rec check (hypernet : bool) (abbaOutside : bool) (strs : string list) = 
+        match strs with 
+        | [] -> 
+            let txt = if abbaOutside then "IP valid" else "IP invalid" 
+            // txt |> printfn "%s"
+            abbaOutside 
+        | h :: t ->
+            if containsAbba h then 
+                if hypernet then 
+                    // printfn "Found abba in hypernet sequence (%s) - FALSE!" h 
+                    false 
+                else 
+                    // printfn "Found abba outside of hypernet sequence (%s)" h 
+                    check (not hypernet) true t 
+            else 
+                check (not hypernet) abbaOutside t 
     let ss = s.Split([|'['; ']'|]) |> List.ofArray
-    printfn "%A" ss
+    check false false ss 
 
 let run fileName = 
     let lines = readLines fileName
-    lines |> printfn "%A"
-    let text = readText fileName
-    text |> printfn "%s"
-    checkAbba "aaaa"
-    checkAbba "abba"
-    checkAbba "oxox"
-    checkAbba "oxxo"
-    checkAbba "ooxxoo"
-    checkAbba "acba"
-    "emzopymywhhxulxuctj[dwwvkzhoigmbmnf]nxgbgfwqvrypqxppyq[qozsihnhpztcrpbdc]rnhnakmrdcowatw[rhvchmzmyfxlolwe]uysecbspabtauvmixa" |> checkTls
+    lines |> List.filter checkTls |> List.length |> printfn "%d"
 
 run "input"
