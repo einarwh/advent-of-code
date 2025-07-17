@@ -9,6 +9,7 @@ import Array exposing (Array)
 import Set exposing (Set)
 import Array2D exposing (Array2D)
 import Html exposing (text)
+import Time
 
 defaultDelay : Float
 defaultDelay = 1
@@ -28,13 +29,17 @@ type DataSource = Input | Sample
 
 type alias Pos = (Int, Int)
 
-type Operation = Rect (Int, Int) | RotateRow (Int, Int) | RolateColumn (Int, Int)
+type alias Screen = Array2D Bool
+
+type Operation = Rect (Int, Int) | RotateRow (Int, Int) | RotateColumn (Int, Int)
 
 type alias Model = 
   { lit : Int 
-  , screen : Array2D Bool
+  , screen : Screen
   , operations : List Operation 
   , dataSource : DataSource 
+  , delay : Float
+  , paused : Bool  
   , lastCommandText : String
   , counter : Int 
   , debug : String }
@@ -247,7 +252,7 @@ rotate column x=1 by 5"""
   in 
     []
 
-initScreen : DataSource -> Array2D Bool
+initScreen : DataSource -> Screen
 initScreen dataSource = 
   let 
     (cols, rows) = 
@@ -266,6 +271,8 @@ init _ =
     model = { lit = 0
             , operations = operations
             , screen = screen
+            , delay = defaultDelay
+            , paused = True
             , lastCommandText = "press play to start"
             , dataSource = dataSource 
             , counter = 0
@@ -275,7 +282,7 @@ init _ =
 
 -- UPDATE
 
-type Msg = Clear | UseSample | UseInput
+type Msg = Tick | Step | TogglePlay | Faster | Slower | Clear | UseSample | UseInput
 
 updateClear : Model -> Model
 updateClear model = { model | lit = 0 } 
@@ -292,11 +299,71 @@ updateUseInput : Model -> Model
 updateUseInput model = 
   updateDataSource Input model 
 
+getPositions : Int -> Int -> List Pos
+getPositions cols rows = 
+  let
+    ys = List.range 0 (rows - 1)
+    xs = List.range 0 (cols - 1)
+  in 
+    ys |> List.concatMap (\y -> xs |> List.map (\x -> (x, y)))
+
+turnOn : List Pos -> Screen -> Screen 
+turnOn posList screen =
+  case posList of 
+    [] -> screen 
+    (x, y) :: rest -> 
+      screen |> Array2D.set y x True |> turnOn rest
+
+rect : (Int, Int) -> Screen -> Screen 
+rect (w, h) screen = 
+  let 
+    posList = getPositions w h 
+  in 
+    turnOn posList screen
+
+execute : Operation -> Screen -> Screen  
+execute op screen = 
+  case op of 
+    Rect (w, h) -> 
+      rect (w, h) screen 
+    RotateRow (y, steps) -> 
+      screen
+      -- rotateRow (y, steps)
+    RotateColumn (x, steps) -> 
+      screen
+      -- rotateCol (x, steps)
+
+updateModel : Model -> Model
+updateModel model = 
+  let 
+    ops = model.operations
+  in 
+    case model.operations of 
+      [] -> { model | lastCommandText = "done", paused = True } 
+      op :: rest -> 
+        let
+          screen = execute op model.screen 
+        in 
+          { model | screen = screen, operations = rest, lastCommandText = "updated" }
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Clear -> 
       (updateClear model, Cmd.none)
+    Tick ->
+      (updateModel model, Cmd.none)
+    Step ->
+      (updateModel model, Cmd.none)
+    TogglePlay -> 
+      let 
+        runningText = "running..."
+      in 
+        ({model | paused = not model.paused, lastCommandText = if model.paused then runningText else "press play to resume" }, Cmd.none)
+    Faster -> 
+      ({model | delay = model.delay / 2 }, Cmd.none)
+    Slower -> 
+      ({model | delay = model.delay * 2 }, Cmd.none)
     UseSample -> 
       (updateUseSample model, Cmd.none)
     UseInput -> 
@@ -305,7 +372,11 @@ update msg model =
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
-subscriptions model = Sub.none
+subscriptions model =
+  let 
+    tickSub = if model.paused then Sub.none else Time.every model.delay (\_ -> Tick)
+  in 
+    Sub.batch [ tickSub ]
 
 -- VIEW
 
@@ -330,11 +401,7 @@ viewBody model =
     nestedPositions = ys |> List.map (\y -> xs |> List.map (\x -> (x, y)))
     nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement model))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
-    commandsStr = ""
-    textFontSize =
-      case model.dataSource of 
-        Sample -> "24px"
-        Input -> "24px"
+    commandsStr = model.lastCommandText
   in 
     Html.table 
       [ Html.Attributes.style "width" "1080px"
@@ -401,7 +468,19 @@ viewBody model =
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Clear ] 
-                [ Html.text "Clear" ] 
+                [ text "Clear" ]
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Slower ] 
+                [ text "Slower" ]
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick TogglePlay ] 
+                [ if model.paused then text "Play" else text "Pause" ] 
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Faster ] 
+                [ text "Faster" ]
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Step ] 
+                [ text "Step" ]
             ] ]
       , Html.tr 
           []
@@ -421,7 +500,7 @@ viewBody model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" textFontSize
+              , Html.Attributes.style "font-size" "24px"
               , Html.Attributes.style "padding" "10px"
               , Html.Attributes.style "width" "200px" ] 
               [ 
