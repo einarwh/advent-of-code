@@ -26,8 +26,33 @@ let doesNotContainDisallowedSubstring = not << containsDisallowedSubstring
 let isNiceString (s : string) = 
     containsThreeVowels s && containsLetterPair s && doesNotContainDisallowedSubstring s
 
+let containsPairWithoutOverlap (str : string) =
+    printfn "%s" str
+    let rec fn (s : string) = 
+        if s.Length < 2 then false 
+        else 
+            let two = s.Substring(0, 2)
+            let rest = s.Substring(2)
+            if rest.Contains(two) then 
+                printfn "found pair: %s" two
+            rest.Contains(two) || fn rest
+    fn str
+
+let containsRepeatingLetter (str : string) = 
+    let rec fn (chars : char list) = 
+        match chars with 
+        | a :: b :: c :: rest -> 
+            if a = c then printfn "%A" [a :: b :: c :: []]
+            a = c || fn (b :: c :: rest)
+        | _ -> false
+    fn (str |> Seq.toList)
+
+let isNicerString (s : string) = 
+    containsPairWithoutOverlap s && containsRepeatingLetter s
+
 let run fileName = 
     let lines = readLines fileName
     lines |> List.filter isNiceString |> List.length |> printfn "%d"
+    lines |> List.filter isNicerString |> List.length |> printfn "%d"
 
 run "input"
