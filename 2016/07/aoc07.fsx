@@ -15,9 +15,7 @@ let containsAbba (s : string) =
             if isAbba ss then true 
             else 
                 fn (s.Substring(1))
-    let result = fn s 
-    // printfn "containsAbba? %s %b" s result
-    result
+    fn s 
 
 let readLines = 
     File.ReadAllLines
@@ -25,20 +23,15 @@ let readLines =
     >> Array.toList
 
 let checkTls (s : string) = 
-    // printfn "check IP %s" s
     let rec check (hypernet : bool) (abbaOutside : bool) (strs : string list) = 
         match strs with 
         | [] -> 
-            let txt = if abbaOutside then "IP valid" else "IP invalid" 
-            // txt |> printfn "%s"
             abbaOutside 
         | h :: t ->
             if containsAbba h then 
                 if hypernet then 
-                    // printfn "Found abba in hypernet sequence (%s) - FALSE!" h 
                     false 
                 else 
-                    // printfn "Found abba outside of hypernet sequence (%s)" h 
                     check (not hypernet) true t 
             else 
                 check (not hypernet) abbaOutside t 
