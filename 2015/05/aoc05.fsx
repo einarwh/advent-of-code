@@ -27,22 +27,17 @@ let isNiceString (s : string) =
     containsThreeVowels s && containsLetterPair s && doesNotContainDisallowedSubstring s
 
 let containsPairWithoutOverlap (str : string) =
-    printfn "%s" str
     let rec fn (s : string) = 
         if s.Length < 2 then false 
         else 
             let two = s.Substring(0, 2)
-            let rest = s.Substring(2)
-            if rest.Contains(two) then 
-                printfn "found pair: %s" two
-            rest.Contains(two) || fn rest
+            s.Substring(2).Contains(two) || fn (s.Substring(1))
     fn str
 
 let containsRepeatingLetter (str : string) = 
     let rec fn (chars : char list) = 
         match chars with 
         | a :: b :: c :: rest -> 
-            if a = c then printfn "%A" [a :: b :: c :: []]
             a = c || fn (b :: c :: rest)
         | _ -> false
     fn (str |> Seq.toList)
