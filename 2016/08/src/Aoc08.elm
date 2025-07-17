@@ -12,7 +12,7 @@ import Html exposing (text)
 import Time
 
 defaultDelay : Float
-defaultDelay = 1000
+defaultDelay = 60
 
 -- MAIN
 
@@ -462,7 +462,7 @@ updateModel model =
     ops = model.operations
   in 
     case model.operations of 
-      [] -> { model | lastCommandText = "done", paused = True } 
+      [] -> { model | lastCommandText = "done", paused = True, prevOperation = Nothing } 
       op :: rest -> 
         let
           screen = execute op model.screen 
@@ -515,6 +515,15 @@ view model =
   { title = "Advent of Code 2016 | Day 8: Two-Factor Authentication"
   , body = [ viewBody model ] }
 
+countLit : Screen -> Int 
+countLit screen = 
+  let 
+    cols = Array2D.columns screen 
+    rows = Array2D.rows screen
+    posList = getPositions cols rows 
+  in 
+    posList |> List.filter (\(x, y) -> Array2D.get y x screen |> Maybe.withDefault False) |> List.length 
+
 viewBody : Model -> Html Msg
 viewBody model =
   let
@@ -525,7 +534,7 @@ viewBody model =
     nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement model))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
     commandsStr = model.lastCommandText
-    s = "rotate row y=0 by 4"
+    litStr = screen |> countLit |> String.fromInt
     opStr = 
       case model.prevOperation of 
         Nothing -> ""
@@ -534,23 +543,6 @@ viewBody model =
             Rect (w, h) -> "rect " ++ String.fromInt w ++ "x" ++ String.fromInt h
             RotateRow (index, steps) -> "rotate row y=" ++ String.fromInt index ++ " by " ++ String.fromInt steps
             RotateColumn (index, steps) -> "rotate column x=" ++ String.fromInt index ++ " by " ++ String.fromInt steps
-    debuggStr = 
-      case tryParseRotate s of 
-        Just (index, steps) -> 
-          String.fromInt index ++ "->" ++ String.fromInt steps 
-        Nothing -> 
-          "......."
-    debugStr =
-        if s |> String.startsWith "rotate row" then 
-          case s |> String.split " " of 
-            _ :: _ :: eqStr :: _ :: stepStr :: _ -> 
-              case eqStr |> String.split "=" of 
-                _ :: indexStr :: _ -> 
-                  indexStr ++ "_" ++ stepStr 
-                _ -> "..."
-            _ -> "?"
-        else 
-          "??"
   in 
     Html.table 
       [ Html.Attributes.style "width" "1080px"
@@ -591,8 +583,8 @@ viewBody model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding-bottom" "10px" ]
               [ Html.a 
-                [ Html.Attributes.href "https://adventofcode.com/2024/day/4" ] 
-                [ Html.text "https://adventofcode.com/2024/day/4" ]
+                [ Html.Attributes.href "https://adventofcode.com/2016/day/8" ] 
+                [ Html.text "https://adventofcode.com/2016/day/8" ]
             ] ]
       , Html.tr 
           []
@@ -637,14 +629,10 @@ viewBody model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "24px"
+              , Html.Attributes.style "font-size" "32px"
               , Html.Attributes.style "width" "200px" ] 
               [ 
-                Html.div [] [ Html.text (String.fromInt model.lit) ]
-              , Html.div [] [ Html.text commandsStr ]
-              , Html.div [] [ Html.text debugStr ]
-              , Html.div [] [ Html.text debuggStr ]
-              , Html.div [] [ Html.text opStr ]
+                Html.div [] [ Html.text litStr ]
               ] ]
       , Html.tr 
           []
@@ -657,4 +645,16 @@ viewBody model =
               , Html.Attributes.style "width" "200px" ] 
               [ 
                 Html.div [] elements
+              ] ] 
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "background-color" "white" 
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "16px"
+              , Html.Attributes.style "width" "200px" ] 
+              [ 
+                Html.div [] [ Html.text opStr ]
               ] ] ]
+

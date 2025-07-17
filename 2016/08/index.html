@@ -5251,7 +5251,7 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$document = _Browser_document;
 var $author$project$Aoc08$Input = 0;
-var $author$project$Aoc08$defaultDelay = 1000;
+var $author$project$Aoc08$defaultDelay = 60;
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
 		var _v0 = f(mx);
@@ -5441,7 +5441,7 @@ var $author$project$Aoc08$initScreen = function (dataSource) {
 var $author$project$Aoc08$initModel = function (dataSource) {
 	var screen = $author$project$Aoc08$initScreen(dataSource);
 	var operations = $author$project$Aoc08$initOperations(dataSource);
-	var model = {W: 0, A: dataSource, Y: '', u: $author$project$Aoc08$defaultDelay, C: 'press play to start', M: 0, D: operations, r: true, N: $elm$core$Maybe$Nothing, y: screen};
+	var model = {W: 0, A: dataSource, Y: '', u: $author$project$Aoc08$defaultDelay, C: 'press play to start', N: 0, D: operations, r: true, I: $elm$core$Maybe$Nothing, y: screen};
 	return model;
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
@@ -6192,7 +6192,7 @@ var $author$project$Aoc08$updateModel = function (model) {
 	if (!_v0.b) {
 		return _Utils_update(
 			model,
-			{C: 'done', r: true});
+			{C: 'done', r: true, I: $elm$core$Maybe$Nothing});
 	} else {
 		var op = _v0.a;
 		var rest = _v0.b;
@@ -6202,7 +6202,7 @@ var $author$project$Aoc08$updateModel = function (model) {
 			{
 				C: 'updated',
 				D: rest,
-				N: $elm$core$Maybe$Just(op),
+				I: $elm$core$Maybe$Just(op),
 				y: screen
 			});
 	}
@@ -6213,7 +6213,7 @@ var $author$project$Aoc08$updateDataSource = F2(
 			model,
 			{
 				A: dataSource,
-				M: 0,
+				N: 0,
 				D: $author$project$Aoc08$initOperations(dataSource),
 				y: $author$project$Aoc08$initScreen(dataSource)
 			});
@@ -6300,6 +6300,34 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 			$elm$json$Json$Encode$bool(bool));
 	});
 var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $author$project$Aoc08$countLit = function (screen) {
+	var rows = $tortus$elm_array_2d$Array2D$rows(screen);
+	var cols = $tortus$elm_array_2d$Array2D$columns(screen);
+	var posList = A2($author$project$Aoc08$getPositions, cols, rows);
+	return $elm$core$List$length(
+		A2(
+			$elm$core$List$filter,
+			function (_v0) {
+				var x = _v0.a;
+				var y = _v0.b;
+				return A2(
+					$elm$core$Maybe$withDefault,
+					false,
+					A3($tortus$elm_array_2d$Array2D$get, y, x, screen));
+			},
+			posList));
+};
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$Attributes$href = function (url) {
 	return A2(
@@ -6356,28 +6384,27 @@ var $author$project$Aoc08$viewBody = function (model) {
 		$elm$core$List$range,
 		0,
 		$tortus$elm_array_2d$Array2D$rows(screen) - 1);
-	var s = 'rotate row y=0 by 4';
 	var opStr = function () {
-		var _v9 = model.N;
-		if (_v9.$ === 1) {
+		var _v0 = model.I;
+		if (_v0.$ === 1) {
 			return '';
 		} else {
-			var op = _v9.a;
+			var op = _v0.a;
 			switch (op.$) {
 				case 0:
-					var _v11 = op.a;
-					var w = _v11.a;
-					var h = _v11.b;
+					var _v2 = op.a;
+					var w = _v2.a;
+					var h = _v2.b;
 					return 'rect ' + ($elm$core$String$fromInt(w) + ('x' + $elm$core$String$fromInt(h)));
 				case 1:
-					var _v12 = op.a;
-					var index = _v12.a;
-					var steps = _v12.b;
+					var _v3 = op.a;
+					var index = _v3.a;
+					var steps = _v3.b;
 					return 'rotate row y=' + ($elm$core$String$fromInt(index) + (' by ' + $elm$core$String$fromInt(steps)));
 				default:
-					var _v13 = op.a;
-					var index = _v13.a;
-					var steps = _v13.b;
+					var _v4 = op.a;
+					var index = _v4.a;
+					var steps = _v4.b;
 					return 'rotate column x=' + ($elm$core$String$fromInt(index) + (' by ' + $elm$core$String$fromInt(steps)));
 			}
 		}
@@ -6402,6 +6429,8 @@ var $author$project$Aoc08$viewBody = function (model) {
 				positions);
 		},
 		nestedPositions);
+	var litStr = $elm$core$String$fromInt(
+		$author$project$Aoc08$countLit(screen));
 	var elements = A3(
 		$elm$core$List$foldr,
 		F2(
@@ -6416,42 +6445,6 @@ var $author$project$Aoc08$viewBody = function (model) {
 			}),
 		_List_Nil,
 		nestedElements);
-	var debuggStr = function () {
-		var _v7 = $author$project$Aoc08$tryParseRotate(s);
-		if (!_v7.$) {
-			var _v8 = _v7.a;
-			var index = _v8.a;
-			var steps = _v8.b;
-			return $elm$core$String$fromInt(index) + ('->' + $elm$core$String$fromInt(steps));
-		} else {
-			return '.......';
-		}
-	}();
-	var debugStr = function () {
-		if (A2($elm$core$String$startsWith, 'rotate row', s)) {
-			var _v0 = A2($elm$core$String$split, ' ', s);
-			if ((((_v0.b && _v0.b.b) && _v0.b.b.b) && _v0.b.b.b.b) && _v0.b.b.b.b.b) {
-				var _v1 = _v0.b;
-				var _v2 = _v1.b;
-				var eqStr = _v2.a;
-				var _v3 = _v2.b;
-				var _v4 = _v3.b;
-				var stepStr = _v4.a;
-				var _v5 = A2($elm$core$String$split, '=', eqStr);
-				if (_v5.b && _v5.b.b) {
-					var _v6 = _v5.b;
-					var indexStr = _v6.a;
-					return indexStr + ('_' + stepStr);
-				} else {
-					return '...';
-				}
-			} else {
-				return '?';
-			}
-		} else {
-			return '??';
-		}
-	}();
 	var commandsStr = model.C;
 	return A2(
 		$elm$html$Html$table,
@@ -6588,11 +6581,11 @@ var $author$project$Aoc08$viewBody = function (model) {
 								$elm$html$Html$a,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$href('https://adventofcode.com/2024/day/4')
+										$elm$html$Html$Attributes$href('https://adventofcode.com/2016/day/8')
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('https://adventofcode.com/2024/day/4')
+										$elm$html$Html$text('https://adventofcode.com/2016/day/8')
 									]))
 							]))
 					])),
@@ -6728,7 +6721,7 @@ var $author$project$Aoc08$viewBody = function (model) {
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '24px'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '32px'),
 								A2($elm$html$Html$Attributes$style, 'width', '200px')
 							]),
 						_List_fromArray(
@@ -6738,36 +6731,7 @@ var $author$project$Aoc08$viewBody = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(
-										$elm$core$String$fromInt(model.M))
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(commandsStr)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(debugStr)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(debuggStr)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(opStr)
+										$elm$html$Html$text(litStr)
 									]))
 							]))
 					])),
@@ -6790,6 +6754,32 @@ var $author$project$Aoc08$viewBody = function (model) {
 						_List_fromArray(
 							[
 								A2($elm$html$Html$div, _List_Nil, elements)
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '16px'),
+								A2($elm$html$Html$Attributes$style, 'width', '200px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(opStr)
+									]))
 							]))
 					]))
 			]));
