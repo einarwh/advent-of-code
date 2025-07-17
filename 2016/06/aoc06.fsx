@@ -16,15 +16,22 @@ let getMostCommon (chars : char list) =
     |> List.head 
     |> fst 
 
-let getErrorCorrectedMessage (messageLength : int) (messages : string list) = 
-    [| 0 .. messageLength - 1 |]
-    |> Array.map (fun index -> messages |> List.map (fun m -> m[index]) |> getMostCommon)
+let getLeastCommon (chars : char list) = 
+    chars 
+    |> List.countBy id 
+    |> List.sortBy (fun (ch, count) -> count)
+    |> List.head 
+    |> fst 
+
+let getErrorCorrectedMessage (charSelector : char list -> char)(messages : string list) = 
+    let length = messages |> List.head |> Seq.length
+    [| 0 .. length - 1 |]
+    |> Array.map (fun index -> messages |> List.map (fun m -> m[index]) |> charSelector)
     |> fun chars -> new string(chars)
 
 let run fileName = 
-    let lines = readLines fileName
-    let length = lines |> List.head |> Seq.length
-    let message = getErrorCorrectedMessage length lines 
-    message |> printfn "%s"
+    let messages = readLines fileName
+    messages |> getErrorCorrectedMessage getMostCommon |> printfn "%s"
+    messages |> getErrorCorrectedMessage getLeastCommon |> printfn "%s"
 
 run "input"
