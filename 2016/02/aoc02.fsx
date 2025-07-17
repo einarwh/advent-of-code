@@ -31,13 +31,13 @@ let makeMoves (move : int*int -> Move -> int*int) (pos : int * int) (moves : Mov
             fn (move pos h) rest  
     fn pos moves
 
-let toDigit (x, y) = 
-    y * 3 + x + 1
+let toPart1Button (x, y) = 
+    y * 3 + x + 1 |> string
 
-let findCode (move : int*int -> Move -> int*int) (movesList : Move list list) = 
+let findCode (move : int*int -> Move -> int*int) (toButton : int*int -> string) (movesList : Move list list) = 
     let rec fn (pos : int * int) (acc : (int * int) list) (lst : Move list list) = 
         match lst with 
-        | [] -> acc |> List.rev |> List.map toDigit |> List.map string |> String.concat ""
+        | [] -> acc |> List.rev |> List.map toButton |> String.concat ""
         | h :: rest -> 
             let pos' = makeMoves move pos h 
             fn pos' (pos' :: acc) rest
@@ -51,6 +51,6 @@ let readLines =
 let run fileName = 
     let lines = readLines fileName
     let movesList = lines |> List.map toMoves
-    movesList |> findCode moveSimpleKeypad |> printfn "%A"
+    movesList |> findCode moveSimpleKeypad toPart1Button |> printfn "%A"
 
 run "sample"
