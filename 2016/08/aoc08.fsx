@@ -1,4 +1,4 @@
-// Advent of Code 2016. Day 08
+// Advent of Code 2016. Day 08: Two-Factor Authentication.
 // dotnet fsi aoc08.fsx
 
 open System
