@@ -1,4 +1,4 @@
-// Advent of Code 2016. Day 03
+// Advent of Code 2016. Day 03: Squares With Three Sides.
 // dotnet fsi aoc03.fsx
 
 open System
