@@ -4,8 +4,19 @@
 open System
 open System.IO
 
-let readText fileName = 
-    File.ReadAllText(fileName).Trim()
+let rec dup = function 
+  | [] -> false
+  | h::t -> List.contains h t || dup t
+  
+let count = List.filter (dup >> not) >> List.length 
+
+let sorted : string -> string = 
+  Seq.sort >> fun cs -> new string(Seq.toArray cs)
+  
+let count2 = List.filter (List.map sorted >> dup >> not) >> List.length 
+
+let readLine (line : string) = 
+  line.Split() |> List.ofArray
 
 let readLines = 
     File.ReadAllLines
@@ -14,8 +25,8 @@ let readLines =
 
 let run fileName = 
     let lines = readLines fileName
-    lines |> printfn "%A"
-    let text = readText fileName
-    text |> printfn "%s"
-
-run "input"
+    let phrases = lines |> List.map readLine
+    phrases |> count |> printfn "%A"
+    phrases |> count2 |> printfn "%A"
+    
+run "input.txt"
