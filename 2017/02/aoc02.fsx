@@ -4,8 +4,19 @@
 open System
 open System.IO
 
-let readText fileName = 
-    File.ReadAllText(fileName).Trim()
+let checksum = List.map (fun row -> List.max row - List.min row) >> List.reduce (+) 
+
+let tryFindDiv x = 
+  List.tryFind (fun d -> x > d && x % d = 0) >> Option.map (fun d -> x / d)
+
+let division lst = 
+  lst |> List.choose (fun x -> tryFindDiv x lst) |> List.head
+     
+let readLine (line : string) = 
+  line.Split() |> List.ofArray |> List.map int
+
+let readSheet = 
+  Seq.map readLine >> Seq.toList
 
 let readLines = 
     File.ReadAllLines
@@ -14,8 +25,8 @@ let readLines =
 
 let run fileName = 
     let lines = readLines fileName
-    lines |> printfn "%A"
-    let text = readText fileName
-    text |> printfn "%s"
+    let sheet = readSheet lines
+    sheet |> checksum |> printfn "%d"
+    sheet |> List.map division |> List.sum |> printfn "%d"
 
-run "input"
+run "input.txt"
