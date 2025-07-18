@@ -30,6 +30,11 @@ module Grid =
         let h = height grid
         let posList = [for x in [0..w-1] do for y in [0..h-1] -> (x, y)]
         posList |> List.map (fun pos -> get grid pos) |> List.sum
+    let brightest (grid : int[,]) = 
+        let w = width grid
+        let h = height grid
+        let posList = [for x in [0..w-1] do for y in [0..h-1] -> (x, y)]
+        posList |> List.map (fun pos -> get grid pos) |> List.max
 
 let tryParseRect (s : string) : Rect option =
     let m = Regex.Match(s, "(\d+),(\d+) through (\d+),(\d+)$")
@@ -108,5 +113,6 @@ let run fileName =
     let grid2 = Grid.create 1000 1000
     execute2 grid2 instructions
     grid2 |> Grid.count |> printfn "%d"
+    // grid2 |> Grid.brightest |> printfn "%d"
 
 run "input"
