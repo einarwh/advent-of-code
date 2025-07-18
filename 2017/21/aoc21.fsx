@@ -1,10 +1,5 @@
-echo "Day: $1"
-mkdir $1
-touch $1/sample.txt
-touch $1/input.txt
-cat > $1/aoc$1.fsx << EOF
-// Advent of Code 2017. Day $1
-// dotnet fsi aoc$1.fsx
+// Advent of Code 2017. Day 21: Fractal Art.
+// dotnet fsi aoc21.fsx
 
 open System
 open System.IO
@@ -23,5 +18,4 @@ let run fileName =
     let text = readText fileName
     text |> printfn "%s"
 
-run "input.txt"
-EOF
+run "input"
