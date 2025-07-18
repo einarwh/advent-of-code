@@ -35,6 +35,30 @@ let solve list lengths =
   | (_, _, a::b::_) -> a * b
   | _ -> failwith "ouch"
   
+let execute list = List.fold step (0, 0, list)
+
+let rec copies n list = 
+  if n = 1 then list 
+  else list @ copies (n - 1) list
+
+let rec blocks = function  
+  | [] -> []
+  | list -> 
+    let block = Seq.take 16 list |> Seq.toList
+    let rest = Seq.skip 16 list |> Seq.toList
+    block :: blocks rest 
+
+let densify = 
+  blocks
+  >> List.map (List.reduce (^^^) >> sprintf "%x")
+  >> List.map (fun s -> s.PadLeft(2, '0'))
+  >> String.concat ""
+
+let hash input = 
+  let input' = (input |> Seq.map int |> Seq.toList) @ [17;31;73;47;23]
+  let (_, _, sparse) = execute [ 0 .. 255 ] (copies 64 input')
+  densify sparse  
+
 let readText fileName = 
     File.ReadAllText(fileName).Trim()
 
@@ -42,5 +66,6 @@ let run fileName =
     let text = readText fileName
     let numbers = text.Split "," |> Array.toList |> List.map int 
     numbers |> solve [ 0 .. 255 ] |> printfn "%d"
+    text |> hash |> printfn "%s"
 
 run "input.txt"
