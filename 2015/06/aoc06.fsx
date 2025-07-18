@@ -16,26 +16,20 @@ type Instruction =
 
 module Grid = 
     let create width height = 
-        Array2D.create height width false
+        Array2D.create height width 0
     let width grid = 
         Array2D.length2 grid
     let height grid = 
         Array2D.length1 grid
-    let get (grid : bool[,]) (x, y) =
+    let get (grid : int[,]) (x, y) =
         Array2D.get grid y x
-    let set (grid : bool[,]) (x, y) (value : bool) =
+    let set (grid : int[,]) (x, y) (value : int) =
         Array2D.set grid y x value
-    let toggle (grid : bool[,]) (rect : Rect) =
-        grid 
-    let turnOn (grid : bool[,]) (rect : Rect) =
-        grid 
-    let turnOff (grid : bool[,]) (rect : Rect) =
-        grid 
-    let countLit (grid : bool[,]) = 
+    let count (grid : int[,]) = 
         let w = width grid
         let h = height grid
         let posList = [for x in [0..w-1] do for y in [0..h-1] -> (x, y)]
-        posList |> List.filter (fun pos -> get grid pos) |> List.length
+        posList |> List.map (fun pos -> get grid pos) |> List.sum
 
 let tryParseRect (s : string) : Rect option =
     let m = Regex.Match(s, "(\d+),(\d+) through (\d+),(\d+)$")
@@ -74,69 +68,45 @@ let getRectPositions (rect : Rect) =
     let ys = [yStart .. yEnd]
     [for x in xs do for y in ys -> (x, y)]
 
-let toggle (grid : bool[,]) (rect : Rect) = 
+let update (fn : int -> int) (grid : int[,]) (rect : Rect) = 
     let rec loop posList = 
         match posList with
         | [] -> ()
         | pos :: rest -> 
             let v = Grid.get grid pos
-            Grid.set grid pos (not v)
+            Grid.set grid pos (fn v)
             loop rest 
     rect |> getRectPositions |> loop
 
-let turnOn (grid : bool[,]) (rect : Rect) = 
-    let rec loop posList = 
-        match posList with
-        | [] -> ()
-        | pos :: rest -> 
-            Grid.set grid pos true
-            loop rest 
-    rect |> getRectPositions |> loop
-
-let turnOff (grid : bool[,]) (rect : Rect) = 
-    let rec loop posList = 
-        match posList with
-        | [] -> ()
-        | pos :: rest -> 
-            Grid.set grid pos false
-            loop rest 
-    rect |> getRectPositions |> loop
-
-let execute grid (instructions : Instruction list) = 
+let execute toggle turnOn turnOff grid (instructions : Instruction list) = 
     let rec loop instList = 
         match instList with 
         | [] -> ()
         | inst :: rest -> 
             match inst with 
-            | Toggle rect -> toggle grid rect 
-            | TurnOn rect -> turnOn grid rect 
-            | TurnOff rect -> turnOff grid rect
+            | Toggle rect -> update toggle grid rect 
+            | TurnOn rect -> update turnOn grid rect 
+            | TurnOff rect -> update turnOff grid rect
             rest |> loop
     instructions |> loop
+
+let execute1 = execute (fun v -> if v = 0 then 1 else 0) (fun _ -> 1) (fun _ -> 0)
+
+let execute2 = execute (fun v -> v + 2) (fun v -> v + 1) (fun v -> max 0 (v - 1))
 
 let readLines = 
     File.ReadAllLines
     >> Array.filter (fun line -> line <> String.Empty)
     >> Array.toList
 
-let visualize grid = 
-    let w = Grid.width grid 
-    let h = Grid.height grid
-    let createRow y = 
-        [ 0 .. (w - 1) ] 
-        |> List.map (fun x -> if Grid.get grid (x, y) then "#" else ".")
-        |> String.concat ""
-    [ 0 .. (h - 1) ] 
-    |> List.map createRow |> String.concat "\n" |> printfn "%s"
-    printfn ""
-
 let run fileName = 
     let lines = readLines fileName
     let instructions = lines |> List.choose tryParse
-    // instructions |> printfn "%A"
-    let grid = Grid.create 1000 1000
-    execute grid instructions
-    grid |> Grid.countLit |> printfn "%d"
-    // visualize grid
+    let grid1 = Grid.create 1000 1000
+    execute1 grid1 instructions
+    grid1 |> Grid.count |> printfn "%d"
+    let grid2 = Grid.create 1000 1000
+    execute2 grid2 instructions
+    grid2 |> Grid.count |> printfn "%d"
 
 run "input"
