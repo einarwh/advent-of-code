@@ -13,20 +13,6 @@ let readGarbage cs =
   | _ -> failwith "?"
   loop 0 cs
 
-// let rec readGroup depth cs = 
-//   let rec loop c = function 
-//     | '}' :: t -> c, t
-//     | '{' :: t -> 
-//       let (c', t') = readGroup (depth + 1) t
-//       loop (c + c') t'
-//     | '<' :: t -> 
-//       loop c <| readGarbage t
-//     | '!' :: _ :: t ->
-//       loop c t
-//     | _ :: t ->
-//       loop c t
-//   loop depth cs
-
 let rec readGroup depth cs =
   let rec loop c g = function
     | '}' :: t -> c, g, t
