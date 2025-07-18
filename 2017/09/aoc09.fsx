@@ -1,5 +1,4 @@
 // Advent of Code 2017. Day 09: Stream Processing.
-// Solution for part 2 only.
 // dotnet fsi aoc09.fsx
 
 open System
@@ -14,34 +13,40 @@ let readGarbage cs =
   | _ -> failwith "?"
   loop 0 cs
 
-let rec readGroup cs =
-  let rec loop g = function
-    | '}' :: t -> g, t
+// let rec readGroup depth cs = 
+//   let rec loop c = function 
+//     | '}' :: t -> c, t
+//     | '{' :: t -> 
+//       let (c', t') = readGroup (depth + 1) t
+//       loop (c + c') t'
+//     | '<' :: t -> 
+//       loop c <| readGarbage t
+//     | '!' :: _ :: t ->
+//       loop c t
+//     | _ :: t ->
+//       loop c t
+//   loop depth cs
+
+let rec readGroup depth cs =
+  let rec loop c g = function
+    | '}' :: t -> c, g, t
     | '{' :: t ->
-      let (g', t') = readGroup t
-      loop (g + g') t'
+      let (c', g', t') = readGroup (depth + 1) t
+      loop (c + c') (g + g') t'
     | '<' :: t ->
       let (g', t') = readGarbage t
-      loop (g + g') t'
+      loop c (g + g') t'
     | '!' :: _ :: t ->
-      loop g t
+      loop c g t
     | _ :: t ->
-      loop g t
+      loop c g t
     | _ -> failwith "?"
-  loop 0 cs
+  loop depth 0 cs
 
 let read = function
   | '{' :: t ->
-    readGroup t |> fun (g, _) -> g
+    readGroup 1 t |> fun (c, g, _) -> (c, g)
   | _ -> failwith "ouch"
-
-// let count (s : string) =
-//   s |> Seq.toList |> read
-
-// let text = File.ReadAllText("C:/einarwh/temp/day9.txt")
-
-// text |> count |> printfn "%A"
-
 
 let readText fileName =
     File.ReadAllText(fileName).Trim()
@@ -49,6 +54,8 @@ let readText fileName =
 let run fileName =
     let text = readText fileName
     // text |> printfn "%s"
-    text |> Seq.toList |> read |> printfn "%A"
+    let (score, garbage) = text |> Seq.toList |> read
+    score |> printfn "%d"
+    garbage |> printfn "%d"
 
 run "input.txt"
