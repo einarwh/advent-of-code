@@ -1,5 +1,4 @@
 // Advent of Code 2017. Day 08: I Heard You Like Registers.
-// Solution for part 1 only.
 // dotnet fsi aoc08.fsx
 
 open System
@@ -21,27 +20,28 @@ let change = function
 
 let rec lookup name = function 
     | [] -> 0
-    | (n, v)::t -> if n = name then v else lookup name t
+    | (n, v, _)::t -> if n = name then v else lookup name t
 
 let rec update n change = function 
-  | [] -> [ n, change 0 ]
-  | (n', v) :: t ->
-    if n = n' then (n, change v) :: t
-    else (n', v) :: update n change t
+  | [] ->
+    let v = change 0 
+    [ n, v, v ]
+  | (n', v, mv) :: t ->
+    if n = n' then 
+        let v' = change v 
+        let mv' = max v' mv 
+        (n, change v, mv') :: t
+    else (n', v, mv) :: update n change t
   
 let readLine (line : string) =
   match line.Split() with 
   | [|n;op;v;_;nc;c;vc|] -> 
-    let p rs = (comparison c) (lookup nc rs) (int vc) 
-    fun rs ->
+    let p (rs : (string*int*int) list) = (comparison c) (lookup nc rs) (int vc) 
+    fun (rs : (string*int*int) list) ->
       if p rs then
         update n (fun x -> (change op) x (int v)) rs
       else rs
   | x -> failwith <| sprintf "line %s" line
-
-let solve lines =
-  let solver = Seq.map readLine >> Seq.reduce (>>)
-  [] |> solver lines |> Seq.maxBy (fun (_, v) -> v)
 
 let readLines = 
     File.ReadAllLines
@@ -50,6 +50,9 @@ let readLines =
 
 let run fileName = 
     let lines = readLines fileName
-    solve lines |> printfn "%A"
+    let solver = Seq.map readLine >> Seq.reduce (>>)
+    let registry = [] |> solver lines
+    registry |> Seq.map (fun (_, v, _) -> v) |> Seq.max |> printfn "%d"
+    registry |> Seq.map (fun (_, _, mv) -> mv) |> Seq.max |> printfn "%d"
 
 run "input.txt"
