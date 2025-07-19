@@ -9,25 +9,8 @@ let parse (s : string) : (int64*int64) option =
     | [|a; b|] -> Some (int64 a, int64 b)
     | _ -> None
 
-let findLowestNonBlockedIp ranges = 
-    let rec find (current : int64) (ranges : (int64*int64) list) = 
-        match ranges with 
-        | [] -> current 
-        | (first, last) :: rest ->
-            if first < current then 
-                if last > current then 
-                    find (last + 1L) rest 
-                else 
-                    find current rest 
-            else if first = current then 
-                find (last + 1L) rest 
-            else 
-                current 
-    find 0 ranges 
-
 let combineRanges (ranges : (int64*int64) list) : (int64*int64) list = 
     let rec fn acc (currentFirst, currentLast) ranges = 
-        // printfn "combining... %A %A %A" acc (currentFirst, currentLast) ranges
         match ranges with 
         | [] -> ((currentFirst, currentLast) :: acc) |> List.rev 
         | (first, last) :: rest -> 
@@ -35,8 +18,6 @@ let combineRanges (ranges : (int64*int64) list) : (int64*int64) list =
                 failwith "not sorted?"
             else 
                 if first > currentLast + 1L then 
-                    // printfn "GAP"
-                    // Gap! 
                     fn ((currentFirst, currentLast) :: acc) (first, last) rest
                 else 
                     fn acc (currentFirst, max currentLast last) rest 
