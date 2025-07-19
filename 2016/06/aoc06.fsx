@@ -34,4 +34,4 @@ let run fileName =
     messages |> getErrorCorrectedMessage getMostCommon |> printfn "%s"
     messages |> getErrorCorrectedMessage getLeastCommon |> printfn "%s"
 
-run "input"
+run "input.txt"

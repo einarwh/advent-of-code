@@ -101,7 +101,6 @@ let visualize screen =
         |> String.concat ""
     [ 0 .. (h - 1) ] 
     |> List.map createRow |> String.concat "\n" |> printfn "%s"
-    printfn ""
 
 let execute screen operations = 
     let rec fn ops = 
@@ -123,4 +122,4 @@ let run fileName =
     Screen.countLit screen |> printfn "%d"
     visualize screen
 
-run "input"
+run "input.txt"

@@ -15,4 +15,4 @@ let run fileName =
     let text = File.ReadAllText(fileName).Trim()
     text |> printfn "%s"
 
-run "input"
+run "input.txt"

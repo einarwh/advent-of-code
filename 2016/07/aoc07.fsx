@@ -69,4 +69,4 @@ let run fileName =
     lines |> List.filter checkTls |> List.length |> printfn "%d"
     lines |> List.filter checkSsl |> List.length |> printfn "%d"
 
-run "input"
+run "input.txt"
