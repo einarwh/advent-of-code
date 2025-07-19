@@ -78,4 +78,4 @@ let run fileName =
     directions |> move |> toDistance 
     directions |> twice |> toDistance
 
-run "input"
+run "input.txt"

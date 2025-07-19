@@ -69,4 +69,4 @@ let run fileName =
     let objectStorage = realRooms |> List.pick checkObjectStorage
     objectStorage.sectorId |> printfn "%d" 
 
-run "input"
+run "input.txt"

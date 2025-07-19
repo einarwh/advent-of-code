@@ -77,7 +77,7 @@ let readLines =
 let run fileName = 
     let lines = readLines fileName
     let movesList = lines |> List.map toMoves
-    movesList |> findCode (1, 1) moveSimpleKeypad toButtonPart1 |> printfn "%A"
-    movesList |> findCode (-2, 0) moveComplexKeypad toButtonPart2 |> printfn "%A"
+    movesList |> findCode (1, 1) moveSimpleKeypad toButtonPart1 |> printfn "%s"
+    movesList |> findCode (-2, 0) moveComplexKeypad toButtonPart2 |> printfn "%s"
 
-run "input"
+run "input.txt"

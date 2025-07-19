@@ -44,4 +44,4 @@ let run fileName =
     let colPossible = colTriplets |> List.filter isPossible |> List.length
     printfn "%d" colPossible
 
-run "input"
+run "input.txt"
