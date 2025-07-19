@@ -1,4 +1,4 @@
-// Advent of Code 2016. Day 18
+// Advent of Code 2016. Day 18: Like a Rogue.
 // dotnet fsi aoc18.fsx
 
 open System

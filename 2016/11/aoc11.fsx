@@ -1,4 +1,4 @@
-// Advent of Code 2016. Day 11
+// Advent of Code 2016. Day 11: Radioisotope Thermoelectric Generators.
 // dotnet fsi aoc11.fsx
 
 open System

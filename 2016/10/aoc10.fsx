@@ -1,4 +1,4 @@
-// Advent of Code 2016. Day 10
+// Advent of Code 2016. Day 10: Balance Bots.
 // dotnet fsi aoc10.fsx
 
 open System
@@ -12,7 +12,5 @@ let readLines =
 let run fileName = 
     let lines = readLines fileName
     lines |> printfn "%A"
-    let text = File.ReadAllText(fileName).Trim()
-    text |> printfn "%s"
 
 run "input.txt"

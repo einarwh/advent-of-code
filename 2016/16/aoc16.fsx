@@ -1,4 +1,4 @@
-// Advent of Code 2016. Day 16
+// Advent of Code 2016. Day 16: Dragon Checksum.
 // dotnet fsi aoc16.fsx
 
 open System

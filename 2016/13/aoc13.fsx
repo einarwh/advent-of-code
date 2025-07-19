@@ -1,4 +1,4 @@
-// Advent of Code 2016. Day 13
+// Advent of Code 2016. Day 13: A Maze of Twisty Little Cubicles.
 // dotnet fsi aoc13.fsx
 
 open System

@@ -1,4 +1,4 @@
-// Advent of Code 2016. Day 17
+// Advent of Code 2016. Day 17: Two Steps Forward.
 // dotnet fsi aoc17.fsx
 
 open System

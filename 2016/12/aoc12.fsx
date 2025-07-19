@@ -1,4 +1,4 @@
-// Advent of Code 2016. Day 12
+// Advent of Code 2016. Day 12: Leonardo's Monorail.
 // dotnet fsi aoc12.fsx
 
 open System

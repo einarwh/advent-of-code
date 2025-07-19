@@ -1,4 +1,4 @@
-// Advent of Code 2016. Day 14
+// Advent of Code 2016. Day 14: One-Time Pad.
 // dotnet fsi aoc14.fsx
 
 open System

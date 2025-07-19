@@ -1,4 +1,4 @@
-// Advent of Code 2016. Day 15
+// Advent of Code 2016. Day 15: Timing is Everything.
 // dotnet fsi aoc15.fsx
 
 open System
