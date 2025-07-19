@@ -17,6 +17,8 @@ let readLines =
 let run fileName = 
     let lines = readLines fileName
     lines |> printfn "%A"
+    let text = File.ReadAllText(fileName).Trim()
+    text |> printfn "%s"
 
-run "input"
+run "input.txt"
 EOF
