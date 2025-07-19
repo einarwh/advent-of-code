@@ -57,7 +57,7 @@ let rec findLengthV2 (s : string) : int64 =
 let verify finder expectedResult inputStr = 
     let actualResult = finder inputStr 
     if expectedResult = actualResult then 
-        printfn "Decompressed length of %s verified as %d" inputStr expectedResult
+        printfn "OK - decompressed length of %s verified as %d" inputStr expectedResult
     else 
         failwith <| sprintf "Expected decompressed length of %s to be %d but was %d" inputStr expectedResult actualResult
 
@@ -70,11 +70,11 @@ let verify2 finder (expectedResult : int64) inputStr =
 
 let verifyPart1() = 
     "ADVENT" |> verify findLength 6
-    "A(1x5)BC" |> verify findLength 6
-    "(3x3)XYZ" |> verify findLength 6
-    "A(2x2)BCD(2x2)EFG" |> verify findLength 6
+    "A(1x5)BC" |> verify findLength 7
+    "(3x3)XYZ" |> verify findLength 9
+    "A(2x2)BCD(2x2)EFG" |> verify findLength 11
     "(6x1)(1x3)A" |> verify findLength 6
-    "X(8x2)(3x3)ABCY" |> verify findLength 6
+    "X(8x2)(3x3)ABCY" |> verify findLength 18
 
 let verifyPart2() = 
     "(3x3)XYZ" |> verify2 findLengthV2 6L
@@ -84,14 +84,7 @@ let verifyPart2() =
 
 let run fileName = 
     let text = readText fileName
-    // "ADVENT" |> findLength |> printfn "%d"
-    // "A(1x5)BC" |> findLength |> printfn "%d"
-    // "(3x3)XYZ" |> findLength |> printfn "%d"
-    // "A(2x2)BCD(2x2)EFG" |> findLength |> printfn "%d"
-    // "(6x1)(1x3)A" |> findLength |> printfn "%d"
-    // "X(8x2)(3x3)ABCY" |> findLength |> printfn "%d"
-    // "(27x12)(20x12)(13x14)(7x10)(1x12)A" |> findLengthV2 |> printfn "%d"
-    // "(25x3)(3x3)ABC(2x3)XY(5x2)PQRSTX(18x9)(3x2)TWO(5x7)SEVEN" |> findLengthV2 |> printfn "%d"
+    verifyPart1()
     text |> findLength |> printfn "%d"
     text |> findLengthV2 |> printfn "%d"
 
