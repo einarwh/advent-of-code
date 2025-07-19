@@ -29,7 +29,6 @@ let findLength (s : string) =
             let skipped = after |> List.skip num 
             fn (len + num * rep) skipped 
         | ch :: rest -> 
-            printfn "%A" rest
             if ch < 'A' || ch > 'Z' then failwith <| sprintf "%c??" ch
             fn (len + 1) rest 
     s |> Seq.toList |> fn 0 
@@ -55,6 +54,34 @@ let rec findLengthV2 (s : string) : int64 =
         | _ ->
             1L + findLengthV2 (s.Substring(1))
 
+let verify finder expectedResult inputStr = 
+    let actualResult = finder inputStr 
+    if expectedResult = actualResult then 
+        printfn "Decompressed length of %s verified as %d" inputStr expectedResult
+    else 
+        failwith <| sprintf "Expected decompressed length of %s to be %d but was %d" inputStr expectedResult actualResult
+
+let verify2 finder (expectedResult : int64) inputStr = 
+    let actualResult = finder inputStr 
+    if expectedResult = actualResult then 
+        printfn "Decompressed length of %s verified as %d" inputStr expectedResult
+    else 
+        failwith <| sprintf "Expected decompressed length of %s to be %d but was %d" inputStr expectedResult actualResult
+
+let verifyPart1() = 
+    "ADVENT" |> verify findLength 6
+    "A(1x5)BC" |> verify findLength 6
+    "(3x3)XYZ" |> verify findLength 6
+    "A(2x2)BCD(2x2)EFG" |> verify findLength 6
+    "(6x1)(1x3)A" |> verify findLength 6
+    "X(8x2)(3x3)ABCY" |> verify findLength 6
+
+let verifyPart2() = 
+    "(3x3)XYZ" |> verify2 findLengthV2 6L
+    "X(8x2)(3x3)ABCY" |> verify2 findLengthV2 6L
+    "(27x12)(20x12)(13x14)(7x10)(1x12)A" |> verify2 findLengthV2 6L
+    "(25x3)(3x3)ABC(2x3)XY(5x2)PQRSTX(18x9)(3x2)TWO(5x7)SEVEN" |> verify2 findLengthV2 6L
+
 let run fileName = 
     let text = readText fileName
     // "ADVENT" |> findLength |> printfn "%d"
@@ -63,9 +90,9 @@ let run fileName =
     // "A(2x2)BCD(2x2)EFG" |> findLength |> printfn "%d"
     // "(6x1)(1x3)A" |> findLength |> printfn "%d"
     // "X(8x2)(3x3)ABCY" |> findLength |> printfn "%d"
-    // text |> findLength |> printfn "%d"
-    "(27x12)(20x12)(13x14)(7x10)(1x12)A" |> findLengthV2 |> printfn "%d"
-    "(25x3)(3x3)ABC(2x3)XY(5x2)PQRSTX(18x9)(3x2)TWO(5x7)SEVEN" |> findLengthV2 |> printfn "%d"
+    // "(27x12)(20x12)(13x14)(7x10)(1x12)A" |> findLengthV2 |> printfn "%d"
+    // "(25x3)(3x3)ABC(2x3)XY(5x2)PQRSTX(18x9)(3x2)TWO(5x7)SEVEN" |> findLengthV2 |> printfn "%d"
+    text |> findLength |> printfn "%d"
     text |> findLengthV2 |> printfn "%d"
 
 run "input.txt"
