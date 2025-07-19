@@ -1,4 +1,4 @@
-// Advent of Code 2016. Day 21
+// Advent of Code 2016. Day 21: Scrambled Letters and Hash.
 // dotnet fsi aoc21.fsx
 
 open System
@@ -14,5 +14,7 @@ let run fileName =
     lines |> printfn "%A"
     let text = File.ReadAllText(fileName).Trim()
     text |> printfn "%s"
+    let password = "abcdefgh"
+    password |> printfn "%s"
 
 run "input.txt"

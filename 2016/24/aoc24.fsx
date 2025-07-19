@@ -1,4 +1,4 @@
-// Advent of Code 2016. Day 24
+// Advent of Code 2016. Day 24: Air Duct Spelunking.
 // dotnet fsi aoc24.fsx
 
 open System

@@ -1,4 +1,4 @@
-// Advent of Code 2016. Day 25
+// Advent of Code 2016. Day 25: Clock Signal.
 // dotnet fsi aoc25.fsx
 
 open System

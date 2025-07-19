@@ -1,4 +1,4 @@
-// Advent of Code 2016. Day 22
+// Advent of Code 2016. Day 22: Grid Computing.
 // dotnet fsi aoc22.fsx
 
 open System

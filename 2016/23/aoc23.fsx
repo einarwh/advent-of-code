@@ -1,4 +1,4 @@
-// Advent of Code 2016. Day 23
+// Advent of Code 2016. Day 23: Safe Cracking.
 // dotnet fsi aoc23.fsx
 
 open System
