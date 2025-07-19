@@ -7,14 +7,6 @@ open System.Linq
 open System.Text
 open System.Security.Cryptography
 
-let readText fileName = 
-    File.ReadAllText(fileName).Trim()
-
-let readLines = 
-    File.ReadAllLines
-    >> Array.filter (fun line -> line <> String.Empty)
-    >> Array.toList
-
 let toHexHash (input : string) = 
     use md5 = MD5.Create()
     input |> Encoding.ASCII.GetBytes |> md5.ComputeHash |> Convert.ToHexString
@@ -58,8 +50,8 @@ let hack2 (doorId : string) =
     fn chars chars.Length 0 doorId
 
 let run fileName = 
-    let text = readText fileName
+    let text = File.ReadAllText(fileName).Trim()
     hack1 text
     hack2 text
 
-run "input"
+run "input.txt"
