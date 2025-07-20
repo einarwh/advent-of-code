@@ -4,7 +4,7 @@
 open System
 open System.IO
 
-let grp (chars : char list) = 
+let group (chars : char list) = 
     let rec fn (acc : (int*char) list) (pairs : (int*char) list) : (int*char) list = 
         match pairs with 
         | [] -> acc |> List.rev 
@@ -19,7 +19,7 @@ let grp (chars : char list) =
 let lookAndSay (s : string) = 
     let desc (n, c) = 
         n.ToString() + c.ToString()
-    let g = s |> Seq.toList |> grp
+    let g = s |> Seq.toList |> group
     g |> List.map desc |> String.concat ""
 
 let apply times s = 
