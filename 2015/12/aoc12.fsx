@@ -3,16 +3,31 @@
 
 open System
 open System.IO
+open System.Text.Json
 
-let readLines = 
-    File.ReadAllLines
-    >> Array.filter (fun line -> line <> String.Empty)
-    >> Array.toList
+let sumNumbers (skipRed : bool) (element : JsonElement) : int = 
+    let isRed (e : JsonElement) : bool = 
+        e.ValueKind = JsonValueKind.String && e.GetString() = "red"
+    let rec sum (e : JsonElement) = 
+        match e.ValueKind with 
+        | JsonValueKind.Object -> 
+            let elements = e.EnumerateObject() |> Seq.map (fun prop -> e.GetProperty(prop.Name))
+            if skipRed && elements |> Seq.exists isRed then 0 
+            else
+                elements |> Seq.sumBy sum 
+        | JsonValueKind.Array -> 
+            e.EnumerateArray() |> Seq.sumBy sum
+        | JsonValueKind.Number -> 
+            e.GetInt32()
+        | _ -> 
+            0
+    sum element
 
 let run fileName = 
-    let lines = readLines fileName
-    lines |> printfn "%A"
     let text = File.ReadAllText(fileName).Trim()
-    text |> printfn "%s"
+    let jsonDoc = JsonDocument.Parse(text)
+    let rootElement = jsonDoc.RootElement
+    rootElement |> sumNumbers false |> printfn "%d"
+    rootElement |> sumNumbers true |> printfn "%d"
 
 run "input.txt"
