@@ -6,7 +6,7 @@ open System.IO
 open System.Text.RegularExpressions
 
 let parse (s : string) : (string*string*int) option =
-    let m = Regex.Match(s, "^([A-Za-z]+) [a-z]+ (lose|gain) (\d+) [a-z]+ [a-z]+ [a-z]+ [a-z]+ [a-z]+ [a-z]+ ([A-Za-z]+)\.$$")
+    let m = Regex.Match(s, "^([A-Za-z]+) would (lose|gain) (\d+) happiness units by sitting next to ([A-Za-z]+)\.$")
     if m.Success then
         let name1 = m.Groups.[1].Value
         let effect = if m.Groups.[2].Value = "gain" then 1 else -1
