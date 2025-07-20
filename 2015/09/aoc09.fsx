@@ -1,4 +1,4 @@
-// Advent of Code 2015. Day 09
+// Advent of Code 2015. Day 09: All in a Single Night.
 // dotnet fsi aoc09.fsx
 
 open System

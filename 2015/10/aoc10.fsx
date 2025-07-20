@@ -1,4 +1,4 @@
-// Advent of Code 2015. Day 10
+// Advent of Code 2015. Day 10: Elves Look, Elves Say.
 // dotnet fsi aoc10.fsx
 
 open System
