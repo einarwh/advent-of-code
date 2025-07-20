@@ -16,7 +16,18 @@ let countMemoryLength (s : string) =
         | '\\' :: 'x' :: _ :: _ :: rest 
         | _ :: rest ->
             fn (count + 1) rest
-    s |> Seq.toList |> fn 0 
+    let withoutQuotes = s.Substring(1, s.Length - 2)
+    withoutQuotes |> Seq.toList |> fn 0 
+
+let encode (s : string) = 
+    let rec fn chars = 
+        match chars with 
+        | [] -> []
+        | '\\' :: rest -> '\\' :: '\\' :: fn rest
+        | '"' :: rest -> '\\' :: '"' :: fn rest
+        | c :: rest -> c :: fn rest 
+    let content = s |> Seq.toList |> fn |> List.toArray |> fun cs -> new string(cs)
+    "\"" + content + "\""
 
 let readLines = 
     File.ReadAllLines
@@ -25,9 +36,10 @@ let readLines =
 
 let run fileName = 
     let lines = readLines fileName
-    lines |> printfn "%A"
     let codeLength = lines |> List.map countCodeLength |> List.sum
     let memoryLength = lines |> List.map countMemoryLength |> List.sum
     codeLength - memoryLength |> printfn "%d"
-
-run "sample.txt"
+    let encodedLength = lines |> List.map encode |> List.map countCodeLength |> List.sum 
+    encodedLength - codeLength |> printfn "%d"
+    
+run "input.txt"
