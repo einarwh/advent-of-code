@@ -38,8 +38,12 @@ let happiness (map : Map<string,Map<string,int>>) (seating : string list) : int 
         let guest = arr[i]
         let leftNeighbor = arr[leftOf i]
         let rightNeighbor = arr[rightOf i]
-        let m = map[guest]
-        m[leftNeighbor] + m[rightNeighbor]
+        match Map.tryFind guest map with 
+        | None -> 0 
+        | Some guestMap -> 
+            let leftScore = Map.tryFind leftNeighbor guestMap |> Option.defaultValue 0
+            let rightScore = Map.tryFind rightNeighbor guestMap |> Option.defaultValue 0 
+            leftScore + rightScore
     [ 0 .. arr.Length - 1 ] |> List.map score |> List.sum
 
 let run fileName = 
@@ -52,5 +56,6 @@ let run fileName =
         |> Map.ofList
     let guests = map |> Map.keys |> Seq.toList
     guests |> permute |> List.map (happiness map) |> List.max |> printfn "%A"
+    "Me" :: guests |> permute |> List.map (happiness map) |> List.max |> printfn "%A"
 
 run "input.txt"
