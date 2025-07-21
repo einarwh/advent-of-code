@@ -12,12 +12,6 @@ type Reindeer = {
     resttime : int
 }
 
-let makeTravelSequence (speed : int) (flytime : int) (resttime : int) = 
-    let flySeq = [0 .. flytime - 1] |> List.map (fun _ -> speed)
-    let restSeq = [0 .. resttime - 1] |> List.map (fun _ -> 0)
-    let finiteSeq = flySeq @ restSeq
-    Seq.initInfinite (fun i -> finiteSeq.[i % List.length finiteSeq])
-
 let parse (s : string) : Reindeer option =
     let m = Regex.Match(s, "^([A-Za-z]+) can fly (\d+) km/s for (\d+) seconds, but then must rest for (\d+) seconds\.$")
     if m.Success then
@@ -31,20 +25,11 @@ let parse (s : string) : Reindeer option =
     else
         None
 
-let travel (timeLimit : int) (reindeer : Reindeer) =
-    let rec loop elapsed distance =
-        if elapsed < timeLimit then
-            let flytime = min reindeer.flytime (timeLimit - elapsed)
-            let elapsedAfterFlying = elapsed + flytime
-            let distanceAfterFlying = distance + flytime * reindeer.speed
-            loop (elapsedAfterFlying + reindeer.resttime) distanceAfterFlying
-        else
-            distance
-    loop 0 0
-
-let travelWithSeq (timeLimit : int) (reindeer : Reindeer) =
-    let travelSeq = makeTravelSequence reindeer.speed reindeer.flytime reindeer.resttime
-    travelSeq |> Seq.take timeLimit |> Seq.sum
+let makeTravelSequence (speed : int) (flytime : int) (resttime : int) = 
+    let flySeq = [0 .. flytime - 1] |> List.map (fun _ -> speed)
+    let restSeq = [0 .. resttime - 1] |> List.map (fun _ -> 0)
+    let finiteSeq = flySeq @ restSeq
+    Seq.initInfinite (fun i -> finiteSeq.[i % List.length finiteSeq])
 
 let getDistances (timeLimit : int) (reindeer : Reindeer) =
     let travelSeq = makeTravelSequence reindeer.speed reindeer.flytime reindeer.resttime
@@ -53,8 +38,6 @@ let getDistances (timeLimit : int) (reindeer : Reindeer) =
 let race (reindeerDistances : int array array) = 
     let reindeerCount = reindeerDistances.Length
     let totalSeconds = reindeerDistances[0].Length
-    printfn "totalSeconds %d" totalSeconds
-    printfn "reindeerCount %d" reindeerCount
     let rec loop results (seconds : int) = 
         if seconds < totalSeconds then 
             let distances = [|0 .. reindeerCount - 1|] |> Array.map (fun reindeer -> reindeerDistances[reindeer][seconds])
@@ -74,10 +57,9 @@ let readLines =
 let run timeLimit fileName =
     let lines = readLines fileName
     let reindeerList = lines |> List.choose parse
-    reindeerList |> List.map (travel timeLimit) |> List.max |> printfn "%d"
-    reindeerList |> List.map (travelWithSeq timeLimit) |> List.max |> printfn "%d"
-    let distances = reindeerList |> List.map (getDistances timeLimit) |> List.toArray
-    distances |> race |> printfn "%A"
+    let reindeerDistances = reindeerList |> List.map (getDistances timeLimit) |> List.toArray
+    reindeerDistances |> Array.map Array.last |> Array.max |> printfn "%d"
+    reindeerDistances |> race |> printfn "%d"
 
 // run 1000 "sample.txt"
 run 2503 "input.txt"
