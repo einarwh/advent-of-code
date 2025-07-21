@@ -25,6 +25,10 @@ let determineOrder (lst : List<string*Set<string>>) =
             loop (chosenStep :: steps) lst'
     loop [] lst
 
+// let completeSteps (lst : List<string*Set<string>>) = 
+//     let rec loop (time : int) (available : int) (working : int list) (steps : string list) (lst : List<string*Set<string>>)
+//         let candidates = lst |> List.filter (fun (_, reqs) -> Set.isEmpty reqs) |> List.sort
+
 let run fileName = 
     let lines = readLines fileName
     let lst = 
