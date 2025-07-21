@@ -6,11 +6,17 @@ open System.IO
 open System.Text.RegularExpressions
 
 type Reindeer = {
-    name : string 
-    speed : int 
-    flytime : int 
-    resttime : int 
+    name : string
+    speed : int
+    flytime : int
+    resttime : int
 }
+
+let makeTravelSequence (speed : int) (flytime : int) (resttime : int) = 
+    let flySeq = [0 .. flytime - 1] |> List.map (fun _ -> speed)
+    let restSeq = [0 .. resttime - 1] |> List.map (fun _ -> 0)
+    let finiteSeq = flySeq @ restSeq
+    Seq.initInfinite (fun i -> finiteSeq.[i % List.length finiteSeq])
 
 let parse (s : string) : Reindeer option =
     let m = Regex.Match(s, "^([A-Za-z]+) can fly (\d+) km/s for (\d+) seconds, but then must rest for (\d+) seconds\.$")
@@ -25,27 +31,30 @@ let parse (s : string) : Reindeer option =
     else
         None
 
-let travel (timeLimit : int) (reindeer : Reindeer) = 
-    let rec loop elapsed distance = 
-        if elapsed < timeLimit then 
+let travel (timeLimit : int) (reindeer : Reindeer) =
+    let rec loop elapsed distance =
+        if elapsed < timeLimit then
             let flytime = min reindeer.flytime (timeLimit - elapsed)
             let elapsedAfterFlying = elapsed + flytime
-            let distanceAfterFlying = distance + flytime * reindeer.speed 
+            let distanceAfterFlying = distance + flytime * reindeer.speed
             loop (elapsedAfterFlying + reindeer.resttime) distanceAfterFlying
-        else 
-            distance 
-    loop 0 0 
+        else
+            distance
+    loop 0 0
 
-let readLines = 
+let travel2 (timeLimit : int) (reindeer : Reindeer) =
+    let travelSeq = makeTravelSequence reindeer.speed reindeer.flytime reindeer.resttime
+    travelSeq |> Seq.take timeLimit |> Seq.sum
+
+let readLines =
     File.ReadAllLines
     >> Array.filter (fun line -> line <> String.Empty)
     >> Array.toList
 
-let run fileName = 
+let run fileName =
     let lines = readLines fileName
-    lines |> printfn "%A"
     let reindeerList = lines |> List.choose parse
-    printfn "%A" reindeerList
-    reindeerList |> List.map (travel 1000) |> printfn "%A"
+    reindeerList |> List.map (travel 2503) |> List.max |> printfn "%d"
+    reindeerList |> List.map (travel2 2503) |> List.max |> printfn "%d"
 
-run "sample.txt"
+run "input.txt"
