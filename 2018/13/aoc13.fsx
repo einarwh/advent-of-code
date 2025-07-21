@@ -13,19 +13,10 @@ type Cart = {
 }
 
 module Mine = 
-    let width mine = 
-        Array2D.length2 mine
-    let height mine = 
-        Array2D.length1 mine
     let get (mine : char[,]) (x, y) =
         Array2D.get mine y x
     let set (mine : char[,]) (x, y) (value : char) =
         Array2D.set mine y x value
-    let count (mine : char[,]) = 
-        let w = width mine
-        let h = height mine
-        let posList = [for x in [0..w-1] do for y in [0..h-1] -> (x, y)]
-        posList |> List.map (fun pos -> get mine pos) |> List.sum
     let fromList (lst : char list list) = 
         let width = lst |> List.head |> List.length 
         let height = lst |> List.length 
@@ -109,27 +100,12 @@ let moveCart (mine : char[,]) (cart : Cart) =
             cart.switches
     { symbol = nextSymbol; pos = nextPos; switches = nextSwitches }
 
-let rec crashOld (mine : char[,]) (carts : Cart list) = 
-    visualize carts mine 
-    printfn ""
-    let cartsAtPositions = 
-        carts 
-        |> List.map (fun c -> c.pos) 
-        |> List.groupBy id |> List.map (fun (p, lst) -> (p, lst |> List.length)) 
-        |> List.sortByDescending (fun (_, c) -> c)
-    let (pos, count) = cartsAtPositions |> List.head 
-    if count > 1 then pos 
-    else 
-        carts |> List.map (moveCart mine) |> crashOld mine 
-
 let rec crash (removeCrashed : bool) (mine : char[,]) (carts : Cart list) : int*int= 
     // visualize carts mine 
-    // printfn ""
     let cartsAtPositions = 
         carts 
         |> List.groupBy (fun c -> c.pos) 
         |> List.sortByDescending (fun (_, carts) -> carts.Length)
-    // let (pos, cartList) = cartsAtPositions |> List.head 
     let crashes = cartsAtPositions |> List.choose (fun (_, cs) -> if cs.Length > 1 then Some cs else None) |> List.concat
     if crashes.Length > 1 then 
         if removeCrashed then 
@@ -145,9 +121,7 @@ let rec crash (removeCrashed : bool) (mine : char[,]) (carts : Cart list) : int*
 
 let run fileName = 
     let lines = readLines fileName
-    lines |> List.iter (printfn "%s")
     let mine = lines |> List.map Seq.toList |> Mine.fromList
-    // printfn "%A" mine
     let indexed = mine |> Mine.toIndexedList 
     let isCart ch = ['^'; '<'; 'v'; '>'] |> List.contains ch
     let carts = indexed |> List.choose (fun (pos, ch) -> if isCart ch then Some { symbol = ch; pos = pos; switches = 0 } else None)
@@ -157,8 +131,6 @@ let run fileName =
         | '>' | '<' -> '-'
         | _ -> symbol
     carts |> List.iter (fun c -> Mine.set mine c.pos (cartReplacementSymbol c.symbol))
-    // printfn "%A" carts
-    // printfn "%d" <| List.length carts
     carts |> crash false mine |> fun (x, y) -> printfn "%d,%d" x y
     carts |> crash true mine |> fun (x, y) -> printfn "%d,%d" x y
 
