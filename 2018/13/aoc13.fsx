@@ -109,7 +109,7 @@ let moveCart (mine : char[,]) (cart : Cart) =
             cart.switches
     { symbol = nextSymbol; pos = nextPos; switches = nextSwitches }
 
-let rec crash (mine : char[,]) (carts : Cart list) = 
+let rec crashOld (mine : char[,]) (carts : Cart list) = 
     visualize carts mine 
     printfn ""
     let cartsAtPositions = 
@@ -120,13 +120,34 @@ let rec crash (mine : char[,]) (carts : Cart list) =
     let (pos, count) = cartsAtPositions |> List.head 
     if count > 1 then pos 
     else 
-        carts |> List.map (moveCart mine) |> crash mine 
+        carts |> List.map (moveCart mine) |> crashOld mine 
+
+let rec crash (removeCrashed : bool) (mine : char[,]) (carts : Cart list) : int*int= 
+    // visualize carts mine 
+    // printfn ""
+    let cartsAtPositions = 
+        carts 
+        |> List.groupBy (fun c -> c.pos) 
+        |> List.sortByDescending (fun (_, carts) -> carts.Length)
+    // let (pos, cartList) = cartsAtPositions |> List.head 
+    let crashes = cartsAtPositions |> List.choose (fun (_, cs) -> if cs.Length > 1 then Some cs else None) |> List.concat
+    if crashes.Length > 1 then 
+        if removeCrashed then 
+            let remaining = carts |> List.filter (fun c -> not <| List.contains c crashes)
+            if remaining.Length > 1 then 
+                remaining |> List.map (moveCart mine) |> crash removeCrashed mine
+            else 
+                remaining |> List.head |> fun c -> c.pos
+        else 
+            crashes |> List.head |> fun c -> c.pos
+    else 
+        carts |> List.map (moveCart mine) |> crash removeCrashed mine 
 
 let run fileName = 
     let lines = readLines fileName
     lines |> List.iter (printfn "%s")
     let mine = lines |> List.map Seq.toList |> Mine.fromList
-    printfn "%A" mine
+    // printfn "%A" mine
     let indexed = mine |> Mine.toIndexedList 
     let isCart ch = ['^'; '<'; 'v'; '>'] |> List.contains ch
     let carts = indexed |> List.choose (fun (pos, ch) -> if isCart ch then Some { symbol = ch; pos = pos; switches = 0 } else None)
@@ -136,8 +157,9 @@ let run fileName =
         | '>' | '<' -> '-'
         | _ -> symbol
     carts |> List.iter (fun c -> Mine.set mine c.pos (cartReplacementSymbol c.symbol))
-    printfn "%A" carts
-    printfn "%d" <| List.length carts
-    carts |> crash mine |> fun (x, y) -> printfn "%d,%d" x y
+    // printfn "%A" carts
+    // printfn "%d" <| List.length carts
+    carts |> crash false mine |> fun (x, y) -> printfn "%d,%d" x y
+    carts |> crash true mine |> fun (x, y) -> printfn "%d,%d" x y
 
 run "input.txt"
