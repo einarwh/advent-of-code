@@ -46,15 +46,38 @@ let travelWithSeq (timeLimit : int) (reindeer : Reindeer) =
     let travelSeq = makeTravelSequence reindeer.speed reindeer.flytime reindeer.resttime
     travelSeq |> Seq.take timeLimit |> Seq.sum
 
+let getDistances (timeLimit : int) (reindeer : Reindeer) =
+    let travelSeq = makeTravelSequence reindeer.speed reindeer.flytime reindeer.resttime
+    travelSeq |> Seq.take timeLimit |> Seq.scan (+) 0 |> Seq.tail |> Seq.toArray
+
+let race (reindeerDistances : int array array) = 
+    let reindeerCount = reindeerDistances.Length
+    let totalSeconds = reindeerDistances[0].Length
+    printfn "totalSeconds %d" totalSeconds
+    printfn "reindeerCount %d" reindeerCount
+    let rec loop results (seconds : int) = 
+        if seconds < totalSeconds then 
+            let distances = [|0 .. reindeerCount - 1|] |> Array.map (fun reindeer -> reindeerDistances[reindeer][seconds])
+            let maxDist = Array.max distances
+            let scores = distances |> Array.map (fun d -> if d = maxDist then 1 else 0)
+            loop (scores :: results) (seconds + 1)
+        else 
+            results |> List.toArray
+    let results = loop [] 0
+    [|0 .. reindeerCount - 1|] |> Array.map (fun reindeer -> results |> Array.sumBy (fun result -> result[reindeer])) |> Array.max
+
 let readLines =
     File.ReadAllLines
     >> Array.filter (fun line -> line <> String.Empty)
     >> Array.toList
 
-let run fileName =
+let run timeLimit fileName =
     let lines = readLines fileName
     let reindeerList = lines |> List.choose parse
-    reindeerList |> List.map (travel 2503) |> List.max |> printfn "%d"
-    reindeerList |> List.map (travelWithSeq 2503) |> List.max |> printfn "%d"
+    reindeerList |> List.map (travel timeLimit) |> List.max |> printfn "%d"
+    reindeerList |> List.map (travelWithSeq timeLimit) |> List.max |> printfn "%d"
+    let distances = reindeerList |> List.map (getDistances timeLimit) |> List.toArray
+    distances |> race |> printfn "%A"
 
-run "input.txt"
+// run 1000 "sample.txt"
+run 2503 "input.txt"
