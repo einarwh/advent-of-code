@@ -9,7 +9,7 @@ type Pos = int*int
 type Cart = {
     symbol : char
     pos : Pos 
-    switches : Map<Pos, int>
+    switches : int
 }
 
 module Mine = 
@@ -81,7 +81,7 @@ let moveCart (mine : char[,]) (cart : Cart) =
             | '>' -> 'v'
             | _ -> failwith <| sprintf "%c?" cart.symbol 
         | '+' -> 
-            let history : int = cart.switches |> Map.find nextPos
+            let history = cart.switches
             match cart.symbol with 
             | '^' -> 
                 if history = 0 then '<'
@@ -101,10 +101,10 @@ let moveCart (mine : char[,]) (cart : Cart) =
                 else 'v'
             | _ -> failwith <| sprintf "%c?" cart.symbol 
         | _ -> cart.symbol
-    let nextSwitches = 
+    let nextSwitches : int = 
         match Mine.get mine nextPos with 
         | '+' -> 
-            cart.switches |> Map.change nextPos (Option.map (fun h -> (h + 1) % 3))
+            (cart.switches + 1) % 3
         | _ -> 
             cart.switches
     { symbol = nextSymbol; pos = nextPos; switches = nextSwitches }
@@ -128,14 +128,16 @@ let run fileName =
     let mine = lines |> List.map Seq.toList |> Mine.fromList
     printfn "%A" mine
     let indexed = mine |> Mine.toIndexedList 
-    let isSwitch ch = ch = '+'
     let isCart ch = ['^'; '<'; 'v'; '>'] |> List.contains ch
-    let switches = indexed |> List.choose (fun (pos, ch) -> if isSwitch ch then Some pos else None)
-    let switchMap = switches |> List.map (fun s -> (s, 0)) |> Map.ofList
-    printfn "%d" <| List.length switches
-    let carts = indexed |> List.choose (fun (pos, ch) -> if isCart ch then Some { symbol = ch; pos = pos; switches = switchMap } else None)
+    let carts = indexed |> List.choose (fun (pos, ch) -> if isCart ch then Some { symbol = ch; pos = pos; switches = 0 } else None)
+    let cartReplacementSymbol symbol = 
+        match symbol with 
+        | '^' | 'v' -> '|'
+        | '>' | '<' -> '-'
+        | _ -> symbol
+    carts |> List.iter (fun c -> Mine.set mine c.pos (cartReplacementSymbol c.symbol))
     printfn "%A" carts
     printfn "%d" <| List.length carts
-    carts |> crash mine |> printfn "%A"
+    carts |> crash mine |> fun (x, y) -> printfn "%d,%d" x y
 
-run "sample.txt"
+run "input.txt"
