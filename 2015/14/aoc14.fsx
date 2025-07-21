@@ -42,7 +42,7 @@ let travel (timeLimit : int) (reindeer : Reindeer) =
             distance
     loop 0 0
 
-let travel2 (timeLimit : int) (reindeer : Reindeer) =
+let travelWithSeq (timeLimit : int) (reindeer : Reindeer) =
     let travelSeq = makeTravelSequence reindeer.speed reindeer.flytime reindeer.resttime
     travelSeq |> Seq.take timeLimit |> Seq.sum
 
@@ -55,6 +55,6 @@ let run fileName =
     let lines = readLines fileName
     let reindeerList = lines |> List.choose parse
     reindeerList |> List.map (travel 2503) |> List.max |> printfn "%d"
-    reindeerList |> List.map (travel2 2503) |> List.max |> printfn "%d"
+    reindeerList |> List.map (travelWithSeq 2503) |> List.max |> printfn "%d"
 
 run "input.txt"
