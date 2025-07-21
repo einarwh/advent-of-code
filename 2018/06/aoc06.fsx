@@ -41,8 +41,11 @@ let createBoundary (points : (int*int) list) : Set<int*int> =
 let manhattan (x1, y1) (x2, y2) =
     abs (x1 - x2) + abs (y1 - y2)
 
-let manhattans coordinates pos = 
+let manhattansWithCoordinate coordinates pos = 
     coordinates |> List.map (fun c -> manhattan pos c, c) |> List.sort 
+
+let manhattans coordinates pos = 
+    coordinates |> List.map (manhattan pos) |> List.sort 
 
 let getPointsForCoordinates (box : Box) coordinates = 
     let selectCoordinate distances = 
@@ -56,9 +59,16 @@ let getPointsForCoordinates (box : Box) coordinates =
         | None -> None
     let positions = [ for x in [box.xMin .. box.xMax] do for y in [box.yMin .. box.yMax] do yield (x, y) ]
     positions 
-    |> List.map (fun p -> (p, manhattans coordinates p |> selectCoordinate))
+    |> List.map (fun p -> (p, manhattansWithCoordinate coordinates p |> selectCoordinate))
     |> List.groupBy snd 
     |> List.choose determined 
+
+let getSafeRegionSize (box : Box) coordinates = 
+    let positions = [ for x in [box.xMin .. box.xMax] do for y in [box.yMin .. box.yMax] do yield (x, y) ]
+    positions 
+    |> List.map (fun p -> manhattans coordinates p |> List.sum)
+    |> List.filter (fun d -> d < 10000)
+    |> List.length
 
 let selectLargest boundary (coordinatesWithPoints : List<(int*int)*List<(int*int)>>) =
     let isInfinite points = 
@@ -78,6 +88,6 @@ let run fileName =
     let box = coordinates |> createBox
     let boundary = coordinates |> createBoundary
     coordinates |> getPointsForCoordinates box |> selectLargest boundary |> printfn "%d"
-    
+    coordinates |> getSafeRegionSize box |> printfn "%A"
 
 run "input.txt"
