@@ -44,8 +44,10 @@ module Mine =
 
 let join (sep : string) (seq : string seq) = String.Join(sep, seq)
 
-let visualize mine =
-    let lines = Mine.toNestedList mine
+let visualize carts mine =
+    let viz = Array2D.copy mine 
+    carts |> List.iter (fun c -> Mine.set viz c.pos c.symbol)
+    let lines = viz |> Mine.toNestedList 
     lines |> List.map (fun chars -> new String(List.toArray chars)) |> join "\n" |> printfn "%s"
 
 let readLines = 
@@ -107,12 +109,24 @@ let moveCart (mine : char[,]) (cart : Cart) =
             cart.switches
     { symbol = nextSymbol; pos = nextPos; switches = nextSwitches }
 
+let rec crash (mine : char[,]) (carts : Cart list) = 
+    visualize carts mine 
+    printfn ""
+    let cartsAtPositions = 
+        carts 
+        |> List.map (fun c -> c.pos) 
+        |> List.groupBy id |> List.map (fun (p, lst) -> (p, lst |> List.length)) 
+        |> List.sortByDescending (fun (_, c) -> c)
+    let (pos, count) = cartsAtPositions |> List.head 
+    if count > 1 then pos 
+    else 
+        carts |> List.map (moveCart mine) |> crash mine 
+
 let run fileName = 
     let lines = readLines fileName
     lines |> List.iter (printfn "%s")
     let mine = lines |> List.map Seq.toList |> Mine.fromList
     printfn "%A" mine
-    mine |> visualize
     let indexed = mine |> Mine.toIndexedList 
     let isSwitch ch = ch = '+'
     let isCart ch = ['^'; '<'; 'v'; '>'] |> List.contains ch
@@ -122,5 +136,6 @@ let run fileName =
     let carts = indexed |> List.choose (fun (pos, ch) -> if isCart ch then Some { symbol = ch; pos = pos; switches = switchMap } else None)
     printfn "%A" carts
     printfn "%d" <| List.length carts
+    carts |> crash mine |> printfn "%A"
 
 run "sample.txt"
