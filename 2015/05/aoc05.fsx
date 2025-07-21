@@ -50,4 +50,4 @@ let run fileName =
     lines |> List.filter isNiceString |> List.length |> printfn "%d"
     lines |> List.filter isNicerString |> List.length |> printfn "%d"
 
-run "input"
+run "input.txt"

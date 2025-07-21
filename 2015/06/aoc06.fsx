@@ -115,4 +115,4 @@ let run fileName =
     grid2 |> Grid.count |> printfn "%d"
     // grid2 |> Grid.brightest |> printfn "%d"
 
-run "input"
+run "input.txt"

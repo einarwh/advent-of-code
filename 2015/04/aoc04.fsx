@@ -28,4 +28,4 @@ let run fileName =
     secretKey |> findNumber "00000" |> printfn "%d"
     secretKey |> findNumber "000000" |> printfn "%d"
 
-run "input"
+run "input.txt"
