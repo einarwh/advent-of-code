@@ -40,4 +40,4 @@ let run fileName =
     twos * threes |> printfn "%d"
     solve boxes boxes |> printfn "%s"
 
-"input" |> run 
+"input.txt" |> run 

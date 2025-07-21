@@ -11,6 +11,6 @@ let run fileName =
     fileName 
     |> readLines 
     |> Array.sort
-    |> writeLines "output"
+    |> writeLines "output.txt"
 
-"input" |> run 
+"input.txt" |> run 

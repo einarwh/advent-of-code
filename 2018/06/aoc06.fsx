@@ -1,10 +1,5 @@
-echo "Day: $1"
-mkdir $1
-touch $1/sample.txt
-touch $1/input.txt
-cat > $1/aoc$1.fsx << EOF
-// Advent of Code 2018. Day $1
-// dotnet fsi aoc$1.fsx
+// Advent of Code 2018. Day 06: Chronal Coordinates.
+// dotnet fsi aoc06.fsx
 
 open System
 open System.IO
@@ -21,4 +16,3 @@ let run fileName =
     text |> printfn "%s"
 
 run "input.txt"
-EOF

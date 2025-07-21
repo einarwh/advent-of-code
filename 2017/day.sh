@@ -9,9 +9,6 @@ cat > $1/aoc$1.fsx << EOF
 open System
 open System.IO
 
-let readText fileName = 
-    File.ReadAllText(fileName).Trim()
-
 let readLines = 
     File.ReadAllLines
     >> Array.filter (fun line -> line <> String.Empty)
@@ -20,8 +17,8 @@ let readLines =
 let run fileName = 
     let lines = readLines fileName
     lines |> printfn "%A"
-    let text = readText fileName
+    let text = File.ReadAllText(fileName).Trim()
     text |> printfn "%s"
-
+    
 run "input.txt"
 EOF

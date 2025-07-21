@@ -71,4 +71,4 @@ let run fileName =
     |> (fun c -> c.Id)
     |> printfn "%A"
 
-"input" |> run 
+"input.txt" |> run 

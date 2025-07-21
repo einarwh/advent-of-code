@@ -36,4 +36,4 @@ let run fileName =
     txt |> reduce |> String.length |> printfn "%d"
     txt |> shortest |> String.length |> printfn "%d" 
     
-"input" |> run 
+"input.txt" |> run 

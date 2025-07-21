@@ -1,4 +1,4 @@
-// Advent of Code 2018. Day 1: Chronal Calibration
+// Advent of Code 2018. Day 1: Chronal Calibration.
 // dotnet fsi aoc01.fsx
 
 open System
@@ -21,4 +21,4 @@ let run fileName =
     changes |> Array.sum |> printfn "%d"
     changes |> solve Set.empty 0 0 |> printfn "%d"
 
-"input" |> run 
+"input.txt" |> run 

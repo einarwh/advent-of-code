@@ -88,4 +88,4 @@ let run fileName =
     combined |> part1 |> printfn "%d"
     combined |> part2 |> printfn "%A"
 
-"input" |> run 
+"input.txt" |> run 
