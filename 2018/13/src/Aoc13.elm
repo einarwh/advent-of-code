@@ -10,7 +10,6 @@ import Set exposing (Set)
 import Array2D exposing (Array2D)
 import Html exposing (text)
 import Time
-import Json.Encode exposing (string)
 
 defaultTickInterval : Float
 defaultTickInterval = 100
@@ -274,22 +273,6 @@ moveForward dir (x, y) =
     S -> (x, y + 1)
     E -> (x + 1, y)
 
-turnRight : Dir -> Dir 
-turnRight dir = 
-  case dir of 
-    N -> E
-    E -> S 
-    S -> W
-    W -> N
-
-turnLeft : Dir -> Dir 
-turnLeft dir = 
-  case dir of 
-    N -> W
-    E -> N 
-    S -> E
-    W -> S
-
 initModel : DataSource -> Model 
 initModel dataSource = 
   let 
@@ -337,6 +320,85 @@ getNestedPositions mine =
     xs = List.range 0 (Array2D.columns mine - 1)
   in 
     ys |> List.map (\y -> xs |> List.map (\x -> (x, y)))
+
+getNextPos : Dir -> Pos -> Pos 
+getNextPos dir (x, y) = 
+  case dir of 
+    N -> (x, y - 1)
+    W -> (x - 1, y)
+    S -> (x, y + 1)
+    E -> (x + 1, y)
+
+turnLeft : Dir -> Dir 
+turnLeft dir = 
+  case dir of 
+    N -> W
+    W -> S
+    S -> E 
+    E -> N
+
+turnRight : Dir -> Dir 
+turnRight dir = 
+  case dir of 
+    N -> E
+    W -> N
+    S -> W 
+    E -> S
+
+straightAhead : Dir -> Dir 
+straightAhead dir = dir
+
+turn : Junction -> (Dir -> Dir)
+turn switches = 
+  case switches of 
+    Left -> turnLeft
+    Forward -> straightAhead
+    Right -> turnRight
+
+getNextDir : Char -> Cart -> Dir 
+getNextDir nextSymbol cart =
+  let 
+    dir = cart.dir 
+    switches = cart.switches
+  in 
+    case nextSymbol of 
+      '/' -> 
+        case dir of 
+          N -> turnRight dir
+          W -> turnLeft dir 
+          S -> turnRight dir 
+          E -> turnLeft dir 
+      '\\' ->
+        case dir of 
+          N -> turnLeft dir
+          W -> turnRight dir 
+          S -> turnLeft dir 
+          E -> turnRight dir 
+      '+' ->
+        turn switches dir 
+      _ -> 
+        dir 
+
+getNextSwitches : Char -> Junction -> Junction 
+getNextSwitches nextSymbol switches = 
+  case nextSymbol of 
+    '+' -> 
+      case switches of 
+        Left -> Forward
+        Forward -> Right 
+        Right -> Left 
+    _ -> 
+      switches
+
+moveCart : Array2D Char -> Cart -> Cart
+moveCart mine cart = 
+  let 
+    (x, y) = getNextPos cart.dir cart.pos 
+    nextSymbol = Array2D.get y x mine |> Maybe.withDefault ' '
+    nextDir = getNextDir nextSymbol cart 
+    nextSwitches = getNextSwitches nextSymbol cart.switches
+  in 
+    { dir = nextDir, pos = (x, y), switches = nextSwitches }
 
 updateClear : Model -> Model
 updateClear model = 
