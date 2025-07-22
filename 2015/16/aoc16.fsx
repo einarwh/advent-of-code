@@ -4,7 +4,7 @@
 open System
 open System.IO
 
-let message = [
+let clues = [
     ("children", 3)
     ("cats", 7)
     ("samoyeds", 2)
@@ -15,7 +15,18 @@ let message = [
     ("trees", 3)
     ("cars", 2)
     ("perfumes", 1)
-]
+] 
+
+let parse (s : string) = 
+    let colonIndex = s.IndexOf(':')
+    let sueStr = s.Substring(0, colonIndex)
+    let restStr = s.Substring(colonIndex + 2)
+    let sueNumber = int <| sueStr.Split(" ")[1]
+    let toFact (str : string) = 
+        let parts = str.Split(": ")
+        parts[0], int parts[1]
+    let facts = restStr.Split(", ") |> Array.map toFact |> Array.toList
+    sueNumber, facts
 
 let readLines = 
     File.ReadAllLines
@@ -24,8 +35,9 @@ let readLines =
 
 let run fileName = 
     let lines = readLines fileName
-    lines |> printfn "%A"
-    let text = File.ReadAllText(fileName).Trim()
-    text |> printfn "%s"
+    let sues = lines |> List.map parse 
+    let correctSue = 
+        sues |> List.filter (fun (n, facts) -> facts |> List.forall (fun f -> List.contains f clues)) |> List.head |> fst
+    printfn "%d" correctSue
 
 run "input.txt"
