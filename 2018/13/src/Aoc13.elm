@@ -43,6 +43,7 @@ type alias Model =
   { mine : Array2D Char
   , carts : List Cart 
   , dataSource : DataSource
+  , steps : Int 
   , removeCrashedCarts : Bool
   , paused : Bool 
   , finished : Bool 
@@ -307,6 +308,7 @@ initModel dataSource removeCrashedCarts =
     , carts = carts
     , dataSource = dataSource
     , removeCrashedCarts = removeCrashedCarts
+    , steps = 0 
     , paused = True
     , finished = False 
     , tickInterval = defaultTickInterval
@@ -427,16 +429,60 @@ moveCart mine cart =
   in 
     { dir = nextDir, pos = (x, y), switches = nextSwitches }
 
+crashesWithAnotherCart : List Cart -> Cart -> Bool 
+crashesWithAnotherCart carts cart = 
+  let 
+    count = carts |> List.filter (\c -> c.pos == cart.pos) |> List.length 
+  in 
+    count > 1
+
+findCrashes : List Cart -> List Cart 
+findCrashes carts =  
+  carts |> List.filter (crashesWithAnotherCart carts) 
+
 updateClear : Model -> Model
 updateClear model = 
   initModel model.dataSource model.removeCrashedCarts
 
+posToString : (Int, Int) -> String 
+posToString (x, y) = 
+  String.fromInt x ++ "," ++ String.fromInt y
+
 updateStep : Model -> Model
 updateStep model = 
   let 
-    carts = model.carts |> List.map (\c -> moveCart model.mine c)
+    carts = model.carts 
+    crashes = findCrashes carts  
+    remaining = carts |> List.filter (\c -> List.member c crashes |> not)
+    movedRemaining = remaining |> List.map (moveCart model.mine)
+    steps = model.steps
   in 
-    { model | carts = carts }
+    if model.removeCrashedCarts then 
+        if List.length remaining > 1 then 
+          { model | carts = movedRemaining, steps = steps + 1 }
+        else 
+          let 
+            msg = 
+              case remaining of 
+                [] -> "No carts left!" 
+                c :: _ -> 
+                  let 
+                    (x, y) = c.pos 
+                  in 
+                    "Last cart at " ++ String.fromInt x ++ "," ++ String.fromInt y
+          in 
+            { model | carts = movedRemaining, finished = True, message = msg }
+    else 
+      case crashes of 
+        [] -> 
+          { model | carts = movedRemaining, steps = steps + 1 }
+        _ -> 
+          let
+            crashPositions = crashes |> List.map (\c -> c.pos) |> Set.fromList |> Set.toList |> List.sort 
+            s = crashPositions |> List.map posToString |> String.join " "
+            msg = "First crash at " ++ s
+          in 
+            { model | carts = carts, finished = True, message = msg }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -496,7 +542,7 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
   let 
-    tickSub = if model.paused then Sub.none else Time.every model.tickInterval (\_ -> Tick)
+    tickSub = if model.paused || model.finished then Sub.none else Time.every model.tickInterval (\_ -> Tick)
   in 
     tickSub
 
@@ -519,11 +565,11 @@ toCharElement mine carts (x, y) =
         _ -> 'X'
   in  
     if isCart symbol then 
-      Html.span [ Html.Attributes.style "background-color" "#CCCCCC" ] [ Html.text (String.fromChar symbol) ]
+      Html.span [ Html.Attributes.style "color" "#2E8B57", Html.Attributes.style "background-color" "#CCCCCC" ] [ Html.text (String.fromChar symbol) ]
     else if isBlank symbol then 
       Html.span [ Html.Attributes.style "color" "#FFFFFF" ] [ Html.text "." ]
     else if isCrash symbol then 
-      Html.span [ Html.Attributes.style "background-color" "#880808" ] [ Html.text "X" ]
+      Html.span [ Html.Attributes.style "color" "#D2042D", Html.Attributes.style "background-color" "#CCCCCC" ] [ Html.text "X" ]
     else 
       Html.text (String.fromChar symbol)
 
@@ -643,22 +689,24 @@ viewBody model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "background-color" "white" 
-              , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "24px"
-              , Html.Attributes.style "width" "200px" ] 
-              [ 
-                Html.div [] [ Html.text "?" ]
-              , Html.div [] [ Html.text "?" ]
-              ] ]
-      , Html.tr 
-          []
-          [ Html.td 
-              [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Source Code Pro, monospace"
               , Html.Attributes.style "font-size" textFontSize
               , Html.Attributes.style "padding" "10px"
               , Html.Attributes.style "width" "200px" ] 
               [ 
                 Html.div [] elements
-              ] ] ]
+              ] ] 
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "background-color" "white" 
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "24px"
+              , Html.Attributes.style "width" "200px" ] 
+              [ 
+                Html.div [] [ Html.text ("Carts: " ++ String.fromInt (model.carts |> List.length)) ]
+              , Html.div [] [ Html.text ("Steps: " ++ String.fromInt model.steps) ]
+              , Html.div [] [ Html.text model.message ]
+              ] ]
+              ]
