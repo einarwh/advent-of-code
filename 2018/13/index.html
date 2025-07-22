@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.S.F === region.Z.F)
+	if (region.S.G === region.Z.G)
 	{
-		return 'on line ' + region.S.F;
+		return 'on line ' + region.S.G;
 	}
-	return 'on lines ' + region.S.F + ' through ' + region.Z.F;
+	return 'on lines ' + region.S.G + ' through ' + region.Z.G;
 }
 
 
@@ -5456,8 +5456,8 @@ var $author$project$Aoc13$findCarts = function (mine) {
 			var ch = _v0.b;
 			return $author$project$Aoc13$isCart(ch) ? $elm$core$Maybe$Just(
 				{
-					z: $author$project$Aoc13$charToDir(ch),
-					G: pos,
+					t: $author$project$Aoc13$charToDir(ch),
+					B: pos,
 					H: 0
 				}) : $elm$core$Maybe$Nothing;
 		},
@@ -5837,10 +5837,125 @@ var $author$project$Aoc13$initMine = function (dataSource) {
 			$elm$core$String$toList,
 			A2($elm$core$String$split, '\n', data)));
 };
+var $author$project$Aoc13$dirToMineSymbol = function (dir) {
+	switch (dir) {
+		case 0:
+			return '|';
+		case 1:
+			return '-';
+		case 2:
+			return '|';
+		default:
+			return '-';
+	}
+};
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $elm$core$Array$setHelp = F4(
+	function (shift, index, value, tree) {
+		var pos = $elm$core$Array$bitMask & (index >>> shift);
+		var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+		if (!_v0.$) {
+			var subTree = _v0.a;
+			var newSub = A4($elm$core$Array$setHelp, shift - $elm$core$Array$shiftStep, index, value, subTree);
+			return A3(
+				$elm$core$Elm$JsArray$unsafeSet,
+				pos,
+				$elm$core$Array$SubTree(newSub),
+				tree);
+		} else {
+			var values = _v0.a;
+			var newLeaf = A3($elm$core$Elm$JsArray$unsafeSet, $elm$core$Array$bitMask & index, value, values);
+			return A3(
+				$elm$core$Elm$JsArray$unsafeSet,
+				pos,
+				$elm$core$Array$Leaf(newLeaf),
+				tree);
+		}
+	});
+var $elm$core$Array$set = F3(
+	function (index, value, array) {
+		var len = array.a;
+		var startShift = array.b;
+		var tree = array.c;
+		var tail = array.d;
+		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? array : ((_Utils_cmp(
+			index,
+			$elm$core$Array$tailIndex(len)) > -1) ? A4(
+			$elm$core$Array$Array_elm_builtin,
+			len,
+			startShift,
+			tree,
+			A3($elm$core$Elm$JsArray$unsafeSet, $elm$core$Array$bitMask & index, value, tail)) : A4(
+			$elm$core$Array$Array_elm_builtin,
+			len,
+			startShift,
+			A4($elm$core$Array$setHelp, startShift, index, value, tree),
+			tail));
+	});
+var $tortus$elm_array_2d$Array2D$set = F4(
+	function (row, col, newValue, array2d) {
+		return A2(
+			$elm$core$Maybe$withDefault,
+			array2d,
+			A2(
+				$elm$core$Maybe$map,
+				function (rowAry) {
+					return _Utils_update(
+						array2d,
+						{
+							a: A3(
+								$elm$core$Array$set,
+								row,
+								A3($elm$core$Array$set, col, newValue, rowAry),
+								array2d.a)
+						});
+				},
+				A2($tortus$elm_array_2d$Array2D$getRow, row, array2d)));
+	});
+var $author$project$Aoc13$withoutCarts = F2(
+	function (carts, mine) {
+		withoutCarts:
+		while (true) {
+			if (!carts.b) {
+				return mine;
+			} else {
+				var c = carts.a;
+				var rest = carts.b;
+				var symbol = $author$project$Aoc13$dirToMineSymbol(c.t);
+				var _v1 = c.B;
+				var x = _v1.a;
+				var y = _v1.b;
+				var $temp$carts = rest,
+					$temp$mine = A4($tortus$elm_array_2d$Array2D$set, y, x, symbol, mine);
+				carts = $temp$carts;
+				mine = $temp$mine;
+				continue withoutCarts;
+			}
+		}
+	});
 var $author$project$Aoc13$initModel = function (dataSource) {
 	var mine = $author$project$Aoc13$initMine(dataSource);
 	var carts = $author$project$Aoc13$findCarts(mine);
-	return {E: carts, W: 0, s: dataSource, Y: '', N: false, ae: '', M: mine, v: true, x: $author$project$Aoc13$defaultTickInterval};
+	return {
+		F: carts,
+		W: 0,
+		s: dataSource,
+		Y: '',
+		N: false,
+		ae: '',
+		M: A2($author$project$Aoc13$withoutCarts, carts, mine),
+		w: true,
+		y: $author$project$Aoc13$defaultTickInterval
+	};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -6266,9 +6381,9 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc13$subscriptions = function (model) {
-	var tickSub = model.v ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = model.w ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.x,
+		model.y,
 		function (_v0) {
 			return 0;
 		});
@@ -6317,7 +6432,7 @@ var $author$project$Aoc13$turn = function (switches) {
 var $author$project$Aoc13$getNextDir = F2(
 	function (nextSymbol, cart) {
 		var switches = cart.H;
-		var dir = cart.z;
+		var dir = cart.t;
 		switch (nextSymbol) {
 			case '/':
 				switch (dir) {
@@ -6381,7 +6496,7 @@ var $author$project$Aoc13$getNextSwitches = F2(
 	});
 var $author$project$Aoc13$moveCart = F2(
 	function (mine, cart) {
-		var _v0 = A2($author$project$Aoc13$getNextPos, cart.z, cart.G);
+		var _v0 = A2($author$project$Aoc13$getNextPos, cart.t, cart.B);
 		var x = _v0.a;
 		var y = _v0.b;
 		var nextSymbol = A2(
@@ -6391,8 +6506,8 @@ var $author$project$Aoc13$moveCart = F2(
 		var nextDir = A2($author$project$Aoc13$getNextDir, nextSymbol, cart);
 		var nextSwitches = A2($author$project$Aoc13$getNextSwitches, nextSymbol, cart.H);
 		return {
-			z: nextDir,
-			G: _Utils_Tuple2(x, y),
+			t: nextDir,
+			B: _Utils_Tuple2(x, y),
 			H: nextSwitches
 		};
 	});
@@ -6402,10 +6517,10 @@ var $author$project$Aoc13$updateStep = function (model) {
 		function (c) {
 			return A2($author$project$Aoc13$moveCart, model.M, c);
 		},
-		model.E);
+		model.F);
 	return _Utils_update(
 		model,
-		{E: carts});
+		{F: carts});
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc13$updateTogglePlay = function (model) {
@@ -6413,11 +6528,11 @@ var $author$project$Aoc13$updateTogglePlay = function (model) {
 		var m = $author$project$Aoc13$initModel(model.s);
 		return _Utils_update(
 			m,
-			{v: false});
+			{w: false});
 	} else {
 		return _Utils_update(
 			model,
-			{v: !model.v});
+			{w: !model.w});
 	}
 };
 var $author$project$Aoc13$updateUseInput = function (model) {
@@ -6446,13 +6561,13 @@ var $author$project$Aoc13$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{x: model.x / 2}),
+						{y: model.y / 2}),
 					$elm$core$Platform$Cmd$none);
 			case 4:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{x: model.x * 2}),
+						{y: model.y * 2}),
 					$elm$core$Platform$Cmd$none);
 			case 2:
 				return _Utils_Tuple2(
@@ -6579,7 +6694,7 @@ var $author$project$Aoc13$toCharElement = F3(
 			$elm$core$List$filter,
 			function (c) {
 				return _Utils_eq(
-					c.G,
+					c.B,
 					_Utils_Tuple2(x, y));
 			},
 			carts);
@@ -6592,7 +6707,7 @@ var $author$project$Aoc13$toCharElement = F3(
 			} else {
 				if (!cartsAtPos.b.b) {
 					var c = cartsAtPos.a;
-					var _v2 = c.z;
+					var _v2 = c.t;
 					switch (_v2) {
 						case 0:
 							return '^';
@@ -6656,7 +6771,7 @@ var $author$project$Aoc13$viewBody = function (model) {
 	}();
 	var mine = model.M;
 	var nestedPositions = $author$project$Aoc13$getNestedPositions(mine);
-	var carts = model.E;
+	var carts = model.F;
 	var nestedElements = A2(
 		$elm$core$List$map,
 		function (positions) {
@@ -6917,7 +7032,7 @@ var $author$project$Aoc13$viewBody = function (model) {
 									]),
 								_List_fromArray(
 									[
-										model.v ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
+										model.w ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
 									])),
 								A2(
 								$elm$html$Html$button,

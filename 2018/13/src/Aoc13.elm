@@ -262,6 +262,22 @@ charToDir ch =
     '>' -> E
     _ -> N
 
+dirToChar : Dir -> Char 
+dirToChar dir  = 
+  case dir of 
+    N -> '^'
+    W -> '<'
+    S -> 'v'
+    E -> '>'
+
+dirToMineSymbol : Dir -> Char 
+dirToMineSymbol dir  = 
+  case dir of 
+    N -> '|'
+    W -> '-'
+    S -> '|'
+    E -> '-'
+
 findCarts : Array2D Char -> List Cart
 findCarts mine = 
   let 
@@ -269,13 +285,24 @@ findCarts mine =
   in 
     indexed |> List.filterMap (\(pos, ch) -> if isCart ch then Just { dir = charToDir ch, pos = pos, switches = Left } else Nothing)
 
+withoutCarts : List Cart -> Array2D Char -> Array2D Char 
+withoutCarts carts mine = 
+  case carts of 
+    [] -> mine 
+    c :: rest -> 
+      let 
+        (x, y) = c.pos 
+        symbol = dirToMineSymbol c.dir 
+      in 
+        withoutCarts rest (Array2D.set y x symbol mine)
+
 initModel : DataSource -> Model 
 initModel dataSource = 
   let 
     mine = initMine dataSource
     carts = findCarts mine
   in 
-    { mine = mine
+    { mine = withoutCarts carts mine
     , carts = carts
     , dataSource = dataSource
     , paused = True
