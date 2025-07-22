@@ -26,6 +26,15 @@ let getIndex row col =
     let colSequence = Seq.unfold (fun (v : int, inc : int) -> Some (v, (v + inc, inc + 1))) (startValue, 1 + row)
     colSequence |> Seq.skip (col - 1) |> Seq.head 
 
+let solve row col = 
+    let targetIndex = getIndex row col 
+    let rec loop (i : int) (n : int64) = 
+        if i < targetIndex then
+            loop (i + 1) ((252533L * n) % 33554393L)
+        else 
+            n
+    loop 1 20151125L
+
 let readLines = 
     File.ReadAllLines
     >> Array.filter (fun line -> line <> String.Empty)
@@ -33,10 +42,11 @@ let readLines =
 
 let run fileName = 
     let text = File.ReadAllText(fileName).Trim()
-    // let (row, col) = text |> parse
-    let row = 2
-    let col = 4
-    getIndex row col |> printfn "%A"
-
+    let (row, col) = text |> parse
+    // // 18361853
+    // solve 3 3 |> printfn "%d"
+    // solve 5 5 |> printfn "%d"
+    // solve 5 1 |> printfn "%d"
+    solve row col |> printfn "%d"
 
 run "input.txt"
