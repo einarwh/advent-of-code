@@ -1,4 +1,4 @@
-// Advent of Code 2015. Day 15
+// Advent of Code 2015. Day 15: Science for Hungry People.
 // dotnet fsi aoc15.fsx
 
 open System
@@ -40,18 +40,17 @@ let calculateScore (caloriesConstraint : bool) (teaspoons : int list) (ingredien
         0L
 
 let solve (caloriesConstraint : bool) (ingredients : Ingredient list) = 
-    let rec loop (teaspoonsSpent : int list) (teaspoonsLeft : int) (ingredientsLeft : Ingredient list) = 
+    let rec loop (teaspoonsSpent : int list) (teaspoonsLeft : int) (ingredientsLeft : int) = 
         match ingredientsLeft with 
-        | [] -> 
+        | 0 -> 
             let teaspoons = teaspoonsSpent |> List.rev 
             let score = calculateScore caloriesConstraint teaspoons ingredients
-            // printfn "score %d %A" score teaspoons 
             [score]
-        | [last] -> 
-            loop (teaspoonsLeft :: teaspoonsSpent) 0 []
-        | ingr :: rest -> 
-            [0 .. teaspoonsLeft] |> List.collect (fun ts -> loop (ts :: teaspoonsSpent) (teaspoonsLeft - ts) rest)
-    loop [] 100 ingredients
+        | 1 -> 
+            loop (teaspoonsLeft :: teaspoonsSpent) 0 0
+        | _ -> 
+            [0 .. teaspoonsLeft] |> List.collect (fun ts -> loop (ts :: teaspoonsSpent) (teaspoonsLeft - ts) (ingredientsLeft - 1))
+    loop [] 100 (ingredients |> List.length)
 
 let readLines = 
     File.ReadAllLines
