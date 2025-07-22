@@ -43,6 +43,7 @@ type alias Model =
   { mine : Array2D Char
   , carts : List Cart 
   , dataSource : DataSource
+  , removeCrashedCarts : Bool
   , paused : Bool 
   , finished : Bool 
   , tickInterval : Float 
@@ -296,8 +297,8 @@ withoutCarts carts mine =
       in 
         withoutCarts rest (Array2D.set y x symbol mine)
 
-initModel : DataSource -> Model 
-initModel dataSource = 
+initModel : DataSource -> Bool -> Model 
+initModel dataSource removeCrashedCarts = 
   let 
     mine = initMine dataSource
     carts = findCarts mine
@@ -305,6 +306,7 @@ initModel dataSource =
     { mine = withoutCarts carts mine
     , carts = carts
     , dataSource = dataSource
+    , removeCrashedCarts = removeCrashedCarts
     , paused = True
     , finished = False 
     , tickInterval = defaultTickInterval
@@ -314,7 +316,7 @@ initModel dataSource =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel Input, Cmd.none)
+  (initModel Input False, Cmd.none)
 
 -- UPDATE
 
@@ -322,10 +324,12 @@ type Msg =
   Tick 
   | Step 
   | TogglePlay 
+  | ToggleRemovedCrashedCarts
   | Faster 
   | Slower 
   | Clear 
   | UseSample 
+  | UseSample2
   | UseInput 
 
 getAllPositions : Array2D Char -> List Pos
@@ -425,7 +429,7 @@ moveCart mine cart =
 
 updateClear : Model -> Model
 updateClear model = 
-  initModel model.dataSource
+  initModel model.dataSource model.removeCrashedCarts
 
 updateStep : Model -> Model
 updateStep model = 
@@ -438,19 +442,30 @@ updateTogglePlay : Model -> Model
 updateTogglePlay model = 
   if model.finished then 
     let 
-      m = initModel model.dataSource
+      m = initModel model.dataSource model.removeCrashedCarts
     in 
       {m | paused = False }
   else 
     { model | paused = not model.paused }
 
+updateToggleRemoveCrashedCarts : Model -> Model
+updateToggleRemoveCrashedCarts model = 
+  let
+    removeCrashedCarts = not model.removeCrashedCarts
+  in
+    initModel model.dataSource removeCrashedCarts
+
 updateUseSample : Model -> Model
 updateUseSample model = 
-  initModel Sample 
+  initModel Sample model.removeCrashedCarts
+
+updateUseSample2 : Model -> Model
+updateUseSample2 model = 
+  initModel Sample2 model.removeCrashedCarts
 
 updateUseInput : Model -> Model
 updateUseInput model = 
-  initModel Input 
+  initModel Input model.removeCrashedCarts
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -467,8 +482,12 @@ update msg model =
       ({model | tickInterval = model.tickInterval * 2 }, Cmd.none)
     TogglePlay -> 
       (updateTogglePlay model, Cmd.none)
+    ToggleRemovedCrashedCarts -> 
+      (updateToggleRemoveCrashedCarts model, Cmd.none)
     UseSample -> 
       (updateUseSample model, Cmd.none)
+    UseSample2 -> 
+      (updateUseSample2 model, Cmd.none)
     UseInput -> 
       (updateUseInput model, Cmd.none)
 
@@ -584,6 +603,10 @@ viewBody model =
                 [ Html.Attributes.type_ "radio", onClick UseSample, Html.Attributes.checked (model.dataSource == Sample) ] 
                 []
               , Html.label [] [ Html.text "Sample" ]
+              , Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseSample2, Html.Attributes.checked (model.dataSource == Sample2) ] 
+                []
+              , Html.label [] [ Html.text "Sample2" ]
             ] ]
       , Html.tr 
           []
@@ -605,6 +628,15 @@ viewBody model =
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Step ] 
                 [ Html.text "Step" ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center" ]
+              [ Html.input 
+                [ Html.Attributes.type_ "checkbox", onClick ToggleRemovedCrashedCarts, Html.Attributes.checked model.removeCrashedCarts ] 
+                []
+              , Html.label [] [ Html.text " Remove crashed carts" ]
             ] ]
       , Html.tr 
           []

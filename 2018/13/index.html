@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.S.G === region.Z.G)
+	if (region.T.H === region._.H)
 	{
-		return 'on line ' + region.S.G;
+		return 'on line ' + region.T.H;
 	}
-	return 'on lines ' + region.S.G + ' through ' + region.Z.G;
+	return 'on lines ' + region.T.H + ' through ' + region._.H;
 }
 
 
@@ -1871,9 +1871,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aG,
-		impl.aO,
-		impl.aM,
+		impl.aH,
+		impl.aP,
+		impl.aN,
 		function() { return function() {} }
 	);
 });
@@ -2733,9 +2733,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		ae: func(record.ae),
-		T: record.T,
-		Q: record.Q
+		af: func(record.af),
+		U: record.U,
+		R: record.R
 	}
 });
 
@@ -3003,11 +3003,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.ae;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.T;
+		var message = !tag ? value : tag < 3 ? value.a : value.af;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.U;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.Q) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.R) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3957,11 +3957,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aG,
-		impl.aO,
-		impl.aM,
+		impl.aH,
+		impl.aP,
+		impl.aN,
 		function(sendToApp, initialModel) {
-			var view = impl.aP;
+			var view = impl.aQ;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3993,12 +3993,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aG,
-		impl.aO,
-		impl.aM,
+		impl.aH,
+		impl.aP,
+		impl.aN,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.R && impl.R(sendToApp)
-			var view = impl.aP;
+			var divertHrefToApp = impl.S && impl.S(sendToApp)
+			var view = impl.aQ;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -4006,12 +4006,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.az);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aA);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.aN) && (_VirtualDom_doc.title = title = doc.aN);
+				(title !== doc.aO) && (_VirtualDom_doc.title = title = doc.aO);
 			});
 		}
 	);
@@ -4067,12 +4067,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aI;
-	var onUrlRequest = impl.aJ;
+	var onUrlChange = impl.aJ;
+	var onUrlRequest = impl.aK;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		R: function(sendToApp)
+		S: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4088,9 +4088,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.am === next.am
-							&& curr.ac === next.ac
-							&& curr.aj.a === next.aj.a
+							&& curr.an === next.an
+							&& curr.ad === next.ad
+							&& curr.ak.a === next.ak.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4098,13 +4098,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aG: function(flags)
+		aH: function(flags)
 		{
-			return A3(impl.aG, flags, _Browser_getUrl(), key);
+			return A3(impl.aH, flags, _Browser_getUrl(), key);
 		},
+		aQ: impl.aQ,
 		aP: impl.aP,
-		aO: impl.aO,
-		aM: impl.aM
+		aN: impl.aN
 	});
 }
 
@@ -4170,17 +4170,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aE: 'hidden', aA: 'visibilitychange' }
+		? { aF: 'hidden', aB: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aE: 'mozHidden', aA: 'mozvisibilitychange' }
+		? { aF: 'mozHidden', aB: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aE: 'msHidden', aA: 'msvisibilitychange' }
+		? { aF: 'msHidden', aB: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aE: 'webkitHidden', aA: 'webkitvisibilitychange' }
-		: { aE: 'hidden', aA: 'visibilitychange' };
+		? { aF: 'webkitHidden', aB: 'webkitvisibilitychange' }
+		: { aF: 'hidden', aB: 'visibilitychange' };
 }
 
 
@@ -4261,12 +4261,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		aq: _Browser_getScene(),
-		at: {
-			av: _Browser_window.pageXOffset,
-			aw: _Browser_window.pageYOffset,
-			au: _Browser_doc.documentElement.clientWidth,
-			ab: _Browser_doc.documentElement.clientHeight
+		ar: _Browser_getScene(),
+		au: {
+			aw: _Browser_window.pageXOffset,
+			ax: _Browser_window.pageYOffset,
+			av: _Browser_doc.documentElement.clientWidth,
+			ac: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4276,8 +4276,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		au: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		ab: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		av: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		ac: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4300,15 +4300,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			aq: {
-				au: node.scrollWidth,
-				ab: node.scrollHeight
+			ar: {
+				av: node.scrollWidth,
+				ac: node.scrollHeight
 			},
-			at: {
-				av: node.scrollLeft,
-				aw: node.scrollTop,
-				au: node.clientWidth,
-				ab: node.clientHeight
+			au: {
+				aw: node.scrollLeft,
+				ax: node.scrollTop,
+				av: node.clientWidth,
+				ac: node.clientHeight
 			}
 		};
 	});
@@ -4338,18 +4338,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			aq: _Browser_getScene(),
-			at: {
-				av: x,
-				aw: y,
-				au: _Browser_doc.documentElement.clientWidth,
-				ab: _Browser_doc.documentElement.clientHeight
+			ar: _Browser_getScene(),
+			au: {
+				aw: x,
+				ax: y,
+				av: _Browser_doc.documentElement.clientWidth,
+				ac: _Browser_doc.documentElement.clientHeight
 			},
-			aC: {
-				av: x + rect.left,
-				aw: y + rect.top,
-				au: rect.width,
-				ab: rect.height
+			aD: {
+				aw: x + rect.left,
+				ax: y + rect.top,
+				av: rect.width,
+				ac: rect.height
 			}
 		};
 	});
@@ -4971,7 +4971,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {aa: fragment, ac: host, ah: path, aj: port_, am: protocol, an: query};
+		return {ab: fragment, ad: host, ai: path, ak: port_, an: protocol, ao: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5456,9 +5456,9 @@ var $author$project$Aoc13$findCarts = function (mine) {
 			var ch = _v0.b;
 			return $author$project$Aoc13$isCart(ch) ? $elm$core$Maybe$Just(
 				{
-					t: $author$project$Aoc13$charToDir(ch),
-					B: pos,
-					H: 0
+					u: $author$project$Aoc13$charToDir(ch),
+					C: pos,
+					I: 0
 				}) : $elm$core$Maybe$Nothing;
 		},
 		indexed);
@@ -5930,8 +5930,8 @@ var $author$project$Aoc13$withoutCarts = F2(
 			} else {
 				var c = carts.a;
 				var rest = carts.b;
-				var symbol = $author$project$Aoc13$dirToMineSymbol(c.t);
-				var _v1 = c.B;
+				var symbol = $author$project$Aoc13$dirToMineSymbol(c.u);
+				var _v1 = c.C;
 				var x = _v1.a;
 				var y = _v1.b;
 				var $temp$carts = rest,
@@ -5942,26 +5942,28 @@ var $author$project$Aoc13$withoutCarts = F2(
 			}
 		}
 	});
-var $author$project$Aoc13$initModel = function (dataSource) {
-	var mine = $author$project$Aoc13$initMine(dataSource);
-	var carts = $author$project$Aoc13$findCarts(mine);
-	return {
-		F: carts,
-		W: 0,
-		s: dataSource,
-		Y: '',
-		N: false,
-		ae: '',
-		M: A2($author$project$Aoc13$withoutCarts, carts, mine),
-		w: true,
-		y: $author$project$Aoc13$defaultTickInterval
-	};
-};
+var $author$project$Aoc13$initModel = F2(
+	function (dataSource, removeCrashedCarts) {
+		var mine = $author$project$Aoc13$initMine(dataSource);
+		var carts = $author$project$Aoc13$findCarts(mine);
+		return {
+			G: carts,
+			X: 0,
+			n: dataSource,
+			Z: '',
+			O: false,
+			af: '',
+			N: A2($author$project$Aoc13$withoutCarts, carts, mine),
+			x: true,
+			p: removeCrashedCarts,
+			z: $author$project$Aoc13$defaultTickInterval
+		};
+	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Aoc13$init = function (_v0) {
 	return _Utils_Tuple2(
-		$author$project$Aoc13$initModel(0),
+		A2($author$project$Aoc13$initModel, 0, false),
 		$elm$core$Platform$Cmd$none);
 };
 var $author$project$Aoc13$Tick = 0;
@@ -5971,7 +5973,7 @@ var $elm$time$Time$Every = F2(
 	});
 var $elm$time$Time$State = F2(
 	function (taggers, processes) {
-		return {al: processes, as: taggers};
+		return {am: processes, at: taggers};
 	});
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
@@ -6263,7 +6265,7 @@ var $elm$time$Time$spawnHelp = F3(
 	});
 var $elm$time$Time$onEffects = F3(
 	function (router, subs, _v0) {
-		var processes = _v0.al;
+		var processes = _v0.am;
 		var rightStep = F3(
 			function (_v6, id, _v7) {
 				var spawns = _v7.a;
@@ -6332,7 +6334,7 @@ var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
 var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $elm$time$Time$onSelfMsg = F3(
 	function (router, interval, state) {
-		var _v0 = A2($elm$core$Dict$get, interval, state.as);
+		var _v0 = A2($elm$core$Dict$get, interval, state.at);
 		if (_v0.$ === 1) {
 			return $elm$core$Task$succeed(state);
 		} else {
@@ -6381,16 +6383,16 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc13$subscriptions = function (model) {
-	var tickSub = model.w ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = model.x ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.y,
+		model.z,
 		function (_v0) {
 			return 0;
 		});
 	return tickSub;
 };
 var $author$project$Aoc13$updateClear = function (model) {
-	return $author$project$Aoc13$initModel(model.s);
+	return A2($author$project$Aoc13$initModel, model.n, model.p);
 };
 var $author$project$Aoc13$straightAhead = function (dir) {
 	return dir;
@@ -6431,8 +6433,8 @@ var $author$project$Aoc13$turn = function (switches) {
 };
 var $author$project$Aoc13$getNextDir = F2(
 	function (nextSymbol, cart) {
-		var switches = cart.H;
-		var dir = cart.t;
+		var switches = cart.I;
+		var dir = cart.u;
 		switch (nextSymbol) {
 			case '/':
 				switch (dir) {
@@ -6496,7 +6498,7 @@ var $author$project$Aoc13$getNextSwitches = F2(
 	});
 var $author$project$Aoc13$moveCart = F2(
 	function (mine, cart) {
-		var _v0 = A2($author$project$Aoc13$getNextPos, cart.t, cart.B);
+		var _v0 = A2($author$project$Aoc13$getNextPos, cart.u, cart.C);
 		var x = _v0.a;
 		var y = _v0.b;
 		var nextSymbol = A2(
@@ -6504,48 +6506,56 @@ var $author$project$Aoc13$moveCart = F2(
 			' ',
 			A3($tortus$elm_array_2d$Array2D$get, y, x, mine));
 		var nextDir = A2($author$project$Aoc13$getNextDir, nextSymbol, cart);
-		var nextSwitches = A2($author$project$Aoc13$getNextSwitches, nextSymbol, cart.H);
+		var nextSwitches = A2($author$project$Aoc13$getNextSwitches, nextSymbol, cart.I);
 		return {
-			t: nextDir,
-			B: _Utils_Tuple2(x, y),
-			H: nextSwitches
+			u: nextDir,
+			C: _Utils_Tuple2(x, y),
+			I: nextSwitches
 		};
 	});
 var $author$project$Aoc13$updateStep = function (model) {
 	var carts = A2(
 		$elm$core$List$map,
 		function (c) {
-			return A2($author$project$Aoc13$moveCart, model.M, c);
+			return A2($author$project$Aoc13$moveCart, model.N, c);
 		},
-		model.F);
+		model.G);
 	return _Utils_update(
 		model,
-		{F: carts});
+		{G: carts});
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc13$updateTogglePlay = function (model) {
-	if (model.N) {
-		var m = $author$project$Aoc13$initModel(model.s);
+	if (model.O) {
+		var m = A2($author$project$Aoc13$initModel, model.n, model.p);
 		return _Utils_update(
 			m,
-			{w: false});
+			{x: false});
 	} else {
 		return _Utils_update(
 			model,
-			{w: !model.w});
+			{x: !model.x});
 	}
 };
+var $author$project$Aoc13$updateToggleRemoveCrashedCarts = function (model) {
+	var removeCrashedCarts = !model.p;
+	return A2($author$project$Aoc13$initModel, model.n, removeCrashedCarts);
+};
 var $author$project$Aoc13$updateUseInput = function (model) {
-	return $author$project$Aoc13$initModel(0);
+	return A2($author$project$Aoc13$initModel, 0, model.p);
 };
 var $author$project$Aoc13$Sample = 1;
 var $author$project$Aoc13$updateUseSample = function (model) {
-	return $author$project$Aoc13$initModel(1);
+	return A2($author$project$Aoc13$initModel, 1, model.p);
+};
+var $author$project$Aoc13$Sample2 = 2;
+var $author$project$Aoc13$updateUseSample2 = function (model) {
+	return A2($author$project$Aoc13$initModel, 2, model.p);
 };
 var $author$project$Aoc13$update = F2(
 	function (msg, model) {
 		switch (msg) {
-			case 5:
+			case 6:
 				return _Utils_Tuple2(
 					$author$project$Aoc13$updateClear(model),
 					$elm$core$Platform$Cmd$none);
@@ -6557,25 +6567,33 @@ var $author$project$Aoc13$update = F2(
 				return _Utils_Tuple2(
 					$author$project$Aoc13$updateStep(model),
 					$elm$core$Platform$Cmd$none);
-			case 3:
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{y: model.y / 2}),
-					$elm$core$Platform$Cmd$none);
 			case 4:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{y: model.y * 2}),
+						{z: model.z / 2}),
+					$elm$core$Platform$Cmd$none);
+			case 5:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{z: model.z * 2}),
 					$elm$core$Platform$Cmd$none);
 			case 2:
 				return _Utils_Tuple2(
 					$author$project$Aoc13$updateTogglePlay(model),
 					$elm$core$Platform$Cmd$none);
-			case 6:
+			case 3:
+				return _Utils_Tuple2(
+					$author$project$Aoc13$updateToggleRemoveCrashedCarts(model),
+					$elm$core$Platform$Cmd$none);
+			case 7:
 				return _Utils_Tuple2(
 					$author$project$Aoc13$updateUseSample(model),
+					$elm$core$Platform$Cmd$none);
+			case 8:
+				return _Utils_Tuple2(
+					$author$project$Aoc13$updateUseSample2(model),
 					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(
@@ -6583,13 +6601,15 @@ var $author$project$Aoc13$update = F2(
 					$elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Aoc13$Clear = 5;
-var $author$project$Aoc13$Faster = 3;
-var $author$project$Aoc13$Slower = 4;
+var $author$project$Aoc13$Clear = 6;
+var $author$project$Aoc13$Faster = 4;
+var $author$project$Aoc13$Slower = 5;
 var $author$project$Aoc13$Step = 1;
 var $author$project$Aoc13$TogglePlay = 2;
-var $author$project$Aoc13$UseInput = 7;
-var $author$project$Aoc13$UseSample = 6;
+var $author$project$Aoc13$ToggleRemovedCrashedCarts = 3;
+var $author$project$Aoc13$UseInput = 9;
+var $author$project$Aoc13$UseSample = 7;
+var $author$project$Aoc13$UseSample2 = 8;
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -6694,7 +6714,7 @@ var $author$project$Aoc13$toCharElement = F3(
 			$elm$core$List$filter,
 			function (c) {
 				return _Utils_eq(
-					c.B,
+					c.C,
 					_Utils_Tuple2(x, y));
 			},
 			carts);
@@ -6707,7 +6727,7 @@ var $author$project$Aoc13$toCharElement = F3(
 			} else {
 				if (!cartsAtPos.b.b) {
 					var c = cartsAtPos.a;
-					var _v2 = c.t;
+					var _v2 = c.u;
 					switch (_v2) {
 						case 0:
 							return '^';
@@ -6759,7 +6779,7 @@ var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Aoc13$viewBody = function (model) {
 	var textFontSize = function () {
-		var _v0 = model.s;
+		var _v0 = model.n;
 		switch (_v0) {
 			case 1:
 				return '32px';
@@ -6769,9 +6789,9 @@ var $author$project$Aoc13$viewBody = function (model) {
 				return '9px';
 		}
 	}();
-	var mine = model.M;
+	var mine = model.N;
 	var nestedPositions = $author$project$Aoc13$getNestedPositions(mine);
-	var carts = model.F;
+	var carts = model.G;
 	var nestedElements = A2(
 		$elm$core$List$map,
 		function (positions) {
@@ -6958,8 +6978,8 @@ var $author$project$Aoc13$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$type_('radio'),
-										$elm$html$Html$Events$onClick(7),
-										$elm$html$Html$Attributes$checked(!model.s)
+										$elm$html$Html$Events$onClick(9),
+										$elm$html$Html$Attributes$checked(!model.n)
 									]),
 								_List_Nil),
 								A2(
@@ -6974,8 +6994,8 @@ var $author$project$Aoc13$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$type_('radio'),
-										$elm$html$Html$Events$onClick(6),
-										$elm$html$Html$Attributes$checked(model.s === 1)
+										$elm$html$Html$Events$onClick(7),
+										$elm$html$Html$Attributes$checked(model.n === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -6984,6 +7004,22 @@ var $author$project$Aoc13$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text('Sample')
+									])),
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('radio'),
+										$elm$html$Html$Events$onClick(8),
+										$elm$html$Html$Attributes$checked(model.n === 2)
+									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Sample2')
 									]))
 							]))
 					])),
@@ -7006,7 +7042,7 @@ var $author$project$Aoc13$viewBody = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick(5)
+										$elm$html$Html$Events$onClick(6)
 									]),
 								_List_fromArray(
 									[
@@ -7017,7 +7053,7 @@ var $author$project$Aoc13$viewBody = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick(4)
+										$elm$html$Html$Events$onClick(5)
 									]),
 								_List_fromArray(
 									[
@@ -7032,14 +7068,14 @@ var $author$project$Aoc13$viewBody = function (model) {
 									]),
 								_List_fromArray(
 									[
-										model.w ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
+										model.x ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
 									])),
 								A2(
 								$elm$html$Html$button,
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick(3)
+										$elm$html$Html$Events$onClick(4)
 									]),
 								_List_fromArray(
 									[
@@ -7055,6 +7091,37 @@ var $author$project$Aoc13$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text('Step')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('checkbox'),
+										$elm$html$Html$Events$onClick(3),
+										$elm$html$Html$Attributes$checked(model.p)
+									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(' Remove crashed carts')
 									]))
 							]))
 					])),
@@ -7116,15 +7183,15 @@ var $author$project$Aoc13$viewBody = function (model) {
 };
 var $author$project$Aoc13$view = function (model) {
 	return {
-		az: _List_fromArray(
+		aA: _List_fromArray(
 			[
 				$author$project$Aoc13$viewBody(model)
 			]),
-		aN: 'Advent of Code 2018 | Day 13: Mine Cart Madness'
+		aO: 'Advent of Code 2018 | Day 13: Mine Cart Madness'
 	};
 };
 var $author$project$Aoc13$main = $elm$browser$Browser$document(
-	{aG: $author$project$Aoc13$init, aM: $author$project$Aoc13$subscriptions, aO: $author$project$Aoc13$update, aP: $author$project$Aoc13$view});
+	{aH: $author$project$Aoc13$init, aN: $author$project$Aoc13$subscriptions, aP: $author$project$Aoc13$update, aQ: $author$project$Aoc13$view});
 _Platform_export({'Aoc13':{'init':$author$project$Aoc13$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
 
