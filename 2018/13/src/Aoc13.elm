@@ -10,6 +10,7 @@ import Set exposing (Set)
 import Array2D exposing (Array2D)
 import Html exposing (text)
 import Time
+import Json.Encode exposing (string)
 
 defaultTickInterval : Float
 defaultTickInterval = 100
@@ -245,6 +246,10 @@ isCart ch =
   in 
     symbols |> List.member ch
 
+isBlank : Char -> Bool 
+isBlank ch = 
+  ch == ' '
+
 charToDir : Char -> Dir 
 charToDir ch = 
   case ch of 
@@ -318,12 +323,20 @@ type Msg =
   | UseInput 
 
 getAllPositions : Array2D Char -> List Pos
-getAllPositions board = 
+getAllPositions mine = 
   let
-    ys = List.range 0 (Array2D.rows board - 1)
-    xs = List.range 0 (Array2D.columns board - 1)
+    ys = List.range 0 (Array2D.rows mine - 1)
+    xs = List.range 0 (Array2D.columns mine - 1)
   in 
     ys |> List.concatMap (\y -> xs |> List.map (\x -> (x, y)))
+
+getNestedPositions : Array2D Char -> List (List Pos)
+getNestedPositions mine = 
+  let
+    ys = List.range 0 (Array2D.rows mine - 1)
+    xs = List.range 0 (Array2D.columns mine - 1)
+  in 
+    ys |> List.map (\y -> xs |> List.map (\x -> (x, y)))
 
 updateClear : Model -> Model
 updateClear model = 
@@ -381,6 +394,18 @@ subscriptions model =
 
 -- VIEW
 
+toCharElement : Array2D Char -> Pos -> Html Msg 
+toCharElement mine (x, y) = 
+    case Array2D.get y x mine of 
+      Nothing -> Html.text "?"
+      Just ch -> 
+        if isCart ch then 
+          Html.span [ Html.Attributes.style "background-color" "#CCCCCC" ] [ Html.text (String.fromChar ch) ]
+        else if isBlank ch then 
+          Html.span [ Html.Attributes.style "color" "#FFFFFF" ] [ Html.text "." ]
+        else 
+          Html.text (String.fromChar ch)
+
 view : Model -> Document Msg
 view model = 
   { title = "Advent of Code 2018 | Day 13: Mine Cart Madness"
@@ -389,10 +414,14 @@ view model =
 viewBody : Model -> Html Msg
 viewBody model =
   let
+    mine = model.mine
+    nestedPositions = getNestedPositions mine
+    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement mine))
+    elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []      
     textFontSize = 
       case model.dataSource of 
-        Sample -> "24px"
-        Sample2 -> "24px"
+        Sample -> "32px"
+        Sample2 -> "32px"
         Input -> "9px"
   in 
     Html.table 
@@ -496,5 +525,5 @@ viewBody model =
               , Html.Attributes.style "padding" "10px"
               , Html.Attributes.style "width" "200px" ] 
               [ 
-                Html.div [] []
+                Html.div [] elements
               ] ] ]

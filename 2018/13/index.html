@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.N.D === region.W.D)
+	if (region.O.D === region.X.D)
 	{
-		return 'on line ' + region.N.D;
+		return 'on line ' + region.O.D;
 	}
-	return 'on lines ' + region.N.D + ' through ' + region.W.D;
+	return 'on lines ' + region.O.D + ' through ' + region.X.D;
 }
 
 
@@ -2733,9 +2733,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		ab: func(record.ab),
-		O: record.O,
-		L: record.L
+		ac: func(record.ac),
+		P: record.P,
+		M: record.M
 	}
 });
 
@@ -3003,11 +3003,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.ab;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.O;
+		var message = !tag ? value : tag < 3 ? value.a : value.ac;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.P;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.L) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.M) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3997,7 +3997,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 		impl.aO,
 		impl.aM,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.M && impl.M(sendToApp)
+			var divertHrefToApp = impl.N && impl.N(sendToApp)
 			var view = impl.aP;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
@@ -4072,7 +4072,7 @@ function _Browser_application(impl)
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		M: function(sendToApp)
+		N: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4089,7 +4089,7 @@ function _Browser_application(impl)
 					sendToApp(onUrlRequest(
 						(next
 							&& curr.al === next.al
-							&& curr._ === next._
+							&& curr.aa === next.aa
 							&& curr.ah.a === next.ah.a
 						)
 							? $elm$browser$Browser$Internal(next)
@@ -4266,7 +4266,7 @@ function _Browser_getViewport()
 			av: _Browser_window.pageXOffset,
 			aw: _Browser_window.pageYOffset,
 			au: _Browser_doc.documentElement.clientWidth,
-			Z: _Browser_doc.documentElement.clientHeight
+			_: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4277,7 +4277,7 @@ function _Browser_getScene()
 	var elem = _Browser_doc.documentElement;
 	return {
 		au: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		Z: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		_: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4302,13 +4302,13 @@ function _Browser_getViewportOf(id)
 		return {
 			ap: {
 				au: node.scrollWidth,
-				Z: node.scrollHeight
+				_: node.scrollHeight
 			},
 			at: {
 				av: node.scrollLeft,
 				aw: node.scrollTop,
 				au: node.clientWidth,
-				Z: node.clientHeight
+				_: node.clientHeight
 			}
 		};
 	});
@@ -4343,13 +4343,13 @@ function _Browser_getElement(id)
 				av: x,
 				aw: y,
 				au: _Browser_doc.documentElement.clientWidth,
-				Z: _Browser_doc.documentElement.clientHeight
+				_: _Browser_doc.documentElement.clientHeight
 			},
 			aC: {
 				av: x + rect.left,
 				aw: y + rect.top,
 				au: rect.width,
-				Z: rect.height
+				_: rect.height
 			}
 		};
 	});
@@ -4971,7 +4971,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {Y: fragment, _: host, af: path, ah: port_, al: protocol, am: query};
+		return {Z: fragment, aa: host, af: path, ah: port_, al: protocol, am: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5456,7 +5456,7 @@ var $author$project$Aoc13$findCarts = function (mine) {
 			var ch = _v0.b;
 			return $author$project$Aoc13$isCart(ch) ? $elm$core$Maybe$Just(
 				{
-					V: $author$project$Aoc13$charToDir(ch),
+					W: $author$project$Aoc13$charToDir(ch),
 					ai: pos,
 					ar: 0
 				}) : $elm$core$Maybe$Nothing;
@@ -5840,7 +5840,7 @@ var $author$project$Aoc13$initMine = function (dataSource) {
 var $author$project$Aoc13$initModel = function (dataSource) {
 	var mine = $author$project$Aoc13$initMine(dataSource);
 	var carts = $author$project$Aoc13$findCarts(mine);
-	return {Q: carts, S: 0, s: dataSource, U: '', I: false, ab: '', ac: mine, v: true, x: $author$project$Aoc13$defaultTickInterval};
+	return {R: carts, T: 0, s: dataSource, V: '', I: false, ac: '', K: mine, v: true, x: $author$project$Aoc13$defaultTickInterval};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -6358,6 +6358,7 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$align = $elm$html$Html$Attributes$stringProperty('align');
+var $elm$html$Html$br = _VirtualDom_node('br');
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$html$Html$Attributes$boolProperty = F2(
@@ -6369,6 +6370,27 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 	});
 var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $author$project$Aoc13$getNestedPositions = function (mine) {
+	var ys = A2(
+		$elm$core$List$range,
+		0,
+		$tortus$elm_array_2d$Array2D$rows(mine) - 1);
+	var xs = A2(
+		$elm$core$List$range,
+		0,
+		$tortus$elm_array_2d$Array2D$columns(mine) - 1);
+	return A2(
+		$elm$core$List$map,
+		function (y) {
+			return A2(
+				$elm$core$List$map,
+				function (x) {
+					return _Utils_Tuple2(x, y);
+				},
+				xs);
+		},
+		ys);
+};
 var $elm$html$Html$Attributes$href = function (url) {
 	return A2(
 		$elm$html$Html$Attributes$stringProperty,
@@ -6400,6 +6422,46 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
+var $author$project$Aoc13$isBlank = function (ch) {
+	return ch === ' ';
+};
+var $elm$html$Html$span = _VirtualDom_node('span');
+var $author$project$Aoc13$toCharElement = F2(
+	function (mine, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var _v1 = A3($tortus$elm_array_2d$Array2D$get, y, x, mine);
+		if (_v1.$ === 1) {
+			return $elm$html$Html$text('?');
+		} else {
+			var ch = _v1.a;
+			return $author$project$Aoc13$isCart(ch) ? A2(
+				$elm$html$Html$span,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'background-color', '#CCCCCC')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						$elm$core$String$fromChar(ch))
+					])) : ($author$project$Aoc13$isBlank(ch) ? A2(
+				$elm$html$Html$span,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('.')
+					])) : $elm$html$Html$text(
+				$elm$core$String$fromChar(ch)));
+		}
+	});
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Aoc13$viewBody = function (model) {
@@ -6407,13 +6469,38 @@ var $author$project$Aoc13$viewBody = function (model) {
 		var _v0 = model.s;
 		switch (_v0) {
 			case 1:
-				return '24px';
+				return '32px';
 			case 2:
-				return '24px';
+				return '32px';
 			default:
 				return '9px';
 		}
 	}();
+	var mine = model.K;
+	var nestedPositions = $author$project$Aoc13$getNestedPositions(mine);
+	var nestedElements = A2(
+		$elm$core$List$map,
+		function (positions) {
+			return A2(
+				$elm$core$List$map,
+				$author$project$Aoc13$toCharElement(mine),
+				positions);
+		},
+		nestedPositions);
+	var elements = A3(
+		$elm$core$List$foldr,
+		F2(
+			function (a, b) {
+				return A2(
+					$elm$core$List$append,
+					a,
+					A2(
+						$elm$core$List$cons,
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
+						b));
+			}),
+		_List_Nil,
+		nestedElements);
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
@@ -6728,7 +6815,7 @@ var $author$project$Aoc13$viewBody = function (model) {
 							]),
 						_List_fromArray(
 							[
-								A2($elm$html$Html$div, _List_Nil, _List_Nil)
+								A2($elm$html$Html$div, _List_Nil, elements)
 							]))
 					]))
 			]));
