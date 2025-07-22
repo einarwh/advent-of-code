@@ -249,6 +249,10 @@ isBlank : Char -> Bool
 isBlank ch = 
   ch == ' '
 
+isCrash : Char -> Bool 
+isCrash ch = 
+  ch == 'X'
+
 charToDir : Char -> Dir 
 charToDir ch = 
   case ch of 
@@ -264,14 +268,6 @@ findCarts mine =
     indexed = toIndexedList mine 
   in 
     indexed |> List.filterMap (\(pos, ch) -> if isCart ch then Just { dir = charToDir ch, pos = pos, switches = Left } else Nothing)
-
-moveForward : Dir -> Pos -> Pos 
-moveForward dir (x, y) = 
-  case dir of 
-    N -> (x, y - 1)
-    W -> (x - 1, y)
-    S -> (x, y + 1)
-    E -> (x + 1, y)
 
 initModel : DataSource -> Model 
 initModel dataSource = 
@@ -405,7 +401,11 @@ updateClear model =
   initModel model.dataSource
 
 updateStep : Model -> Model
-updateStep model = model 
+updateStep model = 
+  let 
+    carts = model.carts |> List.map (\c -> moveCart model.mine c)
+  in 
+    { model | carts = carts }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -456,17 +456,30 @@ subscriptions model =
 
 -- VIEW
 
-toCharElement : Array2D Char -> Pos -> Html Msg 
-toCharElement mine (x, y) = 
-    case Array2D.get y x mine of 
-      Nothing -> Html.text "?"
-      Just ch -> 
-        if isCart ch then 
-          Html.span [ Html.Attributes.style "background-color" "#CCCCCC" ] [ Html.text (String.fromChar ch) ]
-        else if isBlank ch then 
-          Html.span [ Html.Attributes.style "color" "#FFFFFF" ] [ Html.text "." ]
-        else 
-          Html.text (String.fromChar ch)
+toCharElement : Array2D Char -> List Cart -> Pos -> Html Msg 
+toCharElement mine carts (x, y) = 
+  let 
+    cartsAtPos = carts |> List.filter (\c -> c.pos == (x, y))
+    symbol = 
+      case cartsAtPos of 
+        [] ->
+          Array2D.get y x mine |> Maybe.withDefault ' '
+        [c] -> 
+          case c.dir of 
+            N -> '^'
+            W -> '<'
+            S -> 'v'
+            e -> '>'
+        _ -> 'X'
+  in  
+    if isCart symbol then 
+      Html.span [ Html.Attributes.style "background-color" "#CCCCCC" ] [ Html.text (String.fromChar symbol) ]
+    else if isBlank symbol then 
+      Html.span [ Html.Attributes.style "color" "#FFFFFF" ] [ Html.text "." ]
+    else if isCrash symbol then 
+      Html.span [ Html.Attributes.style "background-color" "#880808" ] [ Html.text "X" ]
+    else 
+      Html.text (String.fromChar symbol)
 
 view : Model -> Document Msg
 view model = 
@@ -477,8 +490,9 @@ viewBody : Model -> Html Msg
 viewBody model =
   let
     mine = model.mine
+    carts = model.carts 
     nestedPositions = getNestedPositions mine
-    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement mine))
+    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement mine carts))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []      
     textFontSize = 
       case model.dataSource of 

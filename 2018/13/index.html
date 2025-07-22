@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.R.E === region.Z.E)
+	if (region.S.F === region.Z.F)
 	{
-		return 'on line ' + region.R.E;
+		return 'on line ' + region.S.F;
 	}
-	return 'on lines ' + region.R.E + ' through ' + region.Z.E;
+	return 'on lines ' + region.S.F + ' through ' + region.Z.F;
 }
 
 
@@ -2734,8 +2734,8 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
 		ae: func(record.ae),
-		S: record.S,
-		P: record.P
+		T: record.T,
+		Q: record.Q
 	}
 });
 
@@ -3004,10 +3004,10 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 
 		var value = result.a;
 		var message = !tag ? value : tag < 3 ? value.a : value.ae;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.S;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.T;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.P) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.Q) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3997,7 +3997,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 		impl.aO,
 		impl.aM,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.Q && impl.Q(sendToApp)
+			var divertHrefToApp = impl.R && impl.R(sendToApp)
 			var view = impl.aP;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
@@ -4072,7 +4072,7 @@ function _Browser_application(impl)
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		Q: function(sendToApp)
+		R: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -5456,9 +5456,9 @@ var $author$project$Aoc13$findCarts = function (mine) {
 			var ch = _v0.b;
 			return $author$project$Aoc13$isCart(ch) ? $elm$core$Maybe$Just(
 				{
-					D: $author$project$Aoc13$charToDir(ch),
-					K: pos,
-					F: 0
+					z: $author$project$Aoc13$charToDir(ch),
+					G: pos,
+					H: 0
 				}) : $elm$core$Maybe$Nothing;
 		},
 		indexed);
@@ -5840,7 +5840,7 @@ var $author$project$Aoc13$initMine = function (dataSource) {
 var $author$project$Aoc13$initModel = function (dataSource) {
 	var mine = $author$project$Aoc13$initMine(dataSource);
 	var carts = $author$project$Aoc13$findCarts(mine);
-	return {U: carts, W: 0, s: dataSource, Y: '', L: false, ae: '', N: mine, v: true, x: $author$project$Aoc13$defaultTickInterval};
+	return {E: carts, W: 0, s: dataSource, Y: '', N: false, ae: '', M: mine, v: true, x: $author$project$Aoc13$defaultTickInterval};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -6277,12 +6277,139 @@ var $author$project$Aoc13$subscriptions = function (model) {
 var $author$project$Aoc13$updateClear = function (model) {
 	return $author$project$Aoc13$initModel(model.s);
 };
+var $author$project$Aoc13$straightAhead = function (dir) {
+	return dir;
+};
+var $author$project$Aoc13$turnLeft = function (dir) {
+	switch (dir) {
+		case 0:
+			return 1;
+		case 1:
+			return 2;
+		case 2:
+			return 3;
+		default:
+			return 0;
+	}
+};
+var $author$project$Aoc13$turnRight = function (dir) {
+	switch (dir) {
+		case 0:
+			return 3;
+		case 1:
+			return 0;
+		case 2:
+			return 1;
+		default:
+			return 2;
+	}
+};
+var $author$project$Aoc13$turn = function (switches) {
+	switch (switches) {
+		case 0:
+			return $author$project$Aoc13$turnLeft;
+		case 1:
+			return $author$project$Aoc13$straightAhead;
+		default:
+			return $author$project$Aoc13$turnRight;
+	}
+};
+var $author$project$Aoc13$getNextDir = F2(
+	function (nextSymbol, cart) {
+		var switches = cart.H;
+		var dir = cart.z;
+		switch (nextSymbol) {
+			case '/':
+				switch (dir) {
+					case 0:
+						return $author$project$Aoc13$turnRight(dir);
+					case 1:
+						return $author$project$Aoc13$turnLeft(dir);
+					case 2:
+						return $author$project$Aoc13$turnRight(dir);
+					default:
+						return $author$project$Aoc13$turnLeft(dir);
+				}
+			case '\\':
+				switch (dir) {
+					case 0:
+						return $author$project$Aoc13$turnLeft(dir);
+					case 1:
+						return $author$project$Aoc13$turnRight(dir);
+					case 2:
+						return $author$project$Aoc13$turnLeft(dir);
+					default:
+						return $author$project$Aoc13$turnRight(dir);
+				}
+			case '+':
+				return A2($author$project$Aoc13$turn, switches, dir);
+			default:
+				return dir;
+		}
+	});
+var $author$project$Aoc13$getNextPos = F2(
+	function (dir, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		switch (dir) {
+			case 0:
+				return _Utils_Tuple2(x, y - 1);
+			case 1:
+				return _Utils_Tuple2(x - 1, y);
+			case 2:
+				return _Utils_Tuple2(x, y + 1);
+			default:
+				return _Utils_Tuple2(x + 1, y);
+		}
+	});
+var $author$project$Aoc13$Forward = 1;
+var $author$project$Aoc13$Right = 2;
+var $author$project$Aoc13$getNextSwitches = F2(
+	function (nextSymbol, switches) {
+		if ('+' === nextSymbol) {
+			switch (switches) {
+				case 0:
+					return 1;
+				case 1:
+					return 2;
+				default:
+					return 0;
+			}
+		} else {
+			return switches;
+		}
+	});
+var $author$project$Aoc13$moveCart = F2(
+	function (mine, cart) {
+		var _v0 = A2($author$project$Aoc13$getNextPos, cart.z, cart.G);
+		var x = _v0.a;
+		var y = _v0.b;
+		var nextSymbol = A2(
+			$elm$core$Maybe$withDefault,
+			' ',
+			A3($tortus$elm_array_2d$Array2D$get, y, x, mine));
+		var nextDir = A2($author$project$Aoc13$getNextDir, nextSymbol, cart);
+		var nextSwitches = A2($author$project$Aoc13$getNextSwitches, nextSymbol, cart.H);
+		return {
+			z: nextDir,
+			G: _Utils_Tuple2(x, y),
+			H: nextSwitches
+		};
+	});
 var $author$project$Aoc13$updateStep = function (model) {
-	return model;
+	var carts = A2(
+		$elm$core$List$map,
+		function (c) {
+			return A2($author$project$Aoc13$moveCart, model.M, c);
+		},
+		model.E);
+	return _Utils_update(
+		model,
+		{E: carts});
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc13$updateTogglePlay = function (model) {
-	if (model.L) {
+	if (model.N) {
 		var m = $author$project$Aoc13$initModel(model.s);
 		return _Utils_update(
 			m,
@@ -6422,6 +6549,17 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
 var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
@@ -6429,38 +6567,78 @@ var $elm$core$String$fromChar = function (_char) {
 var $author$project$Aoc13$isBlank = function (ch) {
 	return ch === ' ';
 };
+var $author$project$Aoc13$isCrash = function (ch) {
+	return ch === 'X';
+};
 var $elm$html$Html$span = _VirtualDom_node('span');
-var $author$project$Aoc13$toCharElement = F2(
-	function (mine, _v0) {
+var $author$project$Aoc13$toCharElement = F3(
+	function (mine, carts, _v0) {
 		var x = _v0.a;
 		var y = _v0.b;
-		var _v1 = A3($tortus$elm_array_2d$Array2D$get, y, x, mine);
-		if (_v1.$ === 1) {
-			return $elm$html$Html$text('?');
-		} else {
-			var ch = _v1.a;
-			return $author$project$Aoc13$isCart(ch) ? A2(
-				$elm$html$Html$span,
-				_List_fromArray(
-					[
-						A2($elm$html$Html$Attributes$style, 'background-color', '#CCCCCC')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text(
-						$elm$core$String$fromChar(ch))
-					])) : ($author$project$Aoc13$isBlank(ch) ? A2(
-				$elm$html$Html$span,
-				_List_fromArray(
-					[
-						A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('.')
-					])) : $elm$html$Html$text(
-				$elm$core$String$fromChar(ch)));
-		}
+		var cartsAtPos = A2(
+			$elm$core$List$filter,
+			function (c) {
+				return _Utils_eq(
+					c.G,
+					_Utils_Tuple2(x, y));
+			},
+			carts);
+		var symbol = function () {
+			if (!cartsAtPos.b) {
+				return A2(
+					$elm$core$Maybe$withDefault,
+					' ',
+					A3($tortus$elm_array_2d$Array2D$get, y, x, mine));
+			} else {
+				if (!cartsAtPos.b.b) {
+					var c = cartsAtPos.a;
+					var _v2 = c.z;
+					switch (_v2) {
+						case 0:
+							return '^';
+						case 1:
+							return '<';
+						case 2:
+							return 'v';
+						default:
+							var e = _v2;
+							return '>';
+					}
+				} else {
+					return 'X';
+				}
+			}
+		}();
+		return $author$project$Aoc13$isCart(symbol) ? A2(
+			$elm$html$Html$span,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'background-color', '#CCCCCC')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text(
+					$elm$core$String$fromChar(symbol))
+				])) : ($author$project$Aoc13$isBlank(symbol) ? A2(
+			$elm$html$Html$span,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('.')
+				])) : ($author$project$Aoc13$isCrash(symbol) ? A2(
+			$elm$html$Html$span,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'background-color', '#880808')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('X')
+				])) : $elm$html$Html$text(
+			$elm$core$String$fromChar(symbol))));
 	});
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
@@ -6476,14 +6654,15 @@ var $author$project$Aoc13$viewBody = function (model) {
 				return '9px';
 		}
 	}();
-	var mine = model.N;
+	var mine = model.M;
 	var nestedPositions = $author$project$Aoc13$getNestedPositions(mine);
+	var carts = model.E;
 	var nestedElements = A2(
 		$elm$core$List$map,
 		function (positions) {
 			return A2(
 				$elm$core$List$map,
-				$author$project$Aoc13$toCharElement(mine),
+				A2($author$project$Aoc13$toCharElement, mine, carts),
 				positions);
 		},
 		nestedPositions);
