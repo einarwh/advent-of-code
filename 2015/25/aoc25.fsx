@@ -14,6 +14,18 @@ let parse (s : string) : int * int =
     else
         failwith "?"
 
+let rowSequence = 
+    Seq.unfold (fun (v : int, inc : int) -> Some (v, (v + inc, inc + 1))) (1, 1)
+
+let getColSequence row = 
+    let startValue = rowSequence |> Seq.skip (row - 1) |> Seq.head 
+    Seq.unfold (fun (v : int, inc : int) -> Some (v, (v + inc, inc + 1))) (startValue, 1 + row)
+
+let getIndex row col = 
+    let startValue = rowSequence |> Seq.skip (row - 1) |> Seq.head 
+    let colSequence = Seq.unfold (fun (v : int, inc : int) -> Some (v, (v + inc, inc + 1))) (startValue, 1 + row)
+    colSequence |> Seq.skip (col - 1) |> Seq.head 
+
 let readLines = 
     File.ReadAllLines
     >> Array.filter (fun line -> line <> String.Empty)
@@ -21,6 +33,10 @@ let readLines =
 
 let run fileName = 
     let text = File.ReadAllText(fileName).Trim()
-    text |> parse |> printfn "%A"
+    // let (row, col) = text |> parse
+    let row = 2
+    let col = 4
+    getIndex row col |> printfn "%A"
+
 
 run "input.txt"
