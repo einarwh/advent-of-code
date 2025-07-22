@@ -4,7 +4,7 @@
 open System
 open System.IO
 
-let clues = [
+let readings = [
     ("children", 3)
     ("cats", 7)
     ("samoyeds", 2)
@@ -28,6 +28,21 @@ let parse (s : string) =
     let facts = restStr.Split(", ") |> Array.map toFact |> Array.toList
     sueNumber, facts
 
+let checkFact1 fact = 
+    readings |> List.contains fact
+
+let checkFact2 (prop : string, value : int) : bool = 
+    let reading = readings |> List.find (fun (p, _) -> p = prop) |> snd
+    match prop with 
+    | "cats"
+    | "trees" -> value > reading 
+    | "pomeranians" 
+    | "goldfish" -> value < reading 
+    | _ -> value = reading
+
+let findSue checkFact (sues : (int * (string*int) list) list) : int = 
+    sues |> List.filter (fun (_, facts) -> facts |> List.forall checkFact) |> List.head |> fst
+
 let readLines = 
     File.ReadAllLines
     >> Array.filter (fun line -> line <> String.Empty)
@@ -36,8 +51,7 @@ let readLines =
 let run fileName = 
     let lines = readLines fileName
     let sues = lines |> List.map parse 
-    let correctSue = 
-        sues |> List.filter (fun (n, facts) -> facts |> List.forall (fun f -> List.contains f clues)) |> List.head |> fst
-    printfn "%d" correctSue
+    sues |> findSue checkFact1 |> printfn "%d"
+    sues |> findSue checkFact2 |> printfn "%d"
 
 run "input.txt"
