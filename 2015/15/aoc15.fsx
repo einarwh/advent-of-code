@@ -7,11 +7,11 @@ open System.Text.RegularExpressions
 
 type Ingredient = {
     name : string 
-    capacity : int 
-    durability : int 
-    flavor : int 
-    texture : int 
-    calories : int 
+    capacity : int64 
+    durability : int64 
+    flavor : int64 
+    texture : int64 
+    calories : int64 
 }
 
 let tryParse (s : string) : Ingredient option = 
@@ -27,11 +27,26 @@ let tryParse (s : string) : Ingredient option =
     else
         None
 
-let solve (ingredients : Ingredient list) = 
-    let rec loop (teaspoonsSpent : int list) (teaspoonsLeft : int) (ingredientsLeft : Ingredient list) : int list = 
+let calculateScore (caloriesConstraint : bool) (teaspoons : int list) (ingredients : Ingredient list) =
+    let zipped = List.zip teaspoons ingredients
+    let capacity = zipped |> List.map (fun (ts, ingr) -> int64 ts * ingr.capacity) |> List.sum |> max 0L
+    let durability = zipped |> List.map (fun (ts, ingr) -> int64 ts * ingr.durability) |> List.sum |> max 0L
+    let flavor = zipped |> List.map (fun (ts, ingr) -> int64 ts * ingr.flavor) |> List.sum |> max 0L
+    let texture = zipped |> List.map (fun (ts, ingr) -> int64 ts * ingr.texture) |> List.sum |> max 0L
+    let calories = zipped |> List.map (fun (ts, ingr) -> int64 ts * ingr.calories) |> List.sum |> max 0L
+    if not caloriesConstraint || calories = 500 then 
+        capacity * durability * flavor * texture 
+    else 
+        0L
+
+let solve (caloriesConstraint : bool) (ingredients : Ingredient list) = 
+    let rec loop (teaspoonsSpent : int list) (teaspoonsLeft : int) (ingredientsLeft : Ingredient list) = 
         match ingredientsLeft with 
         | [] -> 
-            teaspoonsSpent |> List.rev 
+            let teaspoons = teaspoonsSpent |> List.rev 
+            let score = calculateScore caloriesConstraint teaspoons ingredients
+            // printfn "score %d %A" score teaspoons 
+            [score]
         | [last] -> 
             loop (teaspoonsLeft :: teaspoonsSpent) 0 []
         | ingr :: rest -> 
@@ -45,6 +60,8 @@ let readLines =
 
 let run fileName = 
     let lines = readLines fileName
-    lines |> List.choose tryParse |> printfn "%A"
+    let ingredients = lines |> List.choose tryParse
+    ingredients |> solve false |> List.max |> printfn "%d"
+    ingredients |> solve true |> List.max |> printfn "%d"
 
 run "input.txt"
