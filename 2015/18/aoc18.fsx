@@ -9,6 +9,10 @@ module Grid =
         Array2D.length2 grid
     let height grid =
         Array2D.length1 grid
+    let isCorner grid (x, y) = 
+        let xMax = width grid - 1
+        let yMax = height grid - 1
+        [(0, 0); (0, yMax); (xMax, 0); (xMax, yMax)] |> List.contains (x, y)
     let get (grid : bool[,]) (x, y) =
         Array2D.get grid y x
     let tryGet (grid : bool[,]) (x, y) =
@@ -38,13 +42,15 @@ module Grid =
         yRange
         |> List.map (fun y -> xRange |> List.map (fun x -> get grid (x, y)))
 
-let step grid =
+let step cornersAlwaysOn grid =
     let nextGrid = Array2D.copy grid
     let posList = Grid.getPositions grid
     let turnOn (pos : int*int) =
-        let nbCount = Grid.getNeighbours grid pos |> List.filter id |> List.length
-        let currentlyOn = Grid.get grid pos
-        (currentlyOn && (nbCount = 2 || nbCount = 3)) || (not currentlyOn && nbCount = 3)
+        if cornersAlwaysOn && Grid.isCorner grid pos then true 
+        else 
+            let nbCount = Grid.getNeighbours grid pos |> List.filter id |> List.length
+            let currentlyOn = Grid.get grid pos
+            (currentlyOn && (nbCount = 2 || nbCount = 3)) || (not currentlyOn && nbCount = 3)
     posList |> List.iter (fun pos -> Grid.set nextGrid pos (turnOn pos))
     nextGrid
 
@@ -56,17 +62,19 @@ let visualize grid =
     |> String.concat "\n"
     |> printfn "%s"
 
-let animate steps grid = 
-    let rec loop stepsLeft g = 
+let animate cornersAlwaysOn steps (grid : bool[,]) = 
+    let rec loop stepsLeft (g : bool[,]) = 
         // visualize g 
-        // g |> Grid.count |> printfn "%d"
-        // printfn ""
-
         if stepsLeft > 0 then 
-            loop (stepsLeft - 1) (step g)
+            loop (stepsLeft - 1) (step cornersAlwaysOn g)
         else 
             g
-    loop steps grid 
+    let g = Array2D.copy grid 
+    if cornersAlwaysOn then 
+        let xMax = Grid.width grid - 1
+        let yMax = Grid.height grid - 1
+        [(0, 0); (xMax, 0); (0, yMax); (xMax, yMax)] |> List.iter (fun pos -> Grid.set g pos true) 
+    loop steps g
 
 let readLines =
     File.ReadAllLines
@@ -77,8 +85,7 @@ let run fileName =
     let lines = readLines fileName
     let grid =
         lines |> List.map (fun s -> s |> Seq.toList |> List.map (fun ch -> ch = '#')) |> Grid.fromNestedList
-    grid |> visualize
-    grid |> Grid.count |> printfn "%d"
-    grid |> animate 100
+    grid |> animate false 100 |> Grid.count |> printfn "%d"
+    grid |> animate true 100 |> Grid.count |> printfn "%d"
 
 run "input.txt"
