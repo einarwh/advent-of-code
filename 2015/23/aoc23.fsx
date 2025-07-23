@@ -106,7 +106,7 @@ let jio r o (ptr, (a, b)) =
     (tgt, (a, b))
 
 let runProgram (a, b) (instructions : Instruction array) = 
-    let rec loop (ptr : int, (a : int, b : int)) = 
+    let rec loop (ptr, (a, b)) = 
         if ptr < 0 || ptr >= instructions.Length then 
             b
         else 
