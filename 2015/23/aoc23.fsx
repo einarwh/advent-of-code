@@ -84,31 +84,31 @@ let tryParse (s : String) : Instruction option =
    |> Option.orElseWith (fun () -> tryParseJio s)
 
 let hlf r (ptr, (a, b)) = 
-    (ptr + 1, match r with | A -> (a / 2L, b) | B -> (a, b / 2L))
+    (ptr + 1, match r with | A -> (a / 2, b) | B -> (a, b / 2))
 
 let tpl r (ptr, (a, b)) = 
-    (ptr + 1, match r with | A -> (a * 3L, b) | B -> (a, b * 3L))
+    (ptr + 1, match r with | A -> (a * 3, b) | B -> (a, b * 3))
 
 let inc r (ptr, (a, b)) = 
-    (ptr + 1, match r with | A -> (a + 1L, b) | B -> (a, b + 1L))
+    (ptr + 1, match r with | A -> (a + 1, b) | B -> (a, b + 1))
 
 let jmp o (ptr, (a, b)) = 
     (ptr + o, (a, b))
 
 let jie r o (ptr, (a, b)) = 
-    let v : int64 = match r with | A -> a | B -> b
-    let tgt = if v % 2L = 0 then (ptr + o) else ptr + 1
+    let v = match r with | A -> a | B -> b
+    let tgt = if v % 2 = 0 then (ptr + o) else ptr + 1
     (tgt, (a, b))
 
 let jio r o (ptr, (a, b)) = 
-    let v : int64 = match r with | A -> a | B -> b
+    let v = match r with | A -> a | B -> b
     let tgt = if v = 1 then (ptr + o) else ptr + 1
     (tgt, (a, b))
 
 let runProgram (a, b) (instructions : Instruction array) = 
-    let rec loop (ptr : int, (a : int64, b : int64)) = 
+    let rec loop (ptr : int, (a : int, b : int)) = 
         if ptr < 0 || ptr >= instructions.Length then 
-            (a, b)
+            b
         else 
             match instructions[ptr] with 
             | Hlf r -> hlf r (ptr, (a, b)) |> loop
