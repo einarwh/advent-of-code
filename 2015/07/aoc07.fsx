@@ -107,7 +107,6 @@ let resolveInput (signalMap : Map<string, int>) (input : Wire) =
 
 let solve (elements : (Wire * Gate) list) =
     let tryResolve (signalMap : Map<string, int>) (wire : Wire, gate : Gate) : Wire * Gate =
-        printfn "tryResolve %A" (wire, gate)
         match gate with
         | Direct input -> 
             let input' = input |> resolveInput signalMap 
@@ -156,7 +155,8 @@ let solve (elements : (Wire * Gate) list) =
     let (signalElements, otherElements) = elements |> List.partition isDirectSignal
     let rec loop (signals : (string * int) list) (unresolved : (Wire * Gate) list) =
         // printfn "loop with signals %d unresolved %d" signals.Length unresolved.Length
-        if List.isEmpty unresolved then signals
+        if List.isEmpty unresolved then 
+            signals |> List.find (fun (n, v) -> n = "a") |> snd
         else
             let signalMap = signals |> Map.ofList
             let result : (Wire * Gate) list = unresolved |> List.map (tryResolve signalMap)
@@ -165,13 +165,17 @@ let solve (elements : (Wire * Gate) list) =
             let oldSignals = signalMap |> Map.toList
             loop (oldSignals @ newSignals) newUnresolved
     let signals = signalElements |> List.choose toDirectSignal
-    printfn "%A" signals
     loop signals otherElements
 
 let run fileName =
     let lines = readLines fileName
     let elements = lines |> List.choose tryParse
-    // elements |> List.iter (printfn "%A")
-    elements |> solve |> List.iter (printfn "%A")
+    let a = elements |> solve 
+    let replaceB (w, g) = 
+        match w with 
+        | Name n when n = "b" -> w, Direct (Signal a)
+        | _ -> w, g
+    let a' = elements |> List.map replaceB |> solve 
+    a' |> printfn "%d"
 
 run "input.txt"
