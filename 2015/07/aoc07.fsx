@@ -17,8 +17,6 @@ type Gate =
     | Lshift of string * int
     | Rshift of string * int
 
-// type Element = Wire * Gate
-
 let parseInput (str : string) = 
     match Int32.TryParse str with
     | true, n -> Signal n
@@ -154,7 +152,6 @@ let solve (elements : (Wire * Gate) list) =
         match w, g with | Name n, Direct (Signal sg) -> Some (n, sg) | _ -> None
     let (signalElements, otherElements) = elements |> List.partition isDirectSignal
     let rec loop (signals : (string * int) list) (unresolved : (Wire * Gate) list) =
-        // printfn "loop with signals %d unresolved %d" signals.Length unresolved.Length
         if List.isEmpty unresolved then 
             signals |> List.find (fun (n, v) -> n = "a") |> snd
         else
@@ -171,6 +168,7 @@ let run fileName =
     let lines = readLines fileName
     let elements = lines |> List.choose tryParse
     let a = elements |> solve 
+    a |> printfn "%d"
     let replaceB (w, g) = 
         match w with 
         | Name n when n = "b" -> w, Direct (Signal a)
