@@ -84,29 +84,29 @@ let tryParse (s : String) : Instruction option =
    |> Option.orElseWith (fun () -> tryParseJio s)
 
 let hlf r (ptr, (a, b)) = 
-    (ptr + 1, match r with | A -> (a / 2, b) | B -> (a, b / 2))
+    (ptr + 1, match r with | A -> (a / 2L, b) | B -> (a, b / 2L))
 
 let tpl r (ptr, (a, b)) = 
-    (ptr + 1, match r with | A -> (a * 3, b) | B -> (a, b * 3))
+    (ptr + 1, match r with | A -> (a * 3L, b) | B -> (a, b * 3L))
 
 let inc r (ptr, (a, b)) = 
-    (ptr + 1, match r with | A -> (a + 1, b) | B -> (a, b + 1))
+    (ptr + 1, match r with | A -> (a + 1L, b) | B -> (a, b + 1L))
 
 let jmp o (ptr, (a, b)) = 
     (ptr + o, (a, b))
 
 let jie r o (ptr, (a, b)) = 
-    let v = match r with | A -> a | B -> b
-    let tgt = if v % 2 = 0 then (ptr + o) else ptr
+    let v : int64 = match r with | A -> a | B -> b
+    let tgt = if v % 2L = 0 then (ptr + o) else ptr + 1
     (tgt, (a, b))
 
 let jio r o (ptr, (a, b)) = 
-    let v = match r with | A -> a | B -> b
-    let tgt = if v = 1 then (ptr + o) else ptr
+    let v : int64 = match r with | A -> a | B -> b
+    let tgt = if v = 1 then (ptr + o) else ptr + 1
     (tgt, (a, b))
 
-let runProgram (instructions : Instruction array) = 
-    let rec loop (ptr : int, (a : int, b : int)) = 
+let runProgram (a, b) (instructions : Instruction array) = 
+    let rec loop (ptr : int, (a : int64, b : int64)) = 
         if ptr < 0 || ptr >= instructions.Length then 
             (a, b)
         else 
@@ -117,13 +117,12 @@ let runProgram (instructions : Instruction array) =
             | Jmp o -> jmp o (ptr, (a, b)) |> loop
             | Jie (r, o) -> jie r o (ptr, (a, b)) |> loop
             | Jio (r, o) -> jio r o (ptr, (a, b)) |> loop
-    loop (0, (0, 0))
+    loop (0, (a, b))
 
 let run fileName = 
     let lines = readLines fileName
-    lines |> printfn "%A"
     let instructions = lines |> Array.choose tryParse
-    instructions |> runProgram |> printfn "%A"
+    instructions |> runProgram (0, 0) |> printfn "%A"
+    instructions |> runProgram (1, 0) |> printfn "%A"
 
-run "sample.txt"
 run "input.txt"
