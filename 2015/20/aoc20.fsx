@@ -1,4 +1,4 @@
-// Advent of Code 2015. Day 20
+// Advent of Code 2015. Day 20: Infinite Elves and Infinite Houses.
 // dotnet fsi aoc20.fsx
 
 open System
