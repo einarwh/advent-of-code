@@ -4,6 +4,12 @@
 open System
 open System.IO
 
+type Stats = {
+    hitPoints : int 
+    damage : int 
+    armor : int 
+}
+
 type Spec = {
     cost : int 
     damage : int 
@@ -68,6 +74,29 @@ let makeCombinations (weaponPerms : Item list list) (armorPerms : Item list list
         |> List.collect (fun wa -> ringPerms |> List.map (fun r -> wa @ r))
     combos 
 
+let getPlayerStats (specs : Spec list) = 
+    { hitPoints = 100 
+      damage = specs |> List.sumBy (fun s -> s.damage) 
+      armor = specs |> List.sumBy (fun s -> s.armor) }
+
+let fight (boss : Stats) (items : Item list) = 
+    let specs = items |> List.map snd 
+    let player = getPlayerStats specs
+    let rec round playerHp bossHp = 
+        let bossHp' = bossHp - max 1 (player.damage - boss.armor)
+        if bossHp' > 0 then 
+            let playerHp' = playerHp - max 1 (boss.damage - player.armor)
+            if playerHp' > 0 then 
+                round playerHp' bossHp' 
+            else 
+                None 
+        else 
+            specs |> List.sumBy (fun s -> s.cost) |> Some
+    round player.hitPoints boss.hitPoints
+
+let findCheapestWin (boss : Stats) (combos : Item list list) = 
+    combos |> List.choose (fight boss) |> List.sort |> List.head
+
 let readLines = 
     File.ReadAllLines
     >> Array.filter (fun line -> line <> String.Empty)
@@ -77,6 +106,17 @@ let run fileName =
     let lines = readLines fileName
     // lines |> printfn "%A"
     // ringPermutations |> List.iter (printfn "%A")
+
+// Hit Points: 103
+// Damage: 9
+// Armor: 2
+
+    let boss = {
+        hitPoints = 103
+        damage = 9 
+        armor = 2
+    }
     let combos = makeCombinations weaponPermutations armorPermutations ringPermutations
+    combos |> findCheapestWin boss |> printfn "%d"
 
 run "input.txt"
