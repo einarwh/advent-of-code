@@ -9,7 +9,6 @@ type SpaceObject = string
 type Tree = Leaf of SpaceObject | Branch of SpaceObject * Tree list 
 
 let rec buildTree root (map : Map<SpaceObject, SpaceObject list>) : Tree = 
-    printfn "buildTree %A" root
     match Map.tryFind root map with 
     | Some objects -> Branch (root, objects |> List.map (fun n -> buildTree n map)) 
     | None -> Leaf root 
@@ -40,6 +39,15 @@ let countOrbits (tree : Tree) : int =
             depth + (subtrees |> List.sumBy (fun t -> fn (depth + 1) t))
     fn 0 tree
 
+let getPath (map : Map<SpaceObject, SpaceObject>) (obj : SpaceObject) = 
+    let rec fn acc obj = 
+        match Map.tryFind obj map with 
+        | Some parent -> 
+            fn (parent :: acc) parent 
+        | None -> 
+            List.rev acc 
+    fn [] obj
+
 let tryParse (line : string) : (SpaceObject * SpaceObject) option = 
     match line.Split ")" with 
     | [|a; b|] -> Some (a, b)
@@ -50,23 +58,22 @@ let readLines =
     >> Array.filter (fun line -> line <> String.Empty)
     >> Array.toList
 
+let findTransfers revMap = 
+    let you = "YOU" |> getPath revMap |> Set.ofList
+    let san = "SAN" |> getPath revMap |> Set.ofList
+    let justYou = Set.difference you san |> Set.count
+    let justSan = Set.difference san you |> Set.count
+    justYou + justSan 
+
 let run fileName = 
     let lines = readLines fileName
-    lines |> printfn "%A"
     let directOrbits = lines |> List.choose tryParse 
     let grouped = directOrbits |> List.groupBy fst |> List.map (fun (o, lst) -> (o, lst |> List.map snd))
     let map = grouped |> Map.ofList 
     let revMap = reverseMap map
     let root = findRoot revMap 
     let tree = buildTree root map 
-    // tree |> printfn "%A"
     tree |> countOrbits |> printfn "%d"
-
-    // let revMap = reverseMap map
-    // let root = findRoot revMap
-    // root |> printfn "%s"
-    // let tree = buildTree root map
-    // tree |> printfn "%A"
-    0
+    revMap |> findTransfers |> printfn "%d"
 
 run "input.txt"
