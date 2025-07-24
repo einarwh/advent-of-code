@@ -57,13 +57,6 @@ let findMaxCliques (graph : Graph) = bronKerbosch Set.empty (graph |> List.map f
 let run fileName = 
     let lines = readLines fileName
     let connections = lines |> List.map parse |> List.sort
-    let flipped = connections |> List.map (fun (a,b) -> (b, a))
-    connections @ flipped |> List.sort |> List.iter (printfn "%A")
-    let graph = 
-        connections @ flipped 
-        |> List.groupBy fst 
-        |> List.sort 
-        |> List.map (fun (c, cs) -> (c, cs |> List.map snd |> List.sort))
     let map = 
         connections 
         |> List.groupBy fst 
@@ -75,9 +68,13 @@ let run fileName =
     let t (c : string) = c.StartsWith("t")
     let ts = circles |> List.filter (fun (c1, c2, c3) -> t c1 || t c2 || t c3)
     ts |> List.length |> printfn "%d"
-    graph |> findMaxCliques |> printfn "%A"
-    let wat = graph |> findMaxCliques |> Seq.head |> Seq.toList |> String.concat ","
+    let flipped = connections |> List.map (fun (a,b) -> (b, a))
+    let graph = 
+        connections @ flipped 
+        |> List.groupBy fst 
+        |> List.sort 
+        |> List.map (fun (c, cs) -> (c, cs |> List.map snd |> List.sort))
+    let wat = graph |> findMaxCliques |> Seq.maxBy (fun clique -> Seq.length clique) |> Seq.toList |> String.concat ","
     wat |> printfn "%s"
 
-
-run "sample.txt"
+run "input.txt"
