@@ -1,4 +1,4 @@
-// Advent of Code 2015. Day 21
+// Advent of Code 2015. Day 21: RPG Simulator 20XX.
 // dotnet fsi aoc21.fsx
 
 open System
@@ -51,7 +51,7 @@ let selectOne items =
 let selectTwo items =
     let rec loop items = 
         match items with 
-        | [] -> failwith "empty"
+        | []
         | [_] -> failwith "empty"
         | [a; b] -> [[a; b]]
         | it :: rest -> 
@@ -68,13 +68,6 @@ let armorPermutations =
 
 let ringPermutations = 
     [] :: selectOne rings @ selectTwo rings 
-
-let makeCombinations (weaponPerms : Item list list) (armorPerms : Item list list) (ringPerms : Item list list) =
-    let combos : Item list list = 
-        weaponPerms 
-        |> List.collect (fun w -> armorPerms |> List.map (fun a -> w @ a))
-        |> List.collect (fun wa -> ringPerms |> List.map (fun r -> wa @ r))
-    combos 
 
 let getPlayerStats (specs : Spec list) = 
     { hitPoints = 100 
@@ -97,21 +90,6 @@ let fight (boss : Stats) (items : Item list) : Outcome =
             Win cost
     round player.hitPoints boss.hitPoints
 
-let fightToLose (boss : Stats) (items : Item list) = 
-    let specs = items |> List.map snd 
-    let player = getPlayerStats specs
-    let rec round playerHp bossHp = 
-        let bossHp' = bossHp - max 1 (player.damage - boss.armor)
-        if bossHp' > 0 then 
-            let playerHp' = playerHp - max 1 (boss.damage - player.armor)
-            if playerHp' > 0 then 
-                round playerHp' bossHp' 
-            else 
-                None 
-        else 
-            specs |> List.sumBy (fun s -> s.cost) |> Some
-    round player.hitPoints boss.hitPoints
-
 let findCheapestWin (boss : Stats) (combos : Item list list) = 
     let fightToWin (boss : Stats) (items : Item list) = 
         match fight boss items with 
@@ -130,8 +108,7 @@ let parse (s : string) =
     (s.Split ": ")[1] |> int
 
 let readLines = 
-    File.ReadAllLines
-    >> Array.filter (fun line -> line <> String.Empty)
+    File.ReadAllLines >> Array.filter (fun line -> line <> String.Empty)
 
 let run fileName = 
     let numbers = readLines fileName |> Array.map parse 
@@ -140,7 +117,10 @@ let run fileName =
         damage = numbers[1]
         armor = numbers[2]
     }
-    let combos = makeCombinations weaponPermutations armorPermutations ringPermutations
+    let combos = 
+        weaponPermutations 
+        |> List.collect (fun w -> armorPermutations |> List.map (fun a -> w @ a))
+        |> List.collect (fun wa -> ringPermutations |> List.map (fun r -> wa @ r))
     combos |> findCheapestWin boss |> printfn "%d"
     combos |> findMostExpensiveLoss boss |> printfn "%d"
 
