@@ -4,6 +4,8 @@
 open System
 open System.IO
 
+type Outcome = Win of int | Loss of int 
+
 type Stats = {
     hitPoints : int 
     damage : int 
@@ -79,7 +81,23 @@ let getPlayerStats (specs : Spec list) =
       damage = specs |> List.sumBy (fun s -> s.damage) 
       armor = specs |> List.sumBy (fun s -> s.armor) }
 
-let fight (boss : Stats) (items : Item list) = 
+let fight (boss : Stats) (items : Item list) : Outcome = 
+    let specs = items |> List.map snd 
+    let player = getPlayerStats specs
+    let cost = specs |> List.sumBy (fun s -> s.cost)
+    let rec round playerHp bossHp = 
+        let bossHp' = bossHp - max 1 (player.damage - boss.armor)
+        if bossHp' > 0 then 
+            let playerHp' = playerHp - max 1 (boss.damage - player.armor)
+            if playerHp' > 0 then 
+                round playerHp' bossHp' 
+            else 
+                Loss cost 
+        else 
+            Win cost
+    round player.hitPoints boss.hitPoints
+
+let fightToLose (boss : Stats) (items : Item list) = 
     let specs = items |> List.map snd 
     let player = getPlayerStats specs
     let rec round playerHp bossHp = 
@@ -95,28 +113,35 @@ let fight (boss : Stats) (items : Item list) =
     round player.hitPoints boss.hitPoints
 
 let findCheapestWin (boss : Stats) (combos : Item list list) = 
-    combos |> List.choose (fight boss) |> List.sort |> List.head
+    let fightToWin (boss : Stats) (items : Item list) = 
+        match fight boss items with 
+        | Win cost -> Some cost 
+        | _ -> None 
+    combos |> List.choose (fightToWin boss) |> List.sort |> List.head
+
+let findMostExpensiveLoss (boss : Stats) (combos : Item list list) = 
+    let fightToLose (boss : Stats) (items : Item list) = 
+        match fight boss items with 
+        | Loss cost -> Some cost 
+        | _ -> None 
+    combos |> List.choose (fightToLose boss) |> List.sortDescending |> List.head 
+
+let parse (s : string) = 
+    (s.Split ": ")[1] |> int
 
 let readLines = 
     File.ReadAllLines
     >> Array.filter (fun line -> line <> String.Empty)
-    >> Array.toList
 
 let run fileName = 
-    let lines = readLines fileName
-    // lines |> printfn "%A"
-    // ringPermutations |> List.iter (printfn "%A")
-
-// Hit Points: 103
-// Damage: 9
-// Armor: 2
-
+    let numbers = readLines fileName |> Array.map parse 
     let boss = {
-        hitPoints = 103
-        damage = 9 
-        armor = 2
+        hitPoints = numbers[0]
+        damage = numbers[1]
+        armor = numbers[2]
     }
     let combos = makeCombinations weaponPermutations armorPermutations ringPermutations
     combos |> findCheapestWin boss |> printfn "%d"
+    combos |> findMostExpensiveLoss boss |> printfn "%d"
 
 run "input.txt"
