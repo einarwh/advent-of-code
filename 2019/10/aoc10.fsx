@@ -7,8 +7,6 @@ open System.IO
 module Grid =
     let get (grid : bool[,]) (x, y) =
         Array2D.get grid y x
-    let set (grid : bool[,]) (x, y) (value : bool) =
-        Array2D.set grid y x value
     let fromList (lst : bool list list) =
         let width = lst |> List.head |> List.length
         let height = lst |> List.length
@@ -17,20 +15,8 @@ module Grid =
         let yRange = [ 0 .. grid.GetLength(0) - 1 ]
         let xRange = [ 0 .. grid.GetLength(1) - 1 ]
         yRange |> List.collect (fun y -> xRange |> List.map (fun x -> x, y))
-    let toNestedList (grid : bool[,]) =
-        let yRange = [ 0 .. grid.GetLength(0) - 1 ]
-        let xRange = [ 0 .. grid.GetLength(1) - 1 ]
-        yRange
-        |> List.map (fun y -> xRange |> List.map (fun x -> get grid (x, y)))
-    let toIndexedList (grid : bool[,]) =
-        let yRange = [ 0 .. grid.GetLength(0) - 1 ]
-        let xRange = [ 0 .. grid.GetLength(1) - 1 ]
-        yRange
-        |> List.map (fun y -> xRange |> List.map (fun x -> (x, y), get grid (x, y)))
-        |> List.concat
 
 let rec gcd a b =
-    // printfn "gcd a=%d b=%d" a b
     if b = 0 then a else gcd b (a % b)
 
 let readLines = 
@@ -53,7 +39,6 @@ let findVectorHlp (ax, ay) (x, y) =
 
 let findVector (ax, ay) (x, y) = 
     let result = findVectorHlp (ax, ay) (x, y) 
-    // printfn "findVector: %A %A -> %A" (ax, ay) (x, y) result 
     result
 
 let countVisibleAsteroids (asteroidPositions : (int*int) list) (pos : int*int) = 
@@ -63,14 +48,34 @@ let countVisibleAsteroids (asteroidPositions : (int*int) list) (pos : int*int) =
         |> List.map (fun p -> (p, findVector p pos))
         |> List.groupBy snd 
         |> List.map (fun (v, lst) -> (v, List.map fst lst))
-    // printfn ""
-    // printfn "pos: %A - visible: %A" pos (List.length grouped)
-    // mapped |> List.iter (printfn "%A")
-    // printfn "..."
-    // grouped |> List.iter (printfn "%A")
     grouped
     |> List.length 
 
+let findAngle ((ax, ay) : (int*int)) ((x, y) : (int*int)) : (int*int)*float*float = 
+    let dx = float ax - float x 
+    let dy = float ay - float y 
+    let dist = Math.Sqrt(dx*dx + dy*dy)
+    let angle = Math.Atan2(dx, -dy)
+    (x, y), angle, dist
+
+let toVaporizationOrder (asteroidPositions : (int*int) list) (pos : int*int) = 
+    let rec fn acc groups =
+        match groups with 
+        | [] -> acc |> List.rev |> List.concat
+        | _ -> 
+            let heads = groups |> List.map List.head 
+            let remaining = groups |> List.map List.tail |> List.filter (not << List.isEmpty)
+            fn (heads :: acc) remaining
+    let grouped = 
+        asteroidPositions 
+        |> List.filter (fun p -> p <> pos)
+        |> List.map (findAngle pos)
+        |> List.groupBy (fun (p, a, d) -> a)
+        |> List.map (fun (a, lst) -> ((if a = Math.PI then -a else a), lst |> List.map (fun (p, a, d) -> (p, d)) |> List.sortBy snd |> List.map fst))
+        |> List.sort
+        |> List.map snd
+    fn [] grouped
+    
 let run fileName = 
     let lines = readLines fileName
     let grid = lines |> List.map Seq.toList |> List.map (List.map (fun ch -> ch = '#')) |> Grid.fromList
@@ -81,23 +86,9 @@ let run fileName =
         |> List.map (fun p -> (p, countVisibleAsteroids asteroidPositions p)) 
         |> List.sortByDescending snd
         |> List.head
-    printfn "%A: %d" bestPlace count 
-    // let pos = (0, 0) 
-    // findVector pos (1, 1) |> printfn "%A"
-    // findVector pos (-1, -1) |> printfn "%A"
-    Math.Atan2 (1.0, 0) |> printfn "(1.0, 0) : %f"
-    Math.Atan2 (0.5, 0.5) |> printfn "(0.5, 0.5) : %f"
-    Math.Atan2 (0, 1.0) |> printfn "(0, 1.0) : %f"
-    Math.Atan2 (-0.5, 0.5) |> printfn "(-0.5, 0.5) : %f"
-    Math.Atan2 (-1.0, 0) |> printfn "(-1.0, 0) : %f"
-    Math.Atan2 (-0.5, -0.5) |> printfn "(-0.5, -0.5) : %f"
-    Math.Atan2 (0, -1.0) |> printfn "(0, -1.0) : %f"
-    Math.Atan2 (1.0, 0) |> printfn "(1.0, 0) : %f"
-
-    // Math.Atan2 (0, 1.0) |> printfn ">>> (0, 1) : %f"
-
-
-    0
-
+    printfn "%d" count
+    let order = bestPlace |> toVaporizationOrder asteroidPositions
+    let x, y = order |> List.skip 199 |> List.head 
+    100 * x + y |> printfn "%d"
 
 run "input.txt"
