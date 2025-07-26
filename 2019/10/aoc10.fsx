@@ -33,23 +33,19 @@ let findVectorHlp (ax, ay) (x, y) =
     | (0, _) -> (0, - dy / abs dy)
     | _ -> 
         let d = gcd dx dy 
-        let result = - dx / abs d, - dy / abs d
-        // printfn "divisor: %d" d
-        result 
+        - dx / abs d, - dy / abs d
 
 let findVector (ax, ay) (x, y) = 
     let result = findVectorHlp (ax, ay) (x, y) 
     result
 
 let countVisibleAsteroids (asteroidPositions : (int*int) list) (pos : int*int) = 
-    let grouped = 
-        asteroidPositions 
-        |> List.filter (fun p -> p <> pos)
-        |> List.map (fun p -> (p, findVector p pos))
-        |> List.groupBy snd 
-        |> List.map (fun (v, lst) -> (v, List.map fst lst))
-    grouped
-    |> List.length 
+    asteroidPositions 
+    |> List.filter (fun p -> p <> pos)
+    |> List.map (fun p -> (p, findVector p pos))
+    |> List.groupBy snd 
+    |> List.map (fun (v, lst) -> (v, List.map fst lst))
+    |> List.length
 
 let findAngle ((ax, ay) : (int*int)) ((x, y) : (int*int)) : (int*int)*float*float = 
     let dx = float ax - float x 
