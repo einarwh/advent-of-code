@@ -15,8 +15,6 @@ module Area =
             Some (Array2D.get area y x)
     let get (area : Acre[,]) (x, y) =
         Array2D.get area y x
-    let set (area : Acre[,]) (x, y) (value : Acre) =
-        Array2D.set area y x value
     let fromNestedList (lst : Acre list list) =
         let width = lst |> List.head |> List.length
         let height = lst |> List.length
@@ -31,12 +29,6 @@ module Area =
         let xRange = [ 0 .. area.GetLength(1) - 1 ]
         yRange
         |> List.map (fun y -> xRange |> List.map (fun x -> x, y))
-    let toIndexedList (area : Acre[,]) =
-        let yRange = [ 0 .. area.GetLength(0) - 1 ]
-        let xRange = [ 0 .. area.GetLength(1) - 1 ]
-        yRange
-        |> List.map (fun y -> xRange |> List.map (fun x -> (x, y), get area (x, y)))
-        |> List.concat
 
 let visualize area =
     let selectChar acre =
@@ -63,25 +55,27 @@ let choose (area : Acre[,]) (x, y) : Acre =
     | Trees -> if countAcre neighbours Lumberyard >= 3 then Lumberyard else Trees 
     | Lumberyard -> if countAcre neighbours Lumberyard > 0 && countAcre neighbours Trees > 0 then Lumberyard else Ground 
 
-let step (area : Acre[,]) = 
-    let positions = Area.getNestedPositions area 
-    let next = positions |> List.map (fun row -> row |> List.map (choose area)) |> Area.fromNestedList
-    printfn ""
-    visualize next
-    0
+let getResourceValue area = 
+    let acres = area |> Area.toNestedList |> List.concat 
+    let trees = countAcre acres Trees 
+    let lumberyards = countAcre acres Lumberyard
+    trees * lumberyards
 
-let evolve steps initialArea = 
-    let rec loop (i : int) (area : Acre[,]) = 
-        printfn ""
-        printfn "Step %d" i
-        visualize area
-        if i < steps then 
-            let positions = Area.getNestedPositions area 
-            let next = positions |> List.map (fun row -> row |> List.map (choose area)) |> Area.fromNestedList
-            loop (i + 1) next
+let evolveUntilRepeat maxSteps initialArea = 
+    let rec loop (i : int) (seen : Map<Acre[,], int>) (area : Acre[,]) = 
+        if Map.containsKey area seen then 
+            let firstIndex = seen[area]
+            let loopSize = i - firstIndex
+            let numberInLoop = (maxSteps - firstIndex) % loopSize
+            seen |> Map.toList |> List.find (fun (_, n) -> numberInLoop + firstIndex = n) |> fst
         else 
-            area
-    loop 0 initialArea
+            if i < maxSteps then 
+                let positions = Area.getNestedPositions area 
+                let next = positions |> List.map (fun row -> row |> List.map (choose area)) |> Area.fromNestedList
+                loop (i + 1) (Map.add area i seen) next
+            else 
+                area
+    loop 0 Map.empty initialArea
 
 let readLines = 
     File.ReadAllLines
@@ -97,10 +91,10 @@ let run fileName =
         | '#' -> Lumberyard
         | _ -> failwith "?"
     let area = lines |> List.map (fun line -> line |> Seq.toList |> List.map toAcre) |> Area.fromNestedList
-    let area' = evolve 10 area
-    let acres = area' |> Area.toNestedList |> List.concat 
-    let trees = countAcre acres Trees 
-    let lumberyards = countAcre acres Lumberyard
-    trees * lumberyards |> printfn "%d"
+    let area' = evolveUntilRepeat 10 area
+    area' |> getResourceValue |> printfn "%d"
+    let area2 = evolveUntilRepeat 1000000000 area
+    area2 |> getResourceValue |> printfn "%d"
+    0
 
 run "input.txt"
