@@ -1,0 +1,1 @@
+elm make --optimize src/Aoc15Element.elm --output=aoc15.js

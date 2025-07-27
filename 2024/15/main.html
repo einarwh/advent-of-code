@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>My Elm App</title>
+    <script src="aoc15.js"></script>
+  </head>
+  <body>
+    <div id="elm-app"></div>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Your JavaScript code interacting with Elm.Main.init goes here
+        const app = Elm.Aoc15Element.init({
+          node: document.getElementById("elm-app"),
+        });
+      });
+      //   var app = Elm.Main.init({ node: document.getElementById("myapp") });
+    </script>
+  </body>
+</html>
