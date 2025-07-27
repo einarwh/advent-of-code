@@ -17,13 +17,14 @@ let run (width, height) fileName =
     let layers = text |> Seq.toArray |> Array.map (fun c -> int (c.ToString())) |> Array.chunkBySize (width*height) 
     let sorted = layers |> Array.sortBy (countDigit 0)
     let head = sorted[0]
-    countDigit 1 head * countDigit 2 head |> printfn "%d"
-    let pixels = layers |> selectPixels
-    let chunked = pixels |> Array.chunkBySize width
-    let foo = chunked |> Array.map (fun row -> row |> Array.map (fun pixel -> if pixel = 1 then '#' else ' ') |> fun ps -> new string(ps)) |> String.concat "\n"
-    printfn "%s" foo
-
-    0
+    countDigit 1 head * countDigit 2 head 
+    |> printfn "%d"
+    layers 
+    |> selectPixels
+    |> Array.chunkBySize width
+    |> Array.map (fun row -> row |> Array.map (fun pixel -> if pixel = 1 then '#' else ' ') |> fun ps -> new string(ps)) 
+    |> String.concat "\n"
+    |> printfn "%s"
 
 // run (3, 2) "sample.txt"
 run (25, 6) "input.txt"
