@@ -22,4 +22,4 @@ let run input =
     calories |> Array.item 0 |> printfn "%d"
     calories |> Array.take 3 |> Array.sum |> printfn "%d"
 
-run "input"
+run "input.txt"

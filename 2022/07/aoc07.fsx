@@ -157,7 +157,7 @@ let run root =
     |> List.head
     |> printfn "Size of dir to delete: %d"
 
-"input"
+"input.txt"
 |> File.ReadAllLines 
 |> Array.toList
 |> List.choose tryParseLine

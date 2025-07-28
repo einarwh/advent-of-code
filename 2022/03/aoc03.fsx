@@ -1,6 +1,6 @@
 // Advent of Code 2022. 
 // Day 3: Rucksack Reorganization, Part A.
-// dotnet fsi aoc03a.fsx
+// dotnet fsi aoc03.fsx
 
 open System.IO 
 
@@ -34,7 +34,7 @@ let run lines =
     |> Array.sumBy (Set.intersectMany >> Set.toList >> List.head >> toPriority)
     |> printfn "Part B: %A"
 
-"input"
+"input.txt"
 |> File.ReadAllLines 
 |> Array.filter (fun s -> s.Length > 0)
 |> run

@@ -116,6 +116,6 @@ let run (text : string) =
     stacks9000 |> printTopCrates
     stacks9100 |> printTopCrates
 
-"input"
+"input.txt"
 |> File.ReadAllText 
 |> run 

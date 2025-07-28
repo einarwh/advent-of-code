@@ -93,7 +93,7 @@ let run dirs =
     dirs |> moveRope 2 |> printfn "Visited: %d"
     dirs |> moveRope 10 |> printfn "Visited: %d"
 
-"input"
+"input.txt"
 |> File.ReadAllLines
 |> Array.toList 
 |> List.choose tryParseMotion

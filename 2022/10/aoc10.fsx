@@ -80,7 +80,7 @@ let run instructions =
     xs |> part1
     xs |> part2
 
-"input"
+"input.txt"
 |> File.ReadAllLines
 |> Array.toList
 |> List.choose tryParseInstruction

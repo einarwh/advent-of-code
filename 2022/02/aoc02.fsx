@@ -31,4 +31,4 @@ let run lines =
     lines |> Array.sumBy score1 |> printfn "%d"
     lines |> Array.sumBy score2 |> printfn "%d"
 
-"input" |> File.ReadAllLines |> run 
+"input.txt" |> File.ReadAllLines |> run 

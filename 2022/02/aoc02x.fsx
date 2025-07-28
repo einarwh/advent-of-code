@@ -82,4 +82,4 @@ let run lines =
     lines |> score parse1 |> printfn "%d" 
     lines |> score parse2 |> printfn "%d" 
 
-"input" |> File.ReadAllLines |> run 
+"input.txt" |> File.ReadAllLines |> run 

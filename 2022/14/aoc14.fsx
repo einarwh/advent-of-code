@@ -88,7 +88,7 @@ let run (lines : string list) =
     rocks |> part1 
     rocks |> part2 
 
-"input"
+"input.txt"
 |> File.ReadAllLines
 |> Array.toList 
 |> run 

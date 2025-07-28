@@ -131,7 +131,7 @@ let run (lines : string list) =
     part1 lines
     part2 lines
 
-"input"
+"input.txt"
 |> File.ReadAllText
 |> trim 
 |> split "\n\n"

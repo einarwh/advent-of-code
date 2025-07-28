@@ -1,7 +1,7 @@
 # Advent of Code 2022. Day 2: Rock Paper Scissors.
 # tclsh aoc02.tcl
 
-set fp [open "input" r]
+set fp [open "input.txt" r]
 set file_data [read $fp]
 close $fp
 

@@ -16,6 +16,6 @@ let run cs =
     cs |> findMarker 4 |> printfn "%d"
     cs |> findMarker 14 |> printfn "%d"
 
-"input"
+"input.txt"
 |> File.ReadAllText
 |> run

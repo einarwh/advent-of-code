@@ -83,7 +83,7 @@ let run (grid : int[,]) =
     grid |> part1
     grid |> part2 
 
-"input"
+"input.txt"
 |> File.ReadAllLines
 |> Array.map parseRow 
 |> array2D

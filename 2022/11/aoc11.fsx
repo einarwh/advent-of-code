@@ -154,7 +154,7 @@ let run (monkeys : Monkey array) =
     monkeys |> Array.copy |> part1 
     monkeys |> Array.copy |> part2
 
-"input"
+"input.txt"
 |> File.ReadAllText 
 |> (fun s -> s.TrimEnd().Split("\n\n"))
 |> Array.map parseMonkey

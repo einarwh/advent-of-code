@@ -93,7 +93,7 @@ let run lists =
     lists |> part1 
     lists |> part2
 
-"input"
+"input.txt"
 |> File.ReadAllLines 
 |> Array.toList 
 |> List.map (Seq.toList)

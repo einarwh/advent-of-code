@@ -30,7 +30,7 @@ let run pairs =
     |> Array.length
     |> printfn "%A"
 
-"input"
+"input.txt"
 |> File.ReadAllLines 
 |> Array.choose parsePair
 |> run 
