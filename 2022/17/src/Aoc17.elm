@@ -42,7 +42,9 @@ type Visit = Vertical | Horizontal | Both
 
 type Cell = Highlight Char | Plain Char 
 
-type Shape = Dash | Cross | Angle | Bar | Box 
+type BasicShape = Dash | Cross | Angle | Bar | Box 
+
+type alias Shape = (BasicShape, Int) 
 
 -- type alias Rock = (Pos, Shape)
 
@@ -79,7 +81,7 @@ initModel dataSource =
   let 
     data = read dataSource
     chamber = Array2D.repeat (2022*4) 7 '.'
-    rock = ((2, 3), Dash)
+    rock = ((2, 3), (Dash, 0))
   in 
     { chamber = chamber 
     , highestRock = 0
@@ -119,14 +121,6 @@ getAllPositions board =
   in 
     ys |> List.concatMap (\y -> xs |> List.map (\x -> (x, y)))
 
-tryMoveRight : Array2D Char -> Rock -> Rock  
-tryMoveRight chamber rock =
-  tryMove chamber rock (\(x, y) -> (x + 1, y))
-
-tryMoveLeft : Array2D Char -> Rock -> Rock  
-tryMoveLeft chamber rock =
-  tryMove chamber rock (\(x, y) -> (x - 1, y))
-
 isForbidden : Array2D Char -> Pos -> Bool
 isForbidden chamber (x, y) = 
   if x < 0 || x >= chamberWidth || y < 0 then True 
@@ -135,10 +129,10 @@ isForbidden chamber (x, y) =
       Just '#' -> True 
       _ -> False
 
-tryMove : Array2D Char -> Rock -> (Pos -> Pos) -> Rock 
+tryMove : Array2D Char -> Rock -> (Pos -> Pos) -> Result Rock Rock 
 tryMove chamber rock moveFn = 
   case rock of 
-    Stopped _ -> rock
+    Stopped _ -> Err rock
     Moving (oldPos, shape) ->
       let 
         (x, y) = moveFn oldPos 
@@ -148,30 +142,116 @@ tryMove chamber rock moveFn =
             rockPositions = toRockPositions (Moving ((x, y), shape))
           in 
             if rockPositions |> List.any (isForbidden chamber) then 
-              rock
+              Err rock
             else 
-              Moving ((x, y), shape)
+              Ok <| Moving ((x, y), shape)
         else 
-          rock
+          Err rock
 
-tryMoveDown : Array2D Char -> Rock -> Rock  
+tryMoveRight : Array2D Char -> Rock -> Result Rock Rock  
+tryMoveRight chamber rock =
+  tryMove chamber rock (\(x, y) -> (x + 1, y))
+
+tryMoveLeft : Array2D Char -> Rock -> Result Rock Rock  
+tryMoveLeft chamber rock =
+  tryMove chamber rock (\(x, y) -> (x - 1, y))
+
+
+tryMoveDown : Array2D Char -> Rock -> Result Rock Rock  
 tryMoveDown chamber rock = 
   tryMove chamber rock (\(x, y) -> (x, y - 1))
 
-moveRock : Array2D Char -> Char -> Rock -> Rock 
+tryRotate : Array2D Char -> Rock -> Result Rock Rock  
+tryRotate chamber rock = 
+  case rock of 
+    Stopped _ -> Err rock
+    Moving (pos, (shape, rot)) ->
+      case (shape, rot) of 
+        (Dash, 0) -> 
+          let 
+            moveFn = \(x, y) -> (x + 2, y - 1)
+            newRock = (Moving (pos, (Dash, 1)))
+          in 
+            case tryMove chamber newRock moveFn of 
+              Ok moved -> Ok moved 
+              Err _ -> Err rock
+        (Dash, _) -> 
+          let 
+            moveFn = \(x, y) -> (x - 2, y + 1)
+            newRock = (Moving (pos, (Dash, 0)))
+          in 
+            case tryMove chamber newRock moveFn of 
+              Ok moved -> Ok moved 
+              Err _ -> Err rock
+        (Bar, 0) -> 
+          let 
+            moveFn = \(x, y) -> (x - 2, y + 1)
+            newRock = (Moving (pos, (Bar, 1)))
+          in 
+            case tryMove chamber newRock moveFn of 
+              Ok moved -> Ok moved 
+              Err _ -> Err rock
+        (Bar, _) -> 
+          let 
+            moveFn = \(x, y) -> (x + 2, y - 1)
+            newRock = (Moving (pos, (Bar, 0)))
+          in 
+            case tryMove chamber newRock moveFn of 
+              Ok moved -> Ok moved 
+              Err _ -> Err rock
+        (Angle, 0) -> 
+          let 
+            moveFn = \(x, y) -> (x, y)
+            newRock = (Moving (pos, (Angle, 1)))
+          in 
+            case tryMove chamber newRock moveFn of 
+              Ok moved -> Ok moved 
+              Err _ -> Err rock
+        (Angle, 1) -> 
+          let 
+            moveFn = \(x, y) -> (x, y)
+            newRock = (Moving (pos, (Angle, 2)))
+          in 
+            case tryMove chamber newRock moveFn of 
+              Ok moved -> Ok moved 
+              Err _ -> Err rock
+        (Angle, 2) -> 
+          let 
+            moveFn = \(x, y) -> (x, y)
+            newRock = (Moving (pos, (Angle, 3)))
+          in 
+            case tryMove chamber newRock moveFn of 
+              Ok moved -> Ok moved 
+              Err _ -> Err rock
+        (Angle, _) -> 
+          let 
+            moveFn = \(x, y) -> (x, y)
+            newRock = (Moving (pos, (Angle, 0)))
+          in 
+            case tryMove chamber newRock moveFn of 
+              Ok moved -> Ok moved 
+              Err _ -> Err rock
+        _ -> 
+          Err rock
+          
+moveRock : Array2D Char -> Char -> Rock -> Result Rock Rock 
 moveRock chamber move rock =
   case move of 
     '>' -> tryMoveRight chamber rock
     '<' -> tryMoveLeft chamber rock 
     'v' -> tryMoveDown chamber rock
-    _ -> rock
+    '^' -> 
+      tryRotate chamber rock
+      -- Ok rock
+    _ -> 
+      Err rock
 
-moveRockJet : Array2D Char -> Char -> Rock -> Rock 
+moveRockJet : Array2D Char -> Char -> Rock -> Result Rock Rock 
 moveRockJet chamber move rock =
   case move of 
     '>' -> tryMoveRight chamber rock
     '<' -> tryMoveLeft chamber rock
-    _ -> rock
+    _ -> Err rock
 
 addRockPositions : Array2D Char -> List Pos -> Array2D Char 
 addRockPositions chamber positions = 
@@ -187,13 +267,13 @@ nextMove move =
     Fall -> Blow
 
 nextShape : Shape -> Shape
-nextShape shape = 
+nextShape (shape, _) = 
   case shape of 
-    Dash -> Cross 
-    Cross -> Angle 
-    Angle -> Bar 
-    Bar -> Box 
-    Box -> Dash
+    Dash -> (Cross, 0) 
+    Cross -> (Angle, 0) 
+    Angle -> (Bar, 0) 
+    Bar -> (Box, 0) 
+    Box -> (Dash, 0)
 
 updateClear : Model -> Model
 updateClear model = 
@@ -206,9 +286,12 @@ updateBlow model =
       let 
         jetMove = model.jetPattern |> Array.get model.jetIndex |> Maybe.withDefault ' '
         jetIndex = (model.jetIndex + 1) |> modBy (Array.length model.jetPattern)
-        r = moveRockJet model.chamber jetMove model.rock 
+        rock = 
+          case moveRockJet model.chamber jetMove model.rock of 
+            Ok moved -> moved 
+            Err notMoved -> notMoved
       in 
-        { model | message = jetMove |> String.fromChar, jetIndex = jetIndex, rock = r, move = Fall }
+        { model | message = jetMove |> String.fromChar, jetIndex = jetIndex, rock = rock, move = Fall }
     Stopped _ -> 
       model
 
@@ -225,18 +308,19 @@ updateFall model =
   case model.rock of 
     Moving (pos, shape) -> 
       let 
-        r = tryMoveDown model.chamber model.rock 
+        result = tryMoveDown model.chamber model.rock 
       in 
-        if r == model.rock then 
-          let 
-            chamber = addRockPositions model.chamber (r |> toRockPositions) 
-            highestRock = findHighestRock chamber 
-            rocksFallen = model.rocksFallen + 1
-            paused = model.paused || model.rocksFallen == 2022
-          in 
-            { model | message = "v", rock = Stopped shape, chamber = chamber, move = Blow, highestRock = highestRock, rocksFallen = rocksFallen, paused = paused }
-        else 
-          { model | message = "v", rock = r, move = Blow }
+        case result of 
+          Ok rock -> 
+            { model | message = "v", rock = rock, move = Blow }
+          Err rock -> 
+            let 
+              chamber = addRockPositions model.chamber (rock |> toRockPositions) 
+              highestRock = findHighestRock chamber 
+              rocksFallen = model.rocksFallen + 1
+              paused = model.paused || model.rocksFallen == 2022
+            in 
+              { model | message = "v", rock = Stopped shape, chamber = chamber, move = Blow, highestRock = highestRock, rocksFallen = rocksFallen, paused = paused }
     Stopped _ -> 
       model
 
@@ -256,9 +340,27 @@ updateStep model =
 updateSideways : Char -> Model -> Model
 updateSideways move model = 
   let 
-    rock = moveRock model.chamber move model.rock
+    rock = 
+      case moveRock model.chamber move model.rock of 
+        Ok moved -> moved 
+        Err notMoved -> notMoved
   in 
     { model | rock = rock, message = move |> String.fromChar }
+
+updateRotate : Model -> Model
+updateRotate model = 
+  case model.rock of 
+    Moving (pos, shape) -> 
+      let 
+        result = tryRotate model.chamber model.rock 
+      in 
+        case result of 
+          Ok rock -> 
+            { model | message = "^", rock = rock }
+          Err rock -> 
+            model 
+    Stopped _ -> 
+      model
 
 updateKey : Char -> Model -> Model
 updateKey move model = 
@@ -268,6 +370,7 @@ updateKey move model =
         '>' -> updateSideways move model
         '<' -> updateSideways move model
         'v' -> updateFall model
+        '^' -> updateRotate model
         _ -> model
     Stopped shape -> 
       let 
@@ -362,12 +465,30 @@ toRockPositions : Rock -> List Pos
 toRockPositions rock = 
   case rock of 
     Stopped _ -> []
-    Moving (pos, shape) -> 
+    Moving (pos, (shape, rot)) -> 
       case shape of 
-        Dash -> [(0, 0), (1, 0), (2, 0), (3, 0)] |> List.map (movePoint pos)
-        Cross -> [(1, 0), (0, 1), (1, 1), (2, 1), (1, 2)] |> List.map (movePoint pos)
-        Angle -> [(0, 0), (1, 0), (2, 0), (2, 1), (2, 2)] |> List.map (movePoint pos)
-        Bar -> [(0, 0), (0, 1), (0, 2), (0, 3)] |> List.map (movePoint pos)
+        Dash -> 
+          if rot == 0 then 
+            [(0, 0), (1, 0), (2, 0), (3, 0)] |> List.map (movePoint pos)
+          else 
+            [(0, 0), (0, 1), (0, 2), (0, 3)] |> List.map (movePoint pos)
+        Cross -> 
+          [(1, 0), (0, 1), (1, 1), (2, 1), (1, 2)] |> List.map (movePoint pos)
+        Angle -> 
+          case rot of 
+            0 -> 
+              [(0, 0), (1, 0), (2, 0), (2, 1), (2, 2)] |> List.map (movePoint pos)
+            1 -> 
+              [(0, 2), (1, 2), (2, 0), (2, 1), (2, 2)] |> List.map (movePoint pos)
+            2 -> 
+              [(2, 2), (1, 2), (0, 0), (0, 1), (0, 2)] |> List.map (movePoint pos)
+            _ -> 
+              [(2, 0), (1, 0), (0, 0), (0, 1), (0, 2)] |> List.map (movePoint pos)
+        Bar -> 
+          if rot == 0 then 
+            [(0, 0), (0, 1), (0, 2), (0, 3)] |> List.map (movePoint pos)
+          else 
+            [(0, 0), (1, 0), (2, 0), (3, 0)] |> List.map (movePoint pos)
         Box -> [(0, 0), (1, 0), (0, 1), (1, 1)] |> List.map (movePoint pos)
 
 view : Model -> Document Msg

@@ -2733,7 +2733,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		x: func(record.x),
+		s: func(record.s),
 		V: record.V,
 		S: record.S
 	}
@@ -3003,7 +3003,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.x;
+		var message = !tag ? value : tag < 3 ? value.a : value.s;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.V;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -4873,7 +4873,7 @@ var $elm$core$Array$treeFromBuilder = F2(
 	});
 var $elm$core$Array$builderToArray = F2(
 	function (reverseNodeList, builder) {
-		if (!builder.b) {
+		if (!builder.c) {
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
 				$elm$core$Elm$JsArray$length(builder.e),
@@ -4881,11 +4881,11 @@ var $elm$core$Array$builderToArray = F2(
 				$elm$core$Elm$JsArray$empty,
 				builder.e);
 		} else {
-			var treeLen = builder.b * $elm$core$Array$branchFactor;
+			var treeLen = builder.c * $elm$core$Array$branchFactor;
 			var depth = $elm$core$Basics$floor(
 				A2($elm$core$Basics$logBase, $elm$core$Array$branchFactor, treeLen - 1));
 			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.f) : builder.f;
-			var tree = A2($elm$core$Array$treeFromBuilder, correctNodeList, builder.b);
+			var tree = A2($elm$core$Array$treeFromBuilder, correctNodeList, builder.c);
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
 				$elm$core$Elm$JsArray$length(builder.e) + treeLen,
@@ -4904,7 +4904,7 @@ var $elm$core$Array$initializeHelp = F5(
 				return A2(
 					$elm$core$Array$builderToArray,
 					false,
-					{f: nodeList, b: (len / $elm$core$Array$branchFactor) | 0, e: tail});
+					{f: nodeList, c: (len / $elm$core$Array$branchFactor) | 0, e: tail});
 			} else {
 				var leaf = $elm$core$Array$Leaf(
 					A3($elm$core$Elm$JsArray$initialize, $elm$core$Array$branchFactor, fromIndex, fn));
@@ -5270,7 +5270,7 @@ var $elm$core$Array$fromListHelp = F3(
 				return A2(
 					$elm$core$Array$builderToArray,
 					true,
-					{f: nodeList, b: nodeListSize, e: jsArray});
+					{f: nodeList, c: nodeListSize, e: jsArray});
 			} else {
 				var $temp$list = remainingItems,
 					$temp$nodeList = A2(
@@ -5325,21 +5325,21 @@ var $elm$core$String$toList = function (string) {
 var $author$project$Aoc17$initModel = function (dataSource) {
 	var rock = _Utils_Tuple2(
 		_Utils_Tuple2(2, 3),
-		0);
+		_Utils_Tuple2(0, 0));
 	var data = $author$project$Aoc17$read(dataSource);
 	var chamber = A3($tortus$elm_array_2d$Array2D$repeat, 2022 * 4, 7, '.');
 	return {
-		r: chamber,
+		o: chamber,
 		I: dataSource,
 		aa: false,
-		w: 0,
+		x: 0,
 		J: 0,
 		P: $elm$core$Array$fromList(
 			$elm$core$String$toList(data)),
-		x: '?',
+		s: '?',
 		D: 0,
-		s: true,
-		d: $author$project$Aoc17$Moving(rock),
+		t: true,
+		b: $author$project$Aoc17$Moving(rock),
 		E: 0,
 		A: $author$project$Aoc17$defaultTickInterval
 	};
@@ -5984,7 +5984,7 @@ var $elm$time$Time$every = F2(
 	});
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc17$subscriptions = function (model) {
-	var tickSub = model.s ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = model.t ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
 		model.A,
 		function (_v0) {
@@ -6041,18 +6041,19 @@ var $author$project$Aoc17$Angle = 2;
 var $author$project$Aoc17$Bar = 3;
 var $author$project$Aoc17$Box = 4;
 var $author$project$Aoc17$Cross = 1;
-var $author$project$Aoc17$nextShape = function (shape) {
+var $author$project$Aoc17$nextShape = function (_v0) {
+	var shape = _v0.a;
 	switch (shape) {
 		case 0:
-			return 1;
+			return _Utils_Tuple2(1, 0);
 		case 1:
-			return 2;
+			return _Utils_Tuple2(2, 0);
 		case 2:
-			return 3;
+			return _Utils_Tuple2(3, 0);
 		case 3:
-			return 4;
+			return _Utils_Tuple2(4, 0);
 		default:
-			return 0;
+			return _Utils_Tuple2(0, 0);
 	}
 };
 var $author$project$Aoc17$Stopped = function (a) {
@@ -6310,10 +6311,12 @@ var $author$project$Aoc17$toRockPositions = function (rock) {
 	} else {
 		var _v1 = rock.a;
 		var pos = _v1.a;
-		var shape = _v1.b;
+		var _v2 = _v1.b;
+		var shape = _v2.a;
+		var rot = _v2.b;
 		switch (shape) {
 			case 0:
-				return A2(
+				return (!rot) ? A2(
 					$elm$core$List$map,
 					$author$project$Aoc17$movePoint(pos),
 					_List_fromArray(
@@ -6322,6 +6325,15 @@ var $author$project$Aoc17$toRockPositions = function (rock) {
 							_Utils_Tuple2(1, 0),
 							_Utils_Tuple2(2, 0),
 							_Utils_Tuple2(3, 0)
+						])) : A2(
+					$elm$core$List$map,
+					$author$project$Aoc17$movePoint(pos),
+					_List_fromArray(
+						[
+							_Utils_Tuple2(0, 0),
+							_Utils_Tuple2(0, 1),
+							_Utils_Tuple2(0, 2),
+							_Utils_Tuple2(0, 3)
 						]));
 			case 1:
 				return A2(
@@ -6336,19 +6348,58 @@ var $author$project$Aoc17$toRockPositions = function (rock) {
 							_Utils_Tuple2(1, 2)
 						]));
 			case 2:
-				return A2(
-					$elm$core$List$map,
-					$author$project$Aoc17$movePoint(pos),
-					_List_fromArray(
-						[
-							_Utils_Tuple2(0, 0),
-							_Utils_Tuple2(1, 0),
-							_Utils_Tuple2(2, 0),
-							_Utils_Tuple2(2, 1),
-							_Utils_Tuple2(2, 2)
-						]));
+				switch (rot) {
+					case 0:
+						return A2(
+							$elm$core$List$map,
+							$author$project$Aoc17$movePoint(pos),
+							_List_fromArray(
+								[
+									_Utils_Tuple2(0, 0),
+									_Utils_Tuple2(1, 0),
+									_Utils_Tuple2(2, 0),
+									_Utils_Tuple2(2, 1),
+									_Utils_Tuple2(2, 2)
+								]));
+					case 1:
+						return A2(
+							$elm$core$List$map,
+							$author$project$Aoc17$movePoint(pos),
+							_List_fromArray(
+								[
+									_Utils_Tuple2(0, 2),
+									_Utils_Tuple2(1, 2),
+									_Utils_Tuple2(2, 0),
+									_Utils_Tuple2(2, 1),
+									_Utils_Tuple2(2, 2)
+								]));
+					case 2:
+						return A2(
+							$elm$core$List$map,
+							$author$project$Aoc17$movePoint(pos),
+							_List_fromArray(
+								[
+									_Utils_Tuple2(2, 2),
+									_Utils_Tuple2(1, 2),
+									_Utils_Tuple2(0, 0),
+									_Utils_Tuple2(0, 1),
+									_Utils_Tuple2(0, 2)
+								]));
+					default:
+						return A2(
+							$elm$core$List$map,
+							$author$project$Aoc17$movePoint(pos),
+							_List_fromArray(
+								[
+									_Utils_Tuple2(2, 0),
+									_Utils_Tuple2(1, 0),
+									_Utils_Tuple2(0, 0),
+									_Utils_Tuple2(0, 1),
+									_Utils_Tuple2(0, 2)
+								]));
+				}
 			case 3:
-				return A2(
+				return (!rot) ? A2(
 					$elm$core$List$map,
 					$author$project$Aoc17$movePoint(pos),
 					_List_fromArray(
@@ -6357,6 +6408,15 @@ var $author$project$Aoc17$toRockPositions = function (rock) {
 							_Utils_Tuple2(0, 1),
 							_Utils_Tuple2(0, 2),
 							_Utils_Tuple2(0, 3)
+						])) : A2(
+					$elm$core$List$map,
+					$author$project$Aoc17$movePoint(pos),
+					_List_fromArray(
+						[
+							_Utils_Tuple2(0, 0),
+							_Utils_Tuple2(1, 0),
+							_Utils_Tuple2(2, 0),
+							_Utils_Tuple2(3, 0)
 						]));
 			default:
 				return A2(
@@ -6412,7 +6472,7 @@ var $author$project$Aoc17$isForbidden = F2(
 var $author$project$Aoc17$tryMove = F3(
 	function (chamber, rock, moveFn) {
 		if (rock.$ === 1) {
-			return rock;
+			return $elm$core$Result$Err(rock);
 		} else {
 			var _v1 = rock.a;
 			var oldPos = _v1.a;
@@ -6429,12 +6489,13 @@ var $author$project$Aoc17$tryMove = F3(
 				return A2(
 					$elm$core$List$any,
 					$author$project$Aoc17$isForbidden(chamber),
-					rockPositions) ? rock : $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x, y),
-						shape));
+					rockPositions) ? $elm$core$Result$Err(rock) : $elm$core$Result$Ok(
+					$author$project$Aoc17$Moving(
+						_Utils_Tuple2(
+							_Utils_Tuple2(x, y),
+							shape)));
 			} else {
-				return rock;
+				return $elm$core$Result$Err(rock);
 			}
 		}
 	});
@@ -6451,35 +6512,225 @@ var $author$project$Aoc17$tryMoveDown = F2(
 			});
 	});
 var $author$project$Aoc17$updateFall = function (model) {
-	var _v0 = model.d;
+	var _v0 = model.b;
 	if (!_v0.$) {
 		var _v1 = _v0.a;
 		var pos = _v1.a;
 		var shape = _v1.b;
-		var r = A2($author$project$Aoc17$tryMoveDown, model.r, model.d);
-		if (_Utils_eq(r, model.d)) {
+		var result = A2($author$project$Aoc17$tryMoveDown, model.o, model.b);
+		if (!result.$) {
+			var rock = result.a;
+			return _Utils_update(
+				model,
+				{s: 'v', D: 0, b: rock});
+		} else {
+			var rock = result.a;
 			var rocksFallen = model.E + 1;
-			var paused = model.s || (model.E === 2022);
+			var paused = model.t || (model.E === 2022);
 			var chamber = A2(
 				$author$project$Aoc17$addRockPositions,
-				model.r,
-				$author$project$Aoc17$toRockPositions(r));
+				model.o,
+				$author$project$Aoc17$toRockPositions(rock));
 			var highestRock = $author$project$Aoc17$findHighestRock(chamber);
 			return _Utils_update(
 				model,
 				{
-					r: chamber,
-					w: highestRock,
-					x: 'v',
+					o: chamber,
+					x: highestRock,
+					s: 'v',
 					D: 0,
-					s: paused,
-					d: $author$project$Aoc17$Stopped(shape),
+					t: paused,
+					b: $author$project$Aoc17$Stopped(shape),
 					E: rocksFallen
 				});
+		}
+	} else {
+		return model;
+	}
+};
+var $author$project$Aoc17$tryRotate = F2(
+	function (chamber, rock) {
+		if (rock.$ === 1) {
+			return $elm$core$Result$Err(rock);
 		} else {
+			var _v1 = rock.a;
+			var pos = _v1.a;
+			var _v2 = _v1.b;
+			var shape = _v2.a;
+			var rot = _v2.b;
+			var _v3 = _Utils_Tuple2(shape, rot);
+			switch (_v3.a) {
+				case 0:
+					if (!_v3.b) {
+						var _v4 = _v3.a;
+						var newRock = $author$project$Aoc17$Moving(
+							_Utils_Tuple2(
+								pos,
+								_Utils_Tuple2(0, 1)));
+						var moveFn = function (_v6) {
+							var x = _v6.a;
+							var y = _v6.b;
+							return _Utils_Tuple2(x + 2, y - 1);
+						};
+						var _v5 = A3($author$project$Aoc17$tryMove, chamber, newRock, moveFn);
+						if (!_v5.$) {
+							var moved = _v5.a;
+							return $elm$core$Result$Ok(moved);
+						} else {
+							return $elm$core$Result$Err(rock);
+						}
+					} else {
+						var _v7 = _v3.a;
+						var newRock = $author$project$Aoc17$Moving(
+							_Utils_Tuple2(
+								pos,
+								_Utils_Tuple2(0, 0)));
+						var moveFn = function (_v9) {
+							var x = _v9.a;
+							var y = _v9.b;
+							return _Utils_Tuple2(x - 2, y + 1);
+						};
+						var _v8 = A3($author$project$Aoc17$tryMove, chamber, newRock, moveFn);
+						if (!_v8.$) {
+							var moved = _v8.a;
+							return $elm$core$Result$Ok(moved);
+						} else {
+							return $elm$core$Result$Err(rock);
+						}
+					}
+				case 3:
+					if (!_v3.b) {
+						var _v10 = _v3.a;
+						var newRock = $author$project$Aoc17$Moving(
+							_Utils_Tuple2(
+								pos,
+								_Utils_Tuple2(3, 1)));
+						var moveFn = function (_v12) {
+							var x = _v12.a;
+							var y = _v12.b;
+							return _Utils_Tuple2(x - 2, y + 1);
+						};
+						var _v11 = A3($author$project$Aoc17$tryMove, chamber, newRock, moveFn);
+						if (!_v11.$) {
+							var moved = _v11.a;
+							return $elm$core$Result$Ok(moved);
+						} else {
+							return $elm$core$Result$Err(rock);
+						}
+					} else {
+						var _v13 = _v3.a;
+						var newRock = $author$project$Aoc17$Moving(
+							_Utils_Tuple2(
+								pos,
+								_Utils_Tuple2(3, 0)));
+						var moveFn = function (_v15) {
+							var x = _v15.a;
+							var y = _v15.b;
+							return _Utils_Tuple2(x + 2, y - 1);
+						};
+						var _v14 = A3($author$project$Aoc17$tryMove, chamber, newRock, moveFn);
+						if (!_v14.$) {
+							var moved = _v14.a;
+							return $elm$core$Result$Ok(moved);
+						} else {
+							return $elm$core$Result$Err(rock);
+						}
+					}
+				case 2:
+					switch (_v3.b) {
+						case 0:
+							var _v16 = _v3.a;
+							var newRock = $author$project$Aoc17$Moving(
+								_Utils_Tuple2(
+									pos,
+									_Utils_Tuple2(2, 1)));
+							var moveFn = function (_v18) {
+								var x = _v18.a;
+								var y = _v18.b;
+								return _Utils_Tuple2(x, y);
+							};
+							var _v17 = A3($author$project$Aoc17$tryMove, chamber, newRock, moveFn);
+							if (!_v17.$) {
+								var moved = _v17.a;
+								return $elm$core$Result$Ok(moved);
+							} else {
+								return $elm$core$Result$Err(rock);
+							}
+						case 1:
+							var _v19 = _v3.a;
+							var newRock = $author$project$Aoc17$Moving(
+								_Utils_Tuple2(
+									pos,
+									_Utils_Tuple2(2, 2)));
+							var moveFn = function (_v21) {
+								var x = _v21.a;
+								var y = _v21.b;
+								return _Utils_Tuple2(x, y);
+							};
+							var _v20 = A3($author$project$Aoc17$tryMove, chamber, newRock, moveFn);
+							if (!_v20.$) {
+								var moved = _v20.a;
+								return $elm$core$Result$Ok(moved);
+							} else {
+								return $elm$core$Result$Err(rock);
+							}
+						case 2:
+							var _v22 = _v3.a;
+							var newRock = $author$project$Aoc17$Moving(
+								_Utils_Tuple2(
+									pos,
+									_Utils_Tuple2(2, 3)));
+							var moveFn = function (_v24) {
+								var x = _v24.a;
+								var y = _v24.b;
+								return _Utils_Tuple2(x, y);
+							};
+							var _v23 = A3($author$project$Aoc17$tryMove, chamber, newRock, moveFn);
+							if (!_v23.$) {
+								var moved = _v23.a;
+								return $elm$core$Result$Ok(moved);
+							} else {
+								return $elm$core$Result$Err(rock);
+							}
+						default:
+							var _v25 = _v3.a;
+							var newRock = $author$project$Aoc17$Moving(
+								_Utils_Tuple2(
+									pos,
+									_Utils_Tuple2(2, 0)));
+							var moveFn = function (_v27) {
+								var x = _v27.a;
+								var y = _v27.b;
+								return _Utils_Tuple2(x, y);
+							};
+							var _v26 = A3($author$project$Aoc17$tryMove, chamber, newRock, moveFn);
+							if (!_v26.$) {
+								var moved = _v26.a;
+								return $elm$core$Result$Ok(moved);
+							} else {
+								return $elm$core$Result$Err(rock);
+							}
+					}
+				default:
+					return $elm$core$Result$Err(rock);
+			}
+		}
+	});
+var $author$project$Aoc17$updateRotate = function (model) {
+	var _v0 = model.b;
+	if (!_v0.$) {
+		var _v1 = _v0.a;
+		var pos = _v1.a;
+		var shape = _v1.b;
+		var result = A2($author$project$Aoc17$tryRotate, model.o, model.b);
+		if (!result.$) {
+			var rock = result.a;
 			return _Utils_update(
 				model,
-				{x: 'v', D: 0, d: r});
+				{s: '^', b: rock});
+		} else {
+			var rock = result.a;
+			return model;
 		}
 	} else {
 		return model;
@@ -6522,23 +6773,34 @@ var $author$project$Aoc17$moveRock = F3(
 				return A2($author$project$Aoc17$tryMoveLeft, chamber, rock);
 			case 'v':
 				return A2($author$project$Aoc17$tryMoveDown, chamber, rock);
+			case '^':
+				return A2($author$project$Aoc17$tryRotate, chamber, rock);
 			default:
-				return rock;
+				return $elm$core$Result$Err(rock);
 		}
 	});
 var $author$project$Aoc17$updateSideways = F2(
 	function (move, model) {
-		var rock = A3($author$project$Aoc17$moveRock, model.r, move, model.d);
+		var rock = function () {
+			var _v0 = A3($author$project$Aoc17$moveRock, model.o, move, model.b);
+			if (!_v0.$) {
+				var moved = _v0.a;
+				return moved;
+			} else {
+				var notMoved = _v0.a;
+				return notMoved;
+			}
+		}();
 		return _Utils_update(
 			model,
 			{
-				x: $elm$core$String$fromChar(move),
-				d: rock
+				s: $elm$core$String$fromChar(move),
+				b: rock
 			});
 	});
 var $author$project$Aoc17$updateKey = F2(
 	function (move, model) {
-		var _v0 = model.d;
+		var _v0 = model.b;
 		if (!_v0.$) {
 			switch (move) {
 				case '>':
@@ -6547,16 +6809,18 @@ var $author$project$Aoc17$updateKey = F2(
 					return A2($author$project$Aoc17$updateSideways, move, model);
 				case 'v':
 					return $author$project$Aoc17$updateFall(model);
+				case '^':
+					return $author$project$Aoc17$updateRotate(model);
 				default:
 					return model;
 			}
 		} else {
 			var shape = _v0.a;
-			var y = model.w + 3;
+			var y = model.x + 3;
 			return _Utils_update(
 				model,
 				{
-					d: $author$project$Aoc17$Moving(
+					b: $author$project$Aoc17$Moving(
 						_Utils_Tuple2(
 							_Utils_Tuple2(2, y),
 							$author$project$Aoc17$nextShape(shape)))
@@ -6573,17 +6837,26 @@ var $author$project$Aoc17$moveRockJet = F3(
 			case '<':
 				return A2($author$project$Aoc17$tryMoveLeft, chamber, rock);
 			default:
-				return rock;
+				return $elm$core$Result$Err(rock);
 		}
 	});
 var $author$project$Aoc17$updateBlow = function (model) {
-	var _v0 = model.d;
+	var _v0 = model.b;
 	if (!_v0.$) {
 		var jetMove = A2(
 			$elm$core$Maybe$withDefault,
 			' ',
 			A2($elm$core$Array$get, model.J, model.P));
-		var r = A3($author$project$Aoc17$moveRockJet, model.r, jetMove, model.d);
+		var rock = function () {
+			var _v1 = A3($author$project$Aoc17$moveRockJet, model.o, jetMove, model.b);
+			if (!_v1.$) {
+				var moved = _v1.a;
+				return moved;
+			} else {
+				var notMoved = _v1.a;
+				return notMoved;
+			}
+		}();
 		var jetIndex = A2(
 			$elm$core$Basics$modBy,
 			$elm$core$Array$length(model.P),
@@ -6592,16 +6865,16 @@ var $author$project$Aoc17$updateBlow = function (model) {
 			model,
 			{
 				J: jetIndex,
-				x: $elm$core$String$fromChar(jetMove),
+				s: $elm$core$String$fromChar(jetMove),
 				D: 1,
-				d: r
+				b: rock
 			});
 	} else {
 		return model;
 	}
 };
 var $author$project$Aoc17$updateStep = function (model) {
-	var _v0 = model.d;
+	var _v0 = model.b;
 	if (!_v0.$) {
 		var _v1 = model.D;
 		if (!_v1) {
@@ -6611,11 +6884,11 @@ var $author$project$Aoc17$updateStep = function (model) {
 		}
 	} else {
 		var shape = _v0.a;
-		var y = model.w + 3;
+		var y = model.x + 3;
 		return _Utils_update(
 			model,
 			{
-				d: $author$project$Aoc17$Moving(
+				b: $author$project$Aoc17$Moving(
 					_Utils_Tuple2(
 						_Utils_Tuple2(2, y),
 						$author$project$Aoc17$nextShape(shape)))
@@ -6626,7 +6899,7 @@ var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc17$updateTogglePlay = function (model) {
 	return _Utils_update(
 		model,
-		{s: !model.s});
+		{t: !model.t});
 };
 var $author$project$Aoc17$update = F2(
 	function (msg, model) {
@@ -6872,10 +7145,10 @@ var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('
 var $author$project$Aoc17$viewBody = function (model) {
 	var textFontSize = '20px';
 	var rockPositions = $elm$core$Set$fromList(
-		$author$project$Aoc17$toRockPositions(model.d));
-	var rows = A3($author$project$Aoc17$toChamberRows, rockPositions, model.w, model.r);
+		$author$project$Aoc17$toRockPositions(model.b));
+	var rows = A3($author$project$Aoc17$toChamberRows, rockPositions, model.x, model.o);
 	var rockPosStr = function () {
-		var _v0 = model.d;
+		var _v0 = model.b;
 		if (!_v0.$) {
 			var _v1 = _v0.a;
 			var _v2 = _v1.a;
@@ -7123,7 +7396,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 									]),
 								_List_fromArray(
 									[
-										model.s ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
+										model.t ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -7189,14 +7462,14 @@ var $author$project$Aoc17$viewBody = function (model) {
 											$elm$core$String$padLeft,
 											4,
 											' ',
-											$elm$core$String$fromInt(model.w)))
+											$elm$core$String$fromInt(model.x)))
 									])),
 								A2(
 								$elm$html$Html$div,
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(model.x)
+										$elm$html$Html$text(model.s)
 									]))
 							]))
 					])),
