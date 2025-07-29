@@ -2733,7 +2733,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		C: func(record.C),
+		x: func(record.x),
 		V: record.V,
 		S: record.S
 	}
@@ -3003,7 +3003,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.C;
+		var message = !tag ? value : tag < 3 ? value.a : value.x;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.V;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -5336,12 +5336,12 @@ var $author$project$Aoc17$initModel = function (dataSource) {
 		J: 0,
 		P: $elm$core$Array$fromList(
 			$elm$core$String$toList(data)),
-		C: '?',
+		x: '?',
 		D: 0,
 		s: true,
 		d: $author$project$Aoc17$Moving(rock),
 		E: 0,
-		z: $author$project$Aoc17$defaultTickInterval
+		A: $author$project$Aoc17$defaultTickInterval
 	};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
@@ -5986,7 +5986,7 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc17$subscriptions = function (model) {
 	var tickSub = model.s ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.z,
+		model.A,
 		function (_v0) {
 			return $author$project$Aoc17$Tick;
 		});
@@ -6470,6 +6470,7 @@ var $author$project$Aoc17$updateFall = function (model) {
 				{
 					r: chamber,
 					w: highestRock,
+					x: 'v',
 					D: 0,
 					s: paused,
 					d: $author$project$Aoc17$Stopped(shape),
@@ -6478,7 +6479,7 @@ var $author$project$Aoc17$updateFall = function (model) {
 		} else {
 			return _Utils_update(
 				model,
-				{C: 'v', D: 0, d: r});
+				{x: 'v', D: 0, d: r});
 		}
 	} else {
 		return model;
@@ -6531,7 +6532,7 @@ var $author$project$Aoc17$updateSideways = F2(
 		return _Utils_update(
 			model,
 			{
-				C: $elm$core$String$fromChar(move),
+				x: $elm$core$String$fromChar(move),
 				d: rock
 			});
 	});
@@ -6591,7 +6592,7 @@ var $author$project$Aoc17$updateBlow = function (model) {
 			model,
 			{
 				J: jetIndex,
-				C: $elm$core$String$fromChar(jetMove),
+				x: $elm$core$String$fromChar(jetMove),
 				D: 1,
 				d: r
 			});
@@ -6646,13 +6647,13 @@ var $author$project$Aoc17$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{z: model.z / 2}),
+						{A: model.A / 2}),
 					$elm$core$Platform$Cmd$none);
 			case 4:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{z: model.z * 2}),
+						{A: model.A * 2}),
 					$elm$core$Platform$Cmd$none);
 			case 2:
 				return _Utils_Tuple2(
@@ -7172,18 +7173,6 @@ var $author$project$Aoc17$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										'Tower height: ' + A3(
-											$elm$core$String$padLeft,
-											4,
-											' ',
-											$elm$core$String$fromInt(model.w)))
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(
 										'Rocks fallen: ' + A3(
 											$elm$core$String$padLeft,
 											4,
@@ -7195,7 +7184,19 @@ var $author$project$Aoc17$viewBody = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(model.C)
+										$elm$html$Html$text(
+										'Tower height: ' + A3(
+											$elm$core$String$padLeft,
+											4,
+											' ',
+											$elm$core$String$fromInt(model.w)))
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(model.x)
 									]))
 							]))
 					])),

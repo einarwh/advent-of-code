@@ -234,7 +234,7 @@ updateFall model =
             rocksFallen = model.rocksFallen + 1
             paused = model.paused || model.rocksFallen == 2022
           in 
-            { model | rock = Stopped shape, chamber = chamber, move = Blow, highestRock = highestRock, rocksFallen = rocksFallen, paused = paused }
+            { model | message = "v", rock = Stopped shape, chamber = chamber, move = Blow, highestRock = highestRock, rocksFallen = rocksFallen, paused = paused }
         else 
           { model | message = "v", rock = r, move = Blow }
     Stopped _ -> 
@@ -475,9 +475,8 @@ viewBody model =
               , Html.Attributes.style "padding-top" "10px"
               , Html.Attributes.style "width" "200px" ] 
               [ 
-                Html.div [] [ Html.text ("Tower height: " ++ (String.fromInt model.highestRock |> String.padLeft 4 ' ')) ]
-              , Html.div [] [ Html.text ("Rocks fallen: " ++ (String.fromInt model.rocksFallen |> String.padLeft 4 ' ')) ]
-              -- , Html.div [] [ Html.text rockPosStr ]
+                Html.div [] [ Html.text ("Rocks fallen: " ++ (String.fromInt model.rocksFallen |> String.padLeft 4 ' ')) ]
+              , Html.div [] [ Html.text ("Tower height: " ++ (String.fromInt model.highestRock |> String.padLeft 4 ' ')) ]
               , Html.div [] [ Html.text model.message ]
               ] ]
       , Html.tr 
