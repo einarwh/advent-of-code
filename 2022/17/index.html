@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.U.J === region.Z.J)
+	if (region.U.K === region.Z.K)
 	{
-		return 'on line ' + region.U.J;
+		return 'on line ' + region.U.K;
 	}
-	return 'on lines ' + region.U.J + ' through ' + region.Z.J;
+	return 'on lines ' + region.U.K + ' through ' + region.Z.K;
 }
 
 
@@ -2733,7 +2733,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		K: func(record.K),
+		C: func(record.C),
 		V: record.V,
 		S: record.S
 	}
@@ -3003,7 +3003,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.K;
+		var message = !tag ? value : tag < 3 ? value.a : value.C;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.V;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -4876,22 +4876,22 @@ var $elm$core$Array$builderToArray = F2(
 		if (!builder.b) {
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
-				$elm$core$Elm$JsArray$length(builder.d),
+				$elm$core$Elm$JsArray$length(builder.e),
 				$elm$core$Array$shiftStep,
 				$elm$core$Elm$JsArray$empty,
-				builder.d);
+				builder.e);
 		} else {
 			var treeLen = builder.b * $elm$core$Array$branchFactor;
 			var depth = $elm$core$Basics$floor(
 				A2($elm$core$Basics$logBase, $elm$core$Array$branchFactor, treeLen - 1));
-			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.e) : builder.e;
+			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.f) : builder.f;
 			var tree = A2($elm$core$Array$treeFromBuilder, correctNodeList, builder.b);
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
-				$elm$core$Elm$JsArray$length(builder.d) + treeLen,
+				$elm$core$Elm$JsArray$length(builder.e) + treeLen,
 				A2($elm$core$Basics$max, 5, depth * $elm$core$Array$shiftStep),
 				tree,
-				builder.d);
+				builder.e);
 		}
 	});
 var $elm$core$Basics$idiv = _Basics_idiv;
@@ -4904,7 +4904,7 @@ var $elm$core$Array$initializeHelp = F5(
 				return A2(
 					$elm$core$Array$builderToArray,
 					false,
-					{e: nodeList, b: (len / $elm$core$Array$branchFactor) | 0, d: tail});
+					{f: nodeList, b: (len / $elm$core$Array$branchFactor) | 0, e: tail});
 			} else {
 				var leaf = $elm$core$Array$Leaf(
 					A3($elm$core$Elm$JsArray$initialize, $elm$core$Array$branchFactor, fromIndex, fn));
@@ -5270,7 +5270,7 @@ var $elm$core$Array$fromListHelp = F3(
 				return A2(
 					$elm$core$Array$builderToArray,
 					true,
-					{e: nodeList, b: nodeListSize, d: jsArray});
+					{f: nodeList, b: nodeListSize, e: jsArray});
 			} else {
 				var $temp$list = remainingItems,
 					$temp$nodeList = A2(
@@ -5330,18 +5330,18 @@ var $author$project$Aoc17$initModel = function (dataSource) {
 	var chamber = A3($tortus$elm_array_2d$Array2D$repeat, 2022 * 4, 7, '.');
 	return {
 		r: chamber,
-		H: dataSource,
+		I: dataSource,
 		aa: false,
-		B: 0,
-		I: 0,
+		w: 0,
+		J: 0,
 		P: $elm$core$Array$fromList(
 			$elm$core$String$toList(data)),
-		K: '?',
-		C: 0,
-		s: true,
-		f: $author$project$Aoc17$Moving(rock),
+		C: '?',
 		D: 0,
-		y: $author$project$Aoc17$defaultTickInterval
+		s: true,
+		d: $author$project$Aoc17$Moving(rock),
+		E: 0,
+		z: $author$project$Aoc17$defaultTickInterval
 	};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
@@ -5986,7 +5986,7 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc17$subscriptions = function (model) {
 	var tickSub = model.s ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.y,
+		model.z,
 		function (_v0) {
 			return $author$project$Aoc17$Tick;
 		});
@@ -6035,7 +6035,25 @@ var $ohanhi$keyboard$Keyboard$Arrows$arrowKey = function (rawKey) {
 	}
 };
 var $author$project$Aoc17$updateClear = function (model) {
-	return $author$project$Aoc17$initModel(model.H);
+	return $author$project$Aoc17$initModel(model.I);
+};
+var $author$project$Aoc17$Angle = 2;
+var $author$project$Aoc17$Bar = 3;
+var $author$project$Aoc17$Box = 4;
+var $author$project$Aoc17$Cross = 1;
+var $author$project$Aoc17$nextShape = function (shape) {
+	switch (shape) {
+		case 0:
+			return 1;
+		case 1:
+			return 2;
+		case 2:
+			return 3;
+		case 3:
+			return 4;
+		default:
+			return 0;
+	}
 };
 var $author$project$Aoc17$Stopped = function (a) {
 	return {$: 1, a: a};
@@ -6433,15 +6451,15 @@ var $author$project$Aoc17$tryMoveDown = F2(
 			});
 	});
 var $author$project$Aoc17$updateFall = function (model) {
-	var _v0 = model.f;
+	var _v0 = model.d;
 	if (!_v0.$) {
 		var _v1 = _v0.a;
 		var pos = _v1.a;
 		var shape = _v1.b;
-		var r = A2($author$project$Aoc17$tryMoveDown, model.r, model.f);
-		if (_Utils_eq(r, model.f)) {
-			var rocksFallen = model.D + 1;
-			var paused = model.s || (model.D === 2022);
+		var r = A2($author$project$Aoc17$tryMoveDown, model.r, model.d);
+		if (_Utils_eq(r, model.d)) {
+			var rocksFallen = model.E + 1;
+			var paused = model.s || (model.E === 2022);
 			var chamber = A2(
 				$author$project$Aoc17$addRockPositions,
 				model.r,
@@ -6451,20 +6469,24 @@ var $author$project$Aoc17$updateFall = function (model) {
 				model,
 				{
 					r: chamber,
-					B: highestRock,
-					C: 0,
+					w: highestRock,
+					D: 0,
 					s: paused,
-					f: $author$project$Aoc17$Stopped(shape),
-					D: rocksFallen
+					d: $author$project$Aoc17$Stopped(shape),
+					E: rocksFallen
 				});
 		} else {
 			return _Utils_update(
 				model,
-				{K: 'v', C: 0, f: r});
+				{C: 'v', D: 0, d: r});
 		}
 	} else {
 		return model;
 	}
+};
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
 };
 var $author$project$Aoc17$tryMoveLeft = F2(
 	function (chamber, rock) {
@@ -6505,47 +6527,42 @@ var $author$project$Aoc17$moveRock = F3(
 	});
 var $author$project$Aoc17$updateSideways = F2(
 	function (move, model) {
-		var rock = A3($author$project$Aoc17$moveRock, model.r, move, model.f);
+		var rock = A3($author$project$Aoc17$moveRock, model.r, move, model.d);
 		return _Utils_update(
 			model,
-			{f: rock});
+			{
+				C: $elm$core$String$fromChar(move),
+				d: rock
+			});
 	});
 var $author$project$Aoc17$updateKey = F2(
 	function (move, model) {
-		switch (move) {
-			case '>':
-				return A2($author$project$Aoc17$updateSideways, move, model);
-			case '<':
-				return A2($author$project$Aoc17$updateSideways, move, model);
-			case 'v':
-				return $author$project$Aoc17$updateFall(model);
-			default:
-				return model;
+		var _v0 = model.d;
+		if (!_v0.$) {
+			switch (move) {
+				case '>':
+					return A2($author$project$Aoc17$updateSideways, move, model);
+				case '<':
+					return A2($author$project$Aoc17$updateSideways, move, model);
+				case 'v':
+					return $author$project$Aoc17$updateFall(model);
+				default:
+					return model;
+			}
+		} else {
+			var shape = _v0.a;
+			var y = model.w + 3;
+			return _Utils_update(
+				model,
+				{
+					d: $author$project$Aoc17$Moving(
+						_Utils_Tuple2(
+							_Utils_Tuple2(2, y),
+							$author$project$Aoc17$nextShape(shape)))
+				});
 		}
 	});
-var $author$project$Aoc17$Angle = 2;
-var $author$project$Aoc17$Bar = 3;
-var $author$project$Aoc17$Box = 4;
-var $author$project$Aoc17$Cross = 1;
-var $author$project$Aoc17$nextShape = function (shape) {
-	switch (shape) {
-		case 0:
-			return 1;
-		case 1:
-			return 2;
-		case 2:
-			return 3;
-		case 3:
-			return 4;
-		default:
-			return 0;
-	}
-};
 var $author$project$Aoc17$Fall = 1;
-var $elm$core$String$cons = _String_cons;
-var $elm$core$String$fromChar = function (_char) {
-	return A2($elm$core$String$cons, _char, '');
-};
 var $elm$core$Basics$modBy = _Basics_modBy;
 var $author$project$Aoc17$moveRockJet = F3(
 	function (chamber, move, rock) {
@@ -6559,33 +6576,33 @@ var $author$project$Aoc17$moveRockJet = F3(
 		}
 	});
 var $author$project$Aoc17$updateBlow = function (model) {
-	var _v0 = model.f;
+	var _v0 = model.d;
 	if (!_v0.$) {
 		var jetMove = A2(
 			$elm$core$Maybe$withDefault,
 			' ',
-			A2($elm$core$Array$get, model.I, model.P));
-		var r = A3($author$project$Aoc17$moveRockJet, model.r, jetMove, model.f);
+			A2($elm$core$Array$get, model.J, model.P));
+		var r = A3($author$project$Aoc17$moveRockJet, model.r, jetMove, model.d);
 		var jetIndex = A2(
 			$elm$core$Basics$modBy,
 			$elm$core$Array$length(model.P),
-			model.I + 1);
+			model.J + 1);
 		return _Utils_update(
 			model,
 			{
-				I: jetIndex,
-				K: $elm$core$String$fromChar(jetMove),
-				C: 1,
-				f: r
+				J: jetIndex,
+				C: $elm$core$String$fromChar(jetMove),
+				D: 1,
+				d: r
 			});
 	} else {
 		return model;
 	}
 };
 var $author$project$Aoc17$updateStep = function (model) {
-	var _v0 = model.f;
+	var _v0 = model.d;
 	if (!_v0.$) {
-		var _v1 = model.C;
+		var _v1 = model.D;
 		if (!_v1) {
 			return $author$project$Aoc17$updateBlow(model);
 		} else {
@@ -6593,11 +6610,11 @@ var $author$project$Aoc17$updateStep = function (model) {
 		}
 	} else {
 		var shape = _v0.a;
-		var y = model.B + 3;
+		var y = model.w + 3;
 		return _Utils_update(
 			model,
 			{
-				f: $author$project$Aoc17$Moving(
+				d: $author$project$Aoc17$Moving(
 					_Utils_Tuple2(
 						_Utils_Tuple2(2, y),
 						$author$project$Aoc17$nextShape(shape)))
@@ -6629,13 +6646,13 @@ var $author$project$Aoc17$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{y: model.y / 2}),
+						{z: model.z / 2}),
 					$elm$core$Platform$Cmd$none);
 			case 4:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{y: model.y * 2}),
+						{z: model.z * 2}),
 					$elm$core$Platform$Cmd$none);
 			case 2:
 				return _Utils_Tuple2(
@@ -6770,6 +6787,28 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
+var $elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
+var $elm$core$String$repeatHelp = F3(
+	function (n, chunk, result) {
+		return (n <= 0) ? result : A3(
+			$elm$core$String$repeatHelp,
+			n >> 1,
+			_Utils_ap(chunk, chunk),
+			(!(n & 1)) ? result : _Utils_ap(result, chunk));
+	});
+var $elm$core$String$repeat = F2(
+	function (n, chunk) {
+		return A3($elm$core$String$repeatHelp, n, chunk, '');
+	});
+var $elm$core$String$padLeft = F3(
+	function (n, _char, string) {
+		return _Utils_ap(
+			A2(
+				$elm$core$String$repeat,
+				n - $elm$core$String$length(string),
+				$elm$core$String$fromChar(_char)),
+			string);
+	});
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$html$Html$table = _VirtualDom_node('table');
@@ -6832,10 +6871,10 @@ var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('
 var $author$project$Aoc17$viewBody = function (model) {
 	var textFontSize = '20px';
 	var rockPositions = $elm$core$Set$fromList(
-		$author$project$Aoc17$toRockPositions(model.f));
-	var rows = A3($author$project$Aoc17$toChamberRows, rockPositions, model.B, model.r);
+		$author$project$Aoc17$toRockPositions(model.d));
+	var rows = A3($author$project$Aoc17$toChamberRows, rockPositions, model.w, model.r);
 	var rockPosStr = function () {
-		var _v0 = model.f;
+		var _v0 = model.d;
 		if (!_v0.$) {
 			var _v1 = _v0.a;
 			var _v2 = _v1.a;
@@ -6983,11 +7022,11 @@ var $author$project$Aoc17$viewBody = function (model) {
 								$elm$html$Html$a,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$href('https://adventofcode.com/2024/day/15')
+										$elm$html$Html$Attributes$href('https://adventofcode.com/2022/day/17')
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('https://adventofcode.com/2024/day/15')
+										$elm$html$Html$text('https://adventofcode.com/2022/day/17')
 									]))
 							]))
 					])),
@@ -7010,7 +7049,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick($author$project$Aoc17$UseInput),
-										$elm$html$Html$Attributes$checked(!model.H)
+										$elm$html$Html$Attributes$checked(!model.I)
 									]),
 								_List_Nil),
 								A2(
@@ -7026,7 +7065,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick($author$project$Aoc17$UseSample),
-										$elm$html$Html$Attributes$checked(model.H === 1)
+										$elm$html$Html$Attributes$checked(model.I === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -7133,7 +7172,11 @@ var $author$project$Aoc17$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										'Tower height: ' + $elm$core$String$fromInt(model.B))
+										'Tower height: ' + A3(
+											$elm$core$String$padLeft,
+											4,
+											' ',
+											$elm$core$String$fromInt(model.w)))
 									])),
 								A2(
 								$elm$html$Html$div,
@@ -7141,14 +7184,18 @@ var $author$project$Aoc17$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										'Rocks fallen: ' + $elm$core$String$fromInt(model.D))
+										'Rocks fallen: ' + A3(
+											$elm$core$String$padLeft,
+											4,
+											' ',
+											$elm$core$String$fromInt(model.E)))
 									])),
 								A2(
 								$elm$html$Html$div,
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(model.K)
+										$elm$html$Html$text(model.C)
 									]))
 							]))
 					])),

@@ -258,15 +258,22 @@ updateSideways move model =
   let 
     rock = moveRock model.chamber move model.rock
   in 
-    { model | rock = rock }
+    { model | rock = rock, message = move |> String.fromChar }
 
 updateKey : Char -> Model -> Model
 updateKey move model = 
-  case move of 
-    '>' -> updateSideways move model
-    '<' -> updateSideways move model
-    'v' -> updateFall model
-    _ -> model
+  case model.rock of 
+    Moving _ ->
+      case move of 
+        '>' -> updateSideways move model
+        '<' -> updateSideways move model
+        'v' -> updateFall model
+        _ -> model
+    Stopped shape -> 
+      let 
+        y = model.highestRock + 3
+      in 
+        { model | rock = Moving ((2, y), nextShape shape)}
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -420,8 +427,8 @@ viewBody model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding-bottom" "10px" ]
               [ Html.a 
-                [ Html.Attributes.href "https://adventofcode.com/2024/day/15" ] 
-                [ text "https://adventofcode.com/2024/day/15" ]
+                [ Html.Attributes.href "https://adventofcode.com/2022/day/17" ] 
+                [ text "https://adventofcode.com/2022/day/17" ]
             ] ]
       , Html.tr 
           []
@@ -468,8 +475,8 @@ viewBody model =
               , Html.Attributes.style "padding-top" "10px"
               , Html.Attributes.style "width" "200px" ] 
               [ 
-                Html.div [] [ Html.text ("Tower height: " ++ String.fromInt model.highestRock) ]
-              , Html.div [] [ Html.text ("Rocks fallen: " ++ String.fromInt model.rocksFallen) ]
+                Html.div [] [ Html.text ("Tower height: " ++ (String.fromInt model.highestRock |> String.padLeft 4 ' ')) ]
+              , Html.div [] [ Html.text ("Rocks fallen: " ++ (String.fromInt model.rocksFallen |> String.padLeft 4 ' ')) ]
               -- , Html.div [] [ Html.text rockPosStr ]
               , Html.div [] [ Html.text model.message ]
               ] ]
