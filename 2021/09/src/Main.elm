@@ -234,10 +234,13 @@ toSvg model =
 
     rects = borderRects ++ basinRects ++ basinTexts
   in 
+    -- // [ svg [ viewBox viewBoxStr, width dimStr, height dimStr, Svg.Attributes.style "background-color:lightblue" ] elements 
+
     svg
       [ viewBox "0 0 600 600"
       , width "600"
       , height "600"
+      , Svg.Attributes.style "background-color:white"
       ]
       rects
 
@@ -277,7 +280,6 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "padding-bottom" "20px" ] 
               [ Html.div [] [ Html.text riskLevelSumStr ]
               , Html.div [] [ Html.text basinStr ]
@@ -286,7 +288,6 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "padding" "0px"] 
               [ Html.div [ Html.Attributes.align "center" ] [ s ] 
               ] ] ]

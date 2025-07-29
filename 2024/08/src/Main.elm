@@ -363,7 +363,6 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "24px"
               , Html.Attributes.style "padding-top" "10px"
@@ -375,7 +374,6 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Source Code Pro, monospace"
               , Html.Attributes.style "font-size" textFontSize
               , Html.Attributes.style "padding" "10px"

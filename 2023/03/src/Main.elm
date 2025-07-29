@@ -409,8 +409,8 @@ toSvg model =
     svg
       [ viewBox ("0 0 " ++ svgWidth ++ " " ++ svgHeight)
       , width svgWidth
-      , height svgHeight ]
-      -- , Svg.Attributes.style "background-color:purple" ]
+      , height svgHeight 
+      , Svg.Attributes.style "background-color:white" ]
       lst
 
 view : Model -> Html Msg
@@ -443,10 +443,9 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "20px"
-              , Html.Attributes.style "padding" "0px"] 
+              , Html.Attributes.style "padding" "10px"] 
               [ Html.div [] [ Html.text (String.fromInt model.partSum) ]
               , Html.div [] [ Html.text (String.fromInt model.gearRatio) ]
               ] ] 
@@ -454,9 +453,7 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "20px"
-              , Html.Attributes.style "padding" "10px"] 
+              , Html.Attributes.style "font-size" "20px" ] 
               [ Html.div [ Html.Attributes.align "center" ] [ s ] 
               ] ] ]

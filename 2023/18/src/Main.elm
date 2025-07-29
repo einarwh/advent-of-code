@@ -1074,8 +1074,9 @@ toSvg model =
       , width svgWidth
       , height svgHeight
       , Svg.Events.onClick Click
-      , onMove (.offsetPos >> MouseMove)
-      , Svg.Attributes.style "background-color:white" ]
+      , onMove (.offsetPos >> MouseMove) 
+      -- , Svg.Attributes.style "background-color:white" 
+      ]
       elements
 
 view : Model -> Html Msg
@@ -1108,12 +1109,17 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "24px"
+              , Html.Attributes.style "padding" "10px"] 
+              [ Html.div [] [ Html.text <| if model.basin.cubicMeters > 0 then (String.fromInt model.basin.cubicMeters) ++ " m³" else "Click to start!" ]
+              ] ] 
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "36px"
               , Html.Attributes.style "padding" "24px"] 
               [ Html.div [ Html.Attributes.align "center" ] [ s ] 
-              , Html.div [] [ Html.text <| if model.basin.cubicMeters > 0 then (String.fromInt model.basin.cubicMeters) ++ " m³" else "Click to start!" ]
-              , Html.div [] [ Html.text <| "" ]
-              , Html.div [] [ Html.text <| "" ]
               ] ] ]

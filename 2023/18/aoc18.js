@@ -6775,7 +6775,6 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions = F3(
 				$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$eventDecoder));
 	});
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousemove', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
-var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
@@ -6855,8 +6854,7 @@ var $author$project$Main$toSvg = function (model) {
 					function ($) {
 						return $.bc;
 					},
-					$author$project$Main$MouseMove)),
-				$elm$svg$Svg$Attributes$style('background-color:white')
+					$author$project$Main$MouseMove))
 			]),
 		elements);
 };
@@ -6940,7 +6938,32 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '24px'),
+								A2($elm$html$Html$Attributes$style, 'padding', '10px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(
+										(model.g.C > 0) ? ($elm$core$String$fromInt(model.g.C) + ' m³') : 'Click to start!')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
 								A2($elm$html$Html$Attributes$style, 'font-size', '36px'),
 								A2($elm$html$Html$Attributes$style, 'padding', '24px')
@@ -6954,29 +6977,7 @@ var $author$project$Main$view = function (model) {
 										$elm$html$Html$Attributes$align('center')
 									]),
 								_List_fromArray(
-									[s])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(
-										(model.g.C > 0) ? ($elm$core$String$fromInt(model.g.C) + ' m³') : 'Click to start!')
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('')
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('')
-									]))
+									[s]))
 							]))
 					]))
 			]));

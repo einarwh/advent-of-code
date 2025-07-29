@@ -6599,6 +6599,7 @@ var $author$project$Main$createBasinText = function (basin) {
 			]));
 };
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
@@ -6658,7 +6659,8 @@ var $author$project$Main$toSvg = function (model) {
 			[
 				$elm$svg$Svg$Attributes$viewBox('0 0 600 600'),
 				$elm$svg$Svg$Attributes$width('600'),
-				$elm$svg$Svg$Attributes$height('600')
+				$elm$svg$Svg$Attributes$height('600'),
+				$elm$svg$Svg$Attributes$style('background-color:white')
 			]),
 		rects);
 };
@@ -6760,7 +6762,6 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'padding-bottom', '20px')
 							]),
 						_List_fromArray(
@@ -6791,7 +6792,6 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'padding', '0px')
 							]),
 						_List_fromArray(

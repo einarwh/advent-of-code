@@ -826,8 +826,8 @@ toSvg stacks =
     svg
       [ viewBox "0 0 210 500"
       , width "210"
-      , height "500" ]
---      , Svg.Attributes.style "background-color:lightblue" ]
+      , height "500" 
+      , Svg.Attributes.style "background-color:white" ]
       lst
 
 view : Model -> Html Msg
@@ -860,19 +860,6 @@ view model =
       , Html.tr 
           []
           [ Html.td 
-              [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
-              , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "20px"
-              , Html.Attributes.style "padding" "20px"] 
-              [ Html.div [ Html.Attributes.align "center" ] [ s ] 
-              , Html.div [] [ Html.text commandsStr ]
-              , Html.div [] [ Html.text model.lastCommandText ]
-              -- , Html.div [] [ Html.text model.debug ]
-              ] ] 
-      , Html.tr 
-          []
-          [ Html.td 
               [ Html.Attributes.align "center" ]
               [ Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Step ] 
@@ -889,4 +876,24 @@ view model =
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick ToggleMachine ] 
                 [ if model.keepOrder then text "CM9000" else text "CM9100" ] 
-            ] ] ]
+            ] ] 
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "20px"
+              , Html.Attributes.style "padding-bottom" "10px"] 
+              [ Html.div [] [ Html.text commandsStr ]
+              , Html.div [] [ Html.text model.lastCommandText ]
+              -- , Html.div [] [ Html.text model.debug ]
+              ] ] 
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "20px"
+              , Html.Attributes.style "padding" "20px"] 
+              [ Html.div [ Html.Attributes.align "center" ] [ s ] 
+              ] ] ]

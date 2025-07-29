@@ -6388,6 +6388,7 @@ var $author$project$Main$lineToCharTexts = F2(
 			$author$project$Main$toCharText(y),
 			$elm$core$String$toList(line));
 	});
+var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var $elm$svg$Svg$Attributes$opacity = _VirtualDom_attribute('opacity');
@@ -6655,7 +6656,8 @@ var $author$project$Main$toSvg = function (model) {
 			[
 				$elm$svg$Svg$Attributes$viewBox('0 0 ' + (svgWidth + svgHeight)),
 				$elm$svg$Svg$Attributes$width(svgWidth),
-				$elm$svg$Svg$Attributes$height(svgHeight)
+				$elm$svg$Svg$Attributes$height(svgHeight),
+				$elm$svg$Svg$Attributes$style('background-color:white')
 			]),
 		elements);
 };
@@ -6739,7 +6741,6 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
 								A2($elm$html$Html$Attributes$style, 'font-size', '24px'),
 								A2($elm$html$Html$Attributes$style, 'padding-top', '10px')
@@ -6774,7 +6775,6 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
 								A2($elm$html$Html$Attributes$style, 'font-size', '24px'),
 								A2($elm$html$Html$Attributes$style, 'padding', '16px')

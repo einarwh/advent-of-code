@@ -7050,6 +7050,7 @@ var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $author$project$Main$toSvg = function (model) {
 	var step = model.o;
 	var fontFamilyAttr = 'font-family:Source Code Pro,monospace';
+	var bgColorAttr = 'background-color:white';
 	var _v0 = function () {
 		var _v1 = model.m;
 		if (!_v1) {
@@ -7065,13 +7066,13 @@ var $author$project$Main$toSvg = function (model) {
 	var fontSize = _v0.a;
 	var plantSize = _v0.b;
 	var fontSizeAttr = 'font-size:' + fontSize;
-	var styles = fontFamilyAttr + ('; ' + fontSizeAttr);
+	var styles = fontFamilyAttr + ('; ' + (fontSizeAttr + ('; ' + bgColorAttr)));
 	var elements = A2(
 		$elm$core$List$concatMap,
 		A2($author$project$Main$toPlotSvgElements, step, plantSize),
 		model.K);
-	var svgHeight = $elm$core$String$fromFloat(4 + (plantSize.y * model.af));
-	var svgWidth = $elm$core$String$fromFloat(4 + (plantSize.C * model.X));
+	var svgHeight = $elm$core$String$fromFloat(3 + (plantSize.y * model.af));
+	var svgWidth = $elm$core$String$fromFloat(3 + (plantSize.C * model.X));
 	var viewBoxStr = A2(
 		$elm$core$String$join,
 		' ',
@@ -7101,7 +7102,6 @@ var $author$project$Main$view = function (model) {
 		},
 		model.K);
 	var numberOfFinishedPlots = $elm$core$List$length(finishedPlotInfoList);
-	var elements = _List_Nil;
 	var currentCostDiscount = $elm$core$List$sum(
 		A2(
 			$elm$core$List$map,
@@ -7385,7 +7385,6 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
 								A2($elm$html$Html$Attributes$style, 'font-size', '16px'),
 								A2($elm$html$Html$Attributes$style, 'padding-top', '10px'),
@@ -7445,8 +7444,7 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
-								A2($elm$html$Html$Attributes$style, 'padding', '20px')
+								A2($elm$html$Html$Attributes$style, 'padding', '0px')
 							]),
 						_List_fromArray(
 							[
@@ -7470,7 +7468,6 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Source Code Pro, monospace'),
 								A2($elm$html$Html$Attributes$style, 'font-size', textFontSize),
 								A2($elm$html$Html$Attributes$style, 'padding', '10px'),
@@ -7478,7 +7475,7 @@ var $author$project$Main$view = function (model) {
 							]),
 						_List_fromArray(
 							[
-								A2($elm$html$Html$div, _List_Nil, elements)
+								A2($elm$html$Html$div, _List_Nil, _List_Nil)
 							]))
 					]))
 			]));

@@ -7067,7 +7067,7 @@ var $author$project$Main$toCharElement = F2(
 					$elm$html$Html$span,
 					_List_fromArray(
 						[
-							A2($elm$html$Html$Attributes$style, 'background-color', '#CCCCCC')
+							A2($elm$html$Html$Attributes$style, 'background-color', '#AAAAAA')
 						]),
 					_List_fromArray(
 						[
@@ -7385,7 +7385,6 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
 								A2($elm$html$Html$Attributes$style, 'font-size', '24px'),
 								A2($elm$html$Html$Attributes$style, 'width', '200px')
@@ -7418,7 +7417,6 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Source Code Pro, monospace'),
 								A2($elm$html$Html$Attributes$style, 'font-size', textFontSize),
 								A2($elm$html$Html$Attributes$style, 'padding', '10px'),

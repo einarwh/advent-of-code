@@ -726,14 +726,17 @@ toSvg model =
       case model.dataSource of 
         Input -> ("9px", { width = 6, height = 10, xOffset = 0.3, yOffset = -2.0, lineWidth = 0.5 })
         _ -> ("16px", { width = 12, height = 16, xOffset = 0.9, yOffset = -2.0, lineWidth = 1.0 })
-    svgWidth = (toFloat 4 + plantSize.width * toFloat model.colCount) |> String.fromFloat 
-    svgHeight = (toFloat 4 + plantSize.height * toFloat model.rowCount) |> String.fromFloat 
+    svgWidth = (toFloat 3 + plantSize.width * toFloat model.colCount) |> String.fromFloat 
+    svgHeight = (toFloat 3 + plantSize.height * toFloat model.rowCount) |> String.fromFloat 
     step = model.step 
     elements = model.plotInfoList |> List.concatMap (toPlotSvgElements step plantSize)
     viewBoxStr = [ "-1", "-1", svgWidth, svgHeight ] |> String.join " "
+    -- viewBoxStr = [ "-1", "-1", svgWidth, svgHeight ] |> String.join " "
     fontFamilyAttr = "font-family:Source Code Pro,monospace"
     fontSizeAttr = "font-size:" ++ fontSize
-    styles = fontFamilyAttr ++ "; " ++ fontSizeAttr 
+    bgColorAttr = "background-color:white"
+    styles = fontFamilyAttr ++ "; " ++ fontSizeAttr  ++ "; " ++ bgColorAttr
+    -- styles = fontFamilyAttr ++ "; " ++ fontSizeAttr  
   in 
     svg
       [ viewBox viewBoxStr
@@ -759,7 +762,7 @@ toLineText line =
 view : Model -> Html Msg
 view model =
   let
-    elements = []
+    -- elements = []
     textFontSize = "9px"
     s = toSvg model 
     numberOfPlots = model.plotInfoList |> List.length
@@ -854,7 +857,6 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "16px"
               , Html.Attributes.style "padding-top" "10px"
@@ -870,19 +872,17 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
-              , Html.Attributes.style "padding" "20px"] 
+              , Html.Attributes.style "padding" "0px"] 
               [ Html.div [ Html.Attributes.align "center" ] [ s ] 
               ] ] 
       , Html.tr 
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Source Code Pro, monospace"
               , Html.Attributes.style "font-size" textFontSize
               , Html.Attributes.style "padding" "10px"
               , Html.Attributes.style "width" "200px" ] 
               [ 
-                Html.div [] elements
+                Html.div [] []
               ] ] ]

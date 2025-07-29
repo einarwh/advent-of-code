@@ -2355,18 +2355,6 @@ view model =
       , Html.tr 
           []
           [ Html.td 
-              [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
-              , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "20px"
-              , Html.Attributes.style "padding" "20px"] 
-              [ Html.div [ Html.Attributes.align "center" ] [ s ] 
-              , Html.div [] [ Html.text movesStr ]
-              , Html.div [] [ Html.text visitedStr ]
-              ] ] 
-      , Html.tr 
-          []
-          [ Html.td 
               [ Html.Attributes.align "center" ]
               [ Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Step ] 
@@ -2393,4 +2381,24 @@ view model =
               , text ("  " ++ ropeLengthStr ++ "  ")
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Longer ] 
-                [ text "Longer" ] ] ] ] 
+                [ text "Longer" ] ] ] 
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "20px"
+              , Html.Attributes.style "padding" "20px"] 
+              [ Html.div [] [ Html.text movesStr ]
+              , Html.div [] [ Html.text visitedStr ]
+              ] ] 
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "20px"
+              , Html.Attributes.style "padding" "20px"] 
+              [ Html.div [ Html.Attributes.align "center" ] [ s ] 
+              ] ] ]
+        

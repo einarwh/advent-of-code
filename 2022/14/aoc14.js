@@ -6148,6 +6148,7 @@ var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
@@ -6252,7 +6253,8 @@ var $author$project$Main$toSvg = function (model) {
 			[
 				$elm$svg$Svg$Attributes$viewBox('300 0 400 170'),
 				$elm$svg$Svg$Attributes$width('800'),
-				$elm$svg$Svg$Attributes$height('340')
+				$elm$svg$Svg$Attributes$height('340'),
+				$elm$svg$Svg$Attributes$style('background-color:white')
 			]),
 		_Utils_ap(
 			floorElements,
@@ -6285,7 +6287,6 @@ var $author$project$Main$view = function (model) {
 							[
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'font-size', '32px'),
 								A2($elm$html$Html$Attributes$style, 'padding', '10px')
 							]),
@@ -6424,7 +6425,6 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
 								A2($elm$html$Html$Attributes$style, 'font-size', '20px'),
 								A2($elm$html$Html$Attributes$style, 'padding', '10px')
@@ -6450,7 +6450,6 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
 								A2($elm$html$Html$Attributes$style, 'font-size', '20px'),
 								A2($elm$html$Html$Attributes$style, 'padding', '20px')

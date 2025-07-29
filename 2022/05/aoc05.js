@@ -6394,6 +6394,7 @@ var $elm$core$List$concatMap = F2(
 			A2($elm$core$List$map, f, list));
 	});
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $author$project$Main$crateSize = 10;
@@ -6511,7 +6512,8 @@ var $author$project$Main$toSvg = function (stacks) {
 			[
 				$elm$svg$Svg$Attributes$viewBox('0 0 210 500'),
 				$elm$svg$Svg$Attributes$width('210'),
-				$elm$svg$Svg$Attributes$height('500')
+				$elm$svg$Svg$Attributes$height('500'),
+				$elm$svg$Svg$Attributes$style('background-color:white')
 			]),
 		lst);
 };
@@ -6523,7 +6525,7 @@ var $author$project$Main$view = function (model) {
 		$elm$html$Html$table,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'width', '1080px'),
+				A2($elm$html$Html$Attributes$style, 'width', '900px'),
 				A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New')
 			]),
 		_List_fromArray(
@@ -6595,47 +6597,6 @@ var $author$project$Main$view = function (model) {
 						$elm$html$Html$td,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
-								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '20px'),
-								A2($elm$html$Html$Attributes$style, 'padding', '20px')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$align('center')
-									]),
-								_List_fromArray(
-									[s])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(commandsStr)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(model.N)
-									]))
-							]))
-					])),
-				A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$td,
-						_List_fromArray(
-							[
 								$elm$html$Html$Attributes$align('center')
 							]),
 						_List_fromArray(
@@ -6695,6 +6656,64 @@ var $author$project$Main$view = function (model) {
 									[
 										model.x ? $elm$svg$Svg$text('CM9000') : $elm$svg$Svg$text('CM9100')
 									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '20px'),
+								A2($elm$html$Html$Attributes$style, 'padding-bottom', '10px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(commandsStr)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(model.N)
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '20px'),
+								A2($elm$html$Html$Attributes$style, 'padding', '20px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$align('center')
+									]),
+								_List_fromArray(
+									[s]))
 							]))
 					]))
 			]));

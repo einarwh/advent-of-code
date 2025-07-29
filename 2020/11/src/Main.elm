@@ -542,6 +542,5 @@ view model =
           []
           [ Html.td
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white"
               , Html.Attributes.style "padding" "0px"]
               [ svg [ width svgWidth, height svgHeight ] elements ] ] ]

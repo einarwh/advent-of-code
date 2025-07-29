@@ -5630,82 +5630,6 @@ var $author$project$Main$view = function (model) {
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2024/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2024')
-									])),
-								$elm$html$Html$text('] '),
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2023/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2023')
-									])),
-								$elm$html$Html$text('] '),
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2022/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2022')
-									])),
-								$elm$html$Html$text('] '),
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2021/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2021')
-									])),
-								$elm$html$Html$text('] '),
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2020/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2020')
-									])),
-								$elm$html$Html$text('] ')
-							]))
-					])),
-				A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$td,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'padding-bottom', '10px')
-							]),
-						_List_fromArray(
-							[
 								A2(
 								$elm$html$Html$a,
 								_List_fromArray(
@@ -5826,7 +5750,6 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
 								A2($elm$html$Html$Attributes$style, 'font-size', '24px'),
 								A2($elm$html$Html$Attributes$style, 'width', '200px')
@@ -5860,7 +5783,6 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
 								A2($elm$html$Html$Attributes$style, 'font-size', textFontSize),
 								A2($elm$html$Html$Attributes$style, 'padding', '20px'),

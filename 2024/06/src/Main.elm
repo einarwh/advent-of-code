@@ -492,7 +492,7 @@ toCharElement vizBoard (x, y) =
       Just cell -> 
         case cell of 
           Highlight ch -> 
-            (Html.span [Html.Attributes.style "background-color" "#CCCCCC" ] [ Html.text (String.fromChar ch) ]) 
+            (Html.span [Html.Attributes.style "background-color" "#AAAAAA" ] [ Html.text (String.fromChar ch) ]) 
           Plain ch -> 
             Html.text (String.fromChar ch)
 
@@ -596,7 +596,6 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "24px"
               , Html.Attributes.style "width" "200px" ] 
@@ -608,7 +607,6 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Source Code Pro, monospace"
               , Html.Attributes.style "font-size" textFontSize
               , Html.Attributes.style "padding" "10px"
