@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.S.G === region.X.G)
+	if (region.X.F === region.ad.F)
 	{
-		return 'on line ' + region.S.G;
+		return 'on line ' + region.X.F;
 	}
-	return 'on lines ' + region.S.G + ' through ' + region.X.G;
+	return 'on lines ' + region.X.F + ' through ' + region.ad.F;
 }
 
 
@@ -1857,9 +1857,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aE,
-		impl.aM,
-		impl.aK,
+		impl.aL,
+		impl.aX,
+		impl.aV,
 		function() { return function() {} }
 	);
 });
@@ -2719,9 +2719,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		M: func(record.M),
-		T: record.T,
-		Q: record.Q
+		p: func(record.p),
+		Y: record.Y,
+		V: record.V
 	}
 });
 
@@ -2989,11 +2989,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.M;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.T;
+		var message = !tag ? value : tag < 3 ? value.a : value.p;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.Y;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.Q) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.V) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3943,11 +3943,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aE,
-		impl.aM,
-		impl.aK,
+		impl.aL,
+		impl.aX,
+		impl.aV,
 		function(sendToApp, initialModel) {
-			var view = impl.aN;
+			var view = impl.aY;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3979,12 +3979,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aE,
-		impl.aM,
-		impl.aK,
+		impl.aL,
+		impl.aX,
+		impl.aV,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.R && impl.R(sendToApp)
-			var view = impl.aN;
+			var divertHrefToApp = impl.W && impl.W(sendToApp)
+			var view = impl.aY;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -3992,12 +3992,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.ax);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aD);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.aL) && (_VirtualDom_doc.title = title = doc.aL);
+				(title !== doc.aW) && (_VirtualDom_doc.title = title = doc.aW);
 			});
 		}
 	);
@@ -4053,12 +4053,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aG;
-	var onUrlRequest = impl.aH;
+	var onUrlChange = impl.aP;
+	var onUrlRequest = impl.aQ;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		R: function(sendToApp)
+		W: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4074,9 +4074,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.ak === next.ak
-							&& curr.ab === next.ab
-							&& curr.ah.a === next.ah.a
+							&& curr.as === next.as
+							&& curr.ah === next.ah
+							&& curr.ap.a === next.ap.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4084,13 +4084,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aE: function(flags)
+		aL: function(flags)
 		{
-			return A3(impl.aE, flags, _Browser_getUrl(), key);
+			return A3(impl.aL, flags, _Browser_getUrl(), key);
 		},
-		aN: impl.aN,
-		aM: impl.aM,
-		aK: impl.aK
+		aY: impl.aY,
+		aX: impl.aX,
+		aV: impl.aV
 	});
 }
 
@@ -4156,17 +4156,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aC: 'hidden', ay: 'visibilitychange' }
+		? { aJ: 'hidden', aF: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aC: 'mozHidden', ay: 'mozvisibilitychange' }
+		? { aJ: 'mozHidden', aF: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aC: 'msHidden', ay: 'msvisibilitychange' }
+		? { aJ: 'msHidden', aF: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aC: 'webkitHidden', ay: 'webkitvisibilitychange' }
-		: { aC: 'hidden', ay: 'visibilitychange' };
+		? { aJ: 'webkitHidden', aF: 'webkitvisibilitychange' }
+		: { aJ: 'hidden', aF: 'visibilitychange' };
 }
 
 
@@ -4247,12 +4247,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		ao: _Browser_getScene(),
-		ar: {
-			at: _Browser_window.pageXOffset,
-			au: _Browser_window.pageYOffset,
-			as: _Browser_doc.documentElement.clientWidth,
-			aa: _Browser_doc.documentElement.clientHeight
+		aw: _Browser_getScene(),
+		az: {
+			K: _Browser_window.pageXOffset,
+			L: _Browser_window.pageYOffset,
+			aA: _Browser_doc.documentElement.clientWidth,
+			ag: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4262,8 +4262,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		as: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		aa: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		aA: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		ag: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4286,15 +4286,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			ao: {
-				as: node.scrollWidth,
-				aa: node.scrollHeight
+			aw: {
+				aA: node.scrollWidth,
+				ag: node.scrollHeight
 			},
-			ar: {
-				at: node.scrollLeft,
-				au: node.scrollTop,
-				as: node.clientWidth,
-				aa: node.clientHeight
+			az: {
+				K: node.scrollLeft,
+				L: node.scrollTop,
+				aA: node.clientWidth,
+				ag: node.clientHeight
 			}
 		};
 	});
@@ -4324,18 +4324,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			ao: _Browser_getScene(),
-			ar: {
-				at: x,
-				au: y,
-				as: _Browser_doc.documentElement.clientWidth,
-				aa: _Browser_doc.documentElement.clientHeight
+			aw: _Browser_getScene(),
+			az: {
+				K: x,
+				L: y,
+				aA: _Browser_doc.documentElement.clientWidth,
+				ag: _Browser_doc.documentElement.clientHeight
 			},
-			aA: {
-				at: x + rect.left,
-				au: y + rect.top,
-				as: rect.width,
-				aa: rect.height
+			aH: {
+				K: x + rect.left,
+				L: y + rect.top,
+				aA: rect.width,
+				ag: rect.height
 			}
 		};
 	});
@@ -4372,87 +4372,105 @@ function _Browser_load(url)
 }
 
 
+// CREATE
 
-var _Bitwise_and = F2(function(a, b)
+var _Regex_never = /.^/;
+
+var _Regex_fromStringWith = F2(function(options, string)
 {
-	return a & b;
-});
+	var flags = 'g';
+	if (options.aM) { flags += 'm'; }
+	if (options.aE) { flags += 'i'; }
 
-var _Bitwise_or = F2(function(a, b)
-{
-	return a | b;
-});
-
-var _Bitwise_xor = F2(function(a, b)
-{
-	return a ^ b;
-});
-
-function _Bitwise_complement(a)
-{
-	return ~a;
-};
-
-var _Bitwise_shiftLeftBy = F2(function(offset, a)
-{
-	return a << offset;
-});
-
-var _Bitwise_shiftRightBy = F2(function(offset, a)
-{
-	return a >> offset;
-});
-
-var _Bitwise_shiftRightZfBy = F2(function(offset, a)
-{
-	return a >>> offset;
-});
-
-
-
-function _Time_now(millisToPosix)
-{
-	return _Scheduler_binding(function(callback)
+	try
 	{
-		callback(_Scheduler_succeed(millisToPosix(Date.now())));
-	});
-}
-
-var _Time_setInterval = F2(function(interval, task)
-{
-	return _Scheduler_binding(function(callback)
+		return $elm$core$Maybe$Just(new RegExp(string, flags));
+	}
+	catch(error)
 	{
-		var id = setInterval(function() { _Scheduler_rawSpawn(task); }, interval);
-		return function() { clearInterval(id); };
-	});
+		return $elm$core$Maybe$Nothing;
+	}
 });
 
-function _Time_here()
+
+// USE
+
+var _Regex_contains = F2(function(re, string)
 {
-	return _Scheduler_binding(function(callback)
-	{
-		callback(_Scheduler_succeed(
-			A2($elm$time$Time$customZone, -(new Date().getTimezoneOffset()), _List_Nil)
-		));
-	});
-}
+	return string.match(re) !== null;
+});
 
 
-function _Time_getZoneName()
+var _Regex_findAtMost = F3(function(n, re, str)
 {
-	return _Scheduler_binding(function(callback)
+	var out = [];
+	var number = 0;
+	var string = str;
+	var lastIndex = re.lastIndex;
+	var prevLastIndex = -1;
+	var result;
+	while (number++ < n && (result = re.exec(string)))
 	{
-		try
+		if (prevLastIndex == re.lastIndex) break;
+		var i = result.length - 1;
+		var subs = new Array(i);
+		while (i > 0)
 		{
-			var name = $elm$time$Time$Name(Intl.DateTimeFormat().resolvedOptions().timeZone);
+			var submatch = result[i];
+			subs[--i] = submatch
+				? $elm$core$Maybe$Just(submatch)
+				: $elm$core$Maybe$Nothing;
 		}
-		catch (e)
+		out.push(A4($elm$regex$Regex$Match, result[0], result.index, number, _List_fromArray(subs)));
+		prevLastIndex = re.lastIndex;
+	}
+	re.lastIndex = lastIndex;
+	return _List_fromArray(out);
+});
+
+
+var _Regex_replaceAtMost = F4(function(n, re, replacer, string)
+{
+	var count = 0;
+	function jsReplacer(match)
+	{
+		if (count++ >= n)
 		{
-			var name = $elm$time$Time$Offset(new Date().getTimezoneOffset());
+			return match;
 		}
-		callback(_Scheduler_succeed(name));
-	});
-}
+		var i = arguments.length - 3;
+		var submatches = new Array(i);
+		while (i > 0)
+		{
+			var submatch = arguments[i];
+			submatches[--i] = submatch
+				? $elm$core$Maybe$Just(submatch)
+				: $elm$core$Maybe$Nothing;
+		}
+		return replacer(A4($elm$regex$Regex$Match, match, arguments[arguments.length - 2], count, _List_fromArray(submatches)));
+	}
+	return string.replace(re, jsReplacer);
+});
+
+var _Regex_splitAtMost = F3(function(n, re, str)
+{
+	var string = str;
+	var out = [];
+	var start = re.lastIndex;
+	var restoreLastIndex = re.lastIndex;
+	while (n--)
+	{
+		var result = re.exec(string);
+		if (!result) break;
+		out.push(string.slice(start, result.index));
+		start = re.lastIndex;
+	}
+	out.push(string.slice(start));
+	re.lastIndex = restoreLastIndex;
+	return _List_fromArray(out);
+});
+
+var _Regex_infinity = Infinity;
 var $elm$core$Basics$EQ = 1;
 var $elm$core$Basics$GT = 2;
 var $elm$core$Basics$LT = 0;
@@ -4859,25 +4877,25 @@ var $elm$core$Array$treeFromBuilder = F2(
 	});
 var $elm$core$Array$builderToArray = F2(
 	function (reverseNodeList, builder) {
-		if (!builder.b) {
+		if (!builder.a) {
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
-				$elm$core$Elm$JsArray$length(builder.d),
+				$elm$core$Elm$JsArray$length(builder.c),
 				$elm$core$Array$shiftStep,
 				$elm$core$Elm$JsArray$empty,
-				builder.d);
+				builder.c);
 		} else {
-			var treeLen = builder.b * $elm$core$Array$branchFactor;
+			var treeLen = builder.a * $elm$core$Array$branchFactor;
 			var depth = $elm$core$Basics$floor(
 				A2($elm$core$Basics$logBase, $elm$core$Array$branchFactor, treeLen - 1));
-			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.e) : builder.e;
-			var tree = A2($elm$core$Array$treeFromBuilder, correctNodeList, builder.b);
+			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.d) : builder.d;
+			var tree = A2($elm$core$Array$treeFromBuilder, correctNodeList, builder.a);
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
-				$elm$core$Elm$JsArray$length(builder.d) + treeLen,
+				$elm$core$Elm$JsArray$length(builder.c) + treeLen,
 				A2($elm$core$Basics$max, 5, depth * $elm$core$Array$shiftStep),
 				tree,
-				builder.d);
+				builder.c);
 		}
 	});
 var $elm$core$Basics$idiv = _Basics_idiv;
@@ -4890,7 +4908,7 @@ var $elm$core$Array$initializeHelp = F5(
 				return A2(
 					$elm$core$Array$builderToArray,
 					false,
-					{e: nodeList, b: (len / $elm$core$Array$branchFactor) | 0, d: tail});
+					{d: nodeList, a: (len / $elm$core$Array$branchFactor) | 0, c: tail});
 			} else {
 				var leaf = $elm$core$Array$Leaf(
 					A3($elm$core$Elm$JsArray$initialize, $elm$core$Array$branchFactor, fromIndex, fn));
@@ -4957,7 +4975,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {_: fragment, ab: host, af: path, ah: port_, ak: protocol, al: query};
+		return {af: fragment, ah: host, an: path, ap: port_, as: protocol, at: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5236,98 +5254,56 @@ var $elm$core$Task$perform = F2(
 			A2($elm$core$Task$map, toMessage, task));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Main$SampleLarger = 2;
-var $author$project$Main$Input = 0;
-var $author$project$Main$defaultTickInterval = 10;
-var $elm$core$Maybe$andThen = F2(
-	function (callback, maybeValue) {
-		if (!maybeValue.$) {
-			var value = maybeValue.a;
-			return callback(value);
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
 	});
-var $elm$core$Bitwise$and = _Bitwise_and;
-var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
-var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
 var $elm$core$Basics$ge = _Utils_ge;
-var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
-var $elm$core$Array$getHelp = F3(
-	function (shift, index, tree) {
-		getHelp:
-		while (true) {
-			var pos = $elm$core$Array$bitMask & (index >>> shift);
-			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
-			if (!_v0.$) {
-				var subTree = _v0.a;
-				var $temp$shift = shift - $elm$core$Array$shiftStep,
-					$temp$index = index,
-					$temp$tree = subTree;
-				shift = $temp$shift;
-				index = $temp$index;
-				tree = $temp$tree;
-				continue getHelp;
-			} else {
-				var values = _v0.a;
-				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
-			}
+var $author$project$Main$overlapping = F2(
+	function (box1, box2) {
+		return (_Utils_cmp(box1.C, box2.x) > -1) && ((_Utils_cmp(box2.C, box1.x) > -1) && ((_Utils_cmp(box1.D, box2.y) > -1) && (_Utils_cmp(box2.D, box1.y) > -1)));
+	});
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
 		}
 	});
-var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
-var $elm$core$Array$tailIndex = function (len) {
-	return (len >>> 5) << 5;
-};
-var $elm$core$Array$get = F2(
-	function (index, _v0) {
-		var len = _v0.a;
-		var startShift = _v0.b;
-		var tree = _v0.c;
-		var tail = _v0.d;
-		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
-			index,
-			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
-			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
-			A3($elm$core$Array$getHelp, startShift, index, tree)));
-	});
-var $tortus$elm_array_2d$Array2D$getRow = F2(
-	function (row, array2d) {
-		return A2($elm$core$Array$get, row, array2d.a);
-	});
-var $tortus$elm_array_2d$Array2D$get = F3(
-	function (row, col, array2d) {
-		return A2(
-			$elm$core$Maybe$andThen,
-			$elm$core$Array$get(col),
-			A2($tortus$elm_array_2d$Array2D$getRow, row, array2d));
-	});
-var $author$project$Main$findRobotLoop = F2(
-	function (warehouse, positions) {
-		findRobotLoop:
-		while (true) {
-			if (!positions.b) {
-				return _Utils_Tuple2(0, 0);
-			} else {
-				var _v1 = positions.a;
-				var x = _v1.a;
-				var y = _v1.b;
-				var rest = positions.b;
-				var _v2 = A3($tortus$elm_array_2d$Array2D$get, y, x, warehouse);
-				if ((!_v2.$) && ('@' === _v2.a)) {
-					return _Utils_Tuple2(x, y);
-				} else {
-					var $temp$warehouse = warehouse,
-						$temp$positions = rest;
-					warehouse = $temp$warehouse;
-					positions = $temp$positions;
-					continue findRobotLoop;
-				}
-			}
+var $author$project$Main$calculateGearRatio = F2(
+	function (boxedParts, boxedSymbol) {
+		var boxedSymbolParts = A2(
+			$elm$core$List$filter,
+			function (bn) {
+				return A2($author$project$Main$overlapping, bn.f, boxedSymbol.f);
+			},
+			boxedParts);
+		if ((boxedSymbolParts.b && boxedSymbolParts.b.b) && (!boxedSymbolParts.b.b.b)) {
+			var bp1 = boxedSymbolParts.a;
+			var _v1 = boxedSymbolParts.b;
+			var bp2 = _v1.a;
+			var v2 = A2(
+				$elm$core$Maybe$withDefault,
+				0,
+				$elm$core$String$toInt(bp2.s));
+			var v1 = A2(
+				$elm$core$Maybe$withDefault,
+				0,
+				$elm$core$String$toInt(bp1.s));
+			return v1 * v2;
+		} else {
+			return 0;
 		}
 	});
-var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
-	return array2d.h;
-};
 var $elm$core$List$append = F2(
 	function (xs, ys) {
 		if (!ys.b) {
@@ -5339,1316 +5315,21 @@ var $elm$core$List$append = F2(
 var $elm$core$List$concat = function (lists) {
 	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
 };
-var $elm$core$List$concatMap = F2(
-	function (f, list) {
-		return $elm$core$List$concat(
-			A2($elm$core$List$map, f, list));
-	});
-var $elm$core$Array$length = function (_v0) {
-	var len = _v0.a;
-	return len;
-};
-var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
-	return $elm$core$Array$length(array2d.a);
-};
-var $author$project$Main$getAllPositions = function (board) {
-	var ys = A2(
-		$elm$core$List$range,
-		0,
-		$tortus$elm_array_2d$Array2D$rows(board) - 1);
-	var xs = A2(
-		$elm$core$List$range,
-		0,
-		$tortus$elm_array_2d$Array2D$columns(board) - 1);
-	return A2(
-		$elm$core$List$concatMap,
-		function (y) {
-			return A2(
-				$elm$core$List$map,
-				function (x) {
-					return _Utils_Tuple2(x, y);
-				},
-				xs);
-		},
-		ys);
-};
-var $author$project$Main$findRobot = function (warehouse) {
-	return A2(
-		$author$project$Main$findRobotLoop,
-		warehouse,
-		$author$project$Main$getAllPositions(warehouse));
-};
-var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
-var $elm$core$Array$foldl = F3(
-	function (func, baseCase, _v0) {
-		var tree = _v0.c;
-		var tail = _v0.d;
-		var helper = F2(
-			function (node, acc) {
-				if (!node.$) {
-					var subTree = node.a;
-					return A3($elm$core$Elm$JsArray$foldl, helper, acc, subTree);
-				} else {
-					var values = node.a;
-					return A3($elm$core$Elm$JsArray$foldl, func, acc, values);
-				}
-			});
-		return A3(
-			$elm$core$Elm$JsArray$foldl,
-			func,
-			A3($elm$core$Elm$JsArray$foldl, helper, baseCase, tree),
-			tail);
-	});
-var $elm$core$Array$isEmpty = function (_v0) {
-	var len = _v0.a;
-	return !len;
-};
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
-var $tortus$elm_array_2d$Array2D$ArrayHelpers$minRowLength = function (array) {
-	return $elm$core$Array$isEmpty(array) ? 0 : A3(
-		$elm$core$Array$foldl,
-		F2(
-			function (row, min) {
-				var rowLen = $elm$core$Array$length(row);
-				return _Utils_eq(min, -1) ? rowLen : ((_Utils_cmp(rowLen, min) < 0) ? rowLen : min);
-			}),
-		-1,
-		array);
-};
-var $elm$core$Elm$JsArray$map = _JsArray_map;
-var $elm$core$Array$map = F2(
-	function (func, _v0) {
-		var len = _v0.a;
-		var startShift = _v0.b;
-		var tree = _v0.c;
-		var tail = _v0.d;
-		var helper = function (node) {
-			if (!node.$) {
-				var subTree = node.a;
-				return $elm$core$Array$SubTree(
-					A2($elm$core$Elm$JsArray$map, helper, subTree));
-			} else {
-				var values = node.a;
-				return $elm$core$Array$Leaf(
-					A2($elm$core$Elm$JsArray$map, func, values));
-			}
-		};
-		return A4(
-			$elm$core$Array$Array_elm_builtin,
-			len,
-			startShift,
-			A2($elm$core$Elm$JsArray$map, helper, tree),
-			A2($elm$core$Elm$JsArray$map, func, tail));
-	});
-var $elm$core$Elm$JsArray$appendN = _JsArray_appendN;
-var $elm$core$Elm$JsArray$slice = _JsArray_slice;
-var $elm$core$Array$appendHelpBuilder = F2(
-	function (tail, builder) {
-		var tailLen = $elm$core$Elm$JsArray$length(tail);
-		var notAppended = ($elm$core$Array$branchFactor - $elm$core$Elm$JsArray$length(builder.d)) - tailLen;
-		var appended = A3($elm$core$Elm$JsArray$appendN, $elm$core$Array$branchFactor, builder.d, tail);
-		return (notAppended < 0) ? {
-			e: A2(
-				$elm$core$List$cons,
-				$elm$core$Array$Leaf(appended),
-				builder.e),
-			b: builder.b + 1,
-			d: A3($elm$core$Elm$JsArray$slice, notAppended, tailLen, tail)
-		} : ((!notAppended) ? {
-			e: A2(
-				$elm$core$List$cons,
-				$elm$core$Array$Leaf(appended),
-				builder.e),
-			b: builder.b + 1,
-			d: $elm$core$Elm$JsArray$empty
-		} : {e: builder.e, b: builder.b, d: appended});
-	});
-var $elm$core$List$drop = F2(
-	function (n, list) {
-		drop:
-		while (true) {
-			if (n <= 0) {
-				return list;
-			} else {
-				if (!list.b) {
-					return list;
-				} else {
-					var x = list.a;
-					var xs = list.b;
-					var $temp$n = n - 1,
-						$temp$list = xs;
-					n = $temp$n;
-					list = $temp$list;
-					continue drop;
-				}
-			}
-		}
-	});
-var $elm$core$Array$sliceLeft = F2(
-	function (from, array) {
-		var len = array.a;
-		var tree = array.c;
-		var tail = array.d;
-		if (!from) {
-			return array;
-		} else {
-			if (_Utils_cmp(
-				from,
-				$elm$core$Array$tailIndex(len)) > -1) {
-				return A4(
-					$elm$core$Array$Array_elm_builtin,
-					len - from,
-					$elm$core$Array$shiftStep,
-					$elm$core$Elm$JsArray$empty,
-					A3(
-						$elm$core$Elm$JsArray$slice,
-						from - $elm$core$Array$tailIndex(len),
-						$elm$core$Elm$JsArray$length(tail),
-						tail));
-			} else {
-				var skipNodes = (from / $elm$core$Array$branchFactor) | 0;
-				var helper = F2(
-					function (node, acc) {
-						if (!node.$) {
-							var subTree = node.a;
-							return A3($elm$core$Elm$JsArray$foldr, helper, acc, subTree);
-						} else {
-							var leaf = node.a;
-							return A2($elm$core$List$cons, leaf, acc);
-						}
-					});
-				var leafNodes = A3(
-					$elm$core$Elm$JsArray$foldr,
-					helper,
-					_List_fromArray(
-						[tail]),
-					tree);
-				var nodesToInsert = A2($elm$core$List$drop, skipNodes, leafNodes);
-				if (!nodesToInsert.b) {
-					return $elm$core$Array$empty;
-				} else {
-					var head = nodesToInsert.a;
-					var rest = nodesToInsert.b;
-					var firstSlice = from - (skipNodes * $elm$core$Array$branchFactor);
-					var initialBuilder = {
-						e: _List_Nil,
-						b: 0,
-						d: A3(
-							$elm$core$Elm$JsArray$slice,
-							firstSlice,
-							$elm$core$Elm$JsArray$length(head),
-							head)
-					};
-					return A2(
-						$elm$core$Array$builderToArray,
-						true,
-						A3($elm$core$List$foldl, $elm$core$Array$appendHelpBuilder, initialBuilder, rest));
-				}
-			}
-		}
-	});
-var $elm$core$Array$fetchNewTail = F4(
-	function (shift, end, treeEnd, tree) {
-		fetchNewTail:
-		while (true) {
-			var pos = $elm$core$Array$bitMask & (treeEnd >>> shift);
-			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
-			if (!_v0.$) {
-				var sub = _v0.a;
-				var $temp$shift = shift - $elm$core$Array$shiftStep,
-					$temp$end = end,
-					$temp$treeEnd = treeEnd,
-					$temp$tree = sub;
-				shift = $temp$shift;
-				end = $temp$end;
-				treeEnd = $temp$treeEnd;
-				tree = $temp$tree;
-				continue fetchNewTail;
-			} else {
-				var values = _v0.a;
-				return A3($elm$core$Elm$JsArray$slice, 0, $elm$core$Array$bitMask & end, values);
-			}
-		}
-	});
-var $elm$core$Array$hoistTree = F3(
-	function (oldShift, newShift, tree) {
-		hoistTree:
-		while (true) {
-			if ((_Utils_cmp(oldShift, newShift) < 1) || (!$elm$core$Elm$JsArray$length(tree))) {
-				return tree;
-			} else {
-				var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, 0, tree);
-				if (!_v0.$) {
-					var sub = _v0.a;
-					var $temp$oldShift = oldShift - $elm$core$Array$shiftStep,
-						$temp$newShift = newShift,
-						$temp$tree = sub;
-					oldShift = $temp$oldShift;
-					newShift = $temp$newShift;
-					tree = $temp$tree;
-					continue hoistTree;
-				} else {
-					return tree;
-				}
-			}
-		}
-	});
-var $elm$core$Elm$JsArray$unsafeSet = _JsArray_unsafeSet;
-var $elm$core$Array$sliceTree = F3(
-	function (shift, endIdx, tree) {
-		var lastPos = $elm$core$Array$bitMask & (endIdx >>> shift);
-		var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, lastPos, tree);
-		if (!_v0.$) {
-			var sub = _v0.a;
-			var newSub = A3($elm$core$Array$sliceTree, shift - $elm$core$Array$shiftStep, endIdx, sub);
-			return (!$elm$core$Elm$JsArray$length(newSub)) ? A3($elm$core$Elm$JsArray$slice, 0, lastPos, tree) : A3(
-				$elm$core$Elm$JsArray$unsafeSet,
-				lastPos,
-				$elm$core$Array$SubTree(newSub),
-				A3($elm$core$Elm$JsArray$slice, 0, lastPos + 1, tree));
-		} else {
-			return A3($elm$core$Elm$JsArray$slice, 0, lastPos, tree);
-		}
-	});
-var $elm$core$Array$sliceRight = F2(
-	function (end, array) {
-		var len = array.a;
-		var startShift = array.b;
-		var tree = array.c;
-		var tail = array.d;
-		if (_Utils_eq(end, len)) {
-			return array;
-		} else {
-			if (_Utils_cmp(
-				end,
-				$elm$core$Array$tailIndex(len)) > -1) {
-				return A4(
-					$elm$core$Array$Array_elm_builtin,
-					end,
-					startShift,
-					tree,
-					A3($elm$core$Elm$JsArray$slice, 0, $elm$core$Array$bitMask & end, tail));
-			} else {
-				var endIdx = $elm$core$Array$tailIndex(end);
-				var depth = $elm$core$Basics$floor(
-					A2(
-						$elm$core$Basics$logBase,
-						$elm$core$Array$branchFactor,
-						A2($elm$core$Basics$max, 1, endIdx - 1)));
-				var newShift = A2($elm$core$Basics$max, 5, depth * $elm$core$Array$shiftStep);
-				return A4(
-					$elm$core$Array$Array_elm_builtin,
-					end,
-					newShift,
-					A3(
-						$elm$core$Array$hoistTree,
-						startShift,
-						newShift,
-						A3($elm$core$Array$sliceTree, startShift, endIdx, tree)),
-					A4($elm$core$Array$fetchNewTail, startShift, end, endIdx, tree));
-			}
-		}
-	});
-var $elm$core$Array$translateIndex = F2(
-	function (index, _v0) {
-		var len = _v0.a;
-		var posIndex = (index < 0) ? (len + index) : index;
-		return (posIndex < 0) ? 0 : ((_Utils_cmp(posIndex, len) > 0) ? len : posIndex);
-	});
-var $elm$core$Array$slice = F3(
-	function (from, to, array) {
-		var correctTo = A2($elm$core$Array$translateIndex, to, array);
-		var correctFrom = A2($elm$core$Array$translateIndex, from, array);
-		return (_Utils_cmp(correctFrom, correctTo) > 0) ? $elm$core$Array$empty : A2(
-			$elm$core$Array$sliceLeft,
-			correctFrom,
-			A2($elm$core$Array$sliceRight, correctTo, array));
-	});
-var $tortus$elm_array_2d$Array2D$ArrayHelpers$truncateRows = F2(
-	function (columns, array) {
-		return A2(
-			$elm$core$Array$map,
-			function (row) {
-				return (_Utils_cmp(
-					$elm$core$Array$length(row),
-					columns) > 0) ? A3($elm$core$Array$slice, 0, columns, row) : row;
+var $author$project$Main$isGearPart = F2(
+	function (boxedParts, boxedSymbol) {
+		var boxedSymbolParts = A2(
+			$elm$core$List$filter,
+			function (bn) {
+				return A2($author$project$Main$overlapping, bn.f, boxedSymbol.f);
 			},
-			array);
-	});
-var $tortus$elm_array_2d$Array2D$ArrayHelpers$getMinColumnsAndTruncateRows = function (array) {
-	var columns = $tortus$elm_array_2d$Array2D$ArrayHelpers$minRowLength(array);
-	var normalizedData = A2($tortus$elm_array_2d$Array2D$ArrayHelpers$truncateRows, columns, array);
-	return _Utils_Tuple2(columns, normalizedData);
-};
-var $tortus$elm_array_2d$Array2D$fromArray = function (array) {
-	var _v0 = $tortus$elm_array_2d$Array2D$ArrayHelpers$getMinColumnsAndTruncateRows(array);
-	var initialColumns = _v0.a;
-	var normalizedData = _v0.b;
-	return {h: initialColumns, a: normalizedData};
-};
-var $elm$core$Array$fromListHelp = F3(
-	function (list, nodeList, nodeListSize) {
-		fromListHelp:
-		while (true) {
-			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
-			var jsArray = _v0.a;
-			var remainingItems = _v0.b;
-			if (_Utils_cmp(
-				$elm$core$Elm$JsArray$length(jsArray),
-				$elm$core$Array$branchFactor) < 0) {
-				return A2(
-					$elm$core$Array$builderToArray,
-					true,
-					{e: nodeList, b: nodeListSize, d: jsArray});
-			} else {
-				var $temp$list = remainingItems,
-					$temp$nodeList = A2(
-					$elm$core$List$cons,
-					$elm$core$Array$Leaf(jsArray),
-					nodeList),
-					$temp$nodeListSize = nodeListSize + 1;
-				list = $temp$list;
-				nodeList = $temp$nodeList;
-				nodeListSize = $temp$nodeListSize;
-				continue fromListHelp;
-			}
-		}
-	});
-var $elm$core$Array$fromList = function (list) {
-	if (!list.b) {
-		return $elm$core$Array$empty;
-	} else {
-		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
-	}
-};
-var $tortus$elm_array_2d$Array2D$fromList = function (list) {
-	return $tortus$elm_array_2d$Array2D$fromArray(
-		$elm$core$Array$fromList(
-			A2($elm$core$List$map, $elm$core$Array$fromList, list)));
-};
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $author$project$Main$input = '##################################################\n#.#.#......O....##.#O.##..O.........O........O.#.#\n#......O..........O..O.O.....O.........#O.......O#\n#.OO....#.O.O.OO#....#.OO.....O.##....O.......O.O#\n#..........O...#O#.......#OO....O.O..O#........OO#\n#O..O.....O..O..#.O.O...O..#.O.O.....O.#....OOO..#\n#O#O..O..O.OO.#..O...........#.......#O.OO.O.O..##\n#.O..OO.O.#.#.......O......O..........O.O..#.....#\n#...O..O..O...OO....O....O....#.OO.#..O.....O..###\n###.#.O..O.O.O..O.....O.O.#.....O.O......OO....#O#\n#....O.....OO.O#..#..O.O...OO..................#O#\n#....OO...O.O.OO.O#.O...O..#..O.#.#....O.O.O.OO.##\n##.##....O#O.......O#..O.OOO....O.....O....O#..O.#\n#...O..O....#O...O..O.OO..OOO.##O...........O.#O.#\n#..O....O.#O...OO....OO.O..O.#OO..O....O.....O...#\n#O#O..O.......OO...#.....O#OOO....#.O...O.......O#\n#O.O.....OO#.#.O..........#..O#.....O..O#...O..###\n#...#.....O#..O....##OO.O.#.#......O......OOO..O.#\n#OO.O....O.OO..O.........OO.O.....#.O.O...O..O#O.#\n#..O#..O#.OO.OOOO..O..O.......#O#..OO...OO.O....O#\n#O.#O#....#..O.#..O#O.OO..O.O.#....#.OOO...O.....#\n#.......#..OOOOO...O..OOO..O...O.OO....OO.OOOO...#\n#...O..#..OO..OOO.O.#O.#..#.O..O...O#.....O.....O#\n#.OOOO.....OOOOO...OO........O#....O.....O.#...#.#\n#O#OO.#O..........O..OOO@.O.....O.....#O...O..OOO#\n#.#............OO....O......O#O..#O..O.O.........#\n#.O.O.....O....O.O.OO.O..O...#........OO.#O....O.#\n#......OOOO......O#.#.O...#O.O.OO..O.O...O.O...OO#\n#OO#.#O..O...#.O..O.....O...OO.O.....##.O.....O..#\n#..#O.#OO.OOO..OOO.#..OO..#.O...OOO......#......##\n#O.O#.O..O.......O..OO....#....O..O..O....O...#..#\n#..OO.O...............##O..O..OO....O.OO...O...OO#\n#.#O........O...O.O....#O#........O.....#..#O....#\n#......#....O#......#.#.#...#........O..OOO..O..O#\n#O.#OO.##..........O.#O.O.#O.#OO#....O..OO...OO..#\n#...OO.......#...##..#......O.O.OO.OOOO.O.#.#....#\n##.O..#..O#......OO.....#....O..#..O..O.#.OO..#..#\n#....O.OOO.O..O#........O.O...OO...O...O.O....O..#\n#OOOO.OO...O.O..#O.OO.O#......#OO..O.O.....O..O..#\n#..#.O..O..#O......O...OO.......#O...#..#O#.O..O.#\n#O...#..OOO.O#O.O.O.O.O..O...O.O#..O..O..O.#..OO.#\n#.....O.O.O..O.O..OO.........#O.....O...O......O.#\n#O...OOO....O.OO..#....O#O...O.O..O.O.......OOO.O#\n#OO#..O##..O...O.#..O....##..OOO...O.O##.##..#.OO#\n#OO.......O##.#..O.OO......O..O..O..O....O.O...O.#\n#.....O...O.O.#..O..O.#..O.OOO#.......#.........##\n#..O.O.OO....#...OOO.OO..O....O.#.O.O##....OOO...#\n#OO#O..#.....O.....O.....O...O#O..O..O#......O#..#\n#O....#.OOO.O#.OO..O...OOO.OOOO...OO#O.O.O.....OO#\n##################################################\n\n<><>^<^^vv>^^v^vvvv<>>^<>v>v>^<^v<><<v^^v^<><<>>>><>vv^^v<^><^<v<><v<^^<<^<^vv^^vv^v^v^<^v^>^vv^<v^>v^><>vvvv^v><>^v>>><^vvv<>v<>^^^vvv<>v>>^v>>^<v<^>^>>>>^<^^^>^>v><<^v><<>>v><v>^>vv<v>^^<^<v>^<v^^>^>^>^>vv<^^<v>>>><^v><vvv^><^<>v<v^vv<<>v<><v<><^vv^>>^v><v>v^<^>>vvv^<>vv<<<<<v^>^<^v<><^v^<>>v<<^<>v^>^>>^^>v>v>^<^^<>^v^<<v<>>v<^>^^v>^v^<<v>^<^v><^vvv>^^^<^<<vvv>>vv<><<<>v>>><v>v^v<v^><<^><vv^>v^v>>vv^><>v^v^<<>vv>><>v<<v>^>>vv<>v^v>^^v<^<>^^<^>^^^<^^<<v<^>vvv><>>^^>>>^>^vvvvv<v^^vv<^^><^v^<><<<>>>v<><v>v><vv><<v^>v>v>v<>vv^>>><v^>v><<<v>v^>^^v<<>v<v<>>v<>v<>>^^<v^<>^>>><<>v^>^vv<^<^^v^^^<vv^v^^^<>v>v>^^^^^>v>v^v><^v>^<<^<<v<>>>>^>><>>^v><^<<>><v^^v<^<>^^<<v>^>^vv<v><<v<v<>>^^><<^^v^>>^<<^^^^<v^^^>v>><<v^^v^>^v^v<^>>vv^^<<^v>><v^^<v<>v^^^<><<v<<^^v>>><vvv^<<<<^<>v>vv<<><^v^>>v^^v^^v<^<^<v>v^<vv>^<<<><><<^<^vv<^<<^^^^v^^>>><<^<^><<>v<>^v<v^>vvv^v^v>>><v>v<<>v>><v><<>><v>>v^>>>^^<^>^^^v<<><<^<<^<>v>^^^v>><>v>^>v<>^><vv^^<<>^v><<<>^^vv>>v^><<^v^<^>>^^v^^vv^v>v^>^^v>v<^<<v><<^>>^^><<<^^v<v\n>^^v<v<^^^^v^^>v^v^^^^v<v^vvv<><^^<<<>>>v^v<>^<>^<vv<>>^^v>^v<^^v>v<>vv<^v>>><^^^vv>>v^><><v>^^>v>^vv<<vv^<^>><^v^<^>^><v<^^><v^<>^<^v<>v>v^<vv^<^<>><<>><^>><<v><vv^>vv<^><v^>>^v<v>v>^^<<<<>v^^<v<^<^<v^>^><<<><v^>><^>v^v<^v>><>^<<^^^^v^>^>vv>>v^<^<v><<><>^<v<>vvvvv>v<>vv^><^<^v^<v>^v<v>vv>v><>v<<><v^v^<>^^<><^<>v^>>^>vv<><<<<^v^<vv<v>^<<>v<^v^v><>>vv>>>>>^v>^v^>><v>^^v^<>v>v>>^><<<v^v<<^v<<<>>>>vv<>v<<^v><<<>v<v^v<><<^><<<vv>^>v^<^v>^<^>>v<v<><^<<^^vv>^>^vv^^<<<<><^<>^<>vv^^^v><vv><>>>vvv<>vv>^<>>^^<>>v^vv>>v<vv><v^^<v<vv<>>><<^^><>v^><v>^>^>v^^vv<>^><>>>>>vv>^^^^^>>^<<<><<^^>>v>^^>^^v^>v^v^<^<^><vv>><v<><^v^^^>>^<v<>><^^><^vv<^v<^^^<<<vv^^^>><<>>v^<>^v>v<<v^v<<<^v><v<^<vvv^^^>^v>^vv>>v^>^<v^^<vv><><>v><<v<vvv><><v^^<<<^><>v<v>v>^<^^>vv^vv^>^<^<v<><v><<^v^<<<^v^^^<<<<^>v>^^vv<v<>>><<>v<>^><v^><<>^<<^^<>>>vv<^>><^<v>^><^v<v<<^^<vvv><<<>^>>v<^><<^v<^v>v>^^v<v^v<<^>vv<<vv^<v^v>><<^v>>>>^v>vvv><>>v^<>><^<<^^>v><><^<v<v<>^v<<v^<>>^>^<<<^v>v<^>><v^>>>v^vv><^v<><v<<<v^<v^><<^>vvv>v^<>v<^v><v<\n^>v>v<>^v>vv<>^<>v<>v<^v<^^<<><<<^<>v<vvv^><<<^v><^<^v>vv^^>v>v<^^<>>>v<<>^<>v<>v<^<>vv<<^<<v^^^><^<vv<^<<v^^<vv>^v^>v^^^^^^vvv^<<^<^<v>>>^<^<>^vv<^^v^v<v><^^vv><<<>>^<v^>^>^v<<<>><v<<>v<>vv<<v>^^<>v^<>^v<^v>><v<><<>><^^><<^v^>>>^^<v^v>v>^><^>^^^^^^<^^<<^v<vvvv<^>>v>v^<>v><^vv>v<<^^<>>>v^^><v<^vv<v<v>>^>><<^vv><v^>^^^^<^^^<v>>^^v<^^<v<v^<v^v<v>vv<<>^^<>^<<v><v>>^><v>><^^vv<^^v<>v>>vvv>>^v<vv<v<^<^^^v<v<<<v><<v<^<<>^<^^<^v^>^^<^><^<^><^^v>v<<^v<<^^^<^<^<v<<<><<v>^>v<<<^<>^>>v<<<^vvv^><v<v>^<<^v<<v><>^<v^v>>vv<<>vv<v<^>vv^^^>v<^^^v<<<vv^<<v>^><v<vv<^^>^<v<>^>><vv^><<>v^><v<v>>vvv^v>vv^^vv^^v<v^<<<v<v>^<>^^v^^><><^v^>v>>vvv<^<<>>>vv^><>v^v>>vvv^vv^v<<>vvv^^<^<<v>^^v>^^>^^v^><<^<<<<>^v<v^^^<><<><>v^<^>^>v^><v>v^v>^>>v^v<^v<<<<v>>^>v<^<v>>^vvv^<^^><<^>>v><^^^>>^vv<^<<^vvv^^><v<v>v^v<>>^>^>>v^^^vv>>^<vv><><>^<<>v<<<vv<v<<<^>^v>^v>^<<<v^^^v>>><v^<><v>^><vv<v><<^^<^>><><v>vv<>vv^^><>^>^v<<^<^^<^^v^><<vvv^>><<><>>v^^<^>v<><^^v^v^v>>v>^v><<<<<^<<<>>>^v^<v>v<v><^^><<>vvv^v<^<^v<<<^^>v>>^>>^<vvv>>\n^>><<v<<>^v^><^^><>^><^<>^>>>vv^v>>^^<vv^^<v<><^^>^^<><<>><>^v><<<<><<v<<<<v<^<>>><>^<^<<v>v<><><v<>>^v^<<>^^<^^^^v^v^<^v<^v<^v^<<^>v<<v>vv>^<<^<vv^v<>^vvv<>>><<<vvv><^^v^^<vv^vv<<^^vv<v<><>^v>>><<^v<v^^<>>>^>^v<<v>><<v^v^^^vvv^v<v^v^v^v^<<vv^>><>v<^><^>v<^v<^^^^<<^v><>><^v<>>><><>v<^vv><<<<^<<>vv<>v>>>^<vv<<^<<<v<^<^^<^^<v<<vvv^^<<>>v>>>^>^>v<v<>^^^v>v<^<v<>>>>vv><>vv<^<>v>^^<v<<<><>><<<<>>^<>>>>^^>v<^v>v^><>v^^^>^v^vv<vvv<^<^>^v^>vvv^<<<>>vv<^^<^>v^v>^^<^v^v<>v>v<v><<<<<>^^<<>>vvv><vv<<<>v><vv>^>><<v>>^^v<v>>v^<^<^>^<^v<>>v<><vv>>v<<v^v>>>^>vvv>><^<vv>^v><<>v<<>v<<>vv^^v<vv^v>^^^>v<^v><v<v^v<vvv<<<<<^<^<>v>^v>^^>>vv^^v^<^vv^^>>v>v<v<vv^>v<>v><><><vvvv<v^<vv^v^v^<<<><<>v><v^>>v<>vv<<><<^v<v^>^>v><v<>^vv>>^^<^<v^><>v>>^><v^<>^^<>>>v<^v>v^vv>^^vv^v>vvvv<v^><>vv^>^vv>><<>^v^<><<>v>>^v<^v^<^^><>v<^v<v><<<><^v^^v><<vv<^v<<>v^<<<^>>>v>^>^vv>>^^^>v>v>><v^>>v>^<v<v>>^<v^v^v>^v>^<<v<^^<<>v>v<vv>v<<^<v^v<<>vv<v<>>v<<>v>^><vv<><<v<^>^^>^^vv>^<vv>^<<^><^^vvv^>>^v<^><v>^vv^^>v>>><^^^^^>>^v><^^<^>v\n^<<v>^^v<>v^><^v^<^^^v<^><^^<<v><^^vv>vv^<><^vv<<<<<<v^>^<<><<^v^>vv>^><^>>v>v^<^^v<<><^>v>^>vv^v<><><v^<<<v<<v<>><^>^v<v>^^^<vvvv>^v^<>>v^^^<^v><><<>^v>><<vv^v<<v>^v<>^<<vvv<^v<^v<><^v^>>>^<vv^>>>>vv^<<<vv^^v<<v^>>v>>v>><vv<>>^vv>v><v>><<<vvvvv^^vv^^^v^^v<v^^v^><^<^vv>>v>v<^>v^<>^>v^>>v<<^vv><<vvv^>>v<v^>v<^v<v><>^>v^<><<vv<^^><^<v^^<<vv<v<>><v<^<><>>>>vvvvv<^<<v>>v^vv^>v^<>vv<>><>>>>^<v>v><^<>>vv>v<>v^v<<>><>^v<<^>^^^^<>^<<^><vv>v<>^v^<<^vv^^>v^^^<^<^>v>>vv<<^<vv<>>><<^vvv^^><<v<vvv><^>^vv>^^^^<^<^vvv^<>vv>vvv>^^^><vv^><>>v^^v><><^vvv>>>v<<^<^>^^v>^<>v<>^v^>v^^><^>^><>^v<>^<^><><>vv>v>^vvv>^^<^<<^v>^^v>v<v>v<><v^<><<<v>>^>v>>^<^v<<<v>^^>v>vvvv^>><<^^>v^>>^>vv<^<vv^v><<^^v<>>v><vvv><^<v><>v^^^<>><>^>vv^^v<>><^v>^^<><^>^v^^^<v>v>v>>>^v<>v<><^v^<<>v><^v><^>^^>^>^v<>vv<vv><^>^<^><^v><v<^^>>><>>><>>v<<^v><><^^^v<^^<vv><><vv<vv<^>>>>><<^>^>^>v<v>v^^^v^>v>v^^^vv>><^^>>v><^^vv<>^<>>^^v<vv^vv><<>><v<<^v^v>^><^<v^^^^><vvv<^>v<<>vv^v^<><<^<v>vv<<v<vv<^vv<>^^v>vv^v>v^^vv^^><^<vvv>v^^<>^^vvv>v>vv\n<>v<>>^^<^>v^><v<vv^^v>>>^^^<^v^^^v^^<>v<>>^<vv<vvv^<<>^^><v><^v<vv^^^v<><>^<<<^<^<<<vv><v>^v^^<<<v>>^^^v>vv^^>><<><><>^^<>>^^<>^<^<^<v>^<v><>>^<v<<^vv^v<vv>v>><vv^>>>^v<<>>>^>>^<<^^v<^^vv>><vv<^>^v<<>v<v^^>^v^^v^>v^vv>>^>>v<>>v<>>^v^<vv<>v<v<v<<vv>v<v^^^<>>^vvvv^^^<<>><v^>^v^v<<<^<<<^>vvv>>^><^^>v^>vv^<<<^<^v>>^^<^<>><<^^<<vv<v^<v<v>^v<vv<v^v^>>><<vv<v<<<><>vv>>>^<<<>>vv^>^^<<<<<v<vv>^<vv^>^>v<<>^<^v<>^vvv<<>>^^^<^^^v>^^v^v^^^^>vv>^>vvvv^<v<><<v^<^vv<^vvv><^vv^>>>>>>vv^<v<<v<^>v<<vvv<<><v>v<>^>vv>>>^<>v<^><^>^<>vv>>>^v^>^v>^v^<v>v<<<<<<v^><>^^<>^v^<<^^^v>v<<><^<><<<^<<<<><>^><v^>v>^^<><^vv^<vv<^><<vv^v<^>^^><v<>v<<v>><>v<<v><<^v<^<^<v<vvv>^^vv>><>^>vv<>^><v^^v^^<><<^>^v<>^^v>v<^>^^^<<v<<^vv^v<vvv^><v>^<^>v^vv>>>>>>v^v><vv<<>v<v>>v^vv>v>^v>v><^<<>v<>v<<vv<^><v<<^>>vvvvv^^^><v^><^>^^^<vvv^v>v^v<^>>vv^><<^^>^v<v<v<<<<<v^v^<v>><>>^v^>>vv<v^v^^>vv^<v^^^<^v>v><<><<^v><<>^v>^^^>^<<^>v<>v^<vv>^>>^<v^^<><^vv^^<>v>v>v^^><v><^<v><^<>v^<<<^^<<>>v^^vvv^v<vv<>v>^>^^vv<<<^><vv^>^v<>v^<>v>v>vv^v<<v<^\n^>^<>^^^^v^<v><<><>v^v^<>vv><v<>>^<^<<<v^vv<<^^<<>v<v>vvv<^<^^<>v>v^v<vv<^vv^<>^><v<<^v^^<>^>>v<>><<^>v<v<<^v>v^^>v^v<^<^<^^<^><^^>>v^<^<<^<v^^><>>v^<^<<<^<v><><>^>v<<v>vv<vv^<v>^<<<>>v<^<><<>^><v<v^<v^^v<<>v^^v<<^<v<>^>^v<^^v<^><v>vv><<^^v>vv<^^<^<<<^<>v><^^v><>>vv<^v><<v>v>^^^><>v^v^>v><^^<v<>^^^<>^v^vv>v>^^^^^v>^<v<<>v><>^vv><<>vvv>v^^^>vv>^>vv>v>^v^<<><<vv><<>^vv^^><vvv<v<>^>>^^><^<<^v><v^^<^<>v>>>^>>^<<v^v>v^>^^^^>v<^^><^v>v>^^><>^^<^v^<<<<v^<<^v<^>>v><^v>vv^<^>v^^^<v^<<v>v<vv^<vv>v^>vv<v<^v><v><^^><><<v^^<>>^>>><v<^^<^><>vv>><>>>^vv<v^v^><v<<^<>vvv>>><>^>v><^^^><v^v^<><<v>v^v^>>>v>^^^>^>^v^<v<>^<<<^<<<^<<>^>v<^<^v^vv>v<vvv^<>v>v<vv>^v^^v<<><<^^^^vvvvvv^v^<v<><<>v<>^>v<^<v>^<v^<>><<<v<vv>><<^>v><>^<v^<vv<>vvv<^><><<v<v^><^vvvv<>>^v<v^v^<^v^^>^^<v>^^>v^vvv^><<v>v<>^><^>v>>v^>vv<<v>^>v<^^>>^^>^<>^<<^vvv<<><^^>>>>^><^^><^^^>><><v^<v^>>>v^^<v^v>v<><><<<<v>>>>^<^v>^>^><<v^<>><><<vv>^<>v>v<>^^>>vv^>>v<^<<>vv>v^<v^^>>>>><>><>><v^><^v>v<><^v^v<>>><>^^>>^vv>^^^^^^<v^^><<^>^^>v<^^><>^>v><<<\n>^<^v^<v>^<v<^v^v>v<v<><>v^<>v>^^<<v^<>v><<v<v<v<<<<^v<v>^>v<vv<<>>v><><v>^v^^>>>>^<v^v>>^>^^v<^^v<<vv<^v^>v<><v>v<v<vv><vvvv<<>v^v^v<>^v>>v<v>>v^v<^<v>>^v>>v<>^^<vv^v<><<^vv<v<<>^<v>^><<^>vv^v<<>vvvv<^vv^<v^^^^^^v<^>vv>vvv>v^v^<<>v^<<>^^^^<>v<^^<^>^^vv><v>^<><>^v<^vv>>vv<<^<^<<<>v^>v>v>vvvv^<>vvv><<><<>vv^<<vv>^<v^>vvv<v^^v>^><^<^>^^<v^<v^vv<^v>^>v^><<vvv^<<vv^^^^>>v<>>vv>vv>>^^^<^v<^><<v>^><^^v<^v<><^v<^<>v>>>>^><><>>>>v<<>><^^v^v^><vv^>v^<<><^>>><vvvv<^<^>^>^>v<>^>><v<>vv<vvv>v<v><v^<<>>>>><>v<^^<<<^^>>><v^<v<>vv<^^<<><v><^<vv>v<^^<>><^>v^><>^v>v><>v^>><><<^<^<>^^^<>^^v>v<^><><vvvv^^<^>^v^vv><^v><vv^^<^v<vv>>>v<<><^>>>>>>>^^<v<^<<^^^>^>v^^>v><>^vv^^<><>v>^>><^^^^>v>^<>>><v<^^^^<>>v<<v<^>v<^<^v><vv^>^^vv^>^>^>>>^v^^>><vv^^v<v<v>><<>vvv<^<^v>>^<v>>v^<v<v^^^<^<<vv>^^>vv<>><^<<<^^><^^>v>^v^^^<<<^>v<><>>>^<>^^<><<v>v><><<<<>^>>>><>>>>><v^<^^>v^^^^>v>>v>>^vv><<<^<^^^^v>v><^<^^><<vv<^^v^v<<v<<^<<^^>^^>>><>^<v^>><<^v><<><v^<>v^^v^v<v>vv^^<>>v<<^<>v<v^<^v<>>^<<^>><^^v^v^<<><><<v>v><v>v<v<<><\n<v^^v>^v>^<^vvvv>>vv^<>v^^v<>>>^^<v<<><>^>^^<^>^v^><v<^v^^<^<v><<v>^>>v^^^v^><>v>><>>v>>vv>v^^><>v^<>^<^<<<v^vvv><^<^<v^v^^v<v^v>vv<^^v^v^v^>><>>>>^^^^^<v>>v>v^v<>>vv^>>^<^^vvv>><^v<<<v^^^^<^><v<v<>^<^<vv>><<^^v>><<<^^^v>v<^^<<vv<>><>v^^^>v<^^>>^<^<^<^><<>v<^^<vvv<vv<v^<>^>><>^>^>^^vv><>>^v><<^>v<>>vv>v^><<vvv<<<<><>^<<vv><^vv<v<>^<^<<v><>v>>^<>^><v<<>^<<vv^<^^v<<^>^^vvv<>v<<<^vv<>>vv^^v^^v^^><^<^^<^<>>>^<<^v<>><<v^<v<>><^v<v^>^><>><vvvv>v^><^>^v<><v>>^<v>><^<^>^v^>>v>^v^<<<>^^<v>v<v^v>v<^^v<<<^vv^v<^<>vv><^v<^>><><^<<>>v>>vv^^<><v<vv^<^<<<>>v^>v^>^<v<<v^<<^>^<^<<<vv><<>><v>>>v<v><^<><v^>>vv^<v^>vv^<v<<<v>>v<vv^><v^vvv>v^v^><^v>^<v>v^^<<v^^v<vv><v>v>><<^^<<v<vv>^>v^^>^>v^><v>><>><v^^v<^^vv^^^v<v>^<<v><^<<v<^v>>^^v^vv^^v^vvv<v^v^^<^v>^v<<v<>v>^<<^v^>>vv<<^^^^^^^v^^>v><<^v^vv^>v><<<<v>v>v^^<vvv<<^^^>>v<>>^><<^<>v^>>v><v^>^<v^v<>vv^>v^^<^>^<v>^^<^>v<<vv><^><<<><>vv^v<^>^<><<<>v^vv^<<>>^^v>^v^v^^>^<^<<^^v>>>^v>v><<^>>^^<v>^^v>v>^v^<>vv><^<<v>^><<<>>v^^v>>>^>^^v^^>^^>^vv>^^^v^<<<^<<><>^^^^>\n><<<>>v^<>vvv^>>>>>v<v<vv><>v<<v^^>v<^>>><<^<v^^v^^>vv>>><<^<<v>>v^v<>^^>^v>>v^^<v<<<v>v><<vvv<^>>v<^^<v^><<<v^<v^v>>^vv<><^vv<>v><v>><v>v><<^>v<>>>^>v^vv^vvvv<>v>^^<>>^v>^<v><^v<^>><<>v^^>v<^>vvvvv<v<^<>>>^^>v>^v^^>><^^v<^v^<^>vv^>vv^>^>^^vvv<>>v^vv<v>v^^^^^>v<^^>><<><^>>>^<^^><<<^<^vv>>>vv^vvvv<v>vv>vv<>v^>><<>>^>>v^^v><^^><<>v<^v<<^v^>>^^v>^^vvv^^^>v<v^^<>^^>vv<^v<<>><<^v<^^>>>^^><><^^^v><vv>v>>>vv^<>>>^>>><>><v^^>>v^>^^v^v^vv<v>v<^><^<<<<>v^v^>^<^v^<vv<vv^v<<<^^><<^^^v<>^><^<>>vvv^<^^<>>><<^<^v^v^^>^<v>v>><>>>v<>><<>^^>^><vv>^<^<^>^v^>^^v<>v^<v^^v^<<>>>v<>^^^vv>^^vv^^<>^^^v<<vv>^^v<<v<>vvv^<<<<<v^^^v>>^>^v>v><v^<<v<<v^<v^<>^^>>^><>^<v^>^>><>^><<vv>v>v^<^vvv^><>v^v<<v><^v<>><<>v<v<vv<^<v<<v^>>^vv<><>><v^v^<^<^>^^<<>>>><><^>><v<^><vv<vv<^>^>^vv^<vv<<^>>><^<^<><^vv^^<<v^>v>>vv^>>^vv>^>v>>^<>>>v<><<^>^vv^^><>v>>^<<v^<<^vv<><<v^>v^^^^vv^<><><^v<v>^>vv^<vv>>vv>v>^>>>>v<v<^<v><<^<><><<v^^<>>><<v>v<>>>>^>^v>>><<<<><><v><><vv^<<<v>v>^>^v<>vvvv^<v^>^v^>>><>v<v^>^>^vv<v><>^<<>><vv>vv<^<v^>v><\nvvv^^<^v^><<^<v<>><^<>><^^^^>>vv<vv<^><<^^^<vv><><>^v^>v^<v<v><v^^><v<<^<v><><v>^<<>^^v>vv><^vvv^^vv<^v<><<v^>vvv>>^<<>vv^^^v>v<v^<>>v^vv<<v>v<^^<>v^<>>>v>v>^<<v<<>^<>^<^<>vv^>v>v>^vvvv^>v^<<<<^^><^>v^>^^^>vv>v<v<>^^>vv<^><^<^<<v<vv<v^^><><^v<^^^^>><^><>><>v>>v>vvv>>v<><>>v<^>^vv>v>>v^^>^v<^><v^v<>vv^v^<vv<v<v^<v^^<v>^<^>^<^<^^<><^<<<<>><vv<^v^><<<v<<v<v^^^v<<<^<<vv>>v^v^>v^^><<<^>^<>>v>^<^v>^^<<v^vvvv<^^v>>^vv^<vv>^^^>v<><<^^^v^^>v>v<<<>^><<v^<v>v^v><>^^<>v^v>v>vv^>^vv<^>>vvv<<^v<^v<>><v>>^vv><v<<><<v>>^<v<v^<v^<>vv>v<v^<v>>v^^<>^>>>^<>^vv><<<<><^^<v<<<>^<v^<>^v<v><>^^>>^<vv^><v^^>>^^v>vv^>vv<<<^^^<>v>^>v^<v<^v^v^><>><v^><^v^>v^<>^v>v<^<^<<>>>>>v^^><><>^v>><^<^^v<<<^><^<^v<v^vv^<<>>^v>v^<^>^<^><v><<>v^vv>><vv<^v^^>^^v>^>^>vv>v>><^>^<>^<>>v<<<<v^^<^<^<vvv>^>>>v^^<v>v<^>^>vvv>v<>v^v<vvvv^<<<v^<><>>vv<<^>>>^>vv^^<v<<^>><v^^>^>v>v><v^<^v<^v<^>><<v<<vv>vv<<<>^^><^<<v^<v>vv^><<<v<^^v^>v<>^^^^>^v>>^>^v<v^^vvv<^<>>>><><vv^^><<<<>><>^<^^v>v^><<vv^<^v^^^v^^v>^>>><<v^<>^>^^<v<^^<^^<vv><>^<>^<>>^\nv^<v<>^>>^v^<<v><v^<v^<<><<>>>^v<^^><>>v<>v>^<^><v><><<<v><^<^vv<v^v^<vv<v<<^<v<^^><v^v<>^>>>v<<<<<^v<><>^v>v^^><<>>vv^<^>v<v><^>v^v<^vv^<vv^>>^v<<<<<v^^v<>v^>>vvv<v^>v^<>vv<<v<><vv>><v^^^<^<^^>^v>vv^v^>><>vv^>^>^<vv><v^vv^^^^v>v^<v<^v>v<<>^<^>vvvv<>v^>^v<vv><v^<<>v><<<<><v^v>^^^v^<^vv>^<<<>^v^>^<>v^>vv<vv>v<<<^vvv<<v^v<v<>v<vv^<<<v>>>>^v>^>v<<^<<^^><^<<<<v<<<>>>^<>v^^>>>^^v<^^^^^^^><^<>^<v><<^v<>v>>>v<^>>^v<>^>>v><<><<^>>^vvv>^>^>v<^><<><^<>>vv^v^^<>v^v^v^<<<^>>v><<vv><>v<><^^v<>v^v^<^v^><>v><^<^vv^<^<^^^<<vvvv><^^^>vvv<^<>^>^^>><vv<>v<><<<<<>^v<><v>^>><^>>>v>>><>^vv<>vv^<v^>>^^>^<^<v>>^^^^^>^><<<<^<v><v>^vv^^>>v^<<^>v<<<v^v>^^vv>v<>^v^>><>v^<^>v^<v<vvv>vvv>>>^^^<^v>^^^<<^>^>v>^>^vv<<<>^>><v<<v^>v>v>v^^^>>><^<<^<^<^^vv^>>^>^vvv^v<>v^<<^v^>^v>v<v^^^vv^v^>vv><<^^^>v><<<><^vv^>v<v<<v^><<v<^><<>^^>>^^vv<v><>v<v<v><^>>^^>v<v>^v<^<><^>v^v<v^>vv<<^<<<^>>vv^^>^>^v<v^^v^vv^<^>v><<^v^^>>>><^v<<v>><v<v^^<<<v<v>>^>v^^v<^v<><<<v^<><<^v>vvv^>>^<><v^><<><>v<v>>v<<<<^^^><^<v^v^^<^^v^>^>v^<<>^v<^v>^<v\n<<^<^>vv<>v>>>^<^^>vv^>v^vv^<^<v^><vv>><v>><v><<>^^<v><v<<vv<^>^^v<v<<^<<v^^>^><^<>^<^v<^^<vv^^v^<v^>>^<<>v^v>^v<>^<^^>^<<><>>>^^<<^>^><>^^v<^^>^v^v<vv^^v<v^v>vv<v>><>>^vv^<^<<^>><vv>vv>vv^<^^>^^v<^^>vv^^v<v>vv<^v^<^>>^<vv^<>vv^<>>v^vv<<v>vv>>><<^>v<<^^<>v<v^v^v><>^<v^^><>>^^>>^>v>>>^>^>v<v>v^v>^<>v^<^>><^v>v<<<<^<<^^v>v^<v^>v^v>^>v^^>^<v>vvv><<<^<>^<>v>v>v<>>vvv^vv><v>^v><^>^^<v^>>^v<<v^v<>>v>^<><<^^<^^^^v^>^v<<^^>^>^>^^<<vvvv^v<>v>v^vv><<>><^^^v^^<v^v<>vv^><^^v><v<<v^^vvvv<>><<vv<v<<>>^vvvv<<<v^vv>v><<v<<v>vv<^<>^<<^vvv>^^^v><<<<>>>^v>^v^><^>v^^v^<^><>vv<vv<v^>v^^^^^v^<v<<>vvvv<^^^>v>><<^^v^v>^>><>>vv>^<<>v^<^^<>v^>^>><>v<>^^^^><><<v<vv<^v^<vv<v<v<v^>v<v>v^v<^<<<^<v<<^<<><><<^>>^^v^<^^v^<<><>v^^v<v^^v<^^<<v<>>^<v<^>v^><v^>^<v<><<v>^<><<^>^^><<<>>><<v>>^^>^><>^<v<<>v>><>^>^><>>v<>vvv<>^vv>><>vv^<<<<<^<<<>vvv><^<<<v<^^>v<>^<>v<<>^<v<<<^v>^v>v><v<>^v><v><v^vv^<^<v^vv><<v><vv>v^^>v>>>v<vv^v<^<><v<<>v<><<<<<<vv^^vv^vv^>>^v^v^vv>>>>><^v>>v<^<^^v<<>^<>v<<>^>>>vv<>v^^^>^v<v<v<<>>^v><vv>^^^<<\n<<v^<v<vvv^^^<<>>><v<>>^>v<<vv<^>>>v>v>^v^^<>^v><<>>^v<<vvv<>>>>>^v>^><^>v>>^v^<>^>^>v^vv<^>v>^^^^v<^vv<>>vv<v>vv<><<v<<>v^^<<>vv>^^<<<v^v>v<>^>^v><v>>v<v^<vvv^<^<^<<<><^vv><<vv>^^vvv^^<vv<>vv^v>v<^^v^v^<<>>>^v^<^<vv^<>>>^<^<v<>>>^<<>^v>^^^<v>v^^v><v^<>v^^>v>^^vvv^><<v^>vv<<^^^^^v<^>v^<>v<<<><>^^<><>v<<^vvvv^v>>v<v><^>^^><><v>^^^^<vv><v^v<v>v>v>^>v^^><<>v^<>>v<^v>^v<^^<^v>>vvv^<<><<<^><>>^v>>^<v<^v><<^<v<vv<^^>v><><><<v<^v^>v<<<<^>v>^^^<>^^^>>v>><>^<>v<<v>^<<<^v<><v><v^<vv<>^>vv<>v^^v<^<^>><>>v<>v^>^v>>^>v><<>^<^^^><>^vvv^vvv<>^><^v>^>^^><v>vv>vv^v><>vvvv<^^^^^^<v>vvv<^>^^^^^^v>^^^<v<v<><><v>^>vv>v^<^v^<vv>><>>>v>>><v^><^v<vv>^v^<>v^v>v>^^^<>>vv^<>^v<^<^>vv>^^vv<<vv^^vv>><<v<><v^v^^>><><^vv<<vv<<<v>^>v<v^>>^>>^^^^<<v>v<^^^v<^>v<v<vv>v<v>^^>v>^vv^^^>v<<<^^>v>^>>><<^vv>>^^>^^^<>v^>^>^<^<>vvv<v<>><<^v^<^<>vv>vv<>vv^vv^><<<^>v>^<v^>^>><<<<<>v^><^>^>><>^v^<vv^>v<v^>>v<v<^v<vvv<v^vvv^^v><^<^<<v<^^>><v<^v<^^>v>^><<<><<>v^>><><<v>>^><v^^vvvv^v>^>v>^v>v>^^v^<v>^v<^<<>^^<^^><v>v>>>><<>v>><vv^^v>\nvv<^v^>v>>>^^>><<vvv<v<^^<^^^^v>>^<^v>vv>v<^^<>>^v^>^v^<<<^<>>v>v<>v^v<<v^v^<^<>vvvvv>vv^<^v<^^^v<^^<vvvv<v<v>^v^^<<v^>^<<v<^<v^^>>v^^^>^vv^^>^<<^v^<>^^><<^<vv^v<>><^v<<>v<<>^<v><<v^<<v>v^>^^^v<>^^vv<<<v>>^v>v>vv<>v^^^>^^><>^vv>>^<<^v>>>^><v^<>>v>><>v^>v<^>v^^v<<>v<v^<^><v^<vv>^^vv<<><<v>^<><>>>vv<vv<<v<<v>v>^<>^^^>v^<^v^<<<<>>^>vv>v><>><v><><<<<<<vv^<vv><^^>^>>><>^>>^^<^^^>^><v^<>^<^vv^<<^><<vv<><v<^v^<<^^^>^vv^<>^<v><^^>>^>^^<<<^v>>^^^vv^^<v<>^>v<^vvv>vv>^<v^<^<v^^^^^<>v^v<v^>vvvvv><^^><v^<v>v>>>^><^v<>^^v>vv<<<<^^<<vv<<v>v^<v<>>^^<>^>>>>^><<v<^>>^<^^v>v^<><^v>^<^^v<^>^^>>v^>>>>>>^<<<<^><<><^<^><>><^^^vv^vv>><>^v>v^^^^<>^^v><>><><vvv<v>>>v>v><^^v<v>>^>^v<>^<^^><vv>>>>>>v<^v><^>^<><^v<<^<>><^<v>>><<><<>v>v^v<<><^^>>vv^v>>^v>><^v^vv>>^>^^>v<<<vv<>v<<^<>^^>>><^^>>>^^>^v<>v<<v<^v<^>v><vvvv^>^><><<^^><v><v>>^<><>>vv^<^>>^>>v<<vv>><^>^v><v>^<>vv^<vvv^vv<vv<^><vv^v>vv>v>>^v>v^<<v>>v>>><v><^vv><><v^v^<<v>>>^^>v><^<<^v<^v<>>v^^v><><>^<<v^<^v^^<v<><^^^^v<v^^vv^v><v<<v^>^<v<<>^>v<^v^v<>>^<>^v>>\nv<<v<<<<v><<><^v<^^vv<v>><v^>>><<v^^<^^>>>v><<<>^>v<<^<^>v<<>>^v^<<<<v<v^>>^>>v>>><>vv><<^v<>><^><^><vv^^^>vv>^^<^v><vvv>v^>^<^v>>>>vvvv>>><>^^<^<<^v<^v<<>vvvvv><v<<v><<^<>>v^<<<v^vv<v<v^>^^vv>vv^vv>>>^><vvv^^^<<>v>>v>><<^^>v^^v<<v>vv><^v^>>v>^<<v>v><v^^>v^<^^^<<^<v><vv<v>^>>v<v><><><>>^^^^^>>vv^vvv^v>^^^<>^>^v>^vv^^><>>^<^<<^>^<<>>^v^v<<>v<v>^<^vv<>^v>>>v<><>^v><v^v<^><<<^v^>^<vv<^<v^>>^>^^^vvvv^v^^^<><v^v<>^v>><<^v^v<^<^v>>><>v<>^>>^>vv^<^<^v^>v^^vv^^<^^<>v>v<<^v^^^>^<>>^vv^v<<<v>>>><<>v>v><^<<v^<v^<<^>^v^>vvv<>^><v>>vv>^^<^v^>^v^>>v<v<v^v>v><^><<<v<^v>>>>>v^^<v^^<v<<>^><<>v>>^vv^>^<v<^v^<<<<v^><>v<<v^<><>><v>v^<<^>^>>>v^vv>>v<<^<v<vv><vvv^^><v^<^^^>v^v<v>v>>v^><>>^<>>^^>><^<^>>v^^^<>>v<>v<>>v^v<<^<<<^>^<><<^<^^vv>v^<<^^v^<^v<>^<^vv><>>>v<>^^<<^v^vv<<v^><<vv><^><<<^v>v<vv>v^>>>>>v><^>><vv<^><^><>>^<v<^>>^<^<<><v^<<><<^<v><v>v>>><<^>>^>^^^<v^vvv<>v>>vv>>^v<>>^vv^^^v^>>^<><v>v<><^>v<v^>^^v^^vv<vv^v>v^><v^^^v<^v^><>^<^^>>^<<><<v>>^^<<>><><>v<^<<^^<vv>>v^v<^^^>><^>^<<<^>^<<vv>><^>v^<>v<v\nvvv>>^^>v>v<>>^^<>><>^v^<>v<>^v^<^>>^><^^>v><>^><<^v<<<<<v>v^<<v<><<v<v<<><^>v>v>^>v^^^vvv><^^<^vvv<<<^v>v^>>^^><vvvv><^<^>v^>>>vv>v>>>v^<><^vv>v<v<><v>><<^v><<<<<>v>^>vvv^v<>^<^v^<<<v>^vv^^^^^^>^><^><><^vv^<<^<>>^^>>^v^><vvv^^v>^><<^v>^<^>>v<^^>>v><vv<^<><<<>vvv<v>^^<^<v<^><>>^>v<^^<v^<<v>><^>v>>>v^^<>^>v^>>^<v<<<<v<<><<<<>v^><v><^v<^v^>><vv^v><>v><><>v<><v^>^<><>vv>v^>^>>^v^>vv^^>^<^<>>^>>v<^<vv>>v>>^v<<<v<^<^v<>^v^v>^^v<v^<>v^v>v<v>><vv>v>v<><^vvv<vvv^v>v<<^<<>>>v>>><vv>^v^<<>^>v>^>^^<^<<>^v^^>^^v<^>^<><>^^<>v^>v<v^vv^v^v^<v<<><><>v><v^vvv^v<>>>^<^^<>v<^^>>v^>v^^<^>>>>><^^<>>>v^<^>^<^<<^<>^v<v^^<>v^<v>^v<<<>^v^^^<><vv^^><^v<>>>^<>^<<>v><<<^vv>>vv^vv<^v^>v>v^>v>><<<<v^^^^vv<v>^v<<^<>>v>>v<>vv^v>>>vv>^vvv^v^v^v^<<>^^>vv>^>v>^v>>>^v^>v><>v<>><>>><>vv<<>>^^v>vv>v^<>>><^vv>v<>^v<v^<v^^^><>^v^><>^>>>^v^^vv>>><>v<>>^<^^^v<>v>^v^^>><^v^>><vvv>><v<<^^^>>>><^^v>v^v><v>v^<v<^>>^v^<<^<v^><vv<^^>vv^v<<><v><^^^<<^^v>^^v<vvvvv^>><><>v^^<<v>>^^>>^>>^<v^<<vv^>^<>>^v^v^<^<>^>^>^^vv^^vvv>>>^^>v^><<^<<\nvv<^v^>^<^>^^><vvv>^vvv<v^v<v<vvv^><v^<>^>^<^<<<<<<<>>v^^>v^<<^><>^>^>><<<><^<>^>v^^<<vv>vv<><vvv^>v<^^^^>v<<v<<v^<>v<<>><^^<^^^>>><>v<>v^<>vv><^>>>>v<v^<v<>v<>^<<v<^^<<^v><^^>^v<v><<v^v>vv^^v<<>>^^^<><<v<^^^^v<vv^<v^>v^>^<^vv<>>>v>>><^<^<v>^<<<v>v^>>v^v<<^vv<^<v^>v<<>><vvv^<^><^^<>><<v>^><<>^v<>><><vv<<^<><>v>>v^>>^><v^^><>><>v^<<<><>^>vv^^^<^v><v<v>v^^^^v><>>^><>>v^^v>v<<><<^^<^>>v^^<v>v^^v><v><<<^>vv<<>^<v<v^v^>v^<v<<v<>>>^vvv<>^<><^^><^v<>^>v<vv>>>><^>>><>><^<<>vv><^<>^v^<^v<^>v^^>v^<v><<v>><^vv<^vv<>^>v^<v>><<v><><^>v>^<<vv^v<<^^<<vv>v<v<v^>^>>^>v>>v>>>>><>v<^>><^^>>^vvv><v^^v^<v^<^<>v^^vv<^><<><^vv><v<<<><^^<>><v^<^<^v><^v<>v>vv^<^v<<^^^><<vv>v<^v><<>vv^vv<>v^^^^^>>^>v<<<>v^^<<<^<<v<^>>>vv>^>^<v>>^^<v^^<<vv><<<vvv>v><^<^<>v^<>^>^^>v<<><>><>><^<<v<><v<v<v>^^<<^>vv<>^>v^<<><^<<><<^<v><><>v>v^^>>v<>^v<<^>>^vv><>v^^>^vv<>v<v>vv^v^>^^><<^><^>v>>^^<^<v<v<^><<v>vv<^v<^>>v><><<v^^<<^^<>^^>>v<<>^v>v^^^<v>vv><v^>>><^vvvv><^^vvv<v<>vv^^<^<<><<>^v<^<^v^v^>><<vv>^<^<v<<>vv<<^<<>v<<<<<<vv>v^v<\n<^vv>^v>^<<>vv<<>>vv<v^<^v>^<>^^><^^^<><v<<<>>^>v<^v>>^>><^<<><^<<^^v<v><^^^^<>v><^>>>vv^>>v<v^<<v^<>v^>^^><>vv<^>^>>>v^v<>v><^>v<<<<^v^>^v><vv^>^^>>v^<v^v>>^>>>^>>vvv>>v<^><>><^^>>v>v>v^^<v<><>^<v<^vv<<^^><>v^><>^>>v>v<>^<vv>v<>^><>^>vv>^v><v><>><<><<v>^<<^>v^<v<vv><v<<v^^><v>vv<v^>v<>>^^<<^<^^^v>v<v><v<<^<^>v^<>>><<^>^<<^<^v<v^^^v^^v<>vv<>^v^^^^^>^><>^^^^>>^>v^^>^v<>vvvv<><v>vv<<><^<>^<<<<^^^><^<^>>>^<^v^vv^^^v^v^^<<<^vv<^<^>^<><><<>>vv^^>><>><<^^<v<<><v>v^><>^^<^v>v^^<v<<<>^><^<<>>^^<^^<>v^vvvv>^<^v>^<v^>^v<vv^v>^^vv>vv^>^>v>^v^<>^v<><>^<>vv^<^>v^^^<vv^>^vv><v<v>v<>^>vv>v<^<v<>v^>^<>><v^><<<^v^v>>v^^>>>^^><v>^>^<>v<v^<>^v<<>v^>^>>v><v><>>>^<><><v>^^^v^^v<<v^><><v>>v>^^<<<<^^^^v>v>v^^>v>^^v^^^v><vv^vvv<^v^<v>>vv<^^v>^^v^<>vvv^^>>v>^<^<^v>^<<vv^<<<>^>><^<<^><>v^v>v^<>><<<<^^<>>^>^>>v<>v<^<v>>>v<<<<>>v^<^v>v>^^v<<v<<^>><<<^v^^<<<<v<<^v<^>>^v^^vvv^v>>^^>v<>v^>>>v<<>^><><<<v^v>>^vv>^v^^v^><v^<^>v^^^vv<^<>vvv><v>^v>><<^>v<v><v<^>>v^<^^vv>v<>^>><v<^v>>><vv^<vv^^^>>>v<^>v<^^<>^vvv><^<>^>>>^\n><<<^v>v>^>^^>^>^^v>>^v>v<v>>^^v<^<<>^^<<v^^>>v><>vv>v^>^^>v<v^^v^^v^^>v>^<vv^^<<^><<><^v^>vv<^v>^vv^<<^<<<^v^^<><^><<<<>>^><^>^vvv>><v^<^<v>^vv>><v>v>><^^v^>^^<^<^<>^v>^v>^v><<>^>v^^vv^^^v^v^v<^vv^^vvv^^^v>^>>^>vvv>>^^<^>^v<>>^^>>v>^^<v><>v>>v<^<vv^<vv>^>v<^^v>^<>>^^v><>^^v^v^<^<<^^<vv^^^<v><<<>^v>v^<<<v<v<>^v>vv<v<^<v>^^>>><<^^><^v>^vv<<^>>^>^vvv><>v<^v>vvv<v<^<>^^^>^^>^^>v^><^<^v<><<<v^v>>^<^<v<^<v<<<>>v><v>v>><>^>><^<<>v^<<^v><^<^<>><^<<^v><^^><v^>^^v<<v<^<^^^<>^>>^^v<<^<<v^>>v<v<^^^v><v<<^>^v>v><<^<<^<>^>v>^^<vvv<^><vv<<<^v><^^vv<<>^v^<^>v^v>v<<^v>><><v<v><<><><<^<<>^>vvv<><<^<v<^^^^><<^v><>v<>v>v>v><^>v^v<^<v^^<>^v^^<v><vv><>vvv>^^<><><>^><^<>><^^^>>>^^>v<v^<<<<>>v<v^<<^^^^vvv^^<^v^><v>><>v<v<>>^^v<v>^<<^^<>>>^>>vv><^>v>^<>^v>v^<^>v^><<<^<<^><><^^v<^<<>v<>>>>v><^<v^^<^<>^vvvv^<^^^^><^^<^><v>>^v>v^^v^<^vv^>^<><><v<>>^v<v<<v>vv<<^>v>v><v^><^v^^<>^<^<<<>>>v>>^v^><>v^<>vvv<<v<v^v^^^<><>v>^v>^<v>^v>^vv^<<v<>^^<^vv>v<^^v^^<^^>^<v<v<<<v>vv^><v^^>v>vv<<>>v^^<^<v^<v^<<vv>^^v^>v<>^^<<v<^v<';
-var $author$project$Main$sampleLarger = '##########\n#..O..O.O#\n#......O.#\n#.OO..O.O#\n#..O@..O.#\n#O#..O...#\n#O..O..O.#\n#.OO.O.OO#\n#....O...#\n##########\n\n<vv>^<v^>v>^vv^v>v<>v^v<v<^vv<<<^><<><>>v<vvv<>^v^>^<<<><<v<<<v^vv^v>^\nvvv<<^>^v^^><<>>><>^<<><^vv^^<>vvv<>><^^v>^>vv<>v<<<<v<^v>^<^^>>>^<v<v\n><>vv>v^v^<>><>>>><^^>vv>v<^^^>>v^v^<^^>v^^>v^<^v>v<>>v^v^<v>v^^<^^vv<\n<<v<^>>^^^^>>>v^<>vvv^><v<<<>^^^vv^<vvv>^>v<^^^^v<>^>vvvv><>>v^<<^^^^^\n^><^><>>><>^^<<^^v>>><^<v>^<vv>>v>>>^v><>^v><<<<v>>v<v<v>vvv>^<><<>^><\n^>><>^v<><^vvv<^^<><v<<<<<><^v<<<><<<^^<v<^^^><^>>^<v^><<<^>>^v<v^v<v^\n>^>>^v>vv>^<<^v<>><<><<v<<v><>v<^vv<<<>^^v^>^^>>><<^v>>v^v><^^>>^<>vv^\n<><^^>^^^<><vvvvv^v<v<<>^v<v>v<<^><<><<><<<^^<<<^<<>><<><^^^>^^<>^>v<>\n^^>vv<^v^v<vv>^<><v<^v>^^^>>>^^vvv^>vvv<>>>^<^>>>>>^<<^v>^vvv<>^<><<v>\nv^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^';
-var $author$project$Main$sampleSituation = '#######\n#...#.#\n#.....#\n#..OO@#\n#..O..#\n#.....#\n#######\n\n<vv<<^^<<^^';
-var $author$project$Main$sampleSmaller = '########\n#..O.O.#\n##@.O..#\n#...O..#\n#.#.O..#\n#...O..#\n#......#\n########\n\n<^^>>>vv<v>>v<<';
-var $author$project$Main$read = function (dataSource) {
-	switch (dataSource) {
-		case 0:
-			return $author$project$Main$input;
-		case 1:
-			return $author$project$Main$sampleSmaller;
-		case 2:
-			return $author$project$Main$sampleLarger;
-		default:
-			return $author$project$Main$sampleSituation;
-	}
-};
-var $elm$core$String$foldr = _String_foldr;
-var $elm$core$String$toList = function (string) {
-	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
-};
-var $elm$core$String$replace = F3(
-	function (before, after, string) {
-		return A2(
-			$elm$core$String$join,
-			after,
-			A2($elm$core$String$split, before, string));
-	});
-var $author$project$Main$widen = function (text) {
-	return A3(
-		$elm$core$String$replace,
-		'@',
-		'@.',
-		A3(
-			$elm$core$String$replace,
-			'.',
-			'..',
-			A3(
-				$elm$core$String$replace,
-				'O',
-				'[]',
-				A3($elm$core$String$replace, '#', '##', text))));
-};
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (!maybe.$) {
-			var value = maybe.a;
-			return value;
+			boxedParts);
+		if ((boxedSymbolParts.b && boxedSymbolParts.b.b) && (!boxedSymbolParts.b.b.b)) {
+			var bp1 = boxedSymbolParts.a;
+			var _v1 = boxedSymbolParts.b;
+			var bp2 = _v1.a;
+			return true;
 		} else {
-			return _default;
-		}
-	});
-var $author$project$Main$initModel = F2(
-	function (wide, dataSource) {
-		var data = $author$project$Main$read(dataSource);
-		var _v0 = function () {
-			var _v1 = A2($elm$core$String$split, '\n\n', data);
-			if (_v1.b && _v1.b.b) {
-				var a = _v1.a;
-				var _v2 = _v1.b;
-				var b = _v2.a;
-				return _Utils_Tuple2(
-					A2($elm$core$String$split, '\n', a),
-					$elm$core$String$toList(b));
-			} else {
-				return _Utils_Tuple2(_List_Nil, _List_Nil);
-			}
-		}();
-		var basicRows = _v0.a;
-		var moves = _v0.b;
-		var rows = wide ? A2($elm$core$List$map, $author$project$Main$widen, basicRows) : basicRows;
-		var numberOfCols = $elm$core$String$length(
-			A2(
-				$elm$core$Maybe$withDefault,
-				'?',
-				$elm$core$List$head(rows)));
-		var numberOfRows = $elm$core$List$length(rows);
-		var warehouse = $tortus$elm_array_2d$Array2D$fromList(
-			A2($elm$core$List$map, $elm$core$String$toList, rows));
-		var robot = $author$project$Main$findRobot(warehouse);
-		return {r: dataSource, Z: false, N: !dataSource, M: '?', H: moves, B: true, C: robot, x: $author$project$Main$defaultTickInterval, z: warehouse, l: wide};
-	});
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Main$init = function (_v0) {
-	return _Utils_Tuple2(
-		A2($author$project$Main$initModel, false, 2),
-		$elm$core$Platform$Cmd$none);
-};
-var $author$project$Main$KeyDown = function (a) {
-	return {$: 11, a: a};
-};
-var $author$project$Main$Tick = {$: 0};
-var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $ohanhi$keyboard$Keyboard$RawKey = $elm$core$Basics$identity;
-var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$json$Json$Decode$string = _Json_decodeString;
-var $ohanhi$keyboard$Keyboard$eventKeyDecoder = A2(
-	$elm$json$Json$Decode$field,
-	'key',
-	A2($elm$json$Json$Decode$map, $elm$core$Basics$identity, $elm$json$Json$Decode$string));
-var $elm$browser$Browser$Events$Document = 0;
-var $elm$browser$Browser$Events$MySub = F3(
-	function (a, b, c) {
-		return {$: 0, a: a, b: b, c: c};
-	});
-var $elm$browser$Browser$Events$State = F2(
-	function (subs, pids) {
-		return {ag: pids, ap: subs};
-	});
-var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
-var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
-var $elm$browser$Browser$Events$init = $elm$core$Task$succeed(
-	A2($elm$browser$Browser$Events$State, _List_Nil, $elm$core$Dict$empty));
-var $elm$browser$Browser$Events$nodeToKey = function (node) {
-	if (!node) {
-		return 'd_';
-	} else {
-		return 'w_';
-	}
-};
-var $elm$browser$Browser$Events$addKey = function (sub) {
-	var node = sub.a;
-	var name = sub.b;
-	return _Utils_Tuple2(
-		_Utils_ap(
-			$elm$browser$Browser$Events$nodeToKey(node),
-			name),
-		sub);
-};
-var $elm$core$Dict$Black = 1;
-var $elm$core$Dict$RBNode_elm_builtin = F5(
-	function (a, b, c, d, e) {
-		return {$: -1, a: a, b: b, c: c, d: d, e: e};
-	});
-var $elm$core$Dict$Red = 0;
-var $elm$core$Dict$balance = F5(
-	function (color, key, value, left, right) {
-		if ((right.$ === -1) && (!right.a)) {
-			var _v1 = right.a;
-			var rK = right.b;
-			var rV = right.c;
-			var rLeft = right.d;
-			var rRight = right.e;
-			if ((left.$ === -1) && (!left.a)) {
-				var _v3 = left.a;
-				var lK = left.b;
-				var lV = left.c;
-				var lLeft = left.d;
-				var lRight = left.e;
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					0,
-					key,
-					value,
-					A5($elm$core$Dict$RBNode_elm_builtin, 1, lK, lV, lLeft, lRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, 1, rK, rV, rLeft, rRight));
-			} else {
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					color,
-					rK,
-					rV,
-					A5($elm$core$Dict$RBNode_elm_builtin, 0, key, value, left, rLeft),
-					rRight);
-			}
-		} else {
-			if ((((left.$ === -1) && (!left.a)) && (left.d.$ === -1)) && (!left.d.a)) {
-				var _v5 = left.a;
-				var lK = left.b;
-				var lV = left.c;
-				var _v6 = left.d;
-				var _v7 = _v6.a;
-				var llK = _v6.b;
-				var llV = _v6.c;
-				var llLeft = _v6.d;
-				var llRight = _v6.e;
-				var lRight = left.e;
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					0,
-					lK,
-					lV,
-					A5($elm$core$Dict$RBNode_elm_builtin, 1, llK, llV, llLeft, llRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, 1, key, value, lRight, right));
-			} else {
-				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
-			}
-		}
-	});
-var $elm$core$Basics$compare = _Utils_compare;
-var $elm$core$Dict$insertHelp = F3(
-	function (key, value, dict) {
-		if (dict.$ === -2) {
-			return A5($elm$core$Dict$RBNode_elm_builtin, 0, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
-		} else {
-			var nColor = dict.a;
-			var nKey = dict.b;
-			var nValue = dict.c;
-			var nLeft = dict.d;
-			var nRight = dict.e;
-			var _v1 = A2($elm$core$Basics$compare, key, nKey);
-			switch (_v1) {
-				case 0:
-					return A5(
-						$elm$core$Dict$balance,
-						nColor,
-						nKey,
-						nValue,
-						A3($elm$core$Dict$insertHelp, key, value, nLeft),
-						nRight);
-				case 1:
-					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
-				default:
-					return A5(
-						$elm$core$Dict$balance,
-						nColor,
-						nKey,
-						nValue,
-						nLeft,
-						A3($elm$core$Dict$insertHelp, key, value, nRight));
-			}
-		}
-	});
-var $elm$core$Dict$insert = F3(
-	function (key, value, dict) {
-		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
-		if ((_v0.$ === -1) && (!_v0.a)) {
-			var _v1 = _v0.a;
-			var k = _v0.b;
-			var v = _v0.c;
-			var l = _v0.d;
-			var r = _v0.e;
-			return A5($elm$core$Dict$RBNode_elm_builtin, 1, k, v, l, r);
-		} else {
-			var x = _v0;
-			return x;
-		}
-	});
-var $elm$core$Dict$fromList = function (assocs) {
-	return A3(
-		$elm$core$List$foldl,
-		F2(
-			function (_v0, dict) {
-				var key = _v0.a;
-				var value = _v0.b;
-				return A3($elm$core$Dict$insert, key, value, dict);
-			}),
-		$elm$core$Dict$empty,
-		assocs);
-};
-var $elm$core$Process$kill = _Scheduler_kill;
-var $elm$core$Dict$foldl = F3(
-	function (func, acc, dict) {
-		foldl:
-		while (true) {
-			if (dict.$ === -2) {
-				return acc;
-			} else {
-				var key = dict.b;
-				var value = dict.c;
-				var left = dict.d;
-				var right = dict.e;
-				var $temp$func = func,
-					$temp$acc = A3(
-					func,
-					key,
-					value,
-					A3($elm$core$Dict$foldl, func, acc, left)),
-					$temp$dict = right;
-				func = $temp$func;
-				acc = $temp$acc;
-				dict = $temp$dict;
-				continue foldl;
-			}
-		}
-	});
-var $elm$core$Dict$merge = F6(
-	function (leftStep, bothStep, rightStep, leftDict, rightDict, initialResult) {
-		var stepState = F3(
-			function (rKey, rValue, _v0) {
-				stepState:
-				while (true) {
-					var list = _v0.a;
-					var result = _v0.b;
-					if (!list.b) {
-						return _Utils_Tuple2(
-							list,
-							A3(rightStep, rKey, rValue, result));
-					} else {
-						var _v2 = list.a;
-						var lKey = _v2.a;
-						var lValue = _v2.b;
-						var rest = list.b;
-						if (_Utils_cmp(lKey, rKey) < 0) {
-							var $temp$rKey = rKey,
-								$temp$rValue = rValue,
-								$temp$_v0 = _Utils_Tuple2(
-								rest,
-								A3(leftStep, lKey, lValue, result));
-							rKey = $temp$rKey;
-							rValue = $temp$rValue;
-							_v0 = $temp$_v0;
-							continue stepState;
-						} else {
-							if (_Utils_cmp(lKey, rKey) > 0) {
-								return _Utils_Tuple2(
-									list,
-									A3(rightStep, rKey, rValue, result));
-							} else {
-								return _Utils_Tuple2(
-									rest,
-									A4(bothStep, lKey, lValue, rValue, result));
-							}
-						}
-					}
-				}
-			});
-		var _v3 = A3(
-			$elm$core$Dict$foldl,
-			stepState,
-			_Utils_Tuple2(
-				$elm$core$Dict$toList(leftDict),
-				initialResult),
-			rightDict);
-		var leftovers = _v3.a;
-		var intermediateResult = _v3.b;
-		return A3(
-			$elm$core$List$foldl,
-			F2(
-				function (_v4, result) {
-					var k = _v4.a;
-					var v = _v4.b;
-					return A3(leftStep, k, v, result);
-				}),
-			intermediateResult,
-			leftovers);
-	});
-var $elm$browser$Browser$Events$Event = F2(
-	function (key, event) {
-		return {Y: event, ac: key};
-	});
-var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
-var $elm$browser$Browser$Events$spawn = F3(
-	function (router, key, _v0) {
-		var node = _v0.a;
-		var name = _v0.b;
-		var actualNode = function () {
-			if (!node) {
-				return _Browser_doc;
-			} else {
-				return _Browser_window;
-			}
-		}();
-		return A2(
-			$elm$core$Task$map,
-			function (value) {
-				return _Utils_Tuple2(key, value);
-			},
-			A3(
-				_Browser_on,
-				actualNode,
-				name,
-				function (event) {
-					return A2(
-						$elm$core$Platform$sendToSelf,
-						router,
-						A2($elm$browser$Browser$Events$Event, key, event));
-				}));
-	});
-var $elm$core$Dict$union = F2(
-	function (t1, t2) {
-		return A3($elm$core$Dict$foldl, $elm$core$Dict$insert, t2, t1);
-	});
-var $elm$browser$Browser$Events$onEffects = F3(
-	function (router, subs, state) {
-		var stepRight = F3(
-			function (key, sub, _v6) {
-				var deads = _v6.a;
-				var lives = _v6.b;
-				var news = _v6.c;
-				return _Utils_Tuple3(
-					deads,
-					lives,
-					A2(
-						$elm$core$List$cons,
-						A3($elm$browser$Browser$Events$spawn, router, key, sub),
-						news));
-			});
-		var stepLeft = F3(
-			function (_v4, pid, _v5) {
-				var deads = _v5.a;
-				var lives = _v5.b;
-				var news = _v5.c;
-				return _Utils_Tuple3(
-					A2($elm$core$List$cons, pid, deads),
-					lives,
-					news);
-			});
-		var stepBoth = F4(
-			function (key, pid, _v2, _v3) {
-				var deads = _v3.a;
-				var lives = _v3.b;
-				var news = _v3.c;
-				return _Utils_Tuple3(
-					deads,
-					A3($elm$core$Dict$insert, key, pid, lives),
-					news);
-			});
-		var newSubs = A2($elm$core$List$map, $elm$browser$Browser$Events$addKey, subs);
-		var _v0 = A6(
-			$elm$core$Dict$merge,
-			stepLeft,
-			stepBoth,
-			stepRight,
-			state.ag,
-			$elm$core$Dict$fromList(newSubs),
-			_Utils_Tuple3(_List_Nil, $elm$core$Dict$empty, _List_Nil));
-		var deadPids = _v0.a;
-		var livePids = _v0.b;
-		var makeNewPids = _v0.c;
-		return A2(
-			$elm$core$Task$andThen,
-			function (pids) {
-				return $elm$core$Task$succeed(
-					A2(
-						$elm$browser$Browser$Events$State,
-						newSubs,
-						A2(
-							$elm$core$Dict$union,
-							livePids,
-							$elm$core$Dict$fromList(pids))));
-			},
-			A2(
-				$elm$core$Task$andThen,
-				function (_v1) {
-					return $elm$core$Task$sequence(makeNewPids);
-				},
-				$elm$core$Task$sequence(
-					A2($elm$core$List$map, $elm$core$Process$kill, deadPids))));
-	});
-var $elm$core$List$maybeCons = F3(
-	function (f, mx, xs) {
-		var _v0 = f(mx);
-		if (!_v0.$) {
-			var x = _v0.a;
-			return A2($elm$core$List$cons, x, xs);
-		} else {
-			return xs;
-		}
-	});
-var $elm$core$List$filterMap = F2(
-	function (f, xs) {
-		return A3(
-			$elm$core$List$foldr,
-			$elm$core$List$maybeCons(f),
-			_List_Nil,
-			xs);
-	});
-var $elm$browser$Browser$Events$onSelfMsg = F3(
-	function (router, _v0, state) {
-		var key = _v0.ac;
-		var event = _v0.Y;
-		var toMessage = function (_v2) {
-			var subKey = _v2.a;
-			var _v3 = _v2.b;
-			var node = _v3.a;
-			var name = _v3.b;
-			var decoder = _v3.c;
-			return _Utils_eq(subKey, key) ? A2(_Browser_decodeEvent, decoder, event) : $elm$core$Maybe$Nothing;
-		};
-		var messages = A2($elm$core$List$filterMap, toMessage, state.ap);
-		return A2(
-			$elm$core$Task$andThen,
-			function (_v1) {
-				return $elm$core$Task$succeed(state);
-			},
-			$elm$core$Task$sequence(
-				A2(
-					$elm$core$List$map,
-					$elm$core$Platform$sendToApp(router),
-					messages)));
-	});
-var $elm$browser$Browser$Events$subMap = F2(
-	function (func, _v0) {
-		var node = _v0.a;
-		var name = _v0.b;
-		var decoder = _v0.c;
-		return A3(
-			$elm$browser$Browser$Events$MySub,
-			node,
-			name,
-			A2($elm$json$Json$Decode$map, func, decoder));
-	});
-_Platform_effectManagers['Browser.Events'] = _Platform_createManager($elm$browser$Browser$Events$init, $elm$browser$Browser$Events$onEffects, $elm$browser$Browser$Events$onSelfMsg, 0, $elm$browser$Browser$Events$subMap);
-var $elm$browser$Browser$Events$subscription = _Platform_leaf('Browser.Events');
-var $elm$browser$Browser$Events$on = F3(
-	function (node, name, decoder) {
-		return $elm$browser$Browser$Events$subscription(
-			A3($elm$browser$Browser$Events$MySub, node, name, decoder));
-	});
-var $elm$browser$Browser$Events$onKeyDown = A2($elm$browser$Browser$Events$on, 0, 'keydown');
-var $ohanhi$keyboard$Keyboard$downs = function (toMsg) {
-	return $elm$browser$Browser$Events$onKeyDown(
-		A2($elm$json$Json$Decode$map, toMsg, $ohanhi$keyboard$Keyboard$eventKeyDecoder));
-};
-var $elm$time$Time$Every = F2(
-	function (a, b) {
-		return {$: 0, a: a, b: b};
-	});
-var $elm$time$Time$State = F2(
-	function (taggers, processes) {
-		return {aj: processes, aq: taggers};
-	});
-var $elm$time$Time$init = $elm$core$Task$succeed(
-	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
-var $elm$core$Dict$get = F2(
-	function (targetKey, dict) {
-		get:
-		while (true) {
-			if (dict.$ === -2) {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var key = dict.b;
-				var value = dict.c;
-				var left = dict.d;
-				var right = dict.e;
-				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
-				switch (_v1) {
-					case 0:
-						var $temp$targetKey = targetKey,
-							$temp$dict = left;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-					case 1:
-						return $elm$core$Maybe$Just(value);
-					default:
-						var $temp$targetKey = targetKey,
-							$temp$dict = right;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-				}
-			}
-		}
-	});
-var $elm$time$Time$addMySub = F2(
-	function (_v0, state) {
-		var interval = _v0.a;
-		var tagger = _v0.b;
-		var _v1 = A2($elm$core$Dict$get, interval, state);
-		if (_v1.$ === 1) {
-			return A3(
-				$elm$core$Dict$insert,
-				interval,
-				_List_fromArray(
-					[tagger]),
-				state);
-		} else {
-			var taggers = _v1.a;
-			return A3(
-				$elm$core$Dict$insert,
-				interval,
-				A2($elm$core$List$cons, tagger, taggers),
-				state);
-		}
-	});
-var $elm$time$Time$Name = function (a) {
-	return {$: 0, a: a};
-};
-var $elm$time$Time$Offset = function (a) {
-	return {$: 1, a: a};
-};
-var $elm$time$Time$Zone = F2(
-	function (a, b) {
-		return {$: 0, a: a, b: b};
-	});
-var $elm$time$Time$customZone = $elm$time$Time$Zone;
-var $elm$time$Time$setInterval = _Time_setInterval;
-var $elm$core$Process$spawn = _Scheduler_spawn;
-var $elm$time$Time$spawnHelp = F3(
-	function (router, intervals, processes) {
-		if (!intervals.b) {
-			return $elm$core$Task$succeed(processes);
-		} else {
-			var interval = intervals.a;
-			var rest = intervals.b;
-			var spawnTimer = $elm$core$Process$spawn(
-				A2(
-					$elm$time$Time$setInterval,
-					interval,
-					A2($elm$core$Platform$sendToSelf, router, interval)));
-			var spawnRest = function (id) {
-				return A3(
-					$elm$time$Time$spawnHelp,
-					router,
-					rest,
-					A3($elm$core$Dict$insert, interval, id, processes));
-			};
-			return A2($elm$core$Task$andThen, spawnRest, spawnTimer);
-		}
-	});
-var $elm$time$Time$onEffects = F3(
-	function (router, subs, _v0) {
-		var processes = _v0.aj;
-		var rightStep = F3(
-			function (_v6, id, _v7) {
-				var spawns = _v7.a;
-				var existing = _v7.b;
-				var kills = _v7.c;
-				return _Utils_Tuple3(
-					spawns,
-					existing,
-					A2(
-						$elm$core$Task$andThen,
-						function (_v5) {
-							return kills;
-						},
-						$elm$core$Process$kill(id)));
-			});
-		var newTaggers = A3($elm$core$List$foldl, $elm$time$Time$addMySub, $elm$core$Dict$empty, subs);
-		var leftStep = F3(
-			function (interval, taggers, _v4) {
-				var spawns = _v4.a;
-				var existing = _v4.b;
-				var kills = _v4.c;
-				return _Utils_Tuple3(
-					A2($elm$core$List$cons, interval, spawns),
-					existing,
-					kills);
-			});
-		var bothStep = F4(
-			function (interval, taggers, id, _v3) {
-				var spawns = _v3.a;
-				var existing = _v3.b;
-				var kills = _v3.c;
-				return _Utils_Tuple3(
-					spawns,
-					A3($elm$core$Dict$insert, interval, id, existing),
-					kills);
-			});
-		var _v1 = A6(
-			$elm$core$Dict$merge,
-			leftStep,
-			bothStep,
-			rightStep,
-			newTaggers,
-			processes,
-			_Utils_Tuple3(
-				_List_Nil,
-				$elm$core$Dict$empty,
-				$elm$core$Task$succeed(0)));
-		var spawnList = _v1.a;
-		var existingDict = _v1.b;
-		var killTask = _v1.c;
-		return A2(
-			$elm$core$Task$andThen,
-			function (newProcesses) {
-				return $elm$core$Task$succeed(
-					A2($elm$time$Time$State, newTaggers, newProcesses));
-			},
-			A2(
-				$elm$core$Task$andThen,
-				function (_v2) {
-					return A3($elm$time$Time$spawnHelp, router, spawnList, existingDict);
-				},
-				killTask));
-	});
-var $elm$time$Time$Posix = $elm$core$Basics$identity;
-var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
-var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
-var $elm$time$Time$onSelfMsg = F3(
-	function (router, interval, state) {
-		var _v0 = A2($elm$core$Dict$get, interval, state.aq);
-		if (_v0.$ === 1) {
-			return $elm$core$Task$succeed(state);
-		} else {
-			var taggers = _v0.a;
-			var tellTaggers = function (time) {
-				return $elm$core$Task$sequence(
-					A2(
-						$elm$core$List$map,
-						function (tagger) {
-							return A2(
-								$elm$core$Platform$sendToApp,
-								router,
-								tagger(time));
-						},
-						taggers));
-			};
-			return A2(
-				$elm$core$Task$andThen,
-				function (_v1) {
-					return $elm$core$Task$succeed(state);
-				},
-				A2($elm$core$Task$andThen, tellTaggers, $elm$time$Time$now));
-		}
-	});
-var $elm$core$Basics$composeL = F3(
-	function (g, f, x) {
-		return g(
-			f(x));
-	});
-var $elm$time$Time$subMap = F2(
-	function (f, _v0) {
-		var interval = _v0.a;
-		var tagger = _v0.b;
-		return A2(
-			$elm$time$Time$Every,
-			interval,
-			A2($elm$core$Basics$composeL, f, tagger));
-	});
-_Platform_effectManagers['Time'] = _Platform_createManager($elm$time$Time$init, $elm$time$Time$onEffects, $elm$time$Time$onSelfMsg, 0, $elm$time$Time$subMap);
-var $elm$time$Time$subscription = _Platform_leaf('Time');
-var $elm$time$Time$every = F2(
-	function (interval, tagger) {
-		return $elm$time$Time$subscription(
-			A2($elm$time$Time$Every, interval, tagger));
-	});
-var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $author$project$Main$subscriptions = function (model) {
-	var tickSub = model.B ? $elm$core$Platform$Sub$none : A2(
-		$elm$time$Time$every,
-		model.x,
-		function (_v0) {
-			return $author$project$Main$Tick;
-		});
-	var keySub = $ohanhi$keyboard$Keyboard$downs($author$project$Main$KeyDown);
-	return $elm$core$Platform$Sub$batch(
-		_List_fromArray(
-			[tickSub, keySub]));
-};
-var $author$project$Main$SampleSituation = 3;
-var $author$project$Main$SampleSmaller = 1;
-var $ohanhi$keyboard$Keyboard$ArrowDown = {$: 18};
-var $ohanhi$keyboard$Keyboard$ArrowLeft = {$: 19};
-var $ohanhi$keyboard$Keyboard$ArrowRight = {$: 20};
-var $ohanhi$keyboard$Keyboard$ArrowUp = {$: 21};
-var $ohanhi$keyboard$Keyboard$Character = function (a) {
-	return {$: 0, a: a};
-};
-var $ohanhi$keyboard$Keyboard$rawValue = function (_v0) {
-	var key = _v0;
-	return key;
-};
-var $elm$core$String$toUpper = _String_toUpper;
-var $ohanhi$keyboard$Keyboard$Arrows$arrowKey = function (rawKey) {
-	var _v0 = $ohanhi$keyboard$Keyboard$rawValue(rawKey);
-	switch (_v0) {
-		case 'ArrowDown':
-			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowDown);
-		case 'ArrowLeft':
-			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowLeft);
-		case 'ArrowRight':
-			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowRight);
-		case 'ArrowUp':
-			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowUp);
-		case 'Down':
-			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowDown);
-		case 'Left':
-			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowLeft);
-		case 'Right':
-			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowRight);
-		case 'Up':
-			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowUp);
-		default:
-			var other = _v0;
-			var upper = $elm$core$String$toUpper(other);
-			return ((upper === 'W') || ((upper === 'A') || ((upper === 'S') || (upper === 'D')))) ? $elm$core$Maybe$Just(
-				$ohanhi$keyboard$Keyboard$Character(upper)) : $elm$core$Maybe$Nothing;
-	}
-};
-var $author$project$Main$updateClear = function (model) {
-	return A2($author$project$Main$initModel, model.l, model.r);
-};
-var $author$project$Main$moveToOffset = function (move) {
-	switch (move) {
-		case '^':
-			return _Utils_Tuple2(0, -1);
-		case '<':
-			return _Utils_Tuple2(-1, 0);
-		case 'v':
-			return _Utils_Tuple2(0, 1);
-		case '>':
-			return _Utils_Tuple2(1, 0);
-		default:
-			return _Utils_Tuple2(0, 0);
-	}
-};
-var $author$project$Main$moveStep = F2(
-	function (move, _v0) {
-		var x = _v0.a;
-		var y = _v0.b;
-		var _v1 = $author$project$Main$moveToOffset(move);
-		var dx = _v1.a;
-		var dy = _v1.b;
-		return _Utils_Tuple2(x + dx, y + dy);
-	});
-var $elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (!maybe.$) {
-			var value = maybe.a;
-			return $elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $elm$core$Array$setHelp = F4(
-	function (shift, index, value, tree) {
-		var pos = $elm$core$Array$bitMask & (index >>> shift);
-		var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
-		if (!_v0.$) {
-			var subTree = _v0.a;
-			var newSub = A4($elm$core$Array$setHelp, shift - $elm$core$Array$shiftStep, index, value, subTree);
-			return A3(
-				$elm$core$Elm$JsArray$unsafeSet,
-				pos,
-				$elm$core$Array$SubTree(newSub),
-				tree);
-		} else {
-			var values = _v0.a;
-			var newLeaf = A3($elm$core$Elm$JsArray$unsafeSet, $elm$core$Array$bitMask & index, value, values);
-			return A3(
-				$elm$core$Elm$JsArray$unsafeSet,
-				pos,
-				$elm$core$Array$Leaf(newLeaf),
-				tree);
-		}
-	});
-var $elm$core$Array$set = F3(
-	function (index, value, array) {
-		var len = array.a;
-		var startShift = array.b;
-		var tree = array.c;
-		var tail = array.d;
-		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? array : ((_Utils_cmp(
-			index,
-			$elm$core$Array$tailIndex(len)) > -1) ? A4(
-			$elm$core$Array$Array_elm_builtin,
-			len,
-			startShift,
-			tree,
-			A3($elm$core$Elm$JsArray$unsafeSet, $elm$core$Array$bitMask & index, value, tail)) : A4(
-			$elm$core$Array$Array_elm_builtin,
-			len,
-			startShift,
-			A4($elm$core$Array$setHelp, startShift, index, value, tree),
-			tail));
-	});
-var $tortus$elm_array_2d$Array2D$set = F4(
-	function (row, col, newValue, array2d) {
-		return A2(
-			$elm$core$Maybe$withDefault,
-			array2d,
-			A2(
-				$elm$core$Maybe$map,
-				function (rowAry) {
-					return _Utils_update(
-						array2d,
-						{
-							a: A3(
-								$elm$core$Array$set,
-								row,
-								A3($elm$core$Array$set, col, newValue, rowAry),
-								array2d.a)
-						});
-				},
-				A2($tortus$elm_array_2d$Array2D$getRow, row, array2d)));
-	});
-var $author$project$Main$moveStuff = F2(
-	function (warehouse, swaps) {
-		moveStuff:
-		while (true) {
-			if (!swaps.b) {
-				return warehouse;
-			} else {
-				var _v1 = swaps.a;
-				var _v2 = _v1.a;
-				var x1 = _v2.a;
-				var y1 = _v2.b;
-				var _v3 = _v1.b;
-				var x2 = _v3.a;
-				var y2 = _v3.b;
-				var rest = swaps.b;
-				var maybeCell2 = A3($tortus$elm_array_2d$Array2D$get, y2, x2, warehouse);
-				var maybeCell1 = A3($tortus$elm_array_2d$Array2D$get, y1, x1, warehouse);
-				var _v4 = _Utils_Tuple2(maybeCell1, maybeCell2);
-				if ((!_v4.a.$) && (!_v4.b.$)) {
-					var cell1 = _v4.a.a;
-					var cell2 = _v4.b.a;
-					var wh = A4(
-						$tortus$elm_array_2d$Array2D$set,
-						y2,
-						x2,
-						cell1,
-						A4($tortus$elm_array_2d$Array2D$set, y1, x1, cell2, warehouse));
-					var $temp$warehouse = wh,
-						$temp$swaps = rest;
-					warehouse = $temp$warehouse;
-					swaps = $temp$swaps;
-					continue moveStuff;
-				} else {
-					var wh = A4($tortus$elm_array_2d$Array2D$set, 0, 0, '?', warehouse);
-					var wh2 = A4($tortus$elm_array_2d$Array2D$set, 3, 3, '?', wh);
-					var $temp$warehouse = wh2,
-						$temp$swaps = rest;
-					warehouse = $temp$warehouse;
-					swaps = $temp$swaps;
-					continue moveStuff;
-				}
-			}
+			return false;
 		}
 	});
 var $elm$core$List$any = F2(
@@ -6672,412 +5353,202 @@ var $elm$core$List$any = F2(
 			}
 		}
 	});
-var $elm$core$Basics$not = _Basics_not;
-var $elm$core$List$all = F2(
-	function (isOkay, list) {
-		return !A2(
+var $author$project$Main$isPartNumber = F2(
+	function (symbolBoxes, _v0) {
+		var box = _v0.f;
+		var val = _v0.s;
+		return A2(
 			$elm$core$List$any,
-			A2($elm$core$Basics$composeL, $elm$core$Basics$not, isOkay),
-			list);
+			$author$project$Main$overlapping(box),
+			symbolBoxes);
 	});
-var $elm$core$Set$Set_elm_builtin = $elm$core$Basics$identity;
-var $elm$core$Set$empty = $elm$core$Dict$empty;
-var $elm$core$Set$insert = F2(
-	function (key, _v0) {
-		var dict = _v0;
-		return A3($elm$core$Dict$insert, key, 0, dict);
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $elm$core$Basics$not = _Basics_not;
+var $elm$regex$Regex$Match = F4(
+	function (match, index, number, submatches) {
+		return {ai: index, ak: match, aO: number, aU: submatches};
 	});
-var $elm$core$Set$fromList = function (list) {
-	return A3($elm$core$List$foldl, $elm$core$Set$insert, $elm$core$Set$empty, list);
+var $elm$regex$Regex$find = _Regex_findAtMost(_Regex_infinity);
+var $elm$regex$Regex$fromStringWith = _Regex_fromStringWith;
+var $elm$regex$Regex$fromString = function (string) {
+	return A2(
+		$elm$regex$Regex$fromStringWith,
+		{aE: false, aM: false},
+		string);
 };
-var $author$project$Main$zip = F2(
-	function (lst1, lst2) {
-		var _v0 = _Utils_Tuple2(lst1, lst2);
-		if (_v0.a.b && _v0.b.b) {
-			var _v1 = _v0.a;
-			var h1 = _v1.a;
-			var r1 = _v1.b;
-			var _v2 = _v0.b;
-			var h2 = _v2.a;
-			var r2 = _v2.b;
-			return A2(
-				$elm$core$List$cons,
-				_Utils_Tuple2(h1, h2),
-				A2($author$project$Main$zip, r1, r2));
-		} else {
-			return _List_Nil;
-		}
-	});
-var $author$project$Main$tryFindSpaceDoubleLoop = F4(
-	function (warehouse, move, positionsToMove, swaps) {
-		tryFindSpaceDoubleLoop:
-		while (true) {
-			var nextPositions = A2(
-				$elm$core$List$map,
-				$author$project$Main$moveStep(move),
-				positionsToMove);
-			var proposedSwaps = A2($author$project$Main$zip, positionsToMove, nextPositions);
-			var nextSwaps = _Utils_ap(proposedSwaps, swaps);
-			var things = A2(
-				$elm$core$List$map,
-				function (_v5) {
-					var x = _v5.a;
-					var y = _v5.b;
-					return A2(
-						$elm$core$Maybe$withDefault,
-						'?',
-						A3($tortus$elm_array_2d$Array2D$get, y, x, warehouse));
-				},
-				nextPositions);
-			if (A2(
-				$elm$core$List$any,
-				function (ch) {
-					return ch === '#';
-				},
-				things)) {
-				return _List_Nil;
-			} else {
-				if (A2(
-					$elm$core$List$all,
-					function (ch) {
-						return ch === '.';
-					},
-					things)) {
-					return nextSwaps;
-				} else {
-					var toTheRight = function (_v4) {
-						var x = _v4.a;
-						var y = _v4.b;
-						return _Utils_Tuple2(x + 1, y);
-					};
-					var toTheLeft = function (_v3) {
-						var x = _v3.a;
-						var y = _v3.b;
-						return _Utils_Tuple2(x - 1, y);
-					};
-					var positionsAndThings = A2(
-						$elm$core$List$map,
-						function (_v2) {
-							var x = _v2.a;
-							var y = _v2.b;
-							return _Utils_Tuple2(
-								_Utils_Tuple2(x, y),
-								A2(
-									$elm$core$Maybe$withDefault,
-									'?',
-									A3($tortus$elm_array_2d$Array2D$get, y, x, warehouse)));
-						},
-						nextPositions);
-					var openPositions = A2(
-						$elm$core$List$filterMap,
-						function (_v1) {
-							var p = _v1.a;
-							var ch = _v1.b;
-							return (ch === '[') ? $elm$core$Maybe$Just(p) : $elm$core$Maybe$Nothing;
-						},
-						positionsAndThings);
-					var rightPositions = A2($elm$core$List$map, toTheRight, openPositions);
-					var closePositions = A2(
-						$elm$core$List$filterMap,
-						function (_v0) {
-							var p = _v0.a;
-							var ch = _v0.b;
-							return (ch === ']') ? $elm$core$Maybe$Just(p) : $elm$core$Maybe$Nothing;
-						},
-						positionsAndThings);
-					var leftPositions = A2($elm$core$List$map, toTheLeft, closePositions);
-					var nextPositionsToMove = $elm$core$Set$toList(
-						$elm$core$Set$fromList(
-							_Utils_ap(
-								openPositions,
-								_Utils_ap(
-									rightPositions,
-									_Utils_ap(closePositions, leftPositions)))));
-					var $temp$warehouse = warehouse,
-						$temp$move = move,
-						$temp$positionsToMove = nextPositionsToMove,
-						$temp$swaps = nextSwaps;
-					warehouse = $temp$warehouse;
-					move = $temp$move;
-					positionsToMove = $temp$positionsToMove;
-					swaps = $temp$swaps;
-					continue tryFindSpaceDoubleLoop;
-				}
-			}
-		}
-	});
-var $author$project$Main$tryFindSpaceDouble = F3(
-	function (warehouse, robot, move) {
-		return A4(
-			$author$project$Main$tryFindSpaceDoubleLoop,
-			warehouse,
-			move,
-			_List_fromArray(
-				[robot]),
-			_List_Nil);
-	});
-var $author$project$Main$tryFindSpaceSimpleLoop = F4(
-	function (warehouse, move, pos, swaps) {
-		tryFindSpaceSimpleLoop:
-		while (true) {
-			var _v0 = A2($author$project$Main$moveStep, move, pos);
-			var x = _v0.a;
-			var y = _v0.b;
-			var nextSwaps = A2(
-				$elm$core$List$cons,
-				_Utils_Tuple2(
-					pos,
-					_Utils_Tuple2(x, y)),
-				swaps);
-			var _v1 = $author$project$Main$moveToOffset(move);
-			var dx = _v1.a;
-			var dy = _v1.b;
-			var _v2 = A3($tortus$elm_array_2d$Array2D$get, y, x, warehouse);
-			_v2$5:
-			while (true) {
-				if (!_v2.$) {
-					switch (_v2.a) {
-						case '#':
-							return _List_Nil;
-						case '.':
-							return nextSwaps;
-						case '[':
-							var $temp$warehouse = warehouse,
-								$temp$move = move,
-								$temp$pos = _Utils_Tuple2(x, y),
-								$temp$swaps = nextSwaps;
-							warehouse = $temp$warehouse;
-							move = $temp$move;
-							pos = $temp$pos;
-							swaps = $temp$swaps;
-							continue tryFindSpaceSimpleLoop;
-						case ']':
-							var $temp$warehouse = warehouse,
-								$temp$move = move,
-								$temp$pos = _Utils_Tuple2(x, y),
-								$temp$swaps = nextSwaps;
-							warehouse = $temp$warehouse;
-							move = $temp$move;
-							pos = $temp$pos;
-							swaps = $temp$swaps;
-							continue tryFindSpaceSimpleLoop;
-						case 'O':
-							var $temp$warehouse = warehouse,
-								$temp$move = move,
-								$temp$pos = _Utils_Tuple2(x, y),
-								$temp$swaps = nextSwaps;
-							warehouse = $temp$warehouse;
-							move = $temp$move;
-							pos = $temp$pos;
-							swaps = $temp$swaps;
-							continue tryFindSpaceSimpleLoop;
-						default:
-							break _v2$5;
-					}
-				} else {
-					break _v2$5;
-				}
-			}
-			return _List_Nil;
-		}
-	});
-var $author$project$Main$tryFindSpaceSimple = F3(
-	function (warehouse, robot, move) {
-		return A4($author$project$Main$tryFindSpaceSimpleLoop, warehouse, move, robot, _List_Nil);
-	});
-var $author$project$Main$tryFindSpace = F4(
-	function (wide, warehouse, robot, move) {
-		if (wide) {
-			switch (move) {
-				case '^':
-					return A3($author$project$Main$tryFindSpaceDouble, warehouse, robot, move);
-				case 'v':
-					return A3($author$project$Main$tryFindSpaceDouble, warehouse, robot, move);
-				case '<':
-					return A3($author$project$Main$tryFindSpaceSimple, warehouse, robot, move);
-				case '>':
-					return A3($author$project$Main$tryFindSpaceSimple, warehouse, robot, move);
-				default:
-					return A3($author$project$Main$tryFindSpaceSimple, warehouse, robot, move);
-			}
-		} else {
-			return A3($author$project$Main$tryFindSpaceSimple, warehouse, robot, move);
-		}
-	});
-var $author$project$Main$tryMoveRobot = F4(
-	function (wide, warehouse, robot, move) {
-		var swaps = A4($author$project$Main$tryFindSpace, wide, warehouse, robot, move);
-		if (!$elm$core$List$length(swaps)) {
-			return _Utils_Tuple2(warehouse, robot);
-		} else {
-			var wh = A2($author$project$Main$moveStuff, warehouse, swaps);
-			var rb = A2($author$project$Main$moveStep, move, robot);
-			return _Utils_Tuple2(wh, rb);
-		}
-	});
-var $author$project$Main$updateKey = F2(
-	function (move, model) {
-		var wide = model.l;
-		var warehouse = model.z;
-		var robot = model.C;
-		var _v0 = A4($author$project$Main$tryMoveRobot, wide, warehouse, robot, move);
-		var wh = _v0.a;
-		var rb = _v0.b;
-		var _v1 = rb;
-		var rx = _v1.a;
-		var ry = _v1.b;
-		return _Utils_update(
-			model,
-			{M: '', C: rb, z: wh});
-	});
-var $author$project$Main$updateStep = function (model) {
-	var wide = model.l;
-	var warehouse = model.z;
-	var robot = model.C;
-	var _v0 = model.H;
-	if (!_v0.b) {
-		return model;
-	} else {
-		var move = _v0.a;
-		var movesLeft = _v0.b;
-		var _v1 = A4($author$project$Main$tryMoveRobot, wide, warehouse, robot, move);
-		var wh = _v1.a;
-		var rb = _v1.b;
-		var _v2 = rb;
-		var rx = _v2.a;
-		var ry = _v2.b;
-		return _Utils_update(
-			model,
-			{M: '', H: movesLeft, C: rb, z: wh});
-	}
+var $elm$regex$Regex$never = _Regex_never;
+var $author$project$Main$parseNumbers = function (line) {
+	var numberRegex = A2(
+		$elm$core$Maybe$withDefault,
+		$elm$regex$Regex$never,
+		$elm$regex$Regex$fromString('[0-9]+'));
+	var matches = A2($elm$regex$Regex$find, numberRegex, line);
+	return A2(
+		$elm$core$List$map,
+		function (m) {
+			return _Utils_Tuple2(m.ai, m.ak);
+		},
+		matches);
 };
-var $author$project$Main$updateTogglePlay = function (model) {
-	return _Utils_update(
-		model,
-		{B: !model.B});
+var $author$project$Main$toNumberBox = F2(
+	function (_v0, s) {
+		var x = _v0.K;
+		var y = _v0.L;
+		return {
+			C: (x + $elm$core$String$length(s)) - 1,
+			x: x,
+			D: y,
+			y: y
+		};
+	});
+var $author$project$Main$parseNumbersWithBox = F2(
+	function (y, line) {
+		return A2(
+			$elm$core$List$map,
+			function (_v0) {
+				var x = _v0.a;
+				var s = _v0.b;
+				return {
+					f: A2(
+						$author$project$Main$toNumberBox,
+						{K: x, L: y},
+						s),
+					s: s
+				};
+			},
+			$author$project$Main$parseNumbers(line));
+	});
+var $author$project$Main$parseSymbols = function (line) {
+	var symbolRegex = A2(
+		$elm$core$Maybe$withDefault,
+		$elm$regex$Regex$never,
+		$elm$regex$Regex$fromString('[^\\d\\.]'));
+	var matches = A2($elm$regex$Regex$find, symbolRegex, line);
+	return A2(
+		$elm$core$List$map,
+		function (m) {
+			return _Utils_Tuple2(m.ai, m.ak);
+		},
+		matches);
 };
-var $author$project$Main$updateToggleWide = function (model) {
-	return A2($author$project$Main$initModel, !model.l, model.r);
+var $author$project$Main$toSymbolBox = function (_v0) {
+	var x = _v0.K;
+	var y = _v0.L;
+	return {C: x + 1, x: x - 1, D: y + 1, y: y - 1};
+};
+var $author$project$Main$parseSymbolsWithBox = F2(
+	function (y, line) {
+		return A2(
+			$elm$core$List$map,
+			function (_v0) {
+				var x = _v0.a;
+				var s = _v0.b;
+				return {
+					f: $author$project$Main$toSymbolBox(
+						{K: x, L: y}),
+					s: s
+				};
+			},
+			$author$project$Main$parseSymbols(line));
+	});
+var $elm$core$List$sum = function (numbers) {
+	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
+};
+var $author$project$Main$init = function (_v0) {
+	var sample = '467..114..\n...*......\n..35..633.\n......#...\n617*......\n.....+.58.\n..592.....\n......755.\n...$.*....\n.664.598..';
+	var input = '..975..95..................717..........................................747................................................622..............\n................/47...........@....701...610.........252.660*.............*..236.....323..........108........653............................\n.......69............313..............$...$...*....@.........640........81.....*................................*332..92....................\n........................*...210.............767...912...367.......505.......817..................*.........478.........=....223.....568.....\n..76...968............108...@.....556.....................=..........*...............412..313...575......../...........................*107.\n............773/..891............*....................744.....805...14................../..../................320&.567..#...................\n.962..708............&........399....146.....385.................*..........825.......................................-..655....485...-.....\n...*.........+..........................*76...+..................242....997..*......185..........207.390..870...883............*.......337..\n....929...299....................*.................249........-...........*.373.....*.............*.....*.*....*.............549............\n................196.745.996...364..............409...-.926.....273.....580.........31...........545..547...862......810.....................\n................*.......*..............900+....*..........*........586.........936...................................*.........673..........\n.../..........864.683.215....*......%.........702..166..46..........&....341..........694..496.......528.%...........839...105..*...887.....\n....506...617.....*........51.807....942..424...............................*..........@..+............@.84...................*......=......\n...........@....594.........................*..........*675...........345..52...$..................-..............899.........804.$.........\n.362*366.................487+.48&.......600..180....845........................535...18...........397.#908....432*........229......346......\n.................*................835....................578......*502...............*..416.............................................391.\n....610&...514...501......./........*....*71.........../.......674......925...............*.869.....966........393................/.687.*...\n............*...............786...248.104........92.633.....%..............*104...&466..138..@.........*.525...+......974......339..=...260.\n....372/.889..............................55.406........134..250.=228..609...........................69...............*.....................\n...........................................*........976...*...........=.......357...........................191.....150.....................\n...-...........595.634.........*396......592..594......*......411.856...760....../..................201.....#...709................168......\n.936..236.........*....@....436.....100....../......35...../.....*........*....................917%............*.....................*..#63.\n.......*..............542..........................*........689.........26....667.&...................738....831..$.............513.53......\n........10.....529........*250..........162.......390...........................*..70.............................701..........*............\n..355.........&........394......301@..........542..............................142..........%..............%..........*.....507.............\n.....*.........................................*.....%..283.....*.........997&.......@670....402..........808......308.459.......712...152..\n..291......246.@....+986.....336/.......976...468.264...*....739.187.............................................................*.....*....\n........../....46...................186.$..............674............................227......-............975...............436.......492.\n.491........................810.......*........................772*.........742........%....198.....*702.......*.596=....64.......=.........\n...................706......=......415..................=.199......235......*...47........................72.607...................443......\n.214..............*.....771.............302...........230..+..............810.....*219.606........912.....................=.................\n......277......320.............937.....*.....+....632...........&374..............................*....................898.....642%.........\n.........#....................*.......716....229./.........................$................934...233...............98............../.......\n.....*........-659..457.........964...................659....786....619.666........277...@.....*......930*460..618...........910..265.......\n..845.877.343......................*537.../120.......*.......*.....*.................&...175..631.............=.................#...........\n............*....................+................@...35.949..34.381......273...880......................451........326.....................\n............876..880......827..733.......645.......38......*.........402.....+..........902....459.775........837.....*.185.......813.......\n........578................/............*...............622..18.........*234..............+....%..........448.......935....#.............350\n..........*...468.....546................588....146=.........*..142.795..............*424................../.....................=..........\n........245............@...746.......362..................970......*..............593...............487.......+.............709..593........\n...990......&415..............*381......*.....................435.......214..908..................*....*.....351.....876.25....*............\n......*............293*.....%...........271.............135......*......=........540............177....604...........&.....-.46..........166\n...609.....................910.................@........$.......321..........141....+.45.....................750......................98....\n.......#....779........944.....653...........797...........788.................*......+....164.724....475&...+.............-.471......&.....\n..794...487....&..81...........*...................@............666@.....*981.937.............*.....%..........888....+...81................\n.....*...........+......694.............748...104..859..............................675.434.......290.............*..352........353=..$.....\n...619.977.........859..#....235....230*......*..............429........335....-.......*......631.......=.......27...................192....\n.......*............=...........&.........121..680.195.959......*417.....*..938.............../..........739..#..............194.750........\n....309...439.............14...............*..........*...............723.........163..748...........853.....885.........175*........487....\n.............*707..-626..........464.....382................356...........868#....*...*.....13......*............450............#.....*.....\n........216......................*...619......$..270........*.....892............25.494.841*.....971.............*............157.+...119...\n...#40...../............343..559.425.......536........718....739...#.......284...............726.....985..136...597.621.173.......203.......\n................383............/......................*...................@....348............*.....*.......*........./...*...811.......*158\n...=..............$......@....................776.829.85...&........541.......*....*...&....700......341.995.....73......114....*....267....\n.700.203....591.*.....924..........$217.......@.....*.......590....*.........812.579....517.......................*.............730.........\n......#......*...586.........312..................806............435...259...........................573........453.282*132.243.............\n..........224.................#.......468@............-...%.............*..............453...................$.....................-........\n....................................................227.673....881......828..&.....632*...................589.....................284..-....\n.....680.........871....17+................117.................*.............506..................#...410...................616.........519.\n........*..386................78*762.........@........28..557.655.......359........-............124..#......&..........843./................\n......724...*..584.....552............................*...&.................209..857...633-..............602...932......*........132&.......\n..........41../.........*..........................#..427.............=370....*................................*...353...902...........529..\n.....................150.......868.......370....549.........779...................284...........431.....3.....889.............189..103.=....\n.......530..355..........442...*............*63............+.......852.....935.....*..............%.....*..................@....*.-.........\n..........*...*...976.....*...500....@...........572...........940....*990..*....627.790.................460..904..601-..821..930....699....\n..........643.824.......248........358...4.........&..301.........&........538.........*.%436....565..........*......................../....\n.768..$.....................186..........*...178........*.......................*.&520..............%........782..........497.-......*......\n......762..828*...972......*..............3.*.......................@....../..836...............278..............666......*...927.413.185...\n....&..........40.......86.122..........&....450....................1....202............42...51....*..............*.....215.................\n.353.................94*.................995.....655.....520...828....*...........612..........&.119...........486...............713........\n.........................255........................*.......+.....-..463..........*........235........836....................668............\n...................................................286........338........=.393....398........*....199./............631..........*631........\n................64%....704...928.........470...125............*....708.15...*.............193.......*........641....*......687..............\n........$..............*...................&.....*..........582......*....652.@358..643..........125.....458........168....$.......$194.....\n........293.........305......417...............117....................612............*......262.............*903............................\n.....$...................615*..........581.........335...139..505.419.............656.........+.......506................710.....956........\n776..110.....+............................-........#..........*....*...447......*......................*...*.....938.366*.......#....376....\n..........366............844....305..761......780......560........236........725.272.....450.............67.126.....................*.......\n.................669$.......$.......=............*220./.....+665........495................*.@103....992....................&........600....\n.......*......................812/.........................................$............940...........+...................146...975.........\n....410.650.282.....*...............696.833....957...............996...*......772.287...................921..935................%.....$.....\n............*....413.921...713....................%.....769.........@.390.216..#.....@..........................=...........*.......46......\n.....798.136..............%....150.....236..............*......31...........*..........@.64..17......616..........901......344..............\n..............................-........*.....402......873.......*......692...592....390...*.............*277................................\n......539.....799.../.....272....%.@....694.#.............667...318.......=...............762.......71%.......-153......................531.\n..........556*......573.......465...916...................*..........602.........................=.......145...........................*....\n........................451.............../....%.....625.401.........*........428-.....493......479.427....$.........60......951......281...\n..947+....36....270....*............517....521..258.*............108..812.............*................*........................*372........\n...........*....*....957.823...290.....*.............415..........*...............908..730..........589......+..............................\n857.........843............*........794......................677..27........................121...........670.........548.837*....&.....664.\n......175..........-.....=........................422.......*..................226-..344.......*...................2....%..........474......\n...................283..190..@...........458........*.162@.666.517....202...............*..@...545.%.........705.............*..............\n...............*............296.466.....#.........................*..*.....852..208...999.475......256..........=....642..188.386...........\n............504.888..................52....416......394...349.....53.953...*......*...........@521.........213........*.....................\n......225...............272*32........*.....*..........*...%..............728.........827.513..........287*.........924..388%.........&.....\n..453...*..................................71.....*..437.......501...869.......928....%...#....................%225.............734@..157...\n....*..400...........810=.300@...13.15.537.....997........./......*.....*.........+.........407.758...674............604....500.............\n..970..........409...............*...*...*................159...788....338..............636*...../....#.......#895....*......./.............\n..................................52.....872........+...........................-........................524.........297............314.....\n...........=...469.....408.............&.........641......364%.780...526.........540.865....742............*..............549..505...*......\n........404.......*...-....58..%....577...............655......*.............613......*.............343..779./854............*....*...567...\n...103............284......./...999....................=.....640.....284..............566.982..........$...........476...478.793..556.......\n......*.....436........916.................941.............@.........&...........284.........*183.........857.953...........................\n...............*.404=.....*910..703@...20......266......815.....201.....54.332...........................@......*...........95..............\n.............898........................*........*..........13.....*806...*.......280.........................905........63*................\n........&.........642..271.627..920.+....534...96..780......@....=...........246../......99........................................../......\n....$....518.......@......*......*..323..............-............477....*4...*...........*....979......810.................366....697......\n.....439........................364.........161..594.....647..................802.........234..............*17......125..82....*............\n................187....667....................*..#.......*.......*................604..................946.............*....414.............\n....585...218.....*...*.............-....536.396........950...200......296*935...*..........#...382..........883......182.......326....*....\n.....+......-...557.349...........217............................./105..........527..387....394...*...........#..430*.....501.......393.190.\n.......*474.............16....................675.....999..............362..............*..........576...................*..................\n....449.....+.296*468.....................607....*...........-..#.................619....177...............31...........194..198..187.......\n.........156......................330.......+..332...631...936...477................*...........658..........%..845..........*..............\n....*262.........$......362......*.....429=..............................*324....296...........+.......161.....*....57.....309..............\n.403............492..97.@.....695..696......$.840..&.................21.....................@.........*.......178...+....$.............364..\n......178..692*.....%.....82..........=...176.......456.....517........+...238.704.......682......266.................&..222..........*.....\n......*........993........*....931*...........445..............*.................=...........@...*.......448.......251................222...\n.......824............467..232.......664..299*.......322*512..850..............@..........585....259........$..................&............\n...458.....572.................379....*........123.....................-........298..................-................336...908....*........\n....&......*....&..732...701/....*....440.....$...........739..636.....65..../.......%151.............823.455............&..........119.....\n........550....391..%.............259....................#....*............834............232.179............*.........4...795.784..........\n.............%...............729...............568.............936...............952........*..*..............726..........*.........-......\n...627.....87....@...........-...........6.....%...106.......................458*.....281..811..282..500..............=....833....214..780..\n..............320................665..............*........584.........................*............................343...............*.....\n..................997....84.590.....*795.90*487.842..%431....*.......233..692....259....391.113*........*338............./..391.............\n.....62.....#689.*.........*.................................444.......*...*......*.............445..861...........498/.857..*.....505*.....\n......*...........436.869.....634@..663...599..901*678.100..........666....301..493.986....174.............838*492..........454........313..\n.....362.....983....../................+..*.............=.............................*....*.......259.............+....464.........27......\n...%........................580....68.....45.........................................21..768...267....*.+....661..879..@....&......$........\n.643....545......./435.....*.........+.............................823....919.......................20..102.*..............267.690.....55...\n.........*...............557....247.......653....584.5*....430....*........../...529+...........856..........305.254..212.............*.....\n........945...528................/...775..+............204...-.537....$..528................276*...................%....*....863......612...\n....572.......*.........614.........+................................810...............842........438.....26...&.....%.........*............\n.......*....201.@......*....671..$........................../.............................*...832*.......*....214.899..........795.421+.....\n994..797.........684.390....*....452../..................989..728............685....23+.856...........498.............443...................\n.....................................424.......%...............@.......228.....+..............+.......................$.....................\n.....2...812.517.........602*967.........262....953...*.....*....67...*...........+......1.431.....721.....402%..&.......*.....504..........\n.............*....%..................963*...........96...287.255.*...548.........534....*.............*..........896..531.789.=.......855...\n...........579....595...........8................................781...............................547......................................';
+	var lines = A2($elm$core$String$split, '\n', input);
+	var boxedSymbols = $elm$core$List$concat(
+		A2($elm$core$List$indexedMap, $author$project$Main$parseSymbolsWithBox, lines));
+	var symbolBoxes = A2(
+		$elm$core$List$map,
+		function (bt) {
+			return bt.f;
+		},
+		boxedSymbols);
+	var boxedNumbers = $elm$core$List$concat(
+		A2($elm$core$List$indexedMap, $author$project$Main$parseNumbersWithBox, lines));
+	var boxedParts = A2(
+		$elm$core$List$filter,
+		$author$project$Main$isPartNumber(symbolBoxes),
+		boxedNumbers);
+	var gearBoxes = A2(
+		$elm$core$List$map,
+		function (bt) {
+			return bt.f;
+		},
+		A2(
+			$elm$core$List$filter,
+			$author$project$Main$isGearPart(boxedParts),
+			boxedSymbols));
+	var gearRatio = $elm$core$List$sum(
+		A2(
+			$elm$core$List$map,
+			$author$project$Main$calculateGearRatio(boxedParts),
+			boxedSymbols));
+	var nonGearBoxes = A2(
+		$elm$core$List$map,
+		function (bt) {
+			return bt.f;
+		},
+		A2(
+			$elm$core$List$filter,
+			function (bs) {
+				return !A2($author$project$Main$isGearPart, boxedParts, bs);
+			},
+			boxedSymbols));
+	var partBoxes = A2(
+		$elm$core$List$map,
+		function (bt) {
+			return bt.f;
+		},
+		boxedParts);
+	var partSum = $elm$core$List$sum(
+		A2(
+			$elm$core$List$map,
+			function (bp) {
+				return A2(
+					$elm$core$Maybe$withDefault,
+					0,
+					$elm$core$String$toInt(bp.s));
+			},
+			boxedParts));
+	var numberBoxes = A2(
+		$elm$core$List$map,
+		function (bt) {
+			return bt.f;
+		},
+		boxedNumbers);
+	var boxedNonParts = A2(
+		$elm$core$List$filter,
+		function (bn) {
+			return !A2($author$project$Main$isPartNumber, symbolBoxes, bn);
+		},
+		boxedNumbers);
+	var nonPartBoxes = A2(
+		$elm$core$List$map,
+		function (bt) {
+			return bt.f;
+		},
+		boxedNonParts);
+	var model = {aa: 0, ac: '...', M: gearBoxes, N: gearRatio, O: lines, Q: nonGearBoxes, R: nonPartBoxes, T: partBoxes, U: partSum};
+	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+};
+var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
+var $author$project$Main$subscriptions = function (model) {
+	return $elm$core$Platform$Sub$none;
+};
+var $author$project$Main$updateModel = function (model) {
+	return model;
 };
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		switch (msg.$) {
-			case 6:
-				return _Utils_Tuple2(
-					$author$project$Main$updateClear(model),
-					$elm$core$Platform$Cmd$none);
-			case 0:
-				return _Utils_Tuple2(
-					$author$project$Main$updateStep(model),
-					$elm$core$Platform$Cmd$none);
-			case 1:
-				return _Utils_Tuple2(
-					$author$project$Main$updateStep(model),
-					$elm$core$Platform$Cmd$none);
-			case 4:
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{x: model.x / 2}),
-					$elm$core$Platform$Cmd$none);
-			case 5:
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{x: model.x * 2}),
-					$elm$core$Platform$Cmd$none);
-			case 2:
-				return _Utils_Tuple2(
-					$author$project$Main$updateTogglePlay(model),
-					$elm$core$Platform$Cmd$none);
-			case 3:
-				return _Utils_Tuple2(
-					$author$project$Main$updateToggleWide(model),
-					$elm$core$Platform$Cmd$none);
-			case 7:
-				return _Utils_Tuple2(
-					A2($author$project$Main$initModel, model.l, 0),
-					$elm$core$Platform$Cmd$none);
-			case 8:
-				return _Utils_Tuple2(
-					A2($author$project$Main$initModel, model.l, 1),
-					$elm$core$Platform$Cmd$none);
-			case 9:
-				return _Utils_Tuple2(
-					A2($author$project$Main$initModel, model.l, 2),
-					$elm$core$Platform$Cmd$none);
-			case 10:
-				return _Utils_Tuple2(
-					A2($author$project$Main$initModel, model.l, 3),
-					$elm$core$Platform$Cmd$none);
-			default:
-				var rawKey = msg.a;
-				var _v1 = $ohanhi$keyboard$Keyboard$Arrows$arrowKey(rawKey);
-				_v1$8:
-				while (true) {
-					if (!_v1.$) {
-						switch (_v1.a.$) {
-							case 21:
-								var _v2 = _v1.a;
-								return _Utils_Tuple2(
-									A2($author$project$Main$updateKey, '^', model),
-									$elm$core$Platform$Cmd$none);
-							case 19:
-								var _v3 = _v1.a;
-								return _Utils_Tuple2(
-									A2($author$project$Main$updateKey, '<', model),
-									$elm$core$Platform$Cmd$none);
-							case 18:
-								var _v4 = _v1.a;
-								return _Utils_Tuple2(
-									A2($author$project$Main$updateKey, 'v', model),
-									$elm$core$Platform$Cmd$none);
-							case 20:
-								var _v5 = _v1.a;
-								return _Utils_Tuple2(
-									A2($author$project$Main$updateKey, '>', model),
-									$elm$core$Platform$Cmd$none);
-							case 0:
-								switch (_v1.a.a) {
-									case 'W':
-										return _Utils_Tuple2(
-											A2($author$project$Main$updateKey, '^', model),
-											$elm$core$Platform$Cmd$none);
-									case 'A':
-										return _Utils_Tuple2(
-											A2($author$project$Main$updateKey, '<', model),
-											$elm$core$Platform$Cmd$none);
-									case 'S':
-										return _Utils_Tuple2(
-											A2($author$project$Main$updateKey, 'v', model),
-											$elm$core$Platform$Cmd$none);
-									case 'D':
-										return _Utils_Tuple2(
-											A2($author$project$Main$updateKey, '>', model),
-											$elm$core$Platform$Cmd$none);
-									default:
-										break _v1$8;
-								}
-							default:
-								break _v1$8;
-						}
-					} else {
-						break _v1$8;
-					}
-				}
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-		}
+		return _Utils_Tuple2(
+			$author$project$Main$updateModel(model),
+			$elm$core$Platform$Cmd$none);
 	});
-var $author$project$Main$Clear = {$: 6};
-var $author$project$Main$Faster = {$: 4};
-var $author$project$Main$Slower = {$: 5};
-var $author$project$Main$Step = {$: 1};
-var $author$project$Main$TogglePlay = {$: 2};
-var $author$project$Main$ToggleWide = {$: 3};
-var $author$project$Main$UseInput = {$: 7};
-var $author$project$Main$UseLarger = {$: 9};
-var $author$project$Main$UseSituation = {$: 10};
-var $author$project$Main$UseSmaller = {$: 8};
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -7088,127 +5559,143 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$align = $elm$html$Html$Attributes$stringProperty('align');
-var $elm$html$Html$button = _VirtualDom_node('button');
-var $elm$json$Json$Encode$bool = _Json_wrap;
-var $elm$html$Html$Attributes$boolProperty = F2(
-	function (key, bool) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$bool(bool));
-	});
-var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $author$project$Main$gpsCoordinate = function (_v0) {
-	var x = _v0.a;
-	var y = _v0.b;
-	return (y * 100) + x;
-};
 var $elm$html$Html$Attributes$href = function (url) {
 	return A2(
 		$elm$html$Html$Attributes$stringProperty,
 		'href',
 		_VirtualDom_noJavaScriptUri(url));
 };
-var $elm$html$Html$input = _VirtualDom_node('input');
-var $author$project$Main$isBox = F2(
-	function (wh, _v0) {
-		var x = _v0.a;
-		var y = _v0.b;
-		return (_Utils_eq(
-			A3($tortus$elm_array_2d$Array2D$get, y, x, wh),
-			$elm$core$Maybe$Just('O')) || _Utils_eq(
-			A3($tortus$elm_array_2d$Array2D$get, y, x, wh),
-			$elm$core$Maybe$Just('['))) ? $elm$core$Maybe$Just(
-			_Utils_Tuple2(x, y)) : $elm$core$Maybe$Nothing;
-	});
-var $elm$core$List$isEmpty = function (xs) {
-	if (!xs.b) {
-		return true;
-	} else {
-		return false;
-	}
-};
-var $elm$html$Html$label = _VirtualDom_node('label');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 0, a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $elm$core$List$sum = function (numbers) {
-	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
-};
 var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$html$Html$br = _VirtualDom_node('br');
-var $author$project$Main$toRowElements = function (rowText) {
-	return _List_fromArray(
-		[
-			$elm$html$Html$text(rowText),
-			A2($elm$html$Html$br, _List_Nil, _List_Nil)
-		]);
+var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$Attributes$fontFamily = _VirtualDom_attribute('font-family');
+var $elm$svg$Svg$Attributes$fontSize = _VirtualDom_attribute('font-size');
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
 };
-var $elm$core$String$fromList = _String_fromList;
-var $author$project$Main$toWarehouseRows = function (warehouse) {
-	var ys = A2(
-		$elm$core$List$range,
-		0,
-		$tortus$elm_array_2d$Array2D$rows(warehouse) - 1);
-	var xs = A2(
-		$elm$core$List$range,
-		0,
-		$tortus$elm_array_2d$Array2D$columns(warehouse) - 1);
-	var rows = A2(
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
+var $author$project$Main$unitSize = 6;
+var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
+var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
+var $author$project$Main$toCharText = F3(
+	function (yPos, xPos, ch) {
+		var yOffset = 5;
+		var yVal = yOffset + (yPos * $author$project$Main$unitSize);
+		var xOffset = 1;
+		var xVal = xOffset + (xPos * $author$project$Main$unitSize);
+		return A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x(
+					$elm$core$String$fromInt(xVal)),
+					$elm$svg$Svg$Attributes$y(
+					$elm$core$String$fromInt(yVal)),
+					$elm$svg$Svg$Attributes$fontSize('6px'),
+					$elm$svg$Svg$Attributes$fontFamily('monospace')
+				]),
+			_List_fromArray(
+				[
+					$elm$svg$Svg$text(
+					$elm$core$String$fromChar(ch))
+				]));
+	});
+var $elm$core$String$foldr = _String_foldr;
+var $elm$core$String$toList = function (string) {
+	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
+};
+var $author$project$Main$lineToCharBox = F2(
+	function (y, line) {
+		return A2(
+			$elm$core$List$indexedMap,
+			$author$project$Main$toCharText(y),
+			$elm$core$String$toList(line));
+	});
+var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$svg$Svg$Attributes$opacity = _VirtualDom_attribute('opacity');
+var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
+var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $author$project$Main$toColoredBox = F2(
+	function (fillColor, box) {
+		var yVal = $author$project$Main$unitSize * box.y;
+		var yDiff = (box.D - box.y) + 1;
+		var xVal = $author$project$Main$unitSize * box.x;
+		var xDiff = (box.C - box.x) + 1;
+		var w = $author$project$Main$unitSize * xDiff;
+		var h = $author$project$Main$unitSize * yDiff;
+		return A2(
+			$elm$svg$Svg$rect,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x(
+					$elm$core$String$fromInt(xVal)),
+					$elm$svg$Svg$Attributes$y(
+					$elm$core$String$fromInt(yVal)),
+					$elm$svg$Svg$Attributes$width(
+					$elm$core$String$fromInt(w)),
+					$elm$svg$Svg$Attributes$height(
+					$elm$core$String$fromInt(h)),
+					$elm$svg$Svg$Attributes$opacity('0.6'),
+					$elm$svg$Svg$Attributes$fill(fillColor)
+				]),
+			_List_Nil);
+	});
+var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
+var $author$project$Main$toSvg = function (model) {
+	var svgWidth = $elm$core$String$fromInt($author$project$Main$unitSize * 140);
+	var svgHeight = $elm$core$String$fromInt($author$project$Main$unitSize * 140);
+	var partBoxes = model.T;
+	var partRects = A2(
 		$elm$core$List$map,
-		function (y) {
-			return $elm$core$String$fromList(
-				A2(
-					$elm$core$List$filterMap,
-					function (x) {
-						return A3($tortus$elm_array_2d$Array2D$get, y, x, warehouse);
-					},
-					xs));
-		},
-		ys);
-	return rows;
+		$author$project$Main$toColoredBox('lightgreen'),
+		partBoxes);
+	var nonPartBoxes = model.R;
+	var nonPartRects = A2(
+		$elm$core$List$map,
+		$author$project$Main$toColoredBox('pink'),
+		nonPartBoxes);
+	var nonGearBoxes = model.Q;
+	var nonGearRects = A2(
+		$elm$core$List$map,
+		$author$project$Main$toColoredBox('lightblue'),
+		nonGearBoxes);
+	var lines = model.O;
+	var gearBoxes = model.M;
+	var gearRects = A2(
+		$elm$core$List$map,
+		$author$project$Main$toColoredBox('plum'),
+		gearBoxes);
+	var charTexts = $elm$core$List$concat(
+		A2($elm$core$List$indexedMap, $author$project$Main$lineToCharBox, lines));
+	var lst = _Utils_ap(
+		partRects,
+		_Utils_ap(
+			nonPartRects,
+			_Utils_ap(
+				gearRects,
+				_Utils_ap(nonGearRects, charTexts))));
+	return A2(
+		$elm$svg$Svg$svg,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$viewBox('0 0 ' + (svgWidth + (' ' + svgHeight))),
+				$elm$svg$Svg$Attributes$width(svgWidth),
+				$elm$svg$Svg$Attributes$height(svgHeight)
+			]),
+		lst);
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$view = function (model) {
-	var warehouse = model.z;
-	var textFontSize = model.N ? '12px' : '28px';
-	var rows = $author$project$Main$toWarehouseRows(warehouse);
-	var gpsSum = function () {
-		if ($elm$core$List$isEmpty(model.H)) {
-			var positions = $author$project$Main$getAllPositions(warehouse);
-			var boxPositions = A2(
-				$elm$core$List$filterMap,
-				$author$project$Main$isBox(warehouse),
-				positions);
-			return $elm$core$String$fromInt(
-				$elm$core$List$sum(
-					A2($elm$core$List$map, $author$project$Main$gpsCoordinate, boxPositions)));
-		} else {
-			return '?';
-		}
-	}();
-	var elements = A2($elm$core$List$concatMap, $author$project$Main$toRowElements, rows);
+	var s = $author$project$Main$toSvg(model);
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
@@ -7239,14 +5726,14 @@ var $author$project$Main$view = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Advent of Code 2024')
+										$elm$html$Html$text('Advent of Code 2023')
 									])),
 								A2(
 								$elm$html$Html$div,
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Day 15: Warehouse Woes')
+										$elm$html$Html$text('Day 3: Gear Ratios')
 									]))
 							]))
 					])),
@@ -7268,192 +5755,11 @@ var $author$project$Main$view = function (model) {
 								$elm$html$Html$a,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$href('https://adventofcode.com/2024/day/15')
+										$elm$html$Html$Attributes$href('https://adventofcode.com/2023/day/3')
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('https://adventofcode.com/2024/day/15')
-									]))
-							]))
-					])),
-				A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$td,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$align('center')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$input,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$type_('radio'),
-										$elm$html$Html$Events$onClick($author$project$Main$UseInput),
-										$elm$html$Html$Attributes$checked(!model.r)
-									]),
-								_List_Nil),
-								A2(
-								$elm$html$Html$label,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Input')
-									])),
-								A2(
-								$elm$html$Html$input,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$type_('radio'),
-										$elm$html$Html$Events$onClick($author$project$Main$UseSmaller),
-										$elm$html$Html$Attributes$checked(model.r === 1)
-									]),
-								_List_Nil),
-								A2(
-								$elm$html$Html$label,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Smaller')
-									])),
-								A2(
-								$elm$html$Html$input,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$type_('radio'),
-										$elm$html$Html$Events$onClick($author$project$Main$UseLarger),
-										$elm$html$Html$Attributes$checked(model.r === 2)
-									]),
-								_List_Nil),
-								A2(
-								$elm$html$Html$label,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Larger')
-									])),
-								A2(
-								$elm$html$Html$input,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$type_('radio'),
-										$elm$html$Html$Events$onClick($author$project$Main$UseSituation),
-										$elm$html$Html$Attributes$checked(model.r === 3)
-									]),
-								_List_Nil),
-								A2(
-								$elm$html$Html$label,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Consider')
-									]))
-							]))
-					])),
-				A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$td,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'padding', '10px')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$button,
-								_List_fromArray(
-									[
-										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Main$Clear)
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Reset')
-									])),
-								A2(
-								$elm$html$Html$button,
-								_List_fromArray(
-									[
-										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Main$Slower)
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Slower')
-									])),
-								A2(
-								$elm$html$Html$button,
-								_List_fromArray(
-									[
-										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Main$TogglePlay)
-									]),
-								_List_fromArray(
-									[
-										model.B ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
-									])),
-								A2(
-								$elm$html$Html$button,
-								_List_fromArray(
-									[
-										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Main$Faster)
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Faster')
-									])),
-								A2(
-								$elm$html$Html$button,
-								_List_fromArray(
-									[
-										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Main$Step)
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Step')
-									]))
-							]))
-					])),
-				A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$td,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$align('center')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$input,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$type_('checkbox'),
-										$elm$html$Html$Events$onClick($author$project$Main$ToggleWide),
-										$elm$html$Html$Attributes$checked(model.l)
-									]),
-								_List_Nil),
-								A2(
-								$elm$html$Html$label,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(' Wide')
+										$elm$svg$Svg$text('https://adventofcode.com/2023/day/3')
 									]))
 							]))
 					])),
@@ -7469,9 +5775,8 @@ var $author$project$Main$view = function (model) {
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '24px'),
-								A2($elm$html$Html$Attributes$style, 'padding-top', '10px'),
-								A2($elm$html$Html$Attributes$style, 'width', '200px')
+								A2($elm$html$Html$Attributes$style, 'font-size', '20px'),
+								A2($elm$html$Html$Attributes$style, 'padding', '0px')
 							]),
 						_List_fromArray(
 							[
@@ -7480,7 +5785,16 @@ var $author$project$Main$view = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(gpsSum)
+										$elm$html$Html$text(
+										$elm$core$String$fromInt(model.U))
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(
+										$elm$core$String$fromInt(model.N))
 									]))
 							]))
 					])),
@@ -7495,19 +5809,25 @@ var $author$project$Main$view = function (model) {
 							[
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
-								A2($elm$html$Html$Attributes$style, 'font-family', 'Source Code Pro, monospace'),
-								A2($elm$html$Html$Attributes$style, 'font-size', textFontSize),
-								A2($elm$html$Html$Attributes$style, 'padding', '10px'),
-								A2($elm$html$Html$Attributes$style, 'width', '200px')
+								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '20px'),
+								A2($elm$html$Html$Attributes$style, 'padding', '10px')
 							]),
 						_List_fromArray(
 							[
-								A2($elm$html$Html$div, _List_Nil, elements)
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$align('center')
+									]),
+								_List_fromArray(
+									[s]))
 							]))
 					]))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
-	{aE: $author$project$Main$init, aK: $author$project$Main$subscriptions, aM: $author$project$Main$update, aN: $author$project$Main$view});
+	{aL: $author$project$Main$init, aV: $author$project$Main$subscriptions, aX: $author$project$Main$update, aY: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));

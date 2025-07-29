@@ -524,7 +524,7 @@ view model =
         "?"
   in 
     Html.table 
-      [ Html.Attributes.style "width" "1080px"
+      [ Html.Attributes.style "width" "900px"
       , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
@@ -535,28 +535,6 @@ view model =
               , Html.Attributes.style "padding" "10px"]
               [ Html.div [] [Html.text "Advent of Code 2024" ]
               , Html.div [] [Html.text "Day 15: Warehouse Woes" ] ] ]
-      , Html.tr 
-          []
-          [ Html.td 
-              [ Html.Attributes.align "center"
-              , Html.Attributes.style "padding-bottom" "10px" ]
-              [ 
-                Html.text " ["
-              , Html.a [ Html.Attributes.href "../../2024/"] [ Html.text "2024" ]
-              , Html.text "] " 
-              , Html.text " ["
-              , Html.a [ Html.Attributes.href "../../2023/"] [ Html.text "2023" ]
-              , Html.text "] "
-              , Html.text " ["
-              , Html.a [ Html.Attributes.href "../../2022/"] [ Html.text "2022" ]
-              , Html.text "] "
-              , Html.text " ["
-              , Html.a [ Html.Attributes.href "../../2021/"] [ Html.text "2021" ]
-              , Html.text "] "
-              , Html.text " ["
-              , Html.a [ Html.Attributes.href "../../2020/"] [ Html.text "2020" ]
-              , Html.text "] " ] 
-          ]
       , Html.tr 
           []
           [ Html.td 

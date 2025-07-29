@@ -72,4 +72,4 @@ let run fileName =
     |> List.sum
     |> printfn "%d"
 
-"input" |> run 
+"input.txt" |> run 
