@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.T.I === region.Y.I)
+	if (region.U.J === region.Z.J)
 	{
-		return 'on line ' + region.T.I;
+		return 'on line ' + region.U.J;
 	}
-	return 'on lines ' + region.T.I + ' through ' + region.Y.I;
+	return 'on lines ' + region.U.J + ' through ' + region.Z.J;
 }
 
 
@@ -1871,9 +1871,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aF,
-		impl.aN,
-		impl.aL,
+		impl.aG,
+		impl.aO,
+		impl.aM,
 		function() { return function() {} }
 	);
 });
@@ -2733,9 +2733,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		J: func(record.J),
-		U: record.U,
-		R: record.R
+		K: func(record.K),
+		V: record.V,
+		S: record.S
 	}
 });
 
@@ -3003,11 +3003,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.J;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.U;
+		var message = !tag ? value : tag < 3 ? value.a : value.K;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.V;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.R) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.S) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3957,11 +3957,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aF,
-		impl.aN,
-		impl.aL,
+		impl.aG,
+		impl.aO,
+		impl.aM,
 		function(sendToApp, initialModel) {
-			var view = impl.aO;
+			var view = impl.aP;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3993,12 +3993,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aF,
-		impl.aN,
-		impl.aL,
+		impl.aG,
+		impl.aO,
+		impl.aM,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.S && impl.S(sendToApp)
-			var view = impl.aO;
+			var divertHrefToApp = impl.T && impl.T(sendToApp)
+			var view = impl.aP;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -4006,12 +4006,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.ay);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.az);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.aM) && (_VirtualDom_doc.title = title = doc.aM);
+				(title !== doc.aN) && (_VirtualDom_doc.title = title = doc.aN);
 			});
 		}
 	);
@@ -4067,12 +4067,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aH;
-	var onUrlRequest = impl.aI;
+	var onUrlChange = impl.aI;
+	var onUrlRequest = impl.aJ;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		S: function(sendToApp)
+		T: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4088,9 +4088,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.al === next.al
-							&& curr.ac === next.ac
-							&& curr.ai.a === next.ai.a
+							&& curr.am === next.am
+							&& curr.ad === next.ad
+							&& curr.aj.a === next.aj.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4098,13 +4098,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aF: function(flags)
+		aG: function(flags)
 		{
-			return A3(impl.aF, flags, _Browser_getUrl(), key);
+			return A3(impl.aG, flags, _Browser_getUrl(), key);
 		},
+		aP: impl.aP,
 		aO: impl.aO,
-		aN: impl.aN,
-		aL: impl.aL
+		aM: impl.aM
 	});
 }
 
@@ -4170,17 +4170,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aD: 'hidden', az: 'visibilitychange' }
+		? { aE: 'hidden', aA: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aD: 'mozHidden', az: 'mozvisibilitychange' }
+		? { aE: 'mozHidden', aA: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aD: 'msHidden', az: 'msvisibilitychange' }
+		? { aE: 'msHidden', aA: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aD: 'webkitHidden', az: 'webkitvisibilitychange' }
-		: { aD: 'hidden', az: 'visibilitychange' };
+		? { aE: 'webkitHidden', aA: 'webkitvisibilitychange' }
+		: { aE: 'hidden', aA: 'visibilitychange' };
 }
 
 
@@ -4261,12 +4261,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		ap: _Browser_getScene(),
-		as: {
-			au: _Browser_window.pageXOffset,
-			av: _Browser_window.pageYOffset,
-			at: _Browser_doc.documentElement.clientWidth,
-			ab: _Browser_doc.documentElement.clientHeight
+		aq: _Browser_getScene(),
+		at: {
+			av: _Browser_window.pageXOffset,
+			aw: _Browser_window.pageYOffset,
+			au: _Browser_doc.documentElement.clientWidth,
+			ac: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4276,8 +4276,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		at: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		ab: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		au: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		ac: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4300,15 +4300,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			ap: {
-				at: node.scrollWidth,
-				ab: node.scrollHeight
+			aq: {
+				au: node.scrollWidth,
+				ac: node.scrollHeight
 			},
-			as: {
-				au: node.scrollLeft,
-				av: node.scrollTop,
-				at: node.clientWidth,
-				ab: node.clientHeight
+			at: {
+				av: node.scrollLeft,
+				aw: node.scrollTop,
+				au: node.clientWidth,
+				ac: node.clientHeight
 			}
 		};
 	});
@@ -4338,18 +4338,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			ap: _Browser_getScene(),
-			as: {
-				au: x,
-				av: y,
-				at: _Browser_doc.documentElement.clientWidth,
-				ab: _Browser_doc.documentElement.clientHeight
+			aq: _Browser_getScene(),
+			at: {
+				av: x,
+				aw: y,
+				au: _Browser_doc.documentElement.clientWidth,
+				ac: _Browser_doc.documentElement.clientHeight
 			},
-			aB: {
-				au: x + rect.left,
-				av: y + rect.top,
-				at: rect.width,
-				ab: rect.height
+			aC: {
+				av: x + rect.left,
+				aw: y + rect.top,
+				au: rect.width,
+				ac: rect.height
 			}
 		};
 	});
@@ -4971,7 +4971,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {aa: fragment, ac: host, ag: path, ai: port_, al: protocol, am: query};
+		return {ab: fragment, ad: host, ah: path, aj: port_, am: protocol, an: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5329,18 +5329,19 @@ var $author$project$Aoc17$initModel = function (dataSource) {
 	var data = $author$project$Aoc17$read(dataSource);
 	var chamber = A3($tortus$elm_array_2d$Array2D$repeat, 2022 * 4, 7, '.');
 	return {
-		F: chamber,
-		G: dataSource,
-		_: false,
-		z: 0,
-		H: 0,
-		O: $elm$core$Array$fromList(
+		r: chamber,
+		H: dataSource,
+		aa: false,
+		B: 0,
+		I: 0,
+		P: $elm$core$Array$fromList(
 			$elm$core$String$toList(data)),
-		J: '?',
-		A: 0,
-		B: true,
+		K: '?',
+		C: 0,
+		s: true,
 		f: $author$project$Aoc17$Moving(rock),
-		w: $author$project$Aoc17$defaultTickInterval
+		D: 0,
+		y: $author$project$Aoc17$defaultTickInterval
 	};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
@@ -5369,7 +5370,7 @@ var $elm$browser$Browser$Events$MySub = F3(
 	});
 var $elm$browser$Browser$Events$State = F2(
 	function (subs, pids) {
-		return {ah: pids, aq: subs};
+		return {ai: pids, ar: subs};
 	});
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
@@ -5601,7 +5602,7 @@ var $elm$core$Dict$merge = F6(
 	});
 var $elm$browser$Browser$Events$Event = F2(
 	function (key, event) {
-		return {Z: event, ad: key};
+		return {_: event, ae: key};
 	});
 var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
 var $elm$browser$Browser$Events$spawn = F3(
@@ -5676,7 +5677,7 @@ var $elm$browser$Browser$Events$onEffects = F3(
 			stepLeft,
 			stepBoth,
 			stepRight,
-			state.ah,
+			state.ai,
 			$elm$core$Dict$fromList(newSubs),
 			_Utils_Tuple3(_List_Nil, $elm$core$Dict$empty, _List_Nil));
 		var deadPids = _v0.a;
@@ -5722,8 +5723,8 @@ var $elm$core$List$filterMap = F2(
 	});
 var $elm$browser$Browser$Events$onSelfMsg = F3(
 	function (router, _v0, state) {
-		var key = _v0.ad;
-		var event = _v0.Z;
+		var key = _v0.ae;
+		var event = _v0._;
 		var toMessage = function (_v2) {
 			var subKey = _v2.a;
 			var _v3 = _v2.b;
@@ -5732,7 +5733,7 @@ var $elm$browser$Browser$Events$onSelfMsg = F3(
 			var decoder = _v3.c;
 			return _Utils_eq(subKey, key) ? A2(_Browser_decodeEvent, decoder, event) : $elm$core$Maybe$Nothing;
 		};
-		var messages = A2($elm$core$List$filterMap, toMessage, state.aq);
+		var messages = A2($elm$core$List$filterMap, toMessage, state.ar);
 		return A2(
 			$elm$core$Task$andThen,
 			function (_v1) {
@@ -5773,7 +5774,7 @@ var $elm$time$Time$Every = F2(
 	});
 var $elm$time$Time$State = F2(
 	function (taggers, processes) {
-		return {ak: processes, ar: taggers};
+		return {al: processes, as: taggers};
 	});
 var $elm$time$Time$init = $elm$core$Task$succeed(
 	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
@@ -5866,7 +5867,7 @@ var $elm$time$Time$spawnHelp = F3(
 	});
 var $elm$time$Time$onEffects = F3(
 	function (router, subs, _v0) {
-		var processes = _v0.ak;
+		var processes = _v0.al;
 		var rightStep = F3(
 			function (_v6, id, _v7) {
 				var spawns = _v7.a;
@@ -5935,7 +5936,7 @@ var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
 var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $elm$time$Time$onSelfMsg = F3(
 	function (router, interval, state) {
-		var _v0 = A2($elm$core$Dict$get, interval, state.ar);
+		var _v0 = A2($elm$core$Dict$get, interval, state.as);
 		if (_v0.$ === 1) {
 			return $elm$core$Task$succeed(state);
 		} else {
@@ -5983,9 +5984,9 @@ var $elm$time$Time$every = F2(
 	});
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc17$subscriptions = function (model) {
-	var tickSub = model.B ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = model.s ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.w,
+		model.y,
 		function (_v0) {
 			return $author$project$Aoc17$Tick;
 		});
@@ -6034,7 +6035,7 @@ var $ohanhi$keyboard$Keyboard$Arrows$arrowKey = function (rawKey) {
 	}
 };
 var $author$project$Aoc17$updateClear = function (model) {
-	return $author$project$Aoc17$initModel(model.G);
+	return $author$project$Aoc17$initModel(model.H);
 };
 var $author$project$Aoc17$Stopped = function (a) {
 	return {$: 1, a: a};
@@ -6353,216 +6354,158 @@ var $author$project$Aoc17$toRockPositions = function (rock) {
 		}
 	}
 };
-var $author$project$Aoc17$Angle = 2;
-var $author$project$Aoc17$Bar = 3;
-var $author$project$Aoc17$Box = 4;
-var $author$project$Aoc17$Cross = 1;
-var $author$project$Aoc17$tryMoveDown = function (rock) {
-	if (rock.$ === 1) {
-		return rock;
-	} else {
-		var _v1 = rock.a;
-		var _v2 = _v1.a;
-		var x = _v2.a;
-		var y = _v2.b;
-		var shape = _v1.b;
-		switch (shape) {
-			case 0:
-				return (y > 0) ? $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x, y - 1),
-						0)) : $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x, y),
-						shape));
-			case 1:
-				return (y > 0) ? $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x, y - 1),
-						1)) : $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x, y),
-						shape));
-			case 2:
-				return (y > 0) ? $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x, y - 1),
-						2)) : $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x, y),
-						shape));
-			case 3:
-				return (y > 0) ? $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x, y - 1),
-						3)) : $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x, y),
-						shape));
-			default:
-				return (y > 0) ? $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x, y - 1),
-						4)) : $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x, y),
-						shape));
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
 		}
-	}
-};
+	});
+var $author$project$Aoc17$chamberWidth = 7;
+var $author$project$Aoc17$isForbidden = F2(
+	function (chamber, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		if ((x < 0) || ((_Utils_cmp(x, $author$project$Aoc17$chamberWidth) > -1) || (y < 0))) {
+			return true;
+		} else {
+			var _v1 = A3($tortus$elm_array_2d$Array2D$get, y, x, chamber);
+			if ((!_v1.$) && ('#' === _v1.a)) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	});
+var $author$project$Aoc17$tryMove = F3(
+	function (chamber, rock, moveFn) {
+		if (rock.$ === 1) {
+			return rock;
+		} else {
+			var _v1 = rock.a;
+			var oldPos = _v1.a;
+			var shape = _v1.b;
+			var _v2 = moveFn(oldPos);
+			var x = _v2.a;
+			var y = _v2.b;
+			if ((x >= 0) && ((_Utils_cmp(x, $author$project$Aoc17$chamberWidth) < 0) && (y >= 0))) {
+				var rockPositions = $author$project$Aoc17$toRockPositions(
+					$author$project$Aoc17$Moving(
+						_Utils_Tuple2(
+							_Utils_Tuple2(x, y),
+							shape)));
+				return A2(
+					$elm$core$List$any,
+					$author$project$Aoc17$isForbidden(chamber),
+					rockPositions) ? rock : $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x, y),
+						shape));
+			} else {
+				return rock;
+			}
+		}
+	});
+var $author$project$Aoc17$tryMoveDown = F2(
+	function (chamber, rock) {
+		return A3(
+			$author$project$Aoc17$tryMove,
+			chamber,
+			rock,
+			function (_v0) {
+				var x = _v0.a;
+				var y = _v0.b;
+				return _Utils_Tuple2(x, y - 1);
+			});
+	});
 var $author$project$Aoc17$updateFall = function (model) {
 	var _v0 = model.f;
 	if (!_v0.$) {
 		var _v1 = _v0.a;
 		var pos = _v1.a;
 		var shape = _v1.b;
-		var r = $author$project$Aoc17$tryMoveDown(model.f);
+		var r = A2($author$project$Aoc17$tryMoveDown, model.r, model.f);
 		if (_Utils_eq(r, model.f)) {
+			var rocksFallen = model.D + 1;
+			var paused = model.s || (model.D === 2022);
 			var chamber = A2(
 				$author$project$Aoc17$addRockPositions,
-				model.F,
+				model.r,
 				$author$project$Aoc17$toRockPositions(r));
 			var highestRock = $author$project$Aoc17$findHighestRock(chamber);
 			return _Utils_update(
 				model,
 				{
-					F: chamber,
-					z: highestRock,
-					A: 0,
-					f: $author$project$Aoc17$Stopped(shape)
+					r: chamber,
+					B: highestRock,
+					C: 0,
+					s: paused,
+					f: $author$project$Aoc17$Stopped(shape),
+					D: rocksFallen
 				});
 		} else {
 			return _Utils_update(
 				model,
-				{J: 'v', A: 0, f: r});
+				{K: 'v', C: 0, f: r});
 		}
 	} else {
 		return model;
 	}
 };
-var $author$project$Aoc17$tryMoveLeft = function (rock) {
-	if (rock.$ === 1) {
-		return rock;
-	} else {
-		var _v1 = rock.a;
-		var _v2 = _v1.a;
-		var x = _v2.a;
-		var y = _v2.b;
-		var shape = _v1.b;
-		switch (shape) {
-			case 0:
-				return (x > 0) ? $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x - 1, y),
-						0)) : $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x, y),
-						shape));
-			case 1:
-				return (x > 0) ? $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x - 1, y),
-						1)) : $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x, y),
-						shape));
-			case 2:
-				return (x > 0) ? $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x - 1, y),
-						2)) : $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x, y),
-						shape));
-			case 3:
-				return (x > 0) ? $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x - 1, y),
-						3)) : $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x, y),
-						shape));
-			default:
-				return (x > 0) ? $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x - 1, y),
-						4)) : $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x, y),
-						shape));
-		}
-	}
-};
-var $author$project$Aoc17$chamberWidth = 7;
-var $author$project$Aoc17$tryMoveRight = function (rock) {
-	if (rock.$ === 1) {
-		return rock;
-	} else {
-		var _v1 = rock.a;
-		var _v2 = _v1.a;
-		var x = _v2.a;
-		var y = _v2.b;
-		var shape = _v1.b;
-		switch (shape) {
-			case 0:
-				return (_Utils_cmp(x + 4, $author$project$Aoc17$chamberWidth) < 0) ? $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x + 1, y),
-						0)) : $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x, y),
-						shape));
-			case 1:
-				return (_Utils_cmp(x + 3, $author$project$Aoc17$chamberWidth) < 0) ? $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x + 1, y),
-						1)) : $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x, y),
-						shape));
-			case 2:
-				return (_Utils_cmp(x + 3, $author$project$Aoc17$chamberWidth) < 0) ? $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x + 1, y),
-						2)) : $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x, y),
-						shape));
-			case 3:
-				return (_Utils_cmp(x + 1, $author$project$Aoc17$chamberWidth) < 0) ? $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x + 1, y),
-						3)) : $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x, y),
-						shape));
-			default:
-				return (_Utils_cmp(x + 2, $author$project$Aoc17$chamberWidth) < 0) ? $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x + 1, y),
-						4)) : $author$project$Aoc17$Moving(
-					_Utils_Tuple2(
-						_Utils_Tuple2(x, y),
-						shape));
-		}
-	}
-};
-var $author$project$Aoc17$moveRock = F2(
-	function (move, rock) {
+var $author$project$Aoc17$tryMoveLeft = F2(
+	function (chamber, rock) {
+		return A3(
+			$author$project$Aoc17$tryMove,
+			chamber,
+			rock,
+			function (_v0) {
+				var x = _v0.a;
+				var y = _v0.b;
+				return _Utils_Tuple2(x - 1, y);
+			});
+	});
+var $author$project$Aoc17$tryMoveRight = F2(
+	function (chamber, rock) {
+		return A3(
+			$author$project$Aoc17$tryMove,
+			chamber,
+			rock,
+			function (_v0) {
+				var x = _v0.a;
+				var y = _v0.b;
+				return _Utils_Tuple2(x + 1, y);
+			});
+	});
+var $author$project$Aoc17$moveRock = F3(
+	function (chamber, move, rock) {
 		switch (move) {
 			case '>':
-				return $author$project$Aoc17$tryMoveRight(rock);
+				return A2($author$project$Aoc17$tryMoveRight, chamber, rock);
 			case '<':
-				return $author$project$Aoc17$tryMoveLeft(rock);
+				return A2($author$project$Aoc17$tryMoveLeft, chamber, rock);
 			case 'v':
-				return $author$project$Aoc17$tryMoveDown(rock);
+				return A2($author$project$Aoc17$tryMoveDown, chamber, rock);
 			default:
 				return rock;
 		}
 	});
 var $author$project$Aoc17$updateSideways = F2(
 	function (move, model) {
-		var rock = A2($author$project$Aoc17$moveRock, move, model.f);
+		var rock = A3($author$project$Aoc17$moveRock, model.r, move, model.f);
 		return _Utils_update(
 			model,
 			{f: rock});
@@ -6580,6 +6523,10 @@ var $author$project$Aoc17$updateKey = F2(
 				return model;
 		}
 	});
+var $author$project$Aoc17$Angle = 2;
+var $author$project$Aoc17$Bar = 3;
+var $author$project$Aoc17$Box = 4;
+var $author$project$Aoc17$Cross = 1;
 var $author$project$Aoc17$nextShape = function (shape) {
 	switch (shape) {
 		case 0:
@@ -6600,13 +6547,13 @@ var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
 };
 var $elm$core$Basics$modBy = _Basics_modBy;
-var $author$project$Aoc17$moveRockJet = F2(
-	function (move, rock) {
+var $author$project$Aoc17$moveRockJet = F3(
+	function (chamber, move, rock) {
 		switch (move) {
 			case '>':
-				return $author$project$Aoc17$tryMoveRight(rock);
+				return A2($author$project$Aoc17$tryMoveRight, chamber, rock);
 			case '<':
-				return $author$project$Aoc17$tryMoveLeft(rock);
+				return A2($author$project$Aoc17$tryMoveLeft, chamber, rock);
 			default:
 				return rock;
 		}
@@ -6617,18 +6564,18 @@ var $author$project$Aoc17$updateBlow = function (model) {
 		var jetMove = A2(
 			$elm$core$Maybe$withDefault,
 			' ',
-			A2($elm$core$Array$get, model.H, model.O));
-		var r = A2($author$project$Aoc17$moveRockJet, jetMove, model.f);
+			A2($elm$core$Array$get, model.I, model.P));
+		var r = A3($author$project$Aoc17$moveRockJet, model.r, jetMove, model.f);
 		var jetIndex = A2(
 			$elm$core$Basics$modBy,
-			$elm$core$Array$length(model.O),
-			model.H + 1);
+			$elm$core$Array$length(model.P),
+			model.I + 1);
 		return _Utils_update(
 			model,
 			{
-				H: jetIndex,
-				J: $elm$core$String$fromChar(jetMove),
-				A: 1,
+				I: jetIndex,
+				K: $elm$core$String$fromChar(jetMove),
+				C: 1,
 				f: r
 			});
 	} else {
@@ -6638,7 +6585,7 @@ var $author$project$Aoc17$updateBlow = function (model) {
 var $author$project$Aoc17$updateStep = function (model) {
 	var _v0 = model.f;
 	if (!_v0.$) {
-		var _v1 = model.A;
+		var _v1 = model.C;
 		if (!_v1) {
 			return $author$project$Aoc17$updateBlow(model);
 		} else {
@@ -6646,7 +6593,7 @@ var $author$project$Aoc17$updateStep = function (model) {
 		}
 	} else {
 		var shape = _v0.a;
-		var y = model.z + 3;
+		var y = model.B + 3;
 		return _Utils_update(
 			model,
 			{
@@ -6661,7 +6608,7 @@ var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc17$updateTogglePlay = function (model) {
 	return _Utils_update(
 		model,
-		{B: !model.B});
+		{s: !model.s});
 };
 var $author$project$Aoc17$update = F2(
 	function (msg, model) {
@@ -6682,13 +6629,13 @@ var $author$project$Aoc17$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{w: model.w / 2}),
+						{y: model.y / 2}),
 					$elm$core$Platform$Cmd$none);
 			case 4:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{w: model.w * 2}),
+						{y: model.y * 2}),
 					$elm$core$Platform$Cmd$none);
 			case 2:
 				return _Utils_Tuple2(
@@ -6860,7 +6807,7 @@ var $author$project$Aoc17$toChamberRow = F4(
 	});
 var $author$project$Aoc17$toChamberRows = F3(
 	function (rocks, highest, chamber) {
-		var ys = A2($elm$core$List$range, 0, highest + 7);
+		var ys = A2($elm$core$List$range, 0, highest + 3);
 		var xs = A2(
 			$elm$core$List$range,
 			0,
@@ -6886,7 +6833,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 	var textFontSize = '20px';
 	var rockPositions = $elm$core$Set$fromList(
 		$author$project$Aoc17$toRockPositions(model.f));
-	var rows = A3($author$project$Aoc17$toChamberRows, rockPositions, model.z, model.F);
+	var rows = A3($author$project$Aoc17$toChamberRows, rockPositions, model.B, model.r);
 	var rockPosStr = function () {
 		var _v0 = model.f;
 		if (!_v0.$) {
@@ -7063,7 +7010,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick($author$project$Aoc17$UseInput),
-										$elm$html$Html$Attributes$checked(!model.G)
+										$elm$html$Html$Attributes$checked(!model.H)
 									]),
 								_List_Nil),
 								A2(
@@ -7079,7 +7026,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick($author$project$Aoc17$UseSample),
-										$elm$html$Html$Attributes$checked(model.G === 1)
+										$elm$html$Html$Attributes$checked(model.H === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -7136,7 +7083,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 									]),
 								_List_fromArray(
 									[
-										model.B ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
+										model.s ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -7186,21 +7133,22 @@ var $author$project$Aoc17$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										$elm$core$String$fromInt(model.z))
+										'Tower height: ' + $elm$core$String$fromInt(model.B))
 									])),
 								A2(
 								$elm$html$Html$div,
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(rockPosStr)
+										$elm$html$Html$text(
+										'Rocks fallen: ' + $elm$core$String$fromInt(model.D))
 									])),
 								A2(
 								$elm$html$Html$div,
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(model.J)
+										$elm$html$Html$text(model.K)
 									]))
 							]))
 					])),
@@ -7229,15 +7177,15 @@ var $author$project$Aoc17$viewBody = function (model) {
 };
 var $author$project$Aoc17$view = function (model) {
 	return {
-		ay: _List_fromArray(
+		az: _List_fromArray(
 			[
 				$author$project$Aoc17$viewBody(model)
 			]),
-		aM: 'Advent of Code 2022 | Day 17: Pyroclastic Flow'
+		aN: 'Advent of Code 2022 | Day 17: Pyroclastic Flow'
 	};
 };
 var $author$project$Aoc17$main = $elm$browser$Browser$document(
-	{aF: $author$project$Aoc17$init, aL: $author$project$Aoc17$subscriptions, aN: $author$project$Aoc17$update, aO: $author$project$Aoc17$view});
+	{aG: $author$project$Aoc17$init, aM: $author$project$Aoc17$subscriptions, aO: $author$project$Aoc17$update, aP: $author$project$Aoc17$view});
 _Platform_export({'Aoc17':{'init':$author$project$Aoc17$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
 

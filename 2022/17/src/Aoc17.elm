@@ -51,6 +51,7 @@ type Rock = Moving (Pos, Shape) | Stopped Shape
 type alias Model = 
   { chamber : Array2D Char
   , rock : Rock
+  , rocksFallen : Int 
   , highestRock : Int
   , dataSource : DataSource
   , move : Move
@@ -82,6 +83,7 @@ initModel dataSource =
   in 
     { chamber = chamber 
     , highestRock = 0
+    , rocksFallen = 0
     , rock = Moving rock
     , dataSource = dataSource
     , move = Blow
@@ -117,55 +119,58 @@ getAllPositions board =
   in 
     ys |> List.concatMap (\y -> xs |> List.map (\x -> (x, y)))
 
-tryMoveRight : Rock -> Rock  
-tryMoveRight rock =
-  case rock of 
-    Stopped _ -> rock 
-    Moving ((x, y), shape) -> 
-      case shape of 
-        Dash -> if x + 4 < chamberWidth then Moving ((x + 1, y), Dash) else Moving ((x, y), shape)
-        Cross -> if x + 3 < chamberWidth then Moving ((x + 1, y), Cross) else Moving ((x, y), shape)
-        Angle -> if x + 3 < chamberWidth then Moving ((x + 1, y), Angle) else Moving ((x, y), shape)
-        Bar -> if x + 1 < chamberWidth then Moving ((x + 1, y), Bar) else Moving ((x, y), shape)
-        Box -> if x + 2 < chamberWidth then Moving ((x + 1, y), Box) else Moving ((x, y), shape)
+tryMoveRight : Array2D Char -> Rock -> Rock  
+tryMoveRight chamber rock =
+  tryMove chamber rock (\(x, y) -> (x + 1, y))
 
-tryMoveLeft : Rock -> Rock  
-tryMoveLeft rock =
-  case rock of 
-    Stopped _ -> rock 
-    Moving ((x, y), shape) -> 
-      case shape of 
-        Dash -> if x > 0 then Moving ((x - 1, y), Dash) else Moving ((x, y), shape)
-        Cross -> if x > 0 then Moving ((x - 1, y), Cross) else Moving ((x, y), shape)
-        Angle -> if x > 0 then Moving ((x - 1, y), Angle) else Moving ((x, y), shape)
-        Bar -> if x > 0 then Moving ((x - 1, y), Bar) else Moving ((x, y), shape)
-        Box -> if x > 0 then Moving ((x - 1, y), Box) else Moving ((x, y), shape)
+tryMoveLeft : Array2D Char -> Rock -> Rock  
+tryMoveLeft chamber rock =
+  tryMove chamber rock (\(x, y) -> (x - 1, y))
 
-tryMoveDown : Rock -> Rock  
-tryMoveDown rock = 
-  case rock of 
-    Stopped _ -> rock 
-    Moving ((x, y), shape) -> 
-      case shape of 
-        Dash -> if y > 0 then Moving ((x, y - 1), Dash) else Moving ((x, y), shape)
-        Cross -> if y > 0 then Moving ((x, y - 1), Cross) else Moving ((x, y), shape)
-        Angle -> if y > 0 then Moving ((x, y - 1), Angle) else Moving ((x, y), shape)
-        Bar -> if y > 0 then Moving ((x, y - 1), Bar) else Moving ((x, y), shape)
-        Box -> if y > 0 then Moving ((x, y - 1), Box) else Moving ((x, y), shape)
+isForbidden : Array2D Char -> Pos -> Bool
+isForbidden chamber (x, y) = 
+  if x < 0 || x >= chamberWidth || y < 0 then True 
+  else 
+    case Array2D.get y x chamber of 
+      Just '#' -> True 
+      _ -> False
 
-moveRock : Char -> Rock -> Rock 
-moveRock move rock =
+tryMove : Array2D Char -> Rock -> (Pos -> Pos) -> Rock 
+tryMove chamber rock moveFn = 
+  case rock of 
+    Stopped _ -> rock
+    Moving (oldPos, shape) ->
+      let 
+        (x, y) = moveFn oldPos 
+      in  
+        if x >= 0 && x < chamberWidth && y >= 0 then 
+          let 
+            rockPositions = toRockPositions (Moving ((x, y), shape))
+          in 
+            if rockPositions |> List.any (isForbidden chamber) then 
+              rock
+            else 
+              Moving ((x, y), shape)
+        else 
+          rock
+
+tryMoveDown : Array2D Char -> Rock -> Rock  
+tryMoveDown chamber rock = 
+  tryMove chamber rock (\(x, y) -> (x, y - 1))
+
+moveRock : Array2D Char -> Char -> Rock -> Rock 
+moveRock chamber move rock =
   case move of 
-    '>' -> tryMoveRight rock
-    '<' -> tryMoveLeft rock 
-    'v' -> tryMoveDown rock
+    '>' -> tryMoveRight chamber rock
+    '<' -> tryMoveLeft chamber rock 
+    'v' -> tryMoveDown chamber rock
     _ -> rock
 
-moveRockJet : Char -> Rock -> Rock 
-moveRockJet move rock =
+moveRockJet : Array2D Char -> Char -> Rock -> Rock 
+moveRockJet chamber move rock =
   case move of 
-    '>' -> tryMoveRight rock
-    '<' -> tryMoveLeft rock
+    '>' -> tryMoveRight chamber rock
+    '<' -> tryMoveLeft chamber rock
     _ -> rock
 
 addRockPositions : Array2D Char -> List Pos -> Array2D Char 
@@ -201,7 +206,7 @@ updateBlow model =
       let 
         jetMove = model.jetPattern |> Array.get model.jetIndex |> Maybe.withDefault ' '
         jetIndex = (model.jetIndex + 1) |> modBy (Array.length model.jetPattern)
-        r = moveRockJet jetMove model.rock 
+        r = moveRockJet model.chamber jetMove model.rock 
       in 
         { model | message = jetMove |> String.fromChar, jetIndex = jetIndex, rock = r, move = Fall }
     Stopped _ -> 
@@ -220,14 +225,16 @@ updateFall model =
   case model.rock of 
     Moving (pos, shape) -> 
       let 
-        r = tryMoveDown model.rock 
+        r = tryMoveDown model.chamber model.rock 
       in 
         if r == model.rock then 
           let 
             chamber = addRockPositions model.chamber (r |> toRockPositions) 
             highestRock = findHighestRock chamber 
+            rocksFallen = model.rocksFallen + 1
+            paused = model.paused || model.rocksFallen == 2022
           in 
-            { model | rock = Stopped shape, chamber = chamber, move = Blow, highestRock = highestRock }
+            { model | rock = Stopped shape, chamber = chamber, move = Blow, highestRock = highestRock, rocksFallen = rocksFallen, paused = paused }
         else 
           { model | message = "v", rock = r, move = Blow }
     Stopped _ -> 
@@ -249,7 +256,7 @@ updateStep model =
 updateSideways : Char -> Model -> Model
 updateSideways move model = 
   let 
-    rock = moveRock move model.rock
+    rock = moveRock model.chamber move model.rock
   in 
     { model | rock = rock }
 
@@ -327,7 +334,7 @@ toChamberRow rocks chamber xs y =
 toChamberRows : Set Pos -> Int -> Array2D Char -> List String 
 toChamberRows rocks highest chamber = 
   let
-    ys = List.range 0 (highest  + 7)
+    ys = List.range 0 (highest  + 3)
     xs = List.range 0 (Array2D.columns chamber - 1)
     rows = ys |> List.map (toChamberRow rocks chamber xs)
   in 
@@ -461,8 +468,9 @@ viewBody model =
               , Html.Attributes.style "padding-top" "10px"
               , Html.Attributes.style "width" "200px" ] 
               [ 
-                Html.div [] [ Html.text (String.fromInt model.highestRock) ]
-              , Html.div [] [ Html.text rockPosStr ]
+                Html.div [] [ Html.text ("Tower height: " ++ String.fromInt model.highestRock) ]
+              , Html.div [] [ Html.text ("Rocks fallen: " ++ String.fromInt model.rocksFallen) ]
+              -- , Html.div [] [ Html.text rockPosStr ]
               , Html.div [] [ Html.text model.message ]
               ] ]
       , Html.tr 
