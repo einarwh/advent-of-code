@@ -1,4 +1,4 @@
-// Advent of Code 2022. Day 17.
+// Advent of Code 2022. Day 17: Pyroclastic Flow.
 // dotnet fsi aoc17.fsx
 
 open System
