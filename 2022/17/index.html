@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.P.E === region.U.E)
+	if (region.T.I === region.Y.I)
 	{
-		return 'on line ' + region.P.E;
+		return 'on line ' + region.T.I;
 	}
-	return 'on lines ' + region.P.E + ' through ' + region.U.E;
+	return 'on lines ' + region.T.I + ' through ' + region.Y.I;
 }
 
 
@@ -1871,9 +1871,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aD,
+		impl.aF,
+		impl.aN,
 		impl.aL,
-		impl.aJ,
 		function() { return function() {} }
 	);
 });
@@ -2733,9 +2733,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		aa: func(record.aa),
-		Q: record.Q,
-		N: record.N
+		J: func(record.J),
+		U: record.U,
+		R: record.R
 	}
 });
 
@@ -3003,11 +3003,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.aa;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.Q;
+		var message = !tag ? value : tag < 3 ? value.a : value.J;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.U;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.N) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.R) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3957,11 +3957,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aD,
+		impl.aF,
+		impl.aN,
 		impl.aL,
-		impl.aJ,
 		function(sendToApp, initialModel) {
-			var view = impl.aM;
+			var view = impl.aO;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3993,12 +3993,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aD,
+		impl.aF,
+		impl.aN,
 		impl.aL,
-		impl.aJ,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.O && impl.O(sendToApp)
-			var view = impl.aM;
+			var divertHrefToApp = impl.S && impl.S(sendToApp)
+			var view = impl.aO;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -4006,12 +4006,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aw);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.ay);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.aK) && (_VirtualDom_doc.title = title = doc.aK);
+				(title !== doc.aM) && (_VirtualDom_doc.title = title = doc.aM);
 			});
 		}
 	);
@@ -4067,12 +4067,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aF;
-	var onUrlRequest = impl.aG;
+	var onUrlChange = impl.aH;
+	var onUrlRequest = impl.aI;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		O: function(sendToApp)
+		S: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4088,9 +4088,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.aj === next.aj
-							&& curr.Z === next.Z
-							&& curr.ag.a === next.ag.a
+							&& curr.al === next.al
+							&& curr.ac === next.ac
+							&& curr.ai.a === next.ai.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4098,13 +4098,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aD: function(flags)
+		aF: function(flags)
 		{
-			return A3(impl.aD, flags, _Browser_getUrl(), key);
+			return A3(impl.aF, flags, _Browser_getUrl(), key);
 		},
-		aM: impl.aM,
-		aL: impl.aL,
-		aJ: impl.aJ
+		aO: impl.aO,
+		aN: impl.aN,
+		aL: impl.aL
 	});
 }
 
@@ -4170,17 +4170,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aB: 'hidden', ax: 'visibilitychange' }
+		? { aD: 'hidden', az: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aB: 'mozHidden', ax: 'mozvisibilitychange' }
+		? { aD: 'mozHidden', az: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aB: 'msHidden', ax: 'msvisibilitychange' }
+		? { aD: 'msHidden', az: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aB: 'webkitHidden', ax: 'webkitvisibilitychange' }
-		: { aB: 'hidden', ax: 'visibilitychange' };
+		? { aD: 'webkitHidden', az: 'webkitvisibilitychange' }
+		: { aD: 'hidden', az: 'visibilitychange' };
 }
 
 
@@ -4261,12 +4261,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		an: _Browser_getScene(),
-		aq: {
-			as: _Browser_window.pageXOffset,
-			at: _Browser_window.pageYOffset,
-			ar: _Browser_doc.documentElement.clientWidth,
-			Y: _Browser_doc.documentElement.clientHeight
+		ap: _Browser_getScene(),
+		as: {
+			au: _Browser_window.pageXOffset,
+			av: _Browser_window.pageYOffset,
+			at: _Browser_doc.documentElement.clientWidth,
+			ab: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4276,8 +4276,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		ar: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		Y: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		at: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		ab: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4300,15 +4300,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			an: {
-				ar: node.scrollWidth,
-				Y: node.scrollHeight
+			ap: {
+				at: node.scrollWidth,
+				ab: node.scrollHeight
 			},
-			aq: {
-				as: node.scrollLeft,
-				at: node.scrollTop,
-				ar: node.clientWidth,
-				Y: node.clientHeight
+			as: {
+				au: node.scrollLeft,
+				av: node.scrollTop,
+				at: node.clientWidth,
+				ab: node.clientHeight
 			}
 		};
 	});
@@ -4338,18 +4338,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			an: _Browser_getScene(),
-			aq: {
-				as: x,
-				at: y,
-				ar: _Browser_doc.documentElement.clientWidth,
-				Y: _Browser_doc.documentElement.clientHeight
+			ap: _Browser_getScene(),
+			as: {
+				au: x,
+				av: y,
+				at: _Browser_doc.documentElement.clientWidth,
+				ab: _Browser_doc.documentElement.clientHeight
 			},
-			az: {
-				as: x + rect.left,
-				at: y + rect.top,
-				ar: rect.width,
-				Y: rect.height
+			aB: {
+				au: x + rect.left,
+				av: y + rect.top,
+				at: rect.width,
+				ab: rect.height
 			}
 		};
 	});
@@ -4971,7 +4971,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {X: fragment, Z: host, ae: path, ag: port_, aj: protocol, ak: query};
+		return {aa: fragment, ac: host, ag: path, ai: port_, al: protocol, am: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5251,8 +5251,47 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$document = _Browser_document;
 var $author$project$Aoc17$Sample = 1;
+var $author$project$Aoc17$Blow = 0;
 var $author$project$Aoc17$Dash = 0;
+var $author$project$Aoc17$Moving = function (a) {
+	return {$: 0, a: a};
+};
 var $author$project$Aoc17$defaultTickInterval = 10;
+var $elm$core$Array$fromListHelp = F3(
+	function (list, nodeList, nodeListSize) {
+		fromListHelp:
+		while (true) {
+			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
+			var jsArray = _v0.a;
+			var remainingItems = _v0.b;
+			if (_Utils_cmp(
+				$elm$core$Elm$JsArray$length(jsArray),
+				$elm$core$Array$branchFactor) < 0) {
+				return A2(
+					$elm$core$Array$builderToArray,
+					true,
+					{e: nodeList, b: nodeListSize, d: jsArray});
+			} else {
+				var $temp$list = remainingItems,
+					$temp$nodeList = A2(
+					$elm$core$List$cons,
+					$elm$core$Array$Leaf(jsArray),
+					nodeList),
+					$temp$nodeListSize = nodeListSize + 1;
+				list = $temp$list;
+				nodeList = $temp$nodeList;
+				nodeListSize = $temp$nodeListSize;
+				continue fromListHelp;
+			}
+		}
+	});
+var $elm$core$Array$fromList = function (list) {
+	if (!list.b) {
+		return $elm$core$Array$empty;
+	} else {
+		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
+	}
+};
 var $author$project$Aoc17$input = '>>>><<><>><<<<>>>><<>>><>><><<>>>><<<<>>><<<>>>><<<>><<>>><<<<>>><<>>>><><><<>>>><<<>>><<<><<>>><<<<>><<<<>>>><<<<>>>><<<>>>><<<><><<<>>><<<>>><<<<>>>><<<<>>>><>><<>><<<>><<>><>>><<<<>><<<<><<<<><<>>><<<>><<<<>><<<><>>><<<<>>>><<<>>><<<>><>>><<<<><>>>><<<><<<>>><<<><<>><<<<><<<>>>><<<<>><<<<>>><<<<><<<>>><<><>>><>>><>>>><><<<<>>><<>>><><>>><<<>>><<<<>>><><<<<>>><<<<>>>><<><>>><>><<>><<>>>><<<<>><<<<><<<<>>><>>>><<>>><<><<<>>>><<>>><<<<>><<<>>><<<<>>>><<>>>><<>>><<<<>>>><<>>>><<><>><<<<>>><<<<>><<<><<<><<<><<>>><<<<>>>><<<<>>>><<<><<<>><<>>><>><<>><>>>><>><<<<>>><<>>><<<>>><<>>>><>>><>>><<><<<>>>><<<<>>><<<<>>><<>>>><<<<>><<>>>><<<>>><>>><<<><>>><>>>><<>>>><<>><><<<<><<<>>><<>><<><<>>>><<>>>><><<<<>>>><<<<><<<><>>><<<>><<<>>>><>><<<<>>><><<><<<<>><<<<>><<<<>>><><<<><<<>>><<<<>>><>><<<<><><<<>>>><<<<><>>>><<<>>>><<><<<><>>><<<><<<<><>>><<<>><<<>><<<><><<<>>><<><<<<>>><<<>>>><<>><>><<<>>><>>>><<<<><>>><<>>>><>>>><<>>>><>><><>>><<<>>><<<>><<>>>><<<>>>><><<>>>><<>>><<<<>>><<<<>>><<<<>><<<>><<<>>><<>><<<>><>><<<>><<>>><<>>>><<<>>><<>>>><>>>><<<<>><<<><<><<<>>><<<><<<<>>>><<<<><<<>>>><<<>>>><<<>>>><>>>><>><<<<>><<<<>>>><<<<>><<<>><><>>>><<>>>><<>><<<>>>><<<<>><<<<>><<>>>><<>><<<<>>><<<<><<<<>>><>>><><<<>>><>><<>>>><<<<><<>><<>>><<<<>>>><<>>><>>>><<><<>>><<>>><<><<>><><<<<>><<<>>><>><<<>>><><<<<>>>><>>>><<<>>><<<>><<<>>><<<<>>><>>>><<<>>><<<>><<<>>>><<>>>><>><>><<<>><<<<><<<<>><<<<>>><>><<<<>><<>><><<>>><<<>>>><<>>>><<<>>><<>>><>><>><<><<<>>><<<><<<>><><><<<>><>>>><<>>>><<<<>>><<<><>>><<<><<<<>><<<><<>>><<<<>><><<<>>>><<>>>><>>>><<>>>><<<<>>><><>>>><>><>>><<<<><<<>><<<<><<<>>>><<<<>>>><>>>><>>><<<<><<<>>>><<<>><<<><<<><<<<><<<<>>>><<><<>>>><<<>><<<<>>><<<>>><><<<><<<>>>><<<<>>><<<><>>>><<<<>><<<<>>>><>><>>>><<<<>>>><<<>>>><<>>><<<>>>><>>><<<>>><<<>>>><>>>><<<>>><<<>><><<<>>>><<<>><<<<>>><>>><<<>>>><<<<>>>><<<><<<><<>><>>><<<>>><<<><<<>><<><<<<>>>><<<<><<>>><>><>><><<<>>>><<<<>><<<<>><<<<>>>><><>>><<<>><<>>><<<<>>>><<<><<<><<<>>>><<<><<>>><<<<>>>><<><>>>><<<>>><<<<>>><<<<>><<<>><<<<><<<<>><>>><>>>><>><<<>>>><><<<<>>><>>><<>>>><<>>><<<<>>>><<<><<><<<<>>><><<>>><>>><<<>><<<>><<>>><<<>>>><<<<>>><<<<><<>>>><<<>>><><>>>><>>><><<<<><<>>>><><<<>>><<>>><><>>><<<<>>>><<<<>>>><<<>>><<<<>>><<<>>><><>><<<><<>>><<>>><<>>><<<<>>>><><<<>>>><<>><<>>>><><<<>>><<><<>>><<<<>>>><<<>><<<><<><>>>><<<>><>>>><<<<>>>><<>>>><>>><>>><<<>><<<<>>><<<><<<<>><<<<>><<<>><><<>>>><<><<<>>>><<<<>><<<<>>><<<>>>><<<>>><<<><<<<>><<<<>>>><<><<>>><>>><<<>><>><<<<>>>><<<>>>><<<><<>>>><<>>><<<<><<<<>>><<<>>><<>><<<<>><<<<><<<>><<<>><>><<>><>>><<<<>><<>>>><<>><<>><<>><<<<>>>><<>><<<<><<<>><><><<>><<<><>>>><<<>>><>>><><>><<<>>>><<>><<>><<>>><<<<><<><>><<<<>>>><>>>><<>>><><<<<>><<<<><>><<<>><<><>>><<>>><<>>>><<<>><<<>>>><<<<>>><<><<<>>><<>>>><<<>>><<<<>><<>>><<<<>><>>><<<<><<<>>>><>><<><><<<<>>>><>>>><<>>>><<<>>><<<>><>>><<>>><<<>><><<<>>>><>>><>>><>><<<<>>>><<><<<<><<>><<>><<><>><<>>><<<>>><<<>>>><<<<>><><<><><<<><<<>>><<>><>>><<>>><<<<>><<<>><<>>>><>>>><<<>>>><>>><<<>>><<<<><<>>><<<<>>><<>><<>>>><>>><<>><<>>><<<><<>>><<>>><<<>>><<<>><>><<<>><<<<>>><>>>><<<<>>><>>><<<>><<<<>>>><>>><<><<<<>><><<><<><>>><><>><<<<>><<<<><>>>><<>>><<<<>>><>><<>><>>><<<<>><<>>>><><<<<>>>><<<<>><<<>>><><<><<>>>><<>><>>><<>><>><><<><<<>><<<<>>><><<>><>><<>>>><<>><>><<<<>>>><<<<>><<><>><<<<>>><<<>>>><<<>><<><<>>><<>>><<<>>>><<><<<<>>><<><<<<>>>><<<<><<<>>><><<>>><<<<><>><<>><<<<>>><<<<><<<>>>><<<>>><<<><<<>><>><<><<<>>>><<>><<><>>>><<>>>><<<<><<<>>>><<>>>><<><<<><<<>>>><<<<>>>><<><<<><<>><<<<>>><<<>>><<>>><<<>>>><>>>><>>><>><<<>>>><<<>>><<><<<>><<<><<<><<<<><>><>>><<<>>><<<<>>><<<><<<>><>><<>>><<>>>><<<<>>>><<>>><<<><<<>>><<<<>><><<>>>><<>>>><<<<>>>><<<>><<<>>>><>>><<<>><><<<<>><<>>><<>>><>>><<<<>>>><<><<<<>>>><<<<><<<<>>>><><<>><<<<>>>><<<<><<<>><<<><>>>><<<><<<>>>><<>>><><<>>><<>>>><<<<>><<<>><<<<>><<<<>><>><<<<>>><>><<<<><<><>>><><<<<>>><>><>>><<<>><<<>><>>>><>>>><<>><<<<>><<<>><<<>>><<<>>>><><<><<><<<<><<>>><<>>>><<<>><<<>><>>><<<<>><<><>>><>>><<<<>>>><>>>><>><<<>><<>><<<>><<<<>>>><<<>>>><<>>><<>><<<><<<>>>><<<>><>>><<><>>>><<<>>>><>><>>><><>>>><<<<>><>><<<>>><<<><>><<<<>>><>>>><<<><<<<><<<<>><<>>><><<<>>><<>>><<<>>>><<<<><<<<><>>><<<<>><>>><<<<>>>><>>><<<<>>><>>>><>>>><<<<>>><<<<>>>><<<<>>><>>><<>>>><<<<>><>>><<<>><<<<>>>><<<<>>>><<<><><<<><><<><>><<<><<>>><<<><<>>><<<<>>>><<>>>><><<>>>><<>><<<<>><>>>><<<<>>><<<>>>><>><<<<>>>><<<>>>><<<>>><<<<><<>><<<>>>><>>>><>>>><<>><<>>>><><>>><<><<>><<<<>>><><<<<><<>>><<<>>><<<>>>><<<<>><<<><>><<<>>>><<<>>><<<><<<<>>>><<<<><><<<>>>><<<>>><<<<>>>><>><<<<>>><<<>>>><<>>><>><<><><>>><<<>>>><<<<><<>>>><<<>>><<<>>>><<>><<<>>><<<<>>>><<>>>><<>>>><>><<<>>>><<>>>><<>>><<<>>><<>><<><<<<><<>>>><<<<>>><><<<><<<<>>><<<>>>><<>>>><><<>>><<>>><<<>>>><><>>><<<><<<>><<<<><>>><<<<>><<<>>>><<<>>>><<<>><<>><<<>><<<<>><<>><<>>>><<<<><<<>><>><><<><>>>><<<<>>><<<>>>><<<<>>><<<><<>><<<<>>><<<<>>>><<<<>>>><<<>>>><<<<>><<<<>>><<>>><>>><<<><<<<>>><>>><<><<<><<<<>><<<>>>><<<>>>><<<<>><<<>><>>><<<<>>>><><><<>>>><<><<<>>><<<>><<>><>>><<>><<<>><<<>>>><<<>>><<>><<<>><<<<>>>><<<<>>>><<<>>>><><><>>><<>>><<>>>><<>>><<<<>>>><<>>><<>><<<>>><<<>>>><<>>><>>>><>><<>>><<<>><<<><>>>><>>><<>>>><>><<<<><<<>>>><<<>><<<>><<<><><><<<<><>>><<<>>>><<<<>><<<<>>><>><<<>>><<<><<<<>>><<>><<>>>><><>><<><<><<<>><<><>>><<><<>>><<<<>>>><<<<><<<>><<><<<<>><<<<>>><<>>><<>>>><<<<>>>><<<>>>><<>>><<>>>><<<<>><>>><<><<><<>><<<><>><<<<><<<>>>><<>>><<<>>><<>>>><<<<>>>><<>>><<<<>><<<>>>><<<>>>><<<<>>>><<<>>>><<<<>>>><>><<<<>>><>>>><>>><>><<>>><<<<>>>><<<>>>><>>>><<<><<<<>><<<>>>><><<>>>><>><<<>>><<<>>>><<><<>>>><>>><>>><>>><>><<<><>>>><<<<>><<>><<<>><>>>><<<<>><<<>>>><<<>><<<<><<<<>>><<<<>>><<<<>>><<<>><<<<>>>><<<<><<<<>>>><>>>><<<><<<<>>>><<>><<<>>><<<>>>><>>><<<<>>>><<>>><>><<><<<>><<<>><<<>>><>>>><<<<>>><<>>>><<<<><<<<>>>><<<<>>>><<<<>>>><<<>><<>><>>><<<<>>>><<<<>>><><<<<>>>><>>><<>>>><<>>>><><<<<>>>><>><>>>><<>>>><>><<>>><<<>><<>>><<><<<<>>>><<<<>><><<<>>><<<>><>><<<<>><>>><<<<>>>><<<<>>>><><><<<>>>><<<>>><<<<><<<>>>><>>><<>>><<<<><>>>><>>><<<<>>>><>>><<<<>>>><<<<><<<<>>><<<<>>>><<<>>>><<<>><<<<>>>><>><<<<>>><>>><<<<>>>><>><>><<<<>><<<>>><><>>><<><<<<><<>>>><>>><>>><>><>>><<<><><>>>><>>>><<>><<<<>><<<>><<<<>><>>>><<<<>>>><<<>>><<>>>><><<>><<<>><<<>>>><<><>>><<>><<>>>><<<>>><<>>><<>>><>><<<>>><<>>><<<<>>><>>>><<<><><<<<>><<<<>>><>>>><><>>>><<<>>>><<<>>><<<<>>>><<<<>>>><<>><<<>><>>><>>>><<<<>><<>>><<>><<<>>>><<<>><<<<><<>>>><>><>><<<<>>><<<><<>>>><<<<>>><<<><>>><<<><<<>>>><<><>>>><<<<><>>><><<<<>>>><<>>>><>>>><<>>>><>>>><>><<<<>>>><>><>>>><<>>><<<>>>><<<>><><<<<><<<<>>>><<>>>><<<<>>><<>>>><<>><<<>>>><<>><>>><<<<>>><>>>><><<<><<<>>><<<<><><<<>>><><<>>><<><<<<>>>><>>>><<<>>>><<>>><>>>><<<<>>>><<<>><>><<<><>><<<>>><>>><>>><><<<>>>><><<<<>>><<<<>>>><<<<>>><<<<>>><>>>><<<<>>><<>><<<<>><>>><<><<<><<<><<<<>>>><<<><<<<>>><<>>>><<>><<<<>>>><<<<>>>><>>><<<<>>>><>>>><<>>><><<<>><>><>>>><><>><<<<>><<<<>>>><<><<<<><<>>><>>>><<><<<<>><><<<>>><<<><>>><<><<>>><<<<>>><<<>>><<<<><<<>>>><<<<><<>>>><<<><<>>><<<><><<<<>>>><<<>>><>>><<><<<>>><<<>><<>>><>><<>><>>><>><>><>>>><<<>><<<<><>>>><<<>>><<<>><<<><><<>><<<>>><<<<>>>><>><<<><<<><<<<><<>><>><<<<>>>><<<>>><<><<<>>><<<><>><>>><>>>><><>>><<<>><><<<<>><<<><<<<>>><<<<>>><<<>>>><<>><<>>>><<><<<>>><<<<>><<>>>><>>>><<<<>><<>><<<>>>><<<>>><<<>><<<<><<<><<>>>><<<>>>><<<>>>><<>>><<<<>>><<>>>><<>>><><>>>><<<>>>><<<><<>>><<<><<<<>><<<>><<>>>><<>>>><<<>>>><<>><>>>><<<<>><>><<>>>><<<<>>><<<<>>>><<<<>>><<><<<>>>><<<<>>><<>><<><<><<>><<<<><<<<>>><>>><<>>><><<<<>><>>><<<<><<<<><<<>>>><<><<<>>>><<<<>>>><>>><>><><><<<<><>><<<<>><<<<>>><<>>>><<<><<<<><<<<>>><<>><<>>>><>><<>><<><<>>>><>>>><><<<<>>>><<<><>>>><<<<>><<>>><<<<><<<<>>><<<<><>><<<<>>>><<>>><<>>>><<<><<<>><>>><<<>>>><>><<<>><><<<>>>><><>>>><>>><<<>>>><>>>><>>>><<<><<>>><<><<<<>>><>><<><<<><<<>>><>>><>>><<>><<><>><><>>><<><<<<><<>>>><<<>>><>>><<<<>>>><<<>>><<<><<<>>><<>><<<>><>><<>><<<><<<<>><<>>>><<<<>>>><<><<>>>><<<<><>>>><<<<><><>>><<<>><<<<><<>>>><<<>><<<>>><<<<><>><<<><<>>>><<<<>>><<<>>><>>>><<><<>>><<>><<<><<<<>>><>>><<>><>>>><>><<<>>>><><<<<>>>><<<>>>><>><<<>>><>>><<>>>><<<<>>>><<<>>><<><<<<><<<<>>><>>><><<<<>>>><<<><<<>>>><<<<>><<>>><<<<>>>><<>>><<<<>>><>><<<>>>><>>><<<<><<<<>>>><<<<>><<><>>>><<<<>>><<<<>><<>>>><><<<>><>>>><<<><>><<<>>>><>><<>>>><<<>>><>><<<>><>><<<><<>>><<<<>>><<<><<<>><><<<>><><<<<>>><<<<><<<>><<>>><<>><<<><<<><<<<>>>><<<><<<><<<<><>>><><<<>>><<<<>>><<<>>><<<>>>><<<<>>><<<><<>><>>>><<>><<<>><<<<>>><>><<>><<>>>><>><>>><<<<><<<><>><>>><><<>><<<><<>>>><>><<<>><<<<><<<>>>><<>><<<<>><<<<><<<>>><<<<><<<<>><<>><<<>>>><<>>>><<<>>><<><<>>>><<<><<><<<<><<<>><<>>><<<<>><<>><<<>>>><<>>>><<<<>>><<<<>>><<<<>><>><<<<>>>><<>>>><<<<><<>>>><<><><><<<<>><<<>><><<<<>>><>>>><<><<<<>><<<<>>><><<<<>><<<>><<>><<<<><>><<<>>>><<<><<<<>>>><>>>><<<<>>><<<>>><<<<><<<>>><<<<><<>><<>>>><>><<<<><<<<>>>><<<<>>>><<>>>><<<>>><<>><<<>>><<<<>>>><<<<><>>><<>><<<<>><><<<<>>><>>><<<<>><>><<><<>>><>>><<<<>><><<<>><>><<<>><<<<>><<>><<<>><>><<>><<<>><>>>><<<<>>>><>>>><<<>><<<>>><<>><>><<<>>>><<<<>>>><>><>><<><<<<>>>><<><>>>><>>><<<>>>><<<<><<<<>><><<<<>>>><>>>><<>><<<<><<>>><<<<><>><><<<>>><<>>><>>>><><<<<><<<<>>><>>><>>>><<<>>>><>>>><<><<<>>><<>><<<>>><>><>><<<<>><<>>>><<<><><<<<><<>>><<<<><<<><<<>><>>><<<>>>><>><<<><<<<>>><<<<>>><<>><<>><>>>><<<<>>>><>><>>><>>>><<<<>><<<<>>><<<><<<>>><><>>>><<<>>><>>>><<<>>>><<<<>><<<<><<<<>>>><<>>>><>>><<<>>><<<>><<<<>><<<>><>><><>>><<><>>>><<<<>><<>><<>>><<>>>><<<<>>>><<<<><><<<<>><<<>>><<><<><<<<>>>><<>>>><<<>>>><>>><<>>>><><<<<>><<>>><<>>>><<><<>><>><<<>>><<<>>>><>><>><>>><<<<><<<>><<<<>><<<<>>><><>>><>><<>><>><>>><><<>>><>>><<<>>><>>><>><<<<>>>><<>>><>><<<>>>><><<>>>><<<>>>><>>>><<<>><<<>><<>>><<<>><<<<><<<><<<<>><<>>><>>><<<>>>><<<>><<<>><<<><<>><<<<><<<>><<<<><<<<><<<<><<<<><>>>><<<>>>><<<<>>>><<<><>>><<>><<<<>>>><>><<<<><>>>><<<<>><<><<<><>><>>>><<<><>>>><<<><<<><<<<>><<<><<<<><<<>>><<>>>><<>>><<<<><<<<><><<<<><<<>><>>><><>>><><<<<>>><<>>>><<<<>>><<<<>>>><<<>><>>><<<<>><>>><<<><<<><<>><<<><<>><<>>><<><>>><<<<><>>>><<<>><<<>>>><<<<>>><<<<>>><<<<>>><<>>>><>><>><>><<>><<<>>><>>><<><<>>><>>><<<>>>><<<><>><>><<>>><<<>><>>>><<<<>><<<<>><<<<><<<>><<>>><>>>><<<<>><>>><<<<><<<<>><>>><<>>><<<<>>><<<>>><><<<<>';
 var $author$project$Aoc17$sample = '>>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>';
 var $author$project$Aoc17$read = function (dataSource) {
@@ -5275,10 +5314,14 @@ var $tortus$elm_array_2d$Array2D$repeat = F3(
 	function (numRows, numColumns, e) {
 		var row = A2($elm$core$Array$repeat, numColumns, e);
 		return {
-			h: numColumns,
+			i: numColumns,
 			a: A2($elm$core$Array$repeat, numRows, row)
 		};
 	});
+var $elm$core$String$foldr = _String_foldr;
+var $elm$core$String$toList = function (string) {
+	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
+};
 var $author$project$Aoc17$initModel = function (dataSource) {
 	var rock = _Utils_Tuple2(
 		_Utils_Tuple2(2, 3),
@@ -5286,14 +5329,17 @@ var $author$project$Aoc17$initModel = function (dataSource) {
 	var data = $author$project$Aoc17$read(dataSource);
 	var chamber = A3($tortus$elm_array_2d$Array2D$repeat, 2022 * 4, 7, '.');
 	return {
-		K: chamber,
-		D: dataSource,
-		W: false,
-		J: 0,
-		aa: '?',
-		ac: _List_Nil,
-		z: true,
-		v: $elm$core$Maybe$Just(rock),
+		F: chamber,
+		G: dataSource,
+		_: false,
+		z: 0,
+		H: 0,
+		O: $elm$core$Array$fromList(
+			$elm$core$String$toList(data)),
+		J: '?',
+		A: 0,
+		B: true,
+		f: $author$project$Aoc17$Moving(rock),
 		w: $author$project$Aoc17$defaultTickInterval
 	};
 };
@@ -5323,7 +5369,7 @@ var $elm$browser$Browser$Events$MySub = F3(
 	});
 var $elm$browser$Browser$Events$State = F2(
 	function (subs, pids) {
-		return {af: pids, ao: subs};
+		return {ah: pids, aq: subs};
 	});
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
@@ -5555,7 +5601,7 @@ var $elm$core$Dict$merge = F6(
 	});
 var $elm$browser$Browser$Events$Event = F2(
 	function (key, event) {
-		return {V: event, _: key};
+		return {Z: event, ad: key};
 	});
 var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
 var $elm$browser$Browser$Events$spawn = F3(
@@ -5630,7 +5676,7 @@ var $elm$browser$Browser$Events$onEffects = F3(
 			stepLeft,
 			stepBoth,
 			stepRight,
-			state.af,
+			state.ah,
 			$elm$core$Dict$fromList(newSubs),
 			_Utils_Tuple3(_List_Nil, $elm$core$Dict$empty, _List_Nil));
 		var deadPids = _v0.a;
@@ -5676,8 +5722,8 @@ var $elm$core$List$filterMap = F2(
 	});
 var $elm$browser$Browser$Events$onSelfMsg = F3(
 	function (router, _v0, state) {
-		var key = _v0._;
-		var event = _v0.V;
+		var key = _v0.ad;
+		var event = _v0.Z;
 		var toMessage = function (_v2) {
 			var subKey = _v2.a;
 			var _v3 = _v2.b;
@@ -5686,7 +5732,7 @@ var $elm$browser$Browser$Events$onSelfMsg = F3(
 			var decoder = _v3.c;
 			return _Utils_eq(subKey, key) ? A2(_Browser_decodeEvent, decoder, event) : $elm$core$Maybe$Nothing;
 		};
-		var messages = A2($elm$core$List$filterMap, toMessage, state.ao);
+		var messages = A2($elm$core$List$filterMap, toMessage, state.aq);
 		return A2(
 			$elm$core$Task$andThen,
 			function (_v1) {
@@ -5727,7 +5773,7 @@ var $elm$time$Time$Every = F2(
 	});
 var $elm$time$Time$State = F2(
 	function (taggers, processes) {
-		return {ai: processes, ap: taggers};
+		return {ak: processes, ar: taggers};
 	});
 var $elm$time$Time$init = $elm$core$Task$succeed(
 	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
@@ -5820,7 +5866,7 @@ var $elm$time$Time$spawnHelp = F3(
 	});
 var $elm$time$Time$onEffects = F3(
 	function (router, subs, _v0) {
-		var processes = _v0.ai;
+		var processes = _v0.ak;
 		var rightStep = F3(
 			function (_v6, id, _v7) {
 				var spawns = _v7.a;
@@ -5889,7 +5935,7 @@ var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
 var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $elm$time$Time$onSelfMsg = F3(
 	function (router, interval, state) {
-		var _v0 = A2($elm$core$Dict$get, interval, state.ap);
+		var _v0 = A2($elm$core$Dict$get, interval, state.ar);
 		if (_v0.$ === 1) {
 			return $elm$core$Task$succeed(state);
 		} else {
@@ -5937,7 +5983,7 @@ var $elm$time$Time$every = F2(
 	});
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc17$subscriptions = function (model) {
-	var tickSub = model.z ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = model.B ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
 		model.w,
 		function (_v0) {
@@ -5988,180 +6034,634 @@ var $ohanhi$keyboard$Keyboard$Arrows$arrowKey = function (rawKey) {
 	}
 };
 var $author$project$Aoc17$updateClear = function (model) {
-	return $author$project$Aoc17$initModel(model.D);
+	return $author$project$Aoc17$initModel(model.G);
 };
-var $author$project$Aoc17$Moving = 0;
-var $author$project$Aoc17$Stopped = 1;
+var $author$project$Aoc17$Stopped = function (a) {
+	return {$: 1, a: a};
+};
+var $elm$core$Bitwise$and = _Bitwise_and;
+var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
+var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
+var $elm$core$Basics$ge = _Utils_ge;
+var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
+var $elm$core$Array$getHelp = F3(
+	function (shift, index, tree) {
+		getHelp:
+		while (true) {
+			var pos = $elm$core$Array$bitMask & (index >>> shift);
+			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+			if (!_v0.$) {
+				var subTree = _v0.a;
+				var $temp$shift = shift - $elm$core$Array$shiftStep,
+					$temp$index = index,
+					$temp$tree = subTree;
+				shift = $temp$shift;
+				index = $temp$index;
+				tree = $temp$tree;
+				continue getHelp;
+			} else {
+				var values = _v0.a;
+				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
+			}
+		}
+	});
+var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
+var $elm$core$Array$tailIndex = function (len) {
+	return (len >>> 5) << 5;
+};
+var $elm$core$Array$get = F2(
+	function (index, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
+			index,
+			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
+			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
+			A3($elm$core$Array$getHelp, startShift, index, tree)));
+	});
+var $tortus$elm_array_2d$Array2D$getRow = F2(
+	function (row, array2d) {
+		return A2($elm$core$Array$get, row, array2d.a);
+	});
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $elm$core$Elm$JsArray$unsafeSet = _JsArray_unsafeSet;
+var $elm$core$Array$setHelp = F4(
+	function (shift, index, value, tree) {
+		var pos = $elm$core$Array$bitMask & (index >>> shift);
+		var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+		if (!_v0.$) {
+			var subTree = _v0.a;
+			var newSub = A4($elm$core$Array$setHelp, shift - $elm$core$Array$shiftStep, index, value, subTree);
+			return A3(
+				$elm$core$Elm$JsArray$unsafeSet,
+				pos,
+				$elm$core$Array$SubTree(newSub),
+				tree);
+		} else {
+			var values = _v0.a;
+			var newLeaf = A3($elm$core$Elm$JsArray$unsafeSet, $elm$core$Array$bitMask & index, value, values);
+			return A3(
+				$elm$core$Elm$JsArray$unsafeSet,
+				pos,
+				$elm$core$Array$Leaf(newLeaf),
+				tree);
+		}
+	});
+var $elm$core$Array$set = F3(
+	function (index, value, array) {
+		var len = array.a;
+		var startShift = array.b;
+		var tree = array.c;
+		var tail = array.d;
+		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? array : ((_Utils_cmp(
+			index,
+			$elm$core$Array$tailIndex(len)) > -1) ? A4(
+			$elm$core$Array$Array_elm_builtin,
+			len,
+			startShift,
+			tree,
+			A3($elm$core$Elm$JsArray$unsafeSet, $elm$core$Array$bitMask & index, value, tail)) : A4(
+			$elm$core$Array$Array_elm_builtin,
+			len,
+			startShift,
+			A4($elm$core$Array$setHelp, startShift, index, value, tree),
+			tail));
+	});
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $tortus$elm_array_2d$Array2D$set = F4(
+	function (row, col, newValue, array2d) {
+		return A2(
+			$elm$core$Maybe$withDefault,
+			array2d,
+			A2(
+				$elm$core$Maybe$map,
+				function (rowAry) {
+					return _Utils_update(
+						array2d,
+						{
+							a: A3(
+								$elm$core$Array$set,
+								row,
+								A3($elm$core$Array$set, col, newValue, rowAry),
+								array2d.a)
+						});
+				},
+				A2($tortus$elm_array_2d$Array2D$getRow, row, array2d)));
+	});
+var $author$project$Aoc17$addRockPositions = F2(
+	function (chamber, positions) {
+		addRockPositions:
+		while (true) {
+			if (!positions.b) {
+				return chamber;
+			} else {
+				var _v1 = positions.a;
+				var x = _v1.a;
+				var y = _v1.b;
+				var rest = positions.b;
+				var $temp$chamber = A4($tortus$elm_array_2d$Array2D$set, y, x, '#', chamber),
+					$temp$positions = rest;
+				chamber = $temp$chamber;
+				positions = $temp$positions;
+				continue addRockPositions;
+			}
+		}
+	});
+var $elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (!maybeValue.$) {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $tortus$elm_array_2d$Array2D$get = F3(
+	function (row, col, array2d) {
+		return A2(
+			$elm$core$Maybe$andThen,
+			$elm$core$Array$get(col),
+			A2($tortus$elm_array_2d$Array2D$getRow, row, array2d));
+	});
+var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
+	return array2d.i;
+};
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
+var $elm$core$Array$length = function (_v0) {
+	var len = _v0.a;
+	return len;
+};
+var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
+	return $elm$core$Array$length(array2d.a);
+};
+var $author$project$Aoc17$getAllPositions = function (board) {
+	var ys = A2(
+		$elm$core$List$range,
+		0,
+		$tortus$elm_array_2d$Array2D$rows(board) - 1);
+	var xs = A2(
+		$elm$core$List$range,
+		0,
+		$tortus$elm_array_2d$Array2D$columns(board) - 1);
+	return A2(
+		$elm$core$List$concatMap,
+		function (y) {
+			return A2(
+				$elm$core$List$map,
+				function (x) {
+					return _Utils_Tuple2(x, y);
+				},
+				xs);
+		},
+		ys);
+};
+var $elm$core$List$maximum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Aoc17$findHighestRock = function (chamber) {
+	var positions = $author$project$Aoc17$getAllPositions(chamber);
+	var index = A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		$elm$core$List$maximum(
+			A2(
+				$elm$core$List$filterMap,
+				function (_v0) {
+					var x = _v0.a;
+					var y = _v0.b;
+					return _Utils_eq(
+						A3($tortus$elm_array_2d$Array2D$get, y, x, chamber),
+						$elm$core$Maybe$Just('#')) ? $elm$core$Maybe$Just(y) : $elm$core$Maybe$Nothing;
+				},
+				positions)));
+	return index + 1;
+};
+var $author$project$Aoc17$movePoint = F2(
+	function (_v0, _v1) {
+		var x0 = _v0.a;
+		var y0 = _v0.b;
+		var x1 = _v1.a;
+		var y1 = _v1.b;
+		return _Utils_Tuple2(x0 + x1, y0 + y1);
+	});
+var $author$project$Aoc17$toRockPositions = function (rock) {
+	if (rock.$ === 1) {
+		return _List_Nil;
+	} else {
+		var _v1 = rock.a;
+		var pos = _v1.a;
+		var shape = _v1.b;
+		switch (shape) {
+			case 0:
+				return A2(
+					$elm$core$List$map,
+					$author$project$Aoc17$movePoint(pos),
+					_List_fromArray(
+						[
+							_Utils_Tuple2(0, 0),
+							_Utils_Tuple2(1, 0),
+							_Utils_Tuple2(2, 0),
+							_Utils_Tuple2(3, 0)
+						]));
+			case 1:
+				return A2(
+					$elm$core$List$map,
+					$author$project$Aoc17$movePoint(pos),
+					_List_fromArray(
+						[
+							_Utils_Tuple2(1, 0),
+							_Utils_Tuple2(0, 1),
+							_Utils_Tuple2(1, 1),
+							_Utils_Tuple2(2, 1),
+							_Utils_Tuple2(1, 2)
+						]));
+			case 2:
+				return A2(
+					$elm$core$List$map,
+					$author$project$Aoc17$movePoint(pos),
+					_List_fromArray(
+						[
+							_Utils_Tuple2(0, 0),
+							_Utils_Tuple2(1, 0),
+							_Utils_Tuple2(2, 0),
+							_Utils_Tuple2(2, 1),
+							_Utils_Tuple2(2, 2)
+						]));
+			case 3:
+				return A2(
+					$elm$core$List$map,
+					$author$project$Aoc17$movePoint(pos),
+					_List_fromArray(
+						[
+							_Utils_Tuple2(0, 0),
+							_Utils_Tuple2(0, 1),
+							_Utils_Tuple2(0, 2),
+							_Utils_Tuple2(0, 3)
+						]));
+			default:
+				return A2(
+					$elm$core$List$map,
+					$author$project$Aoc17$movePoint(pos),
+					_List_fromArray(
+						[
+							_Utils_Tuple2(0, 0),
+							_Utils_Tuple2(1, 0),
+							_Utils_Tuple2(0, 1),
+							_Utils_Tuple2(1, 1)
+						]));
+		}
+	}
+};
 var $author$project$Aoc17$Angle = 2;
 var $author$project$Aoc17$Bar = 3;
 var $author$project$Aoc17$Box = 4;
 var $author$project$Aoc17$Cross = 1;
-var $author$project$Aoc17$tryMoveDown = function (_v0) {
-	var _v1 = _v0.a;
-	var x = _v1.a;
-	var y = _v1.b;
-	var shape = _v0.b;
-	switch (shape) {
-		case 0:
-			return (y > 0) ? _Utils_Tuple2(
-				_Utils_Tuple2(x, y - 1),
-				0) : _Utils_Tuple2(
-				_Utils_Tuple2(x, y),
-				shape);
-		case 1:
-			return (y > 0) ? _Utils_Tuple2(
-				_Utils_Tuple2(x, y - 1),
-				1) : _Utils_Tuple2(
-				_Utils_Tuple2(x, y),
-				shape);
-		case 2:
-			return (y > 0) ? _Utils_Tuple2(
-				_Utils_Tuple2(x, y - 1),
-				2) : _Utils_Tuple2(
-				_Utils_Tuple2(x, y),
-				shape);
-		case 3:
-			return (y > 0) ? _Utils_Tuple2(
-				_Utils_Tuple2(x, y - 1),
-				3) : _Utils_Tuple2(
-				_Utils_Tuple2(x, y),
-				shape);
-		default:
-			return (y > 0) ? _Utils_Tuple2(
-				_Utils_Tuple2(x, y - 1),
-				4) : _Utils_Tuple2(
-				_Utils_Tuple2(x, y),
-				shape);
+var $author$project$Aoc17$tryMoveDown = function (rock) {
+	if (rock.$ === 1) {
+		return rock;
+	} else {
+		var _v1 = rock.a;
+		var _v2 = _v1.a;
+		var x = _v2.a;
+		var y = _v2.b;
+		var shape = _v1.b;
+		switch (shape) {
+			case 0:
+				return (y > 0) ? $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x, y - 1),
+						0)) : $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x, y),
+						shape));
+			case 1:
+				return (y > 0) ? $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x, y - 1),
+						1)) : $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x, y),
+						shape));
+			case 2:
+				return (y > 0) ? $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x, y - 1),
+						2)) : $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x, y),
+						shape));
+			case 3:
+				return (y > 0) ? $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x, y - 1),
+						3)) : $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x, y),
+						shape));
+			default:
+				return (y > 0) ? $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x, y - 1),
+						4)) : $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x, y),
+						shape));
+		}
 	}
 };
-var $author$project$Aoc17$tryMoveLeft = function (_v0) {
-	var _v1 = _v0.a;
-	var x = _v1.a;
-	var y = _v1.b;
-	var shape = _v0.b;
-	switch (shape) {
-		case 0:
-			return (x > 0) ? _Utils_Tuple2(
-				_Utils_Tuple2(x - 1, y),
-				0) : _Utils_Tuple2(
-				_Utils_Tuple2(x, y),
-				shape);
-		case 1:
-			return (x > 0) ? _Utils_Tuple2(
-				_Utils_Tuple2(x - 1, y),
-				1) : _Utils_Tuple2(
-				_Utils_Tuple2(x, y),
-				shape);
-		case 2:
-			return (x > 0) ? _Utils_Tuple2(
-				_Utils_Tuple2(x - 1, y),
-				2) : _Utils_Tuple2(
-				_Utils_Tuple2(x, y),
-				shape);
-		case 3:
-			return (x > 0) ? _Utils_Tuple2(
-				_Utils_Tuple2(x - 1, y),
-				3) : _Utils_Tuple2(
-				_Utils_Tuple2(x, y),
-				shape);
-		default:
-			return (x > 0) ? _Utils_Tuple2(
-				_Utils_Tuple2(x - 1, y),
-				4) : _Utils_Tuple2(
-				_Utils_Tuple2(x, y),
-				shape);
+var $author$project$Aoc17$updateFall = function (model) {
+	var _v0 = model.f;
+	if (!_v0.$) {
+		var _v1 = _v0.a;
+		var pos = _v1.a;
+		var shape = _v1.b;
+		var r = $author$project$Aoc17$tryMoveDown(model.f);
+		if (_Utils_eq(r, model.f)) {
+			var chamber = A2(
+				$author$project$Aoc17$addRockPositions,
+				model.F,
+				$author$project$Aoc17$toRockPositions(r));
+			var highestRock = $author$project$Aoc17$findHighestRock(chamber);
+			return _Utils_update(
+				model,
+				{
+					F: chamber,
+					z: highestRock,
+					A: 0,
+					f: $author$project$Aoc17$Stopped(shape)
+				});
+		} else {
+			return _Utils_update(
+				model,
+				{J: 'v', A: 0, f: r});
+		}
+	} else {
+		return model;
+	}
+};
+var $author$project$Aoc17$tryMoveLeft = function (rock) {
+	if (rock.$ === 1) {
+		return rock;
+	} else {
+		var _v1 = rock.a;
+		var _v2 = _v1.a;
+		var x = _v2.a;
+		var y = _v2.b;
+		var shape = _v1.b;
+		switch (shape) {
+			case 0:
+				return (x > 0) ? $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x - 1, y),
+						0)) : $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x, y),
+						shape));
+			case 1:
+				return (x > 0) ? $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x - 1, y),
+						1)) : $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x, y),
+						shape));
+			case 2:
+				return (x > 0) ? $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x - 1, y),
+						2)) : $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x, y),
+						shape));
+			case 3:
+				return (x > 0) ? $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x - 1, y),
+						3)) : $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x, y),
+						shape));
+			default:
+				return (x > 0) ? $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x - 1, y),
+						4)) : $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x, y),
+						shape));
+		}
 	}
 };
 var $author$project$Aoc17$chamberWidth = 7;
-var $author$project$Aoc17$tryMoveRight = function (_v0) {
-	var _v1 = _v0.a;
-	var x = _v1.a;
-	var y = _v1.b;
-	var shape = _v0.b;
-	switch (shape) {
-		case 0:
-			return (_Utils_cmp(x + 4, $author$project$Aoc17$chamberWidth) < 0) ? _Utils_Tuple2(
-				_Utils_Tuple2(x + 1, y),
-				0) : _Utils_Tuple2(
-				_Utils_Tuple2(x, y),
-				shape);
-		case 1:
-			return (_Utils_cmp(x + 3, $author$project$Aoc17$chamberWidth) < 0) ? _Utils_Tuple2(
-				_Utils_Tuple2(x + 1, y),
-				1) : _Utils_Tuple2(
-				_Utils_Tuple2(x, y),
-				shape);
-		case 2:
-			return (_Utils_cmp(x + 3, $author$project$Aoc17$chamberWidth) < 0) ? _Utils_Tuple2(
-				_Utils_Tuple2(x + 1, y),
-				2) : _Utils_Tuple2(
-				_Utils_Tuple2(x, y),
-				shape);
-		case 3:
-			return (_Utils_cmp(x + 1, $author$project$Aoc17$chamberWidth) < 0) ? _Utils_Tuple2(
-				_Utils_Tuple2(x + 1, y),
-				3) : _Utils_Tuple2(
-				_Utils_Tuple2(x, y),
-				shape);
-		default:
-			return (_Utils_cmp(x + 2, $author$project$Aoc17$chamberWidth) < 0) ? _Utils_Tuple2(
-				_Utils_Tuple2(x + 1, y),
-				4) : _Utils_Tuple2(
-				_Utils_Tuple2(x, y),
-				shape);
+var $author$project$Aoc17$tryMoveRight = function (rock) {
+	if (rock.$ === 1) {
+		return rock;
+	} else {
+		var _v1 = rock.a;
+		var _v2 = _v1.a;
+		var x = _v2.a;
+		var y = _v2.b;
+		var shape = _v1.b;
+		switch (shape) {
+			case 0:
+				return (_Utils_cmp(x + 4, $author$project$Aoc17$chamberWidth) < 0) ? $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x + 1, y),
+						0)) : $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x, y),
+						shape));
+			case 1:
+				return (_Utils_cmp(x + 3, $author$project$Aoc17$chamberWidth) < 0) ? $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x + 1, y),
+						1)) : $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x, y),
+						shape));
+			case 2:
+				return (_Utils_cmp(x + 3, $author$project$Aoc17$chamberWidth) < 0) ? $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x + 1, y),
+						2)) : $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x, y),
+						shape));
+			case 3:
+				return (_Utils_cmp(x + 1, $author$project$Aoc17$chamberWidth) < 0) ? $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x + 1, y),
+						3)) : $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x, y),
+						shape));
+			default:
+				return (_Utils_cmp(x + 2, $author$project$Aoc17$chamberWidth) < 0) ? $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x + 1, y),
+						4)) : $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(x, y),
+						shape));
+		}
 	}
 };
 var $author$project$Aoc17$moveRock = F2(
 	function (move, rock) {
 		switch (move) {
 			case '>':
-				return _Utils_Tuple2(
-					0,
-					$author$project$Aoc17$tryMoveRight(rock));
+				return $author$project$Aoc17$tryMoveRight(rock);
 			case '<':
-				return _Utils_Tuple2(
-					0,
-					$author$project$Aoc17$tryMoveLeft(rock));
+				return $author$project$Aoc17$tryMoveLeft(rock);
 			case 'v':
-				var r = $author$project$Aoc17$tryMoveDown(rock);
-				return _Utils_eq(r, rock) ? _Utils_Tuple2(1, r) : _Utils_Tuple2(0, r);
+				return $author$project$Aoc17$tryMoveDown(rock);
 			default:
-				return _Utils_Tuple2(0, rock);
+				return rock;
 		}
+	});
+var $author$project$Aoc17$updateSideways = F2(
+	function (move, model) {
+		var rock = A2($author$project$Aoc17$moveRock, move, model.f);
+		return _Utils_update(
+			model,
+			{f: rock});
 	});
 var $author$project$Aoc17$updateKey = F2(
 	function (move, model) {
-		var _v0 = model.v;
-		if (!_v0.$) {
-			var rock = _v0.a;
-			var _v1 = A2($author$project$Aoc17$moveRock, move, rock);
-			var result = _v1.a;
-			var r = _v1.b;
-			if (result === 1) {
-				return _Utils_update(
-					model,
-					{
-						v: $elm$core$Maybe$Just(r)
-					});
-			} else {
-				return _Utils_update(
-					model,
-					{
-						v: $elm$core$Maybe$Just(r)
-					});
-			}
-		} else {
-			return model;
+		switch (move) {
+			case '>':
+				return A2($author$project$Aoc17$updateSideways, move, model);
+			case '<':
+				return A2($author$project$Aoc17$updateSideways, move, model);
+			case 'v':
+				return $author$project$Aoc17$updateFall(model);
+			default:
+				return model;
 		}
 	});
+var $author$project$Aoc17$nextShape = function (shape) {
+	switch (shape) {
+		case 0:
+			return 1;
+		case 1:
+			return 2;
+		case 2:
+			return 3;
+		case 3:
+			return 4;
+		default:
+			return 0;
+	}
+};
+var $author$project$Aoc17$Fall = 1;
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
+var $elm$core$Basics$modBy = _Basics_modBy;
+var $author$project$Aoc17$moveRockJet = F2(
+	function (move, rock) {
+		switch (move) {
+			case '>':
+				return $author$project$Aoc17$tryMoveRight(rock);
+			case '<':
+				return $author$project$Aoc17$tryMoveLeft(rock);
+			default:
+				return rock;
+		}
+	});
+var $author$project$Aoc17$updateBlow = function (model) {
+	var _v0 = model.f;
+	if (!_v0.$) {
+		var jetMove = A2(
+			$elm$core$Maybe$withDefault,
+			' ',
+			A2($elm$core$Array$get, model.H, model.O));
+		var r = A2($author$project$Aoc17$moveRockJet, jetMove, model.f);
+		var jetIndex = A2(
+			$elm$core$Basics$modBy,
+			$elm$core$Array$length(model.O),
+			model.H + 1);
+		return _Utils_update(
+			model,
+			{
+				H: jetIndex,
+				J: $elm$core$String$fromChar(jetMove),
+				A: 1,
+				f: r
+			});
+	} else {
+		return model;
+	}
+};
 var $author$project$Aoc17$updateStep = function (model) {
-	return model;
+	var _v0 = model.f;
+	if (!_v0.$) {
+		var _v1 = model.A;
+		if (!_v1) {
+			return $author$project$Aoc17$updateBlow(model);
+		} else {
+			return $author$project$Aoc17$updateFall(model);
+		}
+	} else {
+		var shape = _v0.a;
+		var y = model.z + 3;
+		return _Utils_update(
+			model,
+			{
+				f: $author$project$Aoc17$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(2, y),
+						$author$project$Aoc17$nextShape(shape)))
+			});
+	}
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc17$updateTogglePlay = function (model) {
 	return _Utils_update(
 		model,
-		{z: !model.z});
+		{B: !model.B});
 };
 var $author$project$Aoc17$update = F2(
 	function (msg, model) {
@@ -6287,22 +6787,6 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 			$elm$json$Json$Encode$bool(bool));
 	});
 var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
-};
-var $elm$core$List$concatMap = F2(
-	function (f, list) {
-		return $elm$core$List$concat(
-			A2($elm$core$List$map, f, list));
-	});
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$core$Set$Set_elm_builtin = $elm$core$Basics$identity;
 var $elm$core$Set$empty = $elm$core$Dict$empty;
@@ -6345,72 +6829,7 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
-	return array2d.h;
-};
 var $elm$core$String$fromList = _String_fromList;
-var $elm$core$Maybe$andThen = F2(
-	function (callback, maybeValue) {
-		if (!maybeValue.$) {
-			var value = maybeValue.a;
-			return callback(value);
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $elm$core$Bitwise$and = _Bitwise_and;
-var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
-var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
-var $elm$core$Basics$ge = _Utils_ge;
-var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
-var $elm$core$Array$getHelp = F3(
-	function (shift, index, tree) {
-		getHelp:
-		while (true) {
-			var pos = $elm$core$Array$bitMask & (index >>> shift);
-			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
-			if (!_v0.$) {
-				var subTree = _v0.a;
-				var $temp$shift = shift - $elm$core$Array$shiftStep,
-					$temp$index = index,
-					$temp$tree = subTree;
-				shift = $temp$shift;
-				index = $temp$index;
-				tree = $temp$tree;
-				continue getHelp;
-			} else {
-				var values = _v0.a;
-				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
-			}
-		}
-	});
-var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
-var $elm$core$Array$tailIndex = function (len) {
-	return (len >>> 5) << 5;
-};
-var $elm$core$Array$get = F2(
-	function (index, _v0) {
-		var len = _v0.a;
-		var startShift = _v0.b;
-		var tree = _v0.c;
-		var tail = _v0.d;
-		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
-			index,
-			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
-			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
-			A3($elm$core$Array$getHelp, startShift, index, tree)));
-	});
-var $tortus$elm_array_2d$Array2D$getRow = F2(
-	function (row, array2d) {
-		return A2($elm$core$Array$get, row, array2d.a);
-	});
-var $tortus$elm_array_2d$Array2D$get = F3(
-	function (row, col, array2d) {
-		return A2(
-			$elm$core$Maybe$andThen,
-			$elm$core$Array$get(col),
-			A2($tortus$elm_array_2d$Array2D$getRow, row, array2d));
-	});
 var $elm$core$Dict$member = F2(
 	function (key, dict) {
 		var _v0 = A2($elm$core$Dict$get, key, dict);
@@ -6434,14 +6853,14 @@ var $author$project$Aoc17$toChamberRow = F4(
 					return A2(
 						$elm$core$Set$member,
 						_Utils_Tuple2(x, y),
-						rocks) ? $elm$core$Maybe$Just('#') : A3($tortus$elm_array_2d$Array2D$get, y, x, chamber);
+						rocks) ? $elm$core$Maybe$Just('@') : A3($tortus$elm_array_2d$Array2D$get, y, x, chamber);
 				},
 				xs));
 		return '|' + (s + '|');
 	});
 var $author$project$Aoc17$toChamberRows = F3(
 	function (rocks, highest, chamber) {
-		var ys = A2($elm$core$List$range, 0, highest + 3);
+		var ys = A2($elm$core$List$range, 0, highest + 7);
 		var xs = A2(
 			$elm$core$List$range,
 			0,
@@ -6452,76 +6871,6 @@ var $author$project$Aoc17$toChamberRows = F3(
 			ys);
 		return $elm$core$List$reverse(
 			A2($elm$core$List$cons, '+-------+', rows));
-	});
-var $author$project$Aoc17$movePoint = F2(
-	function (_v0, _v1) {
-		var x0 = _v0.a;
-		var y0 = _v0.b;
-		var x1 = _v1.a;
-		var y1 = _v1.b;
-		return _Utils_Tuple2(x0 + x1, y0 + y1);
-	});
-var $author$project$Aoc17$toRockPositions = F2(
-	function (pos, shape) {
-		switch (shape) {
-			case 0:
-				return A2(
-					$elm$core$List$map,
-					$author$project$Aoc17$movePoint(pos),
-					_List_fromArray(
-						[
-							_Utils_Tuple2(0, 0),
-							_Utils_Tuple2(1, 0),
-							_Utils_Tuple2(2, 0),
-							_Utils_Tuple2(3, 0)
-						]));
-			case 1:
-				return A2(
-					$elm$core$List$map,
-					$author$project$Aoc17$movePoint(pos),
-					_List_fromArray(
-						[
-							_Utils_Tuple2(1, 0),
-							_Utils_Tuple2(0, 1),
-							_Utils_Tuple2(1, 1),
-							_Utils_Tuple2(2, 1),
-							_Utils_Tuple2(1, 2)
-						]));
-			case 2:
-				return A2(
-					$elm$core$List$map,
-					$author$project$Aoc17$movePoint(pos),
-					_List_fromArray(
-						[
-							_Utils_Tuple2(0, 0),
-							_Utils_Tuple2(1, 0),
-							_Utils_Tuple2(2, 0),
-							_Utils_Tuple2(2, 1),
-							_Utils_Tuple2(2, 2)
-						]));
-			case 3:
-				return A2(
-					$elm$core$List$map,
-					$author$project$Aoc17$movePoint(pos),
-					_List_fromArray(
-						[
-							_Utils_Tuple2(0, 0),
-							_Utils_Tuple2(0, 1),
-							_Utils_Tuple2(0, 2),
-							_Utils_Tuple2(0, 3)
-						]));
-			default:
-				return A2(
-					$elm$core$List$map,
-					$author$project$Aoc17$movePoint(pos),
-					_List_fromArray(
-						[
-							_Utils_Tuple2(0, 0),
-							_Utils_Tuple2(1, 0),
-							_Utils_Tuple2(0, 1),
-							_Utils_Tuple2(1, 1)
-						]));
-		}
 	});
 var $elm$html$Html$br = _VirtualDom_node('br');
 var $author$project$Aoc17$toRowElements = function (rowText) {
@@ -6535,21 +6884,11 @@ var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Aoc17$viewBody = function (model) {
 	var textFontSize = '20px';
-	var rockPositions = function () {
-		var _v3 = model.v;
-		if (!_v3.$) {
-			var _v4 = _v3.a;
-			var pos = _v4.a;
-			var shape = _v4.b;
-			return $elm$core$Set$fromList(
-				A2($author$project$Aoc17$toRockPositions, pos, shape));
-		} else {
-			return $elm$core$Set$empty;
-		}
-	}();
-	var rows = A3($author$project$Aoc17$toChamberRows, rockPositions, model.J, model.K);
+	var rockPositions = $elm$core$Set$fromList(
+		$author$project$Aoc17$toRockPositions(model.f));
+	var rows = A3($author$project$Aoc17$toChamberRows, rockPositions, model.z, model.F);
 	var rockPosStr = function () {
-		var _v0 = model.v;
+		var _v0 = model.f;
 		if (!_v0.$) {
 			var _v1 = _v0.a;
 			var _v2 = _v1.a;
@@ -6724,7 +7063,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick($author$project$Aoc17$UseInput),
-										$elm$html$Html$Attributes$checked(!model.D)
+										$elm$html$Html$Attributes$checked(!model.G)
 									]),
 								_List_Nil),
 								A2(
@@ -6740,7 +7079,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick($author$project$Aoc17$UseSample),
-										$elm$html$Html$Attributes$checked(model.D === 1)
+										$elm$html$Html$Attributes$checked(model.G === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -6748,7 +7087,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Smaller')
+										$elm$html$Html$text('Sample')
 									]))
 							]))
 					])),
@@ -6797,7 +7136,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 									]),
 								_List_fromArray(
 									[
-										model.z ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
+										model.B ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -6847,7 +7186,7 @@ var $author$project$Aoc17$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										$elm$core$String$fromInt(model.J))
+										$elm$core$String$fromInt(model.z))
 									])),
 								A2(
 								$elm$html$Html$div,
@@ -6855,6 +7194,13 @@ var $author$project$Aoc17$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(rockPosStr)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(model.J)
 									]))
 							]))
 					])),
@@ -6883,15 +7229,15 @@ var $author$project$Aoc17$viewBody = function (model) {
 };
 var $author$project$Aoc17$view = function (model) {
 	return {
-		aw: _List_fromArray(
+		ay: _List_fromArray(
 			[
 				$author$project$Aoc17$viewBody(model)
 			]),
-		aK: 'Advent of Code 2022 | Day 17: Pyroclastic Flow'
+		aM: 'Advent of Code 2022 | Day 17: Pyroclastic Flow'
 	};
 };
 var $author$project$Aoc17$main = $elm$browser$Browser$document(
-	{aD: $author$project$Aoc17$init, aJ: $author$project$Aoc17$subscriptions, aL: $author$project$Aoc17$update, aM: $author$project$Aoc17$view});
+	{aF: $author$project$Aoc17$init, aL: $author$project$Aoc17$subscriptions, aN: $author$project$Aoc17$update, aO: $author$project$Aoc17$view});
 _Platform_export({'Aoc17':{'init':$author$project$Aoc17$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
 
