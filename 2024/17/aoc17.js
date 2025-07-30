@@ -8323,7 +8323,7 @@ var $author$project$Main$toSvg = function (model) {
 				$elm$svg$Svg$Attributes$viewBox(viewBoxStr),
 				$elm$svg$Svg$Attributes$width(svgWidth),
 				$elm$svg$Svg$Attributes$height(svgHeight),
-				$elm$svg$Svg$Attributes$style('background-color:' + backgroundColor)
+				$elm$svg$Svg$Attributes$style('max-width=100%; background-color:' + backgroundColor)
 			]),
 		elements);
 };
@@ -8344,7 +8344,8 @@ var $author$project$Main$view = function (model) {
 		$elm$html$Html$table,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'width', '900px'),
+				$elm$html$Html$Attributes$align('center'),
+				A2($elm$html$Html$Attributes$style, 'width', '100%'),
 				A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New')
 			]),
 		_List_fromArray(
@@ -8637,8 +8638,9 @@ var $author$project$Main$view = function (model) {
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Source Code Pro, monospace'),
 								A2($elm$html$Html$Attributes$style, 'font-size', '32px'),
-								A2($elm$html$Html$Attributes$style, 'padding', '10px'),
-								A2($elm$html$Html$Attributes$style, 'width', '200px')
+								A2($elm$html$Html$Attributes$style, 'width', '100%'),
+								A2($elm$html$Html$Attributes$style, 'max-width', '100%'),
+								A2($elm$html$Html$Attributes$style, 'overflow', 'scroll')
 							]),
 						_List_fromArray(
 							[

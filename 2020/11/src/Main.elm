@@ -455,9 +455,15 @@ view model =
     widthUnit = 2 * radius
     svgWidth = (rowCount model.layout * widthUnit) |> String.fromInt
     svgHeight = svgWidth
+    s = svg 
+      [ width svgWidth
+      , height svgHeight
+      , Svg.Attributes.style "max-width: 100%;" ] 
+      elements
   in
     Html.table
-      [ Html.Attributes.style "width" "900px"
+      [ Html.Attributes.align "center"
+      , Html.Attributes.style "width" "100%"
       , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr
           []
@@ -543,4 +549,9 @@ view model =
           [ Html.td
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "0px"]
-              [ svg [ width svgWidth, height svgHeight ] elements ] ] ]
+              [ 
+                Html.div [ 
+                  Html.Attributes.align "center" 
+                , Html.Attributes.style "max-width" "100%"
+                ] [ s ] 
+              ] ] ] 

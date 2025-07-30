@@ -121,8 +121,8 @@ findDimensions trench =
     positions = trench |> Set.toList
     xs = positions |> List.map (Tuple.first)
     ys = positions |> List.map (Tuple.second)
-    xMax = xs |> List.maximum |> Maybe.withDefault 123
-    yMax = ys |> List.maximum |> Maybe.withDefault 123
+    xMax = xs |> List.maximum |> Maybe.withDefault 0
+    yMax = ys |> List.maximum |> Maybe.withDefault 0
   in 
     (xMax + 1, yMax + 1)
 
@@ -1062,20 +1062,25 @@ toFilledBox fillColor unitSize (xPos, yPos) =
 toSvg : Model -> Html Msg 
 toSvg model = 
   let 
-    svgWidth = (model.unitSize * model.basin.widthInUnits) |> String.fromInt
-    svgHeight = (model.unitSize * model.basin.heightInUnits) |> String.fromInt
+    svgW = (model.unitSize * model.basin.widthInUnits) 
+    svgH = (model.unitSize * model.basin.heightInUnits) 
+    svgViewBoxWidth = svgW |> String.fromInt 
+    svgViewBoxHeight = svgH |> String.fromInt 
+    svgWidth = svgW |> String.fromInt
+    svgHeight = svgH |> String.fromInt
     trenchBoxes = model.basin.trench |> Set.toList |> List.map (toTrenchBox model.unitSize)
     fillColor = if model.basin.fillInside then "orange" else "gainsboro"
     filledBoxes = model.basin.filledPoints |> Set.toList |> List.map (toFilledBox fillColor model.unitSize)
     elements = trenchBoxes ++ filledBoxes
   in 
     svg
-      [ viewBox ("0 0 " ++ svgWidth ++ svgHeight)
+      [ viewBox ("0 0 " ++ svgViewBoxWidth ++ svgViewBoxHeight)
       , width svgWidth
       , height svgHeight
       , Svg.Events.onClick Click
       , onMove (.offsetPos >> MouseMove) 
-      -- , Svg.Attributes.style "background-color:white" 
+      -- , Svg.Attributes.style "max-width: 100%; background-color: lightgreen;" 
+      , Svg.Attributes.style "max-width: 100%" 
       ]
       elements
 
@@ -1085,7 +1090,8 @@ view model =
     s = toSvg model
   in 
     Html.table 
-      [ Html.Attributes.style "width" "900px"
+      [ Html.Attributes.align "center"
+      , Html.Attributes.style "width" "100%"
       , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
@@ -1117,9 +1123,12 @@ view model =
       , Html.tr 
           []
           [ Html.td 
-              [ Html.Attributes.align "center"
-              , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "36px"
-              , Html.Attributes.style "padding" "24px"] 
-              [ Html.div [ Html.Attributes.align "center" ] [ s ] 
+              [ Html.Attributes.align "center" ] 
+              [ Html.div 
+                [ Html.Attributes.align "center"
+                , Html.Attributes.style "max-width" "100%"
+                -- , Svg.Attributes.style "width: 100%; max-width: 100%; resize: both; overflow: auto; border: 1px dashed #aaa;"
+                -- , Svg.Attributes.style "width: 100%; max-width: 100%; overflow: auto"
+              ] 
+                [ s ] 
               ] ] ]

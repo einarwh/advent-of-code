@@ -6247,6 +6247,7 @@ var $elm$html$Html$Events$onClick = function (msg) {
 };
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$html$Html$table = _VirtualDom_node('table');
@@ -6383,11 +6384,21 @@ var $author$project$Main$view = function (model) {
 	var countStr = $elm$core$String$fromInt(occupied);
 	var circles = A2($author$project$Main$toCircles, radius, model.p);
 	var elements = A2($elm$core$List$map, $author$project$Main$toCircleElement, circles);
+	var s = A2(
+		$elm$svg$Svg$svg,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$width(svgWidth),
+				$elm$svg$Svg$Attributes$height(svgHeight),
+				$elm$svg$Svg$Attributes$style('max-width: 100%;')
+			]),
+		elements);
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'width', '900px'),
+				$elm$html$Html$Attributes$align('center'),
+				A2($elm$html$Html$Attributes$style, 'width', '100%'),
 				A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New')
 			]),
 		_List_fromArray(
@@ -6653,13 +6664,14 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								A2(
-								$elm$svg$Svg$svg,
+								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$svg$Svg$Attributes$width(svgWidth),
-										$elm$svg$Svg$Attributes$height(svgHeight)
+										$elm$html$Html$Attributes$align('center'),
+										A2($elm$html$Html$Attributes$style, 'max-width', '100%')
 									]),
-								elements)
+								_List_fromArray(
+									[s]))
 							]))
 					]))
 			]));

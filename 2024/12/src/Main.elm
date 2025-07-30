@@ -772,7 +772,8 @@ view model =
     currentCostDiscount = finishedPlotInfoList |> List.map (\pi -> pi.fenceCostDiscount) |> List.sum 
   in 
     Html.table 
-      [ Html.Attributes.style "width" "900px"
+      [ Html.Attributes.align "center"
+      , Html.Attributes.style "width" "100%"
       , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
@@ -881,8 +882,9 @@ view model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Source Code Pro, monospace"
               , Html.Attributes.style "font-size" textFontSize
-              , Html.Attributes.style "padding" "10px"
-              , Html.Attributes.style "width" "200px" ] 
+              , Html.Attributes.style "padding" "10px" ] 
               [ 
-                Html.div [] []
+                Html.div [
+                  Html.Attributes.style "max-width" "100%"
+                ] []
               ] ] ]

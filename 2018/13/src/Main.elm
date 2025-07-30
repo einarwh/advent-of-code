@@ -580,7 +580,7 @@ view model =
     carts = model.carts 
     nestedPositions = getNestedPositions mine
     nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement mine carts))
-    elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []      
+    elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
     textFontSize = 
       case model.dataSource of 
         Sample -> "32px"
@@ -588,7 +588,8 @@ view model =
         Input -> "9px"
   in 
     Html.table 
-      [ Html.Attributes.style "width" "900px"
+      [ Html.Attributes.align "center"
+      , Html.Attributes.style "width" "100%"
       , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
@@ -603,7 +604,7 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "padding-bottom" "10px" ]
+              , Html.Attributes.style "font-family" "Courier New" ]
               [ Html.a 
                 [ Html.Attributes.href "https://adventofcode.com/2018/day/13" ] 
                 [ Html.text "https://adventofcode.com/2018/day/13" ]
@@ -663,8 +664,7 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "24px"
-              , Html.Attributes.style "width" "200px" ] 
+              , Html.Attributes.style "font-size" "1.5rem" ] 
               [ 
                 Html.div [] [ Html.text ("Carts: " ++ String.fromInt (model.carts |> List.length)) ]
               , Html.div [] [ Html.text ("Steps: " ++ String.fromInt model.steps) ]
@@ -676,9 +676,11 @@ view model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Source Code Pro, monospace"
               , Html.Attributes.style "font-size" textFontSize
-              , Html.Attributes.style "padding" "10px"
-              , Html.Attributes.style "width" "200px" ] 
+              , Html.Attributes.style "padding" "10px" ] 
               [ 
-                Html.div [] elements
+                Html.div [
+                  Html.Attributes.align "center" 
+                , Html.Attributes.style "max-width" "100%"
+                ] elements
               ] ] ]
               

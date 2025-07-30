@@ -348,7 +348,8 @@ view model =
         Input -> "10px"
   in 
     Html.table 
-      [ Html.Attributes.style "width" "900px"
+      [ Html.Attributes.align "center"
+      , Html.Attributes.style "width" "100%"
       , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
@@ -405,8 +406,7 @@ view model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "24px"
-              , Html.Attributes.style "padding-bottom" "10px"
-              , Html.Attributes.style "width" "200px" ] 
+              , Html.Attributes.style "padding-bottom" "10px" ] 
               [ 
                 Html.div [] [ Html.text (String.fromInt model.found) ]
               , Html.div [] [ Html.text commandsStr ]
@@ -416,8 +416,9 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" textFontSize
-              , Html.Attributes.style "width" "200px" ] 
+              , Html.Attributes.style "font-size" textFontSize ] 
               [ 
-                Html.div [] elements
+                Html.div [
+                  Html.Attributes.style "max-width" "100%"
+                ] elements
               ] ] ]

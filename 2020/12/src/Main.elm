@@ -379,9 +379,16 @@ view model =
     lineElement = toPolylineElement translate model.visited
     elements = lineElement :: shipElements
     viewBoxStr = [ "-200", "-200", "400", "400" ] |> String.join " "
+    s = svg
+     [ viewBox viewBoxStr
+     , width dimStr
+     , height "auto"
+     , Svg.Attributes.style "max-width: 100%; background-color:lightblue" ] 
+     elements
   in 
     Html.table 
-      [ Html.Attributes.style "width" "900px"
+      [ Html.Attributes.align "center"
+      , Html.Attributes.style "width" "100%"
       , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
@@ -473,5 +480,9 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px"] 
-              [ svg [ viewBox viewBoxStr, width dimStr, height dimStr, Svg.Attributes.style "background-color:lightblue" ] elements 
-              ] ] ]
+              [ 
+                Html.div [ 
+                  Html.Attributes.align "center" 
+                , Html.Attributes.style "max-width" "100%"
+                ] [ s ] 
+              ] ] ] 

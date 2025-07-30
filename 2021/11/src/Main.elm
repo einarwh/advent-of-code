@@ -317,7 +317,8 @@ toSvg model =
     svg
       [ viewBox viewBoxStr
       , width svgWidth
-      , height svgHeight
+      , height "auto"
+      , Svg.Attributes.style "max-width: 100%" 
       ]
       octopusElements
 
@@ -330,7 +331,8 @@ view model =
     tickStr = "Steps: " ++ String.fromInt model.steps
   in 
     Html.table 
-      [ Html.Attributes.style "width" "900px"
+      [ Html.Attributes.align "center"
+      , Html.Attributes.style "width" "100%"
       , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
@@ -425,5 +427,8 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New" ] 
-              [ Html.div [ Html.Attributes.align "center" ] [ s ] 
+              [ Html.div [ 
+                  Html.Attributes.align "center"
+                , Html.Attributes.style "max-width" "100%"
+                ] [ s ] 
               ] ] ]

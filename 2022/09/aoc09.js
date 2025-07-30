@@ -6112,6 +6112,7 @@ var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
@@ -6156,7 +6157,8 @@ var $author$project$Main$toGlobalSvg = function (model) {
 			[
 				$elm$svg$Svg$Attributes$viewBox('-260 -260 520 520'),
 				$elm$svg$Svg$Attributes$width('400'),
-				$elm$svg$Svg$Attributes$height('400')
+				$elm$svg$Svg$Attributes$height('400'),
+				$elm$svg$Svg$Attributes$style('max-width: 100%; background-color:white')
 			]),
 		lst);
 };
@@ -6271,7 +6273,8 @@ var $author$project$Main$view = function (model) {
 		$elm$html$Html$table,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'width', '900px'),
+				$elm$html$Html$Attributes$align('center'),
+				A2($elm$html$Html$Attributes$style, 'width', '100%'),
 				A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New')
 			]),
 		_List_fromArray(
@@ -6485,8 +6488,7 @@ var $author$project$Main$view = function (model) {
 							[
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '20px'),
-								A2($elm$html$Html$Attributes$style, 'padding', '20px')
+								A2($elm$html$Html$Attributes$style, 'font-size', '20px')
 							]),
 						_List_fromArray(
 							[
@@ -6494,7 +6496,8 @@ var $author$project$Main$view = function (model) {
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$align('center')
+										$elm$html$Html$Attributes$align('center'),
+										A2($elm$html$Html$Attributes$style, 'max-width', '100%')
 									]),
 								_List_fromArray(
 									[s]))

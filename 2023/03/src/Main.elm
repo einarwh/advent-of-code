@@ -409,8 +409,9 @@ toSvg model =
     svg
       [ viewBox ("0 0 " ++ svgWidth ++ " " ++ svgHeight)
       , width svgWidth
-      , height svgHeight 
-      , Svg.Attributes.style "background-color:white" ]
+      , height "auto" 
+      , Svg.Attributes.style "max-width: 100%; background-color:white"
+      ]
       lst
 
 view : Model -> Html Msg
@@ -419,7 +420,8 @@ view model =
     s = toSvg model
   in 
     Html.table 
-      [ Html.Attributes.style "width" "900px"
+      [ Html.Attributes.align "center"
+      , Html.Attributes.style "width" "100%"
       , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
@@ -455,5 +457,8 @@ view model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "20px" ] 
-              [ Html.div [ Html.Attributes.align "center" ] [ s ] 
+              [ Html.div [ 
+                  Html.Attributes.align "center" 
+                , Html.Attributes.style "max-width" "100%"
+                ] [ s ] 
               ] ] ]

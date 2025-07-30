@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>My Elm App</title>
+    <script src="aoc08.js"></script>
+  </head>
+  <body>
+    <div id="elm-app"></div>
+    <script>
+      function lambda() {
+        const app = Elm.Main.init({
+          node: document.getElementById("elm-app"),
+        });
+      }
+      document.addEventListener("DOMContentLoaded", lambda);
+    </script>
+  </body>
+</html>

@@ -302,7 +302,8 @@ view model =
     countStr = antinodes |> Set.size |> String.fromInt    
   in 
     Html.table 
-      [ Html.Attributes.style "width" "900px"
+      [ Html.Attributes.align "center"
+      , Html.Attributes.style "width" "100%"
       , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
@@ -320,7 +321,7 @@ view model =
               , Html.Attributes.style "padding-bottom" "10px" ]
               [ Html.a 
                 [ Html.Attributes.href "https://adventofcode.com/2024/day/8" ] 
-                [ Html.text "https://adventofcode.com/2024/day/8" ]
+                [ text "https://adventofcode.com/2024/day/8" ]
             ] ]
       , Html.tr 
           []
@@ -365,8 +366,7 @@ view model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "24px"
-              , Html.Attributes.style "padding-top" "10px"
-              , Html.Attributes.style "width" "200px" ] 
+              , Html.Attributes.style "padding-top" "10px" ] 
               [ 
                 Html.div [] [ Html.text countStr ]
               ] ]
@@ -376,8 +376,9 @@ view model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Source Code Pro, monospace"
               , Html.Attributes.style "font-size" textFontSize
-              , Html.Attributes.style "padding" "10px"
-              , Html.Attributes.style "width" "200px" ] 
+              , Html.Attributes.style "padding" "10px" ] 
               [ 
-                Html.div [] elements
+                Html.div [
+                  Html.Attributes.style "max-width" "100%"
+                ] elements
               ] ] ]

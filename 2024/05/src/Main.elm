@@ -1637,7 +1637,8 @@ view model =
     elements = model.rows |> List.concatMap toRowHtmlElement
   in 
     Html.table 
-      [ Html.Attributes.style "width" "900px" 
+      [ Html.Attributes.align "center"
+      , Html.Attributes.style "width" "100%"
       , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
@@ -1693,8 +1694,7 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "24px"
-              , Html.Attributes.style "width" "200px" ] 
+              , Html.Attributes.style "font-size" "24px" ] 
               [ 
                 Html.div [] [ Html.text (String.fromInt model.sumOfMiddles) ]
               , Html.div [] [ Html.text commandsStr ]
@@ -1705,8 +1705,9 @@ view model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" textFontSize
-              , Html.Attributes.style "padding" "20px"
-              , Html.Attributes.style "width" "200px" ] 
+              , Html.Attributes.style "padding" "20px" ] 
               [ 
-                Html.div [] elements
+                Html.div [
+                  Html.Attributes.style "max-width" "100%"
+                ] elements
               ] ] ]

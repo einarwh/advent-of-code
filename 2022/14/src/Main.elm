@@ -416,8 +416,8 @@ toSvg model =
     svg
       [ viewBox "300 0 400 170"
       , width "800"
-      , height "340" 
-      , Svg.Attributes.style "background-color:white"
+      , height "auto" 
+      , Svg.Attributes.style "max-width: 100%; background-color:white"
       ]
       (floorElements ++ rockElements ++ sandElements ++ grainElements)
 
@@ -428,7 +428,8 @@ view model =
     sandStr = model.sand |> Set.size |> String.fromInt
   in 
     Html.table 
-      [ Html.Attributes.style "width" "900px"
+      [ Html.Attributes.align "center"
+      , Html.Attributes.style "width" "100%"
       , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
@@ -488,5 +489,8 @@ view model =
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "20px"
               , Html.Attributes.style "padding" "20px"] 
-              [ Html.div [ Html.Attributes.align "center" ] [ s ] 
+              [ Html.div [ 
+                  Html.Attributes.align "center" 
+                , Html.Attributes.style "max-width" "100%"
+                ] [ s ] 
               ] ] ]

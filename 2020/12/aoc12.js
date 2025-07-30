@@ -6422,11 +6422,22 @@ var $author$project$Main$view = function (model) {
 			A3($author$project$Main$toShipElement, translate, shipOffset, model.l)
 		]);
 	var elements = A2($elm$core$List$cons, lineElement, shipElements);
+	var s = A2(
+		$elm$svg$Svg$svg,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$viewBox(viewBoxStr),
+				$elm$svg$Svg$Attributes$width(dimStr),
+				$elm$svg$Svg$Attributes$height('auto'),
+				$elm$svg$Svg$Attributes$style('max-width: 100%; background-color:lightblue')
+			]),
+		elements);
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'width', '900px'),
+				$elm$html$Html$Attributes$align('center'),
+				A2($elm$html$Html$Attributes$style, 'width', '100%'),
 				A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New')
 			]),
 		_List_fromArray(
@@ -6705,15 +6716,14 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								A2(
-								$elm$svg$Svg$svg,
+								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$svg$Svg$Attributes$viewBox(viewBoxStr),
-										$elm$svg$Svg$Attributes$width(dimStr),
-										$elm$svg$Svg$Attributes$height(dimStr),
-										$elm$svg$Svg$Attributes$style('background-color:lightblue')
+										$elm$html$Html$Attributes$align('center'),
+										A2($elm$html$Html$Attributes$style, 'max-width', '100%')
 									]),
-								elements)
+								_List_fromArray(
+									[s]))
 							]))
 					]))
 			]));

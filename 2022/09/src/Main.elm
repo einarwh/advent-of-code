@@ -2318,8 +2318,11 @@ toGlobalSvg model =
     svg
       [ viewBox "-260 -260 520 520"
       , width "400"
-      , height "400" ]
---      , Svg.Attributes.style "background-color:lightblue" ]
+      , height "400" 
+      , Svg.Attributes.style "max-width: 100%" 
+      -- , Svg.Attributes.style "max-width: 100%; background-color:white"
+      -- , Svg.Attributes.style "max-width: 100%; background-color:red" 
+      ]
       lst
 
 view : Model -> Html Msg
@@ -2332,7 +2335,8 @@ view model =
     ropeLengthStr = "length: " ++ String.fromInt (1 + List.length tail)
   in 
     Html.table 
-      [ Html.Attributes.style "width" "900px"
+      [ Html.Attributes.align "center"
+      , Html.Attributes.style "width" "100%"
       , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
@@ -2397,8 +2401,11 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "20px"
-              , Html.Attributes.style "padding" "20px"] 
-              [ Html.div [ Html.Attributes.align "center" ] [ s ] 
+              , Html.Attributes.style "font-size" "20px" ] 
+              [ Html.div [ 
+                  Html.Attributes.align "center" 
+                -- , Html.Attributes.style "background-color" "pink" 
+                , Html.Attributes.style "max-width" "100%"
+                ] [ s ] 
               ] ] ]
         

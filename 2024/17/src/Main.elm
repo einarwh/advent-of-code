@@ -733,7 +733,7 @@ toSvg model =
       [ viewBox viewBoxStr
       , width svgWidth
       , height svgHeight
-      , Svg.Attributes.style ("background-color:" ++ backgroundColor)
+      , Svg.Attributes.style ("max-width=100%; background-color:" ++ backgroundColor)
       ]
       elements
 
@@ -747,10 +747,9 @@ view model =
         _ -> False 
   in
     Html.table
-      [
-        Html.Attributes.style "width" "900px"
-      , Html.Attributes.style "font-family" "Courier New"
-      ]
+      [ Html.Attributes.align "center"
+      , Html.Attributes.style "width" "100%"
+      , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr
           []
           [ Html.td
@@ -851,9 +850,6 @@ view model =
                     , onInput OverwriteRegA
                     , Html.Attributes.disabled (not isBooted || not model.paused) ] 
                     []
-            --   , Html.div [] [ Html.text ("Debug : " ++ debugStr) ]
-            --   , Html.div [] [ Html.text ("Message : " ++ message) ]
-              -- , Html.div [] [ Html.text ("Step: " ++ (String.fromInt model.step)) ]
               ] ]
       , Html.tr
           []
@@ -861,8 +857,14 @@ view model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Source Code Pro, monospace"
               , Html.Attributes.style "font-size" "32px"
-              , Html.Attributes.style "padding" "10px"
-              , Html.Attributes.style "width" "200px" ]
+              -- , Svg.Attributes.style "width: 100%; max-width: 100%; overflow: auto"
+
+
+              -- , Html.Attributes.style "background-color" "#00FFFF"
+              , Html.Attributes.style "width" "100%"
+              , Html.Attributes.style "max-width" "100%"
+              , Html.Attributes.style "overflow" "scroll" 
+              ]
               [
                 Html.div [] [ s ]
               ] ] ]

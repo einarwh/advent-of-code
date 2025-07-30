@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.ah.O === region.ao.O)
+	if (region.U.K === region.Z.K)
 	{
-		return 'on line ' + region.ah.O;
+		return 'on line ' + region.U.K;
 	}
-	return 'on lines ' + region.ah.O + ' through ' + region.ao.O;
+	return 'on lines ' + region.U.K + ' through ' + region.Z.K;
 }
 
 
@@ -1857,9 +1857,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aW,
-		impl.a6,
-		impl.a4,
+		impl.aG,
+		impl.aO,
+		impl.aM,
 		function() { return function() {} }
 	);
 });
@@ -2719,9 +2719,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		y: func(record.y),
-		ai: record.ai,
-		af: record.af
+		s: func(record.s),
+		V: record.V,
+		S: record.S
 	}
 });
 
@@ -2989,11 +2989,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.y;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.ai;
+		var message = !tag ? value : tag < 3 ? value.a : value.s;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.V;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.af) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.S) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3943,11 +3943,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aW,
-		impl.a6,
-		impl.a4,
+		impl.aG,
+		impl.aO,
+		impl.aM,
 		function(sendToApp, initialModel) {
-			var view = impl.a7;
+			var view = impl.aP;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3979,12 +3979,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aW,
-		impl.a6,
-		impl.a4,
+		impl.aG,
+		impl.aO,
+		impl.aM,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.ag && impl.ag(sendToApp)
-			var view = impl.a7;
+			var divertHrefToApp = impl.T && impl.T(sendToApp)
+			var view = impl.aP;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -3992,12 +3992,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aO);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.az);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.a5) && (_VirtualDom_doc.title = title = doc.a5);
+				(title !== doc.aN) && (_VirtualDom_doc.title = title = doc.aN);
 			});
 		}
 	);
@@ -4053,12 +4053,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.a$;
-	var onUrlRequest = impl.a0;
+	var onUrlChange = impl.aI;
+	var onUrlRequest = impl.aJ;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		ag: function(sendToApp)
+		T: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4074,9 +4074,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.aB === next.aB
-							&& curr.as === next.as
-							&& curr.ay.a === next.ay.a
+							&& curr.am === next.am
+							&& curr.ad === next.ad
+							&& curr.aj.a === next.aj.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4084,13 +4084,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aW: function(flags)
+		aG: function(flags)
 		{
-			return A3(impl.aW, flags, _Browser_getUrl(), key);
+			return A3(impl.aG, flags, _Browser_getUrl(), key);
 		},
-		a7: impl.a7,
-		a6: impl.a6,
-		a4: impl.a4
+		aP: impl.aP,
+		aO: impl.aO,
+		aM: impl.aM
 	});
 }
 
@@ -4156,17 +4156,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aU: 'hidden', aQ: 'visibilitychange' }
+		? { aE: 'hidden', aA: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aU: 'mozHidden', aQ: 'mozvisibilitychange' }
+		? { aE: 'mozHidden', aA: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aU: 'msHidden', aQ: 'msvisibilitychange' }
+		? { aE: 'msHidden', aA: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aU: 'webkitHidden', aQ: 'webkitvisibilitychange' }
-		: { aU: 'hidden', aQ: 'visibilitychange' };
+		? { aE: 'webkitHidden', aA: 'webkitvisibilitychange' }
+		: { aE: 'hidden', aA: 'visibilitychange' };
 }
 
 
@@ -4247,12 +4247,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		aF: _Browser_getScene(),
-		aI: {
-			aK: _Browser_window.pageXOffset,
-			aL: _Browser_window.pageYOffset,
-			aJ: _Browser_doc.documentElement.clientWidth,
-			ar: _Browser_doc.documentElement.clientHeight
+		aq: _Browser_getScene(),
+		at: {
+			av: _Browser_window.pageXOffset,
+			aw: _Browser_window.pageYOffset,
+			au: _Browser_doc.documentElement.clientWidth,
+			ac: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4262,8 +4262,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		aJ: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		ar: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		au: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		ac: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4286,15 +4286,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			aF: {
-				aJ: node.scrollWidth,
-				ar: node.scrollHeight
+			aq: {
+				au: node.scrollWidth,
+				ac: node.scrollHeight
 			},
-			aI: {
-				aK: node.scrollLeft,
-				aL: node.scrollTop,
-				aJ: node.clientWidth,
-				ar: node.clientHeight
+			at: {
+				av: node.scrollLeft,
+				aw: node.scrollTop,
+				au: node.clientWidth,
+				ac: node.clientHeight
 			}
 		};
 	});
@@ -4324,18 +4324,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			aF: _Browser_getScene(),
-			aI: {
-				aK: x,
-				aL: y,
-				aJ: _Browser_doc.documentElement.clientWidth,
-				ar: _Browser_doc.documentElement.clientHeight
+			aq: _Browser_getScene(),
+			at: {
+				av: x,
+				aw: y,
+				au: _Browser_doc.documentElement.clientWidth,
+				ac: _Browser_doc.documentElement.clientHeight
 			},
-			aS: {
-				aK: x + rect.left,
-				aL: y + rect.top,
-				aJ: rect.width,
-				ar: rect.height
+			aC: {
+				av: x + rect.left,
+				aw: y + rect.top,
+				au: rect.width,
+				ac: rect.height
 			}
 		};
 	});
@@ -4370,107 +4370,6 @@ function _Browser_load(url)
 		}
 	}));
 }
-
-
-// CREATE
-
-var _Regex_never = /.^/;
-
-var _Regex_fromStringWith = F2(function(options, string)
-{
-	var flags = 'g';
-	if (options.aY) { flags += 'm'; }
-	if (options.aP) { flags += 'i'; }
-
-	try
-	{
-		return $elm$core$Maybe$Just(new RegExp(string, flags));
-	}
-	catch(error)
-	{
-		return $elm$core$Maybe$Nothing;
-	}
-});
-
-
-// USE
-
-var _Regex_contains = F2(function(re, string)
-{
-	return string.match(re) !== null;
-});
-
-
-var _Regex_findAtMost = F3(function(n, re, str)
-{
-	var out = [];
-	var number = 0;
-	var string = str;
-	var lastIndex = re.lastIndex;
-	var prevLastIndex = -1;
-	var result;
-	while (number++ < n && (result = re.exec(string)))
-	{
-		if (prevLastIndex == re.lastIndex) break;
-		var i = result.length - 1;
-		var subs = new Array(i);
-		while (i > 0)
-		{
-			var submatch = result[i];
-			subs[--i] = submatch
-				? $elm$core$Maybe$Just(submatch)
-				: $elm$core$Maybe$Nothing;
-		}
-		out.push(A4($elm$regex$Regex$Match, result[0], result.index, number, _List_fromArray(subs)));
-		prevLastIndex = re.lastIndex;
-	}
-	re.lastIndex = lastIndex;
-	return _List_fromArray(out);
-});
-
-
-var _Regex_replaceAtMost = F4(function(n, re, replacer, string)
-{
-	var count = 0;
-	function jsReplacer(match)
-	{
-		if (count++ >= n)
-		{
-			return match;
-		}
-		var i = arguments.length - 3;
-		var submatches = new Array(i);
-		while (i > 0)
-		{
-			var submatch = arguments[i];
-			submatches[--i] = submatch
-				? $elm$core$Maybe$Just(submatch)
-				: $elm$core$Maybe$Nothing;
-		}
-		return replacer(A4($elm$regex$Regex$Match, match, arguments[arguments.length - 2], count, _List_fromArray(submatches)));
-	}
-	return string.replace(re, jsReplacer);
-});
-
-var _Regex_splitAtMost = F3(function(n, re, str)
-{
-	var string = str;
-	var out = [];
-	var start = re.lastIndex;
-	var restoreLastIndex = re.lastIndex;
-	while (n--)
-	{
-		var result = re.exec(string);
-		if (!result) break;
-		out.push(string.slice(start, result.index));
-		start = re.lastIndex;
-	}
-	out.push(string.slice(start));
-	re.lastIndex = restoreLastIndex;
-	return _List_fromArray(out);
-});
-
-var _Regex_infinity = Infinity;
 
 
 
@@ -4960,25 +4859,25 @@ var $elm$core$Array$treeFromBuilder = F2(
 	});
 var $elm$core$Array$builderToArray = F2(
 	function (reverseNodeList, builder) {
-		if (!builder.a) {
+		if (!builder.c) {
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
-				$elm$core$Elm$JsArray$length(builder.c),
+				$elm$core$Elm$JsArray$length(builder.e),
 				$elm$core$Array$shiftStep,
 				$elm$core$Elm$JsArray$empty,
-				builder.c);
+				builder.e);
 		} else {
-			var treeLen = builder.a * $elm$core$Array$branchFactor;
+			var treeLen = builder.c * $elm$core$Array$branchFactor;
 			var depth = $elm$core$Basics$floor(
 				A2($elm$core$Basics$logBase, $elm$core$Array$branchFactor, treeLen - 1));
-			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.d) : builder.d;
-			var tree = A2($elm$core$Array$treeFromBuilder, correctNodeList, builder.a);
+			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.f) : builder.f;
+			var tree = A2($elm$core$Array$treeFromBuilder, correctNodeList, builder.c);
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
-				$elm$core$Elm$JsArray$length(builder.c) + treeLen,
+				$elm$core$Elm$JsArray$length(builder.e) + treeLen,
 				A2($elm$core$Basics$max, 5, depth * $elm$core$Array$shiftStep),
 				tree,
-				builder.c);
+				builder.e);
 		}
 	});
 var $elm$core$Basics$idiv = _Basics_idiv;
@@ -4991,7 +4890,7 @@ var $elm$core$Array$initializeHelp = F5(
 				return A2(
 					$elm$core$Array$builderToArray,
 					false,
-					{d: nodeList, a: (len / $elm$core$Array$branchFactor) | 0, c: tail});
+					{f: nodeList, c: (len / $elm$core$Array$branchFactor) | 0, e: tail});
 			} else {
 				var leaf = $elm$core$Array$Leaf(
 					A3($elm$core$Elm$JsArray$initialize, $elm$core$Array$branchFactor, fromIndex, fn));
@@ -5058,7 +4957,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {aq: fragment, as: host, aw: path, ay: port_, aB: protocol, aC: query};
+		return {ab: fragment, ad: host, ah: path, aj: port_, am: protocol, an: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5337,221 +5236,13 @@ var $elm$core$Task$perform = F2(
 			A2($elm$core$Task$map, toMessage, task));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Main$Booting = function (a) {
+var $author$project$Main$Sample = 1;
+var $author$project$Main$Blow = 0;
+var $author$project$Main$Dash = 0;
+var $author$project$Main$Moving = function (a) {
 	return {$: 0, a: a};
 };
-var $author$project$Main$Input = 0;
-var $author$project$Main$defaultBackgroundColor = '#808080';
-var $cmditch$elm_bigint$BigInt$BigIntNotNormalised = F2(
-	function (a, b) {
-		return {$: 0, a: a, b: b};
-	});
-var $cmditch$elm_bigint$BigInt$MagnitudeNotNormalised = $elm$core$Basics$identity;
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
-var $elm$core$Basics$abs = function (n) {
-	return (n < 0) ? (-n) : n;
-};
-var $cmditch$elm_bigint$BigInt$Magnitude = $elm$core$Basics$identity;
-var $elm_community$list_extra$List$Extra$last = function (items) {
-	last:
-	while (true) {
-		if (!items.b) {
-			return $elm$core$Maybe$Nothing;
-		} else {
-			if (!items.b.b) {
-				var x = items.a;
-				return $elm$core$Maybe$Just(x);
-			} else {
-				var rest = items.b;
-				var $temp$items = rest;
-				items = $temp$items;
-				continue last;
-			}
-		}
-	}
-};
-var $cmditch$elm_bigint$BigInt$isNegativeMagnitude = function (digits) {
-	var _v0 = $elm_community$list_extra$List$Extra$last(digits);
-	if (_v0.$ === 1) {
-		return false;
-	} else {
-		var x = _v0.a;
-		return x < 0;
-	}
-};
-var $cmditch$elm_bigint$BigInt$Neg = function (a) {
-	return {$: 1, a: a};
-};
-var $cmditch$elm_bigint$BigInt$Pos = function (a) {
-	return {$: 0, a: a};
-};
-var $cmditch$elm_bigint$BigInt$Zer = {$: 2};
-var $elm$core$List$isEmpty = function (xs) {
-	if (!xs.b) {
-		return true;
-	} else {
-		return false;
-	}
-};
-var $cmditch$elm_bigint$BigInt$mkBigInt = F2(
-	function (s, mag) {
-		var digits = mag;
-		if ($elm$core$List$isEmpty(digits)) {
-			return $cmditch$elm_bigint$BigInt$Zer;
-		} else {
-			switch (s) {
-				case 2:
-					return $cmditch$elm_bigint$BigInt$Zer;
-				case 0:
-					return $cmditch$elm_bigint$BigInt$Pos(mag);
-				default:
-					return $cmditch$elm_bigint$BigInt$Neg(mag);
-			}
-		}
-	});
-var $cmditch$elm_bigint$BigInt$mkBigIntNotNormalised = F2(
-	function (s, digits) {
-		return A2($cmditch$elm_bigint$BigInt$BigIntNotNormalised, s, digits);
-	});
-var $elm_community$list_extra$List$Extra$dropWhileRight = function (p) {
-	return A2(
-		$elm$core$List$foldr,
-		F2(
-			function (x, xs) {
-				return (p(x) && $elm$core$List$isEmpty(xs)) ? _List_Nil : A2($elm$core$List$cons, x, xs);
-			}),
-		_List_Nil);
-};
-var $cmditch$elm_bigint$BigInt$dropZeroes = $elm_community$list_extra$List$Extra$dropWhileRight(
-	$elm$core$Basics$eq(0));
-var $cmditch$elm_bigint$Constants$maxDigitMagnitude = 7;
-var $elm$core$Basics$pow = _Basics_pow;
-var $cmditch$elm_bigint$Constants$maxDigitValue = (-1) + A2($elm$core$Basics$pow, 10, $cmditch$elm_bigint$Constants$maxDigitMagnitude);
-var $cmditch$elm_bigint$BigInt$baseDigit = $cmditch$elm_bigint$Constants$maxDigitValue + 1;
-var $elm$core$Tuple$mapFirst = F2(
-	function (func, _v0) {
-		var x = _v0.a;
-		var y = _v0.b;
-		return _Utils_Tuple2(
-			func(x),
-			y);
-	});
-var $cmditch$elm_bigint$BigInt$normaliseDigit = function (x) {
-	return (x < 0) ? A2(
-		$elm$core$Tuple$mapFirst,
-		$elm$core$Basics$add(-1),
-		$cmditch$elm_bigint$BigInt$normaliseDigit(x + $cmditch$elm_bigint$BigInt$baseDigit)) : _Utils_Tuple2((x / $cmditch$elm_bigint$BigInt$baseDigit) | 0, x % $cmditch$elm_bigint$BigInt$baseDigit);
-};
-var $cmditch$elm_bigint$BigInt$normaliseDigitList = F2(
-	function (carry, xs) {
-		normaliseDigitList:
-		while (true) {
-			if (!xs.b) {
-				if (_Utils_cmp(carry, $cmditch$elm_bigint$BigInt$baseDigit) > 0) {
-					var $temp$carry = 0,
-						$temp$xs = _List_fromArray(
-						[carry]);
-					carry = $temp$carry;
-					xs = $temp$xs;
-					continue normaliseDigitList;
-				} else {
-					return _List_fromArray(
-						[carry]);
-				}
-			} else {
-				var x = xs.a;
-				var xs_ = xs.b;
-				var _v1 = $cmditch$elm_bigint$BigInt$normaliseDigit(x + carry);
-				var newCarry = _v1.a;
-				var x_ = _v1.b;
-				return A2(
-					$elm$core$List$cons,
-					x_,
-					A2($cmditch$elm_bigint$BigInt$normaliseDigitList, newCarry, xs_));
-			}
-		}
-	});
-var $cmditch$elm_bigint$BigInt$normaliseMagnitude = function (_v0) {
-	var xs = _v0;
-	return $cmditch$elm_bigint$BigInt$dropZeroes(
-		A2($cmditch$elm_bigint$BigInt$normaliseDigitList, 0, xs));
-};
-var $cmditch$elm_bigint$BigInt$reverseMagnitude = $elm$core$List$map($elm$core$Basics$negate);
-var $cmditch$elm_bigint$BigInt$Negative = 1;
-var $cmditch$elm_bigint$BigInt$Positive = 0;
-var $cmditch$elm_bigint$BigInt$Zero = 2;
-var $cmditch$elm_bigint$BigInt$signNegate = function (sign_) {
-	switch (sign_) {
-		case 0:
-			return 1;
-		case 1:
-			return 0;
-		default:
-			return 2;
-	}
-};
-var $cmditch$elm_bigint$BigInt$normalise = function (_v0) {
-	normalise:
-	while (true) {
-		var s = _v0.a;
-		var digits = _v0.b;
-		var _v1 = $cmditch$elm_bigint$BigInt$normaliseMagnitude(digits);
-		var normalisedMag = _v1;
-		if ($cmditch$elm_bigint$BigInt$isNegativeMagnitude(normalisedMag)) {
-			var $temp$_v0 = A2(
-				$cmditch$elm_bigint$BigInt$mkBigIntNotNormalised,
-				$cmditch$elm_bigint$BigInt$signNegate(s),
-				$cmditch$elm_bigint$BigInt$reverseMagnitude(normalisedMag));
-			_v0 = $temp$_v0;
-			continue normalise;
-		} else {
-			return A2($cmditch$elm_bigint$BigInt$mkBigInt, s, normalisedMag);
-		}
-	}
-};
-var $elm$core$Basics$compare = _Utils_compare;
-var $cmditch$elm_bigint$BigInt$signFromInt = function (x) {
-	var _v0 = A2($elm$core$Basics$compare, x, 0);
-	switch (_v0) {
-		case 0:
-			return 1;
-		case 2:
-			return 0;
-		default:
-			return 2;
-	}
-};
-var $cmditch$elm_bigint$BigInt$fromInt = function (x) {
-	return $cmditch$elm_bigint$BigInt$normalise(
-		A2(
-			$cmditch$elm_bigint$BigInt$BigIntNotNormalised,
-			$cmditch$elm_bigint$BigInt$signFromInt(x),
-			_List_fromArray(
-				[
-					$elm$core$Basics$abs(x)
-				])));
-};
-var $elm$core$String$lines = _String_lines;
-var $elm$core$List$maybeCons = F3(
-	function (f, mx, xs) {
-		var _v0 = f(mx);
-		if (!_v0.$) {
-			var x = _v0.a;
-			return A2($elm$core$List$cons, x, xs);
-		} else {
-			return xs;
-		}
-	});
-var $elm$core$List$filterMap = F2(
-	function (f, xs) {
-		return A3(
-			$elm$core$List$foldr,
-			$elm$core$List$maybeCons(f),
-			_List_Nil,
-			xs);
-	});
+var $author$project$Main$defaultTickInterval = 10;
 var $elm$core$Array$fromListHelp = F3(
 	function (list, nodeList, nodeListSize) {
 		fromListHelp:
@@ -5565,7 +5256,7 @@ var $elm$core$Array$fromListHelp = F3(
 				return A2(
 					$elm$core$Array$builderToArray,
 					true,
-					{d: nodeList, a: nodeListSize, c: jsArray});
+					{f: nodeList, c: nodeListSize, e: jsArray});
 			} else {
 				var $temp$list = remainingItems,
 					$temp$nodeList = A2(
@@ -5587,494 +5278,106 @@ var $elm$core$Array$fromList = function (list) {
 		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
 	}
 };
-var $author$project$Main$parseProgram = function (s) {
-	var _v0 = A2($elm$core$String$split, ': ', s);
-	if ((_v0.b && _v0.b.b) && (!_v0.b.b.b)) {
-		var _v1 = _v0.b;
-		var str = _v1.a;
-		return $elm$core$Array$fromList(
-			A2(
-				$elm$core$List$filterMap,
-				$elm$core$String$toInt,
-				A2($elm$core$String$split, ',', str)));
+var $author$project$Main$input = '>>>><<><>><<<<>>>><<>>><>><><<>>>><<<<>>><<<>>>><<<>><<>>><<<<>>><<>>>><><><<>>>><<<>>><<<><<>>><<<<>><<<<>>>><<<<>>>><<<>>>><<<><><<<>>><<<>>><<<<>>>><<<<>>>><>><<>><<<>><<>><>>><<<<>><<<<><<<<><<>>><<<>><<<<>><<<><>>><<<<>>>><<<>>><<<>><>>><<<<><>>>><<<><<<>>><<<><<>><<<<><<<>>>><<<<>><<<<>>><<<<><<<>>><<><>>><>>><>>>><><<<<>>><<>>><><>>><<<>>><<<<>>><><<<<>>><<<<>>>><<><>>><>><<>><<>>>><<<<>><<<<><<<<>>><>>>><<>>><<><<<>>>><<>>><<<<>><<<>>><<<<>>>><<>>>><<>>><<<<>>>><<>>>><<><>><<<<>>><<<<>><<<><<<><<<><<>>><<<<>>>><<<<>>>><<<><<<>><<>>><>><<>><>>>><>><<<<>>><<>>><<<>>><<>>>><>>><>>><<><<<>>>><<<<>>><<<<>>><<>>>><<<<>><<>>>><<<>>><>>><<<><>>><>>>><<>>>><<>><><<<<><<<>>><<>><<><<>>>><<>>>><><<<<>>>><<<<><<<><>>><<<>><<<>>>><>><<<<>>><><<><<<<>><<<<>><<<<>>><><<<><<<>>><<<<>>><>><<<<><><<<>>>><<<<><>>>><<<>>>><<><<<><>>><<<><<<<><>>><<<>><<<>><<<><><<<>>><<><<<<>>><<<>>>><<>><>><<<>>><>>>><<<<><>>><<>>>><>>>><<>>>><>><><>>><<<>>><<<>><<>>>><<<>>>><><<>>>><<>>><<<<>>><<<<>>><<<<>><<<>><<<>>><<>><<<>><>><<<>><<>>><<>>>><<<>>><<>>>><>>>><<<<>><<<><<><<<>>><<<><<<<>>>><<<<><<<>>>><<<>>>><<<>>>><>>>><>><<<<>><<<<>>>><<<<>><<<>><><>>>><<>>>><<>><<<>>>><<<<>><<<<>><<>>>><<>><<<<>>><<<<><<<<>>><>>><><<<>>><>><<>>>><<<<><<>><<>>><<<<>>>><<>>><>>>><<><<>>><<>>><<><<>><><<<<>><<<>>><>><<<>>><><<<<>>>><>>>><<<>>><<<>><<<>>><<<<>>><>>>><<<>>><<<>><<<>>>><<>>>><>><>><<<>><<<<><<<<>><<<<>>><>><<<<>><<>><><<>>><<<>>>><<>>>><<<>>><<>>><>><>><<><<<>>><<<><<<>><><><<<>><>>>><<>>>><<<<>>><<<><>>><<<><<<<>><<<><<>>><<<<>><><<<>>>><<>>>><>>>><<>>>><<<<>>><><>>>><>><>>><<<<><<<>><<<<><<<>>>><<<<>>>><>>>><>>><<<<><<<>>>><<<>><<<><<<><<<<><<<<>>>><<><<>>>><<<>><<<<>>><<<>>><><<<><<<>>>><<<<>>><<<><>>>><<<<>><<<<>>>><>><>>>><<<<>>>><<<>>>><<>>><<<>>>><>>><<<>>><<<>>>><>>>><<<>>><<<>><><<<>>>><<<>><<<<>>><>>><<<>>>><<<<>>>><<<><<<><<>><>>><<<>>><<<><<<>><<><<<<>>>><<<<><<>>><>><>><><<<>>>><<<<>><<<<>><<<<>>>><><>>><<<>><<>>><<<<>>>><<<><<<><<<>>>><<<><<>>><<<<>>>><<><>>>><<<>>><<<<>>><<<<>><<<>><<<<><<<<>><>>><>>>><>><<<>>>><><<<<>>><>>><<>>>><<>>><<<<>>>><<<><<><<<<>>><><<>>><>>><<<>><<<>><<>>><<<>>>><<<<>>><<<<><<>>>><<<>>><><>>>><>>><><<<<><<>>>><><<<>>><<>>><><>>><<<<>>>><<<<>>>><<<>>><<<<>>><<<>>><><>><<<><<>>><<>>><<>>><<<<>>>><><<<>>>><<>><<>>>><><<<>>><<><<>>><<<<>>>><<<>><<<><<><>>>><<<>><>>>><<<<>>>><<>>>><>>><>>><<<>><<<<>>><<<><<<<>><<<<>><<<>><><<>>>><<><<<>>>><<<<>><<<<>>><<<>>>><<<>>><<<><<<<>><<<<>>>><<><<>>><>>><<<>><>><<<<>>>><<<>>>><<<><<>>>><<>>><<<<><<<<>>><<<>>><<>><<<<>><<<<><<<>><<<>><>><<>><>>><<<<>><<>>>><<>><<>><<>><<<<>>>><<>><<<<><<<>><><><<>><<<><>>>><<<>>><>>><><>><<<>>>><<>><<>><<>>><<<<><<><>><<<<>>>><>>>><<>>><><<<<>><<<<><>><<<>><<><>>><<>>><<>>>><<<>><<<>>>><<<<>>><<><<<>>><<>>>><<<>>><<<<>><<>>><<<<>><>>><<<<><<<>>>><>><<><><<<<>>>><>>>><<>>>><<<>>><<<>><>>><<>>><<<>><><<<>>>><>>><>>><>><<<<>>>><<><<<<><<>><<>><<><>><<>>><<<>>><<<>>>><<<<>><><<><><<<><<<>>><<>><>>><<>>><<<<>><<<>><<>>>><>>>><<<>>>><>>><<<>>><<<<><<>>><<<<>>><<>><<>>>><>>><<>><<>>><<<><<>>><<>>><<<>>><<<>><>><<<>><<<<>>><>>>><<<<>>><>>><<<>><<<<>>>><>>><<><<<<>><><<><<><>>><><>><<<<>><<<<><>>>><<>>><<<<>>><>><<>><>>><<<<>><<>>>><><<<<>>>><<<<>><<<>>><><<><<>>>><<>><>>><<>><>><><<><<<>><<<<>>><><<>><>><<>>>><<>><>><<<<>>>><<<<>><<><>><<<<>>><<<>>>><<<>><<><<>>><<>>><<<>>>><<><<<<>>><<><<<<>>>><<<<><<<>>><><<>>><<<<><>><<>><<<<>>><<<<><<<>>>><<<>>><<<><<<>><>><<><<<>>>><<>><<><>>>><<>>>><<<<><<<>>>><<>>>><<><<<><<<>>>><<<<>>>><<><<<><<>><<<<>>><<<>>><<>>><<<>>>><>>>><>>><>><<<>>>><<<>>><<><<<>><<<><<<><<<<><>><>>><<<>>><<<<>>><<<><<<>><>><<>>><<>>>><<<<>>>><<>>><<<><<<>>><<<<>><><<>>>><<>>>><<<<>>>><<<>><<<>>>><>>><<<>><><<<<>><<>>><<>>><>>><<<<>>>><<><<<<>>>><<<<><<<<>>>><><<>><<<<>>>><<<<><<<>><<<><>>>><<<><<<>>>><<>>><><<>>><<>>>><<<<>><<<>><<<<>><<<<>><>><<<<>>><>><<<<><<><>>><><<<<>>><>><>>><<<>><<<>><>>>><>>>><<>><<<<>><<<>><<<>>><<<>>>><><<><<><<<<><<>>><<>>>><<<>><<<>><>>><<<<>><<><>>><>>><<<<>>>><>>>><>><<<>><<>><<<>><<<<>>>><<<>>>><<>>><<>><<<><<<>>>><<<>><>>><<><>>>><<<>>>><>><>>><><>>>><<<<>><>><<<>>><<<><>><<<<>>><>>>><<<><<<<><<<<>><<>>><><<<>>><<>>><<<>>>><<<<><<<<><>>><<<<>><>>><<<<>>>><>>><<<<>>><>>>><>>>><<<<>>><<<<>>>><<<<>>><>>><<>>>><<<<>><>>><<<>><<<<>>>><<<<>>>><<<><><<<><><<><>><<<><<>>><<<><<>>><<<<>>>><<>>>><><<>>>><<>><<<<>><>>>><<<<>>><<<>>>><>><<<<>>>><<<>>>><<<>>><<<<><<>><<<>>>><>>>><>>>><<>><<>>>><><>>><<><<>><<<<>>><><<<<><<>>><<<>>><<<>>>><<<<>><<<><>><<<>>>><<<>>><<<><<<<>>>><<<<><><<<>>>><<<>>><<<<>>>><>><<<<>>><<<>>>><<>>><>><<><><>>><<<>>>><<<<><<>>>><<<>>><<<>>>><<>><<<>>><<<<>>>><<>>>><<>>>><>><<<>>>><<>>>><<>>><<<>>><<>><<><<<<><<>>>><<<<>>><><<<><<<<>>><<<>>>><<>>>><><<>>><<>>><<<>>>><><>>><<<><<<>><<<<><>>><<<<>><<<>>>><<<>>>><<<>><<>><<<>><<<<>><<>><<>>>><<<<><<<>><>><><<><>>>><<<<>>><<<>>>><<<<>>><<<><<>><<<<>>><<<<>>>><<<<>>>><<<>>>><<<<>><<<<>>><<>>><>>><<<><<<<>>><>>><<><<<><<<<>><<<>>>><<<>>>><<<<>><<<>><>>><<<<>>>><><><<>>>><<><<<>>><<<>><<>><>>><<>><<<>><<<>>>><<<>>><<>><<<>><<<<>>>><<<<>>>><<<>>>><><><>>><<>>><<>>>><<>>><<<<>>>><<>>><<>><<<>>><<<>>>><<>>><>>>><>><<>>><<<>><<<><>>>><>>><<>>>><>><<<<><<<>>>><<<>><<<>><<<><><><<<<><>>><<<>>>><<<<>><<<<>>><>><<<>>><<<><<<<>>><<>><<>>>><><>><<><<><<<>><<><>>><<><<>>><<<<>>>><<<<><<<>><<><<<<>><<<<>>><<>>><<>>>><<<<>>>><<<>>>><<>>><<>>>><<<<>><>>><<><<><<>><<<><>><<<<><<<>>>><<>>><<<>>><<>>>><<<<>>>><<>>><<<<>><<<>>>><<<>>>><<<<>>>><<<>>>><<<<>>>><>><<<<>>><>>>><>>><>><<>>><<<<>>>><<<>>>><>>>><<<><<<<>><<<>>>><><<>>>><>><<<>>><<<>>>><<><<>>>><>>><>>><>>><>><<<><>>>><<<<>><<>><<<>><>>>><<<<>><<<>>>><<<>><<<<><<<<>>><<<<>>><<<<>>><<<>><<<<>>>><<<<><<<<>>>><>>>><<<><<<<>>>><<>><<<>>><<<>>>><>>><<<<>>>><<>>><>><<><<<>><<<>><<<>>><>>>><<<<>>><<>>>><<<<><<<<>>>><<<<>>>><<<<>>>><<<>><<>><>>><<<<>>>><<<<>>><><<<<>>>><>>><<>>>><<>>>><><<<<>>>><>><>>>><<>>>><>><<>>><<<>><<>>><<><<<<>>>><<<<>><><<<>>><<<>><>><<<<>><>>><<<<>>>><<<<>>>><><><<<>>>><<<>>><<<<><<<>>>><>>><<>>><<<<><>>>><>>><<<<>>>><>>><<<<>>>><<<<><<<<>>><<<<>>>><<<>>>><<<>><<<<>>>><>><<<<>>><>>><<<<>>>><>><>><<<<>><<<>>><><>>><<><<<<><<>>>><>>><>>><>><>>><<<><><>>>><>>>><<>><<<<>><<<>><<<<>><>>>><<<<>>>><<<>>><<>>>><><<>><<<>><<<>>>><<><>>><<>><<>>>><<<>>><<>>><<>>><>><<<>>><<>>><<<<>>><>>>><<<><><<<<>><<<<>>><>>>><><>>>><<<>>>><<<>>><<<<>>>><<<<>>>><<>><<<>><>>><>>>><<<<>><<>>><<>><<<>>>><<<>><<<<><<>>>><>><>><<<<>>><<<><<>>>><<<<>>><<<><>>><<<><<<>>>><<><>>>><<<<><>>><><<<<>>>><<>>>><>>>><<>>>><>>>><>><<<<>>>><>><>>>><<>>><<<>>>><<<>><><<<<><<<<>>>><<>>>><<<<>>><<>>>><<>><<<>>>><<>><>>><<<<>>><>>>><><<<><<<>>><<<<><><<<>>><><<>>><<><<<<>>>><>>>><<<>>>><<>>><>>>><<<<>>>><<<>><>><<<><>><<<>>><>>><>>><><<<>>>><><<<<>>><<<<>>>><<<<>>><<<<>>><>>>><<<<>>><<>><<<<>><>>><<><<<><<<><<<<>>>><<<><<<<>>><<>>>><<>><<<<>>>><<<<>>>><>>><<<<>>>><>>>><<>>><><<<>><>><>>>><><>><<<<>><<<<>>>><<><<<<><<>>><>>>><<><<<<>><><<<>>><<<><>>><<><<>>><<<<>>><<<>>><<<<><<<>>>><<<<><<>>>><<<><<>>><<<><><<<<>>>><<<>>><>>><<><<<>>><<<>><<>>><>><<>><>>><>><>><>>>><<<>><<<<><>>>><<<>>><<<>><<<><><<>><<<>>><<<<>>>><>><<<><<<><<<<><<>><>><<<<>>>><<<>>><<><<<>>><<<><>><>>><>>>><><>>><<<>><><<<<>><<<><<<<>>><<<<>>><<<>>>><<>><<>>>><<><<<>>><<<<>><<>>>><>>>><<<<>><<>><<<>>>><<<>>><<<>><<<<><<<><<>>>><<<>>>><<<>>>><<>>><<<<>>><<>>>><<>>><><>>>><<<>>>><<<><<>>><<<><<<<>><<<>><<>>>><<>>>><<<>>>><<>><>>>><<<<>><>><<>>>><<<<>>><<<<>>>><<<<>>><<><<<>>>><<<<>>><<>><<><<><<>><<<<><<<<>>><>>><<>>><><<<<>><>>><<<<><<<<><<<>>>><<><<<>>>><<<<>>>><>>><>><><><<<<><>><<<<>><<<<>>><<>>>><<<><<<<><<<<>>><<>><<>>>><>><<>><<><<>>>><>>>><><<<<>>>><<<><>>>><<<<>><<>>><<<<><<<<>>><<<<><>><<<<>>>><<>>><<>>>><<<><<<>><>>><<<>>>><>><<<>><><<<>>>><><>>>><>>><<<>>>><>>>><>>>><<<><<>>><<><<<<>>><>><<><<<><<<>>><>>><>>><<>><<><>><><>>><<><<<<><<>>>><<<>>><>>><<<<>>>><<<>>><<<><<<>>><<>><<<>><>><<>><<<><<<<>><<>>>><<<<>>>><<><<>>>><<<<><>>>><<<<><><>>><<<>><<<<><<>>>><<<>><<<>>><<<<><>><<<><<>>>><<<<>>><<<>>><>>>><<><<>>><<>><<<><<<<>>><>>><<>><>>>><>><<<>>>><><<<<>>>><<<>>>><>><<<>>><>>><<>>>><<<<>>>><<<>>><<><<<<><<<<>>><>>><><<<<>>>><<<><<<>>>><<<<>><<>>><<<<>>>><<>>><<<<>>><>><<<>>>><>>><<<<><<<<>>>><<<<>><<><>>>><<<<>>><<<<>><<>>>><><<<>><>>>><<<><>><<<>>>><>><<>>>><<<>>><>><<<>><>><<<><<>>><<<<>>><<<><<<>><><<<>><><<<<>>><<<<><<<>><<>>><<>><<<><<<><<<<>>>><<<><<<><<<<><>>><><<<>>><<<<>>><<<>>><<<>>>><<<<>>><<<><<>><>>>><<>><<<>><<<<>>><>><<>><<>>>><>><>>><<<<><<<><>><>>><><<>><<<><<>>>><>><<<>><<<<><<<>>>><<>><<<<>><<<<><<<>>><<<<><<<<>><<>><<<>>>><<>>>><<<>>><<><<>>>><<<><<><<<<><<<>><<>>><<<<>><<>><<<>>>><<>>>><<<<>>><<<<>>><<<<>><>><<<<>>>><<>>>><<<<><<>>>><<><><><<<<>><<<>><><<<<>>><>>>><<><<<<>><<<<>>><><<<<>><<<>><<>><<<<><>><<<>>>><<<><<<<>>>><>>>><<<<>>><<<>>><<<<><<<>>><<<<><<>><<>>>><>><<<<><<<<>>>><<<<>>>><<>>>><<<>>><<>><<<>>><<<<>>>><<<<><>>><<>><<<<>><><<<<>>><>>><<<<>><>><<><<>>><>>><<<<>><><<<>><>><<<>><<<<>><<>><<<>><>><<>><<<>><>>>><<<<>>>><>>>><<<>><<<>>><<>><>><<<>>>><<<<>>>><>><>><<><<<<>>>><<><>>>><>>><<<>>>><<<<><<<<>><><<<<>>>><>>>><<>><<<<><<>>><<<<><>><><<<>>><<>>><>>>><><<<<><<<<>>><>>><>>>><<<>>>><>>>><<><<<>>><<>><<<>>><>><>><<<<>><<>>>><<<><><<<<><<>>><<<<><<<><<<>><>>><<<>>>><>><<<><<<<>>><<<<>>><<>><<>><>>>><<<<>>>><>><>>><>>>><<<<>><<<<>>><<<><<<>>><><>>>><<<>>><>>>><<<>>>><<<<>><<<<><<<<>>>><<>>>><>>><<<>>><<<>><<<<>><<<>><>><><>>><<><>>>><<<<>><<>><<>>><<>>>><<<<>>>><<<<><><<<<>><<<>>><<><<><<<<>>>><<>>>><<<>>>><>>><<>>>><><<<<>><<>>><<>>>><<><<>><>><<<>>><<<>>>><>><>><>>><<<<><<<>><<<<>><<<<>>><><>>><>><<>><>><>>><><<>>><>>><<<>>><>>><>><<<<>>>><<>>><>><<<>>>><><<>>>><<<>>>><>>>><<<>><<<>><<>>><<<>><<<<><<<><<<<>><<>>><>>><<<>>>><<<>><<<>><<<><<>><<<<><<<>><<<<><<<<><<<<><<<<><>>>><<<>>>><<<<>>>><<<><>>><<>><<<<>>>><>><<<<><>>>><<<<>><<><<<><>><>>>><<<><>>>><<<><<<><<<<>><<<><<<<><<<>>><<>>>><<>>><<<<><<<<><><<<<><<<>><>>><><>>><><<<<>>><<>>>><<<<>>><<<<>>>><<<>><>>><<<<>><>>><<<><<<><<>><<<><<>><<>>><<><>>><<<<><>>>><<<>><<<>>>><<<<>>><<<<>>><<<<>>><<>>>><>><>><>><<>><<<>>><>>><<><<>>><>>><<<>>>><<<><>><>><<>>><<<>><>>>><<<<>><<<<>><<<<><<<>><<>>><>>>><<<<>><>>><<<<><<<<>><>>><<>>><<<<>>><<<>>><><<<<>';
+var $author$project$Main$sample = '>>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>';
+var $author$project$Main$read = function (dataSource) {
+	if (!dataSource) {
+		return $author$project$Main$input;
 	} else {
-		return $elm$core$Array$fromList(_List_Nil);
+		return $author$project$Main$sample;
 	}
 };
-var $elm_community$maybe_extra$Maybe$Extra$combineHelp = F2(
-	function (list, acc) {
-		combineHelp:
-		while (true) {
-			if (list.b) {
-				var head = list.a;
-				var tail = list.b;
-				if (!head.$) {
-					var a = head.a;
-					var $temp$list = tail,
-						$temp$acc = A2($elm$core$List$cons, a, acc);
-					list = $temp$list;
-					acc = $temp$acc;
-					continue combineHelp;
-				} else {
-					return $elm$core$Maybe$Nothing;
-				}
-			} else {
-				return $elm$core$Maybe$Just(
-					$elm$core$List$reverse(acc));
-			}
-		}
-	});
-var $elm_community$maybe_extra$Maybe$Extra$combine = function (list) {
-	return A2($elm_community$maybe_extra$Maybe$Extra$combineHelp, list, _List_Nil);
-};
-var $elm$core$Basics$composeL = F3(
-	function (g, f, x) {
-		return g(
-			f(x));
-	});
-var $elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
-	});
-var $elm$regex$Regex$Match = F4(
-	function (match, index, number, submatches) {
-		return {X: index, aX: match, a_: number, a3: submatches};
-	});
-var $elm$regex$Regex$contains = _Regex_contains;
-var $elm_community$list_extra$List$Extra$dropWhile = F2(
-	function (predicate, list) {
-		dropWhile:
-		while (true) {
-			if (!list.b) {
-				return _List_Nil;
-			} else {
-				var x = list.a;
-				var xs = list.b;
-				if (predicate(x)) {
-					var $temp$predicate = predicate,
-						$temp$list = xs;
-					predicate = $temp$predicate;
-					list = $temp$list;
-					continue dropWhile;
-				} else {
-					return list;
-				}
-			}
-		}
-	});
-var $cmditch$elm_bigint$BigInt$emptyZero = function (_v0) {
-	var xs = _v0;
-	var _v1 = A2(
-		$elm_community$list_extra$List$Extra$dropWhile,
-		$elm$core$Basics$eq(0),
-		xs);
-	if (!_v1.b) {
-		return _List_Nil;
-	} else {
-		return xs;
-	}
-};
-var $elm$core$String$fromList = _String_fromList;
-var $elm$regex$Regex$fromStringWith = _Regex_fromStringWith;
-var $elm$regex$Regex$fromString = function (string) {
-	return A2(
-		$elm$regex$Regex$fromStringWith,
-		{aP: false, aY: false},
-		string);
-};
-var $elm$core$List$drop = F2(
-	function (n, list) {
-		drop:
-		while (true) {
-			if (n <= 0) {
-				return list;
-			} else {
-				if (!list.b) {
-					return list;
-				} else {
-					var x = list.a;
-					var xs = list.b;
-					var $temp$n = n - 1,
-						$temp$list = xs;
-					n = $temp$n;
-					list = $temp$list;
-					continue drop;
-				}
-			}
-		}
-	});
-var $elm$core$List$takeReverse = F3(
-	function (n, list, kept) {
-		takeReverse:
-		while (true) {
-			if (n <= 0) {
-				return kept;
-			} else {
-				if (!list.b) {
-					return kept;
-				} else {
-					var x = list.a;
-					var xs = list.b;
-					var $temp$n = n - 1,
-						$temp$list = xs,
-						$temp$kept = A2($elm$core$List$cons, x, kept);
-					n = $temp$n;
-					list = $temp$list;
-					kept = $temp$kept;
-					continue takeReverse;
-				}
-			}
-		}
-	});
-var $elm$core$List$takeTailRec = F2(
-	function (n, list) {
-		return $elm$core$List$reverse(
-			A3($elm$core$List$takeReverse, n, list, _List_Nil));
-	});
-var $elm$core$List$takeFast = F3(
-	function (ctr, n, list) {
-		if (n <= 0) {
-			return _List_Nil;
-		} else {
-			var _v0 = _Utils_Tuple2(n, list);
-			_v0$1:
-			while (true) {
-				_v0$5:
-				while (true) {
-					if (!_v0.b.b) {
-						return list;
-					} else {
-						if (_v0.b.b.b) {
-							switch (_v0.a) {
-								case 1:
-									break _v0$1;
-								case 2:
-									var _v2 = _v0.b;
-									var x = _v2.a;
-									var _v3 = _v2.b;
-									var y = _v3.a;
-									return _List_fromArray(
-										[x, y]);
-								case 3:
-									if (_v0.b.b.b.b) {
-										var _v4 = _v0.b;
-										var x = _v4.a;
-										var _v5 = _v4.b;
-										var y = _v5.a;
-										var _v6 = _v5.b;
-										var z = _v6.a;
-										return _List_fromArray(
-											[x, y, z]);
-									} else {
-										break _v0$5;
-									}
-								default:
-									if (_v0.b.b.b.b && _v0.b.b.b.b.b) {
-										var _v7 = _v0.b;
-										var x = _v7.a;
-										var _v8 = _v7.b;
-										var y = _v8.a;
-										var _v9 = _v8.b;
-										var z = _v9.a;
-										var _v10 = _v9.b;
-										var w = _v10.a;
-										var tl = _v10.b;
-										return (ctr > 1000) ? A2(
-											$elm$core$List$cons,
-											x,
-											A2(
-												$elm$core$List$cons,
-												y,
-												A2(
-													$elm$core$List$cons,
-													z,
-													A2(
-														$elm$core$List$cons,
-														w,
-														A2($elm$core$List$takeTailRec, n - 4, tl))))) : A2(
-											$elm$core$List$cons,
-											x,
-											A2(
-												$elm$core$List$cons,
-												y,
-												A2(
-													$elm$core$List$cons,
-													z,
-													A2(
-														$elm$core$List$cons,
-														w,
-														A3($elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
-									} else {
-										break _v0$5;
-									}
-							}
-						} else {
-							if (_v0.a === 1) {
-								break _v0$1;
-							} else {
-								break _v0$5;
-							}
-						}
-					}
-				}
-				return list;
-			}
-			var _v1 = _v0.b;
-			var x = _v1.a;
-			return _List_fromArray(
-				[x]);
-		}
-	});
-var $elm$core$List$take = F2(
-	function (n, list) {
-		return A3($elm$core$List$takeFast, 0, n, list);
-	});
-var $elm_community$list_extra$List$Extra$greedyGroupsOfWithStep = F3(
-	function (size, step, list) {
-		if ((size <= 0) || (step <= 0)) {
-			return _List_Nil;
-		} else {
-			var go = F2(
-				function (xs, acc) {
-					go:
-					while (true) {
-						if ($elm$core$List$isEmpty(xs)) {
-							return $elm$core$List$reverse(acc);
-						} else {
-							var $temp$xs = A2($elm$core$List$drop, step, xs),
-								$temp$acc = A2(
-								$elm$core$List$cons,
-								A2($elm$core$List$take, size, xs),
-								acc);
-							xs = $temp$xs;
-							acc = $temp$acc;
-							continue go;
-						}
-					}
-				});
-			return A2(go, list, _List_Nil);
-		}
-	});
-var $elm_community$list_extra$List$Extra$greedyGroupsOf = F2(
-	function (size, xs) {
-		return A3($elm_community$list_extra$List$Extra$greedyGroupsOfWithStep, size, size, xs);
-	});
-var $elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (!maybe.$) {
-			var value = maybe.a;
-			return $elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $elm$regex$Regex$never = _Regex_never;
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (!maybe.$) {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
-var $cmditch$elm_bigint$BigInt$fromString_ = function (x) {
-	var _v0 = A2(
-		$elm$regex$Regex$contains,
-		A2(
-			$elm$core$Maybe$withDefault,
-			$elm$regex$Regex$never,
-			$elm$regex$Regex$fromString('^[0-9]')),
-		$elm$core$String$fromList(x));
-	if (_v0) {
+var $elm$core$Array$repeat = F2(
+	function (n, e) {
 		return A2(
-			$elm$core$Maybe$map,
-			A2($elm$core$Basics$composeL, $cmditch$elm_bigint$BigInt$emptyZero, $elm$core$Basics$identity),
-			$elm_community$maybe_extra$Maybe$Extra$combine(
-				A2(
-					$elm$core$List$map,
-					A2(
-						$elm$core$Basics$composeR,
-						$elm$core$List$reverse,
-						A2($elm$core$Basics$composeR, $elm$core$String$fromList, $elm$core$String$toInt)),
-					A2(
-						$elm_community$list_extra$List$Extra$greedyGroupsOf,
-						$cmditch$elm_bigint$Constants$maxDigitMagnitude,
-						$elm$core$List$reverse(x)))));
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
+			$elm$core$Array$initialize,
+			n,
+			function (_v0) {
+				return e;
+			});
+	});
+var $tortus$elm_array_2d$Array2D$repeat = F3(
+	function (numRows, numColumns, e) {
+		var row = A2($elm$core$Array$repeat, numColumns, e);
+		return {
+			i: numColumns,
+			a: A2($elm$core$Array$repeat, numRows, row)
+		};
+	});
 var $elm$core$String$foldr = _String_foldr;
 var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
 };
-var $elm$core$String$toLower = _String_toLower;
-var $cmditch$elm_bigint$BigInt$fromIntString = function (x) {
-	var _v0 = $elm$core$String$toList(
-		$elm$core$String$toLower(x));
-	if (!_v0.b) {
-		return $elm$core$Maybe$Nothing;
-	} else {
-		switch (_v0.a) {
-			case '-':
-				if (!_v0.b.b) {
-					return $elm$core$Maybe$Nothing;
-				} else {
-					var xs = _v0.b;
-					return A2(
-						$elm$core$Maybe$map,
-						$cmditch$elm_bigint$BigInt$mkBigInt(1),
-						$cmditch$elm_bigint$BigInt$fromString_(xs));
-				}
-			case '+':
-				if (!_v0.b.b) {
-					return $elm$core$Maybe$Nothing;
-				} else {
-					var xs = _v0.b;
-					return A2(
-						$elm$core$Maybe$map,
-						$cmditch$elm_bigint$BigInt$mkBigInt(0),
-						$cmditch$elm_bigint$BigInt$fromString_(xs));
-				}
-			default:
-				var xs = _v0;
-				return A2(
-					$elm$core$Maybe$map,
-					$cmditch$elm_bigint$BigInt$mkBigInt(0),
-					$cmditch$elm_bigint$BigInt$fromString_(xs));
-		}
-	}
+var $author$project$Main$initModel = function (dataSource) {
+	var rock = _Utils_Tuple2(
+		_Utils_Tuple2(2, 3),
+		_Utils_Tuple2(0, 0));
+	var data = $author$project$Main$read(dataSource);
+	var chamber = A3($tortus$elm_array_2d$Array2D$repeat, 2022 * 4, 7, '.');
+	return {
+		o: chamber,
+		I: dataSource,
+		aa: false,
+		x: 0,
+		J: 0,
+		P: $elm$core$Array$fromList(
+			$elm$core$String$toList(data)),
+		s: '?',
+		D: 0,
+		t: true,
+		b: $author$project$Main$Moving(rock),
+		E: 0,
+		A: $author$project$Main$defaultTickInterval
+	};
 };
-var $author$project$Main$parseRegister = function (s) {
-	var _v0 = A2($elm$core$String$split, ': ', s);
-	if ((_v0.b && _v0.b.b) && (!_v0.b.b.b)) {
-		var _v1 = _v0.b;
-		var str = _v1.a;
-		return A2(
-			$elm$core$Maybe$withDefault,
-			$cmditch$elm_bigint$BigInt$fromInt(0),
-			$cmditch$elm_bigint$BigInt$fromIntString(str));
-	} else {
-		return $cmditch$elm_bigint$BigInt$fromInt(0);
-	}
-};
-var $author$project$Main$parseComputer = function (data) {
-	var _v0 = $elm$core$String$lines(data);
-	if (((((_v0.b && _v0.b.b) && _v0.b.b.b) && _v0.b.b.b.b) && _v0.b.b.b.b.b) && (!_v0.b.b.b.b.b.b)) {
-		var a = _v0.a;
-		var _v1 = _v0.b;
-		var b = _v1.a;
-		var _v2 = _v1.b;
-		var c = _v2.a;
-		var _v3 = _v2.b;
-		var _v4 = _v3.b;
-		var p = _v4.a;
-		return {
-			C: _List_Nil,
-			s: 0,
-			m: $author$project$Main$parseProgram(p),
-			e: $author$project$Main$parseRegister(a),
-			p: $author$project$Main$parseRegister(b),
-			t: $author$project$Main$parseRegister(c)
-		};
-	} else {
-		return {
-			C: _List_Nil,
-			s: 0,
-			m: $elm$core$Array$empty,
-			e: $cmditch$elm_bigint$BigInt$fromInt(0),
-			p: $cmditch$elm_bigint$BigInt$fromInt(0),
-			t: $cmditch$elm_bigint$BigInt$fromInt(0)
-		};
-	}
-};
-var $author$project$Main$initComputer = function (dataSource) {
-	var sample2 = 'Register A: 2024\nRegister B: 0\nRegister C: 0\n\nProgram: 0,3,5,4,3,0';
-	var sample = 'Register A: 729\nRegister B: 0\nRegister C: 0\n\nProgram: 0,1,5,4,3,0';
-	var input = 'Register A: 37283687\nRegister B: 0\nRegister C: 0\n\nProgram: 2,4,1,3,7,5,4,1,1,3,0,3,5,5,3,0';
-	var data = function () {
-		switch (dataSource) {
-			case 1:
-				return sample;
-			case 2:
-				return sample2;
-			default:
-				return input;
-		}
-	}();
-	var computer = $author$project$Main$parseComputer(data);
-	return computer;
-};
-var $author$project$Main$initModel = F2(
-	function (deviceStatus, dataSource) {
-		var computer = $author$project$Main$initComputer(dataSource);
-		var model = {N: $author$project$Main$defaultBackgroundColor, U: 1111, w: 1000, f: computer, V: 177, x: dataSource, an: '', h: deviceStatus, W: false, Y: 477, Z: computer, P: '', D: $elm$core$Maybe$Nothing, r: true, aa: 0, G: 200};
-		return model;
-	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		A2(
-			$author$project$Main$initModel,
-			$author$project$Main$Booting(0),
-			0),
+		$author$project$Main$initModel(1),
 		$elm$core$Platform$Cmd$none);
 };
-var $author$project$Main$BlackoutTick = {$: 9};
-var $author$project$Main$BootTick = {$: 8};
-var $author$project$Main$DarkBackgroundTick = {$: 11};
-var $author$project$Main$DefaultBackgroundTick = {$: 10};
-var $author$project$Main$LightBackgroundTick = {$: 12};
-var $author$project$Main$QuineTick = {$: 15};
-var $author$project$Main$Tick = {$: 2};
+var $author$project$Main$KeyDown = function (a) {
+	return {$: 8, a: a};
+};
+var $author$project$Main$Tick = {$: 0};
 var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $elm$time$Time$Every = F2(
-	function (a, b) {
-		return {$: 0, a: a, b: b};
+var $ohanhi$keyboard$Keyboard$RawKey = $elm$core$Basics$identity;
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $ohanhi$keyboard$Keyboard$eventKeyDecoder = A2(
+	$elm$json$Json$Decode$field,
+	'key',
+	A2($elm$json$Json$Decode$map, $elm$core$Basics$identity, $elm$json$Json$Decode$string));
+var $elm$browser$Browser$Events$Document = 0;
+var $elm$browser$Browser$Events$MySub = F3(
+	function (a, b, c) {
+		return {$: 0, a: a, b: b, c: c};
 	});
-var $elm$time$Time$State = F2(
-	function (taggers, processes) {
-		return {aA: processes, aH: taggers};
+var $elm$browser$Browser$Events$State = F2(
+	function (subs, pids) {
+		return {ai: pids, ar: subs};
 	});
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
-var $elm$time$Time$init = $elm$core$Task$succeed(
-	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
-var $elm$core$Dict$get = F2(
-	function (targetKey, dict) {
-		get:
-		while (true) {
-			if (dict.$ === -2) {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var key = dict.b;
-				var value = dict.c;
-				var left = dict.d;
-				var right = dict.e;
-				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
-				switch (_v1) {
-					case 0:
-						var $temp$targetKey = targetKey,
-							$temp$dict = left;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-					case 1:
-						return $elm$core$Maybe$Just(value);
-					default:
-						var $temp$targetKey = targetKey,
-							$temp$dict = right;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-				}
-			}
-		}
-	});
+var $elm$browser$Browser$Events$init = $elm$core$Task$succeed(
+	A2($elm$browser$Browser$Events$State, _List_Nil, $elm$core$Dict$empty));
+var $elm$browser$Browser$Events$nodeToKey = function (node) {
+	if (!node) {
+		return 'd_';
+	} else {
+		return 'w_';
+	}
+};
+var $elm$browser$Browser$Events$addKey = function (sub) {
+	var node = sub.a;
+	var name = sub.b;
+	return _Utils_Tuple2(
+		_Utils_ap(
+			$elm$browser$Browser$Events$nodeToKey(node),
+			name),
+		sub);
+};
 var $elm$core$Dict$Black = 1;
 var $elm$core$Dict$RBNode_elm_builtin = F5(
 	function (a, b, c, d, e) {
@@ -6135,6 +5438,7 @@ var $elm$core$Dict$balance = F5(
 			}
 		}
 	});
+var $elm$core$Basics$compare = _Utils_compare;
 var $elm$core$Dict$insertHelp = F3(
 	function (key, value, dict) {
 		if (dict.$ === -2) {
@@ -6183,27 +5487,18 @@ var $elm$core$Dict$insert = F3(
 			return x;
 		}
 	});
-var $elm$time$Time$addMySub = F2(
-	function (_v0, state) {
-		var interval = _v0.a;
-		var tagger = _v0.b;
-		var _v1 = A2($elm$core$Dict$get, interval, state);
-		if (_v1.$ === 1) {
-			return A3(
-				$elm$core$Dict$insert,
-				interval,
-				_List_fromArray(
-					[tagger]),
-				state);
-		} else {
-			var taggers = _v1.a;
-			return A3(
-				$elm$core$Dict$insert,
-				interval,
-				A2($elm$core$List$cons, tagger, taggers),
-				state);
-		}
-	});
+var $elm$core$Dict$fromList = function (assocs) {
+	return A3(
+		$elm$core$List$foldl,
+		F2(
+			function (_v0, dict) {
+				var key = _v0.a;
+				var value = _v0.b;
+				return A3($elm$core$Dict$insert, key, value, dict);
+			}),
+		$elm$core$Dict$empty,
+		assocs);
+};
 var $elm$core$Process$kill = _Scheduler_kill;
 var $elm$core$Dict$foldl = F3(
 	function (func, acc, dict) {
@@ -6291,7 +5586,236 @@ var $elm$core$Dict$merge = F6(
 			intermediateResult,
 			leftovers);
 	});
+var $elm$browser$Browser$Events$Event = F2(
+	function (key, event) {
+		return {_: event, ae: key};
+	});
 var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
+var $elm$browser$Browser$Events$spawn = F3(
+	function (router, key, _v0) {
+		var node = _v0.a;
+		var name = _v0.b;
+		var actualNode = function () {
+			if (!node) {
+				return _Browser_doc;
+			} else {
+				return _Browser_window;
+			}
+		}();
+		return A2(
+			$elm$core$Task$map,
+			function (value) {
+				return _Utils_Tuple2(key, value);
+			},
+			A3(
+				_Browser_on,
+				actualNode,
+				name,
+				function (event) {
+					return A2(
+						$elm$core$Platform$sendToSelf,
+						router,
+						A2($elm$browser$Browser$Events$Event, key, event));
+				}));
+	});
+var $elm$core$Dict$union = F2(
+	function (t1, t2) {
+		return A3($elm$core$Dict$foldl, $elm$core$Dict$insert, t2, t1);
+	});
+var $elm$browser$Browser$Events$onEffects = F3(
+	function (router, subs, state) {
+		var stepRight = F3(
+			function (key, sub, _v6) {
+				var deads = _v6.a;
+				var lives = _v6.b;
+				var news = _v6.c;
+				return _Utils_Tuple3(
+					deads,
+					lives,
+					A2(
+						$elm$core$List$cons,
+						A3($elm$browser$Browser$Events$spawn, router, key, sub),
+						news));
+			});
+		var stepLeft = F3(
+			function (_v4, pid, _v5) {
+				var deads = _v5.a;
+				var lives = _v5.b;
+				var news = _v5.c;
+				return _Utils_Tuple3(
+					A2($elm$core$List$cons, pid, deads),
+					lives,
+					news);
+			});
+		var stepBoth = F4(
+			function (key, pid, _v2, _v3) {
+				var deads = _v3.a;
+				var lives = _v3.b;
+				var news = _v3.c;
+				return _Utils_Tuple3(
+					deads,
+					A3($elm$core$Dict$insert, key, pid, lives),
+					news);
+			});
+		var newSubs = A2($elm$core$List$map, $elm$browser$Browser$Events$addKey, subs);
+		var _v0 = A6(
+			$elm$core$Dict$merge,
+			stepLeft,
+			stepBoth,
+			stepRight,
+			state.ai,
+			$elm$core$Dict$fromList(newSubs),
+			_Utils_Tuple3(_List_Nil, $elm$core$Dict$empty, _List_Nil));
+		var deadPids = _v0.a;
+		var livePids = _v0.b;
+		var makeNewPids = _v0.c;
+		return A2(
+			$elm$core$Task$andThen,
+			function (pids) {
+				return $elm$core$Task$succeed(
+					A2(
+						$elm$browser$Browser$Events$State,
+						newSubs,
+						A2(
+							$elm$core$Dict$union,
+							livePids,
+							$elm$core$Dict$fromList(pids))));
+			},
+			A2(
+				$elm$core$Task$andThen,
+				function (_v1) {
+					return $elm$core$Task$sequence(makeNewPids);
+				},
+				$elm$core$Task$sequence(
+					A2($elm$core$List$map, $elm$core$Process$kill, deadPids))));
+	});
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (!_v0.$) {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $elm$browser$Browser$Events$onSelfMsg = F3(
+	function (router, _v0, state) {
+		var key = _v0.ae;
+		var event = _v0._;
+		var toMessage = function (_v2) {
+			var subKey = _v2.a;
+			var _v3 = _v2.b;
+			var node = _v3.a;
+			var name = _v3.b;
+			var decoder = _v3.c;
+			return _Utils_eq(subKey, key) ? A2(_Browser_decodeEvent, decoder, event) : $elm$core$Maybe$Nothing;
+		};
+		var messages = A2($elm$core$List$filterMap, toMessage, state.ar);
+		return A2(
+			$elm$core$Task$andThen,
+			function (_v1) {
+				return $elm$core$Task$succeed(state);
+			},
+			$elm$core$Task$sequence(
+				A2(
+					$elm$core$List$map,
+					$elm$core$Platform$sendToApp(router),
+					messages)));
+	});
+var $elm$browser$Browser$Events$subMap = F2(
+	function (func, _v0) {
+		var node = _v0.a;
+		var name = _v0.b;
+		var decoder = _v0.c;
+		return A3(
+			$elm$browser$Browser$Events$MySub,
+			node,
+			name,
+			A2($elm$json$Json$Decode$map, func, decoder));
+	});
+_Platform_effectManagers['Browser.Events'] = _Platform_createManager($elm$browser$Browser$Events$init, $elm$browser$Browser$Events$onEffects, $elm$browser$Browser$Events$onSelfMsg, 0, $elm$browser$Browser$Events$subMap);
+var $elm$browser$Browser$Events$subscription = _Platform_leaf('Browser.Events');
+var $elm$browser$Browser$Events$on = F3(
+	function (node, name, decoder) {
+		return $elm$browser$Browser$Events$subscription(
+			A3($elm$browser$Browser$Events$MySub, node, name, decoder));
+	});
+var $elm$browser$Browser$Events$onKeyDown = A2($elm$browser$Browser$Events$on, 0, 'keydown');
+var $ohanhi$keyboard$Keyboard$downs = function (toMsg) {
+	return $elm$browser$Browser$Events$onKeyDown(
+		A2($elm$json$Json$Decode$map, toMsg, $ohanhi$keyboard$Keyboard$eventKeyDecoder));
+};
+var $elm$time$Time$Every = F2(
+	function (a, b) {
+		return {$: 0, a: a, b: b};
+	});
+var $elm$time$Time$State = F2(
+	function (taggers, processes) {
+		return {al: processes, as: taggers};
+	});
+var $elm$time$Time$init = $elm$core$Task$succeed(
+	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
+var $elm$core$Dict$get = F2(
+	function (targetKey, dict) {
+		get:
+		while (true) {
+			if (dict.$ === -2) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
+				switch (_v1) {
+					case 0:
+						var $temp$targetKey = targetKey,
+							$temp$dict = left;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+					case 1:
+						return $elm$core$Maybe$Just(value);
+					default:
+						var $temp$targetKey = targetKey,
+							$temp$dict = right;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+				}
+			}
+		}
+	});
+var $elm$time$Time$addMySub = F2(
+	function (_v0, state) {
+		var interval = _v0.a;
+		var tagger = _v0.b;
+		var _v1 = A2($elm$core$Dict$get, interval, state);
+		if (_v1.$ === 1) {
+			return A3(
+				$elm$core$Dict$insert,
+				interval,
+				_List_fromArray(
+					[tagger]),
+				state);
+		} else {
+			var taggers = _v1.a;
+			return A3(
+				$elm$core$Dict$insert,
+				interval,
+				A2($elm$core$List$cons, tagger, taggers),
+				state);
+		}
+	});
 var $elm$time$Time$Name = function (a) {
 	return {$: 0, a: a};
 };
@@ -6329,7 +5853,7 @@ var $elm$time$Time$spawnHelp = F3(
 	});
 var $elm$time$Time$onEffects = F3(
 	function (router, subs, _v0) {
-		var processes = _v0.aA;
+		var processes = _v0.al;
 		var rightStep = F3(
 			function (_v6, id, _v7) {
 				var spawns = _v7.a;
@@ -6398,7 +5922,7 @@ var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
 var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $elm$time$Time$onSelfMsg = F3(
 	function (router, interval, state) {
-		var _v0 = A2($elm$core$Dict$get, interval, state.aH);
+		var _v0 = A2($elm$core$Dict$get, interval, state.as);
 		if (_v0.$ === 1) {
 			return $elm$core$Task$succeed(state);
 		} else {
@@ -6423,6 +5947,11 @@ var $elm$time$Time$onSelfMsg = F3(
 				A2($elm$core$Task$andThen, tellTaggers, $elm$time$Time$now));
 		}
 	});
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
 var $elm$time$Time$subMap = F2(
 	function (f, _v0) {
 		var interval = _v0.a;
@@ -6441,632 +5970,81 @@ var $elm$time$Time$every = F2(
 	});
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (model) {
-	var tick = function () {
-		var _v3 = model.h;
-		switch (_v3.$) {
-			case 1:
-				return model.r ? $elm$core$Platform$Sub$none : A2(
-					$elm$time$Time$every,
-					model.G,
-					function (_v4) {
-						return $author$project$Main$Tick;
-					});
-			case 0:
-				return $elm$core$Platform$Sub$batch(
-					_List_fromArray(
-						[
-							A2(
-							$elm$time$Time$every,
-							model.w,
-							function (_v5) {
-								return $author$project$Main$BootTick;
-							}),
-							A2(
-							$elm$time$Time$every,
-							model.U,
-							function (_v6) {
-								return $author$project$Main$BlackoutTick;
-							})
-						]));
-			default:
-				return A2(
-					$elm$time$Time$every,
-					1000,
-					function (_v7) {
-						return $author$project$Main$QuineTick;
-					});
-		}
-	}();
-	var lightBackgroundTick = A2(
+	var tickSub = model.t ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.Y,
-		function (_v2) {
-			return $author$project$Main$LightBackgroundTick;
-		});
-	var defaultBackgroundTick = A2(
-		$elm$time$Time$every,
-		277,
-		function (_v1) {
-			return $author$project$Main$DefaultBackgroundTick;
-		});
-	var darkBackgroundTick = A2(
-		$elm$time$Time$every,
-		model.V,
+		model.A,
 		function (_v0) {
-			return $author$project$Main$DarkBackgroundTick;
+			return $author$project$Main$Tick;
 		});
+	var keySub = $ohanhi$keyboard$Keyboard$downs($author$project$Main$KeyDown);
 	return $elm$core$Platform$Sub$batch(
 		_List_fromArray(
-			[tick, defaultBackgroundTick, darkBackgroundTick, lightBackgroundTick]));
+			[tickSub, keySub]));
 };
-var $author$project$Main$blackoutColor = '#404040';
-var $author$project$Main$darkBackgroundColor = '#696969';
-var $author$project$Main$lightBackgroundColor = '#989898';
-var $author$project$Main$updateBackgroundColor = F2(
-	function (color, model) {
-		return _Utils_update(
-			model,
-			{N: color});
-	});
-var $author$project$Main$Booted = {$: 1};
-var $author$project$Main$Quining = function (a) {
-	return {$: 2, a: a};
-};
-var $author$project$Main$updateBootTick = function (model) {
-	var deviceStatus = function () {
-		var _v0 = model.h;
-		switch (_v0.$) {
-			case 0:
-				var ticks = _v0.a;
-				return (_Utils_cmp(ticks, 6 * model.w) < 1) ? $author$project$Main$Booting(ticks + model.w) : $author$project$Main$Booted;
-			case 1:
-				return $author$project$Main$Booted;
-			default:
-				var qm = _v0.a;
-				return $author$project$Main$Quining(qm);
-		}
-	}();
-	return _Utils_update(
-		model,
-		{h: deviceStatus});
-};
-var $author$project$Main$updateDataSource = F2(
-	function (dataSource, model) {
-		var deviceStatus = function () {
-			var _v0 = model.h;
-			if (_v0.$ === 2) {
-				return $author$project$Main$Booted;
-			} else {
-				return model.h;
-			}
-		}();
-		return A2($author$project$Main$initModel, deviceStatus, dataSource);
-	});
-var $author$project$Main$Ongoing = function (a) {
-	return {$: 1, a: a};
-};
-var $elm$core$Array$length = function (_v0) {
-	var len = _v0.a;
-	return len;
-};
-var $cmditch$elm_bigint$BigInt$one = $cmditch$elm_bigint$BigInt$fromInt(1);
-var $cmditch$elm_bigint$BigInt$abs = function (bigInt) {
-	switch (bigInt.$) {
-		case 2:
-			return $cmditch$elm_bigint$BigInt$Zer;
-		case 1:
-			var mag = bigInt.a;
-			return $cmditch$elm_bigint$BigInt$Pos(mag);
-		default:
-			var i = bigInt;
-			return i;
-	}
-};
-var $cmditch$elm_bigint$BigInt$MagnitudePair = $elm$core$Basics$identity;
-var $cmditch$elm_bigint$BigInt$sameSizeRaw = F2(
-	function (xs, ys) {
-		var _v0 = _Utils_Tuple2(xs, ys);
-		if (!_v0.a.b) {
-			if (!_v0.b.b) {
-				return _List_Nil;
-			} else {
-				var _v2 = _v0.b;
-				var y = _v2.a;
-				var ys_ = _v2.b;
-				return A2(
-					$elm$core$List$cons,
-					_Utils_Tuple2(0, y),
-					A2($cmditch$elm_bigint$BigInt$sameSizeRaw, _List_Nil, ys_));
-			}
-		} else {
-			if (!_v0.b.b) {
-				var _v1 = _v0.a;
-				var x = _v1.a;
-				var xs_ = _v1.b;
-				return A2(
-					$elm$core$List$cons,
-					_Utils_Tuple2(x, 0),
-					A2($cmditch$elm_bigint$BigInt$sameSizeRaw, xs_, _List_Nil));
-			} else {
-				var _v3 = _v0.a;
-				var x = _v3.a;
-				var xs_ = _v3.b;
-				var _v4 = _v0.b;
-				var y = _v4.a;
-				var ys_ = _v4.b;
-				return A2(
-					$elm$core$List$cons,
-					_Utils_Tuple2(x, y),
-					A2($cmditch$elm_bigint$BigInt$sameSizeRaw, xs_, ys_));
-			}
-		}
-	});
-var $cmditch$elm_bigint$BigInt$sameSizeNotNormalized = F2(
-	function (_v0, _v1) {
-		var xs = _v0;
-		var ys = _v1;
-		return A2($cmditch$elm_bigint$BigInt$sameSizeRaw, xs, ys);
-	});
-var $cmditch$elm_bigint$BigInt$toPositiveSign = function (bigInt) {
-	switch (bigInt.$) {
-		case 2:
-			return A2($cmditch$elm_bigint$BigInt$mkBigIntNotNormalised, 2, _List_Nil);
-		case 1:
-			var digits = bigInt.a;
-			return A2(
-				$cmditch$elm_bigint$BigInt$mkBigIntNotNormalised,
-				0,
-				$cmditch$elm_bigint$BigInt$reverseMagnitude(digits));
-		default:
-			var digits = bigInt.a;
-			return A2($cmditch$elm_bigint$BigInt$mkBigIntNotNormalised, 0, digits);
-	}
-};
-var $cmditch$elm_bigint$BigInt$add = F2(
-	function (a, b) {
-		var _v0 = $cmditch$elm_bigint$BigInt$toPositiveSign(b);
-		var mb = _v0.b;
-		var _v1 = $cmditch$elm_bigint$BigInt$toPositiveSign(a);
-		var ma = _v1.b;
-		var _v2 = A2($cmditch$elm_bigint$BigInt$sameSizeNotNormalized, ma, mb);
-		var pairs = _v2;
-		var added = A2(
-			$elm$core$List$map,
-			function (_v3) {
-				var a_ = _v3.a;
-				var b_ = _v3.b;
-				return a_ + b_;
-			},
-			pairs);
-		return $cmditch$elm_bigint$BigInt$normalise(
-			A2($cmditch$elm_bigint$BigInt$BigIntNotNormalised, 0, added));
-	});
-var $cmditch$elm_bigint$BigInt$compareMagnitude = F4(
-	function (x, y, xs, ys) {
-		compareMagnitude:
-		while (true) {
-			var _v0 = _Utils_Tuple2(xs, ys);
-			if (!_v0.a.b) {
-				if (!_v0.b.b) {
-					return A2($elm$core$Basics$compare, x, y);
-				} else {
-					return 0;
-				}
-			} else {
-				if (!_v0.b.b) {
-					return 2;
-				} else {
-					var _v1 = _v0.a;
-					var x_ = _v1.a;
-					var xss = _v1.b;
-					var _v2 = _v0.b;
-					var y_ = _v2.a;
-					var yss = _v2.b;
-					if (_Utils_eq(x_, y_)) {
-						var $temp$x = x,
-							$temp$y = y,
-							$temp$xs = xss,
-							$temp$ys = yss;
-						x = $temp$x;
-						y = $temp$y;
-						xs = $temp$xs;
-						ys = $temp$ys;
-						continue compareMagnitude;
-					} else {
-						var $temp$x = x_,
-							$temp$y = y_,
-							$temp$xs = xss,
-							$temp$ys = yss;
-						x = $temp$x;
-						y = $temp$y;
-						xs = $temp$xs;
-						ys = $temp$ys;
-						continue compareMagnitude;
-					}
-				}
-			}
-		}
-	});
-var $cmditch$elm_bigint$BigInt$orderNegate = function (x) {
-	switch (x) {
-		case 0:
-			return 2;
-		case 1:
-			return 1;
-		default:
-			return 0;
-	}
-};
-var $cmditch$elm_bigint$BigInt$compare = F2(
-	function (int1, int2) {
-		var _v0 = _Utils_Tuple2(int1, int2);
-		switch (_v0.a.$) {
-			case 0:
-				if (!_v0.b.$) {
-					var mag1 = _v0.a.a;
-					var mag2 = _v0.b.a;
-					return A4($cmditch$elm_bigint$BigInt$compareMagnitude, 0, 0, mag1, mag2);
-				} else {
-					return 2;
-				}
-			case 1:
-				if (_v0.b.$ === 1) {
-					var mag1 = _v0.a.a;
-					var mag2 = _v0.b.a;
-					return $cmditch$elm_bigint$BigInt$orderNegate(
-						A4($cmditch$elm_bigint$BigInt$compareMagnitude, 0, 0, mag1, mag2));
-				} else {
-					return 0;
-				}
-			default:
-				switch (_v0.b.$) {
-					case 0:
-						var _v1 = _v0.a;
-						return 0;
-					case 2:
-						var _v2 = _v0.a;
-						var _v3 = _v0.b;
-						return 1;
-					default:
-						var _v4 = _v0.a;
-						return 2;
-				}
-		}
-	});
-var $cmditch$elm_bigint$BigInt$gt = F2(
-	function (x, y) {
-		return A2($cmditch$elm_bigint$BigInt$compare, x, y) === 2;
-	});
-var $elm$core$Basics$not = _Basics_not;
-var $cmditch$elm_bigint$BigInt$lte = F2(
-	function (x, y) {
-		return !A2($cmditch$elm_bigint$BigInt$gt, x, y);
-	});
-var $cmditch$elm_bigint$BigInt$magnitude = function (bigInt) {
-	switch (bigInt.$) {
-		case 2:
-			return _List_Nil;
-		case 0:
-			var mag = bigInt.a;
-			return mag;
-		default:
-			var mag = bigInt.a;
-			return mag;
-	}
-};
-var $cmditch$elm_bigint$BigInt$mulSingleDigit = F2(
-	function (_v0, d) {
-		var xs = _v0;
-		return $cmditch$elm_bigint$BigInt$normaliseMagnitude(
-			A2(
-				$elm$core$List$map,
-				$elm$core$Basics$mul(d),
-				xs));
-	});
-var $cmditch$elm_bigint$BigInt$mulMagnitudes = F2(
-	function (_v0, _v1) {
-		var mag1 = _v0;
-		var mag2 = _v1;
-		if (!mag1.b) {
-			return _List_Nil;
-		} else {
-			if (!mag1.b.b) {
-				var m = mag1.a;
-				return A2($cmditch$elm_bigint$BigInt$mulSingleDigit, mag2, m);
-			} else {
-				var m = mag1.a;
-				var mx = mag1.b;
-				var accum = A2($cmditch$elm_bigint$BigInt$mulSingleDigit, mag2, m);
-				var _v3 = A2($cmditch$elm_bigint$BigInt$mulMagnitudes, mx, mag2);
-				var rest = _v3;
-				var bigInt = A2(
-					$cmditch$elm_bigint$BigInt$add,
-					A2($cmditch$elm_bigint$BigInt$mkBigInt, 0, accum),
-					A2(
-						$cmditch$elm_bigint$BigInt$mkBigInt,
-						0,
-						A2($elm$core$List$cons, 0, rest)));
-				return $cmditch$elm_bigint$BigInt$magnitude(bigInt);
-			}
-		}
-	});
-var $cmditch$elm_bigint$BigInt$sign = function (bigInt) {
-	switch (bigInt.$) {
-		case 2:
-			return 2;
-		case 0:
-			return 0;
-		default:
-			return 1;
-	}
-};
-var $cmditch$elm_bigint$BigInt$signProduct = F2(
-	function (x, y) {
-		return ((x === 2) || (y === 2)) ? 2 : (_Utils_eq(x, y) ? 0 : 1);
-	});
-var $cmditch$elm_bigint$BigInt$mul = F2(
-	function (int1, int2) {
-		return A2(
-			$cmditch$elm_bigint$BigInt$mkBigInt,
-			A2(
-				$cmditch$elm_bigint$BigInt$signProduct,
-				$cmditch$elm_bigint$BigInt$sign(int1),
-				$cmditch$elm_bigint$BigInt$sign(int2)),
-			A2(
-				$cmditch$elm_bigint$BigInt$mulMagnitudes,
-				$cmditch$elm_bigint$BigInt$magnitude(int1),
-				$cmditch$elm_bigint$BigInt$magnitude(int2)));
-	});
-var $cmditch$elm_bigint$BigInt$negate = function (bigInt) {
-	switch (bigInt.$) {
-		case 2:
-			return $cmditch$elm_bigint$BigInt$Zer;
-		case 0:
-			var mag = bigInt.a;
-			return $cmditch$elm_bigint$BigInt$Neg(mag);
-		default:
-			var mag = bigInt.a;
-			return $cmditch$elm_bigint$BigInt$Pos(mag);
-	}
-};
-var $cmditch$elm_bigint$BigInt$sub = F2(
-	function (a, b) {
-		return A2(
-			$cmditch$elm_bigint$BigInt$add,
-			a,
-			$cmditch$elm_bigint$BigInt$negate(b));
-	});
-var $cmditch$elm_bigint$BigInt$zero = $cmditch$elm_bigint$BigInt$fromInt(0);
-var $cmditch$elm_bigint$BigInt$divmodDigit_ = F4(
-	function (to_test, padding, num, den) {
-		if (!to_test) {
-			return _Utils_Tuple2($cmditch$elm_bigint$BigInt$zero, num);
-		} else {
-			var x = $cmditch$elm_bigint$BigInt$fromInt(to_test);
-			var candidate = A2(
-				$cmditch$elm_bigint$BigInt$mul,
-				A2($cmditch$elm_bigint$BigInt$mul, x, den),
-				padding);
-			var _v0 = A2($cmditch$elm_bigint$BigInt$lte, candidate, num) ? _Utils_Tuple2(
-				A2($cmditch$elm_bigint$BigInt$mul, x, padding),
-				A2($cmditch$elm_bigint$BigInt$sub, num, candidate)) : _Utils_Tuple2($cmditch$elm_bigint$BigInt$zero, num);
-			var newdiv = _v0.a;
-			var newmod = _v0.b;
-			var _v1 = A4($cmditch$elm_bigint$BigInt$divmodDigit_, (to_test / 2) | 0, padding, newmod, den);
-			var restdiv = _v1.a;
-			var restmod = _v1.b;
-			return _Utils_Tuple2(
-				A2($cmditch$elm_bigint$BigInt$add, newdiv, restdiv),
-				restmod);
-		}
-	});
-var $cmditch$elm_bigint$BigInt$maxDigitBits = $elm$core$Basics$ceiling(
-	A2($elm$core$Basics$logBase, 2, $cmditch$elm_bigint$Constants$maxDigitValue));
-var $cmditch$elm_bigint$BigInt$divmodDigit = F3(
-	function (padding, x, y) {
-		return A4(
-			$cmditch$elm_bigint$BigInt$divmodDigit_,
-			A2($elm$core$Basics$pow, 2, $cmditch$elm_bigint$BigInt$maxDigitBits),
-			padding,
-			x,
-			y);
-	});
-var $elm$core$Basics$always = F2(
-	function (a, _v0) {
-		return a;
-	});
-var $cmditch$elm_bigint$BigInt$repeatedly = F3(
-	function (f, x, n) {
-		return A3(
-			$elm$core$List$foldl,
-			$elm$core$Basics$always(f),
-			x,
-			A2($elm$core$List$range, 1, n));
-	});
-var $cmditch$elm_bigint$BigInt$padDigits = function (n) {
-	return A3(
-		$cmditch$elm_bigint$BigInt$repeatedly,
-		$cmditch$elm_bigint$BigInt$mul(
-			$cmditch$elm_bigint$BigInt$fromInt($cmditch$elm_bigint$BigInt$baseDigit)),
-		$cmditch$elm_bigint$BigInt$one,
-		n);
-};
-var $cmditch$elm_bigint$BigInt$divMod_ = F3(
-	function (n, num, den) {
-		if (!n) {
-			return A3(
-				$cmditch$elm_bigint$BigInt$divmodDigit,
-				$cmditch$elm_bigint$BigInt$padDigits(n),
-				num,
-				den);
-		} else {
-			var _v0 = A3(
-				$cmditch$elm_bigint$BigInt$divmodDigit,
-				$cmditch$elm_bigint$BigInt$padDigits(n),
-				num,
-				den);
-			var cdiv = _v0.a;
-			var cmod = _v0.b;
-			var _v1 = A3($cmditch$elm_bigint$BigInt$divMod_, n - 1, cmod, den);
-			var rdiv = _v1.a;
-			var rmod = _v1.b;
-			return _Utils_Tuple2(
-				A2($cmditch$elm_bigint$BigInt$add, cdiv, rdiv),
-				rmod);
-		}
-	});
-var $cmditch$elm_bigint$BigInt$toDigits = function (bigInt) {
-	switch (bigInt.$) {
-		case 2:
-			return _List_Nil;
-		case 0:
-			var ds = bigInt.a;
-			return ds;
-		default:
-			var ds = bigInt.a;
-			return ds;
-	}
-};
-var $cmditch$elm_bigint$BigInt$divmod = F2(
-	function (num, den) {
-		if (_Utils_eq(den, $cmditch$elm_bigint$BigInt$zero)) {
-			return $elm$core$Maybe$Nothing;
-		} else {
-			var cand_l = ($elm$core$List$length(
-				$cmditch$elm_bigint$BigInt$toDigits(num)) - $elm$core$List$length(
-				$cmditch$elm_bigint$BigInt$toDigits(den))) + 1;
-			var _v0 = A3(
-				$cmditch$elm_bigint$BigInt$divMod_,
-				A2($elm$core$Basics$max, 0, cand_l),
-				$cmditch$elm_bigint$BigInt$abs(num),
-				$cmditch$elm_bigint$BigInt$abs(den));
-			var d = _v0.a;
-			var m = _v0.b;
-			return $elm$core$Maybe$Just(
-				_Utils_Tuple2(
-					A2(
-						$cmditch$elm_bigint$BigInt$mkBigInt,
-						A2(
-							$cmditch$elm_bigint$BigInt$signProduct,
-							$cmditch$elm_bigint$BigInt$sign(num),
-							$cmditch$elm_bigint$BigInt$sign(den)),
-						$cmditch$elm_bigint$BigInt$magnitude(d)),
-					A2(
-						$cmditch$elm_bigint$BigInt$mkBigInt,
-						$cmditch$elm_bigint$BigInt$sign(num),
-						$cmditch$elm_bigint$BigInt$magnitude(m))));
-		}
-	});
-var $cmditch$elm_bigint$BigInt$div = F2(
-	function (num, den) {
-		return A2(
-			$elm$core$Maybe$withDefault,
-			$cmditch$elm_bigint$BigInt$zero,
-			A2(
-				$elm$core$Maybe$map,
-				$elm$core$Tuple$first,
-				A2($cmditch$elm_bigint$BigInt$divmod, num, den)));
-	});
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $elm$core$Basics$modBy = _Basics_modBy;
-var $cmditch$elm_bigint$BigInt$isEven = function (num) {
-	var even = function (i) {
-		return !A2($elm$core$Basics$modBy, 2, i);
-	};
-	switch (num.$) {
-		case 2:
-			return true;
-		case 0:
-			var mag = num.a;
-			return even(
-				A2(
-					$elm$core$Maybe$withDefault,
-					0,
-					$elm$core$List$head(mag)));
-		default:
-			var mag = num.a;
-			return even(
-				A2(
-					$elm$core$Maybe$withDefault,
-					0,
-					$elm$core$List$head(mag)));
-	}
-};
-var $cmditch$elm_bigint$BigInt$square = function (num) {
-	return A2($cmditch$elm_bigint$BigInt$mul, num, num);
-};
-var $cmditch$elm_bigint$BigInt$two = $cmditch$elm_bigint$BigInt$fromInt(2);
-var $cmditch$elm_bigint$BigInt$powHelp = F3(
-	function (work, num, exp) {
-		powHelp:
-		while (true) {
-			switch (exp.$) {
-				case 2:
-					return $cmditch$elm_bigint$BigInt$one;
-				case 1:
-					return $cmditch$elm_bigint$BigInt$Zer;
-				default:
-					if (_Utils_eq(exp, $cmditch$elm_bigint$BigInt$one)) {
-						return A2($cmditch$elm_bigint$BigInt$mul, work, num);
-					} else {
-						if ($cmditch$elm_bigint$BigInt$isEven(exp)) {
-							var $temp$work = work,
-								$temp$num = $cmditch$elm_bigint$BigInt$square(num),
-								$temp$exp = A2($cmditch$elm_bigint$BigInt$div, exp, $cmditch$elm_bigint$BigInt$two);
-							work = $temp$work;
-							num = $temp$num;
-							exp = $temp$exp;
-							continue powHelp;
-						} else {
-							var $temp$work = A2($cmditch$elm_bigint$BigInt$mul, num, work),
-								$temp$num = $cmditch$elm_bigint$BigInt$square(num),
-								$temp$exp = A2(
-								$cmditch$elm_bigint$BigInt$div,
-								A2($cmditch$elm_bigint$BigInt$sub, exp, $cmditch$elm_bigint$BigInt$one),
-								$cmditch$elm_bigint$BigInt$two);
-							work = $temp$work;
-							num = $temp$num;
-							exp = $temp$exp;
-							continue powHelp;
-						}
-					}
-			}
-		}
-	});
-var $cmditch$elm_bigint$BigInt$pow = F2(
-	function (base, exp) {
-		return A3($cmditch$elm_bigint$BigInt$powHelp, $cmditch$elm_bigint$BigInt$one, base, exp);
-	});
-var $author$project$Main$quineA0 = function (computer) {
-	var len = $elm$core$Array$length(computer.m);
-	var bigLen = $cmditch$elm_bigint$BigInt$fromInt(len);
-	var big8 = $cmditch$elm_bigint$BigInt$fromInt(8);
-	var big1 = $cmditch$elm_bigint$BigInt$fromInt(1);
-	var a0 = A2(
-		$cmditch$elm_bigint$BigInt$pow,
-		big8,
-		A2($cmditch$elm_bigint$BigInt$sub, bigLen, big1));
-	return a0;
-};
-var $author$project$Main$Done = function (a) {
+var $author$project$Main$Input = 0;
+var $ohanhi$keyboard$Keyboard$ArrowDown = {$: 18};
+var $ohanhi$keyboard$Keyboard$ArrowLeft = {$: 19};
+var $ohanhi$keyboard$Keyboard$ArrowRight = {$: 20};
+var $ohanhi$keyboard$Keyboard$ArrowUp = {$: 21};
+var $ohanhi$keyboard$Keyboard$Character = function (a) {
 	return {$: 0, a: a};
 };
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
+var $ohanhi$keyboard$Keyboard$rawValue = function (_v0) {
+	var key = _v0;
+	return key;
+};
+var $elm$core$String$toUpper = _String_toUpper;
+var $ohanhi$keyboard$Keyboard$Arrows$arrowKey = function (rawKey) {
+	var _v0 = $ohanhi$keyboard$Keyboard$rawValue(rawKey);
+	switch (_v0) {
+		case 'ArrowDown':
+			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowDown);
+		case 'ArrowLeft':
+			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowLeft);
+		case 'ArrowRight':
+			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowRight);
+		case 'ArrowUp':
+			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowUp);
+		case 'Down':
+			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowDown);
+		case 'Left':
+			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowLeft);
+		case 'Right':
+			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowRight);
+		case 'Up':
+			return $elm$core$Maybe$Just($ohanhi$keyboard$Keyboard$ArrowUp);
+		default:
+			var other = _v0;
+			var upper = $elm$core$String$toUpper(other);
+			return ((upper === 'W') || ((upper === 'A') || ((upper === 'S') || (upper === 'D')))) ? $elm$core$Maybe$Just(
+				$ohanhi$keyboard$Keyboard$Character(upper)) : $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Main$updateClear = function (model) {
+	return $author$project$Main$initModel(model.I);
+};
+var $author$project$Main$Angle = 2;
+var $author$project$Main$Bar = 3;
+var $author$project$Main$Box = 4;
+var $author$project$Main$Cross = 1;
+var $author$project$Main$nextShape = function (_v0) {
+	var shape = _v0.a;
+	switch (shape) {
+		case 0:
+			return _Utils_Tuple2(1, 0);
+		case 1:
+			return _Utils_Tuple2(2, 0);
+		case 2:
+			return _Utils_Tuple2(3, 0);
+		case 3:
+			return _Utils_Tuple2(4, 0);
+		default:
+			return _Utils_Tuple2(0, 0);
+	}
+};
+var $author$project$Main$Stopped = function (a) {
+	return {$: 1, a: a};
+};
 var $elm$core$Bitwise$and = _Bitwise_and;
 var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
 var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
@@ -7109,705 +6087,910 @@ var $elm$core$Array$get = F2(
 			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
 			A3($elm$core$Array$getHelp, startShift, index, tree)));
 	});
-var $author$project$Main$literal = function (computer) {
-	var pt = computer.s;
-	return A2(
-		$elm$core$Maybe$withDefault,
-		0,
-		A2($elm$core$Array$get, pt + 1, computer.m));
+var $tortus$elm_array_2d$Array2D$getRow = F2(
+	function (row, array2d) {
+		return A2($elm$core$Array$get, row, array2d.a);
+	});
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $elm$core$Elm$JsArray$unsafeSet = _JsArray_unsafeSet;
+var $elm$core$Array$setHelp = F4(
+	function (shift, index, value, tree) {
+		var pos = $elm$core$Array$bitMask & (index >>> shift);
+		var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+		if (!_v0.$) {
+			var subTree = _v0.a;
+			var newSub = A4($elm$core$Array$setHelp, shift - $elm$core$Array$shiftStep, index, value, subTree);
+			return A3(
+				$elm$core$Elm$JsArray$unsafeSet,
+				pos,
+				$elm$core$Array$SubTree(newSub),
+				tree);
+		} else {
+			var values = _v0.a;
+			var newLeaf = A3($elm$core$Elm$JsArray$unsafeSet, $elm$core$Array$bitMask & index, value, values);
+			return A3(
+				$elm$core$Elm$JsArray$unsafeSet,
+				pos,
+				$elm$core$Array$Leaf(newLeaf),
+				tree);
+		}
+	});
+var $elm$core$Array$set = F3(
+	function (index, value, array) {
+		var len = array.a;
+		var startShift = array.b;
+		var tree = array.c;
+		var tail = array.d;
+		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? array : ((_Utils_cmp(
+			index,
+			$elm$core$Array$tailIndex(len)) > -1) ? A4(
+			$elm$core$Array$Array_elm_builtin,
+			len,
+			startShift,
+			tree,
+			A3($elm$core$Elm$JsArray$unsafeSet, $elm$core$Array$bitMask & index, value, tail)) : A4(
+			$elm$core$Array$Array_elm_builtin,
+			len,
+			startShift,
+			A4($elm$core$Array$setHelp, startShift, index, value, tree),
+			tail));
+	});
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $tortus$elm_array_2d$Array2D$set = F4(
+	function (row, col, newValue, array2d) {
+		return A2(
+			$elm$core$Maybe$withDefault,
+			array2d,
+			A2(
+				$elm$core$Maybe$map,
+				function (rowAry) {
+					return _Utils_update(
+						array2d,
+						{
+							a: A3(
+								$elm$core$Array$set,
+								row,
+								A3($elm$core$Array$set, col, newValue, rowAry),
+								array2d.a)
+						});
+				},
+				A2($tortus$elm_array_2d$Array2D$getRow, row, array2d)));
+	});
+var $author$project$Main$addRockPositions = F2(
+	function (chamber, positions) {
+		addRockPositions:
+		while (true) {
+			if (!positions.b) {
+				return chamber;
+			} else {
+				var _v1 = positions.a;
+				var x = _v1.a;
+				var y = _v1.b;
+				var rest = positions.b;
+				var $temp$chamber = A4($tortus$elm_array_2d$Array2D$set, y, x, '#', chamber),
+					$temp$positions = rest;
+				chamber = $temp$chamber;
+				positions = $temp$positions;
+				continue addRockPositions;
+			}
+		}
+	});
+var $elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (!maybeValue.$) {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $tortus$elm_array_2d$Array2D$get = F3(
+	function (row, col, array2d) {
+		return A2(
+			$elm$core$Maybe$andThen,
+			$elm$core$Array$get(col),
+			A2($tortus$elm_array_2d$Array2D$getRow, row, array2d));
+	});
+var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
+	return array2d.i;
 };
-var $author$project$Main$combo = function (computer) {
-	var _v0 = $author$project$Main$literal(computer);
-	switch (_v0) {
-		case 0:
-			return $cmditch$elm_bigint$BigInt$fromInt(0);
-		case 1:
-			return $cmditch$elm_bigint$BigInt$fromInt(1);
-		case 2:
-			return $cmditch$elm_bigint$BigInt$fromInt(2);
-		case 3:
-			return $cmditch$elm_bigint$BigInt$fromInt(3);
-		case 4:
-			return computer.e;
-		case 5:
-			return computer.p;
-		case 6:
-			return computer.t;
-		default:
-			return $cmditch$elm_bigint$BigInt$fromInt(0);
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
+var $elm$core$Array$length = function (_v0) {
+	var len = _v0.a;
+	return len;
+};
+var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
+	return $elm$core$Array$length(array2d.a);
+};
+var $author$project$Main$getAllPositions = function (board) {
+	var ys = A2(
+		$elm$core$List$range,
+		0,
+		$tortus$elm_array_2d$Array2D$rows(board) - 1);
+	var xs = A2(
+		$elm$core$List$range,
+		0,
+		$tortus$elm_array_2d$Array2D$columns(board) - 1);
+	return A2(
+		$elm$core$List$concatMap,
+		function (y) {
+			return A2(
+				$elm$core$List$map,
+				function (x) {
+					return _Utils_Tuple2(x, y);
+				},
+				xs);
+		},
+		ys);
+};
+var $elm$core$List$maximum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
 	}
 };
-var $author$project$Main$division = function (computer) {
-	var numerator = computer.e;
-	var denominator = A2(
-		$cmditch$elm_bigint$BigInt$pow,
-		$cmditch$elm_bigint$BigInt$fromInt(2),
-		$author$project$Main$combo(computer));
-	return A2($cmditch$elm_bigint$BigInt$div, numerator, denominator);
-};
-var $author$project$Main$nextInstruction = function (computer) {
-	return _Utils_update(
-		computer,
-		{s: computer.s + 2});
-};
-var $author$project$Main$writeA = F2(
-	function (value, computer) {
-		return _Utils_update(
-			computer,
-			{e: value});
-	});
-var $author$project$Main$adv = function (computer) {
-	return $author$project$Main$nextInstruction(
-		A2(
-			$author$project$Main$writeA,
-			$author$project$Main$division(computer),
-			computer));
-};
-var $author$project$Main$writeB = F2(
-	function (value, computer) {
-		return _Utils_update(
-			computer,
-			{p: value});
-	});
-var $author$project$Main$bdv = function (computer) {
-	return $author$project$Main$nextInstruction(
-		A2(
-			$author$project$Main$writeB,
-			$author$project$Main$division(computer),
-			computer));
-};
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
-var $cmditch$elm_bigint$BigInt$modBy = F2(
-	function (modulus, x) {
-		return A2(
-			$elm$core$Maybe$map,
-			$elm$core$Tuple$second,
-			A2($cmditch$elm_bigint$BigInt$divmod, x, modulus));
-	});
-var $author$project$Main$bst = function (computer) {
-	return $author$project$Main$nextInstruction(
-		A2(
-			$author$project$Main$writeB,
+var $author$project$Main$findHighestRock = function (chamber) {
+	var positions = $author$project$Main$getAllPositions(chamber);
+	var index = A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		$elm$core$List$maximum(
 			A2(
-				$elm$core$Maybe$withDefault,
-				$cmditch$elm_bigint$BigInt$fromInt(0),
-				A2(
-					$cmditch$elm_bigint$BigInt$modBy,
-					$cmditch$elm_bigint$BigInt$fromInt(8),
-					$author$project$Main$combo(computer))),
-			computer));
+				$elm$core$List$filterMap,
+				function (_v0) {
+					var x = _v0.a;
+					var y = _v0.b;
+					return _Utils_eq(
+						A3($tortus$elm_array_2d$Array2D$get, y, x, chamber),
+						$elm$core$Maybe$Just('#')) ? $elm$core$Maybe$Just(y) : $elm$core$Maybe$Nothing;
+				},
+				positions)));
+	return index + 1;
 };
-var $author$project$Main$bitXor = function (_v0) {
-	var bit1 = _v0.a;
-	var bit2 = _v0.b;
-	return _Utils_eq(bit1, bit2) ? $cmditch$elm_bigint$BigInt$fromInt(0) : $cmditch$elm_bigint$BigInt$fromInt(1);
-};
-var $author$project$Main$fromBitsLoop = F3(
-	function (big0, big2, bits) {
-		return A3(
-			$elm$core$List$foldl,
-			$cmditch$elm_bigint$BigInt$add,
-			big0,
-			A2(
-				$elm$core$List$indexedMap,
-				F2(
-					function (ix, b) {
+var $author$project$Main$movePoint = F2(
+	function (_v0, _v1) {
+		var x0 = _v0.a;
+		var y0 = _v0.b;
+		var x1 = _v1.a;
+		var y1 = _v1.b;
+		return _Utils_Tuple2(x0 + x1, y0 + y1);
+	});
+var $author$project$Main$toRockPositions = function (rock) {
+	if (rock.$ === 1) {
+		return _List_Nil;
+	} else {
+		var _v1 = rock.a;
+		var pos = _v1.a;
+		var _v2 = _v1.b;
+		var shape = _v2.a;
+		var rot = _v2.b;
+		switch (shape) {
+			case 0:
+				return (!rot) ? A2(
+					$elm$core$List$map,
+					$author$project$Main$movePoint(pos),
+					_List_fromArray(
+						[
+							_Utils_Tuple2(0, 0),
+							_Utils_Tuple2(1, 0),
+							_Utils_Tuple2(2, 0),
+							_Utils_Tuple2(3, 0)
+						])) : A2(
+					$elm$core$List$map,
+					$author$project$Main$movePoint(pos),
+					_List_fromArray(
+						[
+							_Utils_Tuple2(0, 0),
+							_Utils_Tuple2(0, 1),
+							_Utils_Tuple2(0, 2),
+							_Utils_Tuple2(0, 3)
+						]));
+			case 1:
+				return A2(
+					$elm$core$List$map,
+					$author$project$Main$movePoint(pos),
+					_List_fromArray(
+						[
+							_Utils_Tuple2(1, 0),
+							_Utils_Tuple2(0, 1),
+							_Utils_Tuple2(1, 1),
+							_Utils_Tuple2(2, 1),
+							_Utils_Tuple2(1, 2)
+						]));
+			case 2:
+				switch (rot) {
+					case 0:
 						return A2(
-							$cmditch$elm_bigint$BigInt$mul,
-							b,
-							A2(
-								$cmditch$elm_bigint$BigInt$pow,
-								big2,
-								$cmditch$elm_bigint$BigInt$fromInt(ix)));
-					}),
-				bits));
-	});
-var $author$project$Main$fromBits = function (bits) {
-	var big2 = $cmditch$elm_bigint$BigInt$fromInt(2);
-	var big0 = $cmditch$elm_bigint$BigInt$fromInt(0);
-	return A3($author$project$Main$fromBitsLoop, big0, big2, bits);
+							$elm$core$List$map,
+							$author$project$Main$movePoint(pos),
+							_List_fromArray(
+								[
+									_Utils_Tuple2(0, 0),
+									_Utils_Tuple2(1, 0),
+									_Utils_Tuple2(2, 0),
+									_Utils_Tuple2(2, 1),
+									_Utils_Tuple2(2, 2)
+								]));
+					case 1:
+						return A2(
+							$elm$core$List$map,
+							$author$project$Main$movePoint(pos),
+							_List_fromArray(
+								[
+									_Utils_Tuple2(0, 2),
+									_Utils_Tuple2(1, 2),
+									_Utils_Tuple2(2, 0),
+									_Utils_Tuple2(2, 1),
+									_Utils_Tuple2(2, 2)
+								]));
+					case 2:
+						return A2(
+							$elm$core$List$map,
+							$author$project$Main$movePoint(pos),
+							_List_fromArray(
+								[
+									_Utils_Tuple2(2, 2),
+									_Utils_Tuple2(1, 2),
+									_Utils_Tuple2(0, 0),
+									_Utils_Tuple2(0, 1),
+									_Utils_Tuple2(0, 2)
+								]));
+					default:
+						return A2(
+							$elm$core$List$map,
+							$author$project$Main$movePoint(pos),
+							_List_fromArray(
+								[
+									_Utils_Tuple2(2, 0),
+									_Utils_Tuple2(1, 0),
+									_Utils_Tuple2(0, 0),
+									_Utils_Tuple2(0, 1),
+									_Utils_Tuple2(0, 2)
+								]));
+				}
+			case 3:
+				return (!rot) ? A2(
+					$elm$core$List$map,
+					$author$project$Main$movePoint(pos),
+					_List_fromArray(
+						[
+							_Utils_Tuple2(0, 0),
+							_Utils_Tuple2(0, 1),
+							_Utils_Tuple2(0, 2),
+							_Utils_Tuple2(0, 3)
+						])) : A2(
+					$elm$core$List$map,
+					$author$project$Main$movePoint(pos),
+					_List_fromArray(
+						[
+							_Utils_Tuple2(0, 0),
+							_Utils_Tuple2(1, 0),
+							_Utils_Tuple2(2, 0),
+							_Utils_Tuple2(3, 0)
+						]));
+			default:
+				return A2(
+					$elm$core$List$map,
+					$author$project$Main$movePoint(pos),
+					_List_fromArray(
+						[
+							_Utils_Tuple2(0, 0),
+							_Utils_Tuple2(1, 0),
+							_Utils_Tuple2(0, 1),
+							_Utils_Tuple2(1, 1)
+						]));
+		}
+	}
 };
-var $author$project$Main$toBitsLoop = F4(
-	function (big0, big2, n, result) {
-		toBitsLoop:
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
 		while (true) {
-			if (A2($cmditch$elm_bigint$BigInt$gt, n, big0)) {
-				var _v0 = A2(
-					$elm$core$Maybe$withDefault,
-					_Utils_Tuple2(big0, big0),
-					A2($cmditch$elm_bigint$BigInt$divmod, n, big2));
-				var divResult = _v0.a;
-				var remResult = _v0.b;
-				var $temp$big0 = big0,
-					$temp$big2 = big2,
-					$temp$n = divResult,
-					$temp$result = A2($elm$core$List$cons, remResult, result);
-				big0 = $temp$big0;
-				big2 = $temp$big2;
-				n = $temp$n;
-				result = $temp$result;
-				continue toBitsLoop;
+			if (!list.b) {
+				return false;
 			} else {
-				return $elm$core$List$reverse(result);
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
 			}
 		}
 	});
-var $author$project$Main$toBits = function (n) {
-	var big2 = $cmditch$elm_bigint$BigInt$fromInt(2);
-	var big0 = $cmditch$elm_bigint$BigInt$fromInt(0);
-	return A4($author$project$Main$toBitsLoop, big0, big2, n, _List_Nil);
-};
-var $author$project$Main$zipWithDefaults = F4(
-	function (a, b, lst1, lst2) {
-		var _v0 = _Utils_Tuple2(lst1, lst2);
-		if (_v0.a.b) {
-			if (_v0.b.b) {
-				var _v1 = _v0.a;
-				var h1 = _v1.a;
-				var r1 = _v1.b;
-				var _v2 = _v0.b;
-				var h2 = _v2.a;
-				var r2 = _v2.b;
-				return A2(
-					$elm$core$List$cons,
-					_Utils_Tuple2(h1, h2),
-					A4($author$project$Main$zipWithDefaults, a, b, r1, r2));
-			} else {
-				var _v3 = _v0.a;
-				var h1 = _v3.a;
-				var r1 = _v3.b;
-				return A2(
-					$elm$core$List$cons,
-					_Utils_Tuple2(h1, b),
-					A4($author$project$Main$zipWithDefaults, a, b, r1, _List_Nil));
-			}
+var $author$project$Main$chamberWidth = 7;
+var $author$project$Main$isForbidden = F2(
+	function (chamber, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		if ((x < 0) || ((_Utils_cmp(x, $author$project$Main$chamberWidth) > -1) || (y < 0))) {
+			return true;
 		} else {
-			if (_v0.b.b) {
-				var _v4 = _v0.b;
-				var h2 = _v4.a;
-				var r2 = _v4.b;
-				return A2(
-					$elm$core$List$cons,
-					_Utils_Tuple2(a, h2),
-					A4($author$project$Main$zipWithDefaults, a, b, _List_Nil, r2));
+			var _v1 = A3($tortus$elm_array_2d$Array2D$get, y, x, chamber);
+			if ((!_v1.$) && ('#' === _v1.a)) {
+				return true;
 			} else {
-				return _List_Nil;
+				return false;
 			}
 		}
 	});
-var $author$project$Main$bigXor = F2(
-	function (a, b) {
-		var big0 = $cmditch$elm_bigint$BigInt$fromInt(0);
-		var bbits = $author$project$Main$toBits(b);
-		var abits = $author$project$Main$toBits(a);
-		var zipped = A4($author$project$Main$zipWithDefaults, big0, big0, abits, bbits);
-		var bits = A2($elm$core$List$map, $author$project$Main$bitXor, zipped);
-		return $author$project$Main$fromBits(bits);
+var $author$project$Main$tryMove = F3(
+	function (chamber, rock, moveFn) {
+		if (rock.$ === 1) {
+			return $elm$core$Result$Err(rock);
+		} else {
+			var _v1 = rock.a;
+			var oldPos = _v1.a;
+			var shape = _v1.b;
+			var _v2 = moveFn(oldPos);
+			var x = _v2.a;
+			var y = _v2.b;
+			if ((x >= 0) && ((_Utils_cmp(x, $author$project$Main$chamberWidth) < 0) && (y >= 0))) {
+				var rockPositions = $author$project$Main$toRockPositions(
+					$author$project$Main$Moving(
+						_Utils_Tuple2(
+							_Utils_Tuple2(x, y),
+							shape)));
+				return A2(
+					$elm$core$List$any,
+					$author$project$Main$isForbidden(chamber),
+					rockPositions) ? $elm$core$Result$Err(rock) : $elm$core$Result$Ok(
+					$author$project$Main$Moving(
+						_Utils_Tuple2(
+							_Utils_Tuple2(x, y),
+							shape)));
+			} else {
+				return $elm$core$Result$Err(rock);
+			}
+		}
 	});
-var $author$project$Main$bxc = function (computer) {
-	return $author$project$Main$nextInstruction(
-		A2(
-			$author$project$Main$writeB,
-			A2($author$project$Main$bigXor, computer.p, computer.t),
-			computer));
-};
-var $author$project$Main$bxl = function (computer) {
-	return $author$project$Main$nextInstruction(
-		A2(
-			$author$project$Main$writeB,
-			A2(
-				$author$project$Main$bigXor,
-				$cmditch$elm_bigint$BigInt$fromInt(
-					$author$project$Main$literal(computer)),
-				computer.p),
-			computer));
-};
-var $author$project$Main$writeC = F2(
-	function (value, computer) {
-		return _Utils_update(
-			computer,
-			{t: value});
-	});
-var $author$project$Main$cdv = function (computer) {
-	return $author$project$Main$nextInstruction(
-		A2(
-			$author$project$Main$writeC,
-			$author$project$Main$division(computer),
-			computer));
-};
-var $author$project$Main$jump = F2(
-	function (target, computer) {
-		return _Utils_update(
-			computer,
-			{s: target});
-	});
-var $author$project$Main$jnz = function (computer) {
-	return _Utils_eq(
-		computer.e,
-		$cmditch$elm_bigint$BigInt$fromInt(0)) ? $author$project$Main$nextInstruction(computer) : A2(
-		$author$project$Main$jump,
-		$author$project$Main$literal(computer),
-		computer);
-};
-var $author$project$Main$output = F2(
-	function (value, computer) {
-		return _Utils_update(
-			computer,
-			{
-				C: A2($elm$core$List$cons, value, computer.C)
+var $author$project$Main$tryMoveDown = F2(
+	function (chamber, rock) {
+		return A3(
+			$author$project$Main$tryMove,
+			chamber,
+			rock,
+			function (_v0) {
+				var x = _v0.a;
+				var y = _v0.b;
+				return _Utils_Tuple2(x, y - 1);
 			});
 	});
-var $elm$core$String$concat = function (strings) {
-	return A2($elm$core$String$join, '', strings);
+var $author$project$Main$updateFall = function (model) {
+	var _v0 = model.b;
+	if (!_v0.$) {
+		var _v1 = _v0.a;
+		var pos = _v1.a;
+		var shape = _v1.b;
+		var result = A2($author$project$Main$tryMoveDown, model.o, model.b);
+		if (!result.$) {
+			var rock = result.a;
+			return _Utils_update(
+				model,
+				{s: 'v', D: 0, b: rock});
+		} else {
+			var rock = result.a;
+			var rocksFallen = model.E + 1;
+			var paused = model.t || (model.E === 2022);
+			var chamber = A2(
+				$author$project$Main$addRockPositions,
+				model.o,
+				$author$project$Main$toRockPositions(rock));
+			var highestRock = $author$project$Main$findHighestRock(chamber);
+			return _Utils_update(
+				model,
+				{
+					o: chamber,
+					x: highestRock,
+					s: 'v',
+					D: 0,
+					t: paused,
+					b: $author$project$Main$Stopped(shape),
+					E: rocksFallen
+				});
+		}
+	} else {
+		return model;
+	}
+};
+var $author$project$Main$tryRotate = F2(
+	function (chamber, rock) {
+		if (rock.$ === 1) {
+			return $elm$core$Result$Err(rock);
+		} else {
+			var _v1 = rock.a;
+			var pos = _v1.a;
+			var _v2 = _v1.b;
+			var shape = _v2.a;
+			var rot = _v2.b;
+			var _v3 = _Utils_Tuple2(shape, rot);
+			switch (_v3.a) {
+				case 0:
+					if (!_v3.b) {
+						var _v4 = _v3.a;
+						var newRock = $author$project$Main$Moving(
+							_Utils_Tuple2(
+								pos,
+								_Utils_Tuple2(0, 1)));
+						var moveFn = function (_v6) {
+							var x = _v6.a;
+							var y = _v6.b;
+							return _Utils_Tuple2(x + 2, y - 1);
+						};
+						var _v5 = A3($author$project$Main$tryMove, chamber, newRock, moveFn);
+						if (!_v5.$) {
+							var moved = _v5.a;
+							return $elm$core$Result$Ok(moved);
+						} else {
+							return $elm$core$Result$Err(rock);
+						}
+					} else {
+						var _v7 = _v3.a;
+						var newRock = $author$project$Main$Moving(
+							_Utils_Tuple2(
+								pos,
+								_Utils_Tuple2(0, 0)));
+						var moveFn = function (_v9) {
+							var x = _v9.a;
+							var y = _v9.b;
+							return _Utils_Tuple2(x - 2, y + 1);
+						};
+						var _v8 = A3($author$project$Main$tryMove, chamber, newRock, moveFn);
+						if (!_v8.$) {
+							var moved = _v8.a;
+							return $elm$core$Result$Ok(moved);
+						} else {
+							return $elm$core$Result$Err(rock);
+						}
+					}
+				case 3:
+					if (!_v3.b) {
+						var _v10 = _v3.a;
+						var newRock = $author$project$Main$Moving(
+							_Utils_Tuple2(
+								pos,
+								_Utils_Tuple2(3, 1)));
+						var moveFn = function (_v12) {
+							var x = _v12.a;
+							var y = _v12.b;
+							return _Utils_Tuple2(x - 2, y + 1);
+						};
+						var _v11 = A3($author$project$Main$tryMove, chamber, newRock, moveFn);
+						if (!_v11.$) {
+							var moved = _v11.a;
+							return $elm$core$Result$Ok(moved);
+						} else {
+							return $elm$core$Result$Err(rock);
+						}
+					} else {
+						var _v13 = _v3.a;
+						var newRock = $author$project$Main$Moving(
+							_Utils_Tuple2(
+								pos,
+								_Utils_Tuple2(3, 0)));
+						var moveFn = function (_v15) {
+							var x = _v15.a;
+							var y = _v15.b;
+							return _Utils_Tuple2(x + 2, y - 1);
+						};
+						var _v14 = A3($author$project$Main$tryMove, chamber, newRock, moveFn);
+						if (!_v14.$) {
+							var moved = _v14.a;
+							return $elm$core$Result$Ok(moved);
+						} else {
+							return $elm$core$Result$Err(rock);
+						}
+					}
+				case 2:
+					switch (_v3.b) {
+						case 0:
+							var _v16 = _v3.a;
+							var newRock = $author$project$Main$Moving(
+								_Utils_Tuple2(
+									pos,
+									_Utils_Tuple2(2, 1)));
+							var moveFn = function (_v18) {
+								var x = _v18.a;
+								var y = _v18.b;
+								return _Utils_Tuple2(x, y);
+							};
+							var _v17 = A3($author$project$Main$tryMove, chamber, newRock, moveFn);
+							if (!_v17.$) {
+								var moved = _v17.a;
+								return $elm$core$Result$Ok(moved);
+							} else {
+								return $elm$core$Result$Err(rock);
+							}
+						case 1:
+							var _v19 = _v3.a;
+							var newRock = $author$project$Main$Moving(
+								_Utils_Tuple2(
+									pos,
+									_Utils_Tuple2(2, 2)));
+							var moveFn = function (_v21) {
+								var x = _v21.a;
+								var y = _v21.b;
+								return _Utils_Tuple2(x, y);
+							};
+							var _v20 = A3($author$project$Main$tryMove, chamber, newRock, moveFn);
+							if (!_v20.$) {
+								var moved = _v20.a;
+								return $elm$core$Result$Ok(moved);
+							} else {
+								return $elm$core$Result$Err(rock);
+							}
+						case 2:
+							var _v22 = _v3.a;
+							var newRock = $author$project$Main$Moving(
+								_Utils_Tuple2(
+									pos,
+									_Utils_Tuple2(2, 3)));
+							var moveFn = function (_v24) {
+								var x = _v24.a;
+								var y = _v24.b;
+								return _Utils_Tuple2(x, y);
+							};
+							var _v23 = A3($author$project$Main$tryMove, chamber, newRock, moveFn);
+							if (!_v23.$) {
+								var moved = _v23.a;
+								return $elm$core$Result$Ok(moved);
+							} else {
+								return $elm$core$Result$Err(rock);
+							}
+						default:
+							var _v25 = _v3.a;
+							var newRock = $author$project$Main$Moving(
+								_Utils_Tuple2(
+									pos,
+									_Utils_Tuple2(2, 0)));
+							var moveFn = function (_v27) {
+								var x = _v27.a;
+								var y = _v27.b;
+								return _Utils_Tuple2(x, y);
+							};
+							var _v26 = A3($author$project$Main$tryMove, chamber, newRock, moveFn);
+							if (!_v26.$) {
+								var moved = _v26.a;
+								return $elm$core$Result$Ok(moved);
+							} else {
+								return $elm$core$Result$Err(rock);
+							}
+					}
+				default:
+					return $elm$core$Result$Err(rock);
+			}
+		}
+	});
+var $author$project$Main$updateRotate = function (model) {
+	var _v0 = model.b;
+	if (!_v0.$) {
+		var _v1 = _v0.a;
+		var pos = _v1.a;
+		var shape = _v1.b;
+		var result = A2($author$project$Main$tryRotate, model.o, model.b);
+		if (!result.$) {
+			var rock = result.a;
+			return _Utils_update(
+				model,
+				{s: '^', b: rock});
+		} else {
+			var rock = result.a;
+			return model;
+		}
+	} else {
+		return model;
+	}
 };
 var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
 };
-var $elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
-var $elm$core$String$repeatHelp = F3(
-	function (n, chunk, result) {
-		return (n <= 0) ? result : A3(
-			$elm$core$String$repeatHelp,
-			n >> 1,
-			_Utils_ap(chunk, chunk),
-			(!(n & 1)) ? result : _Utils_ap(result, chunk));
+var $author$project$Main$tryMoveLeft = F2(
+	function (chamber, rock) {
+		return A3(
+			$author$project$Main$tryMove,
+			chamber,
+			rock,
+			function (_v0) {
+				var x = _v0.a;
+				var y = _v0.b;
+				return _Utils_Tuple2(x - 1, y);
+			});
 	});
-var $elm$core$String$repeat = F2(
-	function (n, chunk) {
-		return A3($elm$core$String$repeatHelp, n, chunk, '');
+var $author$project$Main$tryMoveRight = F2(
+	function (chamber, rock) {
+		return A3(
+			$author$project$Main$tryMove,
+			chamber,
+			rock,
+			function (_v0) {
+				var x = _v0.a;
+				var y = _v0.b;
+				return _Utils_Tuple2(x + 1, y);
+			});
 	});
-var $elm$core$String$padLeft = F3(
-	function (n, _char, string) {
-		return _Utils_ap(
-			A2(
-				$elm$core$String$repeat,
-				n - $elm$core$String$length(string),
-				$elm$core$String$fromChar(_char)),
-			string);
-	});
-var $cmditch$elm_bigint$BigInt$fillZeroes = A2(
-	$elm$core$Basics$composeL,
-	A2($elm$core$String$padLeft, $cmditch$elm_bigint$Constants$maxDigitMagnitude, '0'),
-	$elm$core$String$fromInt);
-var $cmditch$elm_bigint$BigInt$revMagnitudeToString = function (_v0) {
-	var digits = _v0;
-	var _v1 = $elm$core$List$reverse(digits);
-	if (!_v1.b) {
-		return '0';
-	} else {
-		var x = _v1.a;
-		var xs = _v1.b;
-		return $elm$core$String$concat(
-			A2(
-				$elm$core$List$cons,
-				$elm$core$String$fromInt(x),
-				A2($elm$core$List$map, $cmditch$elm_bigint$BigInt$fillZeroes, xs)));
-	}
-};
-var $cmditch$elm_bigint$BigInt$toString = function (bigInt) {
-	switch (bigInt.$) {
-		case 2:
-			return '0';
-		case 0:
-			var mag = bigInt.a;
-			return $cmditch$elm_bigint$BigInt$revMagnitudeToString(mag);
-		default:
-			var mag = bigInt.a;
-			return '-' + $cmditch$elm_bigint$BigInt$revMagnitudeToString(mag);
-	}
-};
-var $author$project$Main$shrinkInt = function (big) {
-	var _v0 = $elm$core$String$toInt(
-		$cmditch$elm_bigint$BigInt$toString(big));
-	if (_v0.$ === 1) {
-		return 0;
-	} else {
-		var n = _v0.a;
-		return n;
-	}
-};
-var $author$project$Main$out = function (computer) {
-	return $author$project$Main$nextInstruction(
-		A2(
-			$author$project$Main$output,
-			$author$project$Main$shrinkInt(
-				A2(
-					$elm$core$Maybe$withDefault,
-					$cmditch$elm_bigint$BigInt$fromInt(0),
-					A2(
-						$cmditch$elm_bigint$BigInt$modBy,
-						$cmditch$elm_bigint$BigInt$fromInt(8),
-						$author$project$Main$combo(computer)))),
-			computer));
-};
-var $author$project$Main$executeOpcode = F2(
-	function (computer, opcode) {
-		switch (opcode) {
-			case 0:
-				return $author$project$Main$adv(computer);
-			case 1:
-				return $author$project$Main$bxl(computer);
-			case 2:
-				return $author$project$Main$bst(computer);
-			case 3:
-				return $author$project$Main$jnz(computer);
-			case 4:
-				return $author$project$Main$bxc(computer);
-			case 5:
-				return $author$project$Main$out(computer);
-			case 6:
-				return $author$project$Main$bdv(computer);
-			case 7:
-				return $author$project$Main$cdv(computer);
+var $author$project$Main$moveRock = F3(
+	function (chamber, move, rock) {
+		switch (move) {
+			case '>':
+				return A2($author$project$Main$tryMoveRight, chamber, rock);
+			case '<':
+				return A2($author$project$Main$tryMoveLeft, chamber, rock);
+			case 'v':
+				return A2($author$project$Main$tryMoveDown, chamber, rock);
+			case '^':
+				return A2($author$project$Main$tryRotate, chamber, rock);
 			default:
-				return computer;
+				return $elm$core$Result$Err(rock);
 		}
 	});
-var $author$project$Main$tryReadOpcode = function (computer) {
-	var pt = computer.s;
-	return A2($elm$core$Array$get, pt, computer.m);
-};
-var $author$project$Main$executeInstruction = function (computer) {
-	return A2(
-		$elm$core$Maybe$map,
-		$author$project$Main$executeOpcode(computer),
-		$author$project$Main$tryReadOpcode(computer));
-};
-var $author$project$Main$execute = function (computer) {
-	execute:
-	while (true) {
-		var _v0 = $author$project$Main$executeInstruction(computer);
-		if (_v0.$ === 1) {
-			return computer;
-		} else {
-			var c = _v0.a;
-			var $temp$computer = c;
-			computer = $temp$computer;
-			continue execute;
-		}
-	}
-};
-var $author$project$Main$checkTarget = F4(
-	function (computer, opIndex, target, candidateA) {
-		var p = computer.m;
-		var c = $author$project$Main$execute(
-			_Utils_update(
-				computer,
-				{e: candidateA}));
-		var program = $elm$core$Array$fromList(
-			$elm$core$List$reverse(c.C));
-		var sameLength = _Utils_eq(
-			$elm$core$Array$length(p),
-			$elm$core$Array$length(program));
-		var _v0 = A2($elm$core$Array$get, opIndex, program);
-		if (!_v0.$) {
-			var n = _v0.a;
-			var cmp = _Utils_update(
-				c,
-				{e: candidateA, p: computer.p, t: computer.t});
-			return (sameLength && _Utils_eq(n, target)) ? $elm$core$Maybe$Just(cmp) : $elm$core$Maybe$Nothing;
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $author$project$Main$quineStep = F4(
-	function (steps, pending, qci, computer) {
-		var len = $elm$core$Array$length(computer.m);
-		var ix = qci.X;
-		var opIndex = len - ix;
-		var bigLen = $cmditch$elm_bigint$BigInt$fromInt(len);
-		var bigIx = $cmditch$elm_bigint$BigInt$fromInt(ix);
-		var big8 = $cmditch$elm_bigint$BigInt$fromInt(8);
-		var a = qci.L;
-		if (_Utils_cmp(ix, len) > 0) {
-			return $author$project$Main$Done(a);
-		} else {
-			var target = A2(
-				$elm$core$Maybe$withDefault,
-				99999999,
-				A2($elm$core$Array$get, opIndex, computer.m));
-			var offset = A2(
-				$cmditch$elm_bigint$BigInt$pow,
-				big8,
-				A2($cmditch$elm_bigint$BigInt$sub, bigLen, bigIx));
-			var candidates = A2(
-				$elm$core$List$filterMap,
-				function (ca) {
-					return A2(
-						$elm$core$Maybe$map,
-						function (c) {
-							return _Utils_Tuple2(
-								{L: ca, X: ix + 1},
-								c);
-						},
-						A4($author$project$Main$checkTarget, computer, opIndex, target, ca));
-				},
-				A2(
-					$elm$core$List$map,
-					function (j) {
-						return A2(
-							$cmditch$elm_bigint$BigInt$add,
-							a,
-							A2($cmditch$elm_bigint$BigInt$mul, j, offset));
-					},
-					A2(
-						$elm$core$List$map,
-						$cmditch$elm_bigint$BigInt$fromInt,
-						A2($elm$core$List$range, 0, 7))));
-			var nextPending = A2($elm$core$List$append, candidates, pending);
-			return $author$project$Main$Ongoing(
-				{_: nextPending, ab: steps + 1});
-		}
-	});
-var $author$project$Main$updateQuineStep = function (model) {
-	var computer = model.Z;
-	var _v0 = model.h;
-	switch (_v0.$) {
-		case 0:
-			return model;
-		case 1:
-			return model;
-		default:
-			var qm = _v0.a;
-			if (!qm.$) {
-				var a = qm.a;
-				var nextDeviceStatus = $author$project$Main$Booted;
-				var nextComputer = _Utils_update(
-					computer,
-					{e: a});
-				return _Utils_update(
-					model,
-					{f: nextComputer, h: nextDeviceStatus});
+var $author$project$Main$updateSideways = F2(
+	function (move, model) {
+		var rock = function () {
+			var _v0 = A3($author$project$Main$moveRock, model.o, move, model.b);
+			if (!_v0.$) {
+				var moved = _v0.a;
+				return moved;
 			} else {
-				var qi = qm.a;
-				var _v2 = qi._;
-				if (!_v2.b) {
-					return _Utils_update(
-						model,
-						{h: $author$project$Main$Booted});
-				} else {
-					var _v3 = _v2.a;
-					var qci = _v3.a;
-					var cmp = _v3.b;
-					var rest = _v2.b;
-					var nextQm = A4($author$project$Main$quineStep, qi.ab, rest, qci, computer);
-					var nextDeviceStatus = $author$project$Main$Quining(nextQm);
-					return _Utils_update(
-						model,
-						{f: cmp, h: nextDeviceStatus});
-				}
+				var notMoved = _v0.a;
+				return notMoved;
 			}
-	}
-};
-var $author$project$Main$updateFindQuine = function (model) {
-	var computer = model.Z;
-	var qci = {
-		L: $author$project$Main$quineA0(computer),
-		X: 1
-	};
-	var cmp = _Utils_update(
-		computer,
-		{e: qci.L});
-	var deviceStatus = $author$project$Main$Quining(
-		$author$project$Main$Ongoing(
-			{
-				_: _List_fromArray(
-					[
-						_Utils_Tuple2(qci, cmp)
-					]),
-				ab: 0
-			}));
-	return $author$project$Main$updateQuineStep(
-		_Utils_update(
+		}();
+		return _Utils_update(
 			model,
-			{f: computer, h: deviceStatus}));
-};
-var $author$project$Main$updateOverwriteRegA = F2(
-	function (aStr, model) {
-		if ($elm$core$String$isEmpty(aStr)) {
-			var regA = A2(
-				$elm$core$Maybe$withDefault,
-				$cmditch$elm_bigint$BigInt$fromInt(0),
-				model.D);
-			var computer = model.f;
+			{
+				s: $elm$core$String$fromChar(move),
+				b: rock
+			});
+	});
+var $author$project$Main$updateKey = F2(
+	function (move, model) {
+		var _v0 = model.b;
+		if (!_v0.$) {
+			switch (move) {
+				case '>':
+					return A2($author$project$Main$updateSideways, move, model);
+				case '<':
+					return A2($author$project$Main$updateSideways, move, model);
+				case 'v':
+					return $author$project$Main$updateFall(model);
+				case '^':
+					return $author$project$Main$updateRotate(model);
+				default:
+					return model;
+			}
+		} else {
+			var shape = _v0.a;
+			var y = model.x + 3;
 			return _Utils_update(
 				model,
 				{
-					f: _Utils_update(
-						computer,
-						{e: regA}),
-					P: '',
-					D: $elm$core$Maybe$Nothing
+					b: $author$project$Main$Moving(
+						_Utils_Tuple2(
+							_Utils_Tuple2(2, y),
+							$author$project$Main$nextShape(shape)))
 				});
-		} else {
-			var _v0 = $cmditch$elm_bigint$BigInt$fromIntString(aStr);
-			if (!_v0.$) {
-				var a = _v0.a;
-				var computer = model.f;
-				return _Utils_update(
-					model,
-					{
-						f: _Utils_update(
-							computer,
-							{e: a}),
-						P: aStr,
-						D: $elm$core$Maybe$Just(model.f.e)
-					});
-			} else {
-				return model;
-			}
 		}
 	});
-var $author$project$Main$updateReboot = function (model) {
-	return A2(
-		$author$project$Main$initModel,
-		$author$project$Main$Booting(0),
-		model.x);
+var $author$project$Main$Fall = 1;
+var $elm$core$Basics$modBy = _Basics_modBy;
+var $author$project$Main$moveRockJet = F3(
+	function (chamber, move, rock) {
+		switch (move) {
+			case '>':
+				return A2($author$project$Main$tryMoveRight, chamber, rock);
+			case '<':
+				return A2($author$project$Main$tryMoveLeft, chamber, rock);
+			default:
+				return $elm$core$Result$Err(rock);
+		}
+	});
+var $author$project$Main$updateBlow = function (model) {
+	var _v0 = model.b;
+	if (!_v0.$) {
+		var jetMove = A2(
+			$elm$core$Maybe$withDefault,
+			' ',
+			A2($elm$core$Array$get, model.J, model.P));
+		var rock = function () {
+			var _v1 = A3($author$project$Main$moveRockJet, model.o, jetMove, model.b);
+			if (!_v1.$) {
+				var moved = _v1.a;
+				return moved;
+			} else {
+				var notMoved = _v1.a;
+				return notMoved;
+			}
+		}();
+		var jetIndex = A2(
+			$elm$core$Basics$modBy,
+			$elm$core$Array$length(model.P),
+			model.J + 1);
+		return _Utils_update(
+			model,
+			{
+				J: jetIndex,
+				s: $elm$core$String$fromChar(jetMove),
+				D: 1,
+				b: rock
+			});
+	} else {
+		return model;
+	}
 };
-var $author$project$Main$updateReset = function (model) {
-	var m = A2($author$project$Main$initModel, $author$project$Main$Booted, model.x);
-	return m;
+var $author$project$Main$updateStep = function (model) {
+	var _v0 = model.b;
+	if (!_v0.$) {
+		var _v1 = model.D;
+		if (!_v1) {
+			return $author$project$Main$updateBlow(model);
+		} else {
+			return $author$project$Main$updateFall(model);
+		}
+	} else {
+		var shape = _v0.a;
+		var y = model.x + 3;
+		return _Utils_update(
+			model,
+			{
+				b: $author$project$Main$Moving(
+					_Utils_Tuple2(
+						_Utils_Tuple2(2, y),
+						$author$project$Main$nextShape(shape)))
+			});
+	}
 };
-var $author$project$Main$updateProgramFinished = function (model) {
+var $elm$core$Basics$not = _Basics_not;
+var $author$project$Main$updateTogglePlay = function (model) {
 	return _Utils_update(
 		model,
-		{W: true, r: true});
-};
-var $author$project$Main$updateProgramRunning = F2(
-	function (computer, model) {
-		return _Utils_update(
-			model,
-			{f: computer, aa: model.aa + 1});
-	});
-var $author$project$Main$updateStep = function (model) {
-	var _v0 = $author$project$Main$executeInstruction(model.f);
-	if (_v0.$ === 1) {
-		return $author$project$Main$updateProgramFinished(model);
-	} else {
-		var computer = _v0.a;
-		return A2($author$project$Main$updateProgramRunning, computer, model);
-	}
-};
-var $author$project$Main$updateTogglePlay = function (model) {
-	if (model.W) {
-		var m = A2($author$project$Main$initModel, $author$project$Main$Booted, model.x);
-		var computer = m.f;
-		var c = _Utils_update(
-			computer,
-			{e: model.f.e});
-		return _Utils_update(
-			m,
-			{f: c, D: model.D, r: false});
-	} else {
-		return _Utils_update(
-			model,
-			{r: !model.r});
-	}
+		{t: !model.t});
 };
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
+			case 5:
+				return _Utils_Tuple2(
+					$author$project$Main$updateClear(model),
+					$elm$core$Platform$Cmd$none);
 			case 0:
 				return _Utils_Tuple2(
-					$author$project$Main$updateReboot(model),
+					$author$project$Main$updateStep(model),
 					$elm$core$Platform$Cmd$none);
 			case 1:
 				return _Utils_Tuple2(
-					$author$project$Main$updateReset(model),
-					$elm$core$Platform$Cmd$none);
-			case 6:
-				return _Utils_Tuple2(
 					$author$project$Main$updateStep(model),
 					$elm$core$Platform$Cmd$none);
-			case 2:
+			case 3:
 				return _Utils_Tuple2(
-					$author$project$Main$updateStep(model),
+					_Utils_update(
+						model,
+						{A: model.A / 2}),
 					$elm$core$Platform$Cmd$none);
 			case 4:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{G: model.G / 2}),
+						{A: model.A * 2}),
 					$elm$core$Platform$Cmd$none);
-			case 5:
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{G: model.G * 2}),
-					$elm$core$Platform$Cmd$none);
-			case 3:
+			case 2:
 				return _Utils_Tuple2(
 					$author$project$Main$updateTogglePlay(model),
 					$elm$core$Platform$Cmd$none);
+			case 6:
+				return _Utils_Tuple2(
+					$author$project$Main$initModel(0),
+					$elm$core$Platform$Cmd$none);
 			case 7:
-				var dataSource = msg.a;
 				return _Utils_Tuple2(
-					A2($author$project$Main$updateDataSource, dataSource, model),
-					$elm$core$Platform$Cmd$none);
-			case 8:
-				return _Utils_Tuple2(
-					$author$project$Main$updateBootTick(model),
-					$elm$core$Platform$Cmd$none);
-			case 9:
-				return _Utils_Tuple2(
-					A2($author$project$Main$updateBackgroundColor, $author$project$Main$blackoutColor, model),
-					$elm$core$Platform$Cmd$none);
-			case 10:
-				return _Utils_Tuple2(
-					A2($author$project$Main$updateBackgroundColor, $author$project$Main$defaultBackgroundColor, model),
-					$elm$core$Platform$Cmd$none);
-			case 11:
-				return _Utils_Tuple2(
-					A2(
-						$author$project$Main$updateBackgroundColor,
-						$author$project$Main$darkBackgroundColor,
-						_Utils_update(
-							model,
-							{V: 1377})),
-					$elm$core$Platform$Cmd$none);
-			case 12:
-				return _Utils_Tuple2(
-					A2(
-						$author$project$Main$updateBackgroundColor,
-						$author$project$Main$lightBackgroundColor,
-						_Utils_update(
-							model,
-							{Y: 7977})),
-					$elm$core$Platform$Cmd$none);
-			case 13:
-				var overwrittenA = msg.a;
-				return _Utils_Tuple2(
-					A2($author$project$Main$updateOverwriteRegA, overwrittenA, model),
-					$elm$core$Platform$Cmd$none);
-			case 14:
-				return _Utils_Tuple2(
-					$author$project$Main$updateFindQuine(model),
+					$author$project$Main$initModel(1),
 					$elm$core$Platform$Cmd$none);
 			default:
-				return _Utils_Tuple2(
-					$author$project$Main$updateQuineStep(model),
-					$elm$core$Platform$Cmd$none);
+				var rawKey = msg.a;
+				var _v1 = $ohanhi$keyboard$Keyboard$Arrows$arrowKey(rawKey);
+				_v1$8:
+				while (true) {
+					if (!_v1.$) {
+						switch (_v1.a.$) {
+							case 21:
+								var _v2 = _v1.a;
+								return _Utils_Tuple2(
+									A2($author$project$Main$updateKey, '^', model),
+									$elm$core$Platform$Cmd$none);
+							case 19:
+								var _v3 = _v1.a;
+								return _Utils_Tuple2(
+									A2($author$project$Main$updateKey, '<', model),
+									$elm$core$Platform$Cmd$none);
+							case 18:
+								var _v4 = _v1.a;
+								return _Utils_Tuple2(
+									A2($author$project$Main$updateKey, 'v', model),
+									$elm$core$Platform$Cmd$none);
+							case 20:
+								var _v5 = _v1.a;
+								return _Utils_Tuple2(
+									A2($author$project$Main$updateKey, '>', model),
+									$elm$core$Platform$Cmd$none);
+							case 0:
+								switch (_v1.a.a) {
+									case 'W':
+										return _Utils_Tuple2(
+											A2($author$project$Main$updateKey, '^', model),
+											$elm$core$Platform$Cmd$none);
+									case 'A':
+										return _Utils_Tuple2(
+											A2($author$project$Main$updateKey, '<', model),
+											$elm$core$Platform$Cmd$none);
+									case 'S':
+										return _Utils_Tuple2(
+											A2($author$project$Main$updateKey, 'v', model),
+											$elm$core$Platform$Cmd$none);
+									case 'D':
+										return _Utils_Tuple2(
+											A2($author$project$Main$updateKey, '>', model),
+											$elm$core$Platform$Cmd$none);
+									default:
+										break _v1$8;
+								}
+							default:
+								break _v1$8;
+						}
+					} else {
+						break _v1$8;
+					}
+				}
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Main$Faster = {$: 4};
-var $author$project$Main$FindQuine = {$: 14};
-var $author$project$Main$OverwriteRegA = function (a) {
-	return {$: 13, a: a};
-};
-var $author$project$Main$Reboot = {$: 0};
-var $author$project$Main$Reset = {$: 1};
-var $author$project$Main$Sample = 1;
-var $author$project$Main$Sample2 = 2;
-var $author$project$Main$Slower = {$: 5};
-var $author$project$Main$Step = {$: 6};
-var $author$project$Main$TogglePlay = {$: 3};
-var $author$project$Main$UseDataSource = function (a) {
-	return {$: 7, a: a};
-};
+var $author$project$Main$Clear = {$: 5};
+var $author$project$Main$Faster = {$: 3};
+var $author$project$Main$Slower = {$: 4};
+var $author$project$Main$Step = {$: 1};
+var $author$project$Main$TogglePlay = {$: 2};
+var $author$project$Main$UseInput = {$: 6};
+var $author$project$Main$UseSample = {$: 7};
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -7828,8 +7011,17 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 			$elm$json$Json$Encode$bool(bool));
 	});
 var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
-var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$core$Set$Set_elm_builtin = $elm$core$Basics$identity;
+var $elm$core$Set$empty = $elm$core$Dict$empty;
+var $elm$core$Set$insert = F2(
+	function (key, _v0) {
+		var dict = _v0;
+		return A3($elm$core$Dict$insert, key, 0, dict);
+	});
+var $elm$core$Set$fromList = function (list) {
+	return A3($elm$core$List$foldl, $elm$core$Set$insert, $elm$core$Set$empty, list);
+};
 var $elm$html$Html$Attributes$href = function (url) {
 	return A2(
 		$elm$html$Html$Attributes$stringProperty,
@@ -7855,496 +7047,112 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
-var $elm$html$Html$Events$alwaysStop = function (x) {
-	return _Utils_Tuple2(x, true);
-};
-var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
-	return {$: 1, a: a};
-};
-var $elm$html$Html$Events$stopPropagationOn = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+var $elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
+var $elm$core$String$repeatHelp = F3(
+	function (n, chunk, result) {
+		return (n <= 0) ? result : A3(
+			$elm$core$String$repeatHelp,
+			n >> 1,
+			_Utils_ap(chunk, chunk),
+			(!(n & 1)) ? result : _Utils_ap(result, chunk));
 	});
-var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$json$Json$Decode$at = F2(
-	function (fields, decoder) {
-		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+var $elm$core$String$repeat = F2(
+	function (n, chunk) {
+		return A3($elm$core$String$repeatHelp, n, chunk, '');
 	});
-var $elm$json$Json$Decode$string = _Json_decodeString;
-var $elm$html$Html$Events$targetValue = A2(
-	$elm$json$Json$Decode$at,
-	_List_fromArray(
-		['target', 'value']),
-	$elm$json$Json$Decode$string);
-var $elm$html$Html$Events$onInput = function (tagger) {
-	return A2(
-		$elm$html$Html$Events$stopPropagationOn,
-		'input',
-		A2(
-			$elm$json$Json$Decode$map,
-			$elm$html$Html$Events$alwaysStop,
-			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
-};
+var $elm$core$String$padLeft = F3(
+	function (n, _char, string) {
+		return _Utils_ap(
+			A2(
+				$elm$core$String$repeat,
+				n - $elm$core$String$length(string),
+				$elm$core$String$fromChar(_char)),
+			string);
+	});
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
-var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
-var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
-var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
-var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
-var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
-var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
-var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
-var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
-var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
-var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
-var $author$project$Main$toBlackoutElements = F2(
-	function (model, ticks) {
-		var svgWidth = $elm$core$String$fromInt(794);
-		var svgHeight = $elm$core$String$fromInt(386);
-		var borderElement = A2(
-			$elm$svg$Svg$rect,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$x('0'),
-					$elm$svg$Svg$Attributes$y('0'),
-					$elm$svg$Svg$Attributes$width(svgWidth),
-					$elm$svg$Svg$Attributes$height(svgHeight),
-					$elm$svg$Svg$Attributes$strokeWidth('4px'),
-					$elm$svg$Svg$Attributes$stroke('black'),
-					$elm$svg$Svg$Attributes$fill('black')
-				]),
-			_List_Nil);
-		return _List_fromArray(
-			[borderElement]);
-	});
-var $elm$svg$Svg$Attributes$fillOpacity = _VirtualDom_attribute('fill-opacity');
-var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
-var $author$project$Main$toBootedElements = function (model) {
-	var textStroke = 'black';
-	var textFill = '#F28C28';
-	var svgWidth = $elm$core$String$fromInt(794);
-	var svgHeight = $elm$core$String$fromInt(386);
-	var regCLabel = A2(
-		$elm$svg$Svg$text_,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x('20'),
-				$elm$svg$Svg$Attributes$y('142'),
-				$elm$svg$Svg$Attributes$stroke(textStroke),
-				$elm$svg$Svg$Attributes$fill(textFill)
-			]),
-		_List_fromArray(
-			[
-				$elm$svg$Svg$text('C')
-			]));
-	var regCBox = A2(
-		$elm$svg$Svg$rect,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x('60'),
-				$elm$svg$Svg$Attributes$y('110'),
-				$elm$svg$Svg$Attributes$width('714'),
-				$elm$svg$Svg$Attributes$height('40'),
-				$elm$svg$Svg$Attributes$strokeWidth('2px'),
-				$elm$svg$Svg$Attributes$stroke('black'),
-				$elm$svg$Svg$Attributes$fill('white'),
-				$elm$svg$Svg$Attributes$fillOpacity('0.2')
-			]),
-		_List_Nil);
-	var regBLabel = A2(
-		$elm$svg$Svg$text_,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x('20'),
-				$elm$svg$Svg$Attributes$y('92'),
-				$elm$svg$Svg$Attributes$stroke(textStroke),
-				$elm$svg$Svg$Attributes$fill(textFill)
-			]),
-		_List_fromArray(
-			[
-				$elm$svg$Svg$text('B')
-			]));
-	var regBBox = A2(
-		$elm$svg$Svg$rect,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x('60'),
-				$elm$svg$Svg$Attributes$y('60'),
-				$elm$svg$Svg$Attributes$width('714'),
-				$elm$svg$Svg$Attributes$height('40'),
-				$elm$svg$Svg$Attributes$strokeWidth('2px'),
-				$elm$svg$Svg$Attributes$stroke('black'),
-				$elm$svg$Svg$Attributes$fill('white'),
-				$elm$svg$Svg$Attributes$fillOpacity('0.2')
-			]),
-		_List_Nil);
-	var regALabel = A2(
-		$elm$svg$Svg$text_,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x('20'),
-				$elm$svg$Svg$Attributes$y('42'),
-				$elm$svg$Svg$Attributes$stroke(textStroke),
-				$elm$svg$Svg$Attributes$fill(textFill)
-			]),
-		_List_fromArray(
-			[
-				$elm$svg$Svg$text('A')
-			]));
-	var regABox = A2(
-		$elm$svg$Svg$rect,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x('60'),
-				$elm$svg$Svg$Attributes$y('10'),
-				$elm$svg$Svg$Attributes$width('714'),
-				$elm$svg$Svg$Attributes$height('40'),
-				$elm$svg$Svg$Attributes$strokeWidth('2px'),
-				$elm$svg$Svg$Attributes$stroke('black'),
-				$elm$svg$Svg$Attributes$fill('white'),
-				$elm$svg$Svg$Attributes$fillOpacity('0.2')
-			]),
-		_List_Nil);
-	var programLabel = A2(
-		$elm$svg$Svg$text_,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x('20'),
-				$elm$svg$Svg$Attributes$y('192'),
-				$elm$svg$Svg$Attributes$stroke(textStroke),
-				$elm$svg$Svg$Attributes$fill(textFill)
-			]),
-		_List_fromArray(
-			[
-				$elm$svg$Svg$text('P')
-			]));
-	var programBox = A2(
-		$elm$svg$Svg$rect,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x('60'),
-				$elm$svg$Svg$Attributes$y('160'),
-				$elm$svg$Svg$Attributes$width('714'),
-				$elm$svg$Svg$Attributes$height('80'),
-				$elm$svg$Svg$Attributes$strokeWidth('2px'),
-				$elm$svg$Svg$Attributes$stroke('black'),
-				$elm$svg$Svg$Attributes$fill('white'),
-				$elm$svg$Svg$Attributes$fillOpacity('0.2')
-			]),
-		_List_Nil);
-	var outputsBox = A2(
-		$elm$svg$Svg$rect,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x('60'),
-				$elm$svg$Svg$Attributes$y('250'),
-				$elm$svg$Svg$Attributes$width('714'),
-				$elm$svg$Svg$Attributes$height('126'),
-				$elm$svg$Svg$Attributes$strokeWidth('2px'),
-				$elm$svg$Svg$Attributes$stroke('black'),
-				$elm$svg$Svg$Attributes$fill('white'),
-				$elm$svg$Svg$Attributes$fillOpacity('0.2')
-			]),
-		_List_Nil);
-	var computer = model.f;
-	var outputs = $elm$core$List$reverse(computer.C);
-	var pointer = computer.s;
-	var paddings = 1 + (2 * pointer);
-	var pointerText = (_Utils_cmp(
-		pointer,
-		$elm$core$Array$length(computer.m)) < 0) ? A3($elm$core$String$padLeft, paddings, ' ', '^') : '';
-	var pointerHat = A2(
-		$elm$svg$Svg$text_,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x('70'),
-				$elm$svg$Svg$Attributes$y('232'),
-				$elm$svg$Svg$Attributes$style('white-space:pre'),
-				$elm$svg$Svg$Attributes$stroke(textStroke),
-				$elm$svg$Svg$Attributes$fill(textFill)
-			]),
-		_List_fromArray(
-			[
-				$elm$svg$Svg$text(pointerText)
-			]));
-	var programStr = A2(
-		$elm$core$String$join,
-		',',
-		A2(
-			$elm$core$List$map,
-			$elm$core$String$fromInt,
-			$elm$core$Array$toList(computer.m)));
-	var programValue = A2(
-		$elm$svg$Svg$text_,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x('70'),
-				$elm$svg$Svg$Attributes$y('192'),
-				$elm$svg$Svg$Attributes$stroke(textStroke),
-				$elm$svg$Svg$Attributes$fill(textFill)
-			]),
-		_List_fromArray(
-			[
-				$elm$svg$Svg$text(programStr)
-			]));
-	var regAText0 = $cmditch$elm_bigint$BigInt$toString(computer.e);
-	var regAText = ($elm$core$String$length(regAText0) > 36) ? (A2($elm$core$String$left, 33, regAText0) + '...') : regAText0;
-	var regAValue = A2(
-		$elm$svg$Svg$text_,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x('70'),
-				$elm$svg$Svg$Attributes$y('42'),
-				$elm$svg$Svg$Attributes$stroke(textStroke),
-				$elm$svg$Svg$Attributes$fill(textFill)
-			]),
-		_List_fromArray(
-			[
-				$elm$svg$Svg$text(regAText)
-			]));
-	var regBText0 = $cmditch$elm_bigint$BigInt$toString(computer.p);
-	var regBText = ($elm$core$String$length(regBText0) > 36) ? (A2($elm$core$String$left, 33, regBText0) + '...') : regBText0;
-	var regBValue = A2(
-		$elm$svg$Svg$text_,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x('70'),
-				$elm$svg$Svg$Attributes$y('92'),
-				$elm$svg$Svg$Attributes$stroke(textStroke),
-				$elm$svg$Svg$Attributes$fill(textFill)
-			]),
-		_List_fromArray(
-			[
-				$elm$svg$Svg$text(regBText)
-			]));
-	var regCText0 = $cmditch$elm_bigint$BigInt$toString(computer.t);
-	var regCText = ($elm$core$String$length(regCText0) > 36) ? (A2($elm$core$String$left, 33, regCText0) + '...') : regCText0;
-	var regCValue = A2(
-		$elm$svg$Svg$text_,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x('70'),
-				$elm$svg$Svg$Attributes$y('142'),
-				$elm$svg$Svg$Attributes$stroke(textStroke),
-				$elm$svg$Svg$Attributes$fill(textFill)
-			]),
-		_List_fromArray(
-			[
-				$elm$svg$Svg$text(regCText)
-			]));
-	var charsPerOutputLine = 18;
-	var outputs1 = A2($elm$core$List$take, charsPerOutputLine, outputs);
-	var outputsText1 = A2(
-		$elm$core$String$join,
-		',',
-		A2($elm$core$List$map, $elm$core$String$fromInt, outputs1));
-	var outputs1Left = A2($elm$core$List$drop, charsPerOutputLine, outputs);
-	var outputsText11 = $elm$core$List$isEmpty(outputs1Left) ? outputsText1 : (outputsText1 + ',');
-	var outputsValue1 = A2(
-		$elm$svg$Svg$text_,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x('70'),
-				$elm$svg$Svg$Attributes$y('282'),
-				$elm$svg$Svg$Attributes$stroke(textStroke),
-				$elm$svg$Svg$Attributes$fill(textFill)
-			]),
-		_List_fromArray(
-			[
-				$elm$svg$Svg$text(outputsText11)
-			]));
-	var outputs2 = A2($elm$core$List$take, charsPerOutputLine, outputs1Left);
-	var outputsText2 = A2(
-		$elm$core$String$join,
-		',',
-		A2($elm$core$List$map, $elm$core$String$fromInt, outputs2));
-	var outputs2Left = A2($elm$core$List$drop, charsPerOutputLine, outputs1Left);
-	var outputsText22 = $elm$core$List$isEmpty(outputs2Left) ? outputsText2 : (outputsText2 + ',');
-	var outputsValue2 = A2(
-		$elm$svg$Svg$text_,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x('70'),
-				$elm$svg$Svg$Attributes$y('322'),
-				$elm$svg$Svg$Attributes$stroke(textStroke),
-				$elm$svg$Svg$Attributes$fill(textFill)
-			]),
-		_List_fromArray(
-			[
-				$elm$svg$Svg$text(outputsText22)
-			]));
-	var outputs3 = A2($elm$core$List$take, charsPerOutputLine, outputs2Left);
-	var outputsText3 = A2(
-		$elm$core$String$join,
-		',',
-		A2($elm$core$List$map, $elm$core$String$fromInt, outputs3));
-	var outputs3Left = A2($elm$core$List$drop, charsPerOutputLine, outputs2Left);
-	var outputsText33 = $elm$core$List$isEmpty(outputs3Left) ? outputsText3 : (outputsText3 + ',');
-	var outputsValue3 = A2(
-		$elm$svg$Svg$text_,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x('70'),
-				$elm$svg$Svg$Attributes$y('362'),
-				$elm$svg$Svg$Attributes$stroke(textStroke),
-				$elm$svg$Svg$Attributes$fill(textFill)
-			]),
-		_List_fromArray(
-			[
-				$elm$svg$Svg$text(outputsText33)
-			]));
-	var borderElement = A2(
-		$elm$svg$Svg$rect,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x('0'),
-				$elm$svg$Svg$Attributes$y('0'),
-				$elm$svg$Svg$Attributes$width(svgWidth),
-				$elm$svg$Svg$Attributes$height(svgHeight),
-				$elm$svg$Svg$Attributes$strokeWidth('4px'),
-				$elm$svg$Svg$Attributes$stroke('black'),
-				$elm$svg$Svg$Attributes$fill('none')
-			]),
-		_List_Nil);
-	return _List_fromArray(
-		[borderElement, regALabel, regABox, regAValue, regBLabel, regBBox, regBValue, regCLabel, regCBox, regCValue, programLabel, programBox, programValue, pointerHat, outputsBox, outputsValue1, outputsValue2, outputsValue3]);
-};
-var $author$project$Main$toBootingElements = F2(
-	function (model, ticks) {
-		var textStroke = 'black';
-		var textFill = '#F28C28';
-		var svgWidth = $elm$core$String$fromInt(794);
-		var svgHeight = $elm$core$String$fromInt(386);
-		var dots = A2(
-			$elm$core$String$repeat,
-			$elm$core$Basics$floor(ticks / model.w) - 4,
-			'.');
-		var debuggerText = A2(
-			$elm$svg$Svg$text_,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$x('20'),
-					$elm$svg$Svg$Attributes$y('142'),
-					$elm$svg$Svg$Attributes$stroke(textStroke),
-					$elm$svg$Svg$Attributes$fill(textFill)
-				]),
-			_List_fromArray(
-				[
-					$elm$svg$Svg$text('Initializing debugger' + dots)
-				]));
-		var criticalText = A2(
-			$elm$svg$Svg$text_,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$x('20'),
-					$elm$svg$Svg$Attributes$y('42'),
-					$elm$svg$Svg$Attributes$stroke(textStroke),
-					$elm$svg$Svg$Attributes$fill(textFill)
-				]),
-			_List_fromArray(
-				[
-					$elm$svg$Svg$text('Situation critical!')
-				]));
-		var borderElement = A2(
-			$elm$svg$Svg$rect,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$x('0'),
-					$elm$svg$Svg$Attributes$y('0'),
-					$elm$svg$Svg$Attributes$width(svgWidth),
-					$elm$svg$Svg$Attributes$height(svgHeight),
-					$elm$svg$Svg$Attributes$strokeWidth('4px'),
-					$elm$svg$Svg$Attributes$stroke('black'),
-					$elm$svg$Svg$Attributes$fill('none')
-				]),
-			_List_Nil);
-		var bootstrappingText = A2(
-			$elm$svg$Svg$text_,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$x('20'),
-					$elm$svg$Svg$Attributes$y('92'),
-					$elm$svg$Svg$Attributes$stroke(textStroke),
-					$elm$svg$Svg$Attributes$fill(textFill)
-				]),
-			_List_fromArray(
-				[
-					$elm$svg$Svg$text('Bootstrapping process failed.')
-				]));
-		var textElements = A2(
-			$elm$core$List$filterMap,
-			$elm$core$Basics$identity,
-			_List_fromArray(
-				[
-					$elm$core$Maybe$Just(criticalText),
-					(_Utils_cmp(ticks, 2 * model.w) > -1) ? $elm$core$Maybe$Just(bootstrappingText) : $elm$core$Maybe$Nothing,
-					(_Utils_cmp(ticks, 4 * model.w) > -1) ? $elm$core$Maybe$Just(debuggerText) : $elm$core$Maybe$Nothing
-				]));
-		return A2(
-			$elm$core$List$append,
-			textElements,
-			_List_fromArray(
-				[borderElement]));
-	});
-var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
-var $author$project$Main$toSvg = function (model) {
-	var svgWidth = $elm$core$String$fromInt(794);
-	var svgHeight = $elm$core$String$fromInt(386);
-	var viewBoxStr = '0 0 ' + (svgWidth + (' ' + svgHeight));
-	var elements = function () {
-		var _v0 = model.h;
-		switch (_v0.$) {
-			case 0:
-				var ticks = _v0.a;
-				return (_Utils_eq(model.N, $author$project$Main$blackoutColor) && (!A2(
-					$elm$core$Basics$modBy,
-					2,
-					($elm$core$Basics$floor(ticks) / $elm$core$Basics$floor(model.U)) | 0))) ? A2($author$project$Main$toBlackoutElements, model, ticks) : A2($author$project$Main$toBootingElements, model, ticks);
-			case 1:
-				return $author$project$Main$toBootedElements(model);
-			default:
-				return $author$project$Main$toBootedElements(model);
-		}
-	}();
-	var backgroundColor = model.N;
-	return A2(
-		$elm$svg$Svg$svg,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$viewBox(viewBoxStr),
-				$elm$svg$Svg$Attributes$width(svgWidth),
-				$elm$svg$Svg$Attributes$height(svgHeight),
-				$elm$svg$Svg$Attributes$style('background-color:' + backgroundColor)
-			]),
-		elements);
-};
-var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
-var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Main$view = function (model) {
-	var s = $author$project$Main$toSvg(model);
-	var isBooted = function () {
-		var _v0 = model.h;
-		if (_v0.$ === 1) {
+var $elm$core$String$fromList = _String_fromList;
+var $elm$core$Dict$member = F2(
+	function (key, dict) {
+		var _v0 = A2($elm$core$Dict$get, key, dict);
+		if (!_v0.$) {
 			return true;
 		} else {
 			return false;
 		}
+	});
+var $elm$core$Set$member = F2(
+	function (key, _v0) {
+		var dict = _v0;
+		return A2($elm$core$Dict$member, key, dict);
+	});
+var $author$project$Main$toChamberRow = F4(
+	function (rocks, chamber, xs, y) {
+		var s = $elm$core$String$fromList(
+			A2(
+				$elm$core$List$filterMap,
+				function (x) {
+					return A2(
+						$elm$core$Set$member,
+						_Utils_Tuple2(x, y),
+						rocks) ? $elm$core$Maybe$Just('@') : A3($tortus$elm_array_2d$Array2D$get, y, x, chamber);
+				},
+				xs));
+		return '|' + (s + '|');
+	});
+var $author$project$Main$toChamberRows = F3(
+	function (rocks, highest, chamber) {
+		var ys = A2($elm$core$List$range, 0, highest + 3);
+		var xs = A2(
+			$elm$core$List$range,
+			0,
+			$tortus$elm_array_2d$Array2D$columns(chamber) - 1);
+		var rows = A2(
+			$elm$core$List$map,
+			A3($author$project$Main$toChamberRow, rocks, chamber, xs),
+			ys);
+		return $elm$core$List$reverse(
+			A2($elm$core$List$cons, '+-------+', rows));
+	});
+var $elm$html$Html$br = _VirtualDom_node('br');
+var $author$project$Main$toRowElements = function (rowText) {
+	return _List_fromArray(
+		[
+			$elm$html$Html$text(rowText),
+			A2($elm$html$Html$br, _List_Nil, _List_Nil)
+		]);
+};
+var $elm$html$Html$tr = _VirtualDom_node('tr');
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $author$project$Main$view = function (model) {
+	var textFontSize = '20px';
+	var rockPositions = $elm$core$Set$fromList(
+		$author$project$Main$toRockPositions(model.b));
+	var rows = A3($author$project$Main$toChamberRows, rockPositions, model.x, model.o);
+	var rockPosStr = function () {
+		var _v0 = model.b;
+		if (!_v0.$) {
+			var _v1 = _v0.a;
+			var _v2 = _v1.a;
+			var x = _v2.a;
+			var y = _v2.b;
+			var shape = _v1.b;
+			return '(' + ($elm$core$String$fromInt(x) + (', ' + ($elm$core$String$fromInt(y) + ')')));
+		} else {
+			return '_';
+		}
 	}();
+	var elements = A2($elm$core$List$concatMap, $author$project$Main$toRowElements, rows);
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'width', '900px'),
+				$elm$html$Html$Attributes$align('center'),
+				A2($elm$html$Html$Attributes$style, 'width', '100%'),
 				A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New')
 			]),
 		_List_fromArray(
@@ -8370,14 +7178,14 @@ var $author$project$Main$view = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Advent of Code 2024')
+										$elm$html$Html$text('Advent of Code 2022')
 									])),
 								A2(
 								$elm$html$Html$div,
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Day 17: Chronospatial Computer')
+										$elm$html$Html$text('Day 17: Pyroclastic Flow')
 									]))
 							]))
 					])),
@@ -8399,11 +7207,11 @@ var $author$project$Main$view = function (model) {
 								$elm$html$Html$a,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$href('https://adventofcode.com/2024/day/17')
+										$elm$html$Html$Attributes$href('https://adventofcode.com/2022/day/17')
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('https://adventofcode.com/2024/day/17')
+										$elm$html$Html$text('https://adventofcode.com/2022/day/17')
 									]))
 							]))
 					])),
@@ -8416,9 +7224,7 @@ var $author$project$Main$view = function (model) {
 						$elm$html$Html$td,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '16px')
+								$elm$html$Html$Attributes$align('center')
 							]),
 						_List_fromArray(
 							[
@@ -8427,9 +7233,8 @@ var $author$project$Main$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$type_('radio'),
-										$elm$html$Html$Events$onClick(
-										$author$project$Main$UseDataSource(0)),
-										$elm$html$Html$Attributes$checked(!model.x)
+										$elm$html$Html$Events$onClick($author$project$Main$UseInput),
+										$elm$html$Html$Attributes$checked(!model.I)
 									]),
 								_List_Nil),
 								A2(
@@ -8444,9 +7249,8 @@ var $author$project$Main$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$type_('radio'),
-										$elm$html$Html$Events$onClick(
-										$author$project$Main$UseDataSource(1)),
-										$elm$html$Html$Attributes$checked(model.x === 1)
+										$elm$html$Html$Events$onClick($author$project$Main$UseSample),
+										$elm$html$Html$Attributes$checked(model.I === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -8455,23 +7259,6 @@ var $author$project$Main$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text('Sample')
-									])),
-								A2(
-								$elm$html$Html$input,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$type_('radio'),
-										$elm$html$Html$Events$onClick(
-										$author$project$Main$UseDataSource(2)),
-										$elm$html$Html$Attributes$checked(model.x === 2)
-									]),
-								_List_Nil),
-								A2(
-								$elm$html$Html$label,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Sample 2')
 									]))
 							]))
 					])),
@@ -8494,47 +7281,7 @@ var $author$project$Main$view = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Main$Reboot)
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Reboot')
-									])),
-								A2(
-								$elm$html$Html$button,
-								_List_fromArray(
-									[
-										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Main$FindQuine),
-										$elm$html$Html$Attributes$disabled(!isBooted)
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Quine')
-									]))
-							]))
-					])),
-				A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$td,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'padding', '10px')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$button,
-								_List_fromArray(
-									[
-										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Main$Reset),
-										$elm$html$Html$Attributes$disabled(!isBooted)
+										$elm$html$Html$Events$onClick($author$project$Main$Clear)
 									]),
 								_List_fromArray(
 									[
@@ -8545,44 +7292,40 @@ var $author$project$Main$view = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Main$Slower),
-										$elm$html$Html$Attributes$disabled(!isBooted)
+										$elm$html$Html$Events$onClick($author$project$Main$Slower)
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Turtle')
+										$elm$html$Html$text('Slower')
 									])),
 								A2(
 								$elm$html$Html$button,
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Main$TogglePlay),
-										$elm$html$Html$Attributes$disabled(!isBooted)
+										$elm$html$Html$Events$onClick($author$project$Main$TogglePlay)
 									]),
 								_List_fromArray(
 									[
-										model.r ? $elm$html$Html$text('Run') : $elm$html$Html$text('Halt')
+										model.t ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
 									])),
 								A2(
 								$elm$html$Html$button,
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Main$Faster),
-										$elm$html$Html$Attributes$disabled(!isBooted)
+										$elm$html$Html$Events$onClick($author$project$Main$Faster)
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Turbo')
+										$elm$html$Html$text('Faster')
 									])),
 								A2(
 								$elm$html$Html$button,
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Main$Step),
-										$elm$html$Html$Attributes$disabled(!isBooted)
+										$elm$html$Html$Events$onClick($author$project$Main$Step)
 									]),
 								_List_fromArray(
 									[
@@ -8600,11 +7343,9 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '24px'),
-								A2($elm$html$Html$Attributes$style, 'padding-top', '10px'),
-								A2($elm$html$Html$Attributes$style, 'width', '200px')
+								A2($elm$html$Html$Attributes$style, 'font-size', '1.2rem'),
+								A2($elm$html$Html$Attributes$style, 'padding-top', '10px')
 							]),
 						_List_fromArray(
 							[
@@ -8613,17 +7354,32 @@ var $author$project$Main$view = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Overwrite A')
+										$elm$html$Html$text(
+										'Rocks fallen: ' + A3(
+											$elm$core$String$padLeft,
+											4,
+											' ',
+											$elm$core$String$fromInt(model.E)))
 									])),
 								A2(
-								$elm$html$Html$input,
+								$elm$html$Html$div,
+								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$value(model.P),
-										$elm$html$Html$Events$onInput($author$project$Main$OverwriteRegA),
-										$elm$html$Html$Attributes$disabled((!isBooted) || (!model.r))
-									]),
-								_List_Nil)
+										$elm$html$Html$text(
+										'Tower height: ' + A3(
+											$elm$core$String$padLeft,
+											4,
+											' ',
+											$elm$core$String$fromInt(model.x)))
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(model.s)
+									]))
 							]))
 					])),
 				A2(
@@ -8636,24 +7392,25 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Source Code Pro, monospace'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '32px'),
-								A2($elm$html$Html$Attributes$style, 'padding', '10px'),
-								A2($elm$html$Html$Attributes$style, 'width', '200px')
+								A2($elm$html$Html$Attributes$style, 'font-size', '1.4rem'),
+								A2($elm$html$Html$Attributes$style, 'padding', '10px')
 							]),
 						_List_fromArray(
 							[
 								A2(
 								$elm$html$Html$div,
-								_List_Nil,
 								_List_fromArray(
-									[s]))
+									[
+										$elm$html$Html$Attributes$align('center'),
+										A2($elm$html$Html$Attributes$style, 'max-width', '100%')
+									]),
+								elements)
 							]))
 					]))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
-	{aW: $author$project$Main$init, a4: $author$project$Main$subscriptions, a6: $author$project$Main$update, a7: $author$project$Main$view});
+	{aG: $author$project$Main$init, aM: $author$project$Main$subscriptions, aO: $author$project$Main$update, aP: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));

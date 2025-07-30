@@ -6657,7 +6657,7 @@ var $author$project$Main$toSvg = function (model) {
 				$elm$svg$Svg$Attributes$viewBox('0 0 ' + (svgWidth + svgHeight)),
 				$elm$svg$Svg$Attributes$width(svgWidth),
 				$elm$svg$Svg$Attributes$height(svgHeight),
-				$elm$svg$Svg$Attributes$style('background-color:white')
+				$elm$svg$Svg$Attributes$style('max-width: 100%; background-color:white')
 			]),
 		elements);
 };
@@ -6668,7 +6668,8 @@ var $author$project$Main$view = function (model) {
 		$elm$html$Html$table,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'width', '900px'),
+				$elm$html$Html$Attributes$align('center'),
+				A2($elm$html$Html$Attributes$style, 'width', '100%'),
 				A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New')
 			]),
 		_List_fromArray(
@@ -6785,7 +6786,8 @@ var $author$project$Main$view = function (model) {
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$align('center')
+										$elm$html$Html$Attributes$align('center'),
+										A2($elm$html$Html$Attributes$style, 'max-width', '100%')
 									]),
 								_List_fromArray(
 									[s])),

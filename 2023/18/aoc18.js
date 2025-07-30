@@ -5316,12 +5316,12 @@ var $author$project$Main$findDimensions = function (trench) {
 	var xs = A2($elm$core$List$map, $elm$core$Tuple$first, positions);
 	var xMax = A2(
 		$elm$core$Maybe$withDefault,
-		123,
+		0,
 		$elm$core$List$maximum(xs));
 	var ys = A2($elm$core$List$map, $elm$core$Tuple$second, positions);
 	var yMax = A2(
 		$elm$core$Maybe$withDefault,
-		123,
+		0,
 		$elm$core$List$maximum(ys));
 	return _Utils_Tuple2(xMax + 1, yMax + 1);
 };
@@ -6775,6 +6775,7 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions = F3(
 				$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$eventDecoder));
 	});
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousemove', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
+var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
@@ -6832,8 +6833,12 @@ var $author$project$Main$toSvg = function (model) {
 		$elm$core$List$map,
 		$author$project$Main$toTrenchBox(model.u),
 		$elm$core$Set$toList(model.g.t));
-	var svgWidth = $elm$core$String$fromInt(model.u * model.g.K);
-	var svgHeight = $elm$core$String$fromInt(model.u * model.g.F);
+	var svgW = model.u * model.g.K;
+	var svgWidth = $elm$core$String$fromInt(svgW);
+	var svgViewBoxWidth = $elm$core$String$fromInt(svgW);
+	var svgH = model.u * model.g.F;
+	var svgHeight = $elm$core$String$fromInt(svgH);
+	var svgViewBoxHeight = $elm$core$String$fromInt(svgH);
 	var fillColor = model.g.w ? 'orange' : 'gainsboro';
 	var filledBoxes = A2(
 		$elm$core$List$map,
@@ -6844,7 +6849,7 @@ var $author$project$Main$toSvg = function (model) {
 		$elm$svg$Svg$svg,
 		_List_fromArray(
 			[
-				$elm$svg$Svg$Attributes$viewBox('0 0 ' + (svgWidth + svgHeight)),
+				$elm$svg$Svg$Attributes$viewBox('0 0 ' + (svgViewBoxWidth + svgViewBoxHeight)),
 				$elm$svg$Svg$Attributes$width(svgWidth),
 				$elm$svg$Svg$Attributes$height(svgHeight),
 				$elm$svg$Svg$Events$onClick($author$project$Main$Click),
@@ -6854,7 +6859,8 @@ var $author$project$Main$toSvg = function (model) {
 					function ($) {
 						return $.bc;
 					},
-					$author$project$Main$MouseMove))
+					$author$project$Main$MouseMove)),
+				$elm$svg$Svg$Attributes$style('max-width: 100%;')
 			]),
 		elements);
 };
@@ -6865,7 +6871,8 @@ var $author$project$Main$view = function (model) {
 		$elm$html$Html$table,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'width', '900px'),
+				$elm$html$Html$Attributes$align('center'),
+				A2($elm$html$Html$Attributes$style, 'width', '100%'),
 				A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New')
 			]),
 		_List_fromArray(
@@ -6963,10 +6970,7 @@ var $author$project$Main$view = function (model) {
 						$elm$html$Html$td,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '36px'),
-								A2($elm$html$Html$Attributes$style, 'padding', '24px')
+								$elm$html$Html$Attributes$align('center')
 							]),
 						_List_fromArray(
 							[
@@ -6974,7 +6978,8 @@ var $author$project$Main$view = function (model) {
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$align('center')
+										$elm$html$Html$Attributes$align('center'),
+										A2($elm$html$Html$Attributes$style, 'max-width', '100%')
 									]),
 								_List_fromArray(
 									[s]))
