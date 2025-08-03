@@ -69,11 +69,33 @@ isNiceOldRules str =
 
 containsPairWithoutOverlap : String -> Bool
 containsPairWithoutOverlap str = 
-    False 
+  if String.length str < 2 then False 
+  else 
+    let 
+      two = String.left 2 str 
+      rest = String.dropLeft 2 str 
+      found = String.contains two rest 
+    in  
+      found || containsPairWithoutOverlap (String.dropLeft 1 str)
+
+-- let containsRepeatingLetter (str : string) = 
+--     let rec fn (chars : char list) = 
+--         match chars with 
+--         | a :: b :: c :: rest -> 
+--             a = c || fn (b :: c :: rest)
+--         | _ -> false
+--     fn (str |> Seq.toList)
+
+containsRepeatingLetterLoop : List Char -> Bool
+containsRepeatingLetterLoop chars = 
+  case chars of 
+    a :: b :: c :: rest -> 
+      a == c || containsRepeatingLetterLoop (b :: c :: rest)
+    _ -> False 
 
 containsRepeatingLetter : String -> Bool
 containsRepeatingLetter str = 
-    False 
+    str |> String.toList |> containsRepeatingLetterLoop
 
 isNiceNewRules : String -> Bool 
 isNiceNewRules str = 
