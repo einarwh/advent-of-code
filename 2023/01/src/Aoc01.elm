@@ -1079,18 +1079,16 @@ init _ =
 
 type Msg = Clear | Solve | ToggleIncludeLetters | UseSample1 | UseSample2 | UseInput
 
--- let toNum (nums : int seq) : int = 
---     let tens = nums |> Seq.head
---     let ones = nums |> Seq.rev |> Seq.head 
---     tens * 10 + ones
-
 tryParseInt : Char -> Maybe Int 
 tryParseInt ch = 
   ch |> String.fromChar |> String.toInt
 
-digitFinder1 : String -> List (Int, Int) 
-digitFinder1 s = 
-  s |> String.toList |> List.indexedMap Tuple.pair |> List.filterMap (\(ix, c) -> tryParseInt c |> Maybe.map (\n -> (ix, n)))
+tryFindNum1 : String -> Maybe (Int, String) 
+tryFindNum1 s  = 
+  let 
+    s0 = String.left 1 s 
+  in 
+    s0 |> String.toInt |> Maybe.map (\d -> (d, s0))
 
 tryFindNum2 : String -> Maybe (Int, String) 
 tryFindNum2 s  = 
@@ -1117,37 +1115,18 @@ substrings s =
   if String.isEmpty s then []
   else s :: substrings (String.dropLeft 1 s)
 
--- let numberFinder2 = subStrings >> List.choose tryFindNum
-
-digitFinder2 : String -> List (Int, (Int, String)) 
-digitFinder2 str = 
+digitFinder : (String -> Maybe (Int, String)) -> String -> List (Int, (Int, String)) 
+digitFinder parser str = 
   let 
     subs = substrings str
     pairs = subs |> List.indexedMap Tuple.pair 
-    foo = pairs |> List.filterMap (\(ix, s) -> tryFindNum2 s |> Maybe.map (\(d, ds) -> (ix, (d, ds))))
   in 
-    foo
+    pairs |> List.filterMap (\(ix, s) -> parser s |> Maybe.map (\(d, ds) -> (ix, (d, ds))))
 
-parseLine1 : String -> Line
-parseLine1 s = 
+parseLine : (String -> Maybe (Int, String)) -> String -> Line
+parseLine parser s = 
   let 
-    digits = digitFinder1 s 
-    (firstIndex, firstDigit) = digits |> List.head |> Maybe.withDefault (2, 2) 
-    (lastIndex, lastDigit) = digits |> List.reverse |> List.head |> Maybe.withDefault (2, 2) 
-    firstDigitSegment = (firstIndex, 1)
-    lastDigitSegment = (lastIndex, 1)
-  in  
-    { content = s
-    , firstDigit = firstDigit
-    , firstDigitSegment = firstDigitSegment
-    , lastDigit = lastDigit
-    , lastDigitSegment = lastDigitSegment
-    }
-
-parseLine2 : String -> Line
-parseLine2 s = 
-  let 
-    digits = digitFinder2 s 
+    digits = digitFinder parser s 
     (firstIndex, (firstDigit, firstDigitStr)) = digits |> List.head |> Maybe.withDefault (0, (0, "0")) 
     (lastIndex, (lastDigit, lastDigitStr)) = digits |> List.reverse |> List.head |> Maybe.withDefault (0, (0, "0"))
     firstDigitSegment = (firstIndex, String.length firstDigitStr)
@@ -1168,8 +1147,8 @@ updateSolve model =
   case model.data of 
     Unsolved unsolved -> 
       let 
-        parser = if model.includeLetters then parseLine2 else parseLine1 
-        data = unsolved |> List.map parser |> Solved 
+        parser = if model.includeLetters then tryFindNum2 else tryFindNum1 
+        data = unsolved |> List.map (parseLine parser) |> Solved 
       in 
         { model | data = data }
     Solved _ -> model 
@@ -1308,9 +1287,6 @@ getTotalScore lines =
 viewBody : Model -> Html Msg
 viewBody model =
   let
-    s = "four95qvkvveight5"
-    digits = digitFinder1 s |> List.map (\(ix, d) -> "(" ++ String.fromInt ix ++ "," ++ String.fromInt d ++ ")") |> String.join " - "
-    -- commandsStr = parsed |> lineToString
     commandsStr = "?"
     textFontSize = 
       case model.dataSource of 
