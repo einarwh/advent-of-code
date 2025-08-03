@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.Q.C === region.X.C)
+	if (region.Q.H === region.X.H)
 	{
-		return 'on line ' + region.Q.C;
+		return 'on line ' + region.Q.H;
 	}
-	return 'on lines ' + region.Q.C + ' through ' + region.X.C;
+	return 'on lines ' + region.Q.H + ' through ' + region.X.H;
 }
 
 
@@ -5193,7 +5193,7 @@ var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Aoc01$init = function (_v0) {
 	var dataSource = 0;
 	var data = $author$project$Aoc01$initData(dataSource);
-	var model = {U: 0, l: data, m: dataSource, W: '', B: false, ac: 'press play to start'};
+	var model = {U: 0, j: data, m: dataSource, W: '', y: false, ac: 'press play to start'};
 	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -5207,7 +5207,7 @@ var $author$project$Aoc01$updateClear = function (model) {
 	return _Utils_update(
 		model,
 		{
-			l: $author$project$Aoc01$initData(model.m)
+			j: $author$project$Aoc01$initData(model.m)
 		});
 };
 var $author$project$Aoc01$updateDataSource = F2(
@@ -5215,7 +5215,7 @@ var $author$project$Aoc01$updateDataSource = F2(
 		return _Utils_update(
 			model,
 			{
-				l: $author$project$Aoc01$initData(dataSource),
+				j: $author$project$Aoc01$initData(dataSource),
 				m: dataSource
 			});
 	});
@@ -5302,7 +5302,7 @@ var $elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
-var $author$project$Aoc01$parseLine = function (s) {
+var $author$project$Aoc01$parseLine1 = function (s) {
 	var digits = $author$project$Aoc01$digitFinder1(s);
 	var _v0 = A2(
 		$elm$core$Maybe$withDefault,
@@ -5319,29 +5319,110 @@ var $author$project$Aoc01$parseLine = function (s) {
 	var firstIndex = _v1.a;
 	var firstDigit = _v1.b;
 	var firstDigitSegment = _Utils_Tuple2(firstIndex, 1);
-	return {H: s, I: firstDigit, J: firstDigitSegment, K: lastDigit, L: lastDigitSegment};
+	return {C: s, D: firstDigit, E: firstDigitSegment, F: lastDigit, G: lastDigitSegment};
+};
+var $author$project$Aoc01$substrings = function (s) {
+	return $elm$core$String$isEmpty(s) ? _List_Nil : A2(
+		$elm$core$List$cons,
+		s,
+		$author$project$Aoc01$substrings(
+			A2($elm$core$String$dropLeft, 1, s)));
+};
+var $author$project$Aoc01$tryFindNum2 = function (s) {
+	var s0 = A2($elm$core$String$left, 1, s);
+	var _v0 = $elm$core$String$toInt(s0);
+	if (!_v0.$) {
+		var d = _v0.a;
+		return $elm$core$Maybe$Just(
+			_Utils_Tuple2(d, s0));
+	} else {
+		return A2($elm$core$String$startsWith, 'one', s) ? $elm$core$Maybe$Just(
+			_Utils_Tuple2(1, 'one')) : (A2($elm$core$String$startsWith, 'two', s) ? $elm$core$Maybe$Just(
+			_Utils_Tuple2(2, 'two')) : (A2($elm$core$String$startsWith, 'three', s) ? $elm$core$Maybe$Just(
+			_Utils_Tuple2(3, 'three')) : (A2($elm$core$String$startsWith, 'four', s) ? $elm$core$Maybe$Just(
+			_Utils_Tuple2(4, 'four')) : (A2($elm$core$String$startsWith, 'five', s) ? $elm$core$Maybe$Just(
+			_Utils_Tuple2(5, 'five')) : (A2($elm$core$String$startsWith, 'six', s) ? $elm$core$Maybe$Just(
+			_Utils_Tuple2(6, 'six')) : (A2($elm$core$String$startsWith, 'seven', s) ? $elm$core$Maybe$Just(
+			_Utils_Tuple2(7, 'seven')) : (A2($elm$core$String$startsWith, 'eight', s) ? $elm$core$Maybe$Just(
+			_Utils_Tuple2(8, 'eight')) : (A2($elm$core$String$startsWith, 'nine', s) ? $elm$core$Maybe$Just(
+			_Utils_Tuple2(9, 'nine')) : $elm$core$Maybe$Nothing))))))));
+	}
+};
+var $author$project$Aoc01$digitFinder2 = function (str) {
+	var subs = $author$project$Aoc01$substrings(str);
+	var pairs = A2($elm$core$List$indexedMap, $elm$core$Tuple$pair, subs);
+	var foo = A2(
+		$elm$core$List$filterMap,
+		function (_v0) {
+			var ix = _v0.a;
+			var s = _v0.b;
+			return A2(
+				$elm$core$Maybe$map,
+				function (_v1) {
+					var d = _v1.a;
+					var ds = _v1.b;
+					return _Utils_Tuple2(
+						ix,
+						_Utils_Tuple2(d, ds));
+				},
+				$author$project$Aoc01$tryFindNum2(s));
+		},
+		pairs);
+	return foo;
+};
+var $author$project$Aoc01$parseLine2 = function (s) {
+	var digits = $author$project$Aoc01$digitFinder2(s);
+	var _v0 = A2(
+		$elm$core$Maybe$withDefault,
+		_Utils_Tuple2(
+			0,
+			_Utils_Tuple2(0, '0')),
+		$elm$core$List$head(
+			$elm$core$List$reverse(digits)));
+	var lastIndex = _v0.a;
+	var _v1 = _v0.b;
+	var lastDigit = _v1.a;
+	var lastDigitStr = _v1.b;
+	var lastDigitSegment = _Utils_Tuple2(
+		lastIndex,
+		$elm$core$String$length(lastDigitStr));
+	var _v2 = A2(
+		$elm$core$Maybe$withDefault,
+		_Utils_Tuple2(
+			0,
+			_Utils_Tuple2(0, '0')),
+		$elm$core$List$head(digits));
+	var firstIndex = _v2.a;
+	var _v3 = _v2.b;
+	var firstDigit = _v3.a;
+	var firstDigitStr = _v3.b;
+	var firstDigitSegment = _Utils_Tuple2(
+		firstIndex,
+		$elm$core$String$length(firstDigitStr));
+	return {C: s, D: firstDigit, E: firstDigitSegment, F: lastDigit, G: lastDigitSegment};
 };
 var $author$project$Aoc01$updateSolve = function (model) {
-	var _v0 = model.l;
+	var _v0 = model.j;
 	if (_v0.$ === 1) {
 		var unsolved = _v0.a;
+		var parser = model.y ? $author$project$Aoc01$parseLine2 : $author$project$Aoc01$parseLine1;
 		var data = $author$project$Aoc01$Solved(
-			A2($elm$core$List$map, $author$project$Aoc01$parseLine, unsolved));
+			A2($elm$core$List$map, parser, unsolved));
 		return _Utils_update(
 			model,
-			{l: data});
+			{j: data});
 	} else {
 		return model;
 	}
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc01$updateToggleIncludeLetters = function (model) {
-	var includeLetters = !model.B;
+	var includeLetters = !model.y;
 	return _Utils_update(
 		model,
 		{
-			l: $author$project$Aoc01$initData(model.m),
-			B: includeLetters
+			j: $author$project$Aoc01$initData(model.m),
+			y: includeLetters
 		});
 };
 var $author$project$Aoc01$update = F2(
@@ -5401,7 +5482,7 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $author$project$Aoc01$getLineScore = function (line) {
-	return (line.I * 10) + line.K;
+	return (line.D * 10) + line.F;
 };
 var $elm$core$List$sum = function (numbers) {
 	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
@@ -5477,14 +5558,14 @@ var $author$project$Aoc01$maybePlainSegment = function (s) {
 		$elm$html$Html$text(s));
 };
 var $author$project$Aoc01$toSolvedLineHtmlElements = function (line) {
-	var s = line.H;
-	var _v0 = line.L;
+	var s = line.C;
+	var _v0 = line.G;
 	var lastStartIndex = _v0.a;
 	var lastLength = _v0.b;
 	var lastEndIndex = (lastStartIndex + lastLength) - 1;
 	var lastDigitStr = A3($elm$core$String$slice, lastStartIndex, lastEndIndex + 1, s);
 	var lastSegment = A2($elm$core$String$dropLeft, lastEndIndex + 1, s);
-	var _v1 = line.J;
+	var _v1 = line.E;
 	var firstStartIndex = _v1.a;
 	var firstLength = _v1.b;
 	var firstEndIndex = (firstStartIndex + firstLength) - 1;
@@ -5546,8 +5627,8 @@ var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Aoc01$viewBody = function (model) {
 	var textFontSize = function () {
-		var _v3 = model.m;
-		switch (_v3) {
+		var _v4 = model.m;
+		switch (_v4) {
 			case 0:
 				return '12px';
 			case 1:
@@ -5557,9 +5638,9 @@ var $author$project$Aoc01$viewBody = function (model) {
 		}
 	}();
 	var scoreStr = function () {
-		var _v2 = model.l;
-		if (!_v2.$) {
-			var solved = _v2.a;
+		var _v3 = model.j;
+		if (!_v3.$) {
+			var solved = _v3.a;
 			return $elm$core$String$fromInt(
 				$author$project$Aoc01$getTotalScore(solved));
 		} else {
@@ -5567,14 +5648,13 @@ var $author$project$Aoc01$viewBody = function (model) {
 		}
 	}();
 	var s = 'four95qvkvveight5';
-	var parsed = $author$project$Aoc01$parseLine(s);
 	var elements = function () {
-		var _v1 = model.l;
-		if (!_v1.$) {
-			var solved = _v1.a;
+		var _v2 = model.j;
+		if (!_v2.$) {
+			var solved = _v2.a;
 			return $author$project$Aoc01$toSolvedElements(solved);
 		} else {
-			var unsolved = _v1.a;
+			var unsolved = _v2.a;
 			return $author$project$Aoc01$toUnsolvedElements(unsolved);
 		}
 	}();
@@ -5583,12 +5663,21 @@ var $author$project$Aoc01$viewBody = function (model) {
 		' - ',
 		A2(
 			$elm$core$List$map,
-			function (_v0) {
-				var ix = _v0.a;
-				var d = _v0.b;
+			function (_v1) {
+				var ix = _v1.a;
+				var d = _v1.b;
 				return '(' + ($elm$core$String$fromInt(ix) + (',' + ($elm$core$String$fromInt(d) + ')')));
 			},
 			$author$project$Aoc01$digitFinder1(s)));
+	var debugStr = function () {
+		var _v0 = model.j;
+		if (!_v0.$) {
+			var solved = _v0.a;
+			return '?';
+		} else {
+			return '?';
+		}
+	}();
 	var commandsStr = '?';
 	return A2(
 		$elm$html$Html$table,
@@ -5855,7 +5944,7 @@ var $author$project$Aoc01$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('checkbox'),
 										$elm$html$Html$Events$onClick(2),
-										$elm$html$Html$Attributes$checked(model.B)
+										$elm$html$Html$Attributes$checked(model.y)
 									]),
 								_List_Nil),
 								A2(
@@ -5889,6 +5978,13 @@ var $author$project$Aoc01$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(scoreStr)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(debugStr)
 									]))
 							]))
 					])),

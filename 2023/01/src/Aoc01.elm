@@ -1092,14 +1092,66 @@ digitFinder1 : String -> List (Int, Int)
 digitFinder1 s = 
   s |> String.toList |> List.indexedMap Tuple.pair |> List.filterMap (\(ix, c) -> tryParseInt c |> Maybe.map (\n -> (ix, n)))
 
-parseLine : String -> Line
-parseLine s = 
+tryFindNum2 : String -> Maybe (Int, String) 
+tryFindNum2 s  = 
+  let 
+    s0 = String.left 1 s 
+  in 
+    case String.toInt s0 of 
+      Just d -> 
+        Just (d, s0) 
+      Nothing -> 
+        if String.startsWith "one" s then Just (1, "one")
+        else if String.startsWith "two" s then Just (2, "two")
+        else if String.startsWith "three" s then Just (3, "three")
+        else if String.startsWith "four" s then Just (4, "four")
+        else if String.startsWith "five" s then Just (5, "five")
+        else if String.startsWith "six" s then Just (6, "six")
+        else if String.startsWith "seven" s then Just (7, "seven")
+        else if String.startsWith "eight" s then Just (8, "eight")
+        else if String.startsWith "nine" s then Just (9, "nine")
+        else Nothing
+
+substrings : String -> List String 
+substrings s = 
+  if String.isEmpty s then []
+  else s :: substrings (String.dropLeft 1 s)
+
+-- let numberFinder2 = subStrings >> List.choose tryFindNum
+
+digitFinder2 : String -> List (Int, (Int, String)) 
+digitFinder2 str = 
+  let 
+    subs = substrings str
+    pairs = subs |> List.indexedMap Tuple.pair 
+    foo = pairs |> List.filterMap (\(ix, s) -> tryFindNum2 s |> Maybe.map (\(d, ds) -> (ix, (d, ds))))
+  in 
+    foo
+
+parseLine1 : String -> Line
+parseLine1 s = 
   let 
     digits = digitFinder1 s 
     (firstIndex, firstDigit) = digits |> List.head |> Maybe.withDefault (2, 2) 
     (lastIndex, lastDigit) = digits |> List.reverse |> List.head |> Maybe.withDefault (2, 2) 
     firstDigitSegment = (firstIndex, 1)
     lastDigitSegment = (lastIndex, 1)
+  in  
+    { content = s
+    , firstDigit = firstDigit
+    , firstDigitSegment = firstDigitSegment
+    , lastDigit = lastDigit
+    , lastDigitSegment = lastDigitSegment
+    }
+
+parseLine2 : String -> Line
+parseLine2 s = 
+  let 
+    digits = digitFinder2 s 
+    (firstIndex, (firstDigit, firstDigitStr)) = digits |> List.head |> Maybe.withDefault (0, (0, "0")) 
+    (lastIndex, (lastDigit, lastDigitStr)) = digits |> List.reverse |> List.head |> Maybe.withDefault (0, (0, "0"))
+    firstDigitSegment = (firstIndex, String.length firstDigitStr)
+    lastDigitSegment = (lastIndex, String.length lastDigitStr)
   in  
     { content = s
     , firstDigit = firstDigit
@@ -1116,7 +1168,8 @@ updateSolve model =
   case model.data of 
     Unsolved unsolved -> 
       let 
-        data = unsolved |> List.map parseLine |> Solved 
+        parser = if model.includeLetters then parseLine2 else parseLine1 
+        data = unsolved |> List.map parser |> Solved 
       in 
         { model | data = data }
     Solved _ -> model 
@@ -1257,7 +1310,6 @@ viewBody model =
   let
     s = "four95qvkvveight5"
     digits = digitFinder1 s |> List.map (\(ix, d) -> "(" ++ String.fromInt ix ++ "," ++ String.fromInt d ++ ")") |> String.join " - "
-    parsed = parseLine s  
     -- commandsStr = parsed |> lineToString
     commandsStr = "?"
     textFontSize = 
@@ -1272,6 +1324,12 @@ viewBody model =
     scoreStr = 
       case model.data of 
         Solved solved -> getTotalScore solved |> String.fromInt 
+        _ -> "?"
+    debugStr = 
+      case model.data of 
+        Solved solved -> 
+          "?"
+          -- solved |> List.map getLineScore |> List.map String.fromInt |> String.join ","
         _ -> "?"
   in 
     Html.table 
@@ -1368,6 +1426,7 @@ viewBody model =
               , Html.Attributes.style "padding-top" "10px" ] 
               [ 
                 Html.div [] [ Html.text scoreStr ]
+              , Html.div [] [ Html.text debugStr ]
               ] ]
       , Html.tr 
           []
