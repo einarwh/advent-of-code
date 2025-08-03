@@ -1132,7 +1132,7 @@ toUnbalancedHtmlElement : String -> List (Html Msg)
 toUnbalancedHtmlElement s =
   let 
     textElement = Html.text s 
-    spanElement = Html.span [ Html.Attributes.style "background-color" "#FAA0A0" ] [ textElement ]
+    spanElement = Html.span [ Html.Attributes.class "mark-err adaptive" ] [ textElement ]
   in 
     [ spanElement, Html.br [] [] ]
 
@@ -1140,7 +1140,7 @@ toBalancedHtmlElement : String -> List (Html Msg)
 toBalancedHtmlElement s =
   let 
     textElement = Html.text s 
-    spanElement = Html.span [ Html.Attributes.style "background-color" "#AFE1AF" ] [ textElement ]
+    spanElement = Html.span [ Html.Attributes.class "mark-ok adaptive" ] [ textElement ]
   in 
     [ spanElement, Html.br [] [] ]
 

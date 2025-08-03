@@ -29,7 +29,6 @@ type alias Pos = (Int, Int)
 type alias Model = 
   { password : String
   , paused : Bool 
-  , finished : Bool 
   , tickInterval : Float 
   , message : String
   , debug : String }
@@ -44,7 +43,6 @@ initModel =
   in 
     { password = input
     , paused = True
-    , finished = False 
     , tickInterval = defaultTickInterval
     , message = ""
     , debug = "" }
@@ -171,7 +169,7 @@ updateStep model =
     nextPwd = nextPassword model.password
   in 
     if isCompliant nextPwd then 
-      { model | password = nextPwd, finished = True, paused = True, message = "FOUND" } 
+      { model | password = nextPwd, paused = True, message = "FOUND" } 
     else 
       { model | password = nextPwd, message = nextPwd }
 
@@ -194,13 +192,7 @@ updateNextValid model =
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
-  if model.finished then 
-    let 
-      m = initModel 
-    in 
-      {m | paused = False }
-  else 
-    { model | paused = not model.paused }
+  { model | paused = not model.paused }
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -225,7 +217,7 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
   let 
-    tickSub = if model.paused || model.finished then Sub.none else Time.every model.tickInterval (\_ -> Tick)
+    tickSub = if model.paused then Sub.none else Time.every model.tickInterval (\_ -> Tick)
   in 
     tickSub
 

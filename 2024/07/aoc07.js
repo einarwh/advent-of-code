@@ -6039,6 +6039,7 @@ var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$br = _VirtualDom_node('br');
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$span = _VirtualDom_node('span');
 var $author$project$Main$toBalancedHtmlElement = function (s) {
 	var textElement = $elm$html$Html$text(s);
@@ -6046,7 +6047,7 @@ var $author$project$Main$toBalancedHtmlElement = function (s) {
 		$elm$html$Html$span,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'background-color', '#AFE1AF')
+				$elm$html$Html$Attributes$class('mark-ok adaptive')
 			]),
 		_List_fromArray(
 			[textElement]));
@@ -6062,7 +6063,7 @@ var $author$project$Main$toUnbalancedHtmlElement = function (s) {
 		$elm$html$Html$span,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'background-color', '#FAA0A0')
+				$elm$html$Html$Attributes$class('mark-err adaptive')
 			]),
 		_List_fromArray(
 			[textElement]));

@@ -217,18 +217,8 @@ getPwdStyle : Bool -> List (Html.Attribute msg)
 getPwdStyle compliant = 
   if compliant then 
     [ Html.Attributes.class "mark-err adaptive" ]
-    -- [ Html.Attributes.style "border-style" "solid"
-    -- , Html.Attributes.style "border-width" "2px"
-    -- , Html.Attributes.style "border-color" "green"
-    -- , Html.Attributes.style "padding" "2px"
-    -- , Html.Attributes.style "font-weight" "normal" ]
   else
     [ Html.Attributes.class "mark-err adaptive" ]
-    -- [ Html.Attributes.style "border-style" "solid"
-    -- , Html.Attributes.style "border-width" "2px"
-    -- , Html.Attributes.style "border-color" "red"
-    -- , Html.Attributes.style "padding" "2px"
-    -- , Html.Attributes.style "font-weight" "light"]
 
 view : Model -> Document Msg
 view model = 
