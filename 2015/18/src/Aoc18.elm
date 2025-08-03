@@ -29,19 +29,8 @@ type DataSource = Input | Sample
 
 type alias Pos = (Int, Int)
 
-type Dir = N | W | S | E
-
-type Junction = Left | Forward | Right
-
-type alias Cart = 
-  { dir : Dir 
-  , pos : Pos 
-  , switches : Junction
-  }
-
 type alias Model = 
   { mine : Array2D Char
-  , carts : List Cart 
   , dataSource : DataSource
   , steps : Int 
   , cornersStuckOn : Bool
@@ -189,72 +178,16 @@ toIndexedList mine =
   in 
     yRange |> List.concatMap (\y -> xRange |> List.map (\x -> ((x, y), Array2D.get y x mine |> Maybe.withDefault ' ')))
 
-isCart : Char -> Bool 
-isCart ch = 
-  let 
-    symbols = ['^', '<', 'v', '>']
-  in 
-    symbols |> List.member ch
-
 isBlank : Char -> Bool 
 isBlank ch = 
   ch == ' '
-
-isCrash : Char -> Bool 
-isCrash ch = 
-  ch == 'X'
-
-charToDir : Char -> Dir 
-charToDir ch = 
-  case ch of 
-    '^' -> N
-    '<' -> W
-    'v' -> S
-    '>' -> E
-    _ -> N
-
-dirToChar : Dir -> Char 
-dirToChar dir  = 
-  case dir of 
-    N -> '^'
-    W -> '<'
-    S -> 'v'
-    E -> '>'
-
-dirToMineSymbol : Dir -> Char 
-dirToMineSymbol dir  = 
-  case dir of 
-    N -> '|'
-    W -> '-'
-    S -> '|'
-    E -> '-'
-
-findCarts : Array2D Char -> List Cart
-findCarts mine = 
-  let 
-    indexed = toIndexedList mine 
-  in 
-    indexed |> List.filterMap (\(pos, ch) -> if isCart ch then Just { dir = charToDir ch, pos = pos, switches = Left } else Nothing)
-
-withoutCarts : List Cart -> Array2D Char -> Array2D Char 
-withoutCarts carts mine = 
-  case carts of 
-    [] -> mine 
-    c :: rest -> 
-      let 
-        (x, y) = c.pos 
-        symbol = dirToMineSymbol c.dir 
-      in 
-        withoutCarts rest (Array2D.set y x symbol mine)
 
 initModel : DataSource -> Bool -> Model 
 initModel dataSource cornersStuckOn = 
   let 
     mine = initMine dataSource
-    carts = findCarts mine
   in 
-    { mine = withoutCarts carts mine
-    , carts = carts
+    { mine = mine
     , dataSource = dataSource
     , cornersStuckOn = cornersStuckOn
     , steps = 0 
@@ -298,96 +231,6 @@ getNestedPositions mine =
   in 
     ys |> List.map (\y -> xs |> List.map (\x -> (x, y)))
 
-getNextPos : Dir -> Pos -> Pos 
-getNextPos dir (x, y) = 
-  case dir of 
-    N -> (x, y - 1)
-    W -> (x - 1, y)
-    S -> (x, y + 1)
-    E -> (x + 1, y)
-
-turnLeft : Dir -> Dir 
-turnLeft dir = 
-  case dir of 
-    N -> W
-    W -> S
-    S -> E 
-    E -> N
-
-turnRight : Dir -> Dir 
-turnRight dir = 
-  case dir of 
-    N -> E
-    W -> N
-    S -> W 
-    E -> S
-
-straightAhead : Dir -> Dir 
-straightAhead dir = dir
-
-turn : Junction -> (Dir -> Dir)
-turn switches = 
-  case switches of 
-    Left -> turnLeft
-    Forward -> straightAhead
-    Right -> turnRight
-
-getNextDir : Char -> Cart -> Dir 
-getNextDir nextSymbol cart =
-  let 
-    dir = cart.dir 
-    switches = cart.switches
-  in 
-    case nextSymbol of 
-      '/' -> 
-        case dir of 
-          N -> turnRight dir
-          W -> turnLeft dir 
-          S -> turnRight dir 
-          E -> turnLeft dir 
-      '\\' ->
-        case dir of 
-          N -> turnLeft dir
-          W -> turnRight dir 
-          S -> turnLeft dir 
-          E -> turnRight dir 
-      '+' ->
-        turn switches dir 
-      _ -> 
-        dir 
-
-getNextSwitches : Char -> Junction -> Junction 
-getNextSwitches nextSymbol switches = 
-  case nextSymbol of 
-    '+' -> 
-      case switches of 
-        Left -> Forward
-        Forward -> Right 
-        Right -> Left 
-    _ -> 
-      switches
-
-moveCart : Array2D Char -> Cart -> Cart
-moveCart mine cart = 
-  let 
-    (x, y) = getNextPos cart.dir cart.pos 
-    nextSymbol = Array2D.get y x mine |> Maybe.withDefault ' '
-    nextDir = getNextDir nextSymbol cart 
-    nextSwitches = getNextSwitches nextSymbol cart.switches
-  in 
-    { dir = nextDir, pos = (x, y), switches = nextSwitches }
-
-crashesWithAnotherCart : List Cart -> Cart -> Bool 
-crashesWithAnotherCart carts cart = 
-  let 
-    count = carts |> List.filter (\c -> c.pos == cart.pos) |> List.length 
-  in 
-    count > 1
-
-findCrashes : List Cart -> List Cart 
-findCrashes carts =  
-  carts |> List.filter (crashesWithAnotherCart carts) 
-
 updateClear : Model -> Model
 updateClear model = 
   initModel model.dataSource model.cornersStuckOn
@@ -399,38 +242,9 @@ posToString (x, y) =
 updateStep : Model -> Model
 updateStep model = 
   let 
-    carts = model.carts 
-    crashes = findCrashes carts  
-    remaining = carts |> List.filter (\c -> List.member c crashes |> not)
-    movedRemaining = remaining |> List.map (moveCart model.mine)
     steps = model.steps
   in 
-    if model.cornersStuckOn then 
-        if List.length remaining > 1 then 
-          { model | carts = movedRemaining, steps = steps + 1 }
-        else 
-          let 
-            msg = 
-              case remaining of 
-                [] -> "No carts left!" 
-                c :: _ -> 
-                  let 
-                    (x, y) = c.pos 
-                  in 
-                    "Last cart at " ++ String.fromInt x ++ "," ++ String.fromInt y
-          in 
-            { model | carts = movedRemaining, finished = True, message = msg }
-    else 
-      case crashes of 
-        [] -> 
-          { model | carts = movedRemaining, steps = steps + 1 }
-        _ -> 
-          let
-            crashPositions = crashes |> List.map (\c -> c.pos) |> Set.fromList |> Set.toList |> List.sort 
-            s = crashPositions |> List.map posToString |> String.join " "
-            msg = "First crash at " ++ s
-          in 
-            { model | carts = carts, finished = True, message = msg }
+    model
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -490,30 +304,12 @@ subscriptions model =
 
 -- VIEW
 
-toCharElement : Array2D Char -> List Cart -> Pos -> Html Msg 
-toCharElement mine carts (x, y) = 
+toCharElement : Array2D Char -> Pos -> Html Msg 
+toCharElement mine (x, y) = 
   let 
-    cartsAtPos = carts |> List.filter (\c -> c.pos == (x, y))
-    symbol = 
-      case cartsAtPos of 
-        [] ->
-          Array2D.get y x mine |> Maybe.withDefault ' '
-        [c] -> 
-          case c.dir of 
-            N -> '^'
-            W -> '<'
-            S -> 'v'
-            e -> '>'
-        _ -> 'X'
+    symbol = Array2D.get y x mine |> Maybe.withDefault ' '
   in  
-    if isCart symbol then 
-      Html.span [ Html.Attributes.style "color" "#2E8B57", Html.Attributes.style "background-color" "#CCCCCC" ] [ Html.text (String.fromChar symbol) ]
-    else if isBlank symbol then 
-      Html.span [ Html.Attributes.style "color" "#FFFFFF" ] [ Html.text "." ]
-    else if isCrash symbol then 
-      Html.span [ Html.Attributes.style "color" "#D2042D", Html.Attributes.style "background-color" "#CCCCCC" ] [ Html.text "X" ]
-    else 
-      Html.text (String.fromChar symbol)
+    Html.text (String.fromChar symbol)
 
 view : Model -> Document Msg
 view model = 
@@ -524,9 +320,8 @@ viewBody : Model -> Html Msg
 viewBody model =
   let
     mine = model.mine
-    carts = model.carts 
     nestedPositions = getNestedPositions mine
-    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement mine carts))
+    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement mine))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []      
     textFontSize = 
       case model.dataSource of 
@@ -638,8 +433,7 @@ viewBody model =
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "24px" ] 
               [ 
-                Html.div [] [ Html.text ("Carts: " ++ String.fromInt (model.carts |> List.length)) ]
-              , Html.div [] [ Html.text ("Steps: " ++ String.fromInt model.steps) ]
+                Html.div [] [ Html.text ("Steps: " ++ String.fromInt model.steps) ]
               , Html.div [] [ Html.text model.message ]
               ] ]
               ]
