@@ -160,8 +160,8 @@ input = """#...##......#......##.##..#...##......##.#.#.###.#.#..#..#......####.
 ###....#.#..#.#..###..#.##......#...#..#..##.#..###..##..#..#.####..#...########..##.#.##.#.#.#...#.
 .#.#.##.##.###..#...#.#....#..#.##..#.#.#.#.##.##.#####...#........####..###..####.#####..#.##.#.##."""
 
-initMine : DataSource -> Array2D Bool
-initMine dataSource = 
+initGrid : DataSource -> Array2D Bool
+initGrid dataSource = 
   let 
     data = 
       case dataSource of 
@@ -178,14 +178,10 @@ toIndexedList grid =
   in 
     yRange |> List.concatMap (\y -> xRange |> List.map (\x -> ((x, y), Array2D.get y x grid |> Maybe.withDefault False)))
 
-isBlank : Char -> Bool 
-isBlank ch = 
-  ch == ' '
-
 initModel : DataSource -> Bool -> Model 
 initModel dataSource cornersStuckOn = 
   let 
-    grid = initMine dataSource
+    grid = initGrid dataSource |> checkCorners cornersStuckOn
   in 
     { grid = grid
     , dataSource = dataSource
@@ -239,12 +235,65 @@ posToString : (Int, Int) -> String
 posToString (x, y) = 
   String.fromInt x ++ "," ++ String.fromInt y
 
+isCorner : Array2D a -> (Int, Int) -> Bool
+isCorner grid (x, y) = 
+  let 
+    xMax = Array2D.rows grid - 1
+    yMax = Array2D.columns grid - 1
+  in 
+    (x == 0 && y == 0) || (x == xMax && y == 0) || (x == 0 && y == yMax) || (x == xMax && y == yMax)
+
+getNeighbours : Array2D Bool -> (Int, Int) -> List Bool
+getNeighbours grid (x, y) = 
+  let 
+    positions = [(x-1, y-1), (x, y-1), (x+1, y-1), (x-1,y), (x+1,y), (x-1, y+1), (x, y+1), (x+1, y+1)]
+  in 
+    positions |> List.filterMap (\(xx, yy) -> Array2D.get yy xx grid)
+
+turnOn cornersStuckOn grid pos = 
+  if cornersStuckOn && isCorner grid pos then True 
+  else 
+    let 
+      nbCount = getNeighbours grid pos |> List.filter identity |> List.length 
+      currentlyOn = isLightOn grid pos 
+    in 
+      (currentlyOn && (nbCount == 2 || nbCount == 3)) || (not currentlyOn && nbCount == 3)
+
+step : Bool -> Array2D Bool -> Array2D Bool 
+step cornersStuckOn grid = 
+  let 
+    nestedPositions = getNestedPositions grid
+    g = nestedPositions |> List.map (\positions -> positions |> List.map (turnOn cornersStuckOn grid)) |> Array2D.fromList
+  in 
+    g
+
+checkCorners : Bool -> Array2D Bool -> Array2D Bool 
+checkCorners cornersStuckOn grid = 
+  if cornersStuckOn then 
+    let 
+      xMax = Array2D.rows grid - 1
+      yMax = Array2D.columns grid - 1
+    in 
+      grid 
+      |> Array2D.set 0 0 True 
+      |> Array2D.set yMax 0 True 
+      |> Array2D.set 0 xMax True 
+      |> Array2D.set yMax xMax True 
+  else 
+    grid 
+
 updateStep : Model -> Model
 updateStep model = 
-  let 
+  let  
     steps = model.steps
   in 
-    model
+    if steps < 100 then 
+      let 
+        g = step model.cornersStuckOn model.grid 
+      in 
+        { model | steps = steps + 1, grid = g }
+    else 
+      { model | finished = True, paused = True } 
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -304,10 +353,14 @@ subscriptions model =
 
 -- VIEW
 
+isLightOn : Array2D Bool -> Pos -> Bool 
+isLightOn grid (x, y) = 
+  Array2D.get y x grid |> Maybe.withDefault False
+
 toCharElement : Array2D Bool -> Pos -> Html Msg 
 toCharElement grid (x, y) = 
   let 
-    enabled = Array2D.get y x grid |> Maybe.withDefault False
+    enabled = isLightOn grid (x, y)
   in  
     Html.text (if enabled then "#" else ".")
 
@@ -322,7 +375,8 @@ viewBody model =
     grid = model.grid
     nestedPositions = getNestedPositions grid
     nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement grid))
-    elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []      
+    elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
+    lightCount = getAllPositions grid |> List.filter (isLightOn grid) |> List.length
     textFontSize = 
       case model.dataSource of 
         Sample -> "32px"
@@ -421,20 +475,21 @@ viewBody model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "24px" ] 
+              [ 
+                Html.div [] [ Html.text ("Steps: " ++ String.fromInt model.steps) ]
+              , Html.div [] [ Html.text ("Lights: " ++ String.fromInt lightCount) ]
+              , Html.div [] [ Html.text model.message ]
+              ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Source Code Pro, monospace"
               , Html.Attributes.style "font-size" textFontSize
               , Html.Attributes.style "padding" "10px" ] 
               [ 
                 Html.div [] elements
               ] ] 
-      , Html.tr 
-          []
-          [ Html.td 
-              [ Html.Attributes.align "center"
-              , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "24px" ] 
-              [ 
-                Html.div [] [ Html.text ("Steps: " ++ String.fromInt model.steps) ]
-              , Html.div [] [ Html.text model.message ]
-              ] ]
               ]

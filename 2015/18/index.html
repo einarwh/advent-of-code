@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.R.E === region.Y.E)
+	if (region.R.G === region.Y.G)
 	{
-		return 'on line ' + region.R.E;
+		return 'on line ' + region.R.G;
 	}
-	return 'on lines ' + region.R.E + ' through ' + region.Y.E;
+	return 'on lines ' + region.R.G + ' through ' + region.Y.G;
 }
 
 
@@ -5251,6 +5251,169 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$document = _Browser_document;
 var $author$project$Aoc18$Input = 0;
+var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
+	return array2d.h;
+};
+var $elm$core$Array$length = function (_v0) {
+	var len = _v0.a;
+	return len;
+};
+var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
+	return $elm$core$Array$length(array2d.a);
+};
+var $elm$core$Bitwise$and = _Bitwise_and;
+var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
+var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
+var $elm$core$Basics$ge = _Utils_ge;
+var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
+var $elm$core$Array$getHelp = F3(
+	function (shift, index, tree) {
+		getHelp:
+		while (true) {
+			var pos = $elm$core$Array$bitMask & (index >>> shift);
+			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+			if (!_v0.$) {
+				var subTree = _v0.a;
+				var $temp$shift = shift - $elm$core$Array$shiftStep,
+					$temp$index = index,
+					$temp$tree = subTree;
+				shift = $temp$shift;
+				index = $temp$index;
+				tree = $temp$tree;
+				continue getHelp;
+			} else {
+				var values = _v0.a;
+				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
+			}
+		}
+	});
+var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
+var $elm$core$Array$tailIndex = function (len) {
+	return (len >>> 5) << 5;
+};
+var $elm$core$Array$get = F2(
+	function (index, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
+			index,
+			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
+			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
+			A3($elm$core$Array$getHelp, startShift, index, tree)));
+	});
+var $tortus$elm_array_2d$Array2D$getRow = F2(
+	function (row, array2d) {
+		return A2($elm$core$Array$get, row, array2d.a);
+	});
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $elm$core$Elm$JsArray$unsafeSet = _JsArray_unsafeSet;
+var $elm$core$Array$setHelp = F4(
+	function (shift, index, value, tree) {
+		var pos = $elm$core$Array$bitMask & (index >>> shift);
+		var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+		if (!_v0.$) {
+			var subTree = _v0.a;
+			var newSub = A4($elm$core$Array$setHelp, shift - $elm$core$Array$shiftStep, index, value, subTree);
+			return A3(
+				$elm$core$Elm$JsArray$unsafeSet,
+				pos,
+				$elm$core$Array$SubTree(newSub),
+				tree);
+		} else {
+			var values = _v0.a;
+			var newLeaf = A3($elm$core$Elm$JsArray$unsafeSet, $elm$core$Array$bitMask & index, value, values);
+			return A3(
+				$elm$core$Elm$JsArray$unsafeSet,
+				pos,
+				$elm$core$Array$Leaf(newLeaf),
+				tree);
+		}
+	});
+var $elm$core$Array$set = F3(
+	function (index, value, array) {
+		var len = array.a;
+		var startShift = array.b;
+		var tree = array.c;
+		var tail = array.d;
+		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? array : ((_Utils_cmp(
+			index,
+			$elm$core$Array$tailIndex(len)) > -1) ? A4(
+			$elm$core$Array$Array_elm_builtin,
+			len,
+			startShift,
+			tree,
+			A3($elm$core$Elm$JsArray$unsafeSet, $elm$core$Array$bitMask & index, value, tail)) : A4(
+			$elm$core$Array$Array_elm_builtin,
+			len,
+			startShift,
+			A4($elm$core$Array$setHelp, startShift, index, value, tree),
+			tail));
+	});
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $tortus$elm_array_2d$Array2D$set = F4(
+	function (row, col, newValue, array2d) {
+		return A2(
+			$elm$core$Maybe$withDefault,
+			array2d,
+			A2(
+				$elm$core$Maybe$map,
+				function (rowAry) {
+					return _Utils_update(
+						array2d,
+						{
+							a: A3(
+								$elm$core$Array$set,
+								row,
+								A3($elm$core$Array$set, col, newValue, rowAry),
+								array2d.a)
+						});
+				},
+				A2($tortus$elm_array_2d$Array2D$getRow, row, array2d)));
+	});
+var $author$project$Aoc18$checkCorners = F2(
+	function (cornersStuckOn, grid) {
+		if (cornersStuckOn) {
+			var yMax = $tortus$elm_array_2d$Array2D$columns(grid) - 1;
+			var xMax = $tortus$elm_array_2d$Array2D$rows(grid) - 1;
+			return A4(
+				$tortus$elm_array_2d$Array2D$set,
+				yMax,
+				xMax,
+				true,
+				A4(
+					$tortus$elm_array_2d$Array2D$set,
+					0,
+					xMax,
+					true,
+					A4(
+						$tortus$elm_array_2d$Array2D$set,
+						yMax,
+						0,
+						true,
+						A4($tortus$elm_array_2d$Array2D$set, 0, 0, true, grid))));
+		} else {
+			return grid;
+		}
+	});
 var $author$project$Aoc18$defaultTickInterval = 100;
 var $elm$core$Basics$composeR = F3(
 	function (f, g, x) {
@@ -5281,10 +5444,6 @@ var $elm$core$Array$foldl = F3(
 var $elm$core$Array$isEmpty = function (_v0) {
 	var len = _v0.a;
 	return !len;
-};
-var $elm$core$Array$length = function (_v0) {
-	var len = _v0.a;
-	return len;
 };
 var $elm$core$Basics$negate = function (n) {
 	return -n;
@@ -5369,12 +5528,6 @@ var $elm$core$List$drop = F2(
 			}
 		}
 	});
-var $elm$core$Basics$ge = _Utils_ge;
-var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
-var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
-var $elm$core$Array$tailIndex = function (len) {
-	return (len >>> 5) << 5;
-};
 var $elm$core$Array$sliceLeft = F2(
 	function (from, array) {
 		var len = array.a;
@@ -5438,9 +5591,6 @@ var $elm$core$Array$sliceLeft = F2(
 			}
 		}
 	});
-var $elm$core$Bitwise$and = _Bitwise_and;
-var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
-var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
 var $elm$core$Array$fetchNewTail = F4(
 	function (shift, end, treeEnd, tree) {
 		fetchNewTail:
@@ -5487,7 +5637,6 @@ var $elm$core$Array$hoistTree = F3(
 			}
 		}
 	});
-var $elm$core$Elm$JsArray$unsafeSet = _JsArray_unsafeSet;
 var $elm$core$Array$sliceTree = F3(
 	function (shift, endIdx, tree) {
 		var lastPos = $elm$core$Array$bitMask & (endIdx >>> shift);
@@ -5626,7 +5775,7 @@ var $elm$core$String$foldr = _String_foldr;
 var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
 };
-var $author$project$Aoc18$initMine = function (dataSource) {
+var $author$project$Aoc18$initGrid = function (dataSource) {
 	var data = function () {
 		if (dataSource === 1) {
 			return $author$project$Aoc18$sample;
@@ -5648,8 +5797,11 @@ var $author$project$Aoc18$initMine = function (dataSource) {
 };
 var $author$project$Aoc18$initModel = F2(
 	function (dataSource, cornersStuckOn) {
-		var grid = $author$project$Aoc18$initMine(dataSource);
-		return {q: cornersStuckOn, V: 0, r: dataSource, X: '', J: false, L: grid, M: '', w: true, K: 0, y: $author$project$Aoc18$defaultTickInterval};
+		var grid = A2(
+			$author$project$Aoc18$checkCorners,
+			cornersStuckOn,
+			$author$project$Aoc18$initGrid(dataSource));
+		return {n: cornersStuckOn, V: 0, r: dataSource, X: '', E: false, F: grid, M: '', s: true, H: 0, y: $author$project$Aoc18$defaultTickInterval};
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -6075,7 +6227,7 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc18$subscriptions = function (model) {
-	var tickSub = (model.w || model.J) ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = (model.s || model.E) ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
 		model.y,
 		function (_v0) {
@@ -6084,35 +6236,180 @@ var $author$project$Aoc18$subscriptions = function (model) {
 	return tickSub;
 };
 var $author$project$Aoc18$updateClear = function (model) {
-	return A2($author$project$Aoc18$initModel, model.r, model.q);
+	return A2($author$project$Aoc18$initModel, model.r, model.n);
 };
-var $author$project$Aoc18$updateStep = function (model) {
-	var steps = model.K;
-	return model;
+var $author$project$Aoc18$getNestedPositions = function (grid) {
+	var ys = A2(
+		$elm$core$List$range,
+		0,
+		$tortus$elm_array_2d$Array2D$rows(grid) - 1);
+	var xs = A2(
+		$elm$core$List$range,
+		0,
+		$tortus$elm_array_2d$Array2D$columns(grid) - 1);
+	return A2(
+		$elm$core$List$map,
+		function (y) {
+			return A2(
+				$elm$core$List$map,
+				function (x) {
+					return _Utils_Tuple2(x, y);
+				},
+				xs);
+		},
+		ys);
 };
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (!_v0.$) {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (!maybeValue.$) {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $tortus$elm_array_2d$Array2D$get = F3(
+	function (row, col, array2d) {
+		return A2(
+			$elm$core$Maybe$andThen,
+			$elm$core$Array$get(col),
+			A2($tortus$elm_array_2d$Array2D$getRow, row, array2d));
+	});
+var $author$project$Aoc18$getNeighbours = F2(
+	function (grid, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var positions = _List_fromArray(
+			[
+				_Utils_Tuple2(x - 1, y - 1),
+				_Utils_Tuple2(x, y - 1),
+				_Utils_Tuple2(x + 1, y - 1),
+				_Utils_Tuple2(x - 1, y),
+				_Utils_Tuple2(x + 1, y),
+				_Utils_Tuple2(x - 1, y + 1),
+				_Utils_Tuple2(x, y + 1),
+				_Utils_Tuple2(x + 1, y + 1)
+			]);
+		return A2(
+			$elm$core$List$filterMap,
+			function (_v1) {
+				var xx = _v1.a;
+				var yy = _v1.b;
+				return A3($tortus$elm_array_2d$Array2D$get, yy, xx, grid);
+			},
+			positions);
+	});
+var $author$project$Aoc18$isCorner = F2(
+	function (grid, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var yMax = $tortus$elm_array_2d$Array2D$columns(grid) - 1;
+		var xMax = $tortus$elm_array_2d$Array2D$rows(grid) - 1;
+		return ((!x) && (!y)) || ((_Utils_eq(x, xMax) && (!y)) || (((!x) && _Utils_eq(y, yMax)) || (_Utils_eq(x, xMax) && _Utils_eq(y, yMax))));
+	});
+var $author$project$Aoc18$isLightOn = F2(
+	function (grid, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		return A2(
+			$elm$core$Maybe$withDefault,
+			false,
+			A3($tortus$elm_array_2d$Array2D$get, y, x, grid));
+	});
 var $elm$core$Basics$not = _Basics_not;
-var $author$project$Aoc18$updateToggleCornersStuckOn = function (model) {
-	var cornersStuckOn = !model.q;
-	return A2($author$project$Aoc18$initModel, model.r, cornersStuckOn);
-};
-var $author$project$Aoc18$updateTogglePlay = function (model) {
-	if (model.J) {
-		var m = A2($author$project$Aoc18$initModel, model.r, model.q);
+var $author$project$Aoc18$turnOn = F3(
+	function (cornersStuckOn, grid, pos) {
+		if (cornersStuckOn && A2($author$project$Aoc18$isCorner, grid, pos)) {
+			return true;
+		} else {
+			var nbCount = $elm$core$List$length(
+				A2(
+					$elm$core$List$filter,
+					$elm$core$Basics$identity,
+					A2($author$project$Aoc18$getNeighbours, grid, pos)));
+			var currentlyOn = A2($author$project$Aoc18$isLightOn, grid, pos);
+			return (currentlyOn && ((nbCount === 2) || (nbCount === 3))) || ((!currentlyOn) && (nbCount === 3));
+		}
+	});
+var $author$project$Aoc18$step = F2(
+	function (cornersStuckOn, grid) {
+		var nestedPositions = $author$project$Aoc18$getNestedPositions(grid);
+		var g = $tortus$elm_array_2d$Array2D$fromList(
+			A2(
+				$elm$core$List$map,
+				function (positions) {
+					return A2(
+						$elm$core$List$map,
+						A2($author$project$Aoc18$turnOn, cornersStuckOn, grid),
+						positions);
+				},
+				nestedPositions));
+		return g;
+	});
+var $author$project$Aoc18$updateStep = function (model) {
+	var steps = model.H;
+	if (steps < 100) {
+		var g = A2($author$project$Aoc18$step, model.n, model.F);
 		return _Utils_update(
-			m,
-			{w: false});
+			model,
+			{F: g, H: steps + 1});
 	} else {
 		return _Utils_update(
 			model,
-			{w: !model.w});
+			{E: true, s: true});
+	}
+};
+var $author$project$Aoc18$updateToggleCornersStuckOn = function (model) {
+	var cornersStuckOn = !model.n;
+	return A2($author$project$Aoc18$initModel, model.r, cornersStuckOn);
+};
+var $author$project$Aoc18$updateTogglePlay = function (model) {
+	if (model.E) {
+		var m = A2($author$project$Aoc18$initModel, model.r, model.n);
+		return _Utils_update(
+			m,
+			{s: false});
+	} else {
+		return _Utils_update(
+			model,
+			{s: !model.s});
 	}
 };
 var $author$project$Aoc18$updateUseInput = function (model) {
-	return A2($author$project$Aoc18$initModel, 0, model.q);
+	return A2($author$project$Aoc18$initModel, 0, model.n);
 };
 var $author$project$Aoc18$Sample = 1;
 var $author$project$Aoc18$updateUseSample = function (model) {
-	return A2($author$project$Aoc18$initModel, 1, model.q);
+	return A2($author$project$Aoc18$initModel, 1, model.n);
 };
 var $author$project$Aoc18$update = F2(
 	function (msg, model) {
@@ -6197,13 +6494,15 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 	});
 var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
-	return array2d.h;
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
 };
-var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
-	return $elm$core$Array$length(array2d.a);
-};
-var $author$project$Aoc18$getNestedPositions = function (grid) {
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
+var $author$project$Aoc18$getAllPositions = function (grid) {
 	var ys = A2(
 		$elm$core$List$range,
 		0,
@@ -6213,7 +6512,7 @@ var $author$project$Aoc18$getNestedPositions = function (grid) {
 		0,
 		$tortus$elm_array_2d$Array2D$columns(grid) - 1);
 	return A2(
-		$elm$core$List$map,
+		$elm$core$List$concatMap,
 		function (y) {
 			return A2(
 				$elm$core$List$map,
@@ -6255,76 +6554,14 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$core$Maybe$andThen = F2(
-	function (callback, maybeValue) {
-		if (!maybeValue.$) {
-			var value = maybeValue.a;
-			return callback(value);
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $elm$core$Array$getHelp = F3(
-	function (shift, index, tree) {
-		getHelp:
-		while (true) {
-			var pos = $elm$core$Array$bitMask & (index >>> shift);
-			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
-			if (!_v0.$) {
-				var subTree = _v0.a;
-				var $temp$shift = shift - $elm$core$Array$shiftStep,
-					$temp$index = index,
-					$temp$tree = subTree;
-				shift = $temp$shift;
-				index = $temp$index;
-				tree = $temp$tree;
-				continue getHelp;
-			} else {
-				var values = _v0.a;
-				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
-			}
-		}
-	});
-var $elm$core$Array$get = F2(
-	function (index, _v0) {
-		var len = _v0.a;
-		var startShift = _v0.b;
-		var tree = _v0.c;
-		var tail = _v0.d;
-		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
-			index,
-			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
-			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
-			A3($elm$core$Array$getHelp, startShift, index, tree)));
-	});
-var $tortus$elm_array_2d$Array2D$getRow = F2(
-	function (row, array2d) {
-		return A2($elm$core$Array$get, row, array2d.a);
-	});
-var $tortus$elm_array_2d$Array2D$get = F3(
-	function (row, col, array2d) {
-		return A2(
-			$elm$core$Maybe$andThen,
-			$elm$core$Array$get(col),
-			A2($tortus$elm_array_2d$Array2D$getRow, row, array2d));
-	});
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (!maybe.$) {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
 var $author$project$Aoc18$toCharElement = F2(
 	function (grid, _v0) {
 		var x = _v0.a;
 		var y = _v0.b;
 		var enabled = A2(
-			$elm$core$Maybe$withDefault,
-			false,
-			A3($tortus$elm_array_2d$Array2D$get, y, x, grid));
+			$author$project$Aoc18$isLightOn,
+			grid,
+			_Utils_Tuple2(x, y));
 		return $elm$html$Html$text(
 			enabled ? '#' : '.');
 	});
@@ -6339,7 +6576,12 @@ var $author$project$Aoc18$viewBody = function (model) {
 			return '9px';
 		}
 	}();
-	var grid = model.L;
+	var grid = model.F;
+	var lightCount = $elm$core$List$length(
+		A2(
+			$elm$core$List$filter,
+			$author$project$Aoc18$isLightOn(grid),
+			$author$project$Aoc18$getAllPositions(grid)));
 	var nestedPositions = $author$project$Aoc18$getNestedPositions(grid);
 	var nestedElements = A2(
 		$elm$core$List$map,
@@ -6602,7 +6844,7 @@ var $author$project$Aoc18$viewBody = function (model) {
 									]),
 								_List_fromArray(
 									[
-										model.w ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
+										model.s ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -6647,7 +6889,7 @@ var $author$project$Aoc18$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('checkbox'),
 										$elm$html$Html$Events$onClick(3),
-										$elm$html$Html$Attributes$checked(model.q)
+										$elm$html$Html$Attributes$checked(model.n)
 									]),
 								_List_Nil),
 								A2(
@@ -6657,25 +6899,6 @@ var $author$project$Aoc18$viewBody = function (model) {
 									[
 										$elm$html$Html$text(' Corners stuck on')
 									]))
-							]))
-					])),
-				A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$td,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'font-family', 'Source Code Pro, monospace'),
-								A2($elm$html$Html$Attributes$style, 'font-size', textFontSize),
-								A2($elm$html$Html$Attributes$style, 'padding', '10px')
-							]),
-						_List_fromArray(
-							[
-								A2($elm$html$Html$div, _List_Nil, elements)
 							]))
 					])),
 				A2(
@@ -6699,7 +6922,15 @@ var $author$project$Aoc18$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										'Steps: ' + $elm$core$String$fromInt(model.K))
+										'Steps: ' + $elm$core$String$fromInt(model.H))
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(
+										'Lights: ' + $elm$core$String$fromInt(lightCount))
 									])),
 								A2(
 								$elm$html$Html$div,
@@ -6708,6 +6939,25 @@ var $author$project$Aoc18$viewBody = function (model) {
 									[
 										$elm$html$Html$text(model.M)
 									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'Source Code Pro, monospace'),
+								A2($elm$html$Html$Attributes$style, 'font-size', textFontSize),
+								A2($elm$html$Html$Attributes$style, 'padding', '10px')
+							]),
+						_List_fromArray(
+							[
+								A2($elm$html$Html$div, _List_Nil, elements)
 							]))
 					]))
 			]));
