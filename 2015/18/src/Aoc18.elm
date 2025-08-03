@@ -30,7 +30,7 @@ type DataSource = Input | Sample
 type alias Pos = (Int, Int)
 
 type alias Model = 
-  { mine : Array2D Char
+  { grid : Array2D Bool
   , dataSource : DataSource
   , steps : Int 
   , cornersStuckOn : Bool
@@ -160,7 +160,7 @@ input = """#...##......#......##.##..#...##......##.#.#.###.#.#..#..#......####.
 ###....#.#..#.#..###..#.##......#...#..#..##.#..###..##..#..#.####..#...########..##.#.##.#.#.#...#.
 .#.#.##.##.###..#...#.#....#..#.##..#.#.#.#.##.##.#####...#........####..###..####.#####..#.##.#.##."""
 
-initMine : DataSource -> Array2D Char
+initMine : DataSource -> Array2D Bool
 initMine dataSource = 
   let 
     data = 
@@ -168,15 +168,15 @@ initMine dataSource =
         Sample -> sample 
         Input -> input 
   in 
-    data |> String.split "\n" |> List.map (String.toList) |> Array2D.fromList
+    data |> String.split "\n" |> List.map (String.toList >> List.map (\ch -> ch == '#')) |> Array2D.fromList
 
-toIndexedList : Array2D Char -> List (Pos, Char)
-toIndexedList mine = 
+toIndexedList : Array2D Bool -> List (Pos, Bool)
+toIndexedList grid = 
   let 
-    yRange = List.range 0 (Array2D.rows mine - 1)
-    xRange = List.range 0 (Array2D.columns mine - 1)
+    yRange = List.range 0 (Array2D.rows grid - 1)
+    xRange = List.range 0 (Array2D.columns grid - 1)
   in 
-    yRange |> List.concatMap (\y -> xRange |> List.map (\x -> ((x, y), Array2D.get y x mine |> Maybe.withDefault ' ')))
+    yRange |> List.concatMap (\y -> xRange |> List.map (\x -> ((x, y), Array2D.get y x grid |> Maybe.withDefault False)))
 
 isBlank : Char -> Bool 
 isBlank ch = 
@@ -185,9 +185,9 @@ isBlank ch =
 initModel : DataSource -> Bool -> Model 
 initModel dataSource cornersStuckOn = 
   let 
-    mine = initMine dataSource
+    grid = initMine dataSource
   in 
-    { mine = mine
+    { grid = grid
     , dataSource = dataSource
     , cornersStuckOn = cornersStuckOn
     , steps = 0 
@@ -215,19 +215,19 @@ type Msg =
   | UseSample 
   | UseInput 
 
-getAllPositions : Array2D Char -> List Pos
-getAllPositions mine = 
+getAllPositions : Array2D Bool -> List Pos
+getAllPositions grid = 
   let
-    ys = List.range 0 (Array2D.rows mine - 1)
-    xs = List.range 0 (Array2D.columns mine - 1)
+    ys = List.range 0 (Array2D.rows grid - 1)
+    xs = List.range 0 (Array2D.columns grid - 1)
   in 
     ys |> List.concatMap (\y -> xs |> List.map (\x -> (x, y)))
 
-getNestedPositions : Array2D Char -> List (List Pos)
-getNestedPositions mine = 
+getNestedPositions : Array2D a -> List (List Pos)
+getNestedPositions grid = 
   let
-    ys = List.range 0 (Array2D.rows mine - 1)
-    xs = List.range 0 (Array2D.columns mine - 1)
+    ys = List.range 0 (Array2D.rows grid - 1)
+    xs = List.range 0 (Array2D.columns grid - 1)
   in 
     ys |> List.map (\y -> xs |> List.map (\x -> (x, y)))
 
@@ -304,12 +304,12 @@ subscriptions model =
 
 -- VIEW
 
-toCharElement : Array2D Char -> Pos -> Html Msg 
-toCharElement mine (x, y) = 
+toCharElement : Array2D Bool -> Pos -> Html Msg 
+toCharElement grid (x, y) = 
   let 
-    symbol = Array2D.get y x mine |> Maybe.withDefault ' '
+    enabled = Array2D.get y x grid |> Maybe.withDefault False
   in  
-    Html.text (String.fromChar symbol)
+    Html.text (if enabled then "#" else ".")
 
 view : Model -> Document Msg
 view model = 
@@ -319,9 +319,9 @@ view model =
 viewBody : Model -> Html Msg
 viewBody model =
   let
-    mine = model.mine
-    nestedPositions = getNestedPositions mine
-    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement mine))
+    grid = model.grid
+    nestedPositions = getNestedPositions grid
+    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement grid))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []      
     textFontSize = 
       case model.dataSource of 
@@ -329,7 +329,8 @@ viewBody model =
         Input -> "9px"
   in 
     Html.table 
-      [ Html.Attributes.style "width" "1080px"
+      [ Html.Attributes.align "center"
+      , Html.Attributes.style "width" "100%"
       , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 

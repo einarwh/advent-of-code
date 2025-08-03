@@ -2733,7 +2733,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		L: func(record.L),
+		M: func(record.M),
 		S: record.S,
 		P: record.P
 	}
@@ -3003,7 +3003,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.L;
+		var message = !tag ? value : tag < 3 ? value.a : value.M;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.S;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -5252,6 +5252,11 @@ var $elm$core$Task$perform = F2(
 var $elm$browser$Browser$document = _Browser_document;
 var $author$project$Aoc18$Input = 0;
 var $author$project$Aoc18$defaultTickInterval = 100;
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
 var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
 var $elm$core$Array$foldl = F3(
 	function (func, baseCase, _v0) {
@@ -5632,13 +5637,19 @@ var $author$project$Aoc18$initMine = function (dataSource) {
 	return $tortus$elm_array_2d$Array2D$fromList(
 		A2(
 			$elm$core$List$map,
-			$elm$core$String$toList,
+			A2(
+				$elm$core$Basics$composeR,
+				$elm$core$String$toList,
+				$elm$core$List$map(
+					function (ch) {
+						return ch === '#';
+					})),
 			A2($elm$core$String$split, '\n', data)));
 };
 var $author$project$Aoc18$initModel = F2(
 	function (dataSource, cornersStuckOn) {
-		var mine = $author$project$Aoc18$initMine(dataSource);
-		return {q: cornersStuckOn, V: 0, r: dataSource, X: '', J: false, L: '', N: mine, w: true, K: 0, y: $author$project$Aoc18$defaultTickInterval};
+		var grid = $author$project$Aoc18$initMine(dataSource);
+		return {q: cornersStuckOn, V: 0, r: dataSource, X: '', J: false, L: grid, M: '', w: true, K: 0, y: $author$project$Aoc18$defaultTickInterval};
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -6192,15 +6203,15 @@ var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
 var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
 	return $elm$core$Array$length(array2d.a);
 };
-var $author$project$Aoc18$getNestedPositions = function (mine) {
+var $author$project$Aoc18$getNestedPositions = function (grid) {
 	var ys = A2(
 		$elm$core$List$range,
 		0,
-		$tortus$elm_array_2d$Array2D$rows(mine) - 1);
+		$tortus$elm_array_2d$Array2D$rows(grid) - 1);
 	var xs = A2(
 		$elm$core$List$range,
 		0,
-		$tortus$elm_array_2d$Array2D$columns(mine) - 1);
+		$tortus$elm_array_2d$Array2D$columns(grid) - 1);
 	return A2(
 		$elm$core$List$map,
 		function (y) {
@@ -6244,10 +6255,6 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$core$String$cons = _String_cons;
-var $elm$core$String$fromChar = function (_char) {
-	return A2($elm$core$String$cons, _char, '');
-};
 var $elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
 		if (!maybeValue.$) {
@@ -6311,15 +6318,15 @@ var $elm$core$Maybe$withDefault = F2(
 		}
 	});
 var $author$project$Aoc18$toCharElement = F2(
-	function (mine, _v0) {
+	function (grid, _v0) {
 		var x = _v0.a;
 		var y = _v0.b;
-		var symbol = A2(
+		var enabled = A2(
 			$elm$core$Maybe$withDefault,
-			' ',
-			A3($tortus$elm_array_2d$Array2D$get, y, x, mine));
+			false,
+			A3($tortus$elm_array_2d$Array2D$get, y, x, grid));
 		return $elm$html$Html$text(
-			$elm$core$String$fromChar(symbol));
+			enabled ? '#' : '.');
 	});
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
@@ -6332,14 +6339,14 @@ var $author$project$Aoc18$viewBody = function (model) {
 			return '9px';
 		}
 	}();
-	var mine = model.N;
-	var nestedPositions = $author$project$Aoc18$getNestedPositions(mine);
+	var grid = model.L;
+	var nestedPositions = $author$project$Aoc18$getNestedPositions(grid);
 	var nestedElements = A2(
 		$elm$core$List$map,
 		function (positions) {
 			return A2(
 				$elm$core$List$map,
-				$author$project$Aoc18$toCharElement(mine),
+				$author$project$Aoc18$toCharElement(grid),
 				positions);
 		},
 		nestedPositions);
@@ -6361,7 +6368,8 @@ var $author$project$Aoc18$viewBody = function (model) {
 		$elm$html$Html$table,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'width', '1080px'),
+				$elm$html$Html$Attributes$align('center'),
+				A2($elm$html$Html$Attributes$style, 'width', '100%'),
 				A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New')
 			]),
 		_List_fromArray(
@@ -6698,7 +6706,7 @@ var $author$project$Aoc18$viewBody = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(model.L)
+										$elm$html$Html$text(model.M)
 									]))
 							]))
 					]))
