@@ -22,16 +22,25 @@ main =
 
 type DataSource = Input | Sample1 | Sample2
 
+type alias Line = 
+  { content : String 
+  , firstDigit : Int 
+  , firstDigitSegment : (Int, Int) 
+  , lastDigit : Int 
+  , lastDigitSegment : (Int, Int) }
+
+type Data = Solved (List Line) | Unsolved (List String)
+
 type alias Model = 
   { dataSource : DataSource 
+  , data : Data 
   , includeLetters : Bool 
-  , document : List String
   , lastCommandText : String
   , counter : Int 
   , debug : String }
 
-initDocument : DataSource -> List String
-initDocument dataSource = 
+initData : DataSource -> Data
+initData dataSource = 
   let 
     sample1 = """1abc2
 pqr3stu8vwx
@@ -1050,15 +1059,14 @@ ssevenhcltwoseven2cxrmxxcr"""
         Sample2 -> sample2
         Input -> input 
   in 
-    data |> String.split "\n"
+    data |> String.split "\n" |> Unsolved
 
 init : () -> (Model, Cmd Msg)
 init _ =
   let 
     dataSource = Input
-    document = initDocument dataSource
-    model = { safeReports = 0
-            , document = document
+    data = initData dataSource
+    model = { data = data
             , lastCommandText = "press play to start"
             , dataSource = dataSource
             , includeLetters = False
@@ -1071,28 +1079,58 @@ init _ =
 
 type Msg = Clear | Solve | ToggleIncludeLetters | UseSample1 | UseSample2 | UseInput
 
+-- let toNum (nums : int seq) : int = 
+--     let tens = nums |> Seq.head
+--     let ones = nums |> Seq.rev |> Seq.head 
+--     tens * 10 + ones
+
+tryParseInt : Char -> Maybe Int 
+tryParseInt ch = 
+  ch |> String.fromChar |> String.toInt
+
+digitFinder1 : String -> List (Int, Int) 
+digitFinder1 s = 
+  s |> String.toList |> List.indexedMap Tuple.pair |> List.filterMap (\(ix, c) -> tryParseInt c |> Maybe.map (\n -> (ix, n)))
+
+parseLine : String -> Line
+parseLine s = 
+  let 
+    digits = digitFinder1 s 
+    (firstIndex, firstDigit) = digits |> List.head |> Maybe.withDefault (2, 2) 
+    (lastIndex, lastDigit) = digits |> List.reverse |> List.head |> Maybe.withDefault (2, 2) 
+    firstDigitSegment = (firstIndex, 1)
+    lastDigitSegment = (lastIndex, 1)
+  in  
+    { content = s
+    , firstDigit = firstDigit
+    , firstDigitSegment = firstDigitSegment
+    , lastDigit = lastDigit
+    , lastDigitSegment = lastDigitSegment
+    }
+
 updateClear : Model -> Model
-updateClear model = { model | document = initReports model.dataSource } 
+updateClear model = { model | data = initData model.dataSource } 
 
 updateSolve : Model -> Model
-updateSolve model = 
-  let
-    reports = 
-        model.reports |> List.map (checkReport model.includeLetters)
-    found = countSafe reports 
-  in
-    { model | reports = reports, safeReports = found }
+updateSolve model =
+  case model.data of 
+    Unsolved unsolved -> 
+      let 
+        data = unsolved |> List.map parseLine |> Solved 
+      in 
+        { model | data = data }
+    Solved _ -> model 
 
 updateToggleIncludeLetters : Model -> Model
 updateToggleIncludeLetters model = 
   let
     includeLetters = not model.includeLetters
   in
-    { model | includeLetters = includeLetters, reports = initReports model.dataSource} 
+    { model | includeLetters = includeLetters, data = initData model.dataSource} 
 
 updateDataSource : DataSource -> Model -> Model
 updateDataSource dataSource model = 
-  { model | dataSource = dataSource, safeReports = 0, reports = initReports dataSource } 
+  { model | dataSource = dataSource, data = initData dataSource } 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -1117,51 +1155,124 @@ subscriptions model = Sub.none
 
 -- VIEW
 
-toUncheckedHtmlElement : String -> List (Html Msg) 
-toUncheckedHtmlElement str =
+toUnsolvedLineHtmlElements : String -> List (Html Msg) 
+toUnsolvedLineHtmlElements s =
   let 
-    textElement = Html.text str
+    textElement = Html.text s 
   in 
     [ textElement, Html.br [] [] ]
 
-toUnsafeHtmlElement : String -> List (Html Msg) 
-toUnsafeHtmlElement str =
-  let 
-    textElement = Html.text str 
-    spanElement = Html.span [ Html.Attributes.style "background-color" "#FAA0A0" ] [ textElement ]
-  in 
-    [ spanElement, Html.br [] [] ]
+toUnsolvedElements : List String -> List (Html Msg)
+toUnsolvedElements strings = 
+  strings |> List.concatMap toUnsolvedLineHtmlElements
 
-toSafeHtmlElement : String -> List (Html Msg)
-toSafeHtmlElement str =
-  let 
-    textElement = Html.text str 
-    spanElement = Html.span [ Html.Attributes.style "background-color" "#AFE1AF" ] [ textElement ]
-  in 
-    [ spanElement, Html.br [] [] ]
+maybePlainSegment : String -> Maybe (Html Msg)
+maybePlainSegment s = 
+  if String.isEmpty s then Nothing 
+  else 
+    Just (Html.text s)
 
-toReportHtmlElement : Report -> List (Html Msg)  
-toReportHtmlElement report = 
-  case report of 
-    Unchecked str -> toUncheckedHtmlElement str 
-    Unsafe str -> toUnsafeHtmlElement str
-    Safe str -> toSafeHtmlElement str
+digitSegment : String -> Html Msg
+digitSegment s = 
+  let 
+    textElement = Html.text s 
+    spanElement = Html.span [ Html.Attributes.style "font-weight" "bold" ] [ textElement ]
+    -- spanElement = Html.span [ Html.Attributes.style "text-decoration-line" "underline" ] [ textElement ]
+  in 
+    spanElement
+
+break : Html Msg 
+break = Html.br [] []
+
+toSolvedLineHtmlElements : Line -> List (Html Msg) 
+toSolvedLineHtmlElements line =
+  let 
+    s = line.content 
+    (firstStartIndex, firstLength) = line.firstDigitSegment
+    (lastStartIndex, lastLength) = line.lastDigitSegment 
+    firstEndIndex = firstStartIndex + firstLength - 1
+    lastEndIndex = lastStartIndex + lastLength - 1
+    firstSegment = String.left firstStartIndex s 
+    lastSegment = String.dropLeft (lastEndIndex + 1) s 
+    firstDigitStr = s |> String.slice firstStartIndex (firstEndIndex + 1)
+    lastDigitStr = s |> String.slice lastStartIndex (lastEndIndex + 1)
+  in 
+    if lastStartIndex == firstStartIndex then 
+      [ maybePlainSegment firstSegment
+      , Just (digitSegment firstDigitStr)
+      , maybePlainSegment lastSegment
+      , Just break ]
+      |> List.filterMap identity
+    else if lastStartIndex > firstEndIndex then 
+      let 
+        midSegment = String.slice firstEndIndex lastStartIndex s 
+      in 
+        [ maybePlainSegment firstSegment
+        , Just (digitSegment firstDigitStr)
+        , maybePlainSegment midSegment
+        , Just (digitSegment lastDigitStr)
+        , maybePlainSegment lastSegment
+        , Just break ]
+        |> List.filterMap identity
+    else 
+      [ Html.text "it's complicated", break ]
+
+toSolvedElements : List Line -> List (Html Msg)
+toSolvedElements strings = 
+  strings |> List.concatMap toSolvedLineHtmlElements
 
 view : Model -> Document Msg
 view model = 
-  { title = "Advent of Code 2015 | Day 5: Doesn't He Have Intern-Elves For This?"
+  { title = "Advent of Code 2023| Day 1: Trebuchet?!"
   , body = [ viewBody model ] }
+
+lineToString : Line -> String 
+lineToString line =
+  let 
+    content = line.content 
+    firstDigit = line.firstDigit
+    (firstIndex, firstLength) = line.firstDigitSegment
+    lastDigit = line.lastDigit
+    (lastIndex, lastLength) = line.lastDigitSegment
+  in 
+    [ "content: " ++ content 
+    , "firstDigit: " ++ String.fromInt firstDigit
+    , "firstIndex: " ++ String.fromInt firstIndex
+    , "firstLength: " ++ String.fromInt firstLength
+    , "lastDigit: " ++ String.fromInt lastDigit
+    , "lastIndex: " ++ String.fromInt lastIndex
+    , "lastLength: " ++ String.fromInt lastLength ] 
+    |> String.join "\n"
+
+getLineScore : Line -> Int 
+getLineScore line = 
+  line.firstDigit * 10 + line.lastDigit 
+
+getTotalScore : List Line -> Int
+getTotalScore lines = 
+  lines |> List.map getLineScore |> List.sum  
 
 viewBody : Model -> Html Msg
 viewBody model =
   let
-    commandsStr = ""
+    s = "four95qvkvveight5"
+    digits = digitFinder1 s |> List.map (\(ix, d) -> "(" ++ String.fromInt ix ++ "," ++ String.fromInt d ++ ")") |> String.join " - "
+    parsed = parseLine s  
+    -- commandsStr = parsed |> lineToString
+    commandsStr = "?"
     textFontSize = 
       case model.dataSource of 
-        Input -> "24px" 
-        Sample1 -> "24px" 
-        Sample2 -> "24px" 
-    elements = model.reports |> List.concatMap toReportHtmlElement
+        Input -> "12px" 
+        Sample1 -> "12px" 
+        Sample2 -> "12px" 
+    elements = 
+      case model.data of 
+        Solved solved -> toSolvedElements solved 
+        Unsolved unsolved -> toUnsolvedElements unsolved
+    scoreStr = 
+      case model.data of 
+        Solved solved -> getTotalScore solved |> String.fromInt 
+        _ -> "?"
   in 
     Html.table 
       [ 
@@ -1175,8 +1286,8 @@ viewBody model =
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "32px"
               , Html.Attributes.style "padding" "10px"]
-              [ Html.div [] [Html.text "Advent of Code 2015" ]
-              , Html.div [] [Html.text "Day 5: Doesn't He Have Intern-Elves For This?" ] ] ]
+              [ Html.div [] [Html.text "Advent of Code 2023" ]
+              , Html.div [] [Html.text "Day 1: Trebuchet?!" ] ] ]
       , Html.tr 
           []
           [ Html.td 
@@ -1204,8 +1315,8 @@ viewBody model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding-bottom" "10px" ]
               [ Html.a 
-                [ Html.Attributes.href "https://adventofcode.com/2015/day/5" ] 
-                [ Html.text "https://adventofcode.com/2015/day/05" ]
+                [ Html.Attributes.href "https://adventofcode.com/2023/day/1" ] 
+                [ Html.text "https://adventofcode.com/2023/day/1" ]
             ] ]
       , Html.tr 
           []
@@ -1246,30 +1357,25 @@ viewBody model =
               [ Html.input 
                 [ Html.Attributes.type_ "checkbox", onClick ToggleIncludeLetters, Html.Attributes.checked model.includeLetters ] 
                 []
-              , Html.label [] [ Html.text " Use new rules" ]
+              , Html.label [] [ Html.text " Include letters" ]
             ] ]
       , Html.tr 
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "24px"
-              , Html.Attributes.style "padding-top" "10px"
-              , Html.Attributes.style "width" "200px" ] 
+              , Html.Attributes.style "padding-top" "10px" ] 
               [ 
-                Html.div [] [ Html.text (String.fromInt model.safeReports) ]
-              , Html.div [] [ Html.text commandsStr ]
+                Html.div [] [ Html.text scoreStr ]
               ] ]
       , Html.tr 
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" textFontSize
-              , Html.Attributes.style "padding" "10px"
-              , Html.Attributes.style "width" "200px" ] 
+              , Html.Attributes.style "padding" "10px" ] 
               [ 
                 Html.div [] elements
               ] ] ]

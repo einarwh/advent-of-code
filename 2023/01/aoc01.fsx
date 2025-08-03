@@ -60,4 +60,4 @@ let run fileName =
     lines |> calculate numberFinder1 |> printfn "%d"
     lines |> calculate numberFinder2 |> printfn "%d"
 
-run "input"
+run "input.txt"
