@@ -1,6 +1,6 @@
-module Main exposing (..)
+module Aoc02 exposing (..)
 
-import Browser
+import Browser exposing (Document)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
@@ -11,7 +11,7 @@ import Html exposing (text)
 -- MAIN
 
 main =
-  Browser.element
+  Browser.document
     { init = init
     , view = view
     , update = update
@@ -1197,7 +1197,7 @@ toUnsafeHtmlElement numbers =
   let 
     str = numbers |> List.map String.fromInt |> String.join " "
     textElement = Html.text str 
-    spanElement = Html.span [ Html.Attributes.class "mark-err adaptive" ] [ textElement ]
+    spanElement = Html.span [ Html.Attributes.style "background-color" "#FAA0A0" ] [ textElement ]
   in 
     [ spanElement, Html.br [] [] ]
 
@@ -1206,7 +1206,7 @@ toSafeHtmlElement numbers =
   let 
     str = numbers |> List.map String.fromInt |> String.join " "
     textElement = Html.text str 
-    spanElement = Html.span [ Html.Attributes.class "mark-ok adaptive" ] [ textElement ]
+    spanElement = Html.span [ Html.Attributes.style "background-color" "#AFE1AF" ] [ textElement ]
   in 
     [ spanElement, Html.br [] [] ]
 
@@ -1219,15 +1219,16 @@ toDampenedHtmlElement index numbers =
     after = fromIndex |> List.drop 1 
     strBefore = before |> List.map String.fromInt |> String.join " " 
     textElementBefore = Html.text (String.append strBefore " ") 
-    spanElementBefore = Html.span [ Html.Attributes.class "mark-ok adaptive" ] [ textElementBefore ]
+    spanElementBefore = Html.span [ Html.Attributes.style "background-color" "#AFE1AF" ] [ textElementBefore ]
     strAfter = after |> List.map String.fromInt |> String.join " "
     textElementAfter = Html.text (String.append " " strAfter) 
-    spanElementAfter = Html.span [ Html.Attributes.class "mark-ok adaptive" ] [ textElementAfter ]
+    spanElementAfter = Html.span [ Html.Attributes.style "background-color" "#AFE1AF" ] [ textElementAfter ]
     strDropped = dropped |> List.map String.fromInt |> String.join " "
     textElementDropped = Html.text strDropped 
     spanElementDropped = 
       Html.span 
-        [ Html.Attributes.class "mark-ok greyed adaptive"
+        [ Html.Attributes.style "background-color" "#AFE1AF"
+        , Html.Attributes.style "color" "#808080"
         , Html.Attributes.style "text-decoration-line" "line-through"] 
         [ textElementDropped ]
     breakElement = Html.br [] []
@@ -1242,8 +1243,13 @@ toReportHtmlElement report =
     Safe numbers -> toSafeHtmlElement numbers
     Dampened (numbers, index) -> toDampenedHtmlElement index numbers
 
-view : Model -> Html Msg
-view model =
+view : Model -> Document Msg
+view model = 
+  { title = "Advent of Code 2024 | Day 2: Red-Nosed Reports"
+  , body = [ viewBody model ] }
+
+viewBody : Model -> Html Msg
+viewBody model =
   let
     commandsStr = ""
     textFontSize = 
@@ -1253,9 +1259,10 @@ view model =
     elements = model.reports |> List.concatMap toReportHtmlElement
   in 
     Html.table 
-      [ Html.Attributes.align "center"
-      , Html.Attributes.style "width" "100%"
-      , Html.Attributes.style "font-family" "Courier New" ]
+      [ 
+        Html.Attributes.style "width" "1080px"
+      , Html.Attributes.style "font-family" "Courier New"
+      ]
       [ Html.tr 
           [] 
           [ Html.td 
@@ -1265,6 +1272,27 @@ view model =
               , Html.Attributes.style "padding" "10px"]
               [ Html.div [] [Html.text "Advent of Code 2024" ]
               , Html.div [] [Html.text "Day 2: Red-Nosed Reports" ] ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "padding-bottom" "10px" ]
+              [ Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2024/"] [ Html.text "2024" ]
+              , Html.text "] " 
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2023/"] [ Html.text "2023" ]
+              , Html.text "] "
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2022/"] [ Html.text "2022" ]
+              , Html.text "] "
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2021/"] [ Html.text "2021" ]
+              , Html.text "] "
+              , Html.text " ["
+              , Html.a [ Html.Attributes.href "../../2020/"] [ Html.text "2020" ]
+              , Html.text "] "
+            ] ]
       , Html.tr 
           []
           [ Html.td 
@@ -1315,9 +1343,11 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
+              , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "24px"
-              , Html.Attributes.style "padding-top" "10px" ] 
+              , Html.Attributes.style "padding-top" "10px"
+              , Html.Attributes.style "width" "200px" ] 
               [ 
                 Html.div [] [ Html.text (String.fromInt model.safeReports) ]
               , Html.div [] [ Html.text commandsStr ]
@@ -1326,11 +1356,11 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
+              , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" textFontSize
-              , Html.Attributes.style "padding" "10px" ] 
+              , Html.Attributes.style "padding" "10px"
+              , Html.Attributes.style "width" "200px" ] 
               [ 
-                Html.div [
-                  Html.Attributes.style "max-width" "100%"
-                ] elements
+                Html.div [] elements
               ] ] ]

@@ -5521,6 +5521,7 @@ var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$br = _VirtualDom_node('br');
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$span = _VirtualDom_node('span');
 var $author$project$Main$toHighlightedHtmlElement = function (numbers) {
 	var str = A2(
@@ -5532,7 +5533,7 @@ var $author$project$Main$toHighlightedHtmlElement = function (numbers) {
 		$elm$html$Html$span,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'background-color', '#AFE1AF')
+				$elm$html$Html$Attributes$class('mark-ok adaptive')
 			]),
 		_List_fromArray(
 			[textElement]));

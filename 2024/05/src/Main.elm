@@ -1616,7 +1616,7 @@ toHighlightedHtmlElement numbers =
   let 
     str = numbers |> List.map String.fromInt |> String.join " "
     textElement = Html.text str 
-    spanElement = Html.span [ Html.Attributes.style "background-color" "#AFE1AF" ] [ textElement ]
+    spanElement = Html.span [ Html.Attributes.class "mark-ok adaptive" ] [ textElement ]
   in 
     [ spanElement, Html.br [] [] ]
 
