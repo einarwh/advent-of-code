@@ -5193,7 +5193,7 @@ var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Aoc01$init = function (_v0) {
 	var dataSource = 0;
 	var data = $author$project$Aoc01$initData(dataSource);
-	var model = {U: 0, j: data, m: dataSource, W: '', y: false, ac: 'press play to start'};
+	var model = {U: 0, l: data, m: dataSource, W: '', y: false, ac: 'press play to start'};
 	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -5207,7 +5207,7 @@ var $author$project$Aoc01$updateClear = function (model) {
 	return _Utils_update(
 		model,
 		{
-			j: $author$project$Aoc01$initData(model.m)
+			l: $author$project$Aoc01$initData(model.m)
 		});
 };
 var $author$project$Aoc01$updateDataSource = F2(
@@ -5215,7 +5215,7 @@ var $author$project$Aoc01$updateDataSource = F2(
 		return _Utils_update(
 			model,
 			{
-				j: $author$project$Aoc01$initData(dataSource),
+				l: $author$project$Aoc01$initData(dataSource),
 				m: dataSource
 			});
 	});
@@ -5363,7 +5363,7 @@ var $author$project$Aoc01$tryFindNum2 = function (s) {
 	}
 };
 var $author$project$Aoc01$updateSolve = function (model) {
-	var _v0 = model.j;
+	var _v0 = model.l;
 	if (_v0.$ === 1) {
 		var unsolved = _v0.a;
 		var parser = model.y ? $author$project$Aoc01$tryFindNum2 : $author$project$Aoc01$tryFindNum1;
@@ -5374,7 +5374,7 @@ var $author$project$Aoc01$updateSolve = function (model) {
 				unsolved));
 		return _Utils_update(
 			model,
-			{j: data});
+			{l: data});
 	} else {
 		return model;
 	}
@@ -5385,7 +5385,7 @@ var $author$project$Aoc01$updateToggleIncludeLetters = function (model) {
 	return _Utils_update(
 		model,
 		{
-			j: $author$project$Aoc01$initData(model.m),
+			l: $author$project$Aoc01$initData(model.m),
 			y: includeLetters
 		});
 };
@@ -5549,7 +5549,7 @@ var $author$project$Aoc01$toSolvedLineHtmlElements = function (line) {
 				]));
 	} else {
 		if (_Utils_cmp(lastStartIndex, firstEndIndex) > 0) {
-			var midSegment = A3($elm$core$String$slice, firstEndIndex, lastStartIndex, s);
+			var midSegment = A3($elm$core$String$slice, firstEndIndex + 1, lastStartIndex, s);
 			return A2(
 				$elm$core$List$filterMap,
 				$elm$core$Basics$identity,
@@ -5591,20 +5591,20 @@ var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Aoc01$viewBody = function (model) {
 	var textFontSize = function () {
-		var _v3 = model.m;
-		switch (_v3) {
+		var _v2 = model.m;
+		switch (_v2) {
 			case 0:
-				return '12px';
+				return '16px';
 			case 1:
-				return '12px';
+				return '24px';
 			default:
-				return '12px';
+				return '24px';
 		}
 	}();
 	var scoreStr = function () {
-		var _v2 = model.j;
-		if (!_v2.$) {
-			var solved = _v2.a;
+		var _v1 = model.l;
+		if (!_v1.$) {
+			var solved = _v1.a;
 			return $elm$core$String$fromInt(
 				$author$project$Aoc01$getTotalScore(solved));
 		} else {
@@ -5612,22 +5612,13 @@ var $author$project$Aoc01$viewBody = function (model) {
 		}
 	}();
 	var elements = function () {
-		var _v1 = model.j;
-		if (!_v1.$) {
-			var solved = _v1.a;
-			return $author$project$Aoc01$toSolvedElements(solved);
-		} else {
-			var unsolved = _v1.a;
-			return $author$project$Aoc01$toUnsolvedElements(unsolved);
-		}
-	}();
-	var debugStr = function () {
-		var _v0 = model.j;
+		var _v0 = model.l;
 		if (!_v0.$) {
 			var solved = _v0.a;
-			return '?';
+			return $author$project$Aoc01$toSolvedElements(solved);
 		} else {
-			return '?';
+			var unsolved = _v0.a;
+			return $author$project$Aoc01$toUnsolvedElements(unsolved);
 		}
 	}();
 	var commandsStr = '?';
@@ -5635,7 +5626,8 @@ var $author$project$Aoc01$viewBody = function (model) {
 		$elm$html$Html$table,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'width', '1080px'),
+				$elm$html$Html$Attributes$align('center'),
+				A2($elm$html$Html$Attributes$style, 'width', '100%'),
 				A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New')
 			]),
 		_List_fromArray(
@@ -5930,13 +5922,6 @@ var $author$project$Aoc01$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(scoreStr)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(debugStr)
 									]))
 							]))
 					])),

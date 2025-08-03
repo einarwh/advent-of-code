@@ -1237,7 +1237,7 @@ toSolvedLineHtmlElements line =
       |> List.filterMap identity
     else if lastStartIndex > firstEndIndex then 
       let 
-        midSegment = String.slice firstEndIndex lastStartIndex s 
+        midSegment = String.slice (firstEndIndex + 1) lastStartIndex s 
       in 
         [ maybePlainSegment firstSegment
         , Just (digitSegment firstDigitStr)
@@ -1290,9 +1290,9 @@ viewBody model =
     commandsStr = "?"
     textFontSize = 
       case model.dataSource of 
-        Input -> "12px" 
-        Sample1 -> "12px" 
-        Sample2 -> "12px" 
+        Input -> "16px" 
+        Sample1 -> "24px" 
+        Sample2 -> "24px" 
     elements = 
       case model.data of 
         Solved solved -> toSolvedElements solved 
@@ -1301,18 +1301,11 @@ viewBody model =
       case model.data of 
         Solved solved -> getTotalScore solved |> String.fromInt 
         _ -> "?"
-    debugStr = 
-      case model.data of 
-        Solved solved -> 
-          "?"
-          -- solved |> List.map getLineScore |> List.map String.fromInt |> String.join ","
-        _ -> "?"
   in 
     Html.table 
-      [ 
-        Html.Attributes.style "width" "1080px"
-      , Html.Attributes.style "font-family" "Courier New"
-      ]
+      [ Html.Attributes.align "center"
+      , Html.Attributes.style "width" "100%"
+      , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
           [ Html.td 
@@ -1402,7 +1395,6 @@ viewBody model =
               , Html.Attributes.style "padding-top" "10px" ] 
               [ 
                 Html.div [] [ Html.text scoreStr ]
-              , Html.div [] [ Html.text debugStr ]
               ] ]
       , Html.tr 
           []

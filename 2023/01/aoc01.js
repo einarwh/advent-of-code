@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.M.D === region.T.D)
+	if (region.Q.C === region.X.C)
 	{
-		return 'on line ' + region.M.D;
+		return 'on line ' + region.Q.C;
 	}
-	return 'on lines ' + region.M.D + ' through ' + region.T.D;
+	return 'on lines ' + region.Q.C + ' through ' + region.X.C;
 }
 
 
@@ -1857,9 +1857,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aA,
-		impl.aI,
-		impl.aG,
+		impl.aE,
+		impl.aM,
+		impl.aK,
 		function() { return function() {} }
 	);
 });
@@ -2719,9 +2719,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		p: func(record.p),
-		N: record.N,
-		K: record.K
+		q: func(record.q),
+		R: record.R,
+		O: record.O
 	}
 });
 
@@ -2989,11 +2989,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.p;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.N;
+		var message = !tag ? value : tag < 3 ? value.a : value.q;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.R;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.K) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.O) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3943,11 +3943,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aA,
-		impl.aI,
-		impl.aG,
+		impl.aE,
+		impl.aM,
+		impl.aK,
 		function(sendToApp, initialModel) {
-			var view = impl.aJ;
+			var view = impl.aN;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3979,12 +3979,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aA,
-		impl.aI,
-		impl.aG,
+		impl.aE,
+		impl.aM,
+		impl.aK,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.L && impl.L(sendToApp)
-			var view = impl.aJ;
+			var divertHrefToApp = impl.P && impl.P(sendToApp)
+			var view = impl.aN;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -3992,12 +3992,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.at);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.ax);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.aH) && (_VirtualDom_doc.title = title = doc.aH);
+				(title !== doc.aL) && (_VirtualDom_doc.title = title = doc.aL);
 			});
 		}
 	);
@@ -4053,12 +4053,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aC;
-	var onUrlRequest = impl.aD;
+	var onUrlChange = impl.aG;
+	var onUrlRequest = impl.aH;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		L: function(sendToApp)
+		P: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4074,9 +4074,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.ag === next.ag
-							&& curr.X === next.X
-							&& curr.ad.a === next.ad.a
+							&& curr.ak === next.ak
+							&& curr.aa === next.aa
+							&& curr.ah.a === next.ah.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4084,13 +4084,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aA: function(flags)
+		aE: function(flags)
 		{
-			return A3(impl.aA, flags, _Browser_getUrl(), key);
+			return A3(impl.aE, flags, _Browser_getUrl(), key);
 		},
-		aJ: impl.aJ,
-		aI: impl.aI,
-		aG: impl.aG
+		aN: impl.aN,
+		aM: impl.aM,
+		aK: impl.aK
 	});
 }
 
@@ -4156,17 +4156,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { ay: 'hidden', au: 'visibilitychange' }
+		? { aC: 'hidden', ay: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { ay: 'mozHidden', au: 'mozvisibilitychange' }
+		? { aC: 'mozHidden', ay: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { ay: 'msHidden', au: 'msvisibilitychange' }
+		? { aC: 'msHidden', ay: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { ay: 'webkitHidden', au: 'webkitvisibilitychange' }
-		: { ay: 'hidden', au: 'visibilitychange' };
+		? { aC: 'webkitHidden', ay: 'webkitvisibilitychange' }
+		: { aC: 'hidden', ay: 'visibilitychange' };
 }
 
 
@@ -4247,12 +4247,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		ak: _Browser_getScene(),
-		an: {
-			ap: _Browser_window.pageXOffset,
-			aq: _Browser_window.pageYOffset,
-			ao: _Browser_doc.documentElement.clientWidth,
-			W: _Browser_doc.documentElement.clientHeight
+		ao: _Browser_getScene(),
+		ar: {
+			at: _Browser_window.pageXOffset,
+			au: _Browser_window.pageYOffset,
+			as: _Browser_doc.documentElement.clientWidth,
+			_: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4262,8 +4262,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		ao: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		W: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		as: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		_: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4286,15 +4286,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			ak: {
-				ao: node.scrollWidth,
-				W: node.scrollHeight
+			ao: {
+				as: node.scrollWidth,
+				_: node.scrollHeight
 			},
-			an: {
-				ap: node.scrollLeft,
-				aq: node.scrollTop,
-				ao: node.clientWidth,
-				W: node.clientHeight
+			ar: {
+				at: node.scrollLeft,
+				au: node.scrollTop,
+				as: node.clientWidth,
+				_: node.clientHeight
 			}
 		};
 	});
@@ -4324,18 +4324,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			ak: _Browser_getScene(),
-			an: {
-				ap: x,
-				aq: y,
-				ao: _Browser_doc.documentElement.clientWidth,
-				W: _Browser_doc.documentElement.clientHeight
+			ao: _Browser_getScene(),
+			ar: {
+				at: x,
+				au: y,
+				as: _Browser_doc.documentElement.clientWidth,
+				_: _Browser_doc.documentElement.clientHeight
 			},
-			aw: {
-				ap: x + rect.left,
-				aq: y + rect.top,
-				ao: rect.width,
-				W: rect.height
+			aA: {
+				at: x + rect.left,
+				au: y + rect.top,
+				as: rect.width,
+				_: rect.height
 			}
 		};
 	});
@@ -4874,7 +4874,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {V: fragment, X: host, ab: path, ad: port_, ag: protocol, ah: query};
+		return {Z: fragment, aa: host, af: path, ah: port_, ak: protocol, al: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5154,13 +5154,13 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Main$Input = 0;
-var $author$project$Main$Unchecked = function (a) {
-	return {$: 0, a: a};
+var $author$project$Main$Unsolved = function (a) {
+	return {$: 1, a: a};
 };
-var $author$project$Main$initReports = function (dataSource) {
-	var sample2 = 'qjhvhtzxzqqjkmpb\nxxyxx\nuurcxstgmygtbstg\nieodomkazucvgmuy';
-	var sample1 = 'ugknbfddgicrmopn\naaa\njchzalrnumimnmhp\nhaegwjzuvuyypxyu\ndvszwmarrgswjxmb';
-	var input = 'zgsnvdmlfuplrubt\nvlhagaovgqjmgvwq\nffumlmqwfcsyqpss\nzztdcqzqddaazdjp\neavfzjajkjesnlsb\nurrvucyrzzzooxhx\nxdwduffwgcptfwad\norbryxwrmvkrsxsr\njzfeybjlgqikjcow\nmayoqiswqqryvqdi\niiyrkoujhgpgkcvx\negcgupjkqwfiwsjl\nzbgtglaqqolttgng\neytquncjituzzhsx\ndtfkgggvqadhqbwb\nzettygjpcoedwyio\nrwgwbwzebsnjmtln\nesbplxhvzzgawctn\nvnvshqgmbotvoine\nwflxwmvbhflkqxvo\ntwdjikcgtpvlctte\nminfkyocskvgubvm\nsfxhhdhaopajbzof\nsofkjdtalvhgwpql\nuqfpeauqzumccnrc\ntdflsbtiiepijanf\ndhfespzrhecigzqb\nxobfthcuuzhvhzpn\nolgjglxaotocvrhw\njhkzpfcskutwlwge\nzurkakkkpchzxjhq\nhekxiofhalvmmkdl\nazvxuwwfmjdpjskj\narsvmfznblsqngvb\nldhkzhejofreaucc\nadrphwlkehqkrdmo\nwmveqrezfkaivvaw\niyphmphgntinfezg\nblomkvgslfnvspem\ncgpaqjvzhbumckwo\nydhqjcuotkeyurpx\nsbtzboxypnmdaefr\nvxrkhvglynljgqrg\nttgrkjjrxnxherxd\nhinyfrjdiwytetkw\nsufltffwqbugmozk\ntohmqlzxxqzinwxr\njbqkhxfokaljgrlg\nfvjeprbxyjemyvuq\ngmlondgqmlselwah\nubpwixgxdloqnvjp\nlxjfhihcsajxtomj\nqouairhvrgpjorgh\nnloszcwcxgullvxb\nmyhsndsttanohnjn\nzjvivcgtjwenyilz\nqaqlyoyouotsmamm\ntadsdceadifqthag\nmafgrbmdhpnlbnks\naohjxahenxaermrq\novvqestjhbuhrwlr\nlnakerdnvequfnqb\nagwpwsgjrtcjjikz\nlhlysrshsmzryzes\nxopwzoaqtlukwwdu\nxsmfrfteyddrqufn\nohnxbykuvvlbbxpf\nbbdlivmchvzfuhoc\nvtacidimfcfyobhf\ntinyzzddgcnmiabd\ntcjzxftqcqrivqhn\nvgnduqyfpokbmzim\nrevkvaxnsxospyow\nydpgwxxoxlywxcgi\nwzuxupbzlpzmikel\nnscghlafavnsycjh\nxorwbquzmgmcapon\nasmtiycegeobfxrn\neqjzvgkxgtlyuxok\nmmjrskloposgjoqu\ngceqosugbkvytfto\nkhivvoxkvhrgwzjl\nqtmejuxbafroifjt\nttmukbmpoagthtfl\nbxqkvuzdbehtduwv\ngvblrpzjylanoggj\ncltewhyjxdbmbtqj\nfbkgedqvomdipklj\nuxvuplhenqawfcjt\nfkdjmayiawdkycva\ngnloqfgbnibzyidh\nkyzorvtopjiyyyqg\ndrckpekhpgrioblt\ntvhrkmbnpmkkrtki\nkhaldwntissbijiz\naoojqakosnaxosom\nxfptccznbgnpfyqw\nmoqdwobwhjxhtrow\nchfwivedutskovri\ngprkyalfnpljcrmi\npwyshpwjndasykst\nxuejivogihttzimd\nbugepxgpgahtsttl\nzufmkmuujavcskpq\nurybkdyvsrosrfro\nisjxqmlxwtqmulbg\npxctldxgqjqhulgz\nhclsekryiwhqqhir\nhbuihpalwuidjpcq\nejyqcxmfczqfhbxa\nxljdvbucuxnnaysv\nirqceqtqwemostbb\nanfziqtpqzqdttnz\ncgfklbljeneeqfub\nzudyqkuqqtdcpmuo\niuvhylvznmhbkbgg\nmpgppmgfdzihulnd\nargwmgcvqqkxkrdi\npdhrfvdldkfihlou\ncbvqnjrvrsnqzfob\nlkvovtsqanohzcmm\nvxoxjdyoylqcnyzt\nkurdpaqiaagiwjle\ngwklwnazaxfkuekn\nrbaamufphjsjhbdl\ntzbrvaqvizhsisbd\npbcqlbfjvlideiub\nhiwoetbfywaeddtx\nfjirczxtuupfywyf\nomeoegeyyospreem\nozbbpupqpsskvrjh\npzvcxkvjdiyeyhxa\nodclumkenabcsfzr\nnpdyqezqdjqaszvm\nyodkwzmrhtexfrqa\nrjcmmggjtactfrxz\nmioxfingsfoimual\naqskaxjjborspfaa\nwientdsttkevjtkf\ntdaswkzckmxnfnct\nvoucjhzvkkhuwoqk\nboaaruhalgaamqmh\niufzxutxymorltvb\npfbyvbayvnrpijpo\nobztirulgyfthgcg\nntrenvhwxypgtjwy\nephlkipjfnjfjrns\npkjhurzbmobhszpx\ngqbnjvienzqfbzvj\nwjelolsrbginwnno\nvotanpqpccxqricj\nbxyuyiglnmbtvehi\nqyophcjfknbcbjrb\nanoqkkbcdropskhj\ntcnyqaczcfffkrtl\nrsvqimuqbuddozrf\nmeppxdrenexxksdt\ntyfhfiynzwadcord\nwayrnykevdmywycf\nmhowloqnppswyzbu\ntserychksuwrgkxz\nxycjvvsuaxsbrqal\nfkrdsgaoqdcqwlpn\nvrabcmlhuktigecp\nxgxtdsvpaymzhurx\nciabcqymnchhsxkc\neqxadalcxzocsgtr\ntsligrgsjtrnzrex\nqeqgmwipbspkbbfq\nvzkzsjujltnqwliw\nldrohvodgbxokjxz\njkoricsxhipcibrq\nqzquxawqmupeujrr\nmizpuwqyzkdbahvk\nsuupfxbtoojqvdca\nywfmuogvicpywpwm\nuevmznxmsxozhobl\nvjbyhsemwfwdxfxk\niyouatgejvecmtin\ntcchwpuouypllcxe\nlgnacnphdiobdsef\nuoxjfzmdrmpojgbf\nlqbxsxbqqhpjhfxj\nknpwpcnnimyjlsyz\nfezotpoicsrshfnh\ndkiwkgpmhudghyhk\nyzptxekgldksridv\npckmzqzyiyzdbcts\noqshafncvftvwvsi\nyynihvdywxupqmbt\niwmbeunfiuhjaaic\npkpkrqjvgocvaxjs\nieqspassuvquvlyz\nxshhahjaxjoqsjtl\nfxrrnaxlqezdcdvd\npksrohfwlaqzpkdd\nravytrdnbxvnnoyy\natkwaifeobgztbgo\ninkcabgfdobyeeom\nywpfwectajohqizp\namcgorhxjcybbisv\nmbbwmnznhafsofvr\nwofcubucymnhuhrv\nmrsamnwvftzqcgta\ntlfyqoxmsiyzyvgv\nydceguvgotylwtea\nbtyvcjqhsygunvle\nusquiquspcdppqeq\nkifnymikhhehgote\nybvkayvtdpgxfpyn\noulxagvbavzmewnx\ntvvpekhnbhjskzpj\nazzxtstaevxurboa\nnfmwtfgrggmqyhdf\nynyzypdmysfwyxgr\niaobtgubrcyqrgmk\nuyxcauvpyzabbzgv\nfbasfnwiguasoedc\nmgmjoalkbvtljilq\nszgkxiqkufdvtksb\nxgfzborpavdmhiuj\nhmuiwnsonvfgcrva\nzolcffdtobfntifb\nmvzgcsortkugvqjr\npbbpgraaldqvzwhs\nzvsxegchksgnhpuv\nkdpdboaxsuxfswhx\njdfggigejfupabth\ntpeddioybqemyvqz\nmxsntwuesonybjby\ntzltdsiojfvocige\nubtdrneozoejiqrv\nfusyucnhncoxqzql\nnlifgomoftdvkpby\npyikzbxoapffbqjw\nhzballplvzcsgjug\nymjyigsfehmdsvgz\nvpqgyxknniunksko\nffkmaqsjxgzclsnq\njcuxthbedplxhslk\nymlevgofmharicfs\nnyhbejkndhqcoisy\nrjntxasfjhnlizgm\noqlnuxtzhyiwzeto\ntntthdowhewszitu\nrmxyoceuwhsvfcua\nqpgsjzwenzbxyfgw\nsumguxpdkocyagpu\nymfrbxwrawejkduu\nhetgrtmojolbmsuf\nqzqizpiyfasgttex\nqnmoemcpuckzsshx\nddyqiihagcmnxccu\noirwxyfxxyktgheo\nphpaoozbdogbushy\nuctjdavsimsrnvjn\naurbbphvjtzipnuh\nhpbtrubopljmltep\npyyvkthqfsxqhrxg\njdxaiqzkepxbfejk\nukgnwbnysrzvqzlw\nlfkatkvcssnlpthd\nucsyecgshklhqmsc\nrwdcbdchuahkvmga\nrxkgqakawgpwokum\nhbuyxeylddfgorgu\ntbllspqozaqzglkz\nrqfwizjlbwngdvvi\nxuxduyzscovachew\nkouiuxckkvmetvdy\nycyejrpwxyrweppd\ntrctlytzwiisjamx\nvtvpjceydunjdbez\ngmtlejdsrbfofgqy\njgfbgtkzavcjlffj\ntyudxlpgraxzchdk\ngyecxacqitgozzgd\nrxaocylfabmmjcvt\ntornfzkzhjyofzqa\nkocjcrqcsvagmfqv\nzfrswnskuupivzxb\ncunkuvhbepztpdug\npmpfnmklqhcmrtmf\ntfebzovjwxzumxap\nxpsxgaswavnzkzye\nlmwijdothmxclqbr\nupqxhmctbltxkarl\naxspehytmyicthmq\nxdwrhwtuooikehbk\ntpggalqsytvmwerj\njodysbwnymloeqjf\nrxbazvwuvudqlydn\nibizqysweiezhlqa\nuexgmotsqjfauhzp\nldymyvumyhyamopg\nvbxvlvthgzgnkxnf\npyvbrwlnatxigbrp\nazxynqididtrwokb\nlwafybyhpfvoawto\nogqoivurfcgspytw\ncinrzzradwymqcgu\nsgruxdvrewgpmypu\nsnfnsbywuczrshtd\nxfzbyqtyxuxdutpw\nfmpvjwbulmncykbo\nljnwoslktrrnffwo\nceaouqquvvienszn\nyjomrunrxjyljyge\nxpmjsapbnsdnbkdi\nuetoytptktkmewre\neixsvzegkadkfbua\nafaefrwhcosurprw\nbwzmmvkuaxiymzwc\ngejyqhhzqgsrybni\ngjriqsfrhyguoiiw\ngtfyomppzsruhuac\nogemfvmsdqqkfymr\njgzbipsygirsnydh\nzghvlhpjnvqmocgr\nngvssuwrbtoxtrka\nietahyupkbuisekn\ngqxqwjizescbufvl\neiprekzrygkncxzl\nigxfnxtwpyaamkxf\nsoqjdkxcupevbren\nfspypobyzdwstxak\nqstcgawvqwtyyidf\ngsccjacboqvezxvd\nbfsblokjvrqzphmc\nsrezeptvjmncqkec\nopmopgyabjjjoygt\nmsvbufqexfrtecbf\nuiaqweyjiulplelu\npbkwhjsibtwjvswi\nxwwzstmozqarurrq\nnytptwddwivtbgyq\nejxvsufbzwhzpabr\njouozvzuwlfqzdgh\ngfgugjihbklbenrk\nlwmnnhiuxqsfvthv\nbzvwbknfmaeahzhi\ncgyqswikclozyvnu\nudmkpvrljsjiagzi\nzzuhqokgmisguyna\nekwcdnjzuctsdoua\neueqkdrnzqcaecyd\nlnibwxmokbxhlris\nfdrbftgjljpzwhea\niabvuhhjsxmqfwld\nqgogzkynrgejakta\nmfcqftytemgnpupp\nklvhlhuqhosvjuqk\ngdokmxcgoqvzvaup\njuududyojcazzgvr\nfyszciheodgmnotg\nyfpngnofceqfvtfs\ncahndkfehjumwavc\ndxsvscqukljxcqyi\ncqukcjtucxwrusji\nvevmmqlehvgebmid\nahswsogfrumzdofy\nftasbklvdquaxhxb\ntsdeumygukferuif\nybfgbwxaaitpwryg\ndjyaoycbymezglio\ntrzrgxdjqnmlnzpn\nrumwchfihhihpqui\nffrvnsgrnzemksif\noizlksxineqknwzd\ncirqcprftpjzrxhk\nzrhemeqegmzrpufd\nkqgatudhxgzlgkey\nsyjugymeajlzffhq\nnlildhmgnwlopohp\nflcszztfbesqhnyz\nohzicmqsajyqptrw\nebyszucgozsjbelq\nenxbgvvcuqeloxud\nubwnvecbsmhkxwuk\nnoifliyxvlkqphbo\nhazlqpetgugxxsiz\nihdzoerqwqhgajzb\nivrdwdquxzhdrzar\nsynwycdvrupablib\nmqkdjkntblnmtvxj\nqmmvoylxymyovrnq\npjtuxskkowutltlq\ngchrqtloggkrjciz\nnamzqovvsdipazae\nyfokqhkmakyjzmys\niapxlbuoiwqfnozm\nfbcmlcekgfdurqxe\nednzgtczbplwxjlq\ngdvsltzpywffelsp\noaitrrmpqdvduqej\ngseupzwowmuuibjo\ndfzsffsqpaqoixhh\ntclhzqpcvbshxmgx\ncfqkptjrulxiabgo\niraiysmwcpmtklhf\nznwjlzodhktjqwlm\nlcietjndlbgxzjht\ngdkcluwjhtaaprfo\nvbksxrfznjzwvmmt\nvpfftxjfkeltcojl\nthrmzmeplpdespnh\nyafopikiqswafsit\nxxbqgeblfruklnhs\nqiufjijzbcpfdgig\nikksmllfyvhyydmi\nsknufchjdvccccta\nwpdcrramajdoisxr\ngrnqkjfxofpwjmji\nlkffhxonjskyccoh\nnpnzshnoaqayhpmb\nfqpvaamqbrnatjia\noljkoldhfggkfnfc\nihpralzpqfrijynm\ngvaxadkuyzgbjpod\nonchdguuhrhhspen\nuefjmufwlioenaus\nthifdypigyihgnzo\nugqblsonqaxycvkg\nyevmbiyrqdqrmlbw\nbvpvwrhoyneorcmm\ngbyjqzcsheaxnyib\nknhsmdjssycvuoqf\nnizjxiwdakpfttyh\nnwrkbhorhfqqoliz\nynsqwvwuwzqpzzwp\nyitscrgexjfclwwh\ndhajwxqdbtrfltzz\nbmrfylxhthiaozpv\nfrvatcvgknjhcndw\nxlvtdmpvkpcnmhya\npxpemuzuqzjlmtoc\ndijdacfteteypkoq\nknrcdkrvywagglnf\nfviuajtspnvnptia\nxvlqzukmwbcjgwho\nbazlsjdsjoeuvgoz\nnslzmlhosrjarndj\nmenvuwiuymknunwm\nuavfnvyrjeiwqmuu\nyrfowuvasupngckz\ntaevqhlrcohlnwye\nskcudnogbncusorn\nomtnmkqnqedsajfv\nyqmgsqdgsuysqcts\nodsnbtyimikkbmdd\nvuryaohxdvjllieb\ndhaxldeywwsfamlo\nopobvtchezqnxpak\npzfnegouvsrfgvro\nrzkcgpxdslzrdktu\nksztdtqzxvhuryam\nctnqnhkcooqipgkh\npyqbbvrzdittqbgm\nkoennvmolejeftij\nrvzlreqikqlgyczj\nxrnujfoyhonzkdgd\nmmsmhkxaiqupfjil\nypjwoemqizddvyfd\nqgugcxnbhvgahykj\ncviodlsrtimbkgmy\nxbfbbechhmrjxhnw\npsuipaoucfczfxkp\nhdhwcpeuptgqqvim\ngsxlruhjeaareilr\nvgyqonnljuznyrhk\neewezahlumervpyu\niiolebrxfadtnigy\ntdadlrodykrdfscn\nocvdtzjxrhtjurpo\ngidljbuvuovkhhrf\nqwfcpilbjwzboohd\nxzohxonlezuiupbg\nvslpbkkqgvgbcbix\npivzqrzfxosbstzn\nfyqcfboevcqmbhhs\nyqsrneacnlxswojx\nheicqpxxyrwcbsjz\nyzynmnnoumkmlbeh\nbncadbjdvvmczylw\nhlnjskgfzbgmigfn\nfphpszymugpcykka\nzbifcktanxpmufvy\nsaklpkhoyfeqbguy\nnqtqfcfxmpivnjyo\nlocygrwerxlsvzqm\nqqflecydqvlogjme\nnjklmixvgkzpgppf\nugzkpjwjflaswyma\nlriousvkbeftslcy\nnsvsauxzfbbotgmh\ntblcpuhjyybrlica\nhqwshxcilwtmxrsf\nxojwroydfeoqupup\ntikuzsrogpnohpib\nlayenyqgxdfggloc\nnqsvjvbrpuxkqvmq\nivchgxkdlfjdzxmk\nuoghiuosiiwiwdws\ntwsgsfzyszsfinlc\nwaixcmadmhtqvcmd\nzkgitozgrqehtjkw\nxbkmyxkzqyktmpfi\nqlyapfmlybmatwxn\nntawlvcpuaebuypf\nclhebxqdkcyndyof\nnrcxuceywiklpemc\nlmurgiminxpapzmq\nobalwqlkykzflxou\nhuvcudpiryefbcye\nzlxbddpnyuyapach\ngqfwzfislmwzyegy\njhynkjtxedmemlob\nhmrnvjodnsfiukex\npstmikjykzyavfef\nwuwpnscrwzsyalyt\nhksvadripgdgwynm\ntvpfthzjleqfxwkh\nxpmrxxepkrosnrco\nqjkqecsnevlhqsly\njjnrfsxzzwkhnwdm\npehmzrzsjngccale\nbsnansnfxduritrr\nejzxkefwmzmbxhlb\npceatehnizeujfrs\njtidrtgxopyeslzl\nsytaoidnamfwtqcr\niabjnikomkgmyirr\neitavndozoezojsi\nwtsbhaftgrbqfsmm\nvvusvrivsmhtfild\nqifbtzszfyzsjzyx\nifhhjpaqatpbxzau\netjqdimpyjxiuhty\nfvllmbdbsjozxrip\ntjtgkadqkdtdlkpi\nxnydmjleowezrecn\nvhcbhxqalroaryfn\nscgvfqsangfbhtay\nlbufpduxwvdkwhmb\ntshipehzspkhmdoi\ngtszsebsulyajcfl\ndlrzswhxajcivlgg\nkgjruggcikrfrkrw\nxxupctxtmryersbn\nhljjqfjrubzozxts\ngiaxjhcwazrenjzs\ntyffxtpufpxylpye\njfugdxxyfwkzqmgv\nkbgufbosjghahacw\nxpbhhssgegmthwxb\nnpefofiharjypyzk\nvelxsseyxuhrpycy\nsglslryxsiwwqzfw\nsusohnlpelojhklv\nlfnpqfvptqhogdmk\nvtcrzetlekguqyle\njlyggqdtamcjiuxn\nolxxqfgizjmvigvl\ncyypypveppxxxfuq\nhewmxtlzfqoqznwd\njzgxxybfeqfyzsmp\nxzvvndrhuejnzesx\nesiripjpvtqqwjkv\nxnhrwhjtactofwrd\nknuzpuogbzplofqx\ntihycsdwqggxntqk\nxkfywvvugkdalehs\ncztwdivxagtqjjel\ndsaslcagopsbfioy\ngmowqtkgrlqjimbl\nctcomvdbiatdvbsd\ngujyrnpsssxmqjhz\nnygeovliqjfauhjf\nmmgmcvnuppkbnonz\nbhipnkoxhzcotwel\nwkwpgedgxvpltqid\nmliajvpdocyzcbot\nkqjhsipuibyjuref\nzqdczykothbgxwsy\nkoirtljkuqzxioaz\naudpjvhmqzvhzqas\ncxyhxlhntyidldfx\niasgocejboxjgtkx\nabehujmqotwcufxp\nfmlrzqmazajxeedl\nknswpkekbacuxfby\nyvyalnvrxgstqhxm\nsjnrljfrfuyqfwuw\nssaqruwarlvxrqzm\niaxbpeqqzlcwfqjz\nuwyxshjutkanvvsc\nuxwrlwbblcianvnb\nnodtifgrxdojhneh\nmloxjfusriktxrms\nlkfzrwulbctupggc\ngcrjljatfhitcgfj\ntkdfxeanwskaivqs\nypyjxqtmitwubbgt\nssxbygzbjsltedjj\nzdrsnoorwqfalnha\nxlgmissaiqmowppd\nazhbwhiopwpguiuo\nfydlahgxtekbweet\nqtaveuqpifprdoiy\nkpubqyepxqleucem\nwlqrgqmnupwiuory\nrwyocktuqkuhdwxz\nabzjfsdevoygctqv\nzsofhaqqghncmzuw\nlqbjwjqxqbfgdckc\nbkhyxjkrqbbunido\nyepxfjnnhldidsjb\nbuilayfduxbppafc\nwedllowzeuswkuez\ngverfowxwtnvgrmo\ntpxycfumxdqgntwf\nlqzokaoglwnfcolw\nyqsksyheyspmcdqt\nvufvchcjjcltwddl\nsaeatqmuvnoacddt\ndxjngeydvsjbobjs\nucrcxoakevhsgcep\ncajgwjsfxkasbayt\nhknzmteafsfemwuv\nxxwhxwiinchqqudr\nusfenmavvuevevgr\nkxcobcwhsgyizjok\nvhqnydeboeunnvyk\nbgxbwbxypnxvaacw\nbwjzdypacwgervgk\nrrioqjluawwwnjcr\nfiaeyggmgijnasot\nxizotjsoqmkvhbzm\nuzphtrpxwfnaiidz\nkihppzgvgyoncptg\nhfbkfrxwejdeuwbz\nzgqthtuaqyrxicdy\nzitqdjnnwhznftze\njnzlplsrwovxlqsn\nbmwrobuhwnwivpca\nuuwsvcdnoyovxuhn\nnmfvoqgoppoyosaj\nhxjkcppaisezygpe\nicvnysgixapvtoos\nvbvzajjgrmjygkhu\njinptbqkyqredaos\ndpmknzhkhleawfvz\nouwwkfhcedsgqqxe\nowroouiyptrijzgv\nbewnckpmnbrmhfyu\nevdqxevdacsbfbjb\ncatppmrovqavxstn\ndqsbjibugjkhgazg\nmkcldhjochtnvvne\nsblkmhtifwtfnmsx\nlynnaujghehmpfpt\nvrseaozoheawffoq\nytysdzbpbazorqes\nsezawbudymfvziff\nvrlfhledogbgxbau\nbipdlplesdezbldn\nermaenjunjtbekeo\neyaedubkthdecxjq\ngbzurepoojlwucuy\nrsiaqiiipjlouecx\nbeqjhvroixhiemtw\nbuzlowghhqbcbdwv\nldexambveeosaimo\nfpyjzachgrhxcvnx\nkomgvqejojpnykol\nfxebehjoxdujwmfu\njnfgvheocgtvmvkx\nqmcclxxgnclkuspx\nrsbelzrfdblatmzu\nvexzwqjqrsenlrhm\ntnfbkclwetommqmh\nlzoskleonvmprdri\nnnahplxqscvtgfwi\nubqdsflhnmiayzrp\nxtiyqxhfyqonqzrn\nomdtmjeqhmlfojfr\ncnimgkdbxkkcnmkb\ntapyijgmxzbmqnks\nbyacsxavjboovukk\nawugnhcrygaoppjq\nyxcnwrvhojpuxehg\nbtjdudofhxmgqbao\nnzqlfygiysfuilou\nnubwfjdxavunrliq\nvqxmmhsbmhlewceh\nygavmcybepzfevrp\nkgflmrqsvxprkqgq\niaqyqmcaedscmakk\ncvbojnbfmrawxzkh\njjjrprbnlijzatuw\nlcsudrrfnnggbrmk\nqzgxbiavunawfibc\ngnnalgfvefdfdwwg\nnokmiitzrigxavsc\netzoxwzxqkkhvais\nurxxfacgjccieufi\nlqrioqhuvgcotuec\ndydbaeyoypsbftra\nhhrotenctylggzaf\nevctqvzjnozpdxzu\ntbpvithmorujxlcp\npllbtcbrtkfpvxcw\nfzyxdqilyvqreowv\nxdleeddxwvqjfmmt\nfcldzthqqpbswoin\nsgomzrpjfmvgwlzi\naxjyskmtdjbxpwoz\nhcvaevqxsmabvswh\nlfdlsfcwkwicizfk\nisjbwpzdognhoxvm\noqnexibqxlyxpluh\nzqfbgodsfzwgcwuf\nkvmnwruwsjllbldz\nkghazimdyiyhmokj\nuiktgpsxpoahofxn\nzkdwawxargcmidct\nftbixlyiprshrjup\nnofhmbxififwroeg\nmcdaqrhplffxrcdt\nfbjxnwojcvlawmlb\nrizoftvwfdhiwyac\neduogrtyhxfwyars\nzoikunqxgjwfqqwr\nzxwbbpmvctzezaqh\nnghujwyeabwdqnop\nvcxamijpoyyksogn\njnckdbuteoqlsdae\njurfqqawafmsiqwv\ninepmztrzehfafie\ntznzkyvzodbrtscf\nxewbavjeppflwscl\nucndzsorexjlnplo\njpxbctscngxgusvu\nmfmygcllauzuoaok\noibkuxhjmhxhhzby\nzjkslwagmeoisunw\navnnxmopdgvmukuu\njmaargejcwboqhkt\nyacmpeosarsrfkrv\niqhgupookcaovwgh\nebjkdnxwtikqzufc\nimdhbarytcscbsvb\nifyibukeffkbqvcr\naloighmyvwybtxhx\nyszqwrutbkiwkxjg\nxyholyzlltjhsuhp\ngykhmrwucneoxcrf\nbadkdgqrpjzbabet\nsunaucaucykwtkjj\npumqkglgfdhneero\nusgtyuestahlydxq\nxmfhflphzeudjsjm\nknywgmclisgpootg\nmtojnyrnvxtweuzb\nuuxufbwfegysabww\nvobhwwocqttlbsik\nyuydfezeqgqxqmnd\nwbqgqkwbibiilhzc\nsfdmgxsbuzsawush\nilhbxcfgordyxwvp\nahqoavuysblnqaeg\nplwgtvpgotskmsey\newjcmzkcnautrrmp\ntyekgzbznlikcyqj\nbqzctiuaxpriuiga\nbimvbfjkiupyqiys\nmpqtbcxfhwymxncw\nhtemlptvqhharjgb\nmqbsmsruwzzxgcxc\nzjyedjwhnvteuaid\npzoelkoidwglpttc\nefydnsvlfimvwxhx\ngfyhgoeiyjcgfyze\ndeqtomhwopmzvjlt\ncasafubtkoopuaju\nyylsfarntbucfulg\nmgjwsormkjsrrxan\nlkkenpupgmjpnqqd\ntegweszyohsoluot\nlihsfdwxmxvwdxna\nrrefrjjxerphejwb\nguuazonjoebhymtm\nysofqzmfmyneziki\nlmjgaliatcpduoal\nqzthcpjwtgahbebr\nwvakvephyukmpemm\nsimxacxxzfoaeddw\naetgqmiqzxbvbviz\njxlmhdmqggevrxes\nmmuglnjmuddzgaik\nsvopsqhtrslgycgc\nxnvcsiiqrcjkvecn\nkkvumxtvashxcops\nbduflsdyeectvcgl\nvfrxbwmmytjvqnsj\neeqtdneiyiaiofxw\ncrtbgknfacjtwkfl\nuuutuoxdsxolpbhd\nlcrztwzreaswovtn\nhtorkvnvujmjdqzj\nwttzuzvrzlyhfzyf\noraewznfwgdsnhuk\nrctlkqqvkwbgrcgk\ncfehrsrqhzyiwtmz\nkbvxwcumjkhvjpui\nxxlocexbmniiakfo\ngtknkkzvykmlqghl\nkcjuxvkuimhwqrtk\nvohekwkuyuoacuww\nvorctgughscysyfo\nzmjevqplngzswxyq\nqhswdrhrijnatkyo\njoakcwpfggtitizs\njuzlwjijcmtswdtq\nicbyaqohpkemhkip\nrpdxgpzxncedmvzh\nrozkmimbqhbhcddv\nwkkypomlvyglpfpf\njcaqyaqvsefwtaya\nghvmtecoxlebdwnf\nlqrcyiykkkpkxvqt\neqlarfazchmzotev\nvqwndafvmpguggef\ndbfxzrdkkrusmdke\ncmjpjjgndozcmefj\nhbrdcwjuyxapyhlo\nmmforetykbosdwce\nzynfntqwblbnfqik\nsodwujfwlasznaiz\nyyvrivjiqnxzqkfp\nuldbskmmjbqllpnm\nfyhhrmrsukeptynl\nhpfjekktvdkgdkzl\nbozhkoekcxzeorob\nuvpptyfrzkvmtoky\nhkhfprmjdpjvfkcb\nigxzwktwsqhsivqu\nqceomwysgkcylipb\ncglateoynluyeqgc\nxcsdfkpeguxgvpfh\nowjhxlcncdgkqyia\nrpbmrpcesiakqpna\nlueszxiourxsmezb\nzelvsowimzkxliwc\nvzxbttoobtvdtkca\npfxvzphzwscqkzsi\nedsjorainowytbzu\nipsegdaluoiphmnz\nmkhueokfpemywvuw\nurxdnumhylpafdlc\nggluurzavsxkvwkl\nctclphidqgteakox\ntfobosynxsktajuk\njzrmemhxqmzhllif\neemwekimdfvqslsx\nyjkwpzrbanoaajgq\nrlxghzanuyeimfhx\nhozbgdoorhthlqpv\nobkbmflhyanxilnx\nxojrippyxjmpzmsz\nukykmbfheixuviue\nqivlmdexwucqkres\nrmyxxipqkarpjmox\nfgaftctbvcvnrror\nraawxozucfqvasru\ndinpjbdfjfizexdh\ngybxubwnnbuyvjcr\nqrqitdvyoneqyxcg\njqzcfggayzyoqteo\ncikqpvxizpdbmppm\nstfpldgyhfmucjjv\nslzbcuihmimpduri\naufajwfrsorqqsnl\niylmzraibygmgmqj\nlcdyfpcqlktudfmu\npmomzzsdpvgkkliw\nzpplirgtscfhbrkj\nmvhyerxfiljlotjl\nofkvrorwwhusyxjx\nxngzmvcgkqfltjpe\nyxfxaqipmysahqqq\nsdqafdzgfdjuabup\nqcqajmerahcdgxfv\nxqimrqtupbapawro\nqfvkqwidzzrehsbl\nhimixxvueksiqfdf\nvgtfqpuzxxmhrvvd\nadiioqeiejguaost\njnzxuycjxvxehbvm\nxedbpxdhphamoodk\njsrioscmwlsfuxrg\nmtsynnfxunuohbnf\nenamqzfzjunnnkpe\nuwcvfecunobyhces\nciygixtgbsccpftq\newjgcronizkcsfjy\nwztjkoipxsikoimv\njrgalyvfelwxforw\nimylyalawbqwkrwb\nyflwqfnuuvgjsgcj\nwkysyzusldlojoue\nzopllxnidcffcuau\nbscgwxuprxaerskj\nzvnvprxxjkhnkkpq\nnejwxbhjxxdbenid\nchryiccsebdbcnkc\nguoeefaeafhlgvxh\nnzapxrfrrqhsingx\nmkzvquzvqvwsejqs\nkozmlmbchydtxeeo\nkeylygnoqhmfzrfp\nsrwzoxccndoxylxe\nuqjzalppoorosxxo\npotmkinyuqxsfdfw\nqkkwrhpbhypxhiun\nwgfvnogarjmdbxyh\ngkidtvepcvxopzuf\natwhvmmdvmewhzty\npybxizvuiwwngqej\nzfumwnazxwwxtiry\nkeboraqttctosemx\nvtlzxaqdetbhclib\nwjiecykptzexuayl\nejatfnyjjdawepyk\nmpcrobansyssvmju\ngqukndzganeueabm\nukzscvomorucdnqd\nwfydhtbzehgwfazx\nmtwqdzlephqvxqmx\ndltmlfxbjopefibh\natcfrowdflluqtbi\nvowawlophlxaqonw\nvblgdjzvwnocdipw\nuzerzksmkvnlvlhm\nytjwhpaylohorvxd\nsiprvfxvnxcdgofz\ncbhjupewcyjhvtgs\napqtozaofusmfqli\ntmssrtlxfouowqnr\nntutrvwnzzgmokes\nzrsgpwdzokztdpis\nnrobvmsxtfmrqdhv\nkadkaftffaziqdze\nyrovbgcyqtlsnoux\nmodheiwuhntdecqs\ngzhjypwddizemnys\ngaputpwpcsvzxjho\nbgmouxwoajgaozau\noxuapfrjcpyakiwt\nkntwbvhuaahdixzj\nepqjdjbnkxdnaccx\ndspltdvznhypykri\ntdrgqmbnagrxdwtt\nnjfqawzjggmemtbg\nchpemsgwpzjpdnkk\nfpsrobmbqbmigmwk\nflxptsrqaazmprnl\nnzdunrxlcbfklshm\nmiuwljvtkgzdlbnn\nxbhjakklmbhsdmdt\nxwxhsbnrwnegwcov\npwosflhodjaiexwq\nfhgepuluczttfvqh\ntldxcacbvxyamvkt\ngffxatrjglkcehim\ntzotkdrpxkucsdps\nwxheftdepysvmzbe\nqfooyczdzoewrmku\nrvlwikuqdbpjuvoo\nbcbrnbtfrdgijtzt\nvaxqmvuogsxonlgq\nibsolflngegravgo\ntxntccjmqakcoorp\nvrrbmqaxfbarmlmc\ndzspqmttgsuhczto\npikcscjunxlwqtiw\nlwzyogwxqitqfqlv\ngsgjsuaqejtzglym\nfeyeqguxbgmcmgpp\ngmttebyebdwvprkn\nmzuuwbhzdjfdryxu\nfganrbnplymqbzjx\ncvsrbdcvhtxxdmro\nscmgkjlkqukoamyp\nfkgrqbyqpqcworqc\nhjsrvkdibdjarxxb\nsztzziuqroeidcus\npxdfvcpvwaddrzwv\nphdqqxleqdjfgfbg\ncqfikbgxvjmnfncy';
+var $author$project$Main$initData = function (dataSource) {
+	var sample2 = 'two1nine\neightwothree\nabcone2threexyz\nxtwone3four\n4nineeightseven2\nzoneight234\n7pqrstsixteen';
+	var sample1 = '1abc2\npqr3stu8vwx\na1b2c3d4e5f\ntreb7uchet';
+	var input = 'rhqrpdxsqhgxzknr2foursnrcfthree\n2bmckl\nfour95qvkvveight5\n2tqbxgrrpmxqfglsqjkqthree6nhjvbxpflhr1eightwohr\n7two68\nnine7twoslseven4sfoursix\nfivemnjxbrnsvl3\n3qcfxgzsevenone1rv\n9four6dk7gvv\nnine91threepdcthjkmrthreeeightwonsg\nfivetglzqdfthreergnseight2lpphhbd\nfourtwohldlr6294\nqkvc7pvsv6rvsxlqzpjdjkd1eightthree\nonefourm5qpfvdnbs\nql8jbzzjpsdgmrjtngrkfdmcsix6eightsix\n8nl2\n5lfzqhgeightnine\nthree313eight2zcjnnmtnh\n4three77dgjzfj4five\nntr5sixfourznnljvqdr5one\nthreedlmnd98nineeighteight7\npzcnnbjjthreefmlf9znfnkdrjs\nflbdjkseven7338qxzbcsx6\nsix43fourthree2\none24hndgmz37mjqqm1\n4fiverlgtbr\n7hqtlxgngd15qkfl2three\nmtcztwo46one\n3onefivechmlkgp87clrmmhseven\ntvsctqdlns1hhhctpn34cztkqzztpcgtzhgrtt\nfour8flptk\n6zkb\n7eight9fivesix75hclgfphhvv\nct53qdjpnkdpxdhvpqqcx8\n144six\nkbjtmgfrx3mpmjhncfl78nine\n7sgnlbdfivecxz\noneqrbbnrdxgbbfl3\n8ndmrfggfz1six87\nhjkfb8vhrhnlmbhbl59rxplvmgzspfour\n3sixjhdn4hckqsnvseven\nzmkgmlpfsixxhmv25bqlgm5\nthree48eighttwo\nrgfzfourbmpxzrh6dfjcdkhqhcdkpfpk\nbpccbcqmlstwos8threenineeightg8\nnbcpd2prckbshrbvsmrmlhxdkq\n6flfsxv\n84xqeightseven\n1xf8five8rgplhdvteightseven9\nfrtwone34btgz4bxlqbf\nthree5eight\n8xtcsggc\n9gtrcffqmxpvccjpsfqsixlcmdfkfgjqc\n5svskptp1twothreersjrlnfdbxttzrkkqz\ntsdtcfsj5sixfivesxvxxsgxhkhngzl\ndgfcrtck2twosxkdq\nfivektlxgmeighttwo1\n9661ldh\ntwobqcfnxbgnd68\npbsnjqtqhzfrjjtkninexqjbsvrcnnine983\nbfcndjjsqseight81\nrgvxddcs82one62\noneeightcgseven7\nfivexhvmhjhmzscjpxjgnxpd37\nonefourdxsgvbkttj2zcpvnrcbpnbfonesix9\nfour65mrbfjsix\ntgbgnqcdrsixone2hsznmgtgtp\n3five3\n3vzg7\nfive94eight1xrbcgnnq7rknvvfnrgv\nmjsmnineone7phrfqseven7\nnjtk1one895\njrpbp7n62zgnrnxlzdvtlt8vqm\n135sslqzn\n9ninenineeightsix4ljnj1twoner\n6nine44mgmvrfhvh4four3\ngvqxreight6\nsqrfkncdk3\n5nine7qkjsdscrvsevenfive\nqbxmone9twoninesljzz\nqhss364lsscxxdk96six\n35bxgcfive8x\neightcmzzdxc853sixsixprnnjknfp\none23pxdgrsbsonegfive8\n41three4\neightkzpscshdstmnklzthreeqzkftmng46\n2two66\nthreeeightninefvmbcfjf2xjsixlrpr\n2269qhvrrfp\n527\n2onevb\nnine7ninefour7threeqsblhrgxvjtwonelg\nfourvjdqxnn84szdc\nkbgtfcrr6twotwoeightthreeone\n5cjlvqhbfivetwo49\nknzgl5cnftwovmffkrgblnjmhhb\n6glbpbn7\nfiverfourfivefive1three\n121\neight3one\ngxlvnmkpkksixfour6\nk8pmlfgsixninetwo\nldlhsix56one\nh1\n5vlcktk\n139nine9gtgqkddsixeightcgqv\nfivesixsixeight3nsnhcqcfoursix\npfdksfpmonejrbbninethreeqsjsfrv8njfdh\nnzltgfsbqpbzcrgvpj5\neighthtfive5gzmqxhbcdmseven7\nnxfvdgxhxninethreegfqlzqmlc4three6\nhfs524zfive\n5fourtflone\n4threenndghtkh41\n54bkrhrt2rrptrvcszrskc97\nspfone69nlpgftmslthlqdf\nqgtf2pz1seven53nfscpnrf\nr4fivehkpthtn\ngvd2qshbjjsevenone\n47397\ngtzqvvsntvqnhrkxqb6twonebt\n3sixninefivekjkgpjvtcqcsix\nsix7ninefourseventwosix7eight\n6fivemgdj\ndvbbjrbfjsxffnjlhfdqthree51oneighttsp\nseven784mxkxr219lf\n6ddjspgcmtkqd4752\n7xlvdtztq\n8sevencjsfivethreefour\n8rqzng\nninejttfnfzrffnzzbtrbzhsix9fivesix\njhgtblzxbs9klzzztwoxlpsfbvhcl\n9ninetwohnvpkkbzklh8\n7threen2zfkphngfkjhvkkz\ngqldlljv5\nnineskmdqcqxj16\n9pgbdlfcmbonesixthreep8s1\n4dbjktxcbqh8cvxsnrkdgvjrghcfhx\nsevensixsevenhtbhnpcpnqjtpfsix686\n5hkvjlrjbgtsevenhrlone7sfrztpcqjpdn\n52nine7ninethree\nthree1251\n1ghlmpvmmseven1threeghgfrsch\n3sixseven7fsdssixdckfvhzrvq8\njtwoninesevenfour73tspxfxcd\n2lxlsninelvnzjvd\nnine1zfx\ngsmfnbkzqqkczkpgg522\nzoneightone9zlxxrtbxzrh73sixthreesix\ntwotwoztxzhrlbnlhtqmlzph6g4eight2\nfkqrmjrhmjjnthdt281sevenfour\ntwodzpjpvx1eightmmkhxtlrfzsevenrnhthree\none72ptwoljccvmmkscflxqv\n9nine9kbmlcvn\n3ninefivevgvcssvfqhrfvxc6hhlmcllsxpzp\n1four7\nvhvlxg5six\nsgcdxjqvkrfive3three\nsixfivesixvgtrtxs5\n4zsevenfour2\n2onenqjkjxjxcknc52fivethree8\nsixzqtgtdkqm1sksnfgbhtwoseven33seven\n4twobq2\ntwocxxl6htqlcrlsdskmone6\n731\n5sevendfrgsdjhdnrhvdp11fgpxknxvfvv\npdktwo2eight824tlpmsmflg1\n71sxtsjtff\nninesixeight5\neightsix3xzrhclnl\ntwotwo6tmslnxnfdfbdvffgt668\nfour54xclbszc\ntt6fourzlbcldmffour\nfourvnxqfngsz7zkh74fourtwo\ntwoeightl8five1scfnnbh\none4bjzzckgseven\nkcb9five\n7five6lgdlmjqblvtfprrfht2\n4fivetwopcnlntseventhreenqrdgrjg\ntwobkbfkmzdlkcjbrfvnl65onesix5three\n73eight7\nnine52jrlrthreez\nsix8tmxhjxgjm6six3\n635jksvjvndtxbkksznrbnine\nzncthreeninefive4seven4pdckvp\none1four\nxndfpkzeight5\n7msxkdfzvtkrsdtqz\n4onejglhdmnjx5\n1seven1three2\n4nvkv\nhd3\n9zbgttprszjmpv\nfourzcxeightthree6\ndkkvxvzzktr5vrztgv1\n797cqxvfhtlthdbhvcmrktwo6\nfour383twoeighttwo\n1lnkzjrlzdtfvgckczfour\nonefivesix3ncll3hcrpsdmtpxvnine\n3fiversgksrncxh46mzvpzv94\n4eightmzsgftrxjsix637pdjhsds\ngz4tgghpmtseveneighteightsix\n9sevenmfourfkfscq\nhjmbkzznjflhtd3one\neighttwoone5gfzxmptfivemlkfzpnxr\none4txtzkrtzmqtfbzdgnfouronenkcmqdtdgfnjvhc\nkljssprljm5nine\nz5\nlrmgjltmfive79lhqj9\nvdgvlvhptpprbx16fourgph5one3\nfivenine9two3\nninemglpslone6\n988seven3seven\ntwonine6zjhhxsdlglsmpmvmvvztbhhxklzponeeight\n3ghmsrggblfngvtt\ngdftwone1six\nsixxtxkgzqvldsixzzqtfq5bvhlxkxrthreeoneeight\n3oneseven\n4three6one19five\nsixfourseventwo2threetwoseven7\n1fiverltmfpdkkj3nine5\n6mzrdnpnfivebfgbbvtmmj4rqssl\nvxjncmpg3twoeightone\nfivefiveztghmbgd1\n6sevenljbnlsfjgpsix38\nthreeskseven1rqtfrmkkxkkkkbqrqknsfsrfoursix\njh5one\n3145hsxsrthree56\nhdxxdz6threenpq68zpqhvrt\nqbfxrcfpeight5lqpcfd\nseven4hldkmhfbeightonenine\nseven9threeeightwocvb\nqtdp6grfdn\nfourhqp93\nthree1tmgpxlqjninenine\nmtbvfjkmxr941bct\none61one\nninesqtf872six526\nncdfhxmgsjseventhree3xvpq8\n1sevenjjnvfjzd1twovpkrsvrdbninestsgzdjfgmfxnc\n36sixmxnhfkneightwov\nthreeeight5sixfive241four\nfour76nine\noneddcxxggx7tvg\n7gstvsclkjsixtwoseveng6four1\nvttsixsrqgmkptdsqbnhvdmhmzxcstxtx3eight\n5qckzltb5\nnine943four\nhdgbvjtjkc3onetwo238\nq97gghxdgcqdkeight3onethree\nsixrsdrdvqlht2sixonexn216\n4nxkbsvninenineqjphghzjqnjqfvhnine\n21fivejpqsgktsjczkdps79three\nonesixst8\n5ctxhzsvllbseventwo91zhznxqeightrlblc\n1178fzjfsevenseven9\n2j5dp\ncpxeightwoonethreehgnldljndt8onetwo\nthltnonefive8twoeight\ncfsthmmztroneqmtwo6\nthreethreesixcsfvf7\ndnsskccxfour3\nbdgcdzdvbjninefourhgtwoone1nine\n6sixeightfive24\nsixcgkfour5\nninekbtkninefsbmjgppfive2\n96cgstvtnsix\n4two4qqflzdeight4\n1pctd7zmpndjhljt\n78two\nhjfbdjggrkjbxjtlmcnnfngrgmfsevendtqjsmqx2\n58eightkpxlqmneight\neightninefoursix44txgslt2vvp\n5fivefive1one6qskqbldeight\n1six3threenine\n5fourqzjhzsgbqkczhvhrvr2two\n7seventhreeeighttwo4lmkdgkftftwofour\nthreeeight21fjfxvrcnfive\nvkzgjvdjzdpdxdsfiverbgeight3\n878\n9zcthreerhvxsp\nhninepjjvvzmfns1pjtbtkoneonenine\nlbjxxthreehkcbjv7\n1682seven\n3xhbltveightfivethreeln\nvdtktf9threesix544\n81sixfournineqshtzqhcp\nninetwomdvdkfm815\n6eight7ninetwosszxkvqmjpdcz9\ntwofive3\nninetwo1vdhjdjd\nqpkgszmrndvgn11seventwo\ncrspcbvbone8h\n48one27754seven\n5dcfivedrpmdlcbvlbjdthree634\n1fivefour21mxfzlkbjft\n7btfbb9twokldmpeighteight\n98qpzgfourfivefivefive9\neight2sixfmsxhvcshrqhpmxj\nthreetwosix126\nfourfivesix1foursgbzzfnggoneighttbk\n2twojnine5ktbjbcgbsdfivefour\nnjbxmqkn3tdthreeeight58\n4zltkpphfiveqmlteightjbklpkmgbhmzt\nfourxx3\nqkgs3eightgnzvnhcdjzjflfsczdonejqbnine6\n3twogqdhbgvqsfour\n618\nplknlddeightjhpmhfleightsnszjmsixczhzq6nlrk\nonesix1sggfxdtxvlnpjllm21\n91mfcztmvnqrrxqftwoeight7five\n2xdthsq\n9vlvsrmdsevensix5sxxn8\njprfqddhp97tbvbtt\njzdpqqrhsmnhtfhbrjdp2\n225ln\nthree18eight99three\nrjsbbkts5zftbxzttrl1\n1hvvhtbgvm95gtcprjgvxcf4\n8sjmrkxxbht\ndgcgzff9fivethree9\n8sixkgtfhppcvp562\nkptdxhmdlfrlfml2\n2lkssldqgt\ngrfkn89ptp36two\nsixfhddpztzntwofive3\nkxxcmtseven2\n1lbdhrzdnd89qphjhxqntxnine\ngrqgmqzfhvksrxgqkb25rjmbllsvzk\neight4fivefivesix1zkbcmhsql16\ndhdpvclbmnine2sixeightchcz\n6ninetwonine\nonepjonehbzsclh83\n4xxzjsqddfxbc29four\nzhdrrgdqkx9hns7three\n1zqfkdhhninebstlhseven\n5zxnn9eight1fourvjqsvpn\none2kdmrrbjhxddxfjqjlxr3one\nnqjghpdmssjbv47zdgbm7\nbvktwonetwothreefive97skqmlv\nnd4onedlvthnsrxfxm8\neight6pcntqp2oneeight79eight\n6vjzqcnvksn91khthreesixtwo\nkxncx932mmmfqf\n93546ctxfbhpgxxnlnx\nfive52\nninevtxblcsbqfzqdqz921\n2lqkgmkpcjhsvtnj\nv2sixmjktdbtpqgbkcbhvm\nrxhvtwo2sixfive\n3one7dffhm9\n1twofoureighteightjczpmtfpmxf1tfpm\n123\n16eightshkfbchsvrrqhjpj\nsevenfoursevennvxthree49tworzzxtvghkn\none1qzskdmrc\ntwo86cqnhvpnsfourtwo1one\nlhxcbcqbrnqvjdlt3znmcbjlfh6\nsix8289\nthree9onetjzqjzdck1jkfive\neight15jrdrjrs5xtdvm\ntwo9fourcnjlvxeightvflxm7eight\npd3nine\n746twoshbngs\neight28\npjztfhmvtsixmbbjxfvmpstfpttfive1\nfivevnncxmbfbtkdqrnmdpdxsqbzprsx2seven\noneljtwo5fivefivethreefour3\nhhzoneightsevenfour5seven9sv\nxkhjlkrr6zcnchhmrjh6hngjjzhgq4eightqdpqf\n3pxcvxkzxlttpsgpk4six\nlpfhfhjshfive96six3\n6rkpkhgjjxrkgldqzvhxmkmfivenine1eight\n9djnfrqzcldeightoneightkxn\n7fourone\nthreethreefourr1four\n2gcmft\n37four8\n7eightbshnvzbzpxeighteight2three\ntwo48pfkmcrkvtfpnine62\nqsix8rfmnine425\ndhssxzlonesixsevennine9three\neightzxdpbdjzfx4pseven6\nthreesxgsncfmthreetwos867\nfour6lkgjqpvqtvvlkmg\n8fiveseven\nthreevhlkdd3\ntwofdgdlhmglf2gjrrnhhhfxpkqjxhspclbh\nfivecjcgbdct4\n3mlnbbcgpnvscmg61csix5\nnksxgppxsixsvzxhrqzs9threesix\nkghb787jdzpjr68\nninegpbqfq6ninethreeeightsixseven\n3eightblxrqctk1llv\nllqzqvmr4dcqtv26threethreeseven5\n6nhzbxeight971fivezmvkvnspj\ngvhvninefiveseventwo1bfnvzdc\ntz3lhtpftvlgkr7zxqjczcblqcxnbxbvp8\neightppnmdmnlvcqsmlsvvvhk9onetwo5\n48fourthreesevenbjj1eight8\n5ghflmtwo\nnineninethreecprnvsvg3dhxhk\nsevenqmmlpdplcmgjtseight5\nsevenksdpnqxfn7vzqg11ninefrrtmncl\n162hsvvpjlg76ksbbrxpqnoneightk\n2733\nvlhzdjxd55\nthree48nine\n6mtkftqtmbf\n4three3eight3eight4one3\n1glmnzhgzzvfn235four\n5seven4hqsjsft9cdfhfccfmbfhteight\nbv7eight1skmkdtbx\n524blmgfivesixhhpv\n57eight79fpmznfjjdckxkjqvk8one\nsix3ttcnzvqhkltbnrrjm\ndpttv5nine4one\nthree3threejpcpzshhrr31one2njhjb\nhlhlclcjnnjfourtgxqsxqtgrprvcslsm2\n6seven257eight\n8ksixfflvxzvhmfninepgq3five\nlncgmjnx14fourrnpfhfmhqkgkr5five\nsixsixseven1seventhreegkjfkznkqhlhk\nsevenzbcpkjkcjq2\nsmsdpfourgpxnine8five\nfxhdt3deight\n7htrrjvtworninebtgkdnbt2five\nqphmdxgzfiveonemxkx3\n1drgktkjcq7mnnxnsixkfhkrf\ntwo7c\n43eighttdcnpqldvd\n4onevnfd\nfltqvxksjrn7\nsix4p5nvfsjdxbfszpxmttcqgqghcczmlz\n8twojseven4\n7mcgkthree4nvqqnjkzcqjt\nnine5onepjmghlc3one7sixone\n4hdone2onezrpnt6\nqcdttnqdtdt6\ntkrztgn1four4eight66\ndjvbrczzqj9nine7vfcctvjqdnmsixkeight\n44htbnmgvxtznzlzfhtwo93\n3xpmx4\n6sixnine\n5hqqspvrzrxqr2eight\nninemgkhcdtfpz2\n3threetwofive4\n6njcmnlkrcf\ngnfxzcxhvbxpc4\npd41seven\n91jvrhxgzrzq4fxcqsixdtnnr\nfivehspkhfour4threefourseven\n8fiveninegcgkpkone4\n6jrk\n4one7sevennrtrdltwo\nthhsjklkq81eightthreeseven\nltzdlltggeight5eightzrbvrh\nsixninem48onespjtjrszk\n7hrnvkdslhb\n76sixvfcdjhgqpccsksfour2hfjccbplzthree\n437ndgtxtwo\n5xv5eight\nnpsmnhzghsrpkrm7\n9four94\nsixpcgj2nine1frhfn8\n51\nsdq8cgphzvqffsljtxlxlc5txqnsfdrmn\nninelxdnzqlsevenj8sixtpxrpfive\n7hcczrfthqkthr39six\nfivesixdkqdnfq9\n5n9threertlbqxtj\n5threeseven\nmqdptrrhxz9threefour\ntwo2two6\nvlkzqbztvnbprdc94one4one9\nxxcfhgkbss94four3nineseven\njlnhmvgczmninefives8\neightoneeightjsixfhkxphlj57\nvpg3fourtwo1\nlnineone31jsmeight\n45srsljgdfivezvrdmntmb\nthree6onelrnmnmqpcn4\ntwozcjvvcdv7xdql993\n71fourtwonejpm\none4one56bnhf\ntwohssdrcsklone8six\n7tcjkcchbpggpk1rddpdgvpgzm5\n7eight7fmqpzrjlcctjvhrdcjgm2mgkqrbdcmzlzngbkqlj1\nfvb4four\nrvqhqhb7kdsrmcc\npdklstjsevenfive6\ngsglqtpj5lmbcfxchmjnbvhpcvbssx\nhgjlmklngdk4zpkfbhmzcmzcjsmfkghdttfb\n586ninesixsixvfbveight\nhrvthreeninesix58\npxmg4threevhrrsbfrck654\n1p5eightonesixhbjbxgjb\nfour6eight2sevenbtgfkkzcm8lxstnvfbz\nc4bqc\n12mmrlfnsxtpfncc3\nfive7eightkvdghfvcrgsevenfivenngqmzh4\n5onefourtwopgnhsfrpfourtwonineqfhrz\nsixzpzk1\nfive45\ngjfpvjvqhpfrrjpddqfbvdpjj8twoqfvkfkvpqzcjvrqn\nczqxtqbxpjt9fourqdcdcfourseven2six\n8gmgfsktkxmfourqfshsqvqjx\nqjdfggfhtfnine38sevenrvslgljqrpeight\n7five6pxhrxcvzsixmcqvjp31nine\ndrvdnptcltnmxxtjvslq98\nfiveqttmkpkrxzngddzsncjlsevenone6\ncrlldnmx9rpx3\n8tqcfour2vbznhzzzl\n9vdtxfbgrqzsix16\n7sixrjpcfdv9twothree9dqjlgkbmb\neightfourvzxckjqbm6tdbthhsnjr\n9bnqfmkxlkj4\n62tskjsixtwonine\nfoureight6gqkdstfivef\nseventhreesevencqj12\nrqfq6rtcvjjqnmk9gvvttbpnbgvjcmmph8\n5zngdplj93seventqlknninesix\nfourgnqdcrgsznk8xknsrmd8qpxxm\nvgslbcnlpk74dfskqgsp\nqmbnjllvvs1fbjslc4onegthree\nz82sdgvgktzfive\nfourdmxcqmstvj7jgzjkfxjntt5cxhchtglmfive9\nnpnfivep2three1tlcctmfp\nmptzvjmfourfive4three\nonelkcmzninefbmgnfghsix3cgpzd\njbshqrc5nbjhktdqmtwotwoxpffrlzxbsix3\n9threefive1threenclhfgrzxl9mnlmcckvnd\n4231\n1366\none9blcprdq\ntwo9two2tdmhtcq13gspmmkrb\neighteightfiveeightjthjbgjm5hpqtbtrfour7\njsjninevmtdscxftwolzfqpbx2gdnflhpvlvtt\nfivegjxkbzdtj6four5\n3oneone\n8gkmzrfhvchfs78jxbtbvgj4\n5two89fzrvnkmkgt\n53four884seven\nfive5hbxqmfccfivefourfourfour3\nonepbsevenbsgvmgf78875\n4fivempxjjpjdgzfkqhqdrrz\n7vqj\ntwovnnknngstnine8\nfour7twofourqddvxkzvvgzrrvlthreekflqh\nvcbmfspdq1jone2two1\neightsixjgfjrsszgmvbdnbqrpzpps6\n6eightwomm\nhgjjltvnsd39nbxdgfpgjl\njfour16xmrdzq\n1jgrkhmjbeight\nlhsdll94kccmdhtwozxlfkrmpxksixthreetwo\nzmtdfour8\n9eightqcpmp8threesevenfive\nsftwonenrzbrvmqjp6br3\ntgqoneighteightsevenonethreesevennpk4qsffx\ndkhqbdnchvfiveeighttwo2fourfthgrgl\nbrfivefive1mlfxznfourfourfive\ndlpqtdpgsevenvzkzljds4three\ntzcvrf1srrjxlhszsixsix89l\nblbnntbjzsixthree44one\nrmppdzntgjtdone1shsevenfive\ndpfdbjtv8\ntwo19nhtbktfk\n4hbkvbrnpxsevensix\njccqhkonetwo6twotlmbfmvbz\n4fouronegbx9\n6xhfxfnmmoneightp\nlnmmkfntxdsghsxzxkf279\nxjdg92ninethreepglp221\nseventhree4xmzxp21bdssnzqnrthreefive\n196\nrgd4\nvlmfjrrmpd2two7sevenqrzcrhhvgpvksqh85\n71sixfour\nsixnine5jfconesevenfournine\n5fourfour96hqphnjrmfhsix\nnshzgrhveight8oneightrhg\ntwo5c9\ndgkvzfzd1\n888ninedvdslkfkf\nfxmd1qfjnpbhrkhptrp\nlnmh48sevenfiveclptstdd5\nzgjbxpgpnlseven6ffjcjjfck\nseven2rmcdrsix\njggjjpj4eightczcngxm3nineone\ntworrgbm31mbhkfhndvb\nszkfqfbknv54fiveninesixsevenseven\nthree3six27\nrf376\n7clbr1999\nxlmfbvseven71nhddnq\nnmpgsvzq2jkfoureight6fourhzhzxkseven\n5344two1bkxdtwo\nsix8dnql4zjd641\n4fourmngrflsix2two\n2tthglxfourfivenpvrqcsrzkfkcqq\nnjrfive4\n633qdvsmlsv2\nseven79oneceightljnkxdsvxrgg\nonefourzlrvctmc663\n27jznqcz861\nsixone6twoeight\n9fivethree75ffldxglvtone\n68onesxzcksgm6\nrpphzspvq8zznrthcdsmvmfbgninefour6six\n5drvndprrvh178\n5threeone3eightthreedmtkpjtmq\ntwo9fzfxseveneightthree\n6xbqvhlbeightsgsjbtqcg\nseven9twofiveseven\nsixtwo87pnltrpkndfttxthpkhjninetxqtcdfxkg\nfivethree2five4688seven\n2fqmcqdbdzfzjn8sixfournrclzsseven6\n9sevensevenxbpljmfsevenone\nfive98seven3\nthreexpnxsveightone5nqqcd\n27eight8\neight1six2one2htb\ntwoeight4bhlvvksqqgqone2eight\nlbroneightthree3ninefournine\n4ctwo7\nfhjpvtwo981foureight\npjffszkdkdg3sevencbh4twothreenine\n12vljtwo\nbldmronetwo33four\njjmcmjmf9fbffcpnp9ptxfptz6vjmbrx\nsnine9kxkxpkk2two\n4eightfive1ftqzsfqgmdcnmrdpthreefivevsdfjt\nlfjnvmm9\nninethpqntwothreeeight4\n8qcplzvqzrlzlznjlvltcbslthree\neighttgqrvm5twoksr37nine\n2fourprchr53three\nqnmkxnhm5ninetwotwoksbnvtqs\nfourdngcgnnfiveonethree8four9\ntwo3kzmrhsdqtfivefourns48eight\ngrclfxj4nblzccrfrcctwo83\nllvcskkmhzrbzvfd1five\n8sixnine3\n16kpsgmcffhdmrqpnmthree\n1qkkpbptccqg5fivethree99\nfour5zslbrzjfvcl9trcnkfdkvrthree\nkv2\n5pxtjhltvxmczx25dtktone\nrsjxvln27cvkk\nfive88three2fourbhmpcthreehxk\none8six\nsevensix5sixlqthreenzsphnxbjtksk\nlmq8fivefiveseven8fvt\nlrshhmlgcxdtq87\nfivexmgsixsix282\n4sczfdpsix54four\n2vxonehqfcvdvxrr\n9seven7five\n27xkkmp5qone3four\njdjjdjr6lgpgszz\ntwo87sevensixtwofive7qktfvch\n86fiveninetwo37\nzjxlcjthree3ninefive76fiveeight\n9rczvmthplvpxhxt1vgf2fzgg\n4nineplxfourtwoseven1lzh6\ntwothreelmvmhkndcrlvggsqfq2xzksfhgsix1\nnjfknspt14hfpsxdpninerdzklfg8\nqsbeightwolczzd9vblksgxrxdseven9two\n8fourseven8five6cnfrcvpnhvttq\nnlstwonevgqvzg3fdllsqktqf7cgsvfjhzmfffntvkln\nglvmzeightonesix85xrfvt2\n5cmlnbrtwo\none6mp82twoeightfour3\nsix11nqvlrrpxhr\nhj95dtrpdkgsevencccfxqlxfour\n7frxlq4two4seven6\nfour6cpkgghfxgfour9fivefour\nlsix1sixthreeeight1cxnnqqhxxk\nzkntsdftthreejk16\nnine2c\n9czbtsl\n5jqxkskkkzdvznine\n7two9\nlfssrfourv363vtbjnxj\n9fourdpcrxtxnvklltlnsheighttwoqzhnrgheight\ntwotwo2jh4431nine\n57nine19xj11\n8sevencone5seven\nxz4sixtnnklcvjfdq\n15nine\nkqtsqznbctwo7vhzfsf987six\n6fournine6rsbdsp2qrrnnvqreight2\n4fr\nhpfllcmjjbbtbfive2sevenmgfvrgbhxmjbxrh\n8nrsix\nmxrgrhtsfvtzxqlt8vspfive9fourgpkpnhsj7\nf6892fourzjgk7three\nxzxnlvgbgninenine49two\neightzjtdkvnmnvone2fzhkqzzthree6\nsix259mtjninerfourkmlg\nsixthreepflrvthree5dsrppdzgb\none882three\nmtmb8ninenpxtfkchcztwompfcjkmnh\n128sevenbeightsixphngd\nqx2\n1flktj7\nsix4nine76kcc68one\n48lvjfsfmgnine\nfmkmvmrrcgeight32three535dl\none7one\n5jlscrmvnvtwonine\n3ls\neight86\nxphtwonefourspczfive9seven6\nfour9g\ntmjtfgrddj9seveneightsixninekzqtwo7\nsxvgv3\nqvrsvlfvpg99\n22qztqxlbjtznfdgcngprx3eight\n2fiveseven\n76jbmlnine1fourtwohsptzfour\np6ffvh6vzqdglghnfgpdd\nsixone9\nfive6grzlghcztrtjqpncr3lpjstpmcvfvxpnthree\n8zkgnine\nonedlnmzkzh46sixsix\nhcmqknkmzrfnchs5vrjbdqvshvtwonev\ntwoqnzpmzbgxm6\n89nmgdvvzgmvsfxpbc155six7\ndhqnjmtzh6bhjnrktjh\none4sdcnk\nqkrsblxng61fzqfcjrjnfndzg\n8fsklvmcsixgdqvkgcqd\nonefiveeightpt2\n395lqvmp1\n7htxhxzxkonesixdlpvnfbcrrgmx4lzpnjxj\nxdf8seven3223\ncmsfivebtn9vtwojmcsix\n92mntfpfseven\n2sixdsdlgvrzbseightqzmdghdvc6\nfourgkncjh8onethreemzpnpx\nfive9pfmbbffcfc9threepdkjxtone\n2lrpmpfzceightzrglddshdfour\nxhgxmvclgvone2\ndlcrxnsix9onesixszqbqbxqfgjgsgsix\n939one4ppp\n5onessszzgf9hpzmpjctql\n9ninesix79\nszbrmlbzxp8cqsgkqnz2four\nvbddlztfkqzb8fivethreeone9\n7four5\n2zccllppptfour6\n2twotwosevennine6fbccsix\n7txcxone4onercgzkskvhlfffive\nsix4ninexzlnfivekgqggbmkcmqeight\n27fourone\n12ljvnmlzbgfkccmqmgkrlccfgk\ntwovgvzxzcfxjdrxbj96bbxvnnnine\n363\nsix1vkcbcpmxtvlksxxjz2btzscsct\n5ninetdrhxk6qgfive7\nsrlvrshx8one\n2oneightg\npvflfr73eighteightprthree\nnmeightwo6\n3three858rvdfxvrmpxhn\nfive8fourtwonineseventnjgmnrjdj\ntwo9ffcstwo5pq9nine3\n79onecscxpbrfoursix5five\nfivemlfbzxczbsixkjgrxjxfourtwo6\nnmtqf7onescmbq\njflnldgfknsxhmmvmtvmgprsbrdglmpxsdn5\nhnb4lxnineeightoneeight\nttshkjxgsdqzjvsvq2fivertgmqplkone\nbvknfivethree4ninemztfvcszdhdghgc\n91sbfbpxhkkndhnhdjsevenonehxglqqfxdkjp3\nqzbqpxvtwo5eight\nfrcgeight5onefivesix78xltkhzx\n248sbtpeighttwozncmmp1vtmndj\nmczxcone918ninetwo1two\nnvhmdc1prjgfknkc5five\n7seven9mdbcjbgx\n5fivephqnc\nseven1gthg\n9xbzmrth\nxxhzgnmtv891two2npv\neight171\n9rnjvzmsix3rkjbmdv\n93oneightxtk\nmkmbfour8\ntwoxbnonefiverx6mjkkfktdxx\nninehrvrcpxfxbzvrtwo1zhbzone\nthree8tps19mqcmchone\nm466zcczxcghqzqlshhzhbkxkm6\nvroneight4eight9seven4two46\nseven5sevensixtwoseveneighttwo\nsnxjjttqxkcs6jvlb\n5six8\npcqpzp6six51\nsix2twothree4zjgcsgmjhjsix\ntcks16\n4jgprfrphdhp52nssrhkfgzhzbvddbtctk9xv\nfivesix8one\n6onermrhxdqbbcdh\njst7ldbfkdkzkvzpqbtxvvcfvkzsrf9eight6\nnine3three9\nkrmjjfrsixsixfqp2\n7gkdlgbdln9jqvzfjq\neighthfslbhxgcbqbldxn9\n1fivesevenj9\n9trldgsznqlkthreetdmfbxbzhdcskv6kbfour\n556qvdmncnkfccnqnkxlslmv\nshc27\nknmhrbkpseventhree715vtnrnpmrnb\ntsnlnmxg5cnxshnmffive\n4fourllsqvbfive254\nstfivezzjhltsfsix83nineq\nsix4five\nfour13\n89qcgfqtsdcmktmctwo2seven9tqlbffgrjg\n8five6\n4three3\n59twosplbcrzmgtdrjmrhmhthreetwo4\ndlm538nine\npgsixtdtxsrteightnine9fjcvpnxzgfcjggjgmr\n9rksix3seven4twoeight\n7bzvgmkr5fivezrhpknpkdfournine\ncbsdlrqsixtwofour1twonffm\n59ndhbj\ngblgkrdtffkcsdthreejbbggninesevenzkrsnm5\nkftmd5\nfourdnvkx84clrnbpftqj6rkdvt\nfournine76bzf59\nthreevhrkzrvbqkfqn26\none9sevensix32bbpvvvt\n8zhnptsl16vkv\nvslkvkffs2fdcvtngkgtdvzzgplvs11\ntwoqmtnnnftnhqb2sixzqzqfmbrqj6\nnineoneggqtf1l72\n7264eightsrjdmhhlfthmglmvgpthree\neightsixsevenone3\n9rlkvhq1threevnqzkpfive4\n16three\ncksqzvzct63fvbcqtr\nxlq4three6vfxn8eightwoq\nseven3fbhrdgft23onesixpffgmptzxj\nfiveone9fmkgxz6thb2\n5vsksrdnrtzqzxkhjxfcsnine\neightfivesix77tnlktpb\nthreeeight11lhc6fivex\n1seven36\nljhbgqdb9cmpjzzct\nsevensdnfvp1\nbzvfsgdhg7p\n8z8fivefivefrlfeighttwo\nfivelqkmsjstqn93foursnkqthreetwo\nbjbnjkpr83\n5sixseven\n843lxtfgzrg\n19xzqmptgslgfxdlvone8\nqvs9ninetwotfivetwofivefour\n3two7177gchxqndqb2\npclgmslngmhninegktmlrvmvbrb1five\ntwosix7fivekcstvdpksn6\none8lgrcj987sixthree5\n3fnjpnhxh\nninefive8slfz4\nthreetwonnxdmnpftn9cjkglxp97\n4one5two8\n8h672smmqm6nine\nqsddxqjbxvjlrmlsfxqjptp8twofourkddx\neightxdlqtltjbccnqkcsgvbcpvrltjfourone8nine\nzvhfiveeightpxmhfsixmfjnsrfncl1\n891\ntwospnzhxsix5twopsgxhcpgkdthree8\ntwosix4vvznbz34xbglgczpcd3\nbkhgn2\nkggbsfour2kcrfbxcscd9lgmthree2\nsixxbzmknzt7fourhmhnmgfivezclrhtgshtwo\n8txhbgvfjfhsjfivegxshndv3nine1\njeightwosix46splstbtjtthree\n55tmflknjjqmrvjtwo\noneqmsxzx8threenine72\n1three8zjdpnclmfive\nmvqeight93one1one\nqqxvlr5fourthreeeight2\nsix82seven\nseveneightseven5one3\n4nine59onefivetwonep\nfourghdmclp7\n11nineeight\n3qx74fxsxdpd\n8rlvfhchthree68\nhbtwone2vgxlzdfsthreesixdxmxrhcone\nssgfcpxgmtwoeightzmtqlhqfive15\nsixtwonpgvtn9ninemq\nnine3one524\nsmleightwoccnpgzqxg2qzvzmnineseven1sshrbzzqmt9\nvzbbxr9fivetwolkzqp\n642fivepkkpljsmtwo\n2qhvjljhxlxlg8plckhqhpbc\nfivesix8xqzfhrkfvqr1eight\neight2onekmfjqzhgthree\nsixfiveeight7\nfournine6hhxtwotwo\nbncgbbfrfktzrhjkfltn9fourtwonercp\ntwosixtwojqtcnznfoureight5\nkphpbmlgvxhcqctksjvkrcfsbthree9gfhtkbs\neightvfkbm3pvtwotworjqxrx8\n2kgfcrvtfive1sgk2nbz8six\n6zgdkmzfr44\nx7qvmtdnhclnn68foursdkdcvrfrfour\nlsrbdckq1\none7xzmhknhgbfks\nhnmkmltwonine729hdf1\nj2fivehttgmfhgzstrcdnvdspxzcxkt\n7fourvhrhqtconefive\nsevensixfour2ccprddhlxdvxtzshnbqtgmp38\n9twolpshzrpgqonercvlqjglchfour\nrcbqcxzlgjlprbcqmjrfourldkgxhsnlb74\nsixtwo6mdrfflbkrone\nrxcsh1\nmcnine4sixrloneightspv\nqkdpnztwoxjcrfnsmhj4eight1gzzzgkcznine\nmkglfvb2vmvrnrfourklnj76onethree\nnrqxpfxcgg2fiveceight6\n6three4xsknpdhgchq6hdgblxszbpnnt\nxvmnsdvqfrgkb1pmqtjfgdsix\n78threexvllvmdgjpck4\nthreermvn16nineone5seven\nsixjkxjmfl4\nfdvhjb16gvpz\n9hnqsix2eight5fiveeight\nszxzqzkhbf9lgxfzvnsxjfhhgc\nqxlbhrtjlkvsixbhvqdvd91\n6sixfour3\n6two2c528ldpscl9\n6rgceight7five931\n2gkprbninefgn\n9vbzhldtxsgmcbst\ndbmqtfkst4eight76\n2sevenoneqkhrxdhbkhcbxbhnjxzsevennine\nfoureight2nine\nfive9ninethreeseven\none8threefourthreexrrhnpdqcf\nmgvq6vrsprdcvjs\nvronedb876four53\n2cpv4tbk\njbvrn2\n81blgc8five295\n4threefour7eighteightdcmrckqxqmnpf\nnxcbtwo5four66\n5seven3\nhlcrfjjkjqrvsevenbtdkvzqvxgrjdcmhggcqrr7fiveeight\ndcjszvn3phczz34qdgfive\nfivefourgrkthree2three1\nthree28nine8\neightt4\nsixfour8\ncptkxpzxk138five1sevenone\ngsxjbkkg3foursix78fnkvhsddqvxs6\nhtkvspn4fourfourtwo\n52rlnsspjhrgfnckg\n9six27sdgmz\ng6ninezrnine\nfour6eightnjzpmninetkfxqgcqnb\n2five8ffgdtrhzqntjzjssckdggqcvbskpdsrclv\n3sixninecxghbrnpcx3vj3\n9hpm4qtdjpdnbqknine4\n9twosevenlnjfz\n5prpkmbkfq6\nbsltmrpklzhrldlvpj1eightkbnxnfrlc71three\nz8\n2sevenlzxone\n9l5pxeight6\nninexhskkhdkgjgvjhrqhrfj9bnrfbtxpp\nsixsixsix3twosevenfivekjdkpxch\njkpvm1567seven\ndvjdfnqgbsixeightsixqdkfpbc3lcjz\n7twonineninetwo\nzjtsjvhfldplt33qpgnlflhj\neight9mkqpbddonejtc78eight6\n797ninetwotwo\ndfjnzxtlnine9five\ngmjknnzrnrpcbcngzqgseven8\nvqplmsqninenbsjvctjfk8one29zrqb\n3ljdlfldqtlqxrmxone4\nqbsixfour6six89pqxspnr8\n6vxhzrmcbvthree\nfour563pllcfonebvnbltn\ndxbtmg2three21\nxtfzzr73\nfivessix4\nsixone485pvzxbd\n18cfour\nxjtctnllkp57seven2jgbjmjbxnpfgone\neight5gmbzbqtxrr27dtgfdbmtc7\ntwoggvcnfmtrseven4dx\nssevenhcltwoseven2cxrmxxcr';
 	var data = function () {
 		switch (dataSource) {
 			case 1:
@@ -5171,17 +5171,15 @@ var $author$project$Main$initReports = function (dataSource) {
 				return input;
 		}
 	}();
-	return A2(
-		$elm$core$List$map,
-		$author$project$Main$Unchecked,
+	return $author$project$Main$Unsolved(
 		A2($elm$core$String$split, '\n', data));
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (_v0) {
 	var dataSource = 0;
-	var reports = $author$project$Main$initReports(dataSource);
-	var model = {Q: 0, l: dataSource, S: '', Z: 'press play to start', r: reports, w: 0, A: false};
+	var data = $author$project$Main$initData(dataSource);
+	var model = {U: 0, l: data, m: dataSource, W: '', y: false, ac: 'press play to start'};
 	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -5195,8 +5193,7 @@ var $author$project$Main$updateClear = function (model) {
 	return _Utils_update(
 		model,
 		{
-			r: $author$project$Main$initReports(model.l),
-			w: 0
+			l: $author$project$Main$initData(model.m)
 		});
 };
 var $author$project$Main$updateDataSource = F2(
@@ -5204,355 +5201,178 @@ var $author$project$Main$updateDataSource = F2(
 		return _Utils_update(
 			model,
 			{
-				l: dataSource,
-				r: $author$project$Main$initReports(dataSource),
-				w: 0
+				l: $author$project$Main$initData(dataSource),
+				m: dataSource
 			});
 	});
-var $author$project$Main$Naughty = function (a) {
-	return {$: 2, a: a};
+var $author$project$Main$Solved = function (a) {
+	return {$: 0, a: a};
 };
-var $author$project$Main$Nice = function (a) {
-	return {$: 1, a: a};
-};
-var $author$project$Main$containsPairWithoutOverlap = function (str) {
-	if ($elm$core$String$length(str) < 2) {
-		return false;
-	} else {
-		var two = A2($elm$core$String$left, 2, str);
-		var rest = A2($elm$core$String$dropLeft, 2, str);
-		var found = A2($elm$core$String$contains, two, rest);
-		return found || $author$project$Main$containsPairWithoutOverlap(
-			A2($elm$core$String$dropLeft, 1, str));
-	}
-};
-var $author$project$Main$containsRepeatingLetterLoop = function (chars) {
-	if ((chars.b && chars.b.b) && chars.b.b.b) {
-		var a = chars.a;
-		var _v1 = chars.b;
-		var b = _v1.a;
-		var _v2 = _v1.b;
-		var c = _v2.a;
-		var rest = _v2.b;
-		return _Utils_eq(a, c) || $author$project$Main$containsRepeatingLetterLoop(
-			A2(
-				$elm$core$List$cons,
-				b,
-				A2($elm$core$List$cons, c, rest)));
-	} else {
-		return false;
-	}
-};
-var $elm$core$String$foldr = _String_foldr;
-var $elm$core$String$toList = function (string) {
-	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
-};
-var $author$project$Main$containsRepeatingLetter = function (str) {
-	return $author$project$Main$containsRepeatingLetterLoop(
-		$elm$core$String$toList(str));
-};
-var $author$project$Main$isNiceNewRules = function (str) {
-	return $author$project$Main$containsPairWithoutOverlap(str) && $author$project$Main$containsRepeatingLetter(str);
-};
-var $elm$core$List$any = F2(
-	function (isOkay, list) {
-		any:
-		while (true) {
-			if (!list.b) {
-				return false;
-			} else {
-				var x = list.a;
-				var xs = list.b;
-				if (isOkay(x)) {
-					return true;
-				} else {
-					var $temp$isOkay = isOkay,
-						$temp$list = xs;
-					isOkay = $temp$isOkay;
-					list = $temp$list;
-					continue any;
-				}
-			}
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (!_v0.$) {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
 		}
 	});
 var $elm$core$Tuple$pair = F2(
 	function (a, b) {
 		return _Utils_Tuple2(a, b);
 	});
-var $author$project$Main$pairwise = function (xs) {
-	if (!xs.b) {
-		return _List_Nil;
-	} else {
-		var t = xs.b;
-		return A3($elm$core$List$map2, $elm$core$Tuple$pair, xs, t);
-	}
+var $author$project$Main$substrings = function (s) {
+	return $elm$core$String$isEmpty(s) ? _List_Nil : A2(
+		$elm$core$List$cons,
+		s,
+		$author$project$Main$substrings(
+			A2($elm$core$String$dropLeft, 1, s)));
 };
-var $author$project$Main$containsLetterPair = function (str) {
-	return A2(
-		$elm$core$List$any,
-		function (_v0) {
-			var a = _v0.a;
-			var b = _v0.b;
-			return _Utils_eq(a, b);
-		},
-		$author$project$Main$pairwise(
-			$elm$core$String$toList(str)));
-};
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
-var $elm$core$Set$Set_elm_builtin = $elm$core$Basics$identity;
-var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
-var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
-var $elm$core$Set$empty = $elm$core$Dict$empty;
-var $elm$core$Dict$Black = 1;
-var $elm$core$Dict$RBNode_elm_builtin = F5(
-	function (a, b, c, d, e) {
-		return {$: -1, a: a, b: b, c: c, d: d, e: e};
-	});
-var $elm$core$Dict$Red = 0;
-var $elm$core$Dict$balance = F5(
-	function (color, key, value, left, right) {
-		if ((right.$ === -1) && (!right.a)) {
-			var _v1 = right.a;
-			var rK = right.b;
-			var rV = right.c;
-			var rLeft = right.d;
-			var rRight = right.e;
-			if ((left.$ === -1) && (!left.a)) {
-				var _v3 = left.a;
-				var lK = left.b;
-				var lV = left.c;
-				var lLeft = left.d;
-				var lRight = left.e;
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					0,
-					key,
-					value,
-					A5($elm$core$Dict$RBNode_elm_builtin, 1, lK, lV, lLeft, lRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, 1, rK, rV, rLeft, rRight));
-			} else {
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					color,
-					rK,
-					rV,
-					A5($elm$core$Dict$RBNode_elm_builtin, 0, key, value, left, rLeft),
-					rRight);
-			}
-		} else {
-			if ((((left.$ === -1) && (!left.a)) && (left.d.$ === -1)) && (!left.d.a)) {
-				var _v5 = left.a;
-				var lK = left.b;
-				var lV = left.c;
-				var _v6 = left.d;
-				var _v7 = _v6.a;
-				var llK = _v6.b;
-				var llV = _v6.c;
-				var llLeft = _v6.d;
-				var llRight = _v6.e;
-				var lRight = left.e;
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					0,
-					lK,
-					lV,
-					A5($elm$core$Dict$RBNode_elm_builtin, 1, llK, llV, llLeft, llRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, 1, key, value, lRight, right));
-			} else {
-				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
-			}
-		}
-	});
-var $elm$core$Basics$compare = _Utils_compare;
-var $elm$core$Dict$insertHelp = F3(
-	function (key, value, dict) {
-		if (dict.$ === -2) {
-			return A5($elm$core$Dict$RBNode_elm_builtin, 0, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
-		} else {
-			var nColor = dict.a;
-			var nKey = dict.b;
-			var nValue = dict.c;
-			var nLeft = dict.d;
-			var nRight = dict.e;
-			var _v1 = A2($elm$core$Basics$compare, key, nKey);
-			switch (_v1) {
-				case 0:
-					return A5(
-						$elm$core$Dict$balance,
-						nColor,
-						nKey,
-						nValue,
-						A3($elm$core$Dict$insertHelp, key, value, nLeft),
-						nRight);
-				case 1:
-					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
-				default:
-					return A5(
-						$elm$core$Dict$balance,
-						nColor,
-						nKey,
-						nValue,
-						nLeft,
-						A3($elm$core$Dict$insertHelp, key, value, nRight));
-			}
-		}
-	});
-var $elm$core$Dict$insert = F3(
-	function (key, value, dict) {
-		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
-		if ((_v0.$ === -1) && (!_v0.a)) {
-			var _v1 = _v0.a;
-			var k = _v0.b;
-			var v = _v0.c;
-			var l = _v0.d;
-			var r = _v0.e;
-			return A5($elm$core$Dict$RBNode_elm_builtin, 1, k, v, l, r);
-		} else {
-			var x = _v0;
-			return x;
-		}
-	});
-var $elm$core$Set$insert = F2(
-	function (key, _v0) {
-		var dict = _v0;
-		return A3($elm$core$Dict$insert, key, 0, dict);
-	});
-var $elm$core$Set$fromList = function (list) {
-	return A3($elm$core$List$foldl, $elm$core$Set$insert, $elm$core$Set$empty, list);
-};
-var $elm$core$Basics$ge = _Utils_ge;
-var $elm$core$Dict$get = F2(
-	function (targetKey, dict) {
-		get:
-		while (true) {
-			if (dict.$ === -2) {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var key = dict.b;
-				var value = dict.c;
-				var left = dict.d;
-				var right = dict.e;
-				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
-				switch (_v1) {
-					case 0:
-						var $temp$targetKey = targetKey,
-							$temp$dict = left;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-					case 1:
-						return $elm$core$Maybe$Just(value);
-					default:
-						var $temp$targetKey = targetKey,
-							$temp$dict = right;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-				}
-			}
-		}
-	});
-var $elm$core$Dict$member = F2(
-	function (key, dict) {
-		var _v0 = A2($elm$core$Dict$get, key, dict);
-		if (!_v0.$) {
-			return true;
-		} else {
-			return false;
-		}
-	});
-var $elm$core$Set$member = F2(
-	function (key, _v0) {
-		var dict = _v0;
-		return A2($elm$core$Dict$member, key, dict);
-	});
-var $author$project$Main$containsThreeVowels = function (str) {
-	var vowels = $elm$core$Set$fromList(
-		$elm$core$String$toList('aeiou'));
-	var count = $elm$core$List$length(
-		A2(
-			$elm$core$List$filter,
-			function (ch) {
-				return A2($elm$core$Set$member, ch, vowels);
+var $author$project$Main$digitFinder = F2(
+	function (parser, str) {
+		var subs = $author$project$Main$substrings(str);
+		var pairs = A2($elm$core$List$indexedMap, $elm$core$Tuple$pair, subs);
+		return A2(
+			$elm$core$List$filterMap,
+			function (_v0) {
+				var ix = _v0.a;
+				var s = _v0.b;
+				return A2(
+					$elm$core$Maybe$map,
+					function (_v1) {
+						var d = _v1.a;
+						var ds = _v1.b;
+						return _Utils_Tuple2(
+							ix,
+							_Utils_Tuple2(d, ds));
+					},
+					parser(s));
 			},
-			$elm$core$String$toList(str)));
-	return count >= 3;
-};
-var $author$project$Main$containsDisallowedSubstring = function (str) {
-	var disallowed = _List_fromArray(
-		['ab', 'cd', 'pq', 'xy']);
-	return A2(
-		$elm$core$List$any,
-		function (s) {
-			return A2($elm$core$String$contains, s, str);
-		},
-		disallowed);
-};
-var $elm$core$Basics$not = _Basics_not;
-var $author$project$Main$doesNotContainDisallowedSubstring = function (str) {
-	return !$author$project$Main$containsDisallowedSubstring(str);
-};
-var $author$project$Main$isNiceOldRules = function (str) {
-	return $author$project$Main$containsThreeVowels(str) && ($author$project$Main$containsLetterPair(str) && $author$project$Main$doesNotContainDisallowedSubstring(str));
-};
-var $author$project$Main$isNice = F2(
-	function (useNewRules, str) {
-		return useNewRules ? $author$project$Main$isNiceNewRules(str) : $author$project$Main$isNiceOldRules(str);
+			pairs);
 	});
-var $author$project$Main$checkReport = F2(
-	function (useNewRules, report) {
-		if (!report.$) {
-			var str = report.a;
-			return A2($author$project$Main$isNice, useNewRules, str) ? $author$project$Main$Nice(str) : $author$project$Main$Naughty(str);
-		} else {
-			return report;
-		}
-	});
-var $author$project$Main$countAsNice = function (report) {
-	switch (report.$) {
-		case 1:
-			return 1;
-		case 0:
-			return 0;
-		default:
-			return 0;
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
 	}
 };
-var $elm$core$List$sum = function (numbers) {
-	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Main$parseLine = F2(
+	function (parser, s) {
+		var digits = A2($author$project$Main$digitFinder, parser, s);
+		var _v0 = A2(
+			$elm$core$Maybe$withDefault,
+			_Utils_Tuple2(
+				0,
+				_Utils_Tuple2(0, '0')),
+			$elm$core$List$head(
+				$elm$core$List$reverse(digits)));
+		var lastIndex = _v0.a;
+		var _v1 = _v0.b;
+		var lastDigit = _v1.a;
+		var lastDigitStr = _v1.b;
+		var lastDigitSegment = _Utils_Tuple2(
+			lastIndex,
+			$elm$core$String$length(lastDigitStr));
+		var _v2 = A2(
+			$elm$core$Maybe$withDefault,
+			_Utils_Tuple2(
+				0,
+				_Utils_Tuple2(0, '0')),
+			$elm$core$List$head(digits));
+		var firstIndex = _v2.a;
+		var _v3 = _v2.b;
+		var firstDigit = _v3.a;
+		var firstDigitStr = _v3.b;
+		var firstDigitSegment = _Utils_Tuple2(
+			firstIndex,
+			$elm$core$String$length(firstDigitStr));
+		return {H: s, I: firstDigit, J: firstDigitSegment, K: lastDigit, L: lastDigitSegment};
+	});
+var $author$project$Main$tryFindNum1 = function (s) {
+	var s0 = A2($elm$core$String$left, 1, s);
+	return A2(
+		$elm$core$Maybe$map,
+		function (d) {
+			return _Utils_Tuple2(d, s0);
+		},
+		$elm$core$String$toInt(s0));
 };
-var $author$project$Main$countNice = function (reports) {
-	return $elm$core$List$sum(
-		A2($elm$core$List$map, $author$project$Main$countAsNice, reports));
+var $author$project$Main$tryFindNum2 = function (s) {
+	var s0 = A2($elm$core$String$left, 1, s);
+	var _v0 = $elm$core$String$toInt(s0);
+	if (!_v0.$) {
+		var d = _v0.a;
+		return $elm$core$Maybe$Just(
+			_Utils_Tuple2(d, s0));
+	} else {
+		return A2($elm$core$String$startsWith, 'one', s) ? $elm$core$Maybe$Just(
+			_Utils_Tuple2(1, 'one')) : (A2($elm$core$String$startsWith, 'two', s) ? $elm$core$Maybe$Just(
+			_Utils_Tuple2(2, 'two')) : (A2($elm$core$String$startsWith, 'three', s) ? $elm$core$Maybe$Just(
+			_Utils_Tuple2(3, 'three')) : (A2($elm$core$String$startsWith, 'four', s) ? $elm$core$Maybe$Just(
+			_Utils_Tuple2(4, 'four')) : (A2($elm$core$String$startsWith, 'five', s) ? $elm$core$Maybe$Just(
+			_Utils_Tuple2(5, 'five')) : (A2($elm$core$String$startsWith, 'six', s) ? $elm$core$Maybe$Just(
+			_Utils_Tuple2(6, 'six')) : (A2($elm$core$String$startsWith, 'seven', s) ? $elm$core$Maybe$Just(
+			_Utils_Tuple2(7, 'seven')) : (A2($elm$core$String$startsWith, 'eight', s) ? $elm$core$Maybe$Just(
+			_Utils_Tuple2(8, 'eight')) : (A2($elm$core$String$startsWith, 'nine', s) ? $elm$core$Maybe$Just(
+			_Utils_Tuple2(9, 'nine')) : $elm$core$Maybe$Nothing))))))));
+	}
 };
 var $author$project$Main$updateSolve = function (model) {
-	var reports = A2(
-		$elm$core$List$map,
-		$author$project$Main$checkReport(model.A),
-		model.r);
-	var found = $author$project$Main$countNice(reports);
-	return _Utils_update(
-		model,
-		{r: reports, w: found});
+	var _v0 = model.l;
+	if (_v0.$ === 1) {
+		var unsolved = _v0.a;
+		var parser = model.y ? $author$project$Main$tryFindNum2 : $author$project$Main$tryFindNum1;
+		var data = $author$project$Main$Solved(
+			A2(
+				$elm$core$List$map,
+				$author$project$Main$parseLine(parser),
+				unsolved));
+		return _Utils_update(
+			model,
+			{l: data});
+	} else {
+		return model;
+	}
 };
-var $author$project$Main$updateToggleNewRules = function (model) {
-	var useNewRules = !model.A;
+var $elm$core$Basics$not = _Basics_not;
+var $author$project$Main$updateToggleIncludeLetters = function (model) {
+	var includeLetters = !model.y;
 	return _Utils_update(
 		model,
 		{
-			r: $author$project$Main$initReports(model.l),
-			w: 0,
-			A: useNewRules
+			l: $author$project$Main$initData(model.m),
+			y: includeLetters
 		});
 };
 var $author$project$Main$update = F2(
@@ -5568,7 +5388,7 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 2:
 				return _Utils_Tuple2(
-					$author$project$Main$updateToggleNewRules(model),
+					$author$project$Main$updateToggleIncludeLetters(model),
 					$elm$core$Platform$Cmd$none);
 			case 3:
 				return _Utils_Tuple2(
@@ -5586,7 +5406,7 @@ var $author$project$Main$update = F2(
 	});
 var $author$project$Main$Clear = 0;
 var $author$project$Main$Solve = 1;
-var $author$project$Main$ToggleNewRules = 2;
+var $author$project$Main$ToggleIncludeLetters = 2;
 var $author$project$Main$UseInput = 5;
 var $author$project$Main$UseSample1 = 3;
 var $author$project$Main$UseSample2 = 4;
@@ -5610,23 +5430,17 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 			$elm$json$Json$Encode$bool(bool));
 	});
 var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
-};
-var $elm$core$List$concatMap = F2(
-	function (f, list) {
-		return $elm$core$List$concat(
-			A2($elm$core$List$map, f, list));
-	});
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $author$project$Main$getLineScore = function (line) {
+	return (line.I * 10) + line.K;
+};
+var $elm$core$List$sum = function (numbers) {
+	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
+};
+var $author$project$Main$getTotalScore = function (lines) {
+	return $elm$core$List$sum(
+		A2($elm$core$List$map, $author$project$Main$getLineScore, lines));
+};
 var $elm$html$Html$Attributes$href = function (url) {
 	return A2(
 		$elm$html$Html$Attributes$stringProperty,
@@ -5658,78 +5472,142 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
 var $elm$html$Html$br = _VirtualDom_node('br');
-var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $author$project$Main$break = A2($elm$html$Html$br, _List_Nil, _List_Nil);
 var $elm$html$Html$span = _VirtualDom_node('span');
-var $author$project$Main$toNaughtyHtmlElement = function (str) {
-	var textElement = $elm$html$Html$text(str);
+var $author$project$Main$digitSegment = function (s) {
+	var textElement = $elm$html$Html$text(s);
 	var spanElement = A2(
 		$elm$html$Html$span,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('mark-err adaptive')
+				A2($elm$html$Html$Attributes$style, 'font-weight', 'bold')
 			]),
 		_List_fromArray(
 			[textElement]));
-	return _List_fromArray(
-		[
-			spanElement,
-			A2($elm$html$Html$br, _List_Nil, _List_Nil)
-		]);
+	return spanElement;
 };
-var $author$project$Main$toNiceHtmlElement = function (str) {
-	var textElement = $elm$html$Html$text(str);
-	var spanElement = A2(
-		$elm$html$Html$span,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$class('mark-ok adaptive')
-			]),
-		_List_fromArray(
-			[textElement]));
-	return _List_fromArray(
-		[
-			spanElement,
-			A2($elm$html$Html$br, _List_Nil, _List_Nil)
-		]);
+var $author$project$Main$maybePlainSegment = function (s) {
+	return $elm$core$String$isEmpty(s) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
+		$elm$html$Html$text(s));
 };
-var $author$project$Main$toUncheckedHtmlElement = function (str) {
-	var textElement = $elm$html$Html$text(str);
+var $author$project$Main$toSolvedLineHtmlElements = function (line) {
+	var s = line.H;
+	var _v0 = line.L;
+	var lastStartIndex = _v0.a;
+	var lastLength = _v0.b;
+	var lastEndIndex = (lastStartIndex + lastLength) - 1;
+	var lastDigitStr = A3($elm$core$String$slice, lastStartIndex, lastEndIndex + 1, s);
+	var lastSegment = A2($elm$core$String$dropLeft, lastEndIndex + 1, s);
+	var _v1 = line.J;
+	var firstStartIndex = _v1.a;
+	var firstLength = _v1.b;
+	var firstEndIndex = (firstStartIndex + firstLength) - 1;
+	var firstDigitStr = A3($elm$core$String$slice, firstStartIndex, firstEndIndex + 1, s);
+	var firstSegment = A2($elm$core$String$left, firstStartIndex, s);
+	if (_Utils_eq(lastStartIndex, firstStartIndex)) {
+		return A2(
+			$elm$core$List$filterMap,
+			$elm$core$Basics$identity,
+			_List_fromArray(
+				[
+					$author$project$Main$maybePlainSegment(firstSegment),
+					$elm$core$Maybe$Just(
+					$author$project$Main$digitSegment(firstDigitStr)),
+					$author$project$Main$maybePlainSegment(lastSegment),
+					$elm$core$Maybe$Just($author$project$Main$break)
+				]));
+	} else {
+		if (_Utils_cmp(lastStartIndex, firstEndIndex) > 0) {
+			var midSegment = A3($elm$core$String$slice, firstEndIndex + 1, lastStartIndex, s);
+			return A2(
+				$elm$core$List$filterMap,
+				$elm$core$Basics$identity,
+				_List_fromArray(
+					[
+						$author$project$Main$maybePlainSegment(firstSegment),
+						$elm$core$Maybe$Just(
+						$author$project$Main$digitSegment(firstDigitStr)),
+						$author$project$Main$maybePlainSegment(midSegment),
+						$elm$core$Maybe$Just(
+						$author$project$Main$digitSegment(lastDigitStr)),
+						$author$project$Main$maybePlainSegment(lastSegment),
+						$elm$core$Maybe$Just($author$project$Main$break)
+					]));
+		} else {
+			return _List_fromArray(
+				[
+					$elm$html$Html$text('it\'s complicated'),
+					$author$project$Main$break
+				]);
+		}
+	}
+};
+var $author$project$Main$toSolvedElements = function (strings) {
+	return A2($elm$core$List$concatMap, $author$project$Main$toSolvedLineHtmlElements, strings);
+};
+var $author$project$Main$toUnsolvedLineHtmlElements = function (s) {
+	var textElement = $elm$html$Html$text(s);
 	return _List_fromArray(
 		[
 			textElement,
 			A2($elm$html$Html$br, _List_Nil, _List_Nil)
 		]);
 };
-var $author$project$Main$toReportHtmlElement = function (report) {
-	switch (report.$) {
-		case 0:
-			var str = report.a;
-			return $author$project$Main$toUncheckedHtmlElement(str);
-		case 2:
-			var str = report.a;
-			return $author$project$Main$toNaughtyHtmlElement(str);
-		default:
-			var str = report.a;
-			return $author$project$Main$toNiceHtmlElement(str);
-	}
+var $author$project$Main$toUnsolvedElements = function (strings) {
+	return A2($elm$core$List$concatMap, $author$project$Main$toUnsolvedLineHtmlElements, strings);
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$view = function (model) {
 	var textFontSize = function () {
-		var _v0 = model.l;
-		switch (_v0) {
+		var _v2 = model.m;
+		switch (_v2) {
 			case 0:
-				return '24px';
+				return '16px';
 			case 1:
 				return '24px';
 			default:
 				return '24px';
 		}
 	}();
-	var elements = A2($elm$core$List$concatMap, $author$project$Main$toReportHtmlElement, model.r);
-	var commandsStr = '';
+	var scoreStr = function () {
+		var _v1 = model.l;
+		if (!_v1.$) {
+			var solved = _v1.a;
+			return $elm$core$String$fromInt(
+				$author$project$Main$getTotalScore(solved));
+		} else {
+			return '?';
+		}
+	}();
+	var elements = function () {
+		var _v0 = model.l;
+		if (!_v0.$) {
+			var solved = _v0.a;
+			return $author$project$Main$toSolvedElements(solved);
+		} else {
+			var unsolved = _v0.a;
+			return $author$project$Main$toUnsolvedElements(unsolved);
+		}
+	}();
+	var commandsStr = '?';
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
@@ -5761,14 +5639,14 @@ var $author$project$Main$view = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Advent of Code 2015')
+										$elm$html$Html$text('Advent of Code 2023')
 									])),
 								A2(
 								$elm$html$Html$div,
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Day 5: Doesn\'t He Have Intern-Elves For This?')
+										$elm$html$Html$text('Day 1: Trebuchet?!')
 									]))
 							]))
 					])),
@@ -5790,11 +5668,11 @@ var $author$project$Main$view = function (model) {
 								$elm$html$Html$a,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$href('https://adventofcode.com/2015/day/5')
+										$elm$html$Html$Attributes$href('https://adventofcode.com/2023/day/1')
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('https://adventofcode.com/2015/day/05')
+										$elm$html$Html$text('https://adventofcode.com/2023/day/1')
 									]))
 							]))
 					])),
@@ -5819,7 +5697,7 @@ var $author$project$Main$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(5),
-										$elm$html$Html$Attributes$checked(!model.l)
+										$elm$html$Html$Attributes$checked(!model.m)
 									]),
 								_List_Nil),
 								A2(
@@ -5835,7 +5713,7 @@ var $author$project$Main$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(3),
-										$elm$html$Html$Attributes$checked(model.l === 1)
+										$elm$html$Html$Attributes$checked(model.m === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -5851,7 +5729,7 @@ var $author$project$Main$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(4),
-										$elm$html$Html$Attributes$checked(model.l === 2)
+										$elm$html$Html$Attributes$checked(model.m === 2)
 									]),
 								_List_Nil),
 								A2(
@@ -5920,7 +5798,7 @@ var $author$project$Main$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('checkbox'),
 										$elm$html$Html$Events$onClick(2),
-										$elm$html$Html$Attributes$checked(model.A)
+										$elm$html$Html$Attributes$checked(model.y)
 									]),
 								_List_Nil),
 								A2(
@@ -5928,7 +5806,7 @@ var $author$project$Main$view = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(' Use new rules')
+										$elm$html$Html$text(' Include letters')
 									]))
 							]))
 					])),
@@ -5953,15 +5831,7 @@ var $author$project$Main$view = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(
-										$elm$core$String$fromInt(model.w))
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(commandsStr)
+										$elm$html$Html$text(scoreStr)
 									]))
 							]))
 					])),
@@ -5987,6 +5857,6 @@ var $author$project$Main$view = function (model) {
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
-	{aA: $author$project$Main$init, aG: $author$project$Main$subscriptions, aI: $author$project$Main$update, aJ: $author$project$Main$view});
+	{aE: $author$project$Main$init, aK: $author$project$Main$subscriptions, aM: $author$project$Main$update, aN: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
