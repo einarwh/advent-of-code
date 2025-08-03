@@ -6,6 +6,7 @@ import Html.Attributes
 import Html.Events exposing (onClick)
 import Dict exposing (Dict)
 import Array exposing (Array)
+import Set exposing (Set)
 import Html exposing (text)
 
 -- MAIN
@@ -32,15 +33,64 @@ type alias Model =
   , counter : Int 
   , debug : String }
 
-isSafe : String -> Bool 
-isSafe str = 
-    False
+containsThreeVowels : String -> Bool 
+containsThreeVowels str = 
+    let 
+        vowels = "aeiou" |> String.toList |> Set.fromList
+        count = str |> String.toList |> List.filter (\ch -> Set.member ch vowels) |> List.length 
+    in 
+        count >= 3
 
-checkReport : Report -> Report 
-checkReport report = 
+pairwise : List a -> List (a, a)
+pairwise xs =
+  case xs of 
+  [] -> [] 
+  _ :: t -> 
+    List.map2 Tuple.pair xs t
+
+containsLetterPair : String -> Bool 
+containsLetterPair str = 
+  str |> String.toList |> pairwise |> List.any (\(a, b) -> a == b)
+
+containsDisallowedSubstring : String -> Bool 
+containsDisallowedSubstring str = 
+  let
+    disallowed = ["ab", "cd", "pq", "xy"]
+  in 
+    disallowed |> List.any (\s -> String.contains s str)
+
+doesNotContainDisallowedSubstring : String -> Bool
+doesNotContainDisallowedSubstring str = 
+  str |> containsDisallowedSubstring |> not 
+
+isNiceOldRules : String -> Bool 
+isNiceOldRules str = 
+    containsThreeVowels str && containsLetterPair str && doesNotContainDisallowedSubstring str 
+
+containsPairWithoutOverlap : String -> Bool
+containsPairWithoutOverlap str = 
+    False 
+
+containsRepeatingLetter : String -> Bool
+containsRepeatingLetter str = 
+    False 
+
+isNiceNewRules : String -> Bool 
+isNiceNewRules str = 
+    containsPairWithoutOverlap str && containsRepeatingLetter str 
+
+isNice : Bool -> String -> Bool 
+isNice useNewRules str = 
+    if useNewRules then 
+        isNiceNewRules str 
+    else 
+        isNiceOldRules str 
+
+checkReport : Bool -> Report -> Report 
+checkReport useNewRules report = 
   case report of 
     Unchecked str -> 
-      if isSafe str then Safe str else Unsafe str
+      if isNice useNewRules str then Safe str else Unsafe str
     _ -> report 
 
 initReports : DataSource -> List Report
@@ -1100,10 +1150,7 @@ updateSolve : Model -> Model
 updateSolve model = 
   let
     reports = 
-      if model.useNewRules then 
-        model.reports |> List.map checkReport
-      else 
-        model.reports |> List.map checkReport
+        model.reports |> List.map (checkReport model.useNewRules)
     found = countSafe reports 
   in
     { model | reports = reports, safeReports = found }

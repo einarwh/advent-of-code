@@ -2733,7 +2733,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		q: func(record.q),
+		p: func(record.p),
 		N: record.N,
 		K: record.K
 	}
@@ -3003,7 +3003,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.q;
+		var message = !tag ? value : tag < 3 ? value.a : value.p;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.N;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -5195,7 +5195,7 @@ var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Aoc05$init = function (_v0) {
 	var dataSource = 0;
 	var reports = $author$project$Aoc05$initReports(dataSource);
-	var model = {Q: 0, l: dataSource, S: '', Z: 'press play to start', n: reports, w: 0, A: false};
+	var model = {Q: 0, l: dataSource, S: '', Z: 'press play to start', r: reports, w: 0, A: false};
 	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -5209,7 +5209,7 @@ var $author$project$Aoc05$updateClear = function (model) {
 	return _Utils_update(
 		model,
 		{
-			n: $author$project$Aoc05$initReports(model.l),
+			r: $author$project$Aoc05$initReports(model.l),
 			w: 0
 		});
 };
@@ -5219,7 +5219,7 @@ var $author$project$Aoc05$updateDataSource = F2(
 			model,
 			{
 				l: dataSource,
-				n: $author$project$Aoc05$initReports(dataSource),
+				r: $author$project$Aoc05$initReports(dataSource),
 				w: 0
 			});
 	});
@@ -5229,17 +5229,283 @@ var $author$project$Aoc05$Safe = function (a) {
 var $author$project$Aoc05$Unsafe = function (a) {
 	return {$: 2, a: a};
 };
-var $author$project$Aoc05$isSafe = function (str) {
+var $author$project$Aoc05$containsPairWithoutOverlap = function (str) {
 	return false;
 };
-var $author$project$Aoc05$checkReport = function (report) {
-	if (!report.$) {
-		var str = report.a;
-		return $author$project$Aoc05$isSafe(str) ? $author$project$Aoc05$Safe(str) : $author$project$Aoc05$Unsafe(str);
+var $author$project$Aoc05$containsRepeatingLetter = function (str) {
+	return false;
+};
+var $author$project$Aoc05$isNiceNewRules = function (str) {
+	return $author$project$Aoc05$containsPairWithoutOverlap(str) && $author$project$Aoc05$containsRepeatingLetter(str);
+};
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
+	});
+var $author$project$Aoc05$pairwise = function (xs) {
+	if (!xs.b) {
+		return _List_Nil;
 	} else {
-		return report;
+		var t = xs.b;
+		return A3($elm$core$List$map2, $elm$core$Tuple$pair, xs, t);
 	}
 };
+var $elm$core$String$foldr = _String_foldr;
+var $elm$core$String$toList = function (string) {
+	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
+};
+var $author$project$Aoc05$containsLetterPair = function (str) {
+	return A2(
+		$elm$core$List$any,
+		function (_v0) {
+			var a = _v0.a;
+			var b = _v0.b;
+			return _Utils_eq(a, b);
+		},
+		$author$project$Aoc05$pairwise(
+			$elm$core$String$toList(str)));
+};
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$Set$Set_elm_builtin = $elm$core$Basics$identity;
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
+var $elm$core$Set$empty = $elm$core$Dict$empty;
+var $elm$core$Dict$Black = 1;
+var $elm$core$Dict$RBNode_elm_builtin = F5(
+	function (a, b, c, d, e) {
+		return {$: -1, a: a, b: b, c: c, d: d, e: e};
+	});
+var $elm$core$Dict$Red = 0;
+var $elm$core$Dict$balance = F5(
+	function (color, key, value, left, right) {
+		if ((right.$ === -1) && (!right.a)) {
+			var _v1 = right.a;
+			var rK = right.b;
+			var rV = right.c;
+			var rLeft = right.d;
+			var rRight = right.e;
+			if ((left.$ === -1) && (!left.a)) {
+				var _v3 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var lLeft = left.d;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					0,
+					key,
+					value,
+					A5($elm$core$Dict$RBNode_elm_builtin, 1, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, 1, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					color,
+					rK,
+					rV,
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, key, value, left, rLeft),
+					rRight);
+			}
+		} else {
+			if ((((left.$ === -1) && (!left.a)) && (left.d.$ === -1)) && (!left.d.a)) {
+				var _v5 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var _v6 = left.d;
+				var _v7 = _v6.a;
+				var llK = _v6.b;
+				var llV = _v6.c;
+				var llLeft = _v6.d;
+				var llRight = _v6.e;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					0,
+					lK,
+					lV,
+					A5($elm$core$Dict$RBNode_elm_builtin, 1, llK, llV, llLeft, llRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, 1, key, value, lRight, right));
+			} else {
+				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
+			}
+		}
+	});
+var $elm$core$Basics$compare = _Utils_compare;
+var $elm$core$Dict$insertHelp = F3(
+	function (key, value, dict) {
+		if (dict.$ === -2) {
+			return A5($elm$core$Dict$RBNode_elm_builtin, 0, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
+		} else {
+			var nColor = dict.a;
+			var nKey = dict.b;
+			var nValue = dict.c;
+			var nLeft = dict.d;
+			var nRight = dict.e;
+			var _v1 = A2($elm$core$Basics$compare, key, nKey);
+			switch (_v1) {
+				case 0:
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						A3($elm$core$Dict$insertHelp, key, value, nLeft),
+						nRight);
+				case 1:
+					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
+				default:
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						nLeft,
+						A3($elm$core$Dict$insertHelp, key, value, nRight));
+			}
+		}
+	});
+var $elm$core$Dict$insert = F3(
+	function (key, value, dict) {
+		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
+		if ((_v0.$ === -1) && (!_v0.a)) {
+			var _v1 = _v0.a;
+			var k = _v0.b;
+			var v = _v0.c;
+			var l = _v0.d;
+			var r = _v0.e;
+			return A5($elm$core$Dict$RBNode_elm_builtin, 1, k, v, l, r);
+		} else {
+			var x = _v0;
+			return x;
+		}
+	});
+var $elm$core$Set$insert = F2(
+	function (key, _v0) {
+		var dict = _v0;
+		return A3($elm$core$Dict$insert, key, 0, dict);
+	});
+var $elm$core$Set$fromList = function (list) {
+	return A3($elm$core$List$foldl, $elm$core$Set$insert, $elm$core$Set$empty, list);
+};
+var $elm$core$Basics$ge = _Utils_ge;
+var $elm$core$Dict$get = F2(
+	function (targetKey, dict) {
+		get:
+		while (true) {
+			if (dict.$ === -2) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
+				switch (_v1) {
+					case 0:
+						var $temp$targetKey = targetKey,
+							$temp$dict = left;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+					case 1:
+						return $elm$core$Maybe$Just(value);
+					default:
+						var $temp$targetKey = targetKey,
+							$temp$dict = right;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+				}
+			}
+		}
+	});
+var $elm$core$Dict$member = F2(
+	function (key, dict) {
+		var _v0 = A2($elm$core$Dict$get, key, dict);
+		if (!_v0.$) {
+			return true;
+		} else {
+			return false;
+		}
+	});
+var $elm$core$Set$member = F2(
+	function (key, _v0) {
+		var dict = _v0;
+		return A2($elm$core$Dict$member, key, dict);
+	});
+var $author$project$Aoc05$containsThreeVowels = function (str) {
+	var vowels = $elm$core$Set$fromList(
+		$elm$core$String$toList('aeiou'));
+	var count = $elm$core$List$length(
+		A2(
+			$elm$core$List$filter,
+			function (ch) {
+				return A2($elm$core$Set$member, ch, vowels);
+			},
+			$elm$core$String$toList(str)));
+	return count >= 3;
+};
+var $author$project$Aoc05$containsDisallowedSubstring = function (str) {
+	var disallowed = _List_fromArray(
+		['ab', 'cd', 'pq', 'xy']);
+	return A2(
+		$elm$core$List$any,
+		function (s) {
+			return A2($elm$core$String$contains, s, str);
+		},
+		disallowed);
+};
+var $elm$core$Basics$not = _Basics_not;
+var $author$project$Aoc05$doesNotContainDisallowedSubstring = function (str) {
+	return !$author$project$Aoc05$containsDisallowedSubstring(str);
+};
+var $author$project$Aoc05$isNiceOldRules = function (str) {
+	return $author$project$Aoc05$containsThreeVowels(str) && ($author$project$Aoc05$containsLetterPair(str) && $author$project$Aoc05$doesNotContainDisallowedSubstring(str));
+};
+var $author$project$Aoc05$isNice = F2(
+	function (useNewRules, str) {
+		return useNewRules ? $author$project$Aoc05$isNiceNewRules(str) : $author$project$Aoc05$isNiceOldRules(str);
+	});
+var $author$project$Aoc05$checkReport = F2(
+	function (useNewRules, report) {
+		if (!report.$) {
+			var str = report.a;
+			return A2($author$project$Aoc05$isNice, useNewRules, str) ? $author$project$Aoc05$Safe(str) : $author$project$Aoc05$Unsafe(str);
+		} else {
+			return report;
+		}
+	});
 var $author$project$Aoc05$countAsSafe = function (report) {
 	switch (report.$) {
 		case 1:
@@ -5258,19 +5524,21 @@ var $author$project$Aoc05$countSafe = function (reports) {
 		A2($elm$core$List$map, $author$project$Aoc05$countAsSafe, reports));
 };
 var $author$project$Aoc05$updateSolve = function (model) {
-	var reports = model.A ? A2($elm$core$List$map, $author$project$Aoc05$checkReport, model.n) : A2($elm$core$List$map, $author$project$Aoc05$checkReport, model.n);
+	var reports = A2(
+		$elm$core$List$map,
+		$author$project$Aoc05$checkReport(model.A),
+		model.r);
 	var found = $author$project$Aoc05$countSafe(reports);
 	return _Utils_update(
 		model,
-		{n: reports, w: found});
+		{r: reports, w: found});
 };
-var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc05$updateToggleNewRules = function (model) {
 	var useNewRules = !model.A;
 	return _Utils_update(
 		model,
 		{
-			n: $author$project$Aoc05$initReports(model.l),
+			r: $author$project$Aoc05$initReports(model.l),
 			w: 0,
 			A: useNewRules
 		});
@@ -5447,7 +5715,7 @@ var $author$project$Aoc05$viewBody = function (model) {
 				return '24px';
 		}
 	}();
-	var elements = A2($elm$core$List$concatMap, $author$project$Aoc05$toReportHtmlElement, model.n);
+	var elements = A2($elm$core$List$concatMap, $author$project$Aoc05$toReportHtmlElement, model.r);
 	var commandsStr = '';
 	return A2(
 		$elm$html$Html$table,
