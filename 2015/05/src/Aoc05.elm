@@ -78,14 +78,6 @@ containsPairWithoutOverlap str =
     in  
       found || containsPairWithoutOverlap (String.dropLeft 1 str)
 
--- let containsRepeatingLetter (str : string) = 
---     let rec fn (chars : char list) = 
---         match chars with 
---         | a :: b :: c :: rest -> 
---             a = c || fn (b :: c :: rest)
---         | _ -> false
---     fn (str |> Seq.toList)
-
 containsRepeatingLetterLoop : List Char -> Bool
 containsRepeatingLetterLoop chars = 
   case chars of 
