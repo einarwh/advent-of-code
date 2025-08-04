@@ -5403,14 +5403,14 @@ var $author$project$Aoc06$initModel = function (useBrightness) {
 		X: 0,
 		L: '',
 		E: false,
-		v: A3($tortus$elm_array_2d$Array2D$repeat, 1000, 1000, 0),
+		w: A3($tortus$elm_array_2d$Array2D$repeat, 1000, 1000, 0),
 		F: 0,
 		M: instructions,
 		ae: 'press play to start',
 		r: true,
 		T: $author$project$Aoc06$defaultTickInterval,
 		U: $elm$core$List$length(instructions),
-		B: useBrightness
+		u: useBrightness
 	};
 	return model;
 };
@@ -5846,7 +5846,7 @@ var $author$project$Aoc06$subscriptions = function (model) {
 	return tickSub;
 };
 var $author$project$Aoc06$updateClear = function (model) {
-	return $author$project$Aoc06$initModel(model.B);
+	return $author$project$Aoc06$initModel(model.u);
 };
 var $elm$core$List$append = F2(
 	function (xs, ys) {
@@ -6074,6 +6074,60 @@ var $author$project$Aoc06$executeInstruction = F2(
 				return A3($elm$core$List$foldl, $author$project$Aoc06$toggleLight, grid, positions);
 		}
 	});
+var $author$project$Aoc06$decreaseLight = F2(
+	function (_v0, grid) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var current = A2(
+			$elm$core$Maybe$withDefault,
+			0,
+			A3($tortus$elm_array_2d$Array2D$get, y, x, grid));
+		var next = A2($elm$core$Basics$max, 0, current - 1);
+		return A4($tortus$elm_array_2d$Array2D$set, y, x, next, grid);
+	});
+var $author$project$Aoc06$doubleIncreaseLight = F2(
+	function (_v0, grid) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var current = A2(
+			$elm$core$Maybe$withDefault,
+			0,
+			A3($tortus$elm_array_2d$Array2D$get, y, x, grid));
+		return A4($tortus$elm_array_2d$Array2D$set, y, x, current + 2, grid);
+	});
+var $author$project$Aoc06$increaseLight = F2(
+	function (_v0, grid) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var current = A2(
+			$elm$core$Maybe$withDefault,
+			0,
+			A3($tortus$elm_array_2d$Array2D$get, y, x, grid));
+		return A4($tortus$elm_array_2d$Array2D$set, y, x, current + 1, grid);
+	});
+var $author$project$Aoc06$executeInstructionBrightness = F2(
+	function (inst, grid) {
+		switch (inst.$) {
+			case 0:
+				var _v1 = inst.a;
+				var pos1 = _v1.a;
+				var pos2 = _v1.b;
+				var positions = A2($author$project$Aoc06$getPositions, pos1, pos2);
+				return A3($elm$core$List$foldl, $author$project$Aoc06$increaseLight, grid, positions);
+			case 1:
+				var _v2 = inst.a;
+				var pos1 = _v2.a;
+				var pos2 = _v2.b;
+				var positions = A2($author$project$Aoc06$getPositions, pos1, pos2);
+				return A3($elm$core$List$foldl, $author$project$Aoc06$decreaseLight, grid, positions);
+			default:
+				var _v3 = inst.a;
+				var pos1 = _v3.a;
+				var pos2 = _v3.b;
+				var positions = A2($author$project$Aoc06$getPositions, pos1, pos2);
+				return A3($elm$core$List$foldl, $author$project$Aoc06$doubleIncreaseLight, grid, positions);
+		}
+	});
 var $author$project$Aoc06$updateStep = function (model) {
 	var _v0 = model.M;
 	if (!_v0.b) {
@@ -6115,20 +6169,21 @@ var $author$project$Aoc06$updateStep = function (model) {
 			}
 		}();
 		var num = model.F;
-		var g = A2($author$project$Aoc06$executeInstruction, h, model.v);
+		var execute = model.u ? $author$project$Aoc06$executeInstructionBrightness : $author$project$Aoc06$executeInstruction;
+		var g = A2(execute, h, model.w);
 		return _Utils_update(
 			model,
-			{L: str, v: g, F: num + 1, M: t});
+			{L: str, w: g, F: num + 1, M: t});
 	}
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc06$updateToggleBrightness = function (model) {
-	var useBrightness = !model.B;
+	var useBrightness = !model.u;
 	return $author$project$Aoc06$initModel(useBrightness);
 };
 var $author$project$Aoc06$updateTogglePlay = function (model) {
 	if (model.E) {
-		var m = $author$project$Aoc06$initModel(model.B);
+		var m = $author$project$Aoc06$initModel(model.u);
 		return _Utils_update(
 			m,
 			{r: false});
@@ -6289,14 +6344,90 @@ var $author$project$Aoc06$toRect = F2(
 				]),
 			_List_Nil);
 	});
+var $author$project$Aoc06$chooseColor = function (value) {
+	switch (value) {
+		case 0:
+			return '#000000';
+		case 1:
+			return '#808080';
+		case 2:
+			return '#888888';
+		case 3:
+			return '#909090';
+		case 4:
+			return '#989898';
+		case 5:
+			return '#A0A0A0';
+		case 6:
+			return '#A8A8A8';
+		case 7:
+			return '#A9A9A9';
+		case 8:
+			return '#B0B0B0';
+		case 9:
+			return '#B8B8B8';
+		case 10:
+			return '#BEBEBE';
+		case 11:
+			return '#C0C0C0';
+		case 12:
+			return '#C8C8C8';
+		case 13:
+			return '#D0D0D0';
+		case 14:
+			return '#D3D3D3';
+		case 15:
+			return '#D8D8D8';
+		case 16:
+			return '#DCDCDC';
+		case 17:
+			return '#E0E0E0';
+		case 18:
+			return '#E8E8E8';
+		case 19:
+			return '#F0F0F0';
+		case 20:
+			return '#F5F5F5';
+		case 21:
+			return '#F8F8F8';
+		default:
+			return '#FFFFFF';
+	}
+};
+var $author$project$Aoc06$toRectBrightness = F2(
+	function (grid, _v0) {
+		var xx = _v0.a;
+		var yy = _v0.b;
+		var yf = yy / 2;
+		var xf = xx / 2;
+		var value = A2(
+			$elm$core$Maybe$withDefault,
+			0,
+			A3($tortus$elm_array_2d$Array2D$get, yy, xx, grid));
+		var fillColor = $author$project$Aoc06$chooseColor(value);
+		return A2(
+			$elm$svg$Svg$rect,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x(
+					$elm$core$String$fromFloat(xf)),
+					$elm$svg$Svg$Attributes$y(
+					$elm$core$String$fromFloat(yf)),
+					$elm$svg$Svg$Attributes$width('0.5'),
+					$elm$svg$Svg$Attributes$height('0.5'),
+					$elm$svg$Svg$Attributes$fill(fillColor)
+				]),
+			_List_Nil);
+	});
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $author$project$Aoc06$toSvg = F2(
 	function (positions, model) {
+		var toRectFn = model.u ? $author$project$Aoc06$toRectBrightness : $author$project$Aoc06$toRect;
 		var svgWidth = $elm$core$String$fromInt(500);
 		var svgHeight = $elm$core$String$fromInt(500);
 		var elements = A2(
 			$elm$core$List$map,
-			$author$project$Aoc06$toRect(model.v),
+			toRectFn(model.w),
 			positions);
 		return A2(
 			$elm$svg$Svg$svg,
@@ -6312,7 +6443,7 @@ var $author$project$Aoc06$toSvg = F2(
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Aoc06$viewBody = function (model) {
-	var positions = $author$project$Aoc06$getAllPositions(model.v);
+	var positions = $author$project$Aoc06$getAllPositions(model.w);
 	var svg = A2($author$project$Aoc06$toSvg, positions, model);
 	var count = $elm$core$List$sum(
 		A2(
@@ -6323,7 +6454,7 @@ var $author$project$Aoc06$viewBody = function (model) {
 				return A2(
 					$elm$core$Maybe$withDefault,
 					0,
-					A3($tortus$elm_array_2d$Array2D$get, y, x, model.v));
+					A3($tortus$elm_array_2d$Array2D$get, y, x, model.w));
 			},
 			positions));
 	return A2(
@@ -6538,7 +6669,7 @@ var $author$project$Aoc06$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('checkbox'),
 										$elm$html$Html$Events$onClick(3),
-										$elm$html$Html$Attributes$checked(model.B)
+										$elm$html$Html$Attributes$checked(model.u)
 									]),
 								_List_Nil),
 								A2(

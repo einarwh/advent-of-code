@@ -464,6 +464,29 @@ toggleLight (x, y) grid =
   in 
     grid |> Array2D.set y x next 
 
+increaseLight : Pos -> Array2D Int -> Array2D Int
+increaseLight (x, y) grid = 
+  let 
+    current = grid |> Array2D.get y x |> Maybe.withDefault 0
+  in 
+    grid |> Array2D.set y x (current + 1) 
+
+decreaseLight : Pos -> Array2D Int -> Array2D Int
+decreaseLight (x, y) grid = 
+  let 
+    current = grid |> Array2D.get y x |> Maybe.withDefault 0
+    next = Basics.max 0 (current - 1)
+  in 
+    grid |> Array2D.set y x next
+
+doubleIncreaseLight : Pos -> Array2D Int -> Array2D Int
+doubleIncreaseLight (x, y) grid = 
+  let 
+    current = grid |> Array2D.get y x |> Maybe.withDefault 0
+  in 
+    grid |> Array2D.set y x (current + 2) 
+
+
 executeInstruction : Instruction -> Array2D Int -> Array2D Int
 executeInstruction inst grid = 
   case inst of 
@@ -482,6 +505,25 @@ executeInstruction inst grid =
         positions = getPositions pos1 pos2 
       in 
         positions |> List.foldl toggleLight grid 
+
+executeInstructionBrightness : Instruction -> Array2D Int -> Array2D Int
+executeInstructionBrightness inst grid = 
+  case inst of 
+    TurnOn (pos1, pos2) -> 
+      let 
+        positions = getPositions pos1 pos2 
+      in 
+        positions |> List.foldl increaseLight grid 
+    TurnOff (pos1, pos2) -> 
+      let 
+        positions = getPositions pos1 pos2 
+      in 
+        positions |> List.foldl decreaseLight grid 
+    Toggle (pos1, pos2) -> 
+      let 
+        positions = getPositions pos1 pos2 
+      in 
+        positions |> List.foldl doubleIncreaseLight grid 
       
 updateStep : Model -> Model
 updateStep model = 
@@ -497,7 +539,8 @@ updateStep model =
               "turn off (" ++ String.fromInt x0 ++ "," ++ String.fromInt y0 ++ ") through (" ++ String.fromInt x1 ++ "," ++ String.fromInt y1 ++ ")"
             Toggle ((x0, y0), (x1, y1)) -> 
               "toggle (" ++ String.fromInt x0 ++ "," ++ String.fromInt y0 ++ ") through (" ++ String.fromInt x1 ++ "," ++ String.fromInt y1 ++ ")"
-        g = executeInstruction h model.grid 
+        execute = if model.useBrightness then executeInstructionBrightness else executeInstruction
+        g = execute h model.grid 
         num = model.instructionNumber
       in 
         { model | instructions = t, grid = g, debug = str, instructionNumber = num + 1 }
@@ -575,12 +618,56 @@ toRect grid (xx, yy) =
         ]
         []
 
+chooseColor value = 
+  case value of 
+    0 -> "#000000"
+    1 -> "#808080"
+    2 -> "#888888"
+    3 -> "#909090"
+    4 -> "#989898"
+    5 -> "#A0A0A0"
+    6 -> "#A8A8A8"
+    7 -> "#A9A9A9"
+    8 -> "#B0B0B0"
+    9 -> "#B8B8B8"
+    10 -> "#BEBEBE"
+    11 -> "#C0C0C0"
+    12 -> "#C8C8C8"
+    13 -> "#D0D0D0"
+    14 -> "#D3D3D3"
+    15 -> "#D8D8D8"
+    16 -> "#DCDCDC"
+    17 -> "#E0E0E0"
+    18 -> "#E8E8E8"
+    19 -> "#F0F0F0"
+    20 -> "#F5F5F5"
+    21 -> "#F8F8F8"
+    _ -> "#FFFFFF"
+
+toRectBrightness : Array2D Int -> (Int, Int) -> Html Msg 
+toRectBrightness grid (xx, yy) = 
+  let 
+    value = grid |> Array2D.get yy xx |> Maybe.withDefault 0 
+    fillColor = chooseColor value
+    xf = (toFloat xx / 2)
+    yf = (toFloat yy / 2)
+  in
+    rect
+        [ x (String.fromFloat xf)
+        , y (String.fromFloat yf)
+        , width "0.5"
+        , height "0.5"
+        , fill fillColor
+        ]
+        []
+
 toSvg : List Pos -> Model -> Html Msg 
 toSvg positions model = 
   let 
     svgWidth = 500 |> String.fromInt
     svgHeight = 500 |> String.fromInt
-    elements = positions |> List.map (toRect model.grid)
+    toRectFn = if model.useBrightness then toRectBrightness else toRect
+    elements = positions |> List.map (toRectFn model.grid)
   in 
     svg
       [ viewBox ("0 0 " ++ svgWidth ++ svgHeight)
