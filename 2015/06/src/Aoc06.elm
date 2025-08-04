@@ -11,9 +11,10 @@ import Array2D exposing (Array2D)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Time
+import Image
 
 defaultTickInterval : Float
-defaultTickInterval = 100
+defaultTickInterval = 500
 
 -- MAIN
 
@@ -34,7 +35,7 @@ type Instruction =
     | Toggle (Pos, Pos)
 
 type alias Model = 
-  { grid : Array2D Int
+  { bulbs : List (Pos, Int)
   , instructions : List Instruction
   , instructionNumber : Int 
   , totalInstructionCount : Int 
@@ -399,7 +400,7 @@ initModel : Bool -> Model
 initModel useBrightness =
   let 
     instructions = input |> String.split "\n" |> List.filterMap tryParse
-    model = { grid = Array2D.repeat 1000 1000 0
+    model = { bulbs = getPositions (0, 0) (999, 999) |> List.map (\p -> (p, 0))
             , instructions = instructions
             , instructionNumber = 0
             , totalInstructionCount = List.length instructions
@@ -437,93 +438,32 @@ getPositions (xMin, yMin) (xMax, yMax) =
   in 
     ys |> List.concatMap (\y -> xs |> List.map (\x -> (x, y)))
 
-getAllPositions : Array2D a -> List Pos
-getAllPositions grid = 
-  let
-    ys = List.range 0 (Array2D.rows grid - 1)
-    xs = List.range 0 (Array2D.columns grid - 1)
-  in 
-    ys |> List.concatMap (\y -> xs |> List.map (\x -> (x, y)))
-
 updateClear : Model -> Model
 updateClear model = initModel model.useBrightness
 
-turnOnLight : Pos -> Array2D Int -> Array2D Int
-turnOnLight (x, y) grid = 
-  grid |> Array2D.set y x 1
+isInsideBounds : Pos -> Pos -> Pos -> Bool
+isInsideBounds (xMin, yMin) (xMax, yMax) (x, y) =
+  xMin <= x && x <= xMax && yMin <= y && y <= yMax 
 
-turnOffLight : Pos -> Array2D Int -> Array2D Int
-turnOffLight (x, y) grid = 
-  grid |> Array2D.set y x 0 
-
-toggleLight : Pos -> Array2D Int -> Array2D Int
-toggleLight (x, y) grid = 
-  let 
-    current = grid |> Array2D.get y x |> Maybe.withDefault 0
-    next = if current == 1 then 0 else 1
-  in 
-    grid |> Array2D.set y x next 
-
-increaseLight : Pos -> Array2D Int -> Array2D Int
-increaseLight (x, y) grid = 
-  let 
-    current = grid |> Array2D.get y x |> Maybe.withDefault 0
-  in 
-    grid |> Array2D.set y x (current + 1) 
-
-decreaseLight : Pos -> Array2D Int -> Array2D Int
-decreaseLight (x, y) grid = 
-  let 
-    current = grid |> Array2D.get y x |> Maybe.withDefault 0
-    next = Basics.max 0 (current - 1)
-  in 
-    grid |> Array2D.set y x next
-
-doubleIncreaseLight : Pos -> Array2D Int -> Array2D Int
-doubleIncreaseLight (x, y) grid = 
-  let 
-    current = grid |> Array2D.get y x |> Maybe.withDefault 0
-  in 
-    grid |> Array2D.set y x (current + 2) 
-
-
-executeInstruction : Instruction -> Array2D Int -> Array2D Int
-executeInstruction inst grid = 
+executeInstruction : Instruction -> List (Pos, Int) -> List (Pos, Int)
+executeInstruction inst bulbs = 
   case inst of 
     TurnOn (pos1, pos2) -> 
-      let 
-        positions = getPositions pos1 pos2 
-      in 
-        positions |> List.foldl turnOnLight grid 
+      bulbs |> List.map (\(p, c) -> if isInsideBounds pos1 pos2 p then (p, 1) else (p, c))
     TurnOff (pos1, pos2) -> 
-      let 
-        positions = getPositions pos1 pos2 
-      in 
-        positions |> List.foldl turnOffLight grid 
+      bulbs |> List.map (\(p, c) -> if isInsideBounds pos1 pos2 p then (p, 0) else (p, c))
     Toggle (pos1, pos2) -> 
-      let 
-        positions = getPositions pos1 pos2 
-      in 
-        positions |> List.foldl toggleLight grid 
+      bulbs |> List.map (\(p, c) -> if isInsideBounds pos1 pos2 p then (p, if c == 0 then 1 else 0) else (p, c))
 
-executeInstructionBrightness : Instruction -> Array2D Int -> Array2D Int
-executeInstructionBrightness inst grid = 
+executeInstructionBrightness : Instruction -> List (Pos, Int) -> List (Pos, Int)
+executeInstructionBrightness inst bulbs = 
   case inst of 
     TurnOn (pos1, pos2) -> 
-      let 
-        positions = getPositions pos1 pos2 
-      in 
-        positions |> List.foldl increaseLight grid 
+      bulbs |> List.map (\(p, c) -> if isInsideBounds pos1 pos2 p then (p, c + 1) else (p, c))
     TurnOff (pos1, pos2) -> 
-      let 
-        positions = getPositions pos1 pos2 
-      in 
-        positions |> List.foldl decreaseLight grid 
+      bulbs |> List.map (\(p, c) -> if isInsideBounds pos1 pos2 p then (p, Basics.max 0 (c - 1)) else (p, c))
     Toggle (pos1, pos2) -> 
-      let 
-        positions = getPositions pos1 pos2 
-      in 
-        positions |> List.foldl doubleIncreaseLight grid 
+      bulbs |> List.map (\(p, c) -> if isInsideBounds pos1 pos2 p then (p, c + 2) else (p, c))
       
 updateStep : Model -> Model
 updateStep model = 
@@ -540,10 +480,10 @@ updateStep model =
             Toggle ((x0, y0), (x1, y1)) -> 
               "toggle (" ++ String.fromInt x0 ++ "," ++ String.fromInt y0 ++ ") through (" ++ String.fromInt x1 ++ "," ++ String.fromInt y1 ++ ")"
         execute = if model.useBrightness then executeInstructionBrightness else executeInstruction
-        g = execute h model.grid 
+        bulbs = execute h model.bulbs 
         num = model.instructionNumber
       in 
-        { model | instructions = t, grid = g, debug = str, instructionNumber = num + 1 }
+        { model | instructions = t, bulbs = bulbs, debug = str, instructionNumber = num + 1 }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -587,36 +527,25 @@ subscriptions model =
 
 -- VIEW
 
-toCircle : Array2D Int -> (Int, Int) -> Html Msg 
-toCircle grid (x, y) = 
-  let 
-    value = grid |> Array2D.get y x |> Maybe.withDefault 0 
-    fillColor = if value == 0 then "black" else "white"
-  in
-    circle
-        [ cx (String.fromInt x)
-        , cy (String.fromInt y)
-        , r "0.5"
-        , fill fillColor
-        ]
-        []
-
-toRect : Array2D Int -> (Int, Int) -> Html Msg 
-toRect grid (xx, yy) = 
-  let 
-    value = grid |> Array2D.get yy xx |> Maybe.withDefault 0 
-    fillColor = if value == 0 then "black" else "white"
-    xf = (toFloat xx / 2)
-    yf = (toFloat yy / 2)
-  in
-    rect
-        [ x (String.fromFloat xf)
-        , y (String.fromFloat yf)
-        , width "0.5"
-        , height "0.5"
-        , fill fillColor
-        ]
-        []
+toRect : (Pos, Int) -> Html Msg
+toRect ((xx, yy), value) = 
+      let 
+        fillColor = if value == 0 then "black" else "white"
+        xf = (toFloat xx / 2)
+        yf = (toFloat yy / 2)
+        s = String.fromInt xx ++ "," ++ String.fromInt yy
+        r =         
+          rect
+            [ x (String.fromFloat xf)
+            , y (String.fromFloat yf)
+            , id s 
+            , width "0.5"
+            , height "0.5"
+            , fill fillColor
+            ]
+            []
+      in
+        r
 
 chooseColor value = 
   case value of 
@@ -644,30 +573,33 @@ chooseColor value =
     21 -> "#F8F8F8"
     _ -> "#FFFFFF"
 
-toRectBrightness : Array2D Int -> (Int, Int) -> Html Msg 
-toRectBrightness grid (xx, yy) = 
-  let 
-    value = grid |> Array2D.get yy xx |> Maybe.withDefault 0 
-    fillColor = chooseColor value
-    xf = (toFloat xx / 2)
-    yf = (toFloat yy / 2)
-  in
-    rect
-        [ x (String.fromFloat xf)
-        , y (String.fromFloat yf)
-        , width "0.5"
-        , height "0.5"
-        , fill fillColor
-        ]
-        []
+toRectBrightness : (Pos, Int) -> (Html Msg)
+toRectBrightness ((xx, yy), value) = 
+      let 
+        fillColor = chooseColor value
+        xf = (toFloat xx / 2)
+        yf = (toFloat yy / 2)
+        s = String.fromInt xx ++ "," ++ String.fromInt yy
+        r =         
+          rect
+            [ x (String.fromFloat xf)
+            , y (String.fromFloat yf)
+            , id s 
+            , width "0.5"
+            , height "0.5"
+            , fill fillColor
+            ]
+            []
+      in
+        r
 
-toSvg : List Pos -> Model -> Html Msg 
-toSvg positions model = 
+toSvg : Model -> Html Msg 
+toSvg model = 
   let 
     svgWidth = 500 |> String.fromInt
     svgHeight = 500 |> String.fromInt
     toRectFn = if model.useBrightness then toRectBrightness else toRect
-    elements = positions |> List.map (toRectFn model.grid)
+    elements = model.bulbs |> List.map toRectFn
   in 
     svg
       [ viewBox ("0 0 " ++ svgWidth ++ svgHeight)
@@ -677,6 +609,15 @@ toSvg positions model =
       ]
       elements
 
+toImage : Model -> Html Msg 
+toImage model = 
+  let 
+    pixels = model.bulbs |> List.map (\(p, c) -> if c == 0 then 0x000000FF else 0xFFFFFFFF)
+    imageData = pixels |> Image.fromList 1000
+    pngEncodeBase64Url = Image.toPngUrl imageData
+  in 
+    Html.img [ Html.Attributes.src pngEncodeBase64Url ] []
+
 view : Model -> Document Msg
 view model = 
   { title = "Advent of Code 2015 | Day 6: Probably a Fire Hazard"
@@ -685,9 +626,9 @@ view model =
 viewBody : Model -> Html Msg
 viewBody model =
   let
-    positions = model.grid |> getAllPositions 
-    count = positions |> List.map (\(x, y) -> model.grid |> Array2D.get y x |> Maybe.withDefault 0) |> List.sum 
-    svg = toSvg positions model 
+    count = model.bulbs |> List.map (\(_, c) -> c) |> List.sum 
+    svg = toSvg model 
+    -- svg = toImage model 
   in 
     Html.table 
       [ Html.Attributes.align "center"
