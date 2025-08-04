@@ -55,4 +55,4 @@ let solve fileName =
     solve1 program 
     solve2 program
 
-solve "input"
+solve "input.txt"

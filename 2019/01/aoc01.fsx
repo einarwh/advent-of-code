@@ -1,4 +1,4 @@
-// Advent of Code 2019. Day 1.
+// Advent of Code 2019. Day 1: The Tyranny of the Rocket Equation. 
 // dotnet fsi aoc01.fsx
 
 open System
@@ -22,4 +22,4 @@ let run lines =
     lines |> calculate fuel |> printfn "%d"
     lines |> calculate zenoFuel |> printfn "%d"
 
-"input" |> File.ReadAllLines |> run
+"input.txt" |> File.ReadAllLines |> run

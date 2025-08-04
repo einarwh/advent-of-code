@@ -18,4 +18,4 @@ let run fileName =
     let text = readText fileName
     text |> printfn "%s"
 
-run "input"
+run "input.txt"

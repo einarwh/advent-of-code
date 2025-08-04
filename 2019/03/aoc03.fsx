@@ -90,4 +90,4 @@ let run fileName =
     solve1 intersectionPoints 
     solve2 intersectionPoints offsetsList
 
-"input" |> run
+"input.txt" |> run
