@@ -10,6 +10,7 @@ import Set exposing (Set)
 import Array2D exposing (Array2D)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
+import Time
 
 defaultTickInterval : Float
 defaultTickInterval = 100
@@ -35,6 +36,8 @@ type Instruction =
 type alias Model = 
   { grid : Array2D Int
   , instructions : List Instruction
+  , instructionNumber : Int 
+  , totalInstructionCount : Int 
   , useBrightness : Bool 
   , paused : Bool 
   , finished : Bool 
@@ -396,8 +399,10 @@ initModel : Bool -> Model
 initModel useBrightness =
   let 
     instructions = input |> String.split "\n" |> List.filterMap tryParse
-    model = { grid = Array2D.repeat 500 500 0
+    model = { grid = Array2D.repeat 1000 1000 0
             , instructions = instructions
+            , instructionNumber = 0
+            , totalInstructionCount = List.length instructions
             , lastCommandText = "press play to start"
             , paused = True 
             , finished = False
@@ -422,13 +427,62 @@ type Msg =
   | Step 
   | TogglePlay 
   | ToggleBrightness
-  | Faster 
-  | Slower 
   | Clear 
+
+getPositions : Pos -> Pos -> List Pos
+getPositions (xMin, yMin) (xMax, yMax) = 
+  let
+    ys = List.range yMin yMax
+    xs = List.range xMin xMax
+  in 
+    ys |> List.concatMap (\y -> xs |> List.map (\x -> (x, y)))
+
+getAllPositions : Array2D a -> List Pos
+getAllPositions grid = 
+  let
+    ys = List.range 0 (Array2D.rows grid - 1)
+    xs = List.range 0 (Array2D.columns grid - 1)
+  in 
+    ys |> List.concatMap (\y -> xs |> List.map (\x -> (x, y)))
 
 updateClear : Model -> Model
 updateClear model = initModel model.useBrightness
 
+turnOnLight : Pos -> Array2D Int -> Array2D Int
+turnOnLight (x, y) grid = 
+  grid |> Array2D.set y x 1
+
+turnOffLight : Pos -> Array2D Int -> Array2D Int
+turnOffLight (x, y) grid = 
+  grid |> Array2D.set y x 0 
+
+toggleLight : Pos -> Array2D Int -> Array2D Int
+toggleLight (x, y) grid = 
+  let 
+    current = grid |> Array2D.get y x |> Maybe.withDefault 0
+    next = if current == 1 then 0 else 1
+  in 
+    grid |> Array2D.set y x next 
+
+executeInstruction : Instruction -> Array2D Int -> Array2D Int
+executeInstruction inst grid = 
+  case inst of 
+    TurnOn (pos1, pos2) -> 
+      let 
+        positions = getPositions pos1 pos2 
+      in 
+        positions |> List.foldl turnOnLight grid 
+    TurnOff (pos1, pos2) -> 
+      let 
+        positions = getPositions pos1 pos2 
+      in 
+        positions |> List.foldl turnOffLight grid 
+    Toggle (pos1, pos2) -> 
+      let 
+        positions = getPositions pos1 pos2 
+      in 
+        positions |> List.foldl toggleLight grid 
+      
 updateStep : Model -> Model
 updateStep model = 
   case model.instructions of 
@@ -443,8 +497,10 @@ updateStep model =
               "turn off (" ++ String.fromInt x0 ++ "," ++ String.fromInt y0 ++ ") through (" ++ String.fromInt x1 ++ "," ++ String.fromInt y1 ++ ")"
             Toggle ((x0, y0), (x1, y1)) -> 
               "toggle (" ++ String.fromInt x0 ++ "," ++ String.fromInt y0 ++ ") through (" ++ String.fromInt x1 ++ "," ++ String.fromInt y1 ++ ")"
+        g = executeInstruction h model.grid 
+        num = model.instructionNumber
       in 
-        { model | instructions = t, debug = str }
+        { model | instructions = t, grid = g, debug = str, instructionNumber = num + 1 }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -472,10 +528,6 @@ update msg model =
       (updateStep model, Cmd.none)
     Step ->
       (updateStep model, Cmd.none)
-    Faster -> 
-      ({model | tickInterval = model.tickInterval / 2 }, Cmd.none)
-    Slower -> 
-      ({model | tickInterval = model.tickInterval * 2 }, Cmd.none)
     TogglePlay -> 
       (updateTogglePlay model, Cmd.none)
     ToggleBrightness -> 
@@ -484,33 +536,51 @@ update msg model =
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
-subscriptions model = Sub.none
+subscriptions model =
+  let 
+    tickSub = if model.paused || model.finished then Sub.none else Time.every model.tickInterval (\_ -> Tick)
+  in 
+    tickSub
 
 -- VIEW
 
-toCircle : String -> (Int, Int) -> Html Msg 
-toCircle fillColor (xStart, yStart) = 
+toCircle : Array2D Int -> (Int, Int) -> Html Msg 
+toCircle grid (x, y) = 
   let 
-    xVal = 10 * xStart
-    yVal = 10 * yStart
+    value = grid |> Array2D.get y x |> Maybe.withDefault 0 
+    fillColor = if value == 0 then "black" else "white"
   in
     circle
-        [ cx (String.fromInt xStart)
-        , cy (String.fromInt yStart)
+        [ cx (String.fromInt x)
+        , cy (String.fromInt y)
         , r "0.5"
         , fill fillColor
         ]
         []
 
-toSvg : Model -> Html Msg 
-toSvg model = 
+toRect : Array2D Int -> (Int, Int) -> Html Msg 
+toRect grid (xx, yy) = 
+  let 
+    value = grid |> Array2D.get yy xx |> Maybe.withDefault 0 
+    fillColor = if value == 0 then "black" else "white"
+    xf = (toFloat xx / 2)
+    yf = (toFloat yy / 2)
+  in
+    rect
+        [ x (String.fromFloat xf)
+        , y (String.fromFloat yf)
+        , width "0.5"
+        , height "0.5"
+        , fill fillColor
+        ]
+        []
+
+toSvg : List Pos -> Model -> Html Msg 
+toSvg positions model = 
   let 
     svgWidth = 500 |> String.fromInt
     svgHeight = 500 |> String.fromInt
-    elements = 
-      [ toCircle "white" (10, 20)
-      , toCircle "white" (11, 20)
-      ]
+    elements = positions |> List.map (toRect model.grid)
   in 
     svg
       [ viewBox ("0 0 " ++ svgWidth ++ svgHeight)
@@ -528,14 +598,14 @@ view model =
 viewBody : Model -> Html Msg
 viewBody model =
   let
-    commandsStr = ""
-    svg = toSvg model 
+    positions = model.grid |> getAllPositions 
+    count = positions |> List.map (\(x, y) -> model.grid |> Array2D.get y x |> Maybe.withDefault 0) |> List.sum 
+    svg = toSvg positions model 
   in 
     Html.table 
-      [ 
-        Html.Attributes.style "width" "1080px"
-      , Html.Attributes.style "font-family" "Courier New"
-      ]
+      [ Html.Attributes.align "center"
+      , Html.Attributes.style "width" "100%"
+      , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
           [ Html.td 
@@ -584,14 +654,8 @@ viewBody model =
                 [ Html.Attributes.style "width" "80px", onClick Clear ] 
                 [ Html.text "Clear"]
               , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Slower ] 
-                [ text "Slower" ]
-              , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick TogglePlay ] 
                 [ if model.paused then text "Play" else text "Pause" ] 
-              , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Faster ] 
-                [ text "Faster" ]
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Step ] 
                 [ Html.text "Step" ]
@@ -608,18 +672,12 @@ viewBody model =
       , Html.tr 
           []
           [ Html.td 
-              [ Html.Attributes.align "center" ]
-              [ Html.label [] [ Html.text model.debug ]
-            ] ]
-      , Html.tr 
-          []
-          [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "24px"
-              , Html.Attributes.style "padding-top" "10px" ] 
+              , Html.Attributes.style "font-size" "24px" ] 
               [ 
-                Html.div [] [ Html.text commandsStr ]
+                Html.div [] [ Html.text (String.fromInt count) ]
+              , Html.div [] [ Html.text (String.fromInt model.instructionNumber ++ " of " ++ String.fromInt model.totalInstructionCount) ]
               ] ]
       , Html.tr 
           []
@@ -630,4 +688,10 @@ viewBody model =
               , Html.Attributes.style "padding" "10px" ] 
               [ 
                 svg
-              ] ] ]
+              ] ] 
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center" ]
+              [ Html.label [] [ Html.text model.debug ]
+            ] ] ]
