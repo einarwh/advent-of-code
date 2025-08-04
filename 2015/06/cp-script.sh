@@ -1,0 +1,1 @@
+cp aoc06.js ../../../experiments-in-powerblog/resources/public/js/aoc/2015/
