@@ -90,7 +90,7 @@ type Msg =
 updatePasswords : Bool -> Array Char -> Int -> (Password, Password) -> (Password, Password)
 updatePasswords interesting hashChars pos (password, guess) = 
   let 
-    ch = Array.get pos hashChars |> Maybe.withDefault '_'
+    ch = Array.get 5 hashChars |> Maybe.withDefault '_'
   in 
     if interesting then 
       (password |> Array.set pos (Just ch), guess)
@@ -106,20 +106,33 @@ findPos i maybeChars =
         Nothing -> i 
         Just _ -> findPos (i + 1) rest 
 
+hack1Loop pos index model = 
+  let 
+    doorCode = model.doorId ++ String.fromInt index 
+    hash = MD5.hex doorCode
+  in 
+    if String.startsWith "00000" hash then
+      let 
+        hashChars = hash |> String.toList |> Array.fromList 
+        ch = hashChars |> Array.get 5 |> Maybe.withDefault '_'
+        p = model.password |> Array.set pos (Just ch)
+      in 
+        { model | password = p, index = index + 1 }
+    else if index < model.index + 10000 then 
+      hack1Loop pos (index + 1) model 
+    else 
+      let 
+        hashChars = hash |> String.toList |> Array.fromList 
+        ch = hashChars |> Array.get 5 |> Maybe.withDefault '_'
+        g = model.guess |> Array.set pos (Just ch)
+      in 
+        { model | guess = g, index = index + 1 }
+
 hack1 model = 
   let 
-    doorId = model.doorId 
-    password = model.password
-    guess = model.guess 
-    index = model.index 
-    pos = password |> Array.toList |> findPos 0
-    doorCode = doorId ++ String.fromInt index 
-    hash = MD5.hex doorCode
-    interesting = String.startsWith "00000" hash 
-    hashChars = hash |> String.toList |> Array.fromList 
-    (p, g) = updatePasswords interesting hashChars pos (password, guess) 
+    pos = model.password |> Array.toList |> findPos 0
   in 
-    { model | password = p, guess = g, index = index + 1 }
+    hack1Loop pos model.index model 
 
 updateReset : Model -> Model
 updateReset model = 
@@ -272,6 +285,6 @@ viewBody model =
               , Html.Attributes.style "padding" "10px" ] 
               [ 
                 pwdElement
-              , Html.div [] [ Html.text dbgStr ]
+              -- , Html.div [] [ Html.text dbgStr ]
               ] ] 
               ]
