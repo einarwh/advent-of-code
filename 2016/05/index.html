@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.T.D === region.Z.D)
+	if (region.T.E === region.Z.E)
 	{
-		return 'on line ' + region.T.D;
+		return 'on line ' + region.T.E;
 	}
-	return 'on lines ' + region.T.D + ' through ' + region.Z.D;
+	return 'on lines ' + region.T.E + ' through ' + region.Z.E;
 }
 
 
@@ -5263,7 +5263,7 @@ var $elm$core$Array$repeat = F2(
 	});
 var $author$project$Aoc05$initModel = function (secondDoor) {
 	var blank = A2($elm$core$Array$repeat, 8, $elm$core$Maybe$Nothing);
-	return {Y: '', O: $author$project$Aoc05$input, M: false, C: blank, r: 0, ae: '', y: blank, t: true, N: secondDoor, v: $author$project$Aoc05$defaultTickInterval};
+	return {Y: '', N: $author$project$Aoc05$input, O: false, m: blank, f: 0, ae: '', o: blank, v: true, x: secondDoor, y: $author$project$Aoc05$defaultTickInterval};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -5689,16 +5689,16 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc05$subscriptions = function (model) {
-	var tickSub = (model.t || model.M) ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = (model.v || model.O) ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.v,
+		model.y,
 		function (_v0) {
 			return 0;
 		});
 	return tickSub;
 };
 var $author$project$Aoc05$updateReset = function (model) {
-	return $author$project$Aoc05$initModel(model.N);
+	return $author$project$Aoc05$initModel(model.x);
 };
 var $author$project$Aoc05$findPos = F2(
 	function (i, maybeChars) {
@@ -5863,10 +5863,10 @@ var $truqu$elm_md5$MD5$ii = F7(
 	});
 var $truqu$elm_md5$MD5$hex_ = F2(
 	function (xs, acc) {
-		var a = acc.I;
-		var b = acc.J;
-		var c = acc.K;
-		var d = acc.L;
+		var a = acc.J;
+		var b = acc.K;
+		var c = acc.L;
+		var d = acc.M;
 		if ((((((((((((((((xs.b && xs.b.b) && xs.b.b.b) && xs.b.b.b.b) && xs.b.b.b.b.b) && xs.b.b.b.b.b.b) && xs.b.b.b.b.b.b.b) && xs.b.b.b.b.b.b.b.b) && xs.b.b.b.b.b.b.b.b.b) && xs.b.b.b.b.b.b.b.b.b.b) && xs.b.b.b.b.b.b.b.b.b.b.b) && xs.b.b.b.b.b.b.b.b.b.b.b.b) && xs.b.b.b.b.b.b.b.b.b.b.b.b.b) && xs.b.b.b.b.b.b.b.b.b.b.b.b.b.b) && xs.b.b.b.b.b.b.b.b.b.b.b.b.b.b.b) && xs.b.b.b.b.b.b.b.b.b.b.b.b.b.b.b.b) && (!xs.b.b.b.b.b.b.b.b.b.b.b.b.b.b.b.b.b)) {
 			var x0 = xs.a;
 			var _v1 = xs.b;
@@ -5987,7 +5987,7 @@ var $truqu$elm_md5$MD5$hex_ = F2(
 			var c17 = A2($truqu$elm_md5$MD5$addUnsigned, c00, c16);
 			var d17 = A2($truqu$elm_md5$MD5$addUnsigned, d00, d16);
 			var a17 = A2($truqu$elm_md5$MD5$addUnsigned, a00, a16);
-			return {I: a17, J: b17, K: c17, L: d17};
+			return {J: a17, K: b17, L: c17, M: d17};
 		} else {
 			return acc;
 		}
@@ -6151,7 +6151,7 @@ var $zwilias$elm_utf_tools$String$UTF8$foldl = F3(
 	});
 var $truqu$elm_md5$MD5$State = F4(
 	function (a, b, c, d) {
-		return {I: a, J: b, K: c, L: d};
+		return {J: a, K: b, L: c, M: d};
 	});
 var $truqu$elm_md5$MD5$initialHashState = A4($truqu$elm_md5$MD5$State, 1732584193, 4023233417, 2562383102, 271733878);
 var $truqu$elm_md5$MD5$hash = function (input) {
@@ -6167,10 +6167,10 @@ var $truqu$elm_md5$MD5$hash = function (input) {
 };
 var $truqu$elm_md5$MD5$bytes = function (string) {
 	var _v0 = $truqu$elm_md5$MD5$hash(string);
-	var a = _v0.I;
-	var b = _v0.J;
-	var c = _v0.K;
-	var d = _v0.L;
+	var a = _v0.J;
+	var b = _v0.K;
+	var c = _v0.L;
+	var d = _v0.M;
 	return _List_fromArray(
 		[a & 255, (a >>> 8) & 255, (a >>> 16) & 255, (a >>> 24) & 255, b & 255, (b >>> 8) & 255, (b >>> 16) & 255, (b >>> 24) & 255, c & 255, (c >>> 8) & 255, (c >>> 16) & 255, (c >>> 24) & 255, d & 255, (d >>> 8) & 255, (d >>> 16) & 255, (d >>> 24) & 255]);
 };
@@ -6265,7 +6265,7 @@ var $author$project$Aoc05$hack1Loop = F3(
 		hack1Loop:
 		while (true) {
 			var doorCode = _Utils_ap(
-				model.O,
+				model.N,
 				$elm$core$String$fromInt(index));
 			var hash = $truqu$elm_md5$MD5$hex(doorCode);
 			if (A2($elm$core$String$startsWith, '00000', hash)) {
@@ -6279,12 +6279,12 @@ var $author$project$Aoc05$hack1Loop = F3(
 					$elm$core$Array$set,
 					pos,
 					$elm$core$Maybe$Just(ch),
-					model.y);
+					model.o);
 				return _Utils_update(
 					model,
-					{r: index + 1, y: p});
+					{f: index + 1, o: p});
 			} else {
-				if (_Utils_cmp(index, model.r + 10000) < 0) {
+				if (_Utils_cmp(index, model.f + 10000) < 0) {
 					var $temp$pos = pos,
 						$temp$index = index + 1,
 						$temp$model = model;
@@ -6303,10 +6303,10 @@ var $author$project$Aoc05$hack1Loop = F3(
 						$elm$core$Array$set,
 						pos,
 						$elm$core$Maybe$Just(ch),
-						model.C);
+						model.m);
 					return _Utils_update(
 						model,
-						{C: g, r: index + 1});
+						{m: g, f: index + 1});
 				}
 			}
 		}
@@ -6315,29 +6315,130 @@ var $author$project$Aoc05$hack1 = function (model) {
 	var pos = A2(
 		$author$project$Aoc05$findPos,
 		0,
-		$elm$core$Array$toList(model.y));
-	return A3($author$project$Aoc05$hack1Loop, pos, model.r, model);
+		$elm$core$Array$toList(model.o));
+	return A3($author$project$Aoc05$hack1Loop, pos, model.f, model);
+};
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $author$project$Aoc05$hack2Loop = F2(
+	function (index, model) {
+		hack2Loop:
+		while (true) {
+			var doorCode = _Utils_ap(
+				model.N,
+				$elm$core$String$fromInt(index));
+			var hash = $truqu$elm_md5$MD5$hex(doorCode);
+			if (A2($elm$core$String$startsWith, '00000', hash)) {
+				var hashChars = $elm$core$Array$fromList(
+					$elm$core$String$toList(hash));
+				var pos = A2(
+					$elm$core$Maybe$withDefault,
+					-1,
+					$elm$core$String$toInt(
+						$elm$core$String$fromChar(
+							A2(
+								$elm$core$Maybe$withDefault,
+								'a',
+								A2($elm$core$Array$get, 5, hashChars)))));
+				var ch = A2(
+					$elm$core$Maybe$withDefault,
+					'_',
+					A2($elm$core$Array$get, 6, hashChars));
+				if ((pos >= 0) && (pos < 8)) {
+					var _v0 = A2(
+						$elm$core$Maybe$withDefault,
+						$elm$core$Maybe$Nothing,
+						A2($elm$core$Array$get, pos, model.o));
+					if (!_v0.$) {
+						return _Utils_update(
+							model,
+							{f: index + 1});
+					} else {
+						var p = A3(
+							$elm$core$Array$set,
+							pos,
+							$elm$core$Maybe$Just(ch),
+							model.o);
+						return _Utils_update(
+							model,
+							{f: index + 1, o: p});
+					}
+				} else {
+					var g = A3(
+						$elm$core$Array$set,
+						pos,
+						$elm$core$Maybe$Just(ch),
+						model.m);
+					return _Utils_update(
+						model,
+						{m: g, f: index + 1});
+				}
+			} else {
+				var hashChars = $elm$core$Array$fromList(
+					$elm$core$String$toList(hash));
+				var pos = A2(
+					$elm$core$Maybe$withDefault,
+					0,
+					$elm$core$String$toInt(
+						$elm$core$String$fromChar(
+							A2(
+								$elm$core$Maybe$withDefault,
+								'0',
+								A2($elm$core$Array$get, 5, hashChars)))));
+				var ch = A2(
+					$elm$core$Maybe$withDefault,
+					'_',
+					A2($elm$core$Array$get, pos, hashChars));
+				var g = A3(
+					$elm$core$Array$set,
+					pos,
+					$elm$core$Maybe$Just(ch),
+					model.m);
+				var m = _Utils_update(
+					model,
+					{m: g});
+				if (_Utils_cmp(index, model.f + 10000) < 0) {
+					var $temp$index = index + 1,
+						$temp$model = m;
+					index = $temp$index;
+					model = $temp$model;
+					continue hack2Loop;
+				} else {
+					return _Utils_update(
+						m,
+						{f: index + 1});
+				}
+			}
+		}
+	});
+var $author$project$Aoc05$hack2 = function (model) {
+	return A2($author$project$Aoc05$hack2Loop, model.f, model);
 };
 var $author$project$Aoc05$updateStep = function (model) {
-	return $author$project$Aoc05$hack1(model);
+	return model.x ? $author$project$Aoc05$hack2(model) : $author$project$Aoc05$hack1(model);
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc05$updateTogglePlay = function (model) {
-	if (model.M) {
-		var m = $author$project$Aoc05$initModel(model.N);
+	if (model.O) {
+		var m = $author$project$Aoc05$initModel(model.x);
 		return _Utils_update(
 			m,
-			{t: false});
+			{v: false});
 	} else {
 		return _Utils_update(
 			model,
-			{t: !model.t});
+			{v: !model.v});
 	}
+};
+var $author$project$Aoc05$updateToggleSecondDoor = function (model) {
+	var secondDoor = !model.x;
+	return $author$project$Aoc05$initModel(secondDoor);
 };
 var $author$project$Aoc05$update = F2(
 	function (msg, model) {
 		switch (msg) {
-			case 5:
+			case 6:
 				return _Utils_Tuple2(
 					$author$project$Aoc05$updateReset(model),
 					$elm$core$Platform$Cmd$none);
@@ -6349,29 +6450,34 @@ var $author$project$Aoc05$update = F2(
 				return _Utils_Tuple2(
 					$author$project$Aoc05$updateStep(model),
 					$elm$core$Platform$Cmd$none);
-			case 3:
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{v: model.v / 2}),
-					$elm$core$Platform$Cmd$none);
 			case 4:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{v: model.v * 2}),
+						{y: model.y / 2}),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 5:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{y: model.y * 2}),
+					$elm$core$Platform$Cmd$none);
+			case 2:
 				return _Utils_Tuple2(
 					$author$project$Aoc05$updateTogglePlay(model),
 					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					$author$project$Aoc05$updateToggleSecondDoor(model),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Aoc05$Faster = 3;
-var $author$project$Aoc05$Reset = 5;
-var $author$project$Aoc05$Slower = 4;
+var $author$project$Aoc05$Faster = 4;
+var $author$project$Aoc05$Reset = 6;
+var $author$project$Aoc05$Slower = 5;
 var $author$project$Aoc05$Step = 1;
 var $author$project$Aoc05$TogglePlay = 2;
+var $author$project$Aoc05$ToggleSecondDoor = 3;
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -6383,6 +6489,15 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$align = $elm$html$Html$Attributes$stringProperty('align');
 var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$Attributes$href = function (url) {
 	return A2(
@@ -6390,6 +6505,8 @@ var $elm$html$Html$Attributes$href = function (url) {
 		'href',
 		_VirtualDom_noJavaScriptUri(url));
 };
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 0, a: a};
 };
@@ -6438,8 +6555,8 @@ var $author$project$Aoc05$getChar = F3(
 		}
 	});
 var $author$project$Aoc05$toPasswordString = function (model) {
-	var p = model.y;
-	var g = model.C;
+	var p = model.o;
+	var g = model.m;
 	return $elm$core$String$fromList(
 		A2(
 			$elm$core$List$map,
@@ -6447,6 +6564,7 @@ var $author$project$Aoc05$toPasswordString = function (model) {
 			A2($elm$core$List$range, 0, 7)));
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Aoc05$viewBody = function (model) {
 	var pwd = $author$project$Aoc05$toPasswordString(model);
 	var pwdElement = A2(
@@ -6456,7 +6574,7 @@ var $author$project$Aoc05$viewBody = function (model) {
 			[
 				$elm$html$Html$text(pwd)
 			]));
-	var dbgStr = $elm$core$String$fromInt(model.r);
+	var dbgStr = $elm$core$String$fromInt(model.f);
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
@@ -6620,7 +6738,7 @@ var $author$project$Aoc05$viewBody = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick(5)
+										$elm$html$Html$Events$onClick(6)
 									]),
 								_List_fromArray(
 									[
@@ -6631,7 +6749,7 @@ var $author$project$Aoc05$viewBody = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick(4)
+										$elm$html$Html$Events$onClick(5)
 									]),
 								_List_fromArray(
 									[
@@ -6646,14 +6764,14 @@ var $author$project$Aoc05$viewBody = function (model) {
 									]),
 								_List_fromArray(
 									[
-										model.t ? $elm$html$Html$text('Find next') : $elm$html$Html$text('Pause')
+										model.v ? $elm$html$Html$text('Find next') : $elm$html$Html$text('Pause')
 									])),
 								A2(
 								$elm$html$Html$button,
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick(3)
+										$elm$html$Html$Events$onClick(4)
 									]),
 								_List_fromArray(
 									[
@@ -6669,6 +6787,37 @@ var $author$project$Aoc05$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text('Step')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('checkbox'),
+										$elm$html$Html$Events$onClick(3),
+										$elm$html$Html$Attributes$checked(model.x)
+									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(' Improved mechanism')
 									]))
 							]))
 					])),

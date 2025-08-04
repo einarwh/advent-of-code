@@ -68,34 +68,10 @@ type Msg =
   Tick 
   | Step 
   | TogglePlay 
+  | ToggleSecondDoor
   | Faster 
   | Slower 
   | Reset 
-
--- let hack1 (doorId : string) = 
---     let rec fn (charsFound : char list) (charsLeft : int) (index : int) (doorId : string) = 
---         if charsLeft > 0 then 
---             let input = doorId + index.ToString()
---             let hash = toHexHash input
---             if hash.StartsWith "00000" then 
---                 let ch = Char.ToLower(hash[5])
---                 printf "%c" ch
---                 fn (ch :: charsFound) (charsLeft - 1) (index + 1) doorId 
---             else 
---                 fn charsFound charsLeft (index + 1) doorId 
---         else 
---             printfn ""
---     fn [] 8 0 doorId
-
-updatePasswords : Bool -> Array Char -> Int -> (Password, Password) -> (Password, Password)
-updatePasswords interesting hashChars pos (password, guess) = 
-  let 
-    ch = Array.get 5 hashChars |> Maybe.withDefault '_'
-  in 
-    if interesting then 
-      (password |> Array.set pos (Just ch), guess)
-    else 
-      (password, guess |> Array.set pos (Just ch))
 
 findPos : Int -> List (Maybe Char) -> Int 
 findPos i maybeChars = 
@@ -106,6 +82,7 @@ findPos i maybeChars =
         Nothing -> i 
         Just _ -> findPos (i + 1) rest 
 
+hack1Loop : Int -> Int -> Model -> Model 
 hack1Loop pos index model = 
   let 
     doorCode = model.doorId ++ String.fromInt index 
@@ -128,11 +105,54 @@ hack1Loop pos index model =
       in 
         { model | guess = g, index = index + 1 }
 
+hack1 : Model -> Model
 hack1 model = 
   let 
     pos = model.password |> Array.toList |> findPos 0
   in 
     hack1Loop pos model.index model 
+
+hack2Loop : Int -> Model -> Model 
+hack2Loop index model = 
+  let 
+    doorCode = model.doorId ++ String.fromInt index 
+    hash = MD5.hex doorCode
+  in 
+    if String.startsWith "00000" hash then
+      let 
+        hashChars = hash |> String.toList |> Array.fromList 
+        pos = hashChars |> Array.get 5 |> Maybe.withDefault 'a' |> String.fromChar |> String.toInt |> Maybe.withDefault -1
+        ch = hashChars |> Array.get 6 |> Maybe.withDefault '_'
+      in 
+        if pos >= 0 && pos < 8 then 
+          case model.password |> Array.get pos |> Maybe.withDefault Nothing of 
+            Just _ -> { model | index = index + 1 }
+            Nothing -> 
+              let 
+                p = model.password |> Array.set pos (Just ch)
+              in 
+                { model | password = p, index = index + 1 }
+        else 
+          let 
+            g = model.guess |> Array.set pos (Just ch)
+          in 
+            { model | guess = g, index = index + 1 }
+    else 
+      let 
+        hashChars = hash |> String.toList |> Array.fromList 
+        pos = hashChars |> Array.get 5 |> Maybe.withDefault '0' |> String.fromChar |> String.toInt |> Maybe.withDefault 0
+        ch = hashChars |> Array.get pos |> Maybe.withDefault '_'
+        g = model.guess |> Array.set pos (Just ch)
+        m = { model | guess = g }
+      in 
+        if index < model.index + 10000 then 
+          hack2Loop (index + 1) m
+        else 
+          { m | index = index + 1 }
+
+hack2 : Model -> Model
+hack2 model = 
+  hack2Loop model.index model 
 
 updateReset : Model -> Model
 updateReset model = 
@@ -140,7 +160,7 @@ updateReset model =
 
 updateStep : Model -> Model
 updateStep model = 
-  hack1 model  
+  if model.secondDoor then hack2 model else hack1 model 
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -151,6 +171,13 @@ updateTogglePlay model =
       {m | paused = False }
   else 
     { model | paused = not model.paused }
+
+updateToggleSecondDoor : Model -> Model
+updateToggleSecondDoor model = 
+  let
+    secondDoor = not model.secondDoor
+  in
+    initModel secondDoor
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -167,6 +194,8 @@ update msg model =
       ({model | tickInterval = model.tickInterval * 2 }, Cmd.none)
     TogglePlay -> 
       (updateTogglePlay model, Cmd.none)
+    ToggleSecondDoor -> 
+      (updateToggleSecondDoor model, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -275,6 +304,15 @@ viewBody model =
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Step ] 
                 [ Html.text "Step" ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center" ]
+              [ Html.input 
+                [ Html.Attributes.type_ "checkbox", onClick ToggleSecondDoor, Html.Attributes.checked model.secondDoor ] 
+                []
+              , Html.label [] [ Html.text " Improved mechanism" ]
             ] ]
       , Html.tr 
           []
