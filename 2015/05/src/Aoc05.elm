@@ -1291,7 +1291,7 @@ viewBody model =
               , Html.Attributes.style "padding-bottom" "10px" ]
               [ Html.a 
                 [ Html.Attributes.href "https://adventofcode.com/2015/day/5" ] 
-                [ Html.text "https://adventofcode.com/2015/day/05" ]
+                [ Html.text "https://adventofcode.com/2015/day/5" ]
             ] ]
       , Html.tr 
           []

@@ -1235,7 +1235,7 @@ toReportHtmlElement report =
 
 view : Model -> Document Msg
 view model = 
-  { title = "Advent of Code 2015 | Day 5: Doesn't He Have Intern-Elves For This?"
+  { title = "Advent of Code 2015 | Day 6: Probably a Fire Hazard"
   , body = [ viewBody model ] }
 
 viewBody : Model -> Html Msg
@@ -1262,7 +1262,7 @@ viewBody model =
               , Html.Attributes.style "font-size" "32px"
               , Html.Attributes.style "padding" "10px"]
               [ Html.div [] [Html.text "Advent of Code 2015" ]
-              , Html.div [] [Html.text "Day 5: Doesn't He Have Intern-Elves For This?" ] ] ]
+              , Html.div [] [Html.text "Day 6: Probably a Fire Hazard" ] ] ]
       , Html.tr 
           []
           [ Html.td 
@@ -1290,8 +1290,8 @@ viewBody model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding-bottom" "10px" ]
               [ Html.a 
-                [ Html.Attributes.href "https://adventofcode.com/2015/day/5" ] 
-                [ Html.text "https://adventofcode.com/2015/day/05" ]
+                [ Html.Attributes.href "https://adventofcode.com/2015/day/6" ] 
+                [ Html.text "https://adventofcode.com/2015/day/6" ]
             ] ]
       , Html.tr 
           []
