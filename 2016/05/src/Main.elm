@@ -6,6 +6,7 @@ import Html.Attributes
 import Html.Events exposing (onClick)
 import Html exposing (text)
 import Array exposing (Array)
+import MD5
 import Time
 
 defaultTickInterval : Float
@@ -24,175 +25,161 @@ main =
 
 type DataSource = Input | Sample 
 
-type alias Pos = (Int, Int)
+type alias Password = Array (Maybe Char)
 
 type alias Model = 
-  { password : String
+  { doorId : String 
+  , password : Password
+  , guess : Password 
+  , index : Int
+  , improvedMechanism : Bool 
   , paused : Bool 
+  , finished : Bool 
   , tickInterval : Float 
   , message : String
   , debug : String }
 
 input : String
-input = "hxbxwxba"
+input = "uqwqemis"
 
-initModel : Model 
-initModel = 
+initModel : Bool -> Model 
+initModel improvedMechanism = 
   let 
-    password = input
+    blank = Array.repeat 8 Nothing 
   in 
-    { password = input
+    { doorId = input
+    , password = blank 
+    , guess = blank
+    , index = 0
+    , improvedMechanism = improvedMechanism 
     , paused = True
+    , finished = False 
     , tickInterval = defaultTickInterval
     , message = ""
     , debug = "" }
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel, Cmd.none)
+  (initModel False, Cmd.none)
 
 -- UPDATE
 
 type Msg = 
   Tick 
-  | Step 
-  | NextValid 
   | TogglePlay 
-  | Faster 
-  | Slower 
+  | ToggleImprovedMechanism
   | Reset 
+
+findPos : Int -> List (Maybe Char) -> Int 
+findPos i maybeChars = 
+  case maybeChars of 
+    [] -> i 
+    h :: rest -> 
+      case h of 
+        Nothing -> i 
+        Just _ -> findPos (i + 1) rest 
+
+hack1Loop : Int -> Int -> Model -> Model 
+hack1Loop pos index model = 
+  let 
+    doorCode = model.doorId ++ String.fromInt index 
+    hash = MD5.hex doorCode
+  in 
+    if String.startsWith "00000" hash then
+      let 
+        hashChars = hash |> String.toList |> Array.fromList 
+        ch = hashChars |> Array.get 5 |> Maybe.withDefault '_'
+        p = model.password |> Array.set pos (Just ch)
+      in 
+        { model | password = p, index = index + 1 }
+    else if index < model.index + 10000 then 
+      hack1Loop pos (index + 1) model 
+    else 
+      let 
+        hashChars = hash |> String.toList |> Array.fromList 
+        ch = hashChars |> Array.get 5 |> Maybe.withDefault '_'
+        g = model.guess |> Array.set pos (Just ch)
+      in 
+        { model | guess = g, index = index + 1 }
+
+hack1 : Model -> Model
+hack1 model = 
+  let 
+    pos = model.password |> Array.toList |> findPos 0
+  in 
+    hack1Loop pos model.index model 
+
+hack2Loop : Int -> Model -> Model 
+hack2Loop index model = 
+  let 
+    doorCode = model.doorId ++ String.fromInt index 
+    hash = MD5.hex doorCode
+  in 
+    if String.startsWith "00000" hash then
+      let 
+        hashChars = hash |> String.toList |> Array.fromList 
+        pos = hashChars |> Array.get 5 |> Maybe.withDefault 'a' |> String.fromChar |> String.toInt |> Maybe.withDefault -1
+        ch = hashChars |> Array.get 6 |> Maybe.withDefault '_'
+      in 
+        if pos >= 0 && pos < 8 then 
+          case model.password |> Array.get pos |> Maybe.withDefault Nothing of 
+            Just _ -> { model | index = index + 1 }
+            Nothing -> 
+              let 
+                p = model.password |> Array.set pos (Just ch)
+              in 
+                { model | password = p, index = index + 1 }
+        else 
+          let 
+            g = model.guess |> Array.set pos (Just ch)
+          in 
+            { model | guess = g, index = index + 1 }
+    else 
+      let 
+        hashChars = hash |> String.toList |> Array.fromList 
+        pos = hashChars |> Array.get 5 |> Maybe.withDefault '0' |> String.fromChar |> String.toInt |> Maybe.withDefault 0
+        ch = hashChars |> Array.get pos |> Maybe.withDefault '_'
+        g = model.guess |> Array.set pos (Just ch)
+        m = { model | guess = g }
+      in 
+        if index < model.index + 10000 then 
+          hack2Loop (index + 1) m
+        else 
+          { m | index = index + 1 }
+
+hack2 : Model -> Model
+hack2 model = 
+  hack2Loop model.index model 
 
 updateReset : Model -> Model
 updateReset model = 
-  initModel
-
-nextChar : Char -> Char 
-nextChar ch = 
-  if ch == 'z' then 'a'
-  else 
-    ch |> Char.toCode |> \n -> n + 1 |> Char.fromCode
-
-nextIncLoop : Int -> Array Char -> Array Char 
-nextIncLoop index chars = 
-  if index < 0 then chars 
-  else 
-    let 
-      ch = chars |> Array.get index |> Maybe.withDefault 'a'
-    in 
-      if ch == 'z' then 
-        chars |> Array.set index 'a' |> nextIncLoop (index - 1)
-      else 
-        chars |> Array.set index (nextChar ch)
-
-nextIncremental : String -> String 
-nextIncremental password = 
-  let 
-    len = String.length password 
-  in 
-    password |> String.toList |> Array.fromList |> nextIncLoop (len - 1) |> Array.toList |> String.fromList 
-
-indexOfLoop : Int -> a -> List a -> Maybe Int 
-indexOfLoop ix element list = 
-  case list of 
-    [] -> Nothing 
-    h :: t -> 
-      if h == element then Just ix 
-      else 
-        indexOfLoop (ix + 1) element t 
-
-indexOf : a -> List a -> Maybe Int
-indexOf element list =
-  indexOfLoop 0 element list 
-
-nextWithoutLetter : Char -> String-> String 
-nextWithoutLetter c s = 
-  let 
-    chars = s |> String.toList 
-  in 
-    case indexOf c chars of 
-      Just ix -> 
-        let 
-          before = s |> String.left ix 
-          afterLen = String.length s - (ix + 1)
-          after = List.repeat afterLen 'a' |> String.fromList 
-        in 
-          before ++ String.fromChar (nextChar c) ++ after 
-      Nothing -> 
-        s
-
-nextPassword : String -> String  
-nextPassword password =
-  password |> nextIncremental |>  nextWithoutLetter 'i' |> nextWithoutLetter 'o' |> nextWithoutLetter 'l'
-
-hasIncreasingSequenceLoop : List Char -> Bool 
-hasIncreasingSequenceLoop chars = 
-  case chars of 
-    a :: b :: c :: rest -> 
-      let 
-        aVal = a |> Char.toCode 
-        bVal = b |> Char.toCode 
-        cVal = c |> Char.toCode 
-      in 
-        if bVal - aVal == 1 && cVal - bVal == 1 then 
-          True 
-        else 
-          hasIncreasingSequenceLoop (b :: c :: rest)
-    _ -> False 
-
-hasIncreasingSequence : String -> Bool 
-hasIncreasingSequence s = 
-  s |> String.toList |> hasIncreasingSequenceLoop
-
-hasOverlappingPairsLoop : Int -> List Char -> Bool 
-hasOverlappingPairsLoop count chars = 
-  case chars of 
-    a :: b :: rest -> 
-      if a == b then 
-        if count == 1 then True 
-        else 
-          hasOverlappingPairsLoop (count + 1) rest 
-      else 
-        hasOverlappingPairsLoop count (b :: rest)
-    _ -> False
-
-hasOverlappingPairs : String -> Bool 
-hasOverlappingPairs s = 
-  s |> String.toList |> hasOverlappingPairsLoop 0
-
-isCompliant : String -> Bool 
-isCompliant password = 
-  hasIncreasingSequence password && hasOverlappingPairs password
+  initModel model.improvedMechanism
 
 updateStep : Model -> Model
 updateStep model = 
-  let  
-    nextPwd = nextPassword model.password
-  in 
-    if isCompliant nextPwd then 
-      { model | password = nextPwd, paused = True, message = "FOUND" } 
-    else 
-      { model | password = nextPwd, message = nextPwd }
-
-stepUntilValid : Model -> Model 
-stepUntilValid model = 
   let 
-    pwd = model.password 
+    m = if model.improvedMechanism then hack2 model else hack1 model 
+    count = m.password |> Array.toList |> List.filterMap identity |> List.length 
+    finished = count == 8
   in 
-    if isCompliant pwd then 
-      { model | message = "compliant: " ++ pwd }
-    else 
-      let 
-        m = updateStep model 
-      in 
-        stepUntilValid m
-
-updateNextValid : Model -> Model
-updateNextValid model = 
-  model |> updateStep |> stepUntilValid
+    { m | finished = finished, paused = finished }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
-  { model | paused = not model.paused }
+  if model.finished then 
+    let 
+      m = initModel model.improvedMechanism
+    in 
+      {m | paused = False }
+  else 
+    { model | paused = not model.paused }
+
+updateToggleImprovedMechanism : Model -> Model
+updateToggleImprovedMechanism model = 
+  let
+    improvedMechanism = not model.improvedMechanism
+  in
+    initModel improvedMechanism
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -201,40 +188,49 @@ update msg model =
       (updateReset model, Cmd.none)
     Tick ->
       (updateStep model, Cmd.none)
-    Step ->
-      (updateStep model, Cmd.none)
-    Faster -> 
-      ({model | tickInterval = model.tickInterval / 2 }, Cmd.none)
-    Slower -> 
-      ({model | tickInterval = model.tickInterval * 2 }, Cmd.none)
     TogglePlay -> 
       (updateTogglePlay model, Cmd.none)
-    NextValid -> 
-      (updateNextValid model, Cmd.none)
+    ToggleImprovedMechanism -> 
+      (updateToggleImprovedMechanism model, Cmd.none)
 
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
   let 
-    tickSub = if model.paused then Sub.none else Time.every model.tickInterval (\_ -> Tick)
+    tickSub = if model.paused || model.finished then Sub.none else Time.every model.tickInterval (\_ -> Tick)
   in 
     tickSub
 
 -- VIEW
 
-getPwdStyle : Bool -> List (Html.Attribute msg)
-getPwdStyle compliant = 
-  if compliant then 
-    [ Html.Attributes.class "mark-ok adaptive" ]
-  else
-    [ Html.Attributes.class "mark-err adaptive" ]
+getChar : Password -> Password -> Int -> Char 
+getChar p g index = 
+  let 
+    pChar = p |> Array.get index |> Maybe.withDefault Nothing 
+    gChar = g |> Array.get index |> Maybe.withDefault Nothing 
+  in 
+    case pChar of 
+      Just pc -> pc 
+      Nothing -> 
+        case gChar of 
+          Just gc -> gc 
+          Nothing -> '_'
+
+toPasswordString : Model -> String
+toPasswordString model = 
+  let 
+    p = model.password 
+    g = model.guess 
+  in 
+    List.range 0 7 |> List.map (getChar p g) |> String.fromList 
 
 view : Model -> Html Msg
 view model =
   let
-    pwd = model.password
-    pwdElement = Html.span (getPwdStyle (isCompliant pwd)) [ Html.text pwd ]
+    pwd = toPasswordString model 
+    pwdElement = Html.span [] [ Html.text pwd ]
+    dbgStr = String.fromInt model.index
   in 
     Html.table 
       [ Html.Attributes.align "center"
@@ -247,26 +243,16 @@ view model =
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "32px"
               , Html.Attributes.style "padding" "20px"]
-              [ Html.div [] [Html.text "Advent of Code 2015" ]
-              , Html.div [] [Html.text "Day 11: Corporate Policy" ]
-              ] ]
+              [ Html.div [] [Html.text "Advent of Code 2016" ]
+              , Html.div [] [Html.text "Day 5: How About a Nice Game of Chess?" ] ] ]
       , Html.tr 
           []
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding-bottom" "10px" ]
               [ Html.a 
-                [ Html.Attributes.href "https://adventofcode.com/2015/day/11" ] 
-                [ Html.text "https://adventofcode.com/2015/day/11" ]
-            ] ]
-      , Html.tr 
-          []
-          [ Html.td 
-              [ Html.Attributes.align "center"
-              , Html.Attributes.style "padding" "10px" ]
-              [ Html.button 
-                [ Html.Attributes.style "width" "80px", onClick NextValid ] 
-                [ Html.text "Next valid"]
+                [ Html.Attributes.href "https://adventofcode.com/2016/day/5" ] 
+                [ Html.text "https://adventofcode.com/2016/day/5" ]
             ] ]
       , Html.tr 
           []
@@ -277,17 +263,17 @@ view model =
                 [ Html.Attributes.style "width" "80px", onClick Reset ] 
                 [ Html.text "Reset"]
               , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Slower ] 
-                [ text "Slower" ]
-              , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick TogglePlay ] 
-                [ if model.paused then text "Search" else text "Pause" ] 
-              , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Faster ] 
-                [ text "Faster" ]
-              , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Step ] 
-                [ Html.text "Step" ]
+                [ if model.paused then text "Hack door" else text "Pause" ] 
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center" ]
+              [ Html.input 
+                [ Html.Attributes.type_ "checkbox", onClick ToggleImprovedMechanism, Html.Attributes.checked model.improvedMechanism ] 
+                []
+              , Html.label [] [ Html.text " Improved mechanism" ]
             ] ]
       , Html.tr 
           []
@@ -298,5 +284,6 @@ view model =
               , Html.Attributes.style "padding" "10px" ] 
               [ 
                 pwdElement
+              -- , Html.div [] [ Html.text dbgStr ]
               ] ] 
               ]

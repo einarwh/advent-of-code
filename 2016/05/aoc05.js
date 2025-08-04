@@ -1,17 +1,3 @@
-<!DOCTYPE HTML>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Aoc05</title>
-  <style>body { padding: 0; margin: 0; }</style>
-</head>
-
-<body>
-
-<pre id="elm"></pre>
-
-<script>
-try {
 (function(scope){
 'use strict';
 
@@ -5249,9 +5235,9 @@ var $elm$core$Task$perform = F2(
 		return $elm$core$Task$command(
 			A2($elm$core$Task$map, toMessage, task));
 	});
-var $elm$browser$Browser$document = _Browser_document;
-var $author$project$Aoc05$defaultTickInterval = 10;
-var $author$project$Aoc05$input = 'uqwqemis';
+var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Main$defaultTickInterval = 10;
+var $author$project$Main$input = 'uqwqemis';
 var $elm$core$Array$repeat = F2(
 	function (n, e) {
 		return A2(
@@ -5261,18 +5247,18 @@ var $elm$core$Array$repeat = F2(
 				return e;
 			});
 	});
-var $author$project$Aoc05$initModel = function (improvedMechanism) {
+var $author$project$Main$initModel = function (improvedMechanism) {
 	var blank = A2($elm$core$Array$repeat, 8, $elm$core$Maybe$Nothing);
-	return {Y: '', N: $author$project$Aoc05$input, D: false, n: blank, v: improvedMechanism, f: 0, ae: '', m: blank, r: true, U: $author$project$Aoc05$defaultTickInterval};
+	return {Y: '', N: $author$project$Main$input, D: false, n: blank, v: improvedMechanism, f: 0, ae: '', m: blank, r: true, U: $author$project$Main$defaultTickInterval};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Aoc05$init = function (_v0) {
+var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		$author$project$Aoc05$initModel(false),
+		$author$project$Main$initModel(false),
 		$elm$core$Platform$Cmd$none);
 };
-var $author$project$Aoc05$Tick = 0;
+var $author$project$Main$Tick = 0;
 var $elm$time$Time$Every = F2(
 	function (a, b) {
 		return {$: 0, a: a, b: b};
@@ -5688,7 +5674,7 @@ var $elm$time$Time$every = F2(
 	});
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $author$project$Aoc05$subscriptions = function (model) {
+var $author$project$Main$subscriptions = function (model) {
 	var tickSub = (model.r || model.D) ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
 		model.U,
@@ -5697,8 +5683,8 @@ var $author$project$Aoc05$subscriptions = function (model) {
 		});
 	return tickSub;
 };
-var $author$project$Aoc05$updateReset = function (model) {
-	return $author$project$Aoc05$initModel(model.v);
+var $author$project$Main$updateReset = function (model) {
+	return $author$project$Main$initModel(model.v);
 };
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
@@ -5718,7 +5704,7 @@ var $elm$core$List$filterMap = F2(
 			_List_Nil,
 			xs);
 	});
-var $author$project$Aoc05$findPos = F2(
+var $author$project$Main$findPos = F2(
 	function (i, maybeChars) {
 		findPos:
 		while (true) {
@@ -6278,7 +6264,7 @@ var $elm$core$String$foldr = _String_foldr;
 var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
 };
-var $author$project$Aoc05$hack1Loop = F3(
+var $author$project$Main$hack1Loop = F3(
 	function (pos, index, model) {
 		hack1Loop:
 		while (true) {
@@ -6329,17 +6315,17 @@ var $author$project$Aoc05$hack1Loop = F3(
 			}
 		}
 	});
-var $author$project$Aoc05$hack1 = function (model) {
+var $author$project$Main$hack1 = function (model) {
 	var pos = A2(
-		$author$project$Aoc05$findPos,
+		$author$project$Main$findPos,
 		0,
 		$elm$core$Array$toList(model.m));
-	return A3($author$project$Aoc05$hack1Loop, pos, model.f, model);
+	return A3($author$project$Main$hack1Loop, pos, model.f, model);
 };
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
-var $author$project$Aoc05$hack2Loop = F2(
+var $author$project$Main$hack2Loop = F2(
 	function (index, model) {
 		hack2Loop:
 		while (true) {
@@ -6430,11 +6416,11 @@ var $author$project$Aoc05$hack2Loop = F2(
 			}
 		}
 	});
-var $author$project$Aoc05$hack2 = function (model) {
-	return A2($author$project$Aoc05$hack2Loop, model.f, model);
+var $author$project$Main$hack2 = function (model) {
+	return A2($author$project$Main$hack2Loop, model.f, model);
 };
-var $author$project$Aoc05$updateStep = function (model) {
-	var m = model.v ? $author$project$Aoc05$hack2(model) : $author$project$Aoc05$hack1(model);
+var $author$project$Main$updateStep = function (model) {
+	var m = model.v ? $author$project$Main$hack2(model) : $author$project$Main$hack1(model);
 	var count = $elm$core$List$length(
 		A2(
 			$elm$core$List$filterMap,
@@ -6446,13 +6432,13 @@ var $author$project$Aoc05$updateStep = function (model) {
 		{D: finished, r: finished});
 };
 var $elm$core$Basics$not = _Basics_not;
-var $author$project$Aoc05$updateToggleImprovedMechanism = function (model) {
+var $author$project$Main$updateToggleImprovedMechanism = function (model) {
 	var improvedMechanism = !model.v;
-	return $author$project$Aoc05$initModel(improvedMechanism);
+	return $author$project$Main$initModel(improvedMechanism);
 };
-var $author$project$Aoc05$updateTogglePlay = function (model) {
+var $author$project$Main$updateTogglePlay = function (model) {
 	if (model.D) {
-		var m = $author$project$Aoc05$initModel(model.v);
+		var m = $author$project$Main$initModel(model.v);
 		return _Utils_update(
 			m,
 			{r: false});
@@ -6462,30 +6448,30 @@ var $author$project$Aoc05$updateTogglePlay = function (model) {
 			{r: !model.r});
 	}
 };
-var $author$project$Aoc05$update = F2(
+var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg) {
 			case 3:
 				return _Utils_Tuple2(
-					$author$project$Aoc05$updateReset(model),
+					$author$project$Main$updateReset(model),
 					$elm$core$Platform$Cmd$none);
 			case 0:
 				return _Utils_Tuple2(
-					$author$project$Aoc05$updateStep(model),
+					$author$project$Main$updateStep(model),
 					$elm$core$Platform$Cmd$none);
 			case 1:
 				return _Utils_Tuple2(
-					$author$project$Aoc05$updateTogglePlay(model),
+					$author$project$Main$updateTogglePlay(model),
 					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(
-					$author$project$Aoc05$updateToggleImprovedMechanism(model),
+					$author$project$Main$updateToggleImprovedMechanism(model),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Aoc05$Reset = 3;
-var $author$project$Aoc05$ToggleImprovedMechanism = 2;
-var $author$project$Aoc05$TogglePlay = 1;
+var $author$project$Main$Reset = 3;
+var $author$project$Main$ToggleImprovedMechanism = 2;
+var $author$project$Main$TogglePlay = 1;
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -6540,7 +6526,7 @@ var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$core$String$fromList = _String_fromList;
-var $author$project$Aoc05$getChar = F3(
+var $author$project$Main$getChar = F3(
 	function (p, g, index) {
 		var pChar = A2(
 			$elm$core$Maybe$withDefault,
@@ -6562,19 +6548,19 @@ var $author$project$Aoc05$getChar = F3(
 			}
 		}
 	});
-var $author$project$Aoc05$toPasswordString = function (model) {
+var $author$project$Main$toPasswordString = function (model) {
 	var p = model.m;
 	var g = model.n;
 	return $elm$core$String$fromList(
 		A2(
 			$elm$core$List$map,
-			A2($author$project$Aoc05$getChar, p, g),
+			A2($author$project$Main$getChar, p, g),
 			A2($elm$core$List$range, 0, 7)));
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
-var $author$project$Aoc05$viewBody = function (model) {
-	var pwd = $author$project$Aoc05$toPasswordString(model);
+var $author$project$Main$view = function (model) {
+	var pwd = $author$project$Main$toPasswordString(model);
 	var pwdElement = A2(
 		$elm$html$Html$span,
 		_List_Nil,
@@ -6623,82 +6609,6 @@ var $author$project$Aoc05$viewBody = function (model) {
 									[
 										$elm$html$Html$text('Day 5: How About a Nice Game of Chess?')
 									]))
-							]))
-					])),
-				A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$td,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'padding-bottom', '10px')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2024/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2024')
-									])),
-								$elm$html$Html$text('] '),
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2023/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2023')
-									])),
-								$elm$html$Html$text('] '),
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2022/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2022')
-									])),
-								$elm$html$Html$text('] '),
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2021/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2021')
-									])),
-								$elm$html$Html$text('] '),
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2020/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2020')
-									])),
-								$elm$html$Html$text('] ')
 							]))
 					])),
 				A2(
@@ -6815,34 +6725,7 @@ var $author$project$Aoc05$viewBody = function (model) {
 					]))
 			]));
 };
-var $author$project$Aoc05$view = function (model) {
-	return {
-		az: _List_fromArray(
-			[
-				$author$project$Aoc05$viewBody(model)
-			]),
-		aN: 'Advent of Code 2016 | Day 5: How About a Nice Game of Chess?'
-	};
-};
-var $author$project$Aoc05$main = $elm$browser$Browser$document(
-	{aG: $author$project$Aoc05$init, aM: $author$project$Aoc05$subscriptions, aO: $author$project$Aoc05$update, aP: $author$project$Aoc05$view});
-_Platform_export({'Aoc05':{'init':$author$project$Aoc05$main(
+var $author$project$Main$main = $elm$browser$Browser$element(
+	{aG: $author$project$Main$init, aM: $author$project$Main$subscriptions, aO: $author$project$Main$update, aP: $author$project$Main$view});
+_Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
-
-  var app = Elm.Aoc05.init({ node: document.getElementById("elm") });
-}
-catch (e)
-{
-  // display initialization errors (e.g. bad flags, infinite recursion)
-  var header = document.createElement("h1");
-  header.style.fontFamily = "monospace";
-  header.innerText = "Initialization Error";
-  var pre = document.getElementById("elm");
-  document.body.insertBefore(header, pre);
-  pre.innerText = e;
-  throw e;
-}
-</script>
-
-</body>
-</html>

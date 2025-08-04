@@ -32,7 +32,7 @@ type alias Model =
   , password : Password
   , guess : Password 
   , index : Int
-  , secondDoor : Bool 
+  , improvedMechanism : Bool 
   , paused : Bool 
   , finished : Bool 
   , tickInterval : Float 
@@ -43,7 +43,7 @@ input : String
 input = "uqwqemis"
 
 initModel : Bool -> Model 
-initModel secondDoor = 
+initModel improvedMechanism = 
   let 
     blank = Array.repeat 8 Nothing 
   in 
@@ -51,7 +51,7 @@ initModel secondDoor =
     , password = blank 
     , guess = blank
     , index = 0
-    , secondDoor = secondDoor 
+    , improvedMechanism = improvedMechanism 
     , paused = True
     , finished = False 
     , tickInterval = defaultTickInterval
@@ -66,11 +66,8 @@ init _ =
 
 type Msg = 
   Tick 
-  | Step 
   | TogglePlay 
-  | ToggleSecondDoor
-  | Faster 
-  | Slower 
+  | ToggleImprovedMechanism
   | Reset 
 
 findPos : Int -> List (Maybe Char) -> Int 
@@ -156,28 +153,33 @@ hack2 model =
 
 updateReset : Model -> Model
 updateReset model = 
-  initModel model.secondDoor
+  initModel model.improvedMechanism
 
 updateStep : Model -> Model
 updateStep model = 
-  if model.secondDoor then hack2 model else hack1 model 
+  let 
+    m = if model.improvedMechanism then hack2 model else hack1 model 
+    count = m.password |> Array.toList |> List.filterMap identity |> List.length 
+    finished = count == 8
+  in 
+    { m | finished = finished, paused = finished }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
   if model.finished then 
     let 
-      m = initModel model.secondDoor
+      m = initModel model.improvedMechanism
     in 
       {m | paused = False }
   else 
     { model | paused = not model.paused }
 
-updateToggleSecondDoor : Model -> Model
-updateToggleSecondDoor model = 
+updateToggleImprovedMechanism : Model -> Model
+updateToggleImprovedMechanism model = 
   let
-    secondDoor = not model.secondDoor
+    improvedMechanism = not model.improvedMechanism
   in
-    initModel secondDoor
+    initModel improvedMechanism
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -186,16 +188,10 @@ update msg model =
       (updateReset model, Cmd.none)
     Tick ->
       (updateStep model, Cmd.none)
-    Step ->
-      (updateStep model, Cmd.none)
-    Faster -> 
-      ({model | tickInterval = model.tickInterval / 2 }, Cmd.none)
-    Slower -> 
-      ({model | tickInterval = model.tickInterval * 2 }, Cmd.none)
     TogglePlay -> 
       (updateTogglePlay model, Cmd.none)
-    ToggleSecondDoor -> 
-      (updateToggleSecondDoor model, Cmd.none)
+    ToggleImprovedMechanism -> 
+      (updateToggleImprovedMechanism model, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -293,24 +289,15 @@ viewBody model =
                 [ Html.Attributes.style "width" "80px", onClick Reset ] 
                 [ Html.text "Reset"]
               , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Slower ] 
-                [ text "Slower" ]
-              , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick TogglePlay ] 
-                [ if model.paused then text "Find next" else text "Pause" ] 
-              , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Faster ] 
-                [ text "Faster" ]
-              , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Step ] 
-                [ Html.text "Step" ]
+                [ if model.paused then text "Hack door" else text "Pause" ] 
             ] ]
       , Html.tr 
           []
           [ Html.td 
               [ Html.Attributes.align "center" ]
               [ Html.input 
-                [ Html.Attributes.type_ "checkbox", onClick ToggleSecondDoor, Html.Attributes.checked model.secondDoor ] 
+                [ Html.Attributes.type_ "checkbox", onClick ToggleImprovedMechanism, Html.Attributes.checked model.improvedMechanism ] 
                 []
               , Html.label [] [ Html.text " Improved mechanism" ]
             ] ]
