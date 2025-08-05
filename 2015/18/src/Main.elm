@@ -35,7 +35,6 @@ type alias Model =
   , steps : Int 
   , cornersStuckOn : Bool
   , paused : Bool 
-  , finished : Bool 
   , tickInterval : Float 
   , message : String
   , counter : Int 
@@ -188,7 +187,6 @@ initModel dataSource cornersStuckOn =
     , cornersStuckOn = cornersStuckOn
     , steps = 0 
     , paused = True
-    , finished = False 
     , tickInterval = defaultTickInterval
     , counter = 0
     , message = ""
@@ -284,26 +282,15 @@ checkCorners cornersStuckOn grid =
 
 updateStep : Model -> Model
 updateStep model = 
-  let  
-    steps = model.steps
+  let 
+    g = step model.cornersStuckOn model.grid 
+    pause = model.steps + 1 == 100 
   in 
-    if steps < 100 then 
-      let 
-        g = step model.cornersStuckOn model.grid 
-      in 
-        { model | steps = steps + 1, grid = g }
-    else 
-      { model | finished = True, paused = True } 
+    { model | steps = model.steps + 1, grid = g, paused = pause }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
-  if model.finished then 
-    let 
-      m = initModel model.dataSource model.cornersStuckOn
-    in 
-      {m | paused = False }
-  else 
-    { model | paused = not model.paused }
+  { model | paused = not model.paused }
 
 updateToggleCornersStuckOn : Model -> Model
 updateToggleCornersStuckOn model = 
@@ -347,7 +334,7 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
   let 
-    tickSub = if model.paused || model.finished then Sub.none else Time.every model.tickInterval (\_ -> Tick)
+    tickSub = if model.paused then Sub.none else Time.every model.tickInterval (\_ -> Tick)
   in 
     tickSub
 
@@ -428,7 +415,7 @@ view model =
                 [ text "Slower" ]
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick TogglePlay ] 
-                [ if model.paused then text "Play" else text "Pause" ] 
+                [ if model.paused then if model.steps == 0 then text "Play" else text "Resume" else text "Pause" ] 
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Faster ] 
                 [ text "Faster" ]
