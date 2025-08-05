@@ -27,6 +27,8 @@ main =
 
 -- MODEL
 
+type Viz = NoViz | SvgViz | ImgViz 
+
 type alias Pos = (Int, Int)
 
 type Instruction =
@@ -35,7 +37,8 @@ type Instruction =
     | Toggle (Pos, Pos)
 
 type alias Model = 
-  { bulbs : List (Pos, Int)
+  { viz : Viz 
+  , bulbs : List (Pos, Int)
   , instructions : List Instruction
   , instructionNumber : Int 
   , totalInstructionCount : Int 
@@ -396,18 +399,23 @@ tryParse s =
   else 
     Nothing
 
-initModel : Bool -> Model
-initModel useBrightness =
+initModel : Viz -> Bool -> Model
+initModel viz useBrightness =
   let 
+    tickInterval = 
+      case viz of 
+        NoViz -> 50
+        _ -> 500
     instructions = input |> String.split "\n" |> List.filterMap tryParse
-    model = { bulbs = getPositions (0, 0) (999, 999) |> List.map (\p -> (p, 0))
+    model = { viz = viz
+            , bulbs = getPositions (0, 0) (999, 999) |> List.map (\p -> (p, 0))
             , instructions = instructions
             , instructionNumber = 0
             , totalInstructionCount = List.length instructions
             , lastCommandText = "press play to start"
             , paused = True 
             , finished = False
-            , tickInterval = defaultTickInterval
+            , tickInterval = tickInterval
             , useBrightness = useBrightness
             , counter = 0
             , debug = "" }
@@ -417,7 +425,7 @@ initModel useBrightness =
 init : () -> (Model, Cmd Msg)
 init _ =
   let 
-    model = initModel False
+    model = initModel NoViz False
   in 
     (model, Cmd.none)
 
@@ -426,8 +434,12 @@ init _ =
 type Msg = 
   Tick 
   | Step 
+  | Solve 
   | TogglePlay 
   | ToggleBrightness
+  | UseNoViz
+  | UseSvgViz
+  | UseImgViz
   | Clear 
 
 getPositions : Pos -> Pos -> List Pos
@@ -439,7 +451,7 @@ getPositions (xMin, yMin) (xMax, yMax) =
     ys |> List.concatMap (\y -> xs |> List.map (\x -> (x, y)))
 
 updateClear : Model -> Model
-updateClear model = initModel model.useBrightness
+updateClear model = initModel NoViz model.useBrightness
 
 isInsideBounds : Pos -> Pos -> Pos -> Bool
 isInsideBounds (xMin, yMin) (xMax, yMax) (x, y) =
@@ -485,11 +497,27 @@ updateStep model =
       in 
         { model | instructions = t, bulbs = bulbs, debug = str, instructionNumber = num + 1 }
 
+updateSolveLoop : Model -> Model 
+updateSolveLoop model = 
+  case model.instructions of 
+    [] -> model 
+    _ -> model |> updateStep |> updateSolveLoop
+
+updateSolve : Model -> Model
+updateSolve model = 
+  if model.finished then 
+    let 
+      m = initModel model.viz model.useBrightness
+    in 
+      {m | paused = False }
+  else 
+    updateSolveLoop model 
+
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
   if model.finished then 
     let 
-      m = initModel model.useBrightness
+      m = initModel model.viz model.useBrightness
     in 
       {m | paused = False }
   else 
@@ -498,21 +526,34 @@ updateTogglePlay model =
 updateToggleBrightness : Model -> Model
 updateToggleBrightness model = 
   let
+    viz = model.viz 
     useBrightness = not model.useBrightness
   in
-    initModel useBrightness
+    initModel viz useBrightness
+
+updateViz : Viz -> Model -> Model
+updateViz viz model = 
+  initModel viz model.useBrightness
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Clear -> 
       (updateClear model, Cmd.none)
+    Solve -> 
+      (updateSolve model, Cmd.none)
     Tick ->
       (updateStep model, Cmd.none)
     Step ->
       (updateStep model, Cmd.none)
     TogglePlay -> 
       (updateTogglePlay model, Cmd.none)
+    UseNoViz -> 
+      (updateViz NoViz model, Cmd.none)
+    UseSvgViz -> 
+      (updateViz SvgViz model, Cmd.none)
+    UseImgViz -> 
+      (updateViz ImgViz model, Cmd.none)
     ToggleBrightness -> 
       (updateToggleBrightness model, Cmd.none)
 
@@ -632,14 +673,17 @@ toImage model =
     imageData = pixels |> Image.fromList 1000
     pngEncodeBase64Url = Image.toPngUrl imageData
   in 
-    Html.img [ Html.Attributes.src pngEncodeBase64Url ] []
+    Html.img [ Html.Attributes.width 500, Html.Attributes.src pngEncodeBase64Url ] []
 
 view : Model -> Html Msg
 view model =
   let
     count = model.bulbs |> List.map (\(_, c) -> c) |> List.sum 
-    svg = toSvg model 
-    -- svg = toImage model 
+    elements = 
+      case model.viz of 
+        NoViz -> []
+        SvgViz -> [ toSvg model ]
+        ImgViz -> [ toImage model ]
   in 
     Html.table 
       [ Html.Attributes.align "center"
@@ -667,10 +711,33 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "16px" ]
+              [ 
+                Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseNoViz, Html.Attributes.checked (model.viz == NoViz) ] 
+                []
+              , Html.label [] [ Html.text "None" ]
+              , Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseSvgViz, Html.Attributes.checked (model.viz == SvgViz) ] 
+                []
+              , Html.label [] [ Html.text "Svg" ]
+              , Html.input 
+                [ Html.Attributes.type_ "radio", onClick UseImgViz, Html.Attributes.checked (model.viz == ImgViz) ] 
+                []
+              , Html.label [] [ Html.text "Image" ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Clear ] 
                 [ Html.text "Clear"]
+              -- , Html.button 
+              --   [ Html.Attributes.style "width" "80px", onClick Solve ] 
+              --   [ if model.paused then text "Solve" else text "Solve" ] 
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick TogglePlay ] 
                 [ if model.paused then text "Play" else text "Pause" ] 
@@ -696,6 +763,7 @@ view model =
               [ 
                 Html.div [] [ Html.text (String.fromInt count) ]
               , Html.div [] [ Html.text (String.fromInt model.instructionNumber ++ " of " ++ String.fromInt model.totalInstructionCount) ]
+              , Html.label [] [ Html.text model.debug ]
               ] ]
       , Html.tr 
           []
@@ -704,12 +772,4 @@ view model =
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "24px"
               , Html.Attributes.style "padding" "10px" ] 
-              [ 
-                svg
-              ] ] 
-      , Html.tr 
-          []
-          [ Html.td 
-              [ Html.Attributes.align "center" ]
-              [ Html.label [] [ Html.text model.debug ]
-            ] ] ]
+              elements ] ]
