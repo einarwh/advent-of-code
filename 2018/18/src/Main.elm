@@ -1,6 +1,6 @@
 module Main exposing (..)
 
-import Browser
+import Browser 
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
@@ -27,147 +27,106 @@ main =
 
 type DataSource = Input | Sample 
 
+-- type Acre = Ground | Trees | Lumberyard 
+type alias Acre = Char
+
 type alias Pos = (Int, Int)
 
+type alias Area = Array2D Acre 
+
 type alias Model = 
-  { grid : Array2D Bool
+  { area : Area
   , dataSource : DataSource
+  , seen : Dict (List (List Acre)) Int
+  , answer : Maybe Int
   , steps : Int 
-  , cornersStuckOn : Bool
   , paused : Bool 
+  , finished : Bool 
   , tickInterval : Float 
   , message : String
   , counter : Int 
   , debug : String }
 
 sample : String
-sample = """.#.#.#
-...##.
-#....#
-..#...
-#.#..#
-####.."""
-
-sample2 : String 
-sample2 = """/>-<\\  
-|   |  
-| /<+-\\
-| | | v
-\\>+</ |
-  |   ^
-  \\<->/"""
+sample = """.#.#...|#.
+.....#|##|
+.|..|...#.
+..|#.....#
+#.#|||#|#|
+...#.||...
+.|....|...
+||...#|.#|
+|.||||..|.
+...#.|..|."""
 
 input : String
-input = """#...##......#......##.##..#...##......##.#.#.###.#.#..#..#......####..#......###.#.#....#..##..###..
-####..#.#...#....#.#####.##.##.#..#.......#....#.##...###.###..#.#.#........#..#.#.##...##..#.####.#
-...#..##...#.#.###.#.###..#.##.####.###...#...........#.###..##.#.##.#.###...#.#..###....#.###.#..#.
-.#...##...####.#..#.....#..#...#.#.##...#...##..#.#.###....#..###.....##..#.###..###.....##..###...#
-..##.#####....##..#.#..##.##..######...#..###.######.....#..##...#.#..##..##..#..#..#..##.#.#.#.#...
-.###.###.###...##...##..###..##.###.#.....##..##.#.#########...##..##.#..##.#..##..####..#.#.#.#####
-#.#####..###.###.##.##.#...#.#.#.#..#.###...#..##.###.#...####.#..#.#.....###..#..####..#.#.#...##..
-....#...##.....#....####.##.#.###..#.#.##..#.#...##.###.###..#.##..#.#.##..##..#.##.###..#.#.###.###
-##.##...#.##...#.#..#.#..#...###...###.#..#..#.#####..###.#......#.....###.#####.#.#..#.#.#.##..#.#.
-#.#..#.....#.....##.#..##...###..##...##...###.#.###.#..#.#.###...##..##..#.###...#.#######.#...#.#.
-#.#.....####.#..#.##...#.##....#####.###.#.....#####....###..#........##..####...#...#.###....#..###
-##.#.##..#.#.##.#.....##.#.....###.####.#..######.....####.#.#..##.#.##...#..#.#.....#.####.#.......
-#..#..#.#..#.######.##..##.####.....##.#.##.#.######..#.#....#.#...#.#..#..#.#.###.#..#.#.#..#...###
-####..####.#.#.###.....#.#.#.##..#.##.##.##.#..##..##.#.##.....#.#..#.####.....###.#..#.####.#.#..##
-###.##..##.#.##..#..##...#.#####.##.#....##.####.#.##....#..###.#.#.##...#.....#.#.#.#.#..##.#.#..#.
-......#..####...##.##...#.##.##...##..#..##.###..#...#..##...#.#....###.####...#.##.###.#.##.####.##
-..#...#####.#.#..#.##....#..#...#..####.....###...##.###....#..#.###...#........#.#.##..#..#.#.....#
-#######.#.#.###.###..######.##..#####.##.###.###....####.#..##.##...###.#..############.#.##....##.#
-#.#...##.###.#.###..#.#.#.#.#.#..##..####.#..##.....#.##..#.##...##.#..##..#.#.#....##....##.#..#.#.
-..#.#.####.....###..#######.#.#.#.#...##.#####.....##...##...##.###..######.###..#...####.#..###.###
-.#.##....#.#.##..##.#.##.##..######...#.....#..#.#.#.#.....#.#..##.#.#.......#######....#.......#...
-..###.##.##..##....#.###...#.....##..##......###...##..###.##...##.###.#.#.#.###.###.#.#...###..#...
-.##.#.#...#...##.#.#...#..#..#.#...##.#.##...##..#....#.#..##.#..#.#..#.#.....#..#.#...#######.#.##.
-...####....#.###.#..###..##...##..#.#.#.###...#..##.##.##..##.#...#..#.##.....#.#........#..#.#.####
-.....##..###...#....#.#.#.#...###.###...#.#...#.#.####....#..####...###..#..######..##.##..###.#####
-#####.##..#....###.###....##.....#.#..#....#.#####.##.#.####.#.##...#..###...###..##...#.###.#####..
-###.##..........########.######....####.###.#..##...#.##.####.#.....##..#####..###...#####.....#.#.#
-##..#####.##.#.#####.#.##.##..#.##....########.#####.#...#.###.##...#.###.#.#..#....##.#..#...#.#.#.
-.##.#....#..#...#..#####..#..##.#......#..#....########...#..#...#.....####.#...##...#.###.#.#..##.#
-.##.##.#.##.#.##...#.#.#..##.##.###.#..##..#...###.##.###.#####.#.###..#..###.#...#.###.#...#..#.#.#
-.#..#..#.#..#..###..#....###.####.##.#.###.#.##.###.#.##.###.###...###...###.#...####...#.##.##.#.#.
-###..##...###...#..##.#..#.#...##....###.##.##..#####....###..#..#....#..###.###.#...#.##...#.#.#..#
-#....#.......##.....#.##...#..#.###.#.##..##..#.##..#.###..##.##...#####.#..#####..#####..#####....#
-.####.####....###..###.#.##.####.##.#...####.#.###.#.....#...####..#####.###..#.#.###.##.##...##..#.
-####..##...##.########...##..###..#..###.##.#.#.#........#.#####.#...#.###.####.#..####..#.#.#....##
-###.#..#...###.#..#..#.###...##..###.##.#.#...#..#...####..##....#.#..#..##.#.#...#####.###.#..#.#.#
-...##....#.###.#.#..##...##.###.#..#..#......#...#.#..####.#.##..######.####.#...#..#..#..##.#.#.##.
-##.####.#...#..#.#.##..##.#.#.###..##...####......#..######.#......#.##.#....##...###.#.#..#......##
-#.....#...#######.##.#..#.#...###.#..#.####....#.#.##.#.##...###..#...#.###.##..#.###..#.##...#####.
-#####.##...#..#.#.#.......#.##..#####..#####...###..##.#.#..###.#.#####.####..#.#..##...#.##...#.###
-.##.#..#######.###.#.####.....##...#.##.#.#..#...##....####......######.#..######.....##########.##.
-##...#.#..#.##.###.#.#.#.##.###.##..##.##.##...#.#..###.#######..#.....#####..#....######.#..##..###
-.#.#.###.....#..##..#.#..##..#.###...###.#..##...#...#.#####.#.#####..###.#..#...##..#.#..#..####...
-.#......##..#.....####.###....##.###.....###.##........#.###.##..#..#.#######.#.######..##..###.....
-..##.#.#..#.##...#.###.###...######..#..#.#..#....###.#.#....#..........#...##.##.##.#..##..#.#####.
-###.###.#..#.##..##.#..#..##.....##.....#..#######.#..#.#.#.####.###..###.#.#..#.##.##.####.###.####
-#.#.#..#....########.#..#..#...##..#.##..#.#..##..####...##.....#.##.#.#...########..#.###.#..#.#.##
-.##.....#...#.#...##.##....###...##..#.####...#..#.#..#..#.##..#.###.##.####.##..####.....##.#.....#
-....####.#.##.#.##.#..##.#.######.##.####..#...####.#..###.#.#..#..##.#.#.....##.#####.#.####...#.#.
-#..#####.#####.....##....######..##....#..#.#.###.#####.....##.##.####.#...##...#.##.#.#####.##.#...
-##.####..###.#....#...#.#.#.#.###.#####.#.####..####...####......##..#..#..#.#.##...########....#...
-.###.#.#.#.#..####.##.#..######..#.#.###.....#.#......#.#.#.#..####.##...##.#####.#.##..##..#..#.#..
-.....###...#...#.####.###.#.#.#.#.....#....#.####.###.##.##.##.#######......#.####......#....##.....
-##..#..#.#.##..#...#..##.##.##..###.#....##.##....####.#.##.###....#.##.#.#.##...##.###...#..#..####
-...#.#..##..##.#...##.##...#.#......#.#.##..###....####.##...#.#.###.#..#..#.####..##..##..#####.###
-.##.##..##########.##...#.##.####.#.#######.##.#.##.##..#...##....########.###..##.##.##.#..##.#.#.#
-#####.#....#.##..#.....#......##.##..#.##.###..##.......###..##.#.###.##.###....####.#..#.###..#.#.#
-.#...#..#.##....##....#...####....#...#..#...####...########.###.#..##.#.#.##..###..#.#.###.....##.#
-##..##.....###......#..###.##.####.##.####.#.#....#..#...#..#.#..#.###.#...#...#..##.##...#..#######
-.....##..###..##...#####.#.#.....###.#.#..####...#.#.#..#..####..##.#..###.####.#....##..###....#..#
-#.#.##.#....#.#####.#....##...#...##...##....#.#.......#....#..#...###.###.#.####..####....#.##.#.#.
-..##...##..###.#.#.##.#..#....#.#.....##.###.#.###.###.....#...#.#..#######.#####..#.###...##......#
-#......###..#....#.#..#.###.##.#...##..###.####.#.#....#.##..#.###..##.#..#####..##.###.....#..###..
-##.#.##..##.###.#..##.....#.##.....###....##.####.######.#...#..###....#.#...#.##.....###....#..#.#.
-.##.#.#.#.##..#.#.#..##..#.###.####....#..###.######..####.#.....###.##..#...###.#..######.##.#.##..
-...##.####.#..##.#####.##.#...##..#..#...#.#.#.#####...#....#..###...#..#....#.#.##.#.######.#..####
-..#.#.#.#...#.######.#.....#..#.#..###....#.#.########...#....#.#.##..#...##...#.#..#.#.###....##...
-#####..#..##..#..##..#..#.#.##.#....#####.####.##.#.###..##..##....#.....#.#####.#...#.#####.##.#.#.
-#.#..#####...####.###.###.....####.###.....##...##...#..#..#######.#.##....##..####.....##...#..#..#
-#.#.###.#.#..##..#....#.#...#.#.##.##..#.##.....##...#.#..##.......##.#.###..#####.#.##....#.##.....
-...#.......#....#.#.####.#.###.###..#....#..##.#..####........#.##..#...#.#...###.#..#.#.#...#...#..
-...##.#####.##.#.###.##.##.#.##..##.#.#.#.#.#.##.#..##...##.#.#..#..##.##.#####.#.###...#####..#..#.
-#######.#..#..#....##.#.#..####.#..#..###...#..#.......###.#.#.####....#.###...#.#.###.#.#.#.#..###.
-..##.##.#.##.###....###.##.#.###.#...#....#.####..###..###.#.#..#...##.#.#.#..##.###..###.#.##...###
-######..######..##..##.#.#.##.##.#..##..#.#.#.##..#.#...#...#.#.#..######.#..#.#.######..#......##.#
-#.#####.....#.......#########..###.##...#...##.#.#..#...#####...#...#..#.###.#..#.#...###.#.#.#...#.
-#....##....###...##.##.#...##.........##.#.#..#.#.##.#.######.#####..#..###.###.#...#.#.##.######...
-#.#...###.#.###.##.#.######.#######.###.##..#.#.#...######.##.####.##..#.#.#.#......##..##.........#
-..###..##....#.....##...#.#.###.#.#.....##.#...###.####.#...#...##..##.#.#.####..###...######....#.#
-..###.#.##.####.#..#.##....##..#####....#..##.##.#..#######...#.####...##.#.#.##.........#....#....#
-.##.#...#.####..#.#...#.##..######.##..##.#.###.##..###.###....##..#.##.##..##.#...###.##.##.###....
-#...###.###.#..#....#.......#..#.....###..#.###.##.##....#.####.#.####.##..##..#..#.....#....##.#.#.
-.##.#..#..#.##.......#.####.#######.....#.##.##.#.....#.#..#....######.#..###.##.##.....#.####..##.#
-###..#.###.#..####.....##....#..####....#.##.##..#...######.#########...#.#....##...###.#..#.##...#.
-#..###..##..#.#.##.###.#.#.##...###.#...##.##..#.###....###..#.#...#.###..######.#..#.###..#..#..#.#
-.#........##.#.###..###.#.#.##.....##.##.#.#...##..#.##....###..#.#.#.#.##....#.##..#.#...###...#...
-####.####..#....#.#.#..#..##.......##.####...###.##..#.#.##.#..##..######.......##.#.##..#...#.....#
-..#..#..###..##.##..######.#..###..###.#.##..##.#..#####.#.#.#.##..#.##..##.##......####.#..........
-...##.##..###.#...###....#.#.#.#.....#.##.....##...#...#......####...##.##....##.#..#.####.#..###.#.
-..#.....####.#.###.#####..#..###..#..#.#...#####...###.###....#.###..#...#..#..#.#..#.##..##.#.#....
-..##.#####...###.###.........#....##.####.##..#.#..#.#...#...##.##.##..#.#.##.########......#####...
-...###.#.#..#...#.###.###.......##.###.#..#.##########...#..#.#.#.##.#.###...######..#.#...###.##...
-.#.#.#######.#..##.##..##...#...####...#..#####.#..##...###.#.#...#.##...#......#..##.####..#.....##
-.##.##.#.#......#######..###.....##.#.##..###......#....####...#.###.#.##.#........#..#....##.....##
-#...#.###.#.##...##.####....#...#.###..#.#.....#.#....#.#.#.##...#.#..#####.#.#..#..#..#....#...####
-.....##...###......#####..##.##.##...##.#.#####..##...#.#.#.#.###...###.##.####..#.#..#.#..#.####.##
-#..#..##.#.##.#.##.#.#.#..###....###.##.#.##.#...#.#..#...#....###.#..#.#.######.#...####..#..##.#.#
-#..#.#..#...###.#..##.#...#...##.#......#...#..#..####..##.....#.###...#.#..#.#....#.#####.##.###...
-###....#.#..#.#..###..#.##......#...#..#..##.#..###..##..#..#.####..#...########..##.#.##.#.#.#...#.
-.#.#.##.##.###..#...#.#....#..#.##..#.#.#.#.##.##.#####...#........####..###..####.#####..#.##.#.##."""
+input = """.#||#|||##....|..#......|..#...##..|#....#|.......
+|..#..#....|.#|.|......||.|..#|...||#......|.....|
+..#|##.#.#.##...#..........#.#|...||.|..|##.#.|.||
+|.#.#|#.#.||...|...|||#|.#..#|..|#.#..##.|......#|
+#..|#|........|......##.|##..|..#|...#||.......|#.
+#...|#..#......##...##.|......|.#|#.|..|#.|#...|.#
+|#.....|.|.###..#...|....|..|.....|#..#..|.......#
+.....##.|........|...#...|#..|..##...|......||.|..
+#....#..|..#.........||.##..##|#.##.#....|...#.|.|
+...|..#.|.|#||..|#.||.....#|.#|.|#|.....#|#.###|##
+...|..#.||....||.#.|....|#...#|.||#.#..#...#...##.
+...||.|#......|...|#...#..|...||..|.#|.....##.|||.
+...|.#|.|#.|...#.....|.|...#|.|.........|||.|.##.|
+..|..|#..|........#.|#.||.#|..#.|....||...|.|.#...
+.|.|...#.|.#..........|..|........#|.|....|..|....
+|...|.#..|..||#.||#........|...|.|.|..|.#|..|...|.
+..#.#..#|......#|.#....###...#.#..|..|.....|....#.
+..|||..#...|#|.##..#|#.#.#..|......#.....||.##.##.
+...|...#.|##..|..|.|.#.|||#|......|.|..|.||#.#..||
+||.....|..#|.#...|.|.#.||.....##...|.#...|#.#.##..
+.|.|.#|..#........#..||.|.#|...###|.#..#........||
+|.##......|.|||..|...##.|.....#|||....#...#||||.|.
+...#...|||.......#..|.#.||.|.......|#|..|..#.|....
+|..|#.............|...##|....|.#|..|#...|#...|.|..
+|.|....|#...|##...#.....|..|..|...||#..|...|.#..||
+...|.##.##....#.|#......##|...|..#.#....||||.||||.
+||.#....#..#...|.||||##.....#..##......#..||##.#..
+........#....|..#..#|#|....#..|..#.....##|...#.|..
+..#.|#.|.#.#..#.....|..#...###....|#...........#.|
+#.|#|.#...|.#.#.|..|....|..|.|.#|.#|#.............
+.||......|||||...||.#......|#...|#.|.|..#.|.#|....
+|.#|.#.|#.#..#.##......#.#|#.....#..#....#.##|.#..
+#.#..|....###..|..|.||..|#..|...|...#|##....|#.#..
+.|#...|..#|..#.|||.|..||...|..#.#...|..|#......#..
+.##...#||..|#.#...|.......|.##.....|..|.#..|.#.|.#
+#||##....#.|.||.#....|.#|..|.|.#....#..#...||.....
+......||.#|........#....||.##...#....|.||...|..##|
+#........|..#|.......#.#.#|..|...#..||||...|.....#
+....#||.##....|..##...##|.....|..#.#.....#..|.....
+.|.|#....|..|.#|#....#..|...|..#|#...#.||...#.#...
+#....|.|#||....#.#|#|.#..|.#.....##........|...|#.
+#...#...|..|.#....|..|.#....#.|#...#...#|.|.#.....
+....#.......#....##|.#.|....##..|||##.....#|.....#
+.....||||..|.#|#..|...|.#..|...#|...|.##||.#||....
+.||....#...|..#.|#.#.|#|#|..#.........##...||..|#.
+...|.#.#..........##...#|...|.##.|.|.||.#......#..
+...###.#..|..#.....#|#.#.|#.######|.|#.....###.|.#
+..##.....##...|..|....#|..||....|.|....#..|...|..#
+.|.##.#...|.|.||.||.|#.#.....||#.#|.#|.|..#|.#..|#
+.|...............#.#..#.##......#|||.|..||..#....#"""
 
-initGrid : DataSource -> Array2D Bool
-initGrid dataSource = 
+-- parseAcre : Char -> Acre 
+-- parseAcre ch = 
+--   case ch of 
+--     '#' -> Lumberyard
+--     '|' -> Trees 
+--     _ -> Ground 
+
+initArea : DataSource -> Area
+initArea dataSource = 
   let 
     data = 
       case dataSource of 
         Sample -> sample 
         Input -> input 
   in 
-    data |> String.split "\n" |> List.map (String.toList >> List.map (\ch -> ch == '#')) |> Array2D.fromList
+    data |> String.split "\n" |> List.map (String.toList) |> Array2D.fromList
 
 toIndexedList : Array2D Bool -> List (Pos, Bool)
 toIndexedList grid = 
@@ -177,16 +136,18 @@ toIndexedList grid =
   in 
     yRange |> List.concatMap (\y -> xRange |> List.map (\x -> ((x, y), Array2D.get y x grid |> Maybe.withDefault False)))
 
-initModel : DataSource -> Bool -> Model 
-initModel dataSource cornersStuckOn = 
+initModel : DataSource -> Model 
+initModel dataSource = 
   let 
-    grid = initGrid dataSource |> checkCorners cornersStuckOn
+    area = initArea dataSource
   in 
-    { grid = grid
+    { area = area
     , dataSource = dataSource
-    , cornersStuckOn = cornersStuckOn
+    , answer = Nothing
     , steps = 0 
+    , seen = Dict.empty
     , paused = True
+    , finished = False 
     , tickInterval = defaultTickInterval
     , counter = 0
     , message = ""
@@ -194,7 +155,7 @@ initModel dataSource cornersStuckOn =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel Input False, Cmd.none)
+  (initModel Input, Cmd.none)
 
 -- UPDATE
 
@@ -202,110 +163,145 @@ type Msg =
   Tick 
   | Step 
   | TogglePlay 
-  | ToggleCornersStuckOn
   | Faster 
   | Slower 
   | Clear 
   | UseSample 
   | UseInput 
 
-getAllPositions : Array2D Bool -> List Pos
-getAllPositions grid = 
+getAllPositions : Array2D a -> List Pos
+getAllPositions arr = 
   let
-    ys = List.range 0 (Array2D.rows grid - 1)
-    xs = List.range 0 (Array2D.columns grid - 1)
+    ys = List.range 0 (Array2D.rows arr - 1)
+    xs = List.range 0 (Array2D.columns arr - 1)
   in 
     ys |> List.concatMap (\y -> xs |> List.map (\x -> (x, y)))
 
-getNestedPositions : Array2D a -> List (List Pos)
-getNestedPositions grid = 
+serialize : Array2D Acre -> List (List Acre)
+serialize arr = 
   let
-    ys = List.range 0 (Array2D.rows grid - 1)
-    xs = List.range 0 (Array2D.columns grid - 1)
+    ys = List.range 0 (Array2D.rows arr - 1)
+    xs = List.range 0 (Array2D.columns arr - 1)
+  in 
+    ys |> List.map (\y -> xs |> List.filterMap (\x -> Array2D.get y x arr))
+
+deserialize : List (List Acre) -> Array2D Acre 
+deserialize = Array2D.fromList
+
+getNestedPositions : Array2D a -> List (List Pos)
+getNestedPositions arr = 
+  let
+    ys = List.range 0 (Array2D.rows arr - 1)
+    xs = List.range 0 (Array2D.columns arr - 1)
   in 
     ys |> List.map (\y -> xs |> List.map (\x -> (x, y)))
 
 updateClear : Model -> Model
 updateClear model = 
-  initModel model.dataSource model.cornersStuckOn
+  initModel model.dataSource 
 
 posToString : (Int, Int) -> String 
 posToString (x, y) = 
   String.fromInt x ++ "," ++ String.fromInt y
 
-isCorner : Array2D a -> (Int, Int) -> Bool
-isCorner grid (x, y) = 
-  let 
-    xMax = Array2D.rows grid - 1
-    yMax = Array2D.columns grid - 1
-  in 
-    (x == 0 && y == 0) || (x == xMax && y == 0) || (x == 0 && y == yMax) || (x == xMax && y == yMax)
-
-getNeighbours : Array2D Bool -> (Int, Int) -> List Bool
-getNeighbours grid (x, y) = 
+getNeighbours : Array2D a -> (Int, Int) -> List a
+getNeighbours arr (x, y) = 
   let 
     positions = [(x-1, y-1), (x, y-1), (x+1, y-1), (x-1,y), (x+1,y), (x-1, y+1), (x, y+1), (x+1, y+1)]
   in 
-    positions |> List.filterMap (\(xx, yy) -> Array2D.get yy xx grid)
+    positions |> List.filterMap (\(xx, yy) -> Array2D.get yy xx arr)
 
-turnOn cornersStuckOn grid pos = 
-  if cornersStuckOn && isCorner grid pos then True 
-  else 
-    let 
-      nbCount = getNeighbours grid pos |> List.filter identity |> List.length 
-      currentlyOn = isLightOn grid pos 
-    in 
-      (currentlyOn && (nbCount == 2 || nbCount == 3)) || (not currentlyOn && nbCount == 3)
-
-step : Bool -> Array2D Bool -> Array2D Bool 
-step cornersStuckOn grid = 
+getResourceValue : Area -> Int
+getResourceValue area = 
   let 
-    nestedPositions = getNestedPositions grid
-    g = nestedPositions |> List.map (\positions -> positions |> List.map (turnOn cornersStuckOn grid)) |> Array2D.fromList
+    acres = area |> getAllPositions |> List.filterMap (\(x, y) -> Array2D.get y x area)
+    trees = countAcre acres '|' 
+    lumberyards = countAcre acres '#' 
   in 
-    g
+    trees * lumberyards
 
-checkCorners : Bool -> Array2D Bool -> Array2D Bool 
-checkCorners cornersStuckOn grid = 
-  if cornersStuckOn then 
-    let 
-      xMax = Array2D.rows grid - 1
-      yMax = Array2D.columns grid - 1
-    in 
-      grid 
-      |> Array2D.set 0 0 True 
-      |> Array2D.set yMax 0 True 
-      |> Array2D.set 0 xMax True 
-      |> Array2D.set yMax xMax True 
-  else 
-    grid 
+countAcre : List Acre -> Acre -> Int 
+countAcre acres acre = 
+  acres |> List.filter (\a -> a == acre) |> List.length 
+
+evolveAcre : Area -> Pos -> Acre 
+evolveAcre area (x, y) = 
+  let 
+    neighbours = getNeighbours area (x, y) 
+  in 
+    case Array2D.get y x area |> Maybe.withDefault '.' of 
+      '|' -> if countAcre neighbours '#' >= 3 then '#' else '|' 
+      '#' -> if countAcre neighbours '#' > 0 && countAcre neighbours '|' > 0 then '#' else '.'
+      _ -> if countAcre neighbours '|' >= 3 then '|' else '.' 
+
+
+-- let evolveUntilRepeat maxSteps initialArea = 
+--     let rec loop (i : int) (seen : Map<Acre[,], int>) (area : Acre[,]) = 
+--         if Map.containsKey area seen then 
+--             let firstIndex = seen[area]
+--             let loopSize = i - firstIndex
+--             let numberInLoop = (maxSteps - firstIndex) % loopSize
+--             seen |> Map.toList |> List.find (fun (_, n) -> numberInLoop + firstIndex = n) |> fst
+--         else 
+--             if i < maxSteps then 
+--                 let positions = Area.getNestedPositions area 
+--                 let next = positions |> List.map (fun row -> row |> List.map (choose area)) |> Area.fromNestedList
+--                 loop (i + 1) (Map.add area i seen) next
+--             else 
+--                 area
+--     loop 0 Map.empty initialArea
+
+step : Area -> Area 
+step area = 
+  let 
+    nestedPositions = getNestedPositions area
+    nextArea = nestedPositions |> List.map (\positions -> positions |> List.map (evolveAcre area)) |> Array2D.fromList
+  in 
+    nextArea
 
 updateStep : Model -> Model
 updateStep model = 
-  let 
-    g = step model.cornersStuckOn model.grid 
-    pause = model.steps + 1 == 100 
+  let  
+    steps = model.steps
+    key = model.area |> serialize
+    (answer, seen, found) = 
+      case model.answer of 
+        Just _ -> (model.answer, model.seen, False) 
+        Nothing -> 
+          case Dict.get key model.seen of 
+            Nothing -> 
+              (Nothing, Dict.insert key steps model.seen, False)
+            Just oldSteps -> 
+              let 
+                loopSize = steps - oldSteps
+                numberInLoop = (1000000000 - oldSteps) |> modBy loopSize
+                targetKey = model.seen |> Dict.toList |> List.filterMap (\(k, v) -> if v == oldSteps + numberInLoop then Just k else Nothing) |> List.head |> Maybe.withDefault []
+                targetArea = deserialize targetKey
+                resourceValue = getResourceValue targetArea
+              in 
+                (Just resourceValue, model.seen, True)
+    a = step model.area 
+    pause = steps + 1 == 10 || found
   in 
-    { model | steps = model.steps + 1, grid = g, paused = pause }
+    { model | steps = steps + 1, area = a, answer = answer, seen = seen, paused = pause }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
-  { model | paused = not model.paused }
-
-updateToggleCornersStuckOn : Model -> Model
-updateToggleCornersStuckOn model = 
-  let
-    cornersStuckOn = not model.cornersStuckOn
-  in
-    initModel model.dataSource cornersStuckOn
+  if model.finished then 
+    let 
+      m = initModel model.dataSource
+    in 
+      {m | paused = False }
+  else 
+    { model | paused = not model.paused }
 
 updateUseSample : Model -> Model
 updateUseSample model = 
-  initModel Sample model.cornersStuckOn
+  initModel Sample 
 
 updateUseInput : Model -> Model
 updateUseInput model = 
-  initModel Input model.cornersStuckOn
+  initModel Input 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -322,8 +318,6 @@ update msg model =
       ({model | tickInterval = model.tickInterval * 2 }, Cmd.none)
     TogglePlay -> 
       (updateTogglePlay model, Cmd.none)
-    ToggleCornersStuckOn -> 
-      (updateToggleCornersStuckOn model, Cmd.none)
     UseSample -> 
       (updateUseSample model, Cmd.none)
     UseInput -> 
@@ -334,35 +328,49 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
   let 
-    tickSub = if model.paused then Sub.none else Time.every model.tickInterval (\_ -> Tick)
+    tickSub = if model.paused || model.finished then Sub.none else Time.every model.tickInterval (\_ -> Tick)
   in 
     tickSub
 
 -- VIEW
 
-isLightOn : Array2D Bool -> Pos -> Bool 
-isLightOn grid (x, y) = 
-  Array2D.get y x grid |> Maybe.withDefault False
+-- toAcreSymbol : Acre -> Char 
+-- toAcreSymbol acre = 
+--   case acre of 
+--     Lumberyard -> '#'
+--     Trees -> '|'
+--     Ground -> '.'
 
-toCharElement : Array2D Bool -> Pos -> Html Msg 
-toCharElement grid (x, y) = 
+getAcreSymbolAtPos : Area -> Pos -> Char 
+getAcreSymbolAtPos area (x, y) = 
+  case Array2D.get y x area of 
+    Just acre -> acre 
+    Nothing -> '.'
+
+toCharElement : Area -> Pos -> Html Msg 
+toCharElement area (x, y) = 
   let 
-    enabled = isLightOn grid (x, y)
+    symbol = getAcreSymbolAtPos area (x, y) |> String.fromChar
   in  
-    Html.text (if enabled then "#" else ".")
+    Html.text symbol
 
 view : Model -> Html Msg
 view model =
   let
-    grid = model.grid
-    nestedPositions = getNestedPositions grid
-    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement grid))
+    area = model.area
+    nestedPositions = getNestedPositions area
+    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement area))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
-    lightCount = getAllPositions grid |> List.filter (isLightOn grid) |> List.length
+    resourceValue = getResourceValue area 
+    prognosisStr =
+      case model.answer of 
+        Just prognosis -> String.fromInt prognosis
+        Nothing -> "?"
+    -- debugStr = model.seen |> Dict.size |> String.fromInt 
     textFontSize = 
       case model.dataSource of 
-        Sample -> "32px"
-        Input -> "9px"
+        Sample -> "24px"
+        Input -> "12px"
   in 
     Html.table 
       [ Html.Attributes.align "center"
@@ -375,16 +383,16 @@ view model =
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "32px"
               , Html.Attributes.style "padding" "20px"]
-              [ Html.div [] [Html.text "Advent of Code 2015" ]
-              , Html.div [] [Html.text "Day 18: Like a GIF For Your Yard" ] ] ]
+              [ Html.div [] [Html.text "Advent of Code 2018" ]
+              , Html.div [] [Html.text "Day 18: Settlers of The North Pole" ] ] ]
       , Html.tr 
           []
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding-bottom" "10px" ]
               [ Html.a 
-                [ Html.Attributes.href "https://adventofcode.com/2015/day/18" ] 
-                [ Html.text "https://adventofcode.com/2015/day/18" ]
+                [ Html.Attributes.href "https://adventofcode.com/2018/day/18" ] 
+                [ Html.text "https://adventofcode.com/2018/day/18" ]
             ] ]
       , Html.tr 
           []
@@ -409,13 +417,13 @@ view model =
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Clear ] 
-                [ Html.text "Clear"]
+                [ Html.text "Reset"]
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Slower ] 
                 [ text "Slower" ]
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick TogglePlay ] 
-                [ if model.paused then if model.steps == 0 then text "Play" else text "Resume" else text "Pause" ] 
+                [ if model.paused then text "Play" else text "Pause" ] 
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Faster ] 
                 [ text "Faster" ]
@@ -426,21 +434,14 @@ view model =
       , Html.tr 
           []
           [ Html.td 
-              [ Html.Attributes.align "center" ]
-              [ Html.input 
-                [ Html.Attributes.type_ "checkbox", onClick ToggleCornersStuckOn, Html.Attributes.checked model.cornersStuckOn ] 
-                []
-              , Html.label [] [ Html.text " Corners stuck on" ]
-            ] ]
-      , Html.tr 
-          []
-          [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "24px" ] 
               [ 
-                Html.div [] [ Html.text ("Steps: " ++ String.fromInt model.steps) ]
-              , Html.div [] [ Html.text ("Lights: " ++ String.fromInt lightCount) ]
+                Html.div [] [ Html.text ("Minutes: " ++ String.fromInt model.steps) ]
+              , Html.div [] [ Html.text ("Value: " ++ String.fromInt resourceValue) ]
+              , Html.div [] [ Html.text ("Prognosis: " ++ prognosisStr) ]
+              -- , Html.div [] [ Html.text ("Debug: " ++ debugStr) ]
               , Html.div [] [ Html.text model.message ]
               ] ]
       , Html.tr 
