@@ -12,7 +12,7 @@ import Html exposing (text)
 import Time
 
 defaultTickInterval : Float
-defaultTickInterval = 100
+defaultTickInterval = 30
 
 -- MAIN
 

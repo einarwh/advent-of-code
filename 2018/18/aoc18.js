@@ -5237,7 +5237,7 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Main$Input = 0;
-var $author$project$Main$defaultTickInterval = 100;
+var $author$project$Main$defaultTickInterval = 30;
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
