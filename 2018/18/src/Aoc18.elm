@@ -27,7 +27,8 @@ main =
 
 type DataSource = Input | Sample 
 
-type Acre = Ground | Trees | Lumberyard 
+-- type Acre = Ground | Trees | Lumberyard 
+type alias Acre = Char
 
 type alias Pos = (Int, Int)
 
@@ -36,6 +37,8 @@ type alias Area = Array2D Acre
 type alias Model = 
   { area : Area
   , dataSource : DataSource
+  , seen : Dict (List (List Acre)) Int
+  , answer : Maybe Int
   , steps : Int 
   , paused : Bool 
   , finished : Bool 
@@ -108,12 +111,12 @@ input = """.#||#|||##....|..#......|..#...##..|#....#|.......
 .|.##.#...|.|.||.||.|#.#.....||#.#|.#|.|..#|.#..|#
 .|...............#.#..#.##......#|||.|..||..#....#"""
 
-parseAcre : Char -> Acre 
-parseAcre ch = 
-  case ch of 
-    '#' -> Lumberyard
-    '|' -> Trees 
-    _ -> Ground 
+-- parseAcre : Char -> Acre 
+-- parseAcre ch = 
+--   case ch of 
+--     '#' -> Lumberyard
+--     '|' -> Trees 
+--     _ -> Ground 
 
 initArea : DataSource -> Area
 initArea dataSource = 
@@ -123,7 +126,7 @@ initArea dataSource =
         Sample -> sample 
         Input -> input 
   in 
-    data |> String.split "\n" |> List.map (String.toList >> List.map parseAcre) |> Array2D.fromList
+    data |> String.split "\n" |> List.map (String.toList) |> Array2D.fromList
 
 toIndexedList : Array2D Bool -> List (Pos, Bool)
 toIndexedList grid = 
@@ -140,7 +143,9 @@ initModel dataSource =
   in 
     { area = area
     , dataSource = dataSource
+    , answer = Nothing
     , steps = 0 
+    , seen = Dict.empty
     , paused = True
     , finished = False 
     , tickInterval = defaultTickInterval
@@ -172,6 +177,17 @@ getAllPositions arr =
   in 
     ys |> List.concatMap (\y -> xs |> List.map (\x -> (x, y)))
 
+serialize : Array2D Acre -> List (List Acre)
+serialize arr = 
+  let
+    ys = List.range 0 (Array2D.rows arr - 1)
+    xs = List.range 0 (Array2D.columns arr - 1)
+  in 
+    ys |> List.map (\y -> xs |> List.filterMap (\x -> Array2D.get y x arr))
+
+deserialize : List (List Acre) -> Array2D Acre 
+deserialize = Array2D.fromList
+
 getNestedPositions : Array2D a -> List (List Pos)
 getNestedPositions arr = 
   let
@@ -195,18 +211,12 @@ getNeighbours arr (x, y) =
   in 
     positions |> List.filterMap (\(xx, yy) -> Array2D.get yy xx arr)
 
--- let getResourceValue area = 
---     let acres = area |> Area.toNestedList |> List.concat 
---     let trees = countAcre acres Trees 
---     let lumberyards = countAcre acres Lumberyard
---     trees * lumberyards
-
 getResourceValue : Area -> Int
 getResourceValue area = 
   let 
     acres = area |> getAllPositions |> List.filterMap (\(x, y) -> Array2D.get y x area)
-    trees = countAcre acres Trees 
-    lumberyards = countAcre acres Lumberyard 
+    trees = countAcre acres '|' 
+    lumberyards = countAcre acres '#' 
   in 
     trees * lumberyards
 
@@ -219,26 +229,61 @@ evolveAcre area (x, y) =
   let 
     neighbours = getNeighbours area (x, y) 
   in 
-    case Array2D.get y x area |> Maybe.withDefault Ground of 
-      Ground -> if countAcre neighbours Trees >= 3 then Trees else Ground 
-      Trees -> if countAcre neighbours Lumberyard >= 3 then Lumberyard else Trees 
-      Lumberyard -> if countAcre neighbours Lumberyard > 0 && countAcre neighbours Trees > 0 then Lumberyard else Ground
+    case Array2D.get y x area |> Maybe.withDefault '.' of 
+      '|' -> if countAcre neighbours '#' >= 3 then '#' else '|' 
+      '#' -> if countAcre neighbours '#' > 0 && countAcre neighbours '|' > 0 then '#' else '.'
+      _ -> if countAcre neighbours '|' >= 3 then '|' else '.' 
+
+
+-- let evolveUntilRepeat maxSteps initialArea = 
+--     let rec loop (i : int) (seen : Map<Acre[,], int>) (area : Acre[,]) = 
+--         if Map.containsKey area seen then 
+--             let firstIndex = seen[area]
+--             let loopSize = i - firstIndex
+--             let numberInLoop = (maxSteps - firstIndex) % loopSize
+--             seen |> Map.toList |> List.find (fun (_, n) -> numberInLoop + firstIndex = n) |> fst
+--         else 
+--             if i < maxSteps then 
+--                 let positions = Area.getNestedPositions area 
+--                 let next = positions |> List.map (fun row -> row |> List.map (choose area)) |> Area.fromNestedList
+--                 loop (i + 1) (Map.add area i seen) next
+--             else 
+--                 area
+--     loop 0 Map.empty initialArea
 
 step : Area -> Area 
 step area = 
   let 
     nestedPositions = getNestedPositions area
+    nextArea = nestedPositions |> List.map (\positions -> positions |> List.map (evolveAcre area)) |> Array2D.fromList
   in 
-    nestedPositions |> List.map (\positions -> positions |> List.map (evolveAcre area)) |> Array2D.fromList
+    nextArea
 
 updateStep : Model -> Model
 updateStep model = 
   let  
     steps = model.steps
+    key = model.area |> serialize
+    (answer, seen, found) = 
+      case model.answer of 
+        Just _ -> (model.answer, model.seen, False) 
+        Nothing -> 
+          case Dict.get key model.seen of 
+            Nothing -> 
+              (Nothing, Dict.insert key steps model.seen, False)
+            Just oldSteps -> 
+              let 
+                loopSize = steps - oldSteps
+                numberInLoop = (1000000000 - oldSteps) |> modBy loopSize
+                targetKey = model.seen |> Dict.toList |> List.filterMap (\(k, v) -> if v == oldSteps + numberInLoop then Just k else Nothing) |> List.head |> Maybe.withDefault []
+                targetArea = deserialize targetKey
+                resourceValue = getResourceValue targetArea
+              in 
+                (Just resourceValue, model.seen, True)
     a = step model.area 
-    pause = steps + 1 == 10 
+    pause = steps + 1 == 10 || found
   in 
-    { model | steps = steps + 1, area = a, paused = pause }
+    { model | steps = steps + 1, area = a, answer = answer, seen = seen, paused = pause }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -289,17 +334,17 @@ subscriptions model =
 
 -- VIEW
 
-toAcreSymbol : Acre -> Char 
-toAcreSymbol acre = 
-  case acre of 
-    Lumberyard -> '#'
-    Trees -> '|'
-    Ground -> '.'
+-- toAcreSymbol : Acre -> Char 
+-- toAcreSymbol acre = 
+--   case acre of 
+--     Lumberyard -> '#'
+--     Trees -> '|'
+--     Ground -> '.'
 
 getAcreSymbolAtPos : Area -> Pos -> Char 
 getAcreSymbolAtPos area (x, y) = 
   case Array2D.get y x area of 
-    Just acre -> toAcreSymbol acre 
+    Just acre -> acre 
     Nothing -> '.'
 
 toCharElement : Area -> Pos -> Html Msg 
@@ -311,7 +356,7 @@ toCharElement area (x, y) =
 
 view : Model -> Document Msg
 view model = 
-  { title = "Advent of Code 2015 | Day 18: Like a GIF For Your Yard"
+  { title = "Advent of Code 2018 | Day 18: Settlers of The North Pole"
   , body = [ viewBody model ] }
 
 viewBody : Model -> Html Msg
@@ -322,6 +367,11 @@ viewBody model =
     nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement area))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
     resourceValue = getResourceValue area 
+    prognosisStr =
+      case model.answer of 
+        Just prognosis -> String.fromInt prognosis
+        Nothing -> "?"
+    -- debugStr = model.seen |> Dict.size |> String.fromInt 
     textFontSize = 
       case model.dataSource of 
         Sample -> "24px"
@@ -338,8 +388,8 @@ viewBody model =
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "32px"
               , Html.Attributes.style "padding" "20px"]
-              [ Html.div [] [Html.text "Advent of Code 2015" ]
-              , Html.div [] [Html.text "Day 18: Like a GIF For Your Yard" ] ] ]
+              [ Html.div [] [Html.text "Advent of Code 2018" ]
+              , Html.div [] [Html.text "Day 18: Settlers of The North Pole" ] ] ]
       , Html.tr 
           []
           [ Html.td 
@@ -367,8 +417,8 @@ viewBody model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding-bottom" "10px" ]
               [ Html.a 
-                [ Html.Attributes.href "https://adventofcode.com/2015/day/18" ] 
-                [ Html.text "https://adventofcode.com/2015/day/18" ]
+                [ Html.Attributes.href "https://adventofcode.com/2018/day/18" ] 
+                [ Html.text "https://adventofcode.com/2018/day/18" ]
             ] ]
       , Html.tr 
           []
@@ -416,6 +466,8 @@ viewBody model =
               [ 
                 Html.div [] [ Html.text ("Minutes: " ++ String.fromInt model.steps) ]
               , Html.div [] [ Html.text ("Value: " ++ String.fromInt resourceValue) ]
+              , Html.div [] [ Html.text ("Prognosis: " ++ prognosisStr) ]
+              -- , Html.div [] [ Html.text ("Debug: " ++ debugStr) ]
               , Html.div [] [ Html.text model.message ]
               ] ]
       , Html.tr 
