@@ -14,12 +14,6 @@ defaultTickInterval = 100
 
 -- MAIN
 
-type DataSource = Input | Sample
-
-type alias Equation = (Int, List Int)
-
-type Op = Add | Mul | Con
-
 main =
   Browser.document
     { init = init
@@ -28,6 +22,8 @@ main =
     , subscriptions = subscriptions }
 
 -- MODEL
+
+type Outcome = Win | Loss | Ongoing
 
 type Weapon = 
   Dagger 
@@ -98,7 +94,9 @@ type alias Player =
 type alias Model = 
   { boss : FighterStats 
   , player : Player
+  , rounds : List String
   , paused : Bool
+  , finished : Bool
   , tickInterval : Float 
   , debug : String }
 
@@ -118,7 +116,9 @@ initModel =
              , rings = [] }
     model = { boss = boss
             , player = player
+            , rounds = []
             , paused = True
+            , finished = False
             , tickInterval = defaultTickInterval
             , debug = "" }
   in 
@@ -132,11 +132,59 @@ init _ =
 
 type Msg = 
   Tick 
+  | Step 
   | Clear 
   | Fight 
   | UseWeapon Weapon 
   | ToggleArmor Armor
   | ToggleRing Ring
+
+        -- let bossHp' = bossHp - max 1 (player.damage - boss.armor)
+        -- if bossHp' > 0 then 
+            -- let playerHp' = playerHp - max 1 (boss.damage - player.armor)
+            -- if playerHp' > 0 then 
+                -- round playerHp' bossHp' 
+            -- else 
+                -- Loss cost 
+        -- else 
+            -- Win cost
+
+
+fightRound : Model -> Model  
+fightRound model = 
+  let 
+    player = model.player 
+    p = getPlayerStats player
+    b = model.boss 
+    pDmg = max 1 (p.damage - b.armor)
+    bDmg = max 1 (b.damage - p.armor)
+    bHp = max 0 (b.hitPoints - pDmg)
+    pHp = max 0 (p.hitPoints - bDmg)
+    line1 = "The player deals " ++ String.fromInt p.damage ++ "-" ++ String.fromInt b.armor ++ " = " ++ String.fromInt pDmg ++ " damage; the boss goes down to " ++ String.fromInt bHp ++ " hit points."
+    line2 = "The boss deals " ++ String.fromInt b.damage ++ "-" ++ String.fromInt p.armor ++ " = " ++ String.fromInt bDmg ++ " damage; the player goes down to " ++ String.fromInt pHp ++ " hit points."
+  in 
+    if bHp == 0 then 
+      let 
+        rounds = List.append model.rounds [ line1, "The player wins!" ]
+        updatedPlayer = player 
+        updatedBoss = { b | hitPoints = 0 }
+      in 
+        { model | player = updatedPlayer, boss = updatedBoss, rounds = rounds }
+    else 
+      if pHp == 0 then 
+        let 
+          rounds = List.append model.rounds [ line1, line2, "The boss wins!" ]
+          updatedPlayer = { player | hitPoints = 0 } 
+          updatedBoss = { b | hitPoints = bHp }
+        in 
+          { model | player = updatedPlayer, boss = updatedBoss, rounds = rounds }
+      else 
+        let 
+          rounds = List.append model.rounds [ line1, line2 ]
+          updatedPlayer = { player | hitPoints = pHp } 
+          updatedBoss = { b | hitPoints = bHp }
+        in 
+          { model | player = updatedPlayer, boss = updatedBoss, rounds = rounds }
 
 updateClear : Model -> Model
 updateClear model = 
@@ -149,7 +197,11 @@ updateFight model =
     { model | paused = paused }
 
 updateTick : Model -> Model 
-updateTick model = model 
+updateTick model = 
+  if model.boss.hitPoints == 0 || model.player.hitPoints == 0 then 
+    { model | finished = True, paused = True }  
+  else 
+    fightRound model 
 
 updateWeapon : Weapon -> Model -> Model
 updateWeapon weapon model = 
@@ -203,12 +255,14 @@ update msg model =
       (updateRing ring model, Cmd.none)
     Tick -> 
       (updateTick model, Cmd.none)
+    Step -> 
+      (updateTick model, Cmd.none)
 
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    if model.paused then Sub.none else Time.every model.tickInterval (\_ -> Tick)
+    if model.paused || model.finished then Sub.none else Time.every model.tickInterval (\_ -> Tick)
 
 -- VIEW
 
@@ -367,8 +421,6 @@ calculateTotalDamage player =
 calculateTotalArmor : Player -> Int 
 calculateTotalArmor player = 
   player |> getAllStats |> List.map (\s -> s.armor) |> List.sum 
-
-
 getPlayerStats : Player -> FighterStats
 getPlayerStats player = 
   let 
@@ -427,12 +479,23 @@ calculateTotalCost : Player -> Int
 calculateTotalCost player = 
   player |> getAllStats |> List.map (\s -> s.cost) |> List.sum 
 
+toRoundElement : String -> List (Html Msg)
+toRoundElement str =
+  let 
+    textElement = Html.text str 
+  in 
+    [ textElement, Html.br [] [] ]
+
 viewBody : Model -> Html Msg
 viewBody model =
   let
     commandsStr = ""
     totalCost = calculateTotalCost model.player 
-    elements = []
+    elements = model.rounds |> List.concatMap toRoundElement 
+    resultStr = 
+      if model.boss.hitPoints == 0 then "Result: WIN"
+      else if model.player.hitPoints == 0 then "Result: LOSS"
+      else "?"
   in 
     Html.table 
       [ Html.Attributes.style "width" "1080px" 
@@ -508,11 +571,14 @@ viewBody model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Clear ] 
+                [ Html.text "Clear" ]
+              , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Fight ] 
                 [ if model.paused then Html.text "Fight!" else Html.text "Halt!" ]
               , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Clear ] 
-                [ Html.text "Clear" ] 
+                [ Html.Attributes.style "width" "80px", onClick Step ] 
+                [ Html.text "Step" ] 
             ] ]
       , Html.tr 
           []
@@ -522,15 +588,15 @@ viewBody model =
               , Html.Attributes.style "font-size" "24px"
               , Html.Attributes.style "padding-top" "10px" ] 
               [ 
-                Html.div [] [ Html.text "?" ]
-              , Html.div [] [ Html.text ("Equipment cost: " ++ (String.fromInt totalCost)) ]
+                Html.div [] [ Html.text ("Equipment cost: " ++ (String.fromInt totalCost)) ]
+              , Html.div [] [ Html.text resultStr ]
               ] ]
       , Html.tr 
           []
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "24px"
+              , Html.Attributes.style "font-size" "16px"
               , Html.Attributes.style "padding" "10px" ] 
               [ 
                 Html.div [] elements

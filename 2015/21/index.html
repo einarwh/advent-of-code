@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.R.G === region.Y.G)
+	if (region.T.I === region._.I)
 	{
-		return 'on line ' + region.R.G;
+		return 'on line ' + region.T.I;
 	}
-	return 'on lines ' + region.R.G + ' through ' + region.Y.G;
+	return 'on lines ' + region.T.I + ' through ' + region._.I;
 }
 
 
@@ -1871,9 +1871,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aE,
+		impl.aG,
+		impl.aO,
 		impl.aM,
-		impl.aK,
 		function() { return function() {} }
 	);
 });
@@ -2733,9 +2733,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		s: func(record.s),
-		S: record.S,
-		P: record.P
+		v: func(record.v),
+		U: record.U,
+		R: record.R
 	}
 });
 
@@ -3003,11 +3003,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.s;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.S;
+		var message = !tag ? value : tag < 3 ? value.a : value.v;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.U;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.P) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.R) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3957,11 +3957,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aE,
+		impl.aG,
+		impl.aO,
 		impl.aM,
-		impl.aK,
 		function(sendToApp, initialModel) {
-			var view = impl.aN;
+			var view = impl.aP;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3993,12 +3993,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aE,
+		impl.aG,
+		impl.aO,
 		impl.aM,
-		impl.aK,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.Q && impl.Q(sendToApp)
-			var view = impl.aN;
+			var divertHrefToApp = impl.S && impl.S(sendToApp)
+			var view = impl.aP;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -4006,12 +4006,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.ax);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.az);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.aL) && (_VirtualDom_doc.title = title = doc.aL);
+				(title !== doc.aN) && (_VirtualDom_doc.title = title = doc.aN);
 			});
 		}
 	);
@@ -4067,12 +4067,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aG;
-	var onUrlRequest = impl.aH;
+	var onUrlChange = impl.aI;
+	var onUrlRequest = impl.aJ;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		Q: function(sendToApp)
+		S: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4088,9 +4088,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.ak === next.ak
-							&& curr.ab === next.ab
-							&& curr.ah.a === next.ah.a
+							&& curr.am === next.am
+							&& curr.ad === next.ad
+							&& curr.aj.a === next.aj.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4098,13 +4098,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aE: function(flags)
+		aG: function(flags)
 		{
-			return A3(impl.aE, flags, _Browser_getUrl(), key);
+			return A3(impl.aG, flags, _Browser_getUrl(), key);
 		},
-		aN: impl.aN,
-		aM: impl.aM,
-		aK: impl.aK
+		aP: impl.aP,
+		aO: impl.aO,
+		aM: impl.aM
 	});
 }
 
@@ -4170,17 +4170,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aC: 'hidden', ay: 'visibilitychange' }
+		? { aE: 'hidden', aA: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aC: 'mozHidden', ay: 'mozvisibilitychange' }
+		? { aE: 'mozHidden', aA: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aC: 'msHidden', ay: 'msvisibilitychange' }
+		? { aE: 'msHidden', aA: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aC: 'webkitHidden', ay: 'webkitvisibilitychange' }
-		: { aC: 'hidden', ay: 'visibilitychange' };
+		? { aE: 'webkitHidden', aA: 'webkitvisibilitychange' }
+		: { aE: 'hidden', aA: 'visibilitychange' };
 }
 
 
@@ -4261,12 +4261,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		ao: _Browser_getScene(),
-		ar: {
-			at: _Browser_window.pageXOffset,
-			au: _Browser_window.pageYOffset,
-			as: _Browser_doc.documentElement.clientWidth,
-			aa: _Browser_doc.documentElement.clientHeight
+		aq: _Browser_getScene(),
+		at: {
+			av: _Browser_window.pageXOffset,
+			aw: _Browser_window.pageYOffset,
+			au: _Browser_doc.documentElement.clientWidth,
+			ac: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4276,8 +4276,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		as: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		aa: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		au: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		ac: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4300,15 +4300,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			ao: {
-				as: node.scrollWidth,
-				aa: node.scrollHeight
+			aq: {
+				au: node.scrollWidth,
+				ac: node.scrollHeight
 			},
-			ar: {
-				at: node.scrollLeft,
-				au: node.scrollTop,
-				as: node.clientWidth,
-				aa: node.clientHeight
+			at: {
+				av: node.scrollLeft,
+				aw: node.scrollTop,
+				au: node.clientWidth,
+				ac: node.clientHeight
 			}
 		};
 	});
@@ -4338,18 +4338,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			ao: _Browser_getScene(),
-			ar: {
-				at: x,
-				au: y,
-				as: _Browser_doc.documentElement.clientWidth,
-				aa: _Browser_doc.documentElement.clientHeight
+			aq: _Browser_getScene(),
+			at: {
+				av: x,
+				aw: y,
+				au: _Browser_doc.documentElement.clientWidth,
+				ac: _Browser_doc.documentElement.clientHeight
 			},
-			aA: {
-				at: x + rect.left,
-				au: y + rect.top,
-				as: rect.width,
-				aa: rect.height
+			aC: {
+				av: x + rect.left,
+				aw: y + rect.top,
+				au: rect.width,
+				ac: rect.height
 			}
 		};
 	});
@@ -4839,22 +4839,22 @@ var $elm$core$Array$builderToArray = F2(
 		if (!builder.d) {
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
-				$elm$core$Elm$JsArray$length(builder.f),
+				$elm$core$Elm$JsArray$length(builder.h),
 				$elm$core$Array$shiftStep,
 				$elm$core$Elm$JsArray$empty,
-				builder.f);
+				builder.h);
 		} else {
 			var treeLen = builder.d * $elm$core$Array$branchFactor;
 			var depth = $elm$core$Basics$floor(
 				A2($elm$core$Basics$logBase, $elm$core$Array$branchFactor, treeLen - 1));
-			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.g) : builder.g;
+			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.i) : builder.i;
 			var tree = A2($elm$core$Array$treeFromBuilder, correctNodeList, builder.d);
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
-				$elm$core$Elm$JsArray$length(builder.f) + treeLen,
+				$elm$core$Elm$JsArray$length(builder.h) + treeLen,
 				A2($elm$core$Basics$max, 5, depth * $elm$core$Array$shiftStep),
 				tree,
-				builder.f);
+				builder.h);
 		}
 	});
 var $elm$core$Basics$idiv = _Basics_idiv;
@@ -4867,7 +4867,7 @@ var $elm$core$Array$initializeHelp = F5(
 				return A2(
 					$elm$core$Array$builderToArray,
 					false,
-					{g: nodeList, d: (len / $elm$core$Array$branchFactor) | 0, f: tail});
+					{i: nodeList, d: (len / $elm$core$Array$branchFactor) | 0, h: tail});
 			} else {
 				var leaf = $elm$core$Array$Leaf(
 					A3($elm$core$Elm$JsArray$initialize, $elm$core$Array$branchFactor, fromIndex, fn));
@@ -4934,7 +4934,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {_: fragment, ab: host, af: path, ah: port_, ak: protocol, al: query};
+		return {ab: fragment, ad: host, ah: path, aj: port_, am: protocol, an: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5215,9 +5215,9 @@ var $elm$core$Task$perform = F2(
 var $elm$browser$Browser$document = _Browser_document;
 var $author$project$Aoc21$defaultTickInterval = 100;
 var $author$project$Aoc21$initModel = function () {
-	var player = {a: $elm$core$Maybe$Nothing, w: 100, C: _List_Nil, L: $elm$core$Maybe$Nothing};
-	var boss = {a: 2, b: 9, w: 103};
-	var model = {M: boss, X: '', B: true, j: player, T: $author$project$Aoc21$defaultTickInterval};
+	var player = {a: $elm$core$Maybe$Nothing, g: 100, E: _List_Nil, N: $elm$core$Maybe$Nothing};
+	var boss = {a: 2, b: 9, g: 103};
+	var model = {q: boss, Z: '', O: false, A: true, e: player, s: _List_Nil, V: $author$project$Aoc21$defaultTickInterval};
 	return model;
 }();
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
@@ -5232,7 +5232,7 @@ var $elm$time$Time$Every = F2(
 	});
 var $elm$time$Time$State = F2(
 	function (taggers, processes) {
-		return {aj: processes, aq: taggers};
+		return {al: processes, as: taggers};
 	});
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
@@ -5524,7 +5524,7 @@ var $elm$time$Time$spawnHelp = F3(
 	});
 var $elm$time$Time$onEffects = F3(
 	function (router, subs, _v0) {
-		var processes = _v0.aj;
+		var processes = _v0.al;
 		var rightStep = F3(
 			function (_v6, id, _v7) {
 				var spawns = _v7.a;
@@ -5593,7 +5593,7 @@ var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
 var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $elm$time$Time$onSelfMsg = F3(
 	function (router, interval, state) {
-		var _v0 = A2($elm$core$Dict$get, interval, state.aq);
+		var _v0 = A2($elm$core$Dict$get, interval, state.as);
 		if (_v0.$ === 1) {
 			return $elm$core$Task$succeed(state);
 		} else {
@@ -5642,16 +5642,16 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc21$subscriptions = function (model) {
-	return model.B ? $elm$core$Platform$Sub$none : A2(
+	return (model.A || model.O) ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.T,
+		model.V,
 		function (_v0) {
 			return $author$project$Aoc21$Tick;
 		});
 };
 var $author$project$Aoc21$updateArmor = F2(
 	function (armor, model) {
-		var player = model.j;
+		var player = model.e;
 		var updated = function () {
 			var _v0 = player.a;
 			if (!_v0.$) {
@@ -5666,17 +5666,17 @@ var $author$project$Aoc21$updateArmor = F2(
 			{a: updated});
 		return _Utils_update(
 			model,
-			{j: p});
+			{e: p});
 	});
 var $author$project$Aoc21$updateClear = function (model) {
 	return $author$project$Aoc21$initModel;
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc21$updateFight = function (model) {
-	var paused = !model.B;
+	var paused = !model.A;
 	return _Utils_update(
 		model,
-		{B: paused});
+		{A: paused});
 };
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
@@ -5722,8 +5722,8 @@ var $elm$core$List$member = F2(
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $author$project$Aoc21$updateRing = F2(
 	function (ring, model) {
-		var player = model.j;
-		var rings = player.C;
+		var player = model.e;
+		var rings = player.E;
 		var updated = A2($elm$core$List$member, ring, rings) ? A2(
 			$elm$core$List$filter,
 			function (r) {
@@ -5732,88 +5732,25 @@ var $author$project$Aoc21$updateRing = F2(
 			rings) : (($elm$core$List$length(rings) < 2) ? A2($elm$core$List$cons, ring, rings) : rings);
 		var p = _Utils_update(
 			player,
-			{C: updated});
+			{E: updated});
 		return _Utils_update(
 			model,
-			{j: p});
+			{e: p});
 	});
-var $author$project$Aoc21$updateTick = function (model) {
-	return model;
-};
-var $author$project$Aoc21$updateWeapon = F2(
-	function (weapon, model) {
-		var player = model.j;
-		var p = _Utils_update(
-			player,
-			{
-				L: $elm$core$Maybe$Just(weapon)
-			});
-		return _Utils_update(
-			model,
-			{j: p});
-	});
-var $author$project$Aoc21$update = F2(
-	function (msg, model) {
-		switch (msg.$) {
-			case 1:
-				return _Utils_Tuple2(
-					$author$project$Aoc21$updateClear(model),
-					$elm$core$Platform$Cmd$none);
-			case 2:
-				return _Utils_Tuple2(
-					$author$project$Aoc21$updateFight(model),
-					$elm$core$Platform$Cmd$none);
-			case 3:
-				var weapon = msg.a;
-				return _Utils_Tuple2(
-					A2($author$project$Aoc21$updateWeapon, weapon, model),
-					$elm$core$Platform$Cmd$none);
-			case 4:
-				var armor = msg.a;
-				return _Utils_Tuple2(
-					A2($author$project$Aoc21$updateArmor, armor, model),
-					$elm$core$Platform$Cmd$none);
-			case 5:
-				var ring = msg.a;
-				return _Utils_Tuple2(
-					A2($author$project$Aoc21$updateRing, ring, model),
-					$elm$core$Platform$Cmd$none);
-			default:
-				return _Utils_Tuple2(
-					$author$project$Aoc21$updateTick(model),
-					$elm$core$Platform$Cmd$none);
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
 		}
 	});
-var $author$project$Aoc21$Clear = {$: 1};
-var $author$project$Aoc21$Fight = {$: 2};
-var $elm$html$Html$a = _VirtualDom_node('a');
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$string(string));
-	});
-var $elm$html$Html$Attributes$align = $elm$html$Html$Attributes$stringProperty('align');
+var $author$project$Aoc21$defaultStats = {a: 0, c: 0, b: 0};
 var $author$project$Aoc21$Bandedmail = 3;
 var $author$project$Aoc21$Chainmail = 1;
 var $author$project$Aoc21$Leather = 0;
 var $author$project$Aoc21$Platemail = 4;
 var $author$project$Aoc21$Splintmail = 2;
-var $author$project$Aoc21$ToggleArmor = function (a) {
-	return {$: 4, a: a};
-};
-var $elm$json$Json$Encode$bool = _Json_wrap;
-var $elm$html$Html$Attributes$boolProperty = F2(
-	function (key, bool) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$bool(bool));
-	});
-var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
-var $author$project$Aoc21$defaultStats = {a: 0, c: 0, b: 0};
 var $author$project$Aoc21$armorList = _List_fromArray(
 	[
 		_Utils_Tuple2(
@@ -5885,6 +5822,276 @@ var $author$project$Aoc21$getArmorStats = function (armor) {
 		$author$project$Aoc21$defaultStats,
 		$author$project$Aoc21$tryGetArmorStats(armor));
 };
+var $author$project$Aoc21$RingDamage1 = 0;
+var $author$project$Aoc21$RingDamage2 = 1;
+var $author$project$Aoc21$RingDamage3 = 2;
+var $author$project$Aoc21$RingDefense1 = 3;
+var $author$project$Aoc21$RingDefense2 = 4;
+var $author$project$Aoc21$RingDefense3 = 5;
+var $author$project$Aoc21$ringList = _List_fromArray(
+	[
+		_Utils_Tuple2(
+		0,
+		{a: 0, c: 25, b: 1}),
+		_Utils_Tuple2(
+		1,
+		{a: 0, c: 50, b: 2}),
+		_Utils_Tuple2(
+		2,
+		{a: 0, c: 100, b: 3}),
+		_Utils_Tuple2(
+		3,
+		{a: 1, c: 20, b: 0}),
+		_Utils_Tuple2(
+		4,
+		{a: 2, c: 40, b: 0}),
+		_Utils_Tuple2(
+		5,
+		{a: 3, c: 80, b: 0})
+	]);
+var $author$project$Aoc21$tryGetRingStats = function (ring) {
+	return $elm$core$List$head(
+		A2(
+			$elm$core$List$filterMap,
+			function (_v0) {
+				var r = _v0.a;
+				var s = _v0.b;
+				return _Utils_eq(r, ring) ? $elm$core$Maybe$Just(s) : $elm$core$Maybe$Nothing;
+			},
+			$author$project$Aoc21$ringList));
+};
+var $author$project$Aoc21$getRingStats = function (ring) {
+	return A2(
+		$elm$core$Maybe$withDefault,
+		$author$project$Aoc21$defaultStats,
+		$author$project$Aoc21$tryGetRingStats(ring));
+};
+var $author$project$Aoc21$Dagger = 0;
+var $author$project$Aoc21$Greataxe = 4;
+var $author$project$Aoc21$Longsword = 3;
+var $author$project$Aoc21$Shortsword = 1;
+var $author$project$Aoc21$Warhammer = 2;
+var $author$project$Aoc21$weaponList = _List_fromArray(
+	[
+		_Utils_Tuple2(
+		0,
+		{a: 0, c: 8, b: 4}),
+		_Utils_Tuple2(
+		1,
+		{a: 0, c: 10, b: 5}),
+		_Utils_Tuple2(
+		2,
+		{a: 0, c: 25, b: 6}),
+		_Utils_Tuple2(
+		3,
+		{a: 0, c: 40, b: 7}),
+		_Utils_Tuple2(
+		4,
+		{a: 0, c: 74, b: 8})
+	]);
+var $author$project$Aoc21$tryGetWeaponStats = function (weapon) {
+	return $elm$core$List$head(
+		A2(
+			$elm$core$List$filterMap,
+			function (_v0) {
+				var w = _v0.a;
+				var s = _v0.b;
+				return _Utils_eq(w, weapon) ? $elm$core$Maybe$Just(s) : $elm$core$Maybe$Nothing;
+			},
+			$author$project$Aoc21$weaponList));
+};
+var $author$project$Aoc21$getWeaponStats = function (weapon) {
+	return A2(
+		$elm$core$Maybe$withDefault,
+		$author$project$Aoc21$defaultStats,
+		$author$project$Aoc21$tryGetWeaponStats(weapon));
+};
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $author$project$Aoc21$getAllStats = function (player) {
+	var weaponStats = A2(
+		$elm$core$Maybe$withDefault,
+		$author$project$Aoc21$defaultStats,
+		A2($elm$core$Maybe$map, $author$project$Aoc21$getWeaponStats, player.N));
+	var ringStats = A2($elm$core$List$map, $author$project$Aoc21$getRingStats, player.E);
+	var armorStats = A2(
+		$elm$core$Maybe$withDefault,
+		$author$project$Aoc21$defaultStats,
+		A2($elm$core$Maybe$map, $author$project$Aoc21$getArmorStats, player.a));
+	return A2(
+		$elm$core$List$cons,
+		weaponStats,
+		A2($elm$core$List$cons, armorStats, ringStats));
+};
+var $elm$core$List$sum = function (numbers) {
+	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
+};
+var $author$project$Aoc21$calculateTotalArmor = function (player) {
+	return $elm$core$List$sum(
+		A2(
+			$elm$core$List$map,
+			function (s) {
+				return s.a;
+			},
+			$author$project$Aoc21$getAllStats(player)));
+};
+var $author$project$Aoc21$calculateTotalDamage = function (player) {
+	return $elm$core$List$sum(
+		A2(
+			$elm$core$List$map,
+			function (s) {
+				return s.b;
+			},
+			$author$project$Aoc21$getAllStats(player)));
+};
+var $author$project$Aoc21$getPlayerStats = function (player) {
+	var damage = $author$project$Aoc21$calculateTotalDamage(player);
+	var armor = $author$project$Aoc21$calculateTotalArmor(player);
+	return {a: armor, b: damage, g: player.g};
+};
+var $author$project$Aoc21$fightRound = function (model) {
+	var player = model.e;
+	var p = $author$project$Aoc21$getPlayerStats(player);
+	var b = model.q;
+	var bDmg = A2($elm$core$Basics$max, 1, b.b - p.a);
+	var pHp = A2($elm$core$Basics$max, 0, p.g - bDmg);
+	var line2 = 'The boss deals ' + ($elm$core$String$fromInt(b.b) + ('-' + ($elm$core$String$fromInt(p.a) + (' = ' + ($elm$core$String$fromInt(bDmg) + (' damage; the player goes down to ' + ($elm$core$String$fromInt(pHp) + ' hit points.')))))));
+	var pDmg = A2($elm$core$Basics$max, 1, p.b - b.a);
+	var bHp = A2($elm$core$Basics$max, 0, b.g - pDmg);
+	var line1 = 'The player deals ' + ($elm$core$String$fromInt(p.b) + ('-' + ($elm$core$String$fromInt(b.a) + (' = ' + ($elm$core$String$fromInt(pDmg) + (' damage; the boss goes down to ' + ($elm$core$String$fromInt(bHp) + ' hit points.')))))));
+	if (!bHp) {
+		var updatedPlayer = player;
+		var updatedBoss = _Utils_update(
+			b,
+			{g: 0});
+		var rounds = A2(
+			$elm$core$List$append,
+			model.s,
+			_List_fromArray(
+				[line1, 'The player wins!']));
+		return _Utils_update(
+			model,
+			{q: updatedBoss, e: updatedPlayer, s: rounds});
+	} else {
+		if (!pHp) {
+			var updatedPlayer = _Utils_update(
+				player,
+				{g: 0});
+			var updatedBoss = _Utils_update(
+				b,
+				{g: bHp});
+			var rounds = A2(
+				$elm$core$List$append,
+				model.s,
+				_List_fromArray(
+					[line1, line2, 'The boss wins!']));
+			return _Utils_update(
+				model,
+				{q: updatedBoss, e: updatedPlayer, s: rounds});
+		} else {
+			var updatedPlayer = _Utils_update(
+				player,
+				{g: pHp});
+			var updatedBoss = _Utils_update(
+				b,
+				{g: bHp});
+			var rounds = A2(
+				$elm$core$List$append,
+				model.s,
+				_List_fromArray(
+					[line1, line2]));
+			return _Utils_update(
+				model,
+				{q: updatedBoss, e: updatedPlayer, s: rounds});
+		}
+	}
+};
+var $author$project$Aoc21$updateTick = function (model) {
+	return ((!model.q.g) || (!model.e.g)) ? _Utils_update(
+		model,
+		{O: true, A: true}) : $author$project$Aoc21$fightRound(model);
+};
+var $author$project$Aoc21$updateWeapon = F2(
+	function (weapon, model) {
+		var player = model.e;
+		var p = _Utils_update(
+			player,
+			{
+				N: $elm$core$Maybe$Just(weapon)
+			});
+		return _Utils_update(
+			model,
+			{e: p});
+	});
+var $author$project$Aoc21$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 2:
+				return _Utils_Tuple2(
+					$author$project$Aoc21$updateClear(model),
+					$elm$core$Platform$Cmd$none);
+			case 3:
+				return _Utils_Tuple2(
+					$author$project$Aoc21$updateFight(model),
+					$elm$core$Platform$Cmd$none);
+			case 4:
+				var weapon = msg.a;
+				return _Utils_Tuple2(
+					A2($author$project$Aoc21$updateWeapon, weapon, model),
+					$elm$core$Platform$Cmd$none);
+			case 5:
+				var armor = msg.a;
+				return _Utils_Tuple2(
+					A2($author$project$Aoc21$updateArmor, armor, model),
+					$elm$core$Platform$Cmd$none);
+			case 6:
+				var ring = msg.a;
+				return _Utils_Tuple2(
+					A2($author$project$Aoc21$updateRing, ring, model),
+					$elm$core$Platform$Cmd$none);
+			case 0:
+				return _Utils_Tuple2(
+					$author$project$Aoc21$updateTick(model),
+					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					$author$project$Aoc21$updateTick(model),
+					$elm$core$Platform$Cmd$none);
+		}
+	});
+var $author$project$Aoc21$Clear = {$: 2};
+var $author$project$Aoc21$Fight = {$: 3};
+var $author$project$Aoc21$Step = {$: 1};
+var $elm$html$Html$a = _VirtualDom_node('a');
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$align = $elm$html$Html$Attributes$stringProperty('align');
+var $author$project$Aoc21$ToggleArmor = function (a) {
+	return {$: 5, a: a};
+};
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
@@ -6046,118 +6253,6 @@ var $author$project$Aoc21$armorTable = function (player) {
 			]));
 };
 var $elm$html$Html$button = _VirtualDom_node('button');
-var $author$project$Aoc21$RingDamage1 = 0;
-var $author$project$Aoc21$RingDamage2 = 1;
-var $author$project$Aoc21$RingDamage3 = 2;
-var $author$project$Aoc21$RingDefense1 = 3;
-var $author$project$Aoc21$RingDefense2 = 4;
-var $author$project$Aoc21$RingDefense3 = 5;
-var $author$project$Aoc21$ringList = _List_fromArray(
-	[
-		_Utils_Tuple2(
-		0,
-		{a: 0, c: 25, b: 1}),
-		_Utils_Tuple2(
-		1,
-		{a: 0, c: 50, b: 2}),
-		_Utils_Tuple2(
-		2,
-		{a: 0, c: 100, b: 3}),
-		_Utils_Tuple2(
-		3,
-		{a: 1, c: 20, b: 0}),
-		_Utils_Tuple2(
-		4,
-		{a: 2, c: 40, b: 0}),
-		_Utils_Tuple2(
-		5,
-		{a: 3, c: 80, b: 0})
-	]);
-var $author$project$Aoc21$tryGetRingStats = function (ring) {
-	return $elm$core$List$head(
-		A2(
-			$elm$core$List$filterMap,
-			function (_v0) {
-				var r = _v0.a;
-				var s = _v0.b;
-				return _Utils_eq(r, ring) ? $elm$core$Maybe$Just(s) : $elm$core$Maybe$Nothing;
-			},
-			$author$project$Aoc21$ringList));
-};
-var $author$project$Aoc21$getRingStats = function (ring) {
-	return A2(
-		$elm$core$Maybe$withDefault,
-		$author$project$Aoc21$defaultStats,
-		$author$project$Aoc21$tryGetRingStats(ring));
-};
-var $author$project$Aoc21$Dagger = 0;
-var $author$project$Aoc21$Greataxe = 4;
-var $author$project$Aoc21$Longsword = 3;
-var $author$project$Aoc21$Shortsword = 1;
-var $author$project$Aoc21$Warhammer = 2;
-var $author$project$Aoc21$weaponList = _List_fromArray(
-	[
-		_Utils_Tuple2(
-		0,
-		{a: 0, c: 8, b: 4}),
-		_Utils_Tuple2(
-		1,
-		{a: 0, c: 10, b: 5}),
-		_Utils_Tuple2(
-		2,
-		{a: 0, c: 25, b: 6}),
-		_Utils_Tuple2(
-		3,
-		{a: 0, c: 40, b: 7}),
-		_Utils_Tuple2(
-		4,
-		{a: 0, c: 74, b: 8})
-	]);
-var $author$project$Aoc21$tryGetWeaponStats = function (weapon) {
-	return $elm$core$List$head(
-		A2(
-			$elm$core$List$filterMap,
-			function (_v0) {
-				var w = _v0.a;
-				var s = _v0.b;
-				return _Utils_eq(w, weapon) ? $elm$core$Maybe$Just(s) : $elm$core$Maybe$Nothing;
-			},
-			$author$project$Aoc21$weaponList));
-};
-var $author$project$Aoc21$getWeaponStats = function (weapon) {
-	return A2(
-		$elm$core$Maybe$withDefault,
-		$author$project$Aoc21$defaultStats,
-		$author$project$Aoc21$tryGetWeaponStats(weapon));
-};
-var $elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (!maybe.$) {
-			var value = maybe.a;
-			return $elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $author$project$Aoc21$getAllStats = function (player) {
-	var weaponStats = A2(
-		$elm$core$Maybe$withDefault,
-		$author$project$Aoc21$defaultStats,
-		A2($elm$core$Maybe$map, $author$project$Aoc21$getWeaponStats, player.L));
-	var ringStats = A2($elm$core$List$map, $author$project$Aoc21$getRingStats, player.C);
-	var armorStats = A2(
-		$elm$core$Maybe$withDefault,
-		$author$project$Aoc21$defaultStats,
-		A2($elm$core$Maybe$map, $author$project$Aoc21$getArmorStats, player.a));
-	return A2(
-		$elm$core$List$cons,
-		weaponStats,
-		A2($elm$core$List$cons, armorStats, ringStats));
-};
-var $elm$core$List$sum = function (numbers) {
-	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
-};
 var $author$project$Aoc21$calculateTotalCost = function (player) {
 	return $elm$core$List$sum(
 		A2(
@@ -6167,6 +6262,14 @@ var $author$project$Aoc21$calculateTotalCost = function (player) {
 			},
 			$author$project$Aoc21$getAllStats(player)));
 };
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $author$project$Aoc21$fighterRow = F2(
 	function (name, stats) {
@@ -6197,7 +6300,7 @@ var $author$project$Aoc21$fighterRow = F2(
 					_List_fromArray(
 						[
 							$elm$html$Html$text(
-							$elm$core$String$fromInt(stats.w))
+							$elm$core$String$fromInt(stats.g))
 						])),
 					A2(
 					$elm$html$Html$td,
@@ -6223,29 +6326,6 @@ var $author$project$Aoc21$fighterRow = F2(
 						]))
 				]));
 	});
-var $author$project$Aoc21$calculateTotalArmor = function (player) {
-	return $elm$core$List$sum(
-		A2(
-			$elm$core$List$map,
-			function (s) {
-				return s.a;
-			},
-			$author$project$Aoc21$getAllStats(player)));
-};
-var $author$project$Aoc21$calculateTotalDamage = function (player) {
-	return $elm$core$List$sum(
-		A2(
-			$elm$core$List$map,
-			function (s) {
-				return s.b;
-			},
-			$author$project$Aoc21$getAllStats(player)));
-};
-var $author$project$Aoc21$getPlayerStats = function (player) {
-	var damage = $author$project$Aoc21$calculateTotalDamage(player);
-	var armor = $author$project$Aoc21$calculateTotalArmor(player);
-	return {a: armor, b: damage, w: player.w};
-};
 var $author$project$Aoc21$fighterTable = F2(
 	function (player, bossStats) {
 		var playerStats = $author$project$Aoc21$getPlayerStats(player);
@@ -6308,12 +6388,12 @@ var $elm$html$Html$Attributes$href = function (url) {
 		_VirtualDom_noJavaScriptUri(url));
 };
 var $author$project$Aoc21$ToggleRing = function (a) {
-	return {$: 5, a: a};
+	return {$: 6, a: a};
 };
 var $author$project$Aoc21$ringRow = F3(
 	function (player, ringName, ring) {
 		var stats = $author$project$Aoc21$getRingStats(ring);
-		var isChecked = A2($elm$core$List$member, ring, player.C);
+		var isChecked = A2($elm$core$List$member, ring, player.E);
 		return A2(
 			$elm$html$Html$tr,
 			_List_Nil,
@@ -6441,8 +6521,17 @@ var $author$project$Aoc21$ringTable = function (player) {
 				A3($author$project$Aoc21$ringRow, player, 'Defense +3', 5)
 			]));
 };
+var $elm$html$Html$br = _VirtualDom_node('br');
+var $author$project$Aoc21$toRoundElement = function (str) {
+	var textElement = $elm$html$Html$text(str);
+	return _List_fromArray(
+		[
+			textElement,
+			A2($elm$html$Html$br, _List_Nil, _List_Nil)
+		]);
+};
 var $author$project$Aoc21$UseWeapon = function (a) {
-	return {$: 3, a: a};
+	return {$: 4, a: a};
 };
 var $author$project$Aoc21$weaponRow = F3(
 	function (player, weaponName, weapon) {
@@ -6466,7 +6555,7 @@ var $author$project$Aoc21$weaponRow = F3(
 									$author$project$Aoc21$UseWeapon(weapon)),
 									$elm$html$Html$Attributes$checked(
 									_Utils_eq(
-										player.L,
+										player.N,
 										$elm$core$Maybe$Just(weapon)))
 								]),
 							_List_Nil)
@@ -6577,8 +6666,9 @@ var $author$project$Aoc21$weaponsTable = function (player) {
 			]));
 };
 var $author$project$Aoc21$viewBody = function (model) {
-	var totalCost = $author$project$Aoc21$calculateTotalCost(model.j);
-	var elements = _List_Nil;
+	var totalCost = $author$project$Aoc21$calculateTotalCost(model.e);
+	var resultStr = (!model.q.g) ? 'Result: WIN' : ((!model.e.g) ? 'Result: LOSS' : '?');
+	var elements = A2($elm$core$List$concatMap, $author$project$Aoc21$toRoundElement, model.s);
 	var commandsStr = '';
 	return A2(
 		$elm$html$Html$table,
@@ -6736,7 +6826,7 @@ var $author$project$Aoc21$viewBody = function (model) {
 							]),
 						_List_fromArray(
 							[
-								$author$project$Aoc21$weaponsTable(model.j)
+								$author$project$Aoc21$weaponsTable(model.e)
 							]))
 					])),
 				A2(
@@ -6752,7 +6842,7 @@ var $author$project$Aoc21$viewBody = function (model) {
 							]),
 						_List_fromArray(
 							[
-								$author$project$Aoc21$armorTable(model.j)
+								$author$project$Aoc21$armorTable(model.e)
 							]))
 					])),
 				A2(
@@ -6768,7 +6858,7 @@ var $author$project$Aoc21$viewBody = function (model) {
 							]),
 						_List_fromArray(
 							[
-								$author$project$Aoc21$ringTable(model.j)
+								$author$project$Aoc21$ringTable(model.e)
 							]))
 					])),
 				A2(
@@ -6806,7 +6896,7 @@ var $author$project$Aoc21$viewBody = function (model) {
 							]),
 						_List_fromArray(
 							[
-								A2($author$project$Aoc21$fighterTable, model.j, model.M)
+								A2($author$project$Aoc21$fighterTable, model.e, model.q)
 							]))
 					])),
 				A2(
@@ -6850,22 +6940,33 @@ var $author$project$Aoc21$viewBody = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Aoc21$Fight)
+										$elm$html$Html$Events$onClick($author$project$Aoc21$Clear)
 									]),
 								_List_fromArray(
 									[
-										model.B ? $elm$html$Html$text('Fight!') : $elm$html$Html$text('Halt!')
+										$elm$html$Html$text('Clear')
 									])),
 								A2(
 								$elm$html$Html$button,
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Aoc21$Clear)
+										$elm$html$Html$Events$onClick($author$project$Aoc21$Fight)
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Clear')
+										model.A ? $elm$html$Html$text('Fight!') : $elm$html$Html$text('Halt!')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick($author$project$Aoc21$Step)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Step')
 									]))
 							]))
 					])),
@@ -6890,15 +6991,15 @@ var $author$project$Aoc21$viewBody = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('?')
+										$elm$html$Html$text(
+										'Equipment cost: ' + $elm$core$String$fromInt(totalCost))
 									])),
 								A2(
 								$elm$html$Html$div,
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(
-										'Equipment cost: ' + $elm$core$String$fromInt(totalCost))
+										$elm$html$Html$text(resultStr)
 									]))
 							]))
 					])),
@@ -6913,7 +7014,7 @@ var $author$project$Aoc21$viewBody = function (model) {
 							[
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '24px'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '16px'),
 								A2($elm$html$Html$Attributes$style, 'padding', '10px')
 							]),
 						_List_fromArray(
@@ -6925,15 +7026,15 @@ var $author$project$Aoc21$viewBody = function (model) {
 };
 var $author$project$Aoc21$view = function (model) {
 	return {
-		ax: _List_fromArray(
+		az: _List_fromArray(
 			[
 				$author$project$Aoc21$viewBody(model)
 			]),
-		aL: 'Advent of Code 2015 | Day 21: RPG Simulator 20XX'
+		aN: 'Advent of Code 2015 | Day 21: RPG Simulator 20XX'
 	};
 };
 var $author$project$Aoc21$main = $elm$browser$Browser$document(
-	{aE: $author$project$Aoc21$init, aK: $author$project$Aoc21$subscriptions, aM: $author$project$Aoc21$update, aN: $author$project$Aoc21$view});
+	{aG: $author$project$Aoc21$init, aM: $author$project$Aoc21$subscriptions, aO: $author$project$Aoc21$update, aP: $author$project$Aoc21$view});
 _Platform_export({'Aoc21':{'init':$author$project$Aoc21$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
 
