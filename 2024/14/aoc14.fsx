@@ -126,13 +126,13 @@ let findTree width height robots =
             loop (seconds + 1) moved 
     loop 0 robots 
 
-let run width height searchForTree fileName = 
+let run width height searchForTree fileName =   
     let lines = readLines fileName
     let robots = lines |> List.map parseRobot
     let moved = robots |> simulate width height 100
     moved |> calculateSafetyFactor width height |> printfn "%A"
     if searchForTree then findTree width height robots 
 
-run 11 7 false "sample"
-run 101 103 true "input"
-//run 101 103 true "not-a-tree.txt"
+// run 11 7 false "sample.txt"
+// run 101 103 true "input.txt"
+run 101 103 true "not-a-tree.txt"
