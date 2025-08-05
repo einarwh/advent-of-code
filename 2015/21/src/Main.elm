@@ -104,12 +104,15 @@ type alias Model =
 -- Damage: 9
 -- Armor: 2
 
+initBoss = 
+  { hitPoints = 103
+  , damage = 9
+  , armor = 2 }
+
 initModel : Model
 initModel =
   let 
-    boss = { hitPoints = 103
-           , damage = 9
-           , armor = 2 }
+    boss = initBoss
     player = { hitPoints = 100 
              , weapon = Nothing 
              , armor = Nothing 
@@ -135,6 +138,7 @@ type Msg =
   | Step 
   | Clear 
   | Fight 
+  | Heal 
   | FindBestDeal 
   | FindWorstDeal 
   | UseWeapon Weapon 
@@ -279,6 +283,14 @@ updateClear : Model -> Model
 updateClear model = 
   initModel 
 
+healPlayer : Player -> Player 
+healPlayer player = 
+  { player | hitPoints = 100 }
+
+updateHeal : Model -> Model
+updateHeal model = 
+  { model | boss = initBoss, player = healPlayer model.player, finished = False, rounds = [] }
+
 updateFight model = 
   if model.finished then 
     let 
@@ -341,6 +353,8 @@ update msg model =
       (updateFindCheapestWin model, Cmd.none)
     FindWorstDeal -> 
       (updateFindMostExpensiveLoss model, Cmd.none)
+    Heal -> 
+      (updateHeal model, Cmd.none)
     Fight -> 
       (updateFight model, Cmd.none)
     UseWeapon weapon -> 
@@ -643,10 +657,18 @@ view model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Clear ] 
+                [ Html.Attributes.style "width" "80px"
+                , onClick Clear
+                , Html.Attributes.title "Reset everything" ] 
                 [ Html.text "Reset" ]
               , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick FindBestDeal ] 
+                [ Html.Attributes.style "width" "80px"
+                , onClick Heal
+                , Html.Attributes.title "Restore player and boss to original health" ] 
+                [ Html.text "Heal" ] 
+              , Html.button 
+                [ Html.Attributes.style "width" "80px"
+                , onClick FindBestDeal ] 
                 [ Html.text "Best" ] 
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick FindWorstDeal ] 
