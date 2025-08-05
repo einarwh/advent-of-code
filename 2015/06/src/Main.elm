@@ -710,6 +710,14 @@ view model =
       , Html.tr 
           []
           [ Html.td 
+              [ Html.Attributes.align "center" ] 
+              [ 
+                Html.div [] [ Html.text "The animation is sluggish and may crash some browsers." ]
+              , Html.div [] [ Html.text "But it's also kind of cool." ]
+              ] ]
+      , Html.tr 
+          []
+          [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "16px" ]
