@@ -5625,7 +5625,7 @@ var $author$project$Main$initArea = function (dataSource) {
 };
 var $author$project$Main$initModel = function (dataSource) {
 	var area = $author$project$Main$initArea(dataSource);
-	return {A: $elm$core$Maybe$Nothing, B: area, W: 0, u: dataSource, Y: '', M: false, N: '', q: true, s: $elm$core$Dict$empty, H: 0, y: $author$project$Main$defaultTickInterval};
+	return {A: $elm$core$Maybe$Nothing, B: area, W: 0, u: dataSource, Y: '', M: false, N: '', o: true, s: $elm$core$Dict$empty, H: 0, y: $author$project$Main$defaultTickInterval};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -6049,7 +6049,7 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (model) {
-	var tickSub = (model.q || model.M) ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = (model.o || model.M) ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
 		model.y,
 		function (_v0) {
@@ -6331,6 +6331,7 @@ var $author$project$Main$step = function (area) {
 };
 var $author$project$Main$updateStep = function (model) {
 	var steps = model.H;
+	var paused = model.o;
 	var key = $author$project$Main$serialize(model.B);
 	var a = $author$project$Main$step(model.B);
 	var _v0 = function () {
@@ -6372,10 +6373,10 @@ var $author$project$Main$updateStep = function (model) {
 	var answer = _v0.a;
 	var seen = _v0.b;
 	var found = _v0.c;
-	var pause = ((steps + 1) === 10) || found;
+	var pause = paused || (((steps + 1) === 10) || found);
 	return _Utils_update(
 		model,
-		{A: answer, B: a, q: pause, s: seen, H: steps + 1});
+		{A: answer, B: a, o: pause, s: seen, H: steps + 1});
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Main$updateTogglePlay = function (model) {
@@ -6383,11 +6384,11 @@ var $author$project$Main$updateTogglePlay = function (model) {
 		var m = $author$project$Main$initModel(model.u);
 		return _Utils_update(
 			m,
-			{q: false});
+			{o: false});
 	} else {
 		return _Utils_update(
 			model,
-			{q: !model.q});
+			{o: !model.o});
 	}
 };
 var $author$project$Main$updateUseInput = function (model) {
@@ -6733,7 +6734,7 @@ var $author$project$Main$view = function (model) {
 									]),
 								_List_fromArray(
 									[
-										model.q ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
+										model.o ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
 									])),
 								A2(
 								$elm$html$Html$button,

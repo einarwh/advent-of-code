@@ -246,7 +246,8 @@ updateStep model =
               in 
                 (Just resourceValue, model.seen, True)
     a = step model.area 
-    pause = steps + 1 == 10 || found
+    paused = model.paused 
+    pause = paused || steps + 1 == 10 || found
   in 
     { model | steps = steps + 1, area = a, answer = answer, seen = seen, paused = pause }
 
