@@ -5,14 +5,12 @@ import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
 import Dict exposing (Dict)
-import Array exposing (Array)
-import Set exposing (Set)
 import Array2D exposing (Array2D)
 import Html exposing (text)
 import Time
 
 defaultTickInterval : Float
-defaultTickInterval = 30
+defaultTickInterval = 40
 
 -- MAIN
 
@@ -27,7 +25,6 @@ main =
 
 type DataSource = Input | Sample 
 
--- type Acre = Ground | Trees | Lumberyard 
 type alias Acre = Char
 
 type alias Pos = (Int, Int)
@@ -111,13 +108,6 @@ input = """.#||#|||##....|..#......|..#...##..|#....#|.......
 .|.##.#...|.|.||.||.|#.#.....||#.#|.#|.|..#|.#..|#
 .|...............#.#..#.##......#|||.|..||..#....#"""
 
--- parseAcre : Char -> Acre 
--- parseAcre ch = 
---   case ch of 
---     '#' -> Lumberyard
---     '|' -> Trees 
---     _ -> Ground 
-
 initArea : DataSource -> Area
 initArea dataSource = 
   let 
@@ -127,14 +117,6 @@ initArea dataSource =
         Input -> input 
   in 
     data |> String.split "\n" |> List.map (String.toList) |> Array2D.fromList
-
-toIndexedList : Array2D Bool -> List (Pos, Bool)
-toIndexedList grid = 
-  let 
-    yRange = List.range 0 (Array2D.rows grid - 1)
-    xRange = List.range 0 (Array2D.columns grid - 1)
-  in 
-    yRange |> List.concatMap (\y -> xRange |> List.map (\x -> ((x, y), Array2D.get y x grid |> Maybe.withDefault False)))
 
 initModel : DataSource -> Model 
 initModel dataSource = 
@@ -234,23 +216,6 @@ evolveAcre area (x, y) =
       '#' -> if countAcre neighbours '#' > 0 && countAcre neighbours '|' > 0 then '#' else '.'
       _ -> if countAcre neighbours '|' >= 3 then '|' else '.' 
 
-
--- let evolveUntilRepeat maxSteps initialArea = 
---     let rec loop (i : int) (seen : Map<Acre[,], int>) (area : Acre[,]) = 
---         if Map.containsKey area seen then 
---             let firstIndex = seen[area]
---             let loopSize = i - firstIndex
---             let numberInLoop = (maxSteps - firstIndex) % loopSize
---             seen |> Map.toList |> List.find (fun (_, n) -> numberInLoop + firstIndex = n) |> fst
---         else 
---             if i < maxSteps then 
---                 let positions = Area.getNestedPositions area 
---                 let next = positions |> List.map (fun row -> row |> List.map (choose area)) |> Area.fromNestedList
---                 loop (i + 1) (Map.add area i seen) next
---             else 
---                 area
---     loop 0 Map.empty initialArea
-
 step : Area -> Area 
 step area = 
   let 
@@ -333,13 +298,6 @@ subscriptions model =
     tickSub
 
 -- VIEW
-
--- toAcreSymbol : Acre -> Char 
--- toAcreSymbol acre = 
---   case acre of 
---     Lumberyard -> '#'
---     Trees -> '|'
---     Ground -> '.'
 
 getAcreSymbolAtPos : Area -> Pos -> Char 
 getAcreSymbolAtPos area (x, y) = 
