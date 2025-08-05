@@ -1250,10 +1250,9 @@ viewBody model =
     elements = model.reports |> List.concatMap toReportHtmlElement
   in 
     Html.table 
-      [ 
-        Html.Attributes.style "width" "1080px"
-      , Html.Attributes.style "font-family" "Courier New"
-      ]
+      [ Html.Attributes.align "center"
+      , Html.Attributes.style "width" "100%"
+      , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
           [ Html.td 
