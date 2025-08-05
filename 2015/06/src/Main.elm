@@ -418,7 +418,7 @@ initModel viz useBrightness =
             , tickInterval = tickInterval
             , useBrightness = useBrightness
             , counter = 0
-            , debug = "" }
+            , debug = "..." }
   in 
     model 
 
@@ -588,6 +588,7 @@ toRect ((xx, yy), value) =
       in
         r
 
+chooseColor : Int -> String 
 chooseColor value = 
   case value of 
     0 -> "#000000"
@@ -630,6 +631,49 @@ chooseColor value =
     37 -> "#F8F8F8"
     _ -> "#FFFFFF"
 
+chooseColorHex : Int -> Int 
+chooseColorHex value = 
+  case value of 
+    0 -> 0x000000FF
+    1 -> 0x080808FF
+    2 -> 0x101010FF
+    3 -> 0x181818FF
+    4 -> 0x202020FF
+    5 -> 0x282828FF
+    6 -> 0x303030FF
+    7 -> 0x383838FF
+    8 -> 0x404040FF
+    9 -> 0x484848FF
+    10 -> 0x505050FF
+    11 -> 0x585858FF
+    12 -> 0x606060FF
+    13 -> 0x686868FF
+    14 -> 0x696969FF
+    15 -> 0x707070FF
+    16 -> 0x787878FF
+    17 -> 0x808080FF
+    18 -> 0x888888FF
+    19 -> 0x909090FF
+    20 -> 0x989898FF
+    21 -> 0xA0A0A0FF
+    22 -> 0xA8A8A8FF
+    23 -> 0xA9A9A9FF
+    24 -> 0xB0B0B0FF
+    25 -> 0xB8B8B8FF
+    26 -> 0xBEBEBEFF
+    27 -> 0xC0C0C0FF
+    28 -> 0xC8C8C8FF
+    29 -> 0xD0D0D0FF
+    30 -> 0xD3D3D3FF
+    31 -> 0xD8D8D8FF
+    32 -> 0xDCDCDCFF
+    33 -> 0xE0E0E0FF
+    34 -> 0xE8E8E8FF
+    35 -> 0xF0F0F0FF
+    36 -> 0xF5F5F5FF
+    37 -> 0xF8F8F8FF
+    _ -> 0xFFFFFFFF
+
 toRectBrightness : (Pos, Int) -> (Html Msg)
 toRectBrightness ((xx, yy), value) = 
       let 
@@ -669,7 +713,7 @@ toSvg model =
 toImage : Model -> Html Msg 
 toImage model = 
   let 
-    pixels = model.bulbs |> List.map (\(p, c) -> if c == 0 then 0x000000FF else 0xFFFFFFFF)
+    pixels = model.bulbs |> List.map (\(p, c) -> chooseColorHex c)
     imageData = pixels |> Image.fromList 1000
     pngEncodeBase64Url = Image.toPngUrl imageData
   in 

@@ -5601,7 +5601,7 @@ var $author$project$Main$initModel = F2(
 					_Utils_Tuple2(0, 0),
 					_Utils_Tuple2(999, 999))),
 			a_: 0,
-			al: '',
+			al: '...',
 			S: false,
 			X: 0,
 			Y: instructions,
@@ -6339,6 +6339,88 @@ var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$chooseColorHex = function (value) {
+	switch (value) {
+		case 0:
+			return 255;
+		case 1:
+			return 134744319;
+		case 2:
+			return 269488383;
+		case 3:
+			return 404232447;
+		case 4:
+			return 538976511;
+		case 5:
+			return 673720575;
+		case 6:
+			return 808464639;
+		case 7:
+			return 943208703;
+		case 8:
+			return 1077952767;
+		case 9:
+			return 1212696831;
+		case 10:
+			return 1347440895;
+		case 11:
+			return 1482184959;
+		case 12:
+			return 1616929023;
+		case 13:
+			return 1751673087;
+		case 14:
+			return 1768516095;
+		case 15:
+			return 1886417151;
+		case 16:
+			return 2021161215;
+		case 17:
+			return 2155905279;
+		case 18:
+			return 2290649343;
+		case 19:
+			return 2425393407;
+		case 20:
+			return 2560137471;
+		case 21:
+			return 2694881535;
+		case 22:
+			return 2829625599;
+		case 23:
+			return 2846468607;
+		case 24:
+			return 2964369663;
+		case 25:
+			return 3099113727;
+		case 26:
+			return 3200171775;
+		case 27:
+			return 3233857791;
+		case 28:
+			return 3368601855;
+		case 29:
+			return 3503345919;
+		case 30:
+			return 3553874943;
+		case 31:
+			return 3638089983;
+		case 32:
+			return 3705462015;
+		case 33:
+			return 3772834047;
+		case 34:
+			return 3907578111;
+		case 35:
+			return 4042322175;
+		case 36:
+			return 4126537215;
+		case 37:
+			return 4177066239;
+		default:
+			return 4294967295;
+	}
+};
 var $justgook$elm_image$Image$Internal$Meta$FromData = function (a) {
 	return {$: 3, a: a};
 };
@@ -10563,7 +10645,7 @@ var $author$project$Main$toImage = function (model) {
 		function (_v0) {
 			var p = _v0.a;
 			var c = _v0.b;
-			return (!c) ? 255 : 4294967295;
+			return $author$project$Main$chooseColorHex(c);
 		},
 		model.G);
 	var imageData = A2($justgook$elm_image$Image$fromList, 1000, pixels);
