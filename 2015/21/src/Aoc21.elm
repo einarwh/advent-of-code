@@ -135,20 +135,11 @@ type Msg =
   | Step 
   | Clear 
   | Fight 
+  | FindBestDeal 
+  | FindWorstDeal 
   | UseWeapon Weapon 
   | ToggleArmor Armor
   | ToggleRing Ring
-
-        -- let bossHp' = bossHp - max 1 (player.damage - boss.armor)
-        -- if bossHp' > 0 then 
-            -- let playerHp' = playerHp - max 1 (boss.damage - player.armor)
-            -- if playerHp' > 0 then 
-                -- round playerHp' bossHp' 
-            -- else 
-                -- Loss cost 
-        -- else 
-            -- Win cost
-
 
 fightRound : Model -> Model  
 fightRound model = 
@@ -186,15 +177,116 @@ fightRound model =
         in 
           { model | player = updatedPlayer, boss = updatedBoss, rounds = rounds }
 
+selectOne : List a -> List (List a)
+selectOne items = 
+    items |> List.map (\it -> [it])
+
+selectTwo : List a -> List (List a)
+selectTwo items = 
+  case items of 
+    [] -> []
+    [_] -> []
+    [a, b] -> [[a, b]]
+    it :: rest -> 
+      let 
+        lst1 = selectOne rest |> List.map (\lst -> it :: lst)
+        lst2 = selectTwo rest 
+      in 
+        List.append lst1 lst2 
+
+weaponPermutations : List Weapon
+weaponPermutations = 
+  let 
+    weapons = weaponList |> List.map Tuple.first
+  in 
+    weapons
+
+armorPermutations : List (Maybe Armor)
+armorPermutations = 
+  let 
+    armors = armorList |> List.map (Tuple.first >> Just)
+  in 
+    Nothing :: armors
+
+ringPermutations : List (List Ring)
+ringPermutations =
+  let 
+    rings = ringList |> List.map Tuple.first 
+  in 
+    [] :: List.append (selectOne rings) (selectTwo rings)
+
+combos : List (Weapon, Maybe Armor, List Ring)
+combos = 
+  weaponPermutations 
+  |> List.concatMap (\w -> armorPermutations |> List.map (\a -> (w, a)))
+  |> List.concatMap (\(w, a) -> ringPermutations |> List.map (\rs -> (w, a, rs)))
+
+fightToWin : Model -> Maybe Model 
+fightToWin model = 
+  if model.boss.hitPoints == 0 then 
+    Just model 
+  else if model.player.hitPoints == 0 then 
+    Nothing 
+  else 
+    model |> fightRound |> fightToWin 
+
+fightToLose : Model -> Maybe Model 
+fightToLose model = 
+  if model.boss.hitPoints == 0 then 
+    Nothing
+  else if model.player.hitPoints == 0 then 
+    Just model  
+  else 
+    model |> fightRound |> fightToLose 
+
+equipPlayer : Player -> (Weapon, Maybe Armor, List Ring) -> Player 
+equipPlayer player (w, a, rs) = 
+  { player | weapon = Just w, armor = a, rings = rs }
+
+updateFindCheapestWin : Model -> Model 
+updateFindCheapestWin model =
+  if model.finished then 
+    updateFindCheapestWin initModel 
+  else 
+    let 
+      players = combos |> List.map (equipPlayer model.player)
+      models = players |> List.map (\p -> { model | player = p })
+      best = models |> List.filterMap fightToWin |> List.sortBy (\m -> calculateTotalCost m.player) |> List.head |> Maybe.withDefault model 
+      weapon = best.player.weapon |> Maybe.withDefault Dagger
+      armor = best.player.armor 
+      rings = best.player.rings
+      equipped = equipPlayer model.player (weapon, armor, rings)
+    in 
+      { model | player = equipped } 
+
+updateFindMostExpensiveLoss : Model -> Model 
+updateFindMostExpensiveLoss model =  
+  if model.finished then 
+    updateFindMostExpensiveLoss initModel 
+  else 
+    let 
+      players = combos |> List.map (equipPlayer model.player)
+      models = players |> List.map (\p -> { model | player = p })
+      worst = models |> List.filterMap fightToLose |> List.sortBy (\m -> calculateTotalCost m.player) |> List.reverse |> List.head |> Maybe.withDefault model 
+      weapon = worst.player.weapon |> Maybe.withDefault Dagger
+      armor = worst.player.armor 
+      rings = worst.player.rings
+      equipped = equipPlayer model.player (weapon, armor, rings)
+    in 
+      { model | player = equipped } 
+
 updateClear : Model -> Model
 updateClear model = 
   initModel 
 
 updateFight model = 
-  let 
-    paused = not model.paused
-  in  
-    { model | paused = paused }
+  if model.finished then 
+    let 
+      m = initModel 
+    in 
+      { m | paused = False }
+  else if model.paused then { model | paused = False } 
+  else model 
 
 updateTick : Model -> Model 
 updateTick model = 
@@ -245,6 +337,10 @@ update msg model =
   case msg of
     Clear -> 
       (updateClear model, Cmd.none)
+    FindBestDeal -> 
+      (updateFindCheapestWin model, Cmd.none)
+    FindWorstDeal -> 
+      (updateFindMostExpensiveLoss model, Cmd.none)
     Fight -> 
       (updateFight model, Cmd.none)
     UseWeapon weapon -> 
@@ -421,6 +517,7 @@ calculateTotalDamage player =
 calculateTotalArmor : Player -> Int 
 calculateTotalArmor player = 
   player |> getAllStats |> List.map (\s -> s.armor) |> List.sum 
+
 getPlayerStats : Player -> FighterStats
 getPlayerStats player = 
   let 
@@ -572,13 +669,19 @@ viewBody model =
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Clear ] 
-                [ Html.text "Clear" ]
+                [ Html.text "Reset" ]
               , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Fight ] 
-                [ if model.paused then Html.text "Fight!" else Html.text "Halt!" ]
+                [ Html.Attributes.style "width" "80px", onClick FindBestDeal ] 
+                [ Html.text "Best" ] 
               , Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Step ] 
-                [ Html.text "Step" ] 
+                [ Html.Attributes.style "width" "80px", onClick FindWorstDeal ] 
+                [ Html.text "Worst" ] 
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Fight, Html.Attributes.disabled (not model.paused || model.finished) ] 
+                [ Html.text "Fight!" ]
+              -- , Html.button 
+              --   [ Html.Attributes.style "width" "80px", onClick Step ] 
+              --   [ Html.text "Step" ] 
             ] ]
       , Html.tr 
           []
