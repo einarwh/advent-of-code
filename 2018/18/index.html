@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.P.D === region.X.D)
+	if (region.Q.E === region.X.E)
 	{
-		return 'on line ' + region.P.D;
+		return 'on line ' + region.Q.E;
 	}
-	return 'on lines ' + region.P.D + ' through ' + region.X.D;
+	return 'on lines ' + region.Q.E + ' through ' + region.X.E;
 }
 
 
@@ -2733,9 +2733,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		K: func(record.K),
+		L: func(record.L),
 		R: record.R,
-		N: record.N
+		O: record.O
 	}
 });
 
@@ -3003,11 +3003,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.K;
+		var message = !tag ? value : tag < 3 ? value.a : value.L;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.R;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.N) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.O) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3997,7 +3997,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 		impl.aL,
 		impl.aJ,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.O && impl.O(sendToApp)
+			var divertHrefToApp = impl.P && impl.P(sendToApp)
 			var view = impl.aM;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
@@ -4072,7 +4072,7 @@ function _Browser_application(impl)
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		O: function(sendToApp)
+		P: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -5658,7 +5658,7 @@ var $author$project$Aoc18$initArea = function (dataSource) {
 };
 var $author$project$Aoc18$initModel = function (dataSource) {
 	var area = $author$project$Aoc18$initArea(dataSource);
-	return {J: area, U: 0, s: dataSource, W: '', I: false, K: '', v: true, Q: 0, x: $author$project$Aoc18$defaultTickInterval};
+	return {D: area, U: 0, t: dataSource, W: '', K: false, L: '', q: true, F: 0, x: $author$project$Aoc18$defaultTickInterval};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -6084,7 +6084,7 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc18$subscriptions = function (model) {
-	var tickSub = (model.v || model.I) ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = (model.q || model.K) ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
 		model.x,
 		function (_v0) {
@@ -6093,22 +6093,213 @@ var $author$project$Aoc18$subscriptions = function (model) {
 	return tickSub;
 };
 var $author$project$Aoc18$updateClear = function (model) {
-	return $author$project$Aoc18$initModel(model.s);
+	return $author$project$Aoc18$initModel(model.t);
+};
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $author$project$Aoc18$countAcre = F2(
+	function (acres, acre) {
+		return $elm$core$List$length(
+			A2(
+				$elm$core$List$filter,
+				function (a) {
+					return _Utils_eq(a, acre);
+				},
+				acres));
+	});
+var $elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (!maybeValue.$) {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $elm$core$Array$getHelp = F3(
+	function (shift, index, tree) {
+		getHelp:
+		while (true) {
+			var pos = $elm$core$Array$bitMask & (index >>> shift);
+			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+			if (!_v0.$) {
+				var subTree = _v0.a;
+				var $temp$shift = shift - $elm$core$Array$shiftStep,
+					$temp$index = index,
+					$temp$tree = subTree;
+				shift = $temp$shift;
+				index = $temp$index;
+				tree = $temp$tree;
+				continue getHelp;
+			} else {
+				var values = _v0.a;
+				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
+			}
+		}
+	});
+var $elm$core$Array$get = F2(
+	function (index, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
+			index,
+			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
+			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
+			A3($elm$core$Array$getHelp, startShift, index, tree)));
+	});
+var $tortus$elm_array_2d$Array2D$getRow = F2(
+	function (row, array2d) {
+		return A2($elm$core$Array$get, row, array2d.a);
+	});
+var $tortus$elm_array_2d$Array2D$get = F3(
+	function (row, col, array2d) {
+		return A2(
+			$elm$core$Maybe$andThen,
+			$elm$core$Array$get(col),
+			A2($tortus$elm_array_2d$Array2D$getRow, row, array2d));
+	});
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (!_v0.$) {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $author$project$Aoc18$getNeighbours = F2(
+	function (arr, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var positions = _List_fromArray(
+			[
+				_Utils_Tuple2(x - 1, y - 1),
+				_Utils_Tuple2(x, y - 1),
+				_Utils_Tuple2(x + 1, y - 1),
+				_Utils_Tuple2(x - 1, y),
+				_Utils_Tuple2(x + 1, y),
+				_Utils_Tuple2(x - 1, y + 1),
+				_Utils_Tuple2(x, y + 1),
+				_Utils_Tuple2(x + 1, y + 1)
+			]);
+		return A2(
+			$elm$core$List$filterMap,
+			function (_v1) {
+				var xx = _v1.a;
+				var yy = _v1.b;
+				return A3($tortus$elm_array_2d$Array2D$get, yy, xx, arr);
+			},
+			positions);
+	});
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Aoc18$evolveAcre = F2(
+	function (area, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var neighbours = A2(
+			$author$project$Aoc18$getNeighbours,
+			area,
+			_Utils_Tuple2(x, y));
+		var _v1 = A2(
+			$elm$core$Maybe$withDefault,
+			0,
+			A3($tortus$elm_array_2d$Array2D$get, y, x, area));
+		switch (_v1) {
+			case 0:
+				return (A2($author$project$Aoc18$countAcre, neighbours, 1) >= 3) ? 1 : 0;
+			case 1:
+				return (A2($author$project$Aoc18$countAcre, neighbours, 2) >= 3) ? 2 : 1;
+			default:
+				return ((A2($author$project$Aoc18$countAcre, neighbours, 2) > 0) && (A2($author$project$Aoc18$countAcre, neighbours, 1) > 0)) ? 2 : 0;
+		}
+	});
+var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
+	return array2d.h;
+};
+var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
+	return $elm$core$Array$length(array2d.a);
+};
+var $author$project$Aoc18$getNestedPositions = function (arr) {
+	var ys = A2(
+		$elm$core$List$range,
+		0,
+		$tortus$elm_array_2d$Array2D$rows(arr) - 1);
+	var xs = A2(
+		$elm$core$List$range,
+		0,
+		$tortus$elm_array_2d$Array2D$columns(arr) - 1);
+	return A2(
+		$elm$core$List$map,
+		function (y) {
+			return A2(
+				$elm$core$List$map,
+				function (x) {
+					return _Utils_Tuple2(x, y);
+				},
+				xs);
+		},
+		ys);
+};
+var $author$project$Aoc18$step = function (area) {
+	var nestedPositions = $author$project$Aoc18$getNestedPositions(area);
+	return $tortus$elm_array_2d$Array2D$fromList(
+		A2(
+			$elm$core$List$map,
+			function (positions) {
+				return A2(
+					$elm$core$List$map,
+					$author$project$Aoc18$evolveAcre(area),
+					positions);
+			},
+			nestedPositions));
 };
 var $author$project$Aoc18$updateStep = function (model) {
-	return model;
+	var steps = model.F;
+	var pause = (steps + 1) === 10;
+	var a = $author$project$Aoc18$step(model.D);
+	return _Utils_update(
+		model,
+		{D: a, q: pause, F: steps + 1});
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc18$updateTogglePlay = function (model) {
-	if (model.I) {
-		var m = $author$project$Aoc18$initModel(model.s);
+	if (model.K) {
+		var m = $author$project$Aoc18$initModel(model.t);
 		return _Utils_update(
 			m,
-			{v: false});
+			{q: false});
 	} else {
 		return _Utils_update(
 			model,
-			{v: !model.v});
+			{q: !model.q});
 	}
 };
 var $author$project$Aoc18$updateUseInput = function (model) {
@@ -6196,23 +6387,25 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 	});
 var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
-	return array2d.h;
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
 };
-var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
-	return $elm$core$Array$length(array2d.a);
-};
-var $author$project$Aoc18$getNestedPositions = function (grid) {
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
+var $author$project$Aoc18$getAllPositions = function (arr) {
 	var ys = A2(
 		$elm$core$List$range,
 		0,
-		$tortus$elm_array_2d$Array2D$rows(grid) - 1);
+		$tortus$elm_array_2d$Array2D$rows(arr) - 1);
 	var xs = A2(
 		$elm$core$List$range,
 		0,
-		$tortus$elm_array_2d$Array2D$columns(grid) - 1);
+		$tortus$elm_array_2d$Array2D$columns(arr) - 1);
 	return A2(
-		$elm$core$List$map,
+		$elm$core$List$concatMap,
 		function (y) {
 			return A2(
 				$elm$core$List$map,
@@ -6222,6 +6415,19 @@ var $author$project$Aoc18$getNestedPositions = function (grid) {
 				xs);
 		},
 		ys);
+};
+var $author$project$Aoc18$getResourceValue = function (area) {
+	var acres = A2(
+		$elm$core$List$filterMap,
+		function (_v0) {
+			var x = _v0.a;
+			var y = _v0.b;
+			return A3($tortus$elm_array_2d$Array2D$get, y, x, area);
+		},
+		$author$project$Aoc18$getAllPositions(area));
+	var lumberyards = A2($author$project$Aoc18$countAcre, acres, 2);
+	var trees = A2($author$project$Aoc18$countAcre, acres, 1);
+	return trees * lumberyards;
 };
 var $elm$html$Html$Attributes$href = function (url) {
 	return A2(
@@ -6258,59 +6464,6 @@ var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
 };
-var $elm$core$Maybe$andThen = F2(
-	function (callback, maybeValue) {
-		if (!maybeValue.$) {
-			var value = maybeValue.a;
-			return callback(value);
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $elm$core$Array$getHelp = F3(
-	function (shift, index, tree) {
-		getHelp:
-		while (true) {
-			var pos = $elm$core$Array$bitMask & (index >>> shift);
-			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
-			if (!_v0.$) {
-				var subTree = _v0.a;
-				var $temp$shift = shift - $elm$core$Array$shiftStep,
-					$temp$index = index,
-					$temp$tree = subTree;
-				shift = $temp$shift;
-				index = $temp$index;
-				tree = $temp$tree;
-				continue getHelp;
-			} else {
-				var values = _v0.a;
-				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
-			}
-		}
-	});
-var $elm$core$Array$get = F2(
-	function (index, _v0) {
-		var len = _v0.a;
-		var startShift = _v0.b;
-		var tree = _v0.c;
-		var tail = _v0.d;
-		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
-			index,
-			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
-			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
-			A3($elm$core$Array$getHelp, startShift, index, tree)));
-	});
-var $tortus$elm_array_2d$Array2D$getRow = F2(
-	function (row, array2d) {
-		return A2($elm$core$Array$get, row, array2d.a);
-	});
-var $tortus$elm_array_2d$Array2D$get = F3(
-	function (row, col, array2d) {
-		return A2(
-			$elm$core$Maybe$andThen,
-			$elm$core$Array$get(col),
-			A2($tortus$elm_array_2d$Array2D$getRow, row, array2d));
-	});
 var $author$project$Aoc18$toAcreSymbol = function (acre) {
 	switch (acre) {
 		case 2:
@@ -6348,14 +6501,14 @@ var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Aoc18$viewBody = function (model) {
 	var textFontSize = function () {
-		var _v0 = model.s;
+		var _v0 = model.t;
 		if (_v0 === 1) {
 			return '24px';
 		} else {
 			return '12px';
 		}
 	}();
-	var area = model.J;
+	var area = model.D;
 	var nestedPositions = $author$project$Aoc18$getNestedPositions(area);
 	var nestedElements = A2(
 		$elm$core$List$map,
@@ -6380,6 +6533,7 @@ var $author$project$Aoc18$viewBody = function (model) {
 			}),
 		_List_Nil,
 		nestedElements);
+	var resourceValue = $author$project$Aoc18$getResourceValue(area);
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
@@ -6545,7 +6699,7 @@ var $author$project$Aoc18$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(7),
-										$elm$html$Html$Attributes$checked(!model.s)
+										$elm$html$Html$Attributes$checked(!model.t)
 									]),
 								_List_Nil),
 								A2(
@@ -6561,7 +6715,7 @@ var $author$project$Aoc18$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(6),
-										$elm$html$Html$Attributes$checked(model.s === 1)
+										$elm$html$Html$Attributes$checked(model.t === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -6596,7 +6750,7 @@ var $author$project$Aoc18$viewBody = function (model) {
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Clear')
+										$elm$html$Html$text('Reset')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -6618,7 +6772,7 @@ var $author$project$Aoc18$viewBody = function (model) {
 									]),
 								_List_fromArray(
 									[
-										model.v ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
+										model.q ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -6665,21 +6819,22 @@ var $author$project$Aoc18$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										'Steps: ' + $elm$core$String$fromInt(model.Q))
+										'Minutes: ' + $elm$core$String$fromInt(model.F))
 									])),
 								A2(
 								$elm$html$Html$div,
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('?')
+										$elm$html$Html$text(
+										'Value: ' + $elm$core$String$fromInt(resourceValue))
 									])),
 								A2(
 								$elm$html$Html$div,
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(model.K)
+										$elm$html$Html$text(model.L)
 									]))
 							]))
 					])),

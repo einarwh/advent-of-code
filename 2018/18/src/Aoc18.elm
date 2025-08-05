@@ -164,19 +164,19 @@ type Msg =
   | UseSample 
   | UseInput 
 
-getAllPositions : Array2D Bool -> List Pos
-getAllPositions grid = 
+getAllPositions : Array2D a -> List Pos
+getAllPositions arr = 
   let
-    ys = List.range 0 (Array2D.rows grid - 1)
-    xs = List.range 0 (Array2D.columns grid - 1)
+    ys = List.range 0 (Array2D.rows arr - 1)
+    xs = List.range 0 (Array2D.columns arr - 1)
   in 
     ys |> List.concatMap (\y -> xs |> List.map (\x -> (x, y)))
 
 getNestedPositions : Array2D a -> List (List Pos)
-getNestedPositions grid = 
+getNestedPositions arr = 
   let
-    ys = List.range 0 (Array2D.rows grid - 1)
-    xs = List.range 0 (Array2D.columns grid - 1)
+    ys = List.range 0 (Array2D.rows arr - 1)
+    xs = List.range 0 (Array2D.columns arr - 1)
   in 
     ys |> List.map (\y -> xs |> List.map (\x -> (x, y)))
 
@@ -188,23 +188,57 @@ posToString : (Int, Int) -> String
 posToString (x, y) = 
   String.fromInt x ++ "," ++ String.fromInt y
 
-isCorner : Array2D a -> (Int, Int) -> Bool
-isCorner grid (x, y) = 
-  let 
-    xMax = Array2D.rows grid - 1
-    yMax = Array2D.columns grid - 1
-  in 
-    (x == 0 && y == 0) || (x == xMax && y == 0) || (x == 0 && y == yMax) || (x == xMax && y == yMax)
-
-getNeighbours : Array2D Bool -> (Int, Int) -> List Bool
-getNeighbours grid (x, y) = 
+getNeighbours : Array2D a -> (Int, Int) -> List a
+getNeighbours arr (x, y) = 
   let 
     positions = [(x-1, y-1), (x, y-1), (x+1, y-1), (x-1,y), (x+1,y), (x-1, y+1), (x, y+1), (x+1, y+1)]
   in 
-    positions |> List.filterMap (\(xx, yy) -> Array2D.get yy xx grid)
+    positions |> List.filterMap (\(xx, yy) -> Array2D.get yy xx arr)
+
+-- let getResourceValue area = 
+--     let acres = area |> Area.toNestedList |> List.concat 
+--     let trees = countAcre acres Trees 
+--     let lumberyards = countAcre acres Lumberyard
+--     trees * lumberyards
+
+getResourceValue : Area -> Int
+getResourceValue area = 
+  let 
+    acres = area |> getAllPositions |> List.filterMap (\(x, y) -> Array2D.get y x area)
+    trees = countAcre acres Trees 
+    lumberyards = countAcre acres Lumberyard 
+  in 
+    trees * lumberyards
+
+countAcre : List Acre -> Acre -> Int 
+countAcre acres acre = 
+  acres |> List.filter (\a -> a == acre) |> List.length 
+
+evolveAcre : Area -> Pos -> Acre 
+evolveAcre area (x, y) = 
+  let 
+    neighbours = getNeighbours area (x, y) 
+  in 
+    case Array2D.get y x area |> Maybe.withDefault Ground of 
+      Ground -> if countAcre neighbours Trees >= 3 then Trees else Ground 
+      Trees -> if countAcre neighbours Lumberyard >= 3 then Lumberyard else Trees 
+      Lumberyard -> if countAcre neighbours Lumberyard > 0 && countAcre neighbours Trees > 0 then Lumberyard else Ground
+
+step : Area -> Area 
+step area = 
+  let 
+    nestedPositions = getNestedPositions area
+  in 
+    nestedPositions |> List.map (\positions -> positions |> List.map (evolveAcre area)) |> Array2D.fromList
 
 updateStep : Model -> Model
-updateStep model = model 
+updateStep model = 
+  let  
+    steps = model.steps
+    a = step model.area 
+    pause = steps + 1 == 10 
+  in 
+    { model | steps = steps + 1, area = a, paused = pause }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -287,6 +321,7 @@ viewBody model =
     nestedPositions = getNestedPositions area
     nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement area))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
+    resourceValue = getResourceValue area 
     textFontSize = 
       case model.dataSource of 
         Sample -> "24px"
@@ -358,7 +393,7 @@ viewBody model =
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Clear ] 
-                [ Html.text "Clear"]
+                [ Html.text "Reset"]
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Slower ] 
                 [ text "Slower" ]
@@ -379,8 +414,8 @@ viewBody model =
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "24px" ] 
               [ 
-                Html.div [] [ Html.text ("Steps: " ++ String.fromInt model.steps) ]
-              , Html.div [] [ Html.text "?" ]
+                Html.div [] [ Html.text ("Minutes: " ++ String.fromInt model.steps) ]
+              , Html.div [] [ Html.text ("Value: " ++ String.fromInt resourceValue) ]
               , Html.div [] [ Html.text model.message ]
               ] ]
       , Html.tr 
