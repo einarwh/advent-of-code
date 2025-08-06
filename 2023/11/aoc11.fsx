@@ -48,14 +48,15 @@ let findDistance expansion emptyRows emptyColumns ((x1, y1), (x2, y2)) =
     let yExpansion = emptyRows |> getExpansion yStart yStop 
     xStop - xStart + xExpansion + yStop - yStart + yExpansion
     
-let run fileName = 
+let run expansion fileName = 
     let rows = readLines fileName |> Array.toList
     let emptyRows = findEmptyRows rows 
     let emptyColumns = findEmptyColumns rows 
     rows 
     |> findGalaxies 
     |> findPairs 
-    |> List.sumBy (findDistance 1000000 emptyRows emptyColumns)
+    |> List.sumBy (findDistance expansion emptyRows emptyColumns)
     |> printfn "%d"
 
-"input" |> run 
+run 2 "input.txt"
+run 1000000 "input.txt"

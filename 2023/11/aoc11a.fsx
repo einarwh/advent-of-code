@@ -71,4 +71,4 @@ let run fileName =
     |> List.sumBy findDistance 
     |> printfn "%A"
 
-"sample" |> run 
+"input.txt" |> run 
