@@ -10,7 +10,7 @@ let trees (lines : string array) (right : int, left : int) : int64 =
     |> Array.map (fun (i, line) -> if '#' = line.[(right * i) % line.Length] then 1L else 0L)
     |> Array.sum
 
-let lines = "input" |> File.ReadAllLines
+let lines = "input.txt" |> File.ReadAllLines
 let configs = [ (1, 1); (3, 1); (5, 1); (7, 1); (1, 2) ]
 configs
 |> List.map (trees lines)

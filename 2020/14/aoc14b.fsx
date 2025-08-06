@@ -1,3 +1,7 @@
+// Advent of Code 2020. 
+// Day 14: Docking Data, Part B.
+// dotnet fsi aoc14b.fsx
+
 open System.Text.RegularExpressions
 open System.IO
 
@@ -90,14 +94,15 @@ let toInt64 (bits : Bit array) : int64 =
 let dumpValues (memory : Memory) =
     memory |> Map.toList |> List.map snd |> List.map toInt64
 
-[<EntryPoint>]
-let main argv =
+let run fileName =
     let initMask = parseMask "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     let initMemory = Map.empty
     let (_, memory) =
-        File.ReadAllLines argv.[0]
+        File.ReadAllLines fileName
         |> Array.filter (fun s -> s.Length > 0)
         |> Array.map parseInstruction
         |> Array.fold runInstruction (initMask, initMemory)
     memory |> dumpValues |> List.sum |> printfn "%d" 
     0 
+
+"input.txt" |> run 

@@ -1,3 +1,7 @@
+// Advent of Code 2020. 
+// Day 14: Docking Data, Part A.
+// dotnet fsi aoc14a.fsx
+
 open System.IO
 open System.Text.RegularExpressions
 
@@ -46,15 +50,16 @@ let runInstruction (mask : Mask, memory : Memory) (inst : Instruction) : (Mask *
 let dumpValues (memory : Memory) =
     memory |> Map.toList |> List.map snd 
     
-[<EntryPoint>]
-let main argv =
+let run fileName =
     let initMask = parseMask "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     let initMemory = Map.empty
     let endState =
-        File.ReadAllLines argv.[0]
+        File.ReadAllLines fileName
         |> Array.filter (fun s -> s.Length > 0)
         |> Array.map parseInstruction
         |> Array.fold runInstruction (initMask, initMemory)
     let sum = endState |> snd |> dumpValues |> List.sum 
     printfn "%d" sum
     0 
+
+"input.txt" |> run 

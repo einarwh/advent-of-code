@@ -16,7 +16,7 @@ let run (lines : string array) (configs : (int * int) list) =
     |> List.reduce (*)
     |> printfn "%d"
 
-let lines = "input" |> File.ReadAllLines
+let lines = "input.txt" |> File.ReadAllLines
 
 [ (3, 1) ] |> run lines
 [ (1, 1); (3, 1); (5, 1); (7, 1); (1, 2) ] |> run lines

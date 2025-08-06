@@ -3,7 +3,7 @@
 
 open System.IO
 
-let lines = "input" |> File.ReadAllLines
+let lines = "input.txt" |> File.ReadAllLines
 let len = (Array.head lines).Length
 
 lines
