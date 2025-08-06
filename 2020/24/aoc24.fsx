@@ -100,6 +100,22 @@ let evolve days blackTiles =
             tiles 
     loop 0 blackTiles 
 
+let findMinMaxRow tiles = 
+    let rec loop (lowest, highest) tiles = 
+        match tiles with 
+        | [] -> (lowest, highest) 
+        | tile :: rest -> 
+            loop (min lowest tile.r, max highest tile.r) rest 
+    loop (0, 0) tiles 
+
+let findMinMaxColumn tiles = 
+    let rec loop (lowest, highest) tiles = 
+        match tiles with 
+        | [] -> (lowest, highest) 
+        | tile :: rest -> 
+            loop (min lowest tile.c, max highest tile.c) rest 
+    loop (0, 0) tiles 
+
 let readLines = 
     File.ReadAllLines
     >> Array.filter (fun line -> line <> String.Empty)
@@ -110,6 +126,9 @@ let run fileName =
     let moveList : Move list list = lines |> List.map parseLine 
     let blackTiles = findInitialBlackTiles moveList |> Set.ofList 
     blackTiles |> Set.count |> printfn "%d"
-    blackTiles |> evolve 100 |> Set.count |> printfn "%d"
+    let hundred = blackTiles |> evolve 100
+    hundred |> Set.count |> printfn "%d"
+    // findMinMaxRow (hundred |> Set.toList) |> printfn "%A" -- (-32, 31)
+    // findMinMaxColumn (hundred |> Set.toList) |> printfn "%A" -- (-56, 59)
 
 run "input.txt"
