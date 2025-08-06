@@ -6418,7 +6418,7 @@ var $author$project$Main$view = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(' Find easter egg')
+										$elm$html$Html$text(' Find Easter egg')
 									]))
 							]))
 					])),

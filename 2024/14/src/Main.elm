@@ -1640,7 +1640,7 @@ view model =
               [ Html.input 
                 [ Html.Attributes.type_ "checkbox", onClick ToggleEasterEgg, Html.Attributes.checked model.findEasterEgg ] 
                 []
-              , Html.label [] [ Html.text " Find easter egg" ]
+              , Html.label [] [ Html.text " Find Easter egg" ]
             ] ]
       , Html.tr 
           []
