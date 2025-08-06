@@ -672,6 +672,18 @@ calculateSafetyFactor width height robots =
   in 
     nw * ne * sw * se
 
+longLine : Set Pos -> Pos -> Bool 
+longLine posSet (xStart, y) = 
+  List.range xStart (xStart + 10) |> List.all (\x -> Set.member (x, y) posSet)
+
+checkEasterEgg : List Robot -> Bool 
+checkEasterEgg robots = 
+  let 
+    posList = robots |> List.map (\r -> r.position)
+    posSet = posList |> Set.fromList 
+  in 
+    posList |> List.any (longLine posSet)
+
 updateClear : Model -> Model
 updateClear model = 
   initModel model.findEasterEgg model.dataSource 
@@ -681,7 +693,7 @@ updateStep model =
   let 
     steps = model.steps 
     robots = moveAll model.width model.height model.robots 
-    pause = model.paused || steps + 1 == 100
+    pause = model.paused || steps + 1 == 100 || (model.findEasterEgg && checkEasterEgg robots)
   in 
     { model | robots = robots, steps = steps + 1, paused = pause }
 

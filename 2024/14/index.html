@@ -2733,7 +2733,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		o: func(record.o),
+		p: func(record.p),
 		U: record.U,
 		R: record.R
 	}
@@ -3003,7 +3003,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.o;
+		var message = !tag ? value : tag < 3 ? value.a : value.p;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.U;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -5282,7 +5282,7 @@ var $author$project$Aoc14$parseRobot = function (s) {
 			var p = _v2.a.a;
 			var v = _v2.b.a;
 			return $elm$core$Maybe$Just(
-				{A: p, V: v});
+				{w: p, V: v});
 		} else {
 			return $elm$core$Maybe$Nothing;
 		}
@@ -5310,7 +5310,7 @@ var $author$project$Aoc14$initModel = F2(
 		var _v0 = $author$project$Aoc14$initDim(dataSource);
 		var width = _v0.a;
 		var height = _v0.b;
-		return {s: dataSource, _: '', t: findEasterEgg, N: false, F: height, p: true, B: robots, H: 0, x: $author$project$Aoc14$defaultTickInterval, M: width};
+		return {t: dataSource, _: '', o: findEasterEgg, N: false, F: height, q: true, B: robots, H: 0, y: $author$project$Aoc14$defaultTickInterval, M: width};
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -5736,21 +5736,101 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc14$subscriptions = function (model) {
-	var tickSub = (model.p || model.N) ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = (model.q || model.N) ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.x,
+		model.y,
 		function (_v0) {
 			return 0;
 		});
 	return tickSub;
 };
 var $author$project$Aoc14$updateClear = function (model) {
-	return A2($author$project$Aoc14$initModel, model.t, model.s);
+	return A2($author$project$Aoc14$initModel, model.o, model.t);
+};
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$Set$Set_elm_builtin = $elm$core$Basics$identity;
+var $elm$core$Set$empty = $elm$core$Dict$empty;
+var $elm$core$Set$insert = F2(
+	function (key, _v0) {
+		var dict = _v0;
+		return A3($elm$core$Dict$insert, key, 0, dict);
+	});
+var $elm$core$Set$fromList = function (list) {
+	return A3($elm$core$List$foldl, $elm$core$Set$insert, $elm$core$Set$empty, list);
+};
+var $elm$core$Basics$not = _Basics_not;
+var $elm$core$List$all = F2(
+	function (isOkay, list) {
+		return !A2(
+			$elm$core$List$any,
+			A2($elm$core$Basics$composeL, $elm$core$Basics$not, isOkay),
+			list);
+	});
+var $elm$core$Dict$member = F2(
+	function (key, dict) {
+		var _v0 = A2($elm$core$Dict$get, key, dict);
+		if (!_v0.$) {
+			return true;
+		} else {
+			return false;
+		}
+	});
+var $elm$core$Set$member = F2(
+	function (key, _v0) {
+		var dict = _v0;
+		return A2($elm$core$Dict$member, key, dict);
+	});
+var $author$project$Aoc14$longLine = F2(
+	function (posSet, _v0) {
+		var xStart = _v0.a;
+		var y = _v0.b;
+		return A2(
+			$elm$core$List$all,
+			function (x) {
+				return A2(
+					$elm$core$Set$member,
+					_Utils_Tuple2(x, y),
+					posSet);
+			},
+			A2($elm$core$List$range, xStart, xStart + 10));
+	});
+var $author$project$Aoc14$checkEasterEgg = function (robots) {
+	var posList = A2(
+		$elm$core$List$map,
+		function (r) {
+			return r.w;
+		},
+		robots);
+	var posSet = $elm$core$Set$fromList(posList);
+	return A2(
+		$elm$core$List$any,
+		$author$project$Aoc14$longLine(posSet),
+		posList);
 };
 var $elm$core$Basics$modBy = _Basics_modBy;
 var $author$project$Aoc14$move = F3(
 	function (width, height, robot) {
-		var _v0 = robot.A;
+		var _v0 = robot.w;
 		var x = _v0.a;
 		var y = _v0.b;
 		var _v1 = robot.V;
@@ -5761,7 +5841,7 @@ var $author$project$Aoc14$move = F3(
 		return _Utils_update(
 			robot,
 			{
-				A: _Utils_Tuple2(xMoved, yMoved)
+				w: _Utils_Tuple2(xMoved, yMoved)
 			});
 	});
 var $author$project$Aoc14$moveAll = F3(
@@ -5774,27 +5854,26 @@ var $author$project$Aoc14$moveAll = F3(
 var $author$project$Aoc14$updateStep = function (model) {
 	var steps = model.H;
 	var robots = A3($author$project$Aoc14$moveAll, model.M, model.F, model.B);
-	var pause = model.p || ((steps + 1) === 100);
+	var pause = model.q || (((steps + 1) === 100) || (model.o && $author$project$Aoc14$checkEasterEgg(robots)));
 	return _Utils_update(
 		model,
-		{p: pause, B: robots, H: steps + 1});
+		{q: pause, B: robots, H: steps + 1});
 };
-var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc14$updateToggleEasterEgg = function (model) {
-	var findEasterEgg = !model.t;
-	return A2($author$project$Aoc14$initModel, findEasterEgg, model.s);
+	var findEasterEgg = !model.o;
+	return A2($author$project$Aoc14$initModel, findEasterEgg, model.t);
 };
 var $author$project$Aoc14$updateTogglePlay = function (model) {
 	return _Utils_update(
 		model,
-		{p: !model.p});
+		{q: !model.q});
 };
 var $author$project$Aoc14$updateUseInput = function (model) {
-	return A2($author$project$Aoc14$initModel, model.t, 0);
+	return A2($author$project$Aoc14$initModel, model.o, 0);
 };
 var $author$project$Aoc14$Sample = 1;
 var $author$project$Aoc14$updateUseSample = function (model) {
-	return A2($author$project$Aoc14$initModel, model.t, 1);
+	return A2($author$project$Aoc14$initModel, model.o, 1);
 };
 var $author$project$Aoc14$update = F2(
 	function (msg, model) {
@@ -5815,13 +5894,13 @@ var $author$project$Aoc14$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{x: model.x / 2}),
+						{y: model.y / 2}),
 					$elm$core$Platform$Cmd$none);
 			case 5:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{x: model.x * 2}),
+						{y: model.y * 2}),
 					$elm$core$Platform$Cmd$none);
 			case 2:
 				return _Utils_Tuple2(
@@ -5952,7 +6031,7 @@ var $author$project$Aoc14$toQuadrant = F2(
 			A2(
 				$elm$core$List$map,
 				function (r) {
-					return r.A;
+					return r.w;
 				},
 				robots));
 	});
@@ -6008,16 +6087,6 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 	});
 var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$core$Set$Set_elm_builtin = $elm$core$Basics$identity;
-var $elm$core$Set$empty = $elm$core$Dict$empty;
-var $elm$core$Set$insert = F2(
-	function (key, _v0) {
-		var dict = _v0;
-		return A3($elm$core$Dict$insert, key, 0, dict);
-	});
-var $elm$core$Set$fromList = function (list) {
-	return A3($elm$core$List$foldl, $elm$core$Set$insert, $elm$core$Set$empty, list);
-};
 var $author$project$Aoc14$getNestedPositions = F2(
 	function (width, height) {
 		var ys = A2($elm$core$List$range, 0, height - 1);
@@ -6065,20 +6134,6 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$core$Dict$member = F2(
-	function (key, dict) {
-		var _v0 = A2($elm$core$Dict$get, key, dict);
-		if (!_v0.$) {
-			return true;
-		} else {
-			return false;
-		}
-	});
-var $elm$core$Set$member = F2(
-	function (key, _v0) {
-		var dict = _v0;
-		return A2($elm$core$Dict$member, key, dict);
-	});
 var $author$project$Aoc14$toCharElement = F2(
 	function (robotSet, _v0) {
 		var x = _v0.a;
@@ -6093,7 +6148,7 @@ var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Aoc14$viewBody = function (model) {
 	var textFontSize = function () {
-		var _v0 = model.s;
+		var _v0 = model.t;
 		if (_v0 === 1) {
 			return '24px';
 		} else {
@@ -6105,7 +6160,7 @@ var $author$project$Aoc14$viewBody = function (model) {
 		A2(
 			$elm$core$List$map,
 			function (r) {
-				return r.A;
+				return r.w;
 			},
 			model.B));
 	var nestedPositions = A2($author$project$Aoc14$getNestedPositions, model.M, model.F);
@@ -6297,7 +6352,7 @@ var $author$project$Aoc14$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(8),
-										$elm$html$Html$Attributes$checked(!model.s)
+										$elm$html$Html$Attributes$checked(!model.t)
 									]),
 								_List_Nil),
 								A2(
@@ -6313,7 +6368,7 @@ var $author$project$Aoc14$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(7),
-										$elm$html$Html$Attributes$checked(model.s === 1)
+										$elm$html$Html$Attributes$checked(model.t === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -6370,7 +6425,7 @@ var $author$project$Aoc14$viewBody = function (model) {
 									]),
 								_List_fromArray(
 									[
-										model.p ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
+										model.q ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -6415,7 +6470,7 @@ var $author$project$Aoc14$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('checkbox'),
 										$elm$html$Html$Events$onClick(3),
-										$elm$html$Html$Attributes$checked(model.t)
+										$elm$html$Html$Attributes$checked(model.o)
 									]),
 								_List_Nil),
 								A2(
