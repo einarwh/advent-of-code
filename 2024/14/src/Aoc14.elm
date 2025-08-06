@@ -35,6 +35,7 @@ type alias Model =
   { robots : List Robot 
   , width : Int 
   , height : Int 
+  , findEasterEgg : Bool 
   , dataSource : DataSource
   , steps : Int 
   , paused : Bool 
@@ -595,8 +596,8 @@ initDim dataSource =
     Sample -> (11, 7)
     Input -> (101, 103)
 
-initModel : DataSource -> Model 
-initModel dataSource = 
+initModel : Bool -> DataSource -> Model 
+initModel findEasterEgg dataSource = 
   let 
     robots = initRobots dataSource
     (width, height) = initDim dataSource 
@@ -604,6 +605,7 @@ initModel dataSource =
     { robots = robots
     , width = width 
     , height = height 
+    , findEasterEgg = findEasterEgg
     , steps = 0
     , dataSource = dataSource
     , paused = True
@@ -613,7 +615,7 @@ initModel dataSource =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel Input, Cmd.none)
+  (initModel False Input, Cmd.none)
 
 -- UPDATE
 
@@ -621,6 +623,7 @@ type Msg =
   Tick 
   | Step 
   | TogglePlay 
+  | ToggleEasterEgg
   | Faster 
   | Slower 
   | Clear 
@@ -671,7 +674,7 @@ calculateSafetyFactor width height robots =
 
 updateClear : Model -> Model
 updateClear model = 
-  initModel model.dataSource 
+  initModel model.findEasterEgg model.dataSource 
 
 updateStep : Model -> Model
 updateStep model = 
@@ -686,13 +689,20 @@ updateTogglePlay : Model -> Model
 updateTogglePlay model = 
   { model | paused = not model.paused }
 
+updateToggleEasterEgg : Model -> Model
+updateToggleEasterEgg model = 
+  let
+    findEasterEgg = not model.findEasterEgg
+  in
+    initModel findEasterEgg model.dataSource 
+
 updateUseSample : Model -> Model
 updateUseSample model = 
-  initModel Sample 
+  initModel model.findEasterEgg Sample 
 
 updateUseInput : Model -> Model
 updateUseInput model = 
-  initModel Input 
+  initModel model.findEasterEgg Input 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -709,6 +719,8 @@ update msg model =
       ({model | tickInterval = model.tickInterval * 2 }, Cmd.none)
     TogglePlay -> 
       (updateTogglePlay model, Cmd.none)
+    ToggleEasterEgg -> 
+      (updateToggleEasterEgg model, Cmd.none)
     UseSample -> 
       (updateUseSample model, Cmd.none)
     UseInput -> 
@@ -826,6 +838,15 @@ viewBody model =
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Step ] 
                 [ Html.text "Step" ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center" ]
+              [ Html.input 
+                [ Html.Attributes.type_ "checkbox", onClick ToggleEasterEgg, Html.Attributes.checked model.findEasterEgg ] 
+                []
+              , Html.label [] [ Html.text " Find easter egg" ]
             ] ]
       , Html.tr 
           []

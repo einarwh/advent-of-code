@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.S.F === region._.F)
+	if (region.T.G === region.aa.G)
 	{
-		return 'on line ' + region.S.F;
+		return 'on line ' + region.T.G;
 	}
-	return 'on lines ' + region.S.F + ' through ' + region._.F;
+	return 'on lines ' + region.T.G + ' through ' + region.aa.G;
 }
 
 
@@ -1871,9 +1871,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aE,
-		impl.aM,
-		impl.aK,
+		impl.aF,
+		impl.aN,
+		impl.aL,
 		function() { return function() {} }
 	);
 });
@@ -2734,8 +2734,8 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
 		o: func(record.o),
-		T: record.T,
-		Q: record.Q
+		U: record.U,
+		R: record.R
 	}
 });
 
@@ -3004,10 +3004,10 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 
 		var value = result.a;
 		var message = !tag ? value : tag < 3 ? value.a : value.o;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.T;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.U;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.Q) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.R) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3957,11 +3957,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aE,
-		impl.aM,
-		impl.aK,
+		impl.aF,
+		impl.aN,
+		impl.aL,
 		function(sendToApp, initialModel) {
-			var view = impl.aN;
+			var view = impl.aO;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3993,12 +3993,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aE,
-		impl.aM,
-		impl.aK,
+		impl.aF,
+		impl.aN,
+		impl.aL,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.R && impl.R(sendToApp)
-			var view = impl.aN;
+			var divertHrefToApp = impl.S && impl.S(sendToApp)
+			var view = impl.aO;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -4006,12 +4006,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.ax);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.ay);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.aL) && (_VirtualDom_doc.title = title = doc.aL);
+				(title !== doc.aM) && (_VirtualDom_doc.title = title = doc.aM);
 			});
 		}
 	);
@@ -4067,12 +4067,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aG;
-	var onUrlRequest = impl.aH;
+	var onUrlChange = impl.aH;
+	var onUrlRequest = impl.aI;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		R: function(sendToApp)
+		S: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4088,9 +4088,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.al === next.al
-							&& curr.ac === next.ac
-							&& curr.ai.a === next.ai.a
+							&& curr.am === next.am
+							&& curr.ad === next.ad
+							&& curr.aj.a === next.aj.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4098,13 +4098,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aE: function(flags)
+		aF: function(flags)
 		{
-			return A3(impl.aE, flags, _Browser_getUrl(), key);
+			return A3(impl.aF, flags, _Browser_getUrl(), key);
 		},
+		aO: impl.aO,
 		aN: impl.aN,
-		aM: impl.aM,
-		aK: impl.aK
+		aL: impl.aL
 	});
 }
 
@@ -4170,17 +4170,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aC: 'hidden', ay: 'visibilitychange' }
+		? { aD: 'hidden', az: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aC: 'mozHidden', ay: 'mozvisibilitychange' }
+		? { aD: 'mozHidden', az: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aC: 'msHidden', ay: 'msvisibilitychange' }
+		? { aD: 'msHidden', az: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aC: 'webkitHidden', ay: 'webkitvisibilitychange' }
-		: { aC: 'hidden', ay: 'visibilitychange' };
+		? { aD: 'webkitHidden', az: 'webkitvisibilitychange' }
+		: { aD: 'hidden', az: 'visibilitychange' };
 }
 
 
@@ -4261,12 +4261,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		ap: _Browser_getScene(),
-		as: {
-			at: _Browser_window.pageXOffset,
-			au: _Browser_window.pageYOffset,
-			L: _Browser_doc.documentElement.clientWidth,
-			E: _Browser_doc.documentElement.clientHeight
+		aq: _Browser_getScene(),
+		at: {
+			au: _Browser_window.pageXOffset,
+			av: _Browser_window.pageYOffset,
+			M: _Browser_doc.documentElement.clientWidth,
+			F: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4276,8 +4276,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		L: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		E: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		M: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		F: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4300,15 +4300,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			ap: {
-				L: node.scrollWidth,
-				E: node.scrollHeight
+			aq: {
+				M: node.scrollWidth,
+				F: node.scrollHeight
 			},
-			as: {
-				at: node.scrollLeft,
-				au: node.scrollTop,
-				L: node.clientWidth,
-				E: node.clientHeight
+			at: {
+				au: node.scrollLeft,
+				av: node.scrollTop,
+				M: node.clientWidth,
+				F: node.clientHeight
 			}
 		};
 	});
@@ -4338,18 +4338,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			ap: _Browser_getScene(),
-			as: {
-				at: x,
-				au: y,
-				L: _Browser_doc.documentElement.clientWidth,
-				E: _Browser_doc.documentElement.clientHeight
+			aq: _Browser_getScene(),
+			at: {
+				au: x,
+				av: y,
+				M: _Browser_doc.documentElement.clientWidth,
+				F: _Browser_doc.documentElement.clientHeight
 			},
-			aA: {
-				at: x + rect.left,
-				au: y + rect.top,
-				L: rect.width,
-				E: rect.height
+			aB: {
+				au: x + rect.left,
+				av: y + rect.top,
+				M: rect.width,
+				F: rect.height
 			}
 		};
 	});
@@ -4934,7 +4934,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {ab: fragment, ac: host, ag: path, ai: port_, al: protocol, am: query};
+		return {ac: fragment, ad: host, ah: path, aj: port_, am: protocol, an: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5282,7 +5282,7 @@ var $author$project$Aoc14$parseRobot = function (s) {
 			var p = _v2.a.a;
 			var v = _v2.b.a;
 			return $elm$core$Maybe$Just(
-				{z: p, U: v});
+				{A: p, V: v});
 		} else {
 			return $elm$core$Maybe$Nothing;
 		}
@@ -5304,18 +5304,19 @@ var $author$project$Aoc14$initRobots = function (dataSource) {
 		$author$project$Aoc14$parseRobot,
 		A2($elm$core$String$split, '\n', data));
 };
-var $author$project$Aoc14$initModel = function (dataSource) {
-	var robots = $author$project$Aoc14$initRobots(dataSource);
-	var _v0 = $author$project$Aoc14$initDim(dataSource);
-	var width = _v0.a;
-	var height = _v0.b;
-	return {x: dataSource, Z: '', M: false, E: height, p: true, A: robots, G: 0, v: $author$project$Aoc14$defaultTickInterval, L: width};
-};
+var $author$project$Aoc14$initModel = F2(
+	function (findEasterEgg, dataSource) {
+		var robots = $author$project$Aoc14$initRobots(dataSource);
+		var _v0 = $author$project$Aoc14$initDim(dataSource);
+		var width = _v0.a;
+		var height = _v0.b;
+		return {s: dataSource, _: '', t: findEasterEgg, N: false, F: height, p: true, B: robots, H: 0, x: $author$project$Aoc14$defaultTickInterval, M: width};
+	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Aoc14$init = function (_v0) {
 	return _Utils_Tuple2(
-		$author$project$Aoc14$initModel(0),
+		A2($author$project$Aoc14$initModel, false, 0),
 		$elm$core$Platform$Cmd$none);
 };
 var $author$project$Aoc14$Tick = 0;
@@ -5325,7 +5326,7 @@ var $elm$time$Time$Every = F2(
 	});
 var $elm$time$Time$State = F2(
 	function (taggers, processes) {
-		return {ak: processes, ar: taggers};
+		return {al: processes, as: taggers};
 	});
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
@@ -5617,7 +5618,7 @@ var $elm$time$Time$spawnHelp = F3(
 	});
 var $elm$time$Time$onEffects = F3(
 	function (router, subs, _v0) {
-		var processes = _v0.ak;
+		var processes = _v0.al;
 		var rightStep = F3(
 			function (_v6, id, _v7) {
 				var spawns = _v7.a;
@@ -5686,7 +5687,7 @@ var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
 var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $elm$time$Time$onSelfMsg = F3(
 	function (router, interval, state) {
-		var _v0 = A2($elm$core$Dict$get, interval, state.ar);
+		var _v0 = A2($elm$core$Dict$get, interval, state.as);
 		if (_v0.$ === 1) {
 			return $elm$core$Task$succeed(state);
 		} else {
@@ -5735,24 +5736,24 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc14$subscriptions = function (model) {
-	var tickSub = (model.p || model.M) ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = (model.p || model.N) ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.v,
+		model.x,
 		function (_v0) {
 			return 0;
 		});
 	return tickSub;
 };
 var $author$project$Aoc14$updateClear = function (model) {
-	return $author$project$Aoc14$initModel(model.x);
+	return A2($author$project$Aoc14$initModel, model.t, model.s);
 };
 var $elm$core$Basics$modBy = _Basics_modBy;
 var $author$project$Aoc14$move = F3(
 	function (width, height, robot) {
-		var _v0 = robot.z;
+		var _v0 = robot.A;
 		var x = _v0.a;
 		var y = _v0.b;
-		var _v1 = robot.U;
+		var _v1 = robot.V;
 		var vx = _v1.a;
 		var vy = _v1.b;
 		var xMoved = A2($elm$core$Basics$modBy, width, (x + vx) + width);
@@ -5760,7 +5761,7 @@ var $author$project$Aoc14$move = F3(
 		return _Utils_update(
 			robot,
 			{
-				z: _Utils_Tuple2(xMoved, yMoved)
+				A: _Utils_Tuple2(xMoved, yMoved)
 			});
 	});
 var $author$project$Aoc14$moveAll = F3(
@@ -5771,30 +5772,34 @@ var $author$project$Aoc14$moveAll = F3(
 			robots);
 	});
 var $author$project$Aoc14$updateStep = function (model) {
-	var steps = model.G;
-	var robots = A3($author$project$Aoc14$moveAll, model.L, model.E, model.A);
+	var steps = model.H;
+	var robots = A3($author$project$Aoc14$moveAll, model.M, model.F, model.B);
 	var pause = model.p || ((steps + 1) === 100);
 	return _Utils_update(
 		model,
-		{p: pause, A: robots, G: steps + 1});
+		{p: pause, B: robots, H: steps + 1});
 };
 var $elm$core$Basics$not = _Basics_not;
+var $author$project$Aoc14$updateToggleEasterEgg = function (model) {
+	var findEasterEgg = !model.t;
+	return A2($author$project$Aoc14$initModel, findEasterEgg, model.s);
+};
 var $author$project$Aoc14$updateTogglePlay = function (model) {
 	return _Utils_update(
 		model,
 		{p: !model.p});
 };
 var $author$project$Aoc14$updateUseInput = function (model) {
-	return $author$project$Aoc14$initModel(0);
+	return A2($author$project$Aoc14$initModel, model.t, 0);
 };
 var $author$project$Aoc14$Sample = 1;
 var $author$project$Aoc14$updateUseSample = function (model) {
-	return $author$project$Aoc14$initModel(1);
+	return A2($author$project$Aoc14$initModel, model.t, 1);
 };
 var $author$project$Aoc14$update = F2(
 	function (msg, model) {
 		switch (msg) {
-			case 5:
+			case 6:
 				return _Utils_Tuple2(
 					$author$project$Aoc14$updateClear(model),
 					$elm$core$Platform$Cmd$none);
@@ -5806,23 +5811,27 @@ var $author$project$Aoc14$update = F2(
 				return _Utils_Tuple2(
 					$author$project$Aoc14$updateStep(model),
 					$elm$core$Platform$Cmd$none);
-			case 3:
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{v: model.v / 2}),
-					$elm$core$Platform$Cmd$none);
 			case 4:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{v: model.v * 2}),
+						{x: model.x / 2}),
+					$elm$core$Platform$Cmd$none);
+			case 5:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{x: model.x * 2}),
 					$elm$core$Platform$Cmd$none);
 			case 2:
 				return _Utils_Tuple2(
 					$author$project$Aoc14$updateTogglePlay(model),
 					$elm$core$Platform$Cmd$none);
-			case 6:
+			case 3:
+				return _Utils_Tuple2(
+					$author$project$Aoc14$updateToggleEasterEgg(model),
+					$elm$core$Platform$Cmd$none);
+			case 7:
 				return _Utils_Tuple2(
 					$author$project$Aoc14$updateUseSample(model),
 					$elm$core$Platform$Cmd$none);
@@ -5832,13 +5841,14 @@ var $author$project$Aoc14$update = F2(
 					$elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Aoc14$Clear = 5;
-var $author$project$Aoc14$Faster = 3;
-var $author$project$Aoc14$Slower = 4;
+var $author$project$Aoc14$Clear = 6;
+var $author$project$Aoc14$Faster = 4;
+var $author$project$Aoc14$Slower = 5;
 var $author$project$Aoc14$Step = 1;
+var $author$project$Aoc14$ToggleEasterEgg = 3;
 var $author$project$Aoc14$TogglePlay = 2;
-var $author$project$Aoc14$UseInput = 7;
-var $author$project$Aoc14$UseSample = 6;
+var $author$project$Aoc14$UseInput = 8;
+var $author$project$Aoc14$UseSample = 7;
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -5942,7 +5952,7 @@ var $author$project$Aoc14$toQuadrant = F2(
 			A2(
 				$elm$core$List$map,
 				function (r) {
-					return r.z;
+					return r.A;
 				},
 				robots));
 	});
@@ -6083,22 +6093,22 @@ var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Aoc14$viewBody = function (model) {
 	var textFontSize = function () {
-		var _v0 = model.x;
+		var _v0 = model.s;
 		if (_v0 === 1) {
 			return '24px';
 		} else {
 			return '12px';
 		}
 	}();
-	var safetyFactor = A3($author$project$Aoc14$calculateSafetyFactor, model.L, model.E, model.A);
+	var safetyFactor = A3($author$project$Aoc14$calculateSafetyFactor, model.M, model.F, model.B);
 	var robotPositions = $elm$core$Set$fromList(
 		A2(
 			$elm$core$List$map,
 			function (r) {
-				return r.z;
+				return r.A;
 			},
-			model.A));
-	var nestedPositions = A2($author$project$Aoc14$getNestedPositions, model.L, model.E);
+			model.B));
+	var nestedPositions = A2($author$project$Aoc14$getNestedPositions, model.M, model.F);
 	var nestedElements = A2(
 		$elm$core$List$map,
 		function (ps) {
@@ -6286,8 +6296,8 @@ var $author$project$Aoc14$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$type_('radio'),
-										$elm$html$Html$Events$onClick(7),
-										$elm$html$Html$Attributes$checked(!model.x)
+										$elm$html$Html$Events$onClick(8),
+										$elm$html$Html$Attributes$checked(!model.s)
 									]),
 								_List_Nil),
 								A2(
@@ -6302,8 +6312,8 @@ var $author$project$Aoc14$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$type_('radio'),
-										$elm$html$Html$Events$onClick(6),
-										$elm$html$Html$Attributes$checked(model.x === 1)
+										$elm$html$Html$Events$onClick(7),
+										$elm$html$Html$Attributes$checked(model.s === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -6334,7 +6344,7 @@ var $author$project$Aoc14$viewBody = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick(5)
+										$elm$html$Html$Events$onClick(6)
 									]),
 								_List_fromArray(
 									[
@@ -6345,7 +6355,7 @@ var $author$project$Aoc14$viewBody = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick(4)
+										$elm$html$Html$Events$onClick(5)
 									]),
 								_List_fromArray(
 									[
@@ -6367,7 +6377,7 @@ var $author$project$Aoc14$viewBody = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick(3)
+										$elm$html$Html$Events$onClick(4)
 									]),
 								_List_fromArray(
 									[
@@ -6395,6 +6405,37 @@ var $author$project$Aoc14$viewBody = function (model) {
 						$elm$html$Html$td,
 						_List_fromArray(
 							[
+								$elm$html$Html$Attributes$align('center')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('checkbox'),
+										$elm$html$Html$Events$onClick(3),
+										$elm$html$Html$Attributes$checked(model.t)
+									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(' Find easter egg')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
 								A2($elm$html$Html$Attributes$style, 'font-size', '24px')
@@ -6407,7 +6448,7 @@ var $author$project$Aoc14$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										'Steps: ' + $elm$core$String$fromInt(model.G))
+										'Steps: ' + $elm$core$String$fromInt(model.H))
 									])),
 								A2(
 								$elm$html$Html$div,
@@ -6442,15 +6483,15 @@ var $author$project$Aoc14$viewBody = function (model) {
 };
 var $author$project$Aoc14$view = function (model) {
 	return {
-		ax: _List_fromArray(
+		ay: _List_fromArray(
 			[
 				$author$project$Aoc14$viewBody(model)
 			]),
-		aL: 'Advent of Code 2024 | Day 14: Restroom Redoubt'
+		aM: 'Advent of Code 2024 | Day 14: Restroom Redoubt'
 	};
 };
 var $author$project$Aoc14$main = $elm$browser$Browser$document(
-	{aE: $author$project$Aoc14$init, aK: $author$project$Aoc14$subscriptions, aM: $author$project$Aoc14$update, aN: $author$project$Aoc14$view});
+	{aF: $author$project$Aoc14$init, aL: $author$project$Aoc14$subscriptions, aN: $author$project$Aoc14$update, aO: $author$project$Aoc14$view});
 _Platform_export({'Aoc14':{'init':$author$project$Aoc14$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
 
