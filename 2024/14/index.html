@@ -5216,12 +5216,16 @@ var $elm$browser$Browser$document = _Browser_document;
 var $author$project$Aoc14$Input = 0;
 var $author$project$Aoc14$defaultTickInterval = 100;
 var $author$project$Aoc14$initDim = function (dataSource) {
-	if (dataSource === 1) {
-		return _Utils_Tuple2(11, 7);
-	} else {
-		return _Utils_Tuple2(101, 103);
+	switch (dataSource) {
+		case 1:
+			return _Utils_Tuple2(11, 7);
+		case 0:
+			return _Utils_Tuple2(101, 103);
+		default:
+			return _Utils_Tuple2(101, 103);
 	}
 };
+var $author$project$Aoc14$bonus = 'p=94,79 v=28,-49\np=61,1 v=59,28\np=98,17 v=44,-1\np=49,96 v=-53,-9\np=49,32 v=-61,-99\np=46,70 v=-93,51\np=2,97 v=-49,60\np=97,67 v=97,50\np=90,85 v=33,56\np=61,15 v=96,67\np=4,87 v=36,91\np=61,15 v=-21,-36\np=93,94 v=25,-44\np=83,30 v=38,-31\np=21,60 v=-62,82\np=53,8 v=-16,-4\np=60,80 v=32,20\np=79,63 v=75,83\np=21,93 v=7,-10\np=30,3 v=71,63\np=85,12 v=-2,66\np=48,40 v=98,-62\np=92,39 v=38,75\np=60,100 v=77,-42\np=60,47 v=69,9\np=48,48 v=66,-25\np=77,81 v=88,-14\np=93,93 v=-95,-10\np=20,13 v=20,-71\np=4,2 v=-15,97\np=99,54 v=-71,80\np=20,88 v=97,57\np=50,38 v=26,6\np=7,14 v=78,-2\np=2,1 v=30,28\np=16,9 v=33,65\np=53,47 v=18,-94\np=92,39 v=19,-28\np=91,68 v=3,-87\np=92,98 v=3,26\np=73,5 v=45,98\np=79,30 v=85,-31\np=86,75 v=-69,87\np=9,26 v=-87,2\np=54,54 v=-38,80\np=27,76 v=-60,-50\np=72,30 v=-11,-31\np=44,70 v=32,-18\np=89,91 v=-77,92\np=76,20 v=86,-35\np=56,58 v=-48,-91\np=45,17 v=58,67\np=31,100 v=39,26\np=31,44 v=-70,-27\np=42,65 v=10,-20\np=18,33 v=12,-65\np=10,57 v=99,-57\np=30,43 v=-80,-62\np=29,53 v=-46,-93\np=58,89 v=-24,22\np=4,70 v=-15,-53\np=93,69 v=-45,84\np=52,91 v=-5,91\np=12,26 v=44,-68\np=76,63 v=43,13\np=36,32 v=-83,-66\np=84,56 v=-10,45\np=96,31 v=-23,71\np=66,33 v=32,3\np=38,84 v=-99,20\np=52,96 v=-96,24\np=83,15 v=-58,-3\np=70,47 v=32,42\np=59,94 v=-64,92\np=33,14 v=-94,31\np=99,38 v=-98,39\np=67,80 v=-87,-16\np=3,62 v=97,81\np=89,81 v=-31,-50\np=83,76 v=14,-86\np=92,49 v=-10,-95\np=55,88 v=90,-82\np=72,69 v=16,49\np=73,34 v=16,3\np=16,101 v=46,94\np=61,68 v=67,14\np=63,35 v=-13,3\np=26,69 v=87,-20\np=19,17 v=-65,-3\np=56,94 v=21,57\np=96,24 v=30,68\np=28,46 v=-17,41\np=70,65 v=8,-90\np=82,66 v=96,82\np=72,102 v=8,-9\np=43,24 v=71,68\np=7,46 v=78,41\np=53,4 v=39,-76\np=98,101 v=60,-44\np=42,14 v=37,30\np=1,77 v=4,-52\np=99,69 v=-44,14\np=41,20 v=-11,-71\np=3,0 v=-20,94\np=29,94 v=79,-12\np=53,25 v=61,-35\np=54,3 v=-40,-8\np=59,60 v=93,-92\np=63,46 v=16,75\np=3,90 v=33,21\np=74,75 v=88,16\np=48,40 v=74,-30\np=86,43 v=-34,74\np=2,14 v=94,30\np=23,102 v=-49,25\np=85,12 v=-66,-5\np=58,66 v=13,13\np=49,49 v=-67,76\np=30,46 v=-25,75\np=38,92 v=31,-47\np=44,6 v=71,96\np=28,78 v=41,-86\np=41,69 v=-93,48\np=51,70 v=16,-89\np=47,32 v=-24,-33\np=21,75 v=-38,50\np=33,64 v=50,-91\np=79,85 v=-95,19\np=31,99 v=18,58\np=98,13 v=41,-5\np=4,13 v=89,-5\np=75,50 v=-58,-27\np=42,57 v=-27,44\np=77,82 v=43,18\np=4,80 v=57,-17\np=33,57 v=79,44\np=35,60 v=-14,-58\np=45,94 v=58,22\np=60,82 v=-32,-85\np=77,51 v=-5,-61\np=24,35 v=68,71\np=93,41 v=6,-30\np=79,92 v=88,90\np=14,59 v=-36,-24\np=82,58 v=96,10\np=79,58 v=64,10\np=32,61 v=84,-92\np=97,24 v=91,33\np=44,75 v=68,-53\np=70,11 v=-63,-6\np=42,11 v=-24,97\np=37,101 v=-72,24\np=22,33 v=-99,70\np=0,90 v=-81,89\np=53,53 v=-69,-95\np=9,36 v=76,-32\np=39,62 v=-11,-92\np=70,17 v=27,-4\np=0,91 v=65,-48\np=77,77 v=67,16\np=47,13 v=-80,-74\np=32,30 v=95,-34\np=91,89 v=-47,-83\np=15,23 v=-57,-2\np=9,48 v=-12,75\np=41,63 v=-67,80\np=24,10 v=92,28\np=76,87 v=96,-15\np=30,6 v=23,-42\np=39,100 v=-14,-45\np=17,49 v=4,41\np=74,94 v=-53,56\np=82,72 v=3,-20\np=64,86 v=-48,19\np=30,56 v=-25,-94\np=47,14 v=2,-5\np=1,96 v=-71,91\np=3,42 v=43,-30\np=59,63 v=51,11\np=27,82 v=58,86\np=30,55 v=74,77\np=63,45 v=-74,5\np=19,26 v=-30,-70\np=31,53 v=-43,42\np=3,22 v=28,-37\np=53,11 v=93,28\np=59,65 v=-69,46\np=91,7 v=-23,-42\np=91,88 v=-31,88\np=31,42 v=87,4\np=78,67 v=40,-22\np=38,48 v=15,-97\np=4,66 v=-50,-91\np=93,69 v=-81,-56\np=89,51 v=49,-62\np=16,15 v=-38,-74\np=54,51 v=56,41\np=33,54 v=-19,-61\np=21,66 v=79,-57\np=55,101 v=-61,-11\np=80,81 v=-87,-52\np=15,48 v=92,40\np=9,43 v=36,4\np=89,84 v=-71,52\np=27,56 v=31,-26\np=71,93 v=8,55\np=99,20 v=22,65\np=11,17 v=1,-39\np=10,65 v=-15,80\np=71,6 v=-19,-77\np=49,69 v=-29,81\np=56,60 v=-69,78\np=10,58 v=-41,43\np=42,9 v=-96,-42\np=94,47 v=-92,5\np=43,38 v=-27,2\np=25,59 v=-94,-94\np=28,60 v=76,78\np=9,30 v=1,68\np=23,58 v=-12,43\np=68,19 v=-64,-73\np=100,84 v=-90,86\np=71,93 v=-55,-83\np=70,88 v=-50,-16\np=25,75 v=-14,14\np=93,98 v=17,-47\np=70,66 v=-74,11\np=93,93 v=-79,-83\np=94,27 v=-79,-2\np=78,53 v=-13,41\np=89,11 v=-50,-76\np=10,52 v=86,-28\np=86,76 v=80,83\np=20,0 v=49,92\np=54,42 v=47,3\np=42,36 v=16,-68\np=71,101 v=-34,-12\np=57,52 v=48,-97\np=64,67 v=-5,-92\np=76,79 v=-18,-88\np=14,89 v=20,87\np=47,36 v=74,35\np=37,58 v=79,8\np=26,24 v=84,31\np=99,26 v=-47,-37\np=19,46 v=-97,-99\np=94,44 v=-10,72\np=78,9 v=24,26\np=86,62 v=80,78\np=56,0 v=34,23\np=18,11 v=25,-42\np=96,88 v=80,18\np=69,54 v=30,-28\np=52,42 v=-77,-32\np=43,101 v=45,22\np=84,100 v=-39,56\np=29,18 v=-83,-40\np=93,77 v=-84,14\np=26,55 v=79,41\np=80,52 v=59,40\np=6,51 v=65,74\np=23,96 v=92,89\np=100,9 v=-7,60\np=19,6 v=-57,59\np=7,37 v=-60,-68\np=54,84 v=5,85\np=71,79 v=-69,-54\np=75,8 v=56,94\np=74,33 v=-61,68\np=4,49 v=-23,39\np=76,12 v=-61,-42\np=31,77 v=-25,14\np=31,2 v=-57,92\np=29,26 v=-81,-3\np=65,49 v=98,-64\np=24,10 v=65,26\np=30,85 v=-44,51\np=10,17 v=63,-75\np=84,54 v=86,-97\np=76,22 v=14,64\np=21,31 v=71,67\np=22,62 v=71,43\np=6,86 v=-65,-52\np=33,21 v=42,98\np=72,52 v=43,-29\np=52,80 v=77,49\np=69,38 v=-98,-68\np=75,25 v=-74,-38\np=59,38 v=93,-68\np=93,14 v=-47,-76\np=58,80 v=-32,49\np=51,70 v=5,-23\np=0,83 v=-7,50\np=3,25 v=-15,-38\np=33,43 v=15,-32\np=20,32 v=4,33\np=35,6 v=15,93\np=0,37 v=-71,-34\np=75,57 v=-85,7\np=93,19 v=-74,63\np=53,12 v=-99,95\np=31,79 v=20,-20\np=69,10 v=-35,60\np=84,29 v=49,66\np=21,87 v=-6,-52\np=79,16 v=46,-7\np=60,71 v=88,80\np=24,88 v=-6,-86\np=57,62 v=-53,77\np=92,40 v=-84,1\np=80,10 v=-87,94\np=82,5 v=22,-45\np=38,54 v=-35,-63\np=24,19 v=-54,97\np=15,68 v=-33,-24\np=40,66 v=58,-59\np=35,56 v=10,-28\np=71,50 v=-13,73\np=9,6 v=89,-79\np=32,77 v=63,82\np=85,54 v=-26,-63\np=83,59 v=51,-27\np=35,19 v=63,97\np=95,15 v=30,27\np=49,101 v=58,90\np=84,35 v=27,-35\np=17,88 v=89,-86\np=40,69 v=63,-58\np=77,76 v=-53,13\np=79,29 v=-45,-37\np=90,1 v=-66,-12\np=17,42 v=49,-67\np=74,55 v=-8,6\np=44,41 v=-54,70\np=12,25 v=-15,-4\np=81,66 v=24,44\np=93,91 v=11,-85\np=100,83 v=59,84\np=0,65 v=-82,-25\np=38,92 v=-16,18\np=38,6 v=-72,-45\np=75,98 v=-87,20\np=14,99 v=-78,-14\np=70,75 v=-42,-22\np=58,84 v=56,84\np=54,71 v=16,11\np=39,30 v=90,66\np=38,9 v=74,-44\np=31,43 v=-91,36\np=75,9 v=-50,59\np=71,56 v=11,6\np=85,14 v=-87,-8\np=21,37 v=-1,34\np=34,74 v=-6,-91\np=21,1 v=84,22\np=10,64 v=89,-60\np=74,100 v=-13,55\np=52,56 v=-96,-97\np=14,35 v=-4,-1\np=51,72 v=-19,80\np=56,51 v=13,73\np=26,91 v=-33,-51\np=97,39 v=-79,69\np=75,27 v=40,65\np=35,102 v=-86,-13\np=96,69 v=91,79\np=55,24 v=58,64\np=67,90 v=45,-17\np=85,40 v=80,35\np=64,22 v=5,-74\np=55,30 v=-75,-37\np=7,46 v=38,-66\np=56,30 v=18,-37\np=49,74 v=-46,-91\np=37,41 v=52,1\np=29,80 v=-52,-89\np=90,98 v=-4,54\np=80,99 v=62,20\np=40,79 v=37,82\np=0,91 v=-89,-17\np=98,34 v=81,-36\np=63,81 v=96,-89\np=47,68 v=61,-59\np=20,52 v=-62,73\np=69,23 v=19,-74\np=19,93 v=15,-85\np=79,71 v=-18,-58\np=89,62 v=54,-61\np=43,102 v=82,-82\np=96,54 v=-7,5\np=29,96 v=-46,19\np=21,95 v=-17,-50\np=68,68 v=48,44\np=33,82 v=63,83\np=94,66 v=-63,9\np=98,87 v=62,-87\np=91,15 v=99,95\np=13,71 v=73,45\np=3,89 v=86,51\np=7,22 v=-92,63\np=96,52 v=6,73\np=27,46 v=-49,71\np=63,75 v=29,-91\np=61,77 v=-96,47\np=30,98 v=52,54\np=65,0 v=-80,90\np=74,88 v=85,85\np=71,75 v=-48,-91\np=69,94 v=-72,87\np=77,21 v=-16,97\np=49,76 v=55,-22\np=26,52 v=-36,73\np=54,3 v=47,91\np=15,78 v=2,-56\np=64,74 v=35,-23\np=29,102 v=-51,-48\np=33,48 v=-27,37\np=94,72 v=49,-58\np=60,53 v=-29,73\np=6,72 v=36,-58\np=39,68 v=-11,-25\np=42,91 v=5,-86\np=75,71 v=59,79\np=19,50 v=-94,-31\np=79,5 v=-26,57\np=57,100 v=93,-83\np=92,71 v=-39,-24\np=96,13 v=86,-9\np=51,19 v=-80,96\np=26,30 v=-86,31\np=11,77 v=-12,-22\np=46,89 v=58,-18\np=18,70 v=28,-93\np=50,28 v=-27,-4\np=74,12 v=-45,25\np=35,81 v=39,-55\np=61,54 v=-64,-64\np=1,45 v=-47,36\np=59,87 v=5,50\np=87,3 v=19,22\np=47,21 v=-6,28\np=37,63 v=7,-61\np=83,93 v=64,52\np=81,47 v=40,-32\np=27,5 v=-97,57\np=76,45 v=85,-67\np=56,69 v=18,-59\np=11,64 v=54,8\np=40,84 v=-25,49\np=7,63 v=75,-61\np=46,30 v=-53,-38\np=72,60 v=-10,75\np=50,43 v=8,-68\np=67,28 v=35,-73\np=39,34 v=-96,32\np=12,30 v=84,65\np=36,39 v=66,-35\np=68,3 v=-90,56\np=21,33 v=31,66\np=19,52 v=-94,-65\np=83,18 v=-95,-42\np=92,48 v=70,71\np=68,18 v=-29,-42\np=85,46 v=-2,-67\np=66,34 v=40,32\np=78,75 v=-74,-23\np=36,32 v=-14,-3\np=28,70 v=15,-59\np=58,30 v=-56,-38\np=77,68 v=-13,-94\np=30,93 v=7,-17\np=69,33 v=8,66\np=75,64 v=48,42\np=69,57 v=-8,74\np=51,12 v=-59,59\np=92,86 v=59,15\np=3,10 v=46,-79\np=97,78 v=83,81\np=39,40 v=15,34\np=0,92 v=99,-86\np=78,96 v=-93,87\np=76,3 v=-16,56\np=28,62 v=-4,-96\np=12,93 v=-39,-17\np=86,85 v=40,-54\np=62,19 v=10,27\np=5,71 v=23,-59\np=66,62 v=-66,41\np=19,85 v=-46,-20\np=43,102 v=-64,-83\np=16,72 v=-86,10\np=84,31 v=-55,-38\np=90,12 v=-15,-10\np=83,66 v=22,-95\np=7,76 v=12,80\np=13,28 v=-49,-39\np=40,87 v=-43,-88\np=32,64 v=-14,-27\np=21,53 v=-9,-65\np=22,9 v=92,92\np=67,83 v=40,48\np=24,72 v=-9,10\np=82,26 v=-58,29\np=97,94 v=-47,86\np=83,1 v=35,55\np=54,12 v=98,93\np=78,93 v=-21,17\np=19,14 v=-97,-78\np=86,8 v=27,-80\np=79,69 v=64,9\np=8,70 v=-7,-25\np=68,3 v=-40,90\np=43,44 v=55,-68\np=6,27 v=-47,-5\np=12,56 v=-7,39\np=30,72 v=28,-93\np=71,67 v=45,77\np=10,89 v=54,50\np=73,1 v=45,55\np=40,7 v=-65,-46\np=41,92 v=-93,-18\np=95,101 v=-52,88\np=82,8 v=-63,57\np=15,86 v=-1,-20\np=27,70 v=-14,-94\np=0,64 v=-36,-96\np=74,91 v=43,16\np=94,57 v=-7,-64\np=93,102 v=78,-49\np=41,62 v=-43,-28\np=73,15 v=-98,25\np=42,17 v=-51,60\np=0,81 v=-92,-56\np=66,50 v=24,71\np=56,91 v=37,16\np=76,55 v=-13,4\np=64,20 v=-16,-42\np=81,1 v=11,-14\np=7,2 v=-84,55\np=85,95 v=-74,-17\np=97,18 v=-87,-77\np=33,41 v=-1,-35\np=45,23 v=87,62\np=22,98 v=-4,87\np=19,75 v=65,45\np=51,33 v=-91,31\np=6,83 v=46,82\np=45,87 v=-54,-54\np=47,29 v=-46,64\np=52,20 v=-14,-42\np=74,0 v=5,-83\np=81,93 v=25,85\np=1,84 v=97,82\np=40,10 v=98,23\np=53,63 v=93,-28\np=100,98 v=57,18\np=39,79 v=-35,-57\np=47,24 v=21,-41\np=94,101 v=-15,-84\np=32,39 v=-14,-36\np=27,89 v=-62,15\np=23,87 v=-1,83\np=23,17 v=92,-9\np=10,52 v=81,37\np=73,48 v=72,70\np=79,32 v=11,99\np=33,65 v=39,-96\np=92,10 v=99,-80\np=61,78 v=45,80\np=24,42 v=-57,-35\np=48,61 v=26,-63\np=7,72 v=-7,-25\np=2,0 v=-55,-49\np=3,8 v=-55,91\np=52,25 v=26,28\np=61,45 v=-11,-34\np=18,4 v=-60,21\np=75,19 v=85,-77\np=67,64 v=-51,41\np=21,25 v=-51,62\np=29,95 v=-14,-52\np=91,69 v=70,8\np=9,97 v=-89,-17\np=49,28 v=21,63\np=95,0 v=78,-15\np=26,69 v=-78,-95\np=34,19 v=79,-43\np=14,82 v=12,-22\np=99,68 v=78,42\np=40,59 v=-99,-64\np=12,62 v=-28,40\np=2,25 v=-15,62\np=2,19 v=-23,-43\np=51,67 v=58,-27\np=49,12 v=-67,-11\np=40,58 v=-46,73\np=7,39 v=86,-2\np=44,73 v=71,78\np=25,100 v=12,-16\np=68,57 v=-56,4\np=37,12 v=-89,92\np=16,57 v=-91,38\np=90,32 v=54,-39\np=89,62 v=-63,-29\np=9,41 v=97,-36\np=15,33 v=36,-73\np=43,36 v=-51,31\np=18,91 v=-57,-88\np=56,77 v=37,-24\np=29,57 v=-86,38\np=12,1 v=-28,88\np=5,83 v=9,-22\np=91,63 v=83,-63\np=85,65 v=-74,75\np=24,18 v=-65,-78\np=62,11 v=29,-46\np=63,56 v=29,72\np=75,86 v=-85,82\np=48,85 v=-6,-90\np=25,85 v=-84,-90\np=18,85 v=26,-56\np=60,74 v=-8,-94\np=58,102 v=-32,87\np=16,73 v=28,43\np=61,98 v=77,-86\np=78,69 v=3,-27\np=57,80 v=29,11\np=28,4 v=92,20\np=76,54 v=64,71\np=91,58 v=75,38\np=84,7 v=-90,21\np=18,5 v=81,89\np=87,18 v=8,59\np=66,14 v=6,23\np=29,94 v=23,84\np=80,86 v=19,-56\np=77,95 v=88,-53\np=25,2 v=-33,19\np=76,7 v=64,-48\np=3,16 v=43,-45\np=20,34 v=42,98\np=99,43 v=-98,-2\np=75,91 v=-23,48\np=53,48 v=-5,68\np=8,86 v=31,-91\np=66,33 v=-18,-40\np=80,77 v=86,-94\np=38,28 v=-56,27\np=11,29 v=23,-7\np=41,64 v=-48,39\np=80,73 v=54,42\np=50,26 v=8,95\np=49,5 v=93,-15\np=50,37 v=93,-73\np=53,16 v=8,23\np=20,63 v=-62,-30\np=88,80 v=70,-93\np=23,13 v=-54,22\np=19,99 v=-94,-18\np=53,45 v=69,-36\np=24,39 v=-70,-38\np=10,79 v=-89,-59\np=57,78 v=-24,78\np=41,10 v=42,21\np=14,27 v=-81,-42\np=24,6 v=92,-49\np=35,32 v=-30,-6\np=69,99 v=32,85\np=5,18 v=17,-45\np=98,63 v=46,73\np=80,85 v=96,-57\np=3,52 v=-23,-68\np=48,101 v=-75,17\np=39,46 v=47,33\np=34,8 v=-1,89\np=82,67 v=-29,40\np=1,58 v=22,-66\np=79,56 v=32,2\np=10,9 v=-23,-48\np=15,72 v=-92,-27\np=89,69 v=-13,-28\np=57,48 v=26,68\np=4,11 v=99,90\np=17,74 v=-7,-95\np=53,51 v=-30,69\np=81,70 v=-16,-62\np=46,14 v=-1,91\np=44,11 v=76,90\np=89,63 v=24,73\np=48,67 v=-39,-44\np=89,78 v=-41,-22\np=68,30 v=42,77\np=70,92 v=8,62\np=67,32 v=47,-4\np=26,42 v=53,42\np=82,3 v=21,-11\np=99,20 v=37,31\np=71,72 v=-53,27\np=64,89 v=-51,70\np=82,47 v=-52,69\np=6,16 v=23,51\np=30,96 v=-78,44\np=32,71 v=6,-96\np=15,57 v=-56,67\np=44,2 v=90,-34\np=11,83 v=34,-90\np=15,71 v=-13,-93\np=34,60 v=98,30\np=45,27 v=35,-77\np=43,74 v=-53,45\np=17,80 v=63,-60\np=71,82 v=-62,27\np=28,49 v=80,-62\np=69,5 v=-49,-65\np=13,66 v=17,27\np=18,27 v=90,-40\np=29,75 v=-65,22\np=37,90 v=57,-43\np=5,88 v=-69,61\np=2,35 v=74,-44\np=25,56 v=32,-99\np=49,17 v=-33,62\np=66,35 v=94,29\np=35,74 v=-19,36\np=19,62 v=-44,18\np=59,92 v=-14,-3\np=75,57 v=23,76\np=80,34 v=-66,-28\np=31,22 v=-18,54\np=31,45 v=-56,49\np=67,98 v=-55,-87\np=91,34 v=-16,-46\np=29,86 v=12,-8\np=28,26 v=-42,4\np=79,80 v=-39,63\np=48,37 v=-98,-7\np=81,8 v=-49,-67\np=60,99 v=17,-17\np=18,95 v=93,-90\np=82,102 v=-76,-95\np=25,4 v=48,4\np=98,66 v=-51,57\np=46,42 v=-88,78\np=12,46 v=-7,49\np=99,72 v=-54,47\np=88,102 v=-15,76\np=52,33 v=36,-46\np=12,54 v=67,92\np=77,16 v=77,-93\np=61,99 v=24,77\np=47,18 v=17,33\np=24,78 v=43,61\np=57,56 v=-33,43\np=21,4 v=-64,50\np=83,1 v=26,8\np=62,82 v=21,-31\np=14,9 v=-89,-17\np=8,55 v=66,-4\np=55,78 v=-28,-19\np=20,10 v=48,-90\np=51,96 v=-24,78\np=93,55 v=-83,-32\np=94,51 v=-8,-46\np=43,73 v=52,-4\np=69,34 v=84,-78\np=95,2 v=-71,32\np=92,52 v=5,22\np=81,15 v=52,56\np=59,84 v=-20,-7\np=17,11 v=84,-15\np=45,97 v=47,31\np=58,84 v=93,-12\np=90,75 v=-1,-22\np=87,24 v=44,44\np=78,24 v=-47,-81\np=76,41 v=-99,73\np=59,52 v=70,-39\np=60,42 v=5,-95\np=85,57 v=-98,-11\np=37,81 v=-4,-10\np=11,15 v=24,34\np=6,78 v=-53,45\np=47,79 v=60,-33\np=9,92 v=-27,-67\np=69,30 v=-29,-29\np=85,71 v=98,-7\np=22,5 v=-77,-81\np=69,74 v=-62,-79\np=20,20 v=-6,2\np=66,72 v=-22,-44\np=99,96 v=86,-75\np=87,91 v=-11,86\np=39,66 v=-79,88\np=94,24 v=67,15\np=7,90 v=-71,71\np=23,7 v=15,87\np=90,67 v=-64,-37\np=55,77 v=58,-62\np=49,81 v=-28,56\np=3,74 v=23,-61';
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
 		var _v0 = f(mx);
@@ -5293,10 +5297,13 @@ var $author$project$Aoc14$parseRobot = function (s) {
 var $author$project$Aoc14$sample = 'p=0,4 v=3,-3\np=6,3 v=-1,-3\np=10,3 v=-1,2\np=2,0 v=2,-1\np=0,0 v=1,3\np=3,0 v=-2,-2\np=7,6 v=-1,-3\np=3,0 v=-1,-2\np=9,3 v=2,3\np=7,3 v=-1,2\np=2,4 v=2,-3\np=9,5 v=-3,-3';
 var $author$project$Aoc14$initRobots = function (dataSource) {
 	var data = function () {
-		if (dataSource === 1) {
-			return $author$project$Aoc14$sample;
-		} else {
-			return $author$project$Aoc14$input;
+		switch (dataSource) {
+			case 1:
+				return $author$project$Aoc14$sample;
+			case 0:
+				return $author$project$Aoc14$input;
+			default:
+				return $author$project$Aoc14$bonus;
 		}
 	}();
 	return A2(
@@ -5310,7 +5317,7 @@ var $author$project$Aoc14$initModel = F2(
 		var _v0 = $author$project$Aoc14$initDim(dataSource);
 		var width = _v0.a;
 		var height = _v0.b;
-		return {t: dataSource, _: '', o: findEasterEgg, N: false, F: height, q: true, B: robots, H: 0, y: $author$project$Aoc14$defaultTickInterval, M: width};
+		return {o: dataSource, _: '', t: findEasterEgg, N: false, F: height, q: true, B: robots, H: 0, y: $author$project$Aoc14$defaultTickInterval, M: width};
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -5744,9 +5751,15 @@ var $author$project$Aoc14$subscriptions = function (model) {
 		});
 	return tickSub;
 };
+var $author$project$Aoc14$Bonus = 2;
+var $author$project$Aoc14$Sample = 1;
 var $author$project$Aoc14$updateClear = function (model) {
-	return A2($author$project$Aoc14$initModel, model.o, model.t);
+	return A2($author$project$Aoc14$initModel, model.t, model.o);
 };
+var $author$project$Aoc14$updateDataSource = F2(
+	function (dataSource, model) {
+		return A2($author$project$Aoc14$initModel, model.t, dataSource);
+	});
 var $elm$core$List$any = F2(
 	function (isOkay, list) {
 		any:
@@ -5854,26 +5867,19 @@ var $author$project$Aoc14$moveAll = F3(
 var $author$project$Aoc14$updateStep = function (model) {
 	var steps = model.H;
 	var robots = A3($author$project$Aoc14$moveAll, model.M, model.F, model.B);
-	var pause = model.q || (((steps + 1) === 100) || (model.o && $author$project$Aoc14$checkEasterEgg(robots)));
+	var pause = model.q || (((steps + 1) === 100) || (model.t && $author$project$Aoc14$checkEasterEgg(robots)));
 	return _Utils_update(
 		model,
 		{q: pause, B: robots, H: steps + 1});
 };
 var $author$project$Aoc14$updateToggleEasterEgg = function (model) {
-	var findEasterEgg = !model.o;
-	return A2($author$project$Aoc14$initModel, findEasterEgg, model.t);
+	var findEasterEgg = !model.t;
+	return A2($author$project$Aoc14$initModel, findEasterEgg, model.o);
 };
 var $author$project$Aoc14$updateTogglePlay = function (model) {
 	return _Utils_update(
 		model,
 		{q: !model.q});
-};
-var $author$project$Aoc14$updateUseInput = function (model) {
-	return A2($author$project$Aoc14$initModel, model.o, 0);
-};
-var $author$project$Aoc14$Sample = 1;
-var $author$project$Aoc14$updateUseSample = function (model) {
-	return A2($author$project$Aoc14$initModel, model.o, 1);
 };
 var $author$project$Aoc14$update = F2(
 	function (msg, model) {
@@ -5912,11 +5918,15 @@ var $author$project$Aoc14$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 7:
 				return _Utils_Tuple2(
-					$author$project$Aoc14$updateUseSample(model),
+					A2($author$project$Aoc14$updateDataSource, 1, model),
+					$elm$core$Platform$Cmd$none);
+			case 8:
+				return _Utils_Tuple2(
+					A2($author$project$Aoc14$updateDataSource, 2, model),
 					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(
-					$author$project$Aoc14$updateUseInput(model),
+					A2($author$project$Aoc14$updateDataSource, 0, model),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
@@ -5926,7 +5936,8 @@ var $author$project$Aoc14$Slower = 5;
 var $author$project$Aoc14$Step = 1;
 var $author$project$Aoc14$ToggleEasterEgg = 3;
 var $author$project$Aoc14$TogglePlay = 2;
-var $author$project$Aoc14$UseInput = 8;
+var $author$project$Aoc14$UseBonus = 8;
+var $author$project$Aoc14$UseInput = 9;
 var $author$project$Aoc14$UseSample = 7;
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$json$Json$Encode$string = _Json_wrap;
@@ -6148,11 +6159,14 @@ var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Aoc14$viewBody = function (model) {
 	var textFontSize = function () {
-		var _v0 = model.t;
-		if (_v0 === 1) {
-			return '24px';
-		} else {
-			return '12px';
+		var _v0 = model.o;
+		switch (_v0) {
+			case 1:
+				return '24px';
+			case 0:
+				return '12px';
+			default:
+				return '12px';
 		}
 	}();
 	var safetyFactor = A3($author$project$Aoc14$calculateSafetyFactor, model.M, model.F, model.B);
@@ -6351,8 +6365,8 @@ var $author$project$Aoc14$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$type_('radio'),
-										$elm$html$Html$Events$onClick(8),
-										$elm$html$Html$Attributes$checked(!model.t)
+										$elm$html$Html$Events$onClick(9),
+										$elm$html$Html$Attributes$checked(!model.o)
 									]),
 								_List_Nil),
 								A2(
@@ -6368,7 +6382,7 @@ var $author$project$Aoc14$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(7),
-										$elm$html$Html$Attributes$checked(model.t === 1)
+										$elm$html$Html$Attributes$checked(model.o === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -6377,6 +6391,22 @@ var $author$project$Aoc14$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text('Sample')
+									])),
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('radio'),
+										$elm$html$Html$Events$onClick(8),
+										$elm$html$Html$Attributes$checked(model.o === 2)
+									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Bonus')
 									]))
 							]))
 					])),
@@ -6470,7 +6500,7 @@ var $author$project$Aoc14$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('checkbox'),
 										$elm$html$Html$Events$onClick(3),
-										$elm$html$Html$Attributes$checked(model.o)
+										$elm$html$Html$Attributes$checked(model.t)
 									]),
 								_List_Nil),
 								A2(
