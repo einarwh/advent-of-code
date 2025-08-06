@@ -6,6 +6,7 @@ import Html.Attributes
 import Html.Events exposing (onClick)
 import Html exposing (text)
 import Set exposing (Set)
+import List.Extra exposing (gatherEquals)
 import Time
 
 defaultTickInterval : Float
@@ -634,12 +635,52 @@ getNestedPositions width height =
   in 
     ys |> List.map (\y -> xs |> List.map (\x -> (x, y)))
 
+move : Int -> Int -> Robot -> Robot
+move width height robot = 
+  let 
+    (x, y) = robot.position
+    (vx, vy) = robot.velocity 
+    xMoved = (x + vx + width) |> modBy width
+    yMoved = (y + vy + height) |> modBy height
+  in 
+    { robot | position = (xMoved, yMoved) }
+
+moveAll : Int -> Int -> List Robot -> List Robot 
+moveAll width height robots = 
+  robots |> List.map (move width height)
+
+countPositions : List Pos -> Int 
+countPositions positions = 
+  positions |> gatherEquals |> List.map (\(_, lst) -> 1 + List.length lst) |> List.sum 
+
+toQuadrant : (Pos -> Bool) -> List Robot -> List Pos
+toQuadrant predicate robots = 
+  robots |> List.map (\r -> r.position) |> List.filter predicate 
+
+calculateSafetyFactor : Int -> Int -> List Robot -> Int 
+calculateSafetyFactor width height robots = 
+  let 
+    midRow = height // 2
+    midCol = width // 2
+    nw = robots |> toQuadrant (\(x, y) -> x < midCol && y < midRow) |> countPositions 
+    ne = robots |> toQuadrant (\(x, y) -> x > midCol && y < midRow) |> countPositions 
+    sw = robots |> toQuadrant (\(x, y) -> x < midCol && y > midRow) |> countPositions 
+    se = robots |> toQuadrant (\(x, y) -> x > midCol && y > midRow) |> countPositions 
+  in 
+    nw * ne * sw * se
+
 updateClear : Model -> Model
 updateClear model = 
   initModel model.dataSource 
 
 updateStep : Model -> Model
-updateStep model = model 
+updateStep model = 
+  let 
+    steps = model.steps 
+    robots = moveAll model.width model.height model.robots 
+    pause = model.paused || steps + 1 == 100
+  in 
+    { model | robots = robots, steps = steps + 1, paused = pause }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -704,6 +745,7 @@ viewBody model =
     nestedPositions = getNestedPositions model.width model.height 
     nestedElements = nestedPositions |> List.map (\ps -> ps |> List.map (toCharElement robotPositions))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
+    safetyFactor = calculateSafetyFactor model.width model.height model.robots
   in 
     Html.table 
       [ Html.Attributes.align "center"
@@ -792,8 +834,8 @@ viewBody model =
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "24px" ] 
               [ 
-                Html.div [] [ Html.text ("Minutes: " ++ String.fromInt model.steps) ]
-              -- , Html.div [] [ Html.text ("Debug: " ++ debugStr) ]
+                Html.div [] [ Html.text ("Steps: " ++ String.fromInt model.steps) ]
+              , Html.div [] [ Html.text ("Safety factor: " ++ String.fromInt safetyFactor) ]
               ] ]
       , Html.tr 
           []
