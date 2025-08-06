@@ -32,7 +32,7 @@ let parseLine (s : string) : Move list =
         | _ -> failwith "?"
     s |> Seq.toList |> loop [] 
 
-let nextTile (tile : Hecs) (move : Move) = 
+let adjacent (tile : Hecs) (move : Move) = 
     match move with 
     | E -> { tile with c = tile.c + 1 }
     | SE -> 
@@ -62,11 +62,43 @@ let findTile (moves : Move list) =
         match moves with 
         | [] -> tile 
         | m :: rest -> 
-            find (nextTile tile m) rest 
+            find (adjacent tile m) rest 
     find { a = 0; r = 0; c = 0 } moves
 
+let getAdjacentTiles (tile : Hecs) : Hecs list = 
+    [ adjacent tile E
+    ; adjacent tile SE
+    ; adjacent tile SW
+    ; adjacent tile W 
+    ; adjacent tile NW 
+    ; adjacent tile NE ]
+
 let findInitialBlackTiles (moveList : Move list list) = 
-    moveList |> List.map findTile |> List.countBy id |> List.filter (fun (t, c) -> c % 2 = 1)
+    moveList |> List.map findTile |> List.countBy id |> List.choose (fun (t, c) -> if c % 2 = 1 then Some t else None)
+
+let findWhiteTiles (blackTiles : Set<Hecs>) : Set<Hecs> = 
+    let neighbours = blackTiles |> Set.toList |> List.collect getAdjacentTiles |> Set.ofList 
+    Set.difference neighbours blackTiles 
+
+let evolveStep (blackTiles : Set<Hecs>) = 
+    let whiteTiles = findWhiteTiles blackTiles 
+    let remainsBlack (t : Hecs) : bool = 
+        let count = getAdjacentTiles t |> List.filter (fun a -> Set.contains a blackTiles) |> List.length 
+        count = 1 || count = 2 
+    let becomesBlack (t : Hecs) : bool = 
+        let count = getAdjacentTiles t |> List.filter (fun a -> Set.contains a blackTiles) |> List.length 
+        count = 2 
+    let black1 = blackTiles |> Set.filter remainsBlack
+    let black2 = whiteTiles |> Set.filter becomesBlack
+    Set.union black1 black2 
+
+let evolve days blackTiles = 
+    let rec loop day tiles = 
+        if day < days then 
+            loop (day + 1) (evolveStep tiles)
+        else 
+            tiles 
+    loop 0 blackTiles 
 
 let readLines = 
     File.ReadAllLines
@@ -76,7 +108,8 @@ let readLines =
 let run fileName = 
     let lines = readLines fileName
     let moveList : Move list list = lines |> List.map parseLine 
-    let blackTiles = findInitialBlackTiles moveList 
-    blackTiles |> List.length |> printfn "%d"
+    let blackTiles = findInitialBlackTiles moveList |> Set.ofList 
+    blackTiles |> Set.count |> printfn "%d"
+    blackTiles |> evolve 100 |> Set.count |> printfn "%d"
 
 run "input.txt"
