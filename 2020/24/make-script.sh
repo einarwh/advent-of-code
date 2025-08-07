@@ -1,0 +1,1 @@
+elm make --optimize src/Main.elm --output=aoc24.js

@@ -55,7 +55,7 @@ let adjacent (tile : Hecs) (move : Move) =
         if tile.a = 0 then 
             { tile with a = 1; r = tile.r - 1 } 
         else 
-            { tile with a = 0; c = tile.c + 1  }
+            { tile with a = 0; c = tile.c + 1 }
 
 let findTile (moves : Move list) = 
     let rec find (tile : Hecs) (moves : Move list) = 
