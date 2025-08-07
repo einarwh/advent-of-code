@@ -44,13 +44,16 @@ type alias InitializingModel =
   , debug : String }
 
 type alias AnimatingModel = 
-  { blackTiles : Set Hecs 
+  { startBlackTiles : Set Hecs
+  , blackTiles : Set Hecs 
+  , tickInterval : Float 
   , paused : Bool 
   , days : Int
   , debug : String }
 
 type State = 
   Initializing InitializingModel
+  | Animating AnimatingModel 
 
 type alias Model = 
   { dataSource : DataSource
@@ -487,7 +490,7 @@ initInitializationModel dataSource =
     , movesLeft = []
     , tilesToPlace = tilesToPlace
     , tilesPlaced = Set.empty
-    , tickInterval = 50
+    , tickInterval = 40
     , paused = True 
     , finished = False
     , debug = "?" }
@@ -516,11 +519,30 @@ type Msg =
   | Slower 
   | Step 
   | TogglePlay 
+  | Restart 
   | Reset 
   | UseDataSource DataSource
 
+initAnimating blackTiles = 
+  { startBlackTiles = blackTiles 
+  , blackTiles = blackTiles 
+  , tickInterval = 100
+  , paused = True 
+  , days = 0 
+  , debug = "?" }
+
 updateReset : Model -> Model
 updateReset model = initModel model.dataSource
+
+updateRestart : Model -> Model
+updateRestart model = 
+  case model.state of 
+    Initializing _ -> model 
+    Animating animating -> 
+      let 
+        a = initAnimating animating.startBlackTiles 
+      in 
+        { model | state = Animating a }
 
 adjacent : Hecs -> Move -> Hecs
 adjacent (a, (r, c)) move = 
@@ -571,22 +593,6 @@ updateInitializing initializing =
           in 
             { initializing | currentTile = Just moved, movesLeft = restMoves, debug = dbg } 
 
--- let findWhiteTiles (blackTiles : Set<Hecs>) : Set<Hecs> = 
---     let neighbours = blackTiles |> Set.toList |> List.collect getAdjacentTiles |> Set.ofList 
---     Set.difference neighbours blackTiles 
-
--- let evolveStep (blackTiles : Set<Hecs>) = 
---     let whiteTiles = findWhiteTiles blackTiles 
---     let remainsBlack (t : Hecs) : bool = 
---         let count = getAdjacentTiles t |> List.filter (fun a -> Set.contains a blackTiles) |> List.length 
---         count = 1 || count = 2 
---     let becomesBlack (t : Hecs) : bool = 
---         let count = getAdjacentTiles t |> List.filter (fun a -> Set.contains a blackTiles) |> List.length 
---         count = 2 
---     let black1 = blackTiles |> Set.filter remainsBlack
---     let black2 = whiteTiles |> Set.filter becomesBlack
---     Set.union black1 black2 
-
 findWhiteTiles : Set Hecs -> Set Hecs 
 findWhiteTiles blackTiles = 
   let 
@@ -617,11 +623,29 @@ evolveStep blackTiles =
   in 
     Set.union black1 black2 
 
+updateAnimating : AnimatingModel -> AnimatingModel
+updateAnimating animating = 
+  let 
+    days = animating.days
+    pause = days + 1 == 100 
+    blackTiles = evolveStep animating.blackTiles
+  in 
+    { animating | blackTiles = blackTiles, days = days + 1, debug = String.fromInt (days + 1), paused = pause }
+
 updateStep : Model -> Model
 updateStep model = 
   case model.state of 
     Initializing initializing -> 
-      { model | state = Initializing (updateInitializing initializing) }
+      if initializing.finished then 
+        let 
+          blackTiles = initializing.tilesPlaced 
+          anim = initAnimating blackTiles 
+        in 
+          { model | state = Animating anim }
+      else 
+        { model | state = Initializing (updateInitializing initializing) }
+    Animating animating -> 
+      { model | state = Animating (updateAnimating animating) }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -631,6 +655,11 @@ updateTogglePlay model =
         paused = not initializing.paused 
       in 
         { model | state = Initializing { initializing | paused = paused } }
+    Animating animating -> 
+      let 
+        paused = not animating.paused 
+      in 
+        { model | state = Animating { animating | paused = paused } }
 
 updateDataSource : DataSource -> Model -> Model
 updateDataSource dataSource model = 
@@ -643,6 +672,11 @@ updateFaster model =
         tickInterval = initializing.tickInterval / 2
       in 
         { model | state = Initializing { initializing | tickInterval = tickInterval } }
+    Animating animating -> 
+      let 
+        tickInterval = animating.tickInterval / 2
+      in 
+        { model | state = Animating { animating | tickInterval = tickInterval } }
 
 updateSlower model = 
   case model.state of 
@@ -651,12 +685,19 @@ updateSlower model =
         tickInterval = initializing.tickInterval * 2
       in 
         { model | state = Initializing { initializing | tickInterval = tickInterval } }
+    Animating animating -> 
+      let 
+        tickInterval = animating.tickInterval * 2
+      in 
+        { model | state = Animating { animating | tickInterval = tickInterval } }
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Reset -> 
       (updateReset model, Cmd.none)
+    Restart -> 
+      (updateRestart model, Cmd.none)
     Tick ->
       (updateStep model, Cmd.none)
     Faster -> 
@@ -677,6 +718,8 @@ subscriptions model =
   case model.state of 
     Initializing initializing -> 
       if initializing.paused then Sub.none else Time.every initializing.tickInterval (\_ -> Tick)
+    Animating animating -> 
+      if animating.paused then Sub.none else Time.every animating.tickInterval (\_ -> Tick)
 
 -- VIEW
 
@@ -751,6 +794,9 @@ toHexagonElement placed size (a, (r, c)) =
   in 
     Svg.polygon attrs []
 
+hexSize : Float 
+hexSize = 3
+
 toInitializingElements : InitializingModel -> List (Html Msg) 
 toInitializingElements initializing = 
   let
@@ -758,10 +804,14 @@ toInitializingElements initializing =
     currentElements = 
       case currentTile of 
       Nothing -> []
-      Just tile -> [ toHexagonElement False 8 tile ]
-    placedElements = initializing.tilesPlaced |> Set.toList |> List.map (toHexagonElement True 8)
+      Just tile -> [ toHexagonElement False hexSize tile ]
+    placedElements = initializing.tilesPlaced |> Set.toList |> List.map (toHexagonElement True hexSize)
   in 
     List.append placedElements currentElements
+
+toAnimatingElements : AnimatingModel -> List (Html Msg) 
+toAnimatingElements animating = 
+  animating.blackTiles |> Set.toList |> List.map (toHexagonElement True hexSize)
 
 toSvg : Model -> Html Msg 
 toSvg model = 
@@ -769,11 +819,12 @@ toSvg model =
     elements = 
       case model.state of 
         Initializing initializing -> toInitializingElements initializing
+        Animating animating -> toAnimatingElements animating
   in 
     svg
-      [ viewBox "-300 -200 600 400"
-      , width "600"
-      , height "400"
+      [ viewBox "-320 -300 640 600"
+      , width "640"
+      , height "600"
       , Svg.Attributes.style "max-width: 100%; background-color:white"
       ]
       elements
@@ -792,17 +843,27 @@ viewBody model =
       case model.state of 
         Initializing initializing -> 
           if initializing.paused then "Initialize" else "Pause"
+        Animating animating -> 
+          if animating.paused then "Animate" else "Pause"
 
     blackTilesCount = 
       case model.state of 
         Initializing initializing -> 
           initializing.tilesPlaced |> Set.size
+        Animating animating -> 
+          animating.blackTiles |> Set.size 
 
     debugStr = 
       case model.state of 
         Initializing initializing -> 
           initializing.debug
+        Animating animating -> 
+          animating.debug
 
+    restartDisabled = 
+      case model.state of 
+        Initializing _ -> True
+        Animating _ -> False
   in 
     Html.table 
       [ Html.Attributes.align "center"
@@ -871,6 +932,9 @@ viewBody model =
               [ Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Reset ] 
                 [ Html.text "Reset"]
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Restart, Html.Attributes.disabled restartDisabled ] 
+                [ Html.text "Restart" ]
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Slower ] 
                 [ Html.text "Slower" ]

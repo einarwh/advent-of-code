@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.R.F === region.W.F)
+	if (region.T.G === region.Z.G)
 	{
-		return 'on line ' + region.R.F;
+		return 'on line ' + region.T.G;
 	}
-	return 'on lines ' + region.R.F + ' through ' + region.W.F;
+	return 'on lines ' + region.T.G + ' through ' + region.Z.G;
 }
 
 
@@ -1871,9 +1871,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aE,
-		impl.aM,
-		impl.aK,
+		impl.aF,
+		impl.aN,
+		impl.aL,
 		function() { return function() {} }
 	);
 });
@@ -2733,9 +2733,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		p: func(record.p),
-		S: record.S,
-		P: record.P
+		r: func(record.r),
+		V: record.V,
+		R: record.R
 	}
 });
 
@@ -3003,11 +3003,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.p;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.S;
+		var message = !tag ? value : tag < 3 ? value.a : value.r;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.V;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.P) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.R) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3957,11 +3957,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aE,
-		impl.aM,
-		impl.aK,
+		impl.aF,
+		impl.aN,
+		impl.aL,
 		function(sendToApp, initialModel) {
-			var view = impl.aN;
+			var view = impl.aO;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3993,12 +3993,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aE,
-		impl.aM,
-		impl.aK,
+		impl.aF,
+		impl.aN,
+		impl.aL,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.Q && impl.Q(sendToApp)
-			var view = impl.aN;
+			var divertHrefToApp = impl.S && impl.S(sendToApp)
+			var view = impl.aO;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -4006,12 +4006,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aw);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.ay);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.aL) && (_VirtualDom_doc.title = title = doc.aL);
+				(title !== doc.aM) && (_VirtualDom_doc.title = title = doc.aM);
 			});
 		}
 	);
@@ -4067,12 +4067,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aG;
-	var onUrlRequest = impl.aH;
+	var onUrlChange = impl.aH;
+	var onUrlRequest = impl.aI;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		Q: function(sendToApp)
+		S: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4088,9 +4088,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.ai === next.ai
-							&& curr._ === next._
-							&& curr.af.a === next.af.a
+							&& curr.al === next.al
+							&& curr.ac === next.ac
+							&& curr.ai.a === next.ai.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4098,13 +4098,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aE: function(flags)
+		aF: function(flags)
 		{
-			return A3(impl.aE, flags, _Browser_getUrl(), key);
+			return A3(impl.aF, flags, _Browser_getUrl(), key);
 		},
+		aO: impl.aO,
 		aN: impl.aN,
-		aM: impl.aM,
-		aK: impl.aK
+		aL: impl.aL
 	});
 }
 
@@ -4170,17 +4170,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aC: 'hidden', ax: 'visibilitychange' }
+		? { aD: 'hidden', az: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aC: 'mozHidden', ax: 'mozvisibilitychange' }
+		? { aD: 'mozHidden', az: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aC: 'msHidden', ax: 'msvisibilitychange' }
+		? { aD: 'msHidden', az: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aC: 'webkitHidden', ax: 'webkitvisibilitychange' }
-		: { aC: 'hidden', ax: 'visibilitychange' };
+		? { aD: 'webkitHidden', az: 'webkitvisibilitychange' }
+		: { aD: 'hidden', az: 'visibilitychange' };
 }
 
 
@@ -4261,12 +4261,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		am: _Browser_getScene(),
-		ap: {
-			ar: _Browser_window.pageXOffset,
-			as: _Browser_window.pageYOffset,
-			aq: _Browser_doc.documentElement.clientWidth,
-			Z: _Browser_doc.documentElement.clientHeight
+		ap: _Browser_getScene(),
+		as: {
+			au: _Browser_window.pageXOffset,
+			av: _Browser_window.pageYOffset,
+			at: _Browser_doc.documentElement.clientWidth,
+			ab: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4276,8 +4276,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		aq: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		Z: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		at: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		ab: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4300,15 +4300,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			am: {
-				aq: node.scrollWidth,
-				Z: node.scrollHeight
-			},
 			ap: {
-				ar: node.scrollLeft,
-				as: node.scrollTop,
-				aq: node.clientWidth,
-				Z: node.clientHeight
+				at: node.scrollWidth,
+				ab: node.scrollHeight
+			},
+			as: {
+				au: node.scrollLeft,
+				av: node.scrollTop,
+				at: node.clientWidth,
+				ab: node.clientHeight
 			}
 		};
 	});
@@ -4338,18 +4338,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			am: _Browser_getScene(),
-			ap: {
-				ar: x,
-				as: y,
-				aq: _Browser_doc.documentElement.clientWidth,
-				Z: _Browser_doc.documentElement.clientHeight
+			ap: _Browser_getScene(),
+			as: {
+				au: x,
+				av: y,
+				at: _Browser_doc.documentElement.clientWidth,
+				ab: _Browser_doc.documentElement.clientHeight
 			},
-			aA: {
-				ar: x + rect.left,
-				as: y + rect.top,
-				aq: rect.width,
-				Z: rect.height
+			aB: {
+				au: x + rect.left,
+				av: y + rect.top,
+				at: rect.width,
+				ab: rect.height
 			}
 		};
 	});
@@ -4836,25 +4836,25 @@ var $elm$core$Array$treeFromBuilder = F2(
 	});
 var $elm$core$Array$builderToArray = F2(
 	function (reverseNodeList, builder) {
-		if (!builder.a) {
+		if (!builder.b) {
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
-				$elm$core$Elm$JsArray$length(builder.b),
+				$elm$core$Elm$JsArray$length(builder.c),
 				$elm$core$Array$shiftStep,
 				$elm$core$Elm$JsArray$empty,
-				builder.b);
+				builder.c);
 		} else {
-			var treeLen = builder.a * $elm$core$Array$branchFactor;
+			var treeLen = builder.b * $elm$core$Array$branchFactor;
 			var depth = $elm$core$Basics$floor(
 				A2($elm$core$Basics$logBase, $elm$core$Array$branchFactor, treeLen - 1));
-			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.c) : builder.c;
-			var tree = A2($elm$core$Array$treeFromBuilder, correctNodeList, builder.a);
+			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.d) : builder.d;
+			var tree = A2($elm$core$Array$treeFromBuilder, correctNodeList, builder.b);
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
-				$elm$core$Elm$JsArray$length(builder.b) + treeLen,
+				$elm$core$Elm$JsArray$length(builder.c) + treeLen,
 				A2($elm$core$Basics$max, 5, depth * $elm$core$Array$shiftStep),
 				tree,
-				builder.b);
+				builder.c);
 		}
 	});
 var $elm$core$Basics$idiv = _Basics_idiv;
@@ -4867,7 +4867,7 @@ var $elm$core$Array$initializeHelp = F5(
 				return A2(
 					$elm$core$Array$builderToArray,
 					false,
-					{c: nodeList, a: (len / $elm$core$Array$branchFactor) | 0, b: tail});
+					{d: nodeList, b: (len / $elm$core$Array$branchFactor) | 0, c: tail});
 			} else {
 				var leaf = $elm$core$Array$Leaf(
 					A3($elm$core$Elm$JsArray$initialize, $elm$core$Array$branchFactor, fromIndex, fn));
@@ -4934,7 +4934,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {Y: fragment, _: host, ad: path, af: port_, ai: protocol, aj: query};
+		return {aa: fragment, ac: host, ag: path, ai: port_, al: protocol, am: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5214,7 +5214,9 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$document = _Browser_document;
 var $author$project$Aoc24$Input = 0;
-var $author$project$Aoc24$Initializing = $elm$core$Basics$identity;
+var $author$project$Aoc24$Initializing = function (a) {
+	return {$: 0, a: a};
+};
 var $elm$core$Set$Set_elm_builtin = $elm$core$Basics$identity;
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
@@ -5291,11 +5293,12 @@ var $author$project$Aoc24$initTileMovesList = function (dataSource) {
 };
 var $author$project$Aoc24$initInitializationModel = function (dataSource) {
 	var tilesToPlace = $author$project$Aoc24$initTileMovesList(dataSource);
-	return {s: $elm$core$Maybe$Nothing, j: '?', M: false, G: _List_Nil, v: true, x: 50, B: $elm$core$Set$empty, L: tilesToPlace};
+	return {u: $elm$core$Maybe$Nothing, g: '?', N: false, H: _List_Nil, i: true, f: 40, y: $elm$core$Set$empty, O: tilesToPlace};
 };
 var $author$project$Aoc24$initModel = function (dataSource) {
-	var state = $author$project$Aoc24$initInitializationModel(dataSource);
-	return {E: dataSource, j: '?', e: state};
+	var state = $author$project$Aoc24$Initializing(
+		$author$project$Aoc24$initInitializationModel(dataSource));
+	return {F: dataSource, g: '?', a: state};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -5310,7 +5313,7 @@ var $elm$time$Time$Every = F2(
 	});
 var $elm$time$Time$State = F2(
 	function (taggers, processes) {
-		return {ah: processes, ao: taggers};
+		return {ak: processes, ar: taggers};
 	});
 var $elm$time$Time$init = $elm$core$Task$succeed(
 	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
@@ -5600,7 +5603,7 @@ var $elm$time$Time$spawnHelp = F3(
 	});
 var $elm$time$Time$onEffects = F3(
 	function (router, subs, _v0) {
-		var processes = _v0.ah;
+		var processes = _v0.ak;
 		var rightStep = F3(
 			function (_v6, id, _v7) {
 				var spawns = _v7.a;
@@ -5669,7 +5672,7 @@ var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
 var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $elm$time$Time$onSelfMsg = F3(
 	function (router, interval, state) {
-		var _v0 = A2($elm$core$Dict$get, interval, state.ao);
+		var _v0 = A2($elm$core$Dict$get, interval, state.ar);
 		if (_v0.$ === 1) {
 			return $elm$core$Task$succeed(state);
 		} else {
@@ -5718,46 +5721,115 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc24$subscriptions = function (model) {
-	var _v0 = model.e;
-	var initializing = _v0;
-	return initializing.v ? $elm$core$Platform$Sub$none : A2(
-		$elm$time$Time$every,
-		initializing.x,
-		function (_v1) {
-			return $author$project$Aoc24$Tick;
-		});
+	var _v0 = model.a;
+	if (!_v0.$) {
+		var initializing = _v0.a;
+		return initializing.i ? $elm$core$Platform$Sub$none : A2(
+			$elm$time$Time$every,
+			initializing.f,
+			function (_v1) {
+				return $author$project$Aoc24$Tick;
+			});
+	} else {
+		var animating = _v0.a;
+		return animating.i ? $elm$core$Platform$Sub$none : A2(
+			$elm$time$Time$every,
+			animating.f,
+			function (_v2) {
+				return $author$project$Aoc24$Tick;
+			});
+	}
 };
 var $author$project$Aoc24$updateDataSource = F2(
 	function (dataSource, model) {
 		return $author$project$Aoc24$initModel(dataSource);
 	});
+var $author$project$Aoc24$Animating = function (a) {
+	return {$: 1, a: a};
+};
 var $author$project$Aoc24$updateFaster = function (model) {
-	var _v0 = model.e;
-	var initializing = _v0;
-	var tickInterval = initializing.x / 2;
-	return _Utils_update(
-		model,
-		{
-			e: _Utils_update(
-				initializing,
-				{x: tickInterval})
-		});
+	var _v0 = model.a;
+	if (!_v0.$) {
+		var initializing = _v0.a;
+		var tickInterval = initializing.f / 2;
+		return _Utils_update(
+			model,
+			{
+				a: $author$project$Aoc24$Initializing(
+					_Utils_update(
+						initializing,
+						{f: tickInterval}))
+			});
+	} else {
+		var animating = _v0.a;
+		var tickInterval = animating.f / 2;
+		return _Utils_update(
+			model,
+			{
+				a: $author$project$Aoc24$Animating(
+					_Utils_update(
+						animating,
+						{f: tickInterval}))
+			});
+	}
 };
 var $author$project$Aoc24$updateReset = function (model) {
-	return $author$project$Aoc24$initModel(model.E);
+	return $author$project$Aoc24$initModel(model.F);
+};
+var $author$project$Aoc24$initAnimating = function (blackTiles) {
+	return {A: blackTiles, M: 0, g: '?', i: true, U: blackTiles, f: 100};
+};
+var $author$project$Aoc24$updateRestart = function (model) {
+	var _v0 = model.a;
+	if (!_v0.$) {
+		return model;
+	} else {
+		var animating = _v0.a;
+		var a = $author$project$Aoc24$initAnimating(animating.U);
+		return _Utils_update(
+			model,
+			{
+				a: $author$project$Aoc24$Animating(a)
+			});
+	}
 };
 var $author$project$Aoc24$updateSlower = function (model) {
-	var _v0 = model.e;
-	var initializing = _v0;
-	var tickInterval = initializing.x * 2;
-	return _Utils_update(
-		model,
-		{
-			e: _Utils_update(
-				initializing,
-				{x: tickInterval})
-		});
+	var _v0 = model.a;
+	if (!_v0.$) {
+		var initializing = _v0.a;
+		var tickInterval = initializing.f * 2;
+		return _Utils_update(
+			model,
+			{
+				a: $author$project$Aoc24$Initializing(
+					_Utils_update(
+						initializing,
+						{f: tickInterval}))
+			});
+	} else {
+		var animating = _v0.a;
+		var tickInterval = animating.f * 2;
+		return _Utils_update(
+			model,
+			{
+				a: $author$project$Aoc24$Animating(
+					_Utils_update(
+						animating,
+						{f: tickInterval}))
+			});
+	}
 };
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
 var $author$project$Aoc24$adjacent = F2(
 	function (_v0, move) {
 		var a = _v0.a;
@@ -5791,14 +5863,13 @@ var $author$project$Aoc24$adjacent = F2(
 					_Utils_Tuple2(r - (1 - a), c + a));
 		}
 	});
-var $author$project$Aoc24$initTile = _Utils_Tuple2(
-	0,
-	_Utils_Tuple2(0, 0));
-var $elm$core$Set$insert = F2(
-	function (key, _v0) {
-		var dict = _v0;
-		return A3($elm$core$Dict$insert, key, 0, dict);
-	});
+var $author$project$Aoc24$getAdjacentTiles = function (tile) {
+	return A2(
+		$elm$core$List$map,
+		$author$project$Aoc24$adjacent(tile),
+		_List_fromArray(
+			[3, 0, 5, 2, 4, 1]));
+};
 var $elm$core$Dict$member = F2(
 	function (key, dict) {
 		var _v0 = A2($elm$core$Dict$get, key, dict);
@@ -5812,6 +5883,55 @@ var $elm$core$Set$member = F2(
 	function (key, _v0) {
 		var dict = _v0;
 		return A2($elm$core$Dict$member, key, dict);
+	});
+var $author$project$Aoc24$becomesBlack = F2(
+	function (blackTiles, tile) {
+		var count = $elm$core$List$length(
+			A2(
+				$elm$core$List$filter,
+				function (t) {
+					return A2($elm$core$Set$member, t, blackTiles);
+				},
+				$author$project$Aoc24$getAdjacentTiles(tile)));
+		return count === 2;
+	});
+var $elm$core$Dict$filter = F2(
+	function (isGood, dict) {
+		return A3(
+			$elm$core$Dict$foldl,
+			F3(
+				function (k, v, d) {
+					return A2(isGood, k, v) ? A3($elm$core$Dict$insert, k, v, d) : d;
+				}),
+			$elm$core$Dict$empty,
+			dict);
+	});
+var $elm$core$Set$filter = F2(
+	function (isGood, _v0) {
+		var dict = _v0;
+		return A2(
+			$elm$core$Dict$filter,
+			F2(
+				function (key, _v1) {
+					return isGood(key);
+				}),
+			dict);
+	});
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
 	});
 var $elm$core$Dict$getMin = function (dict) {
 	getMin:
@@ -6175,6 +6295,88 @@ var $elm$core$Dict$remove = F2(
 			return x;
 		}
 	});
+var $elm$core$Dict$diff = F2(
+	function (t1, t2) {
+		return A3(
+			$elm$core$Dict$foldl,
+			F3(
+				function (k, v, t) {
+					return A2($elm$core$Dict$remove, k, t);
+				}),
+			t1,
+			t2);
+	});
+var $elm$core$Set$diff = F2(
+	function (_v0, _v1) {
+		var dict1 = _v0;
+		var dict2 = _v1;
+		return A2($elm$core$Dict$diff, dict1, dict2);
+	});
+var $elm$core$Set$insert = F2(
+	function (key, _v0) {
+		var dict = _v0;
+		return A3($elm$core$Dict$insert, key, 0, dict);
+	});
+var $elm$core$Set$fromList = function (list) {
+	return A3($elm$core$List$foldl, $elm$core$Set$insert, $elm$core$Set$empty, list);
+};
+var $author$project$Aoc24$findWhiteTiles = function (blackTiles) {
+	var neighbours = $elm$core$Set$fromList(
+		A2(
+			$elm$core$List$concatMap,
+			$author$project$Aoc24$getAdjacentTiles,
+			$elm$core$Set$toList(blackTiles)));
+	return A2($elm$core$Set$diff, neighbours, blackTiles);
+};
+var $author$project$Aoc24$remainsBlack = F2(
+	function (blackTiles, tile) {
+		var count = $elm$core$List$length(
+			A2(
+				$elm$core$List$filter,
+				function (t) {
+					return A2($elm$core$Set$member, t, blackTiles);
+				},
+				$author$project$Aoc24$getAdjacentTiles(tile)));
+		return (count === 1) || (count === 2);
+	});
+var $elm$core$Dict$union = F2(
+	function (t1, t2) {
+		return A3($elm$core$Dict$foldl, $elm$core$Dict$insert, t2, t1);
+	});
+var $elm$core$Set$union = F2(
+	function (_v0, _v1) {
+		var dict1 = _v0;
+		var dict2 = _v1;
+		return A2($elm$core$Dict$union, dict1, dict2);
+	});
+var $author$project$Aoc24$evolveStep = function (blackTiles) {
+	var whiteTiles = $author$project$Aoc24$findWhiteTiles(blackTiles);
+	var black2 = A2(
+		$elm$core$Set$filter,
+		$author$project$Aoc24$becomesBlack(blackTiles),
+		whiteTiles);
+	var black1 = A2(
+		$elm$core$Set$filter,
+		$author$project$Aoc24$remainsBlack(blackTiles),
+		blackTiles);
+	return A2($elm$core$Set$union, black1, black2);
+};
+var $author$project$Aoc24$updateAnimating = function (animating) {
+	var days = animating.M;
+	var pause = (days + 1) === 100;
+	var blackTiles = $author$project$Aoc24$evolveStep(animating.A);
+	return _Utils_update(
+		animating,
+		{
+			A: blackTiles,
+			M: days + 1,
+			g: $elm$core$String$fromInt(days + 1),
+			i: pause
+		});
+};
+var $author$project$Aoc24$initTile = _Utils_Tuple2(
+	0,
+	_Utils_Tuple2(0, 0));
 var $elm$core$Set$remove = F2(
 	function (key, _v0) {
 		var dict = _v0;
@@ -6197,79 +6399,118 @@ var $author$project$Aoc24$toMoveStr = function (move) {
 	}
 };
 var $author$project$Aoc24$updateInitializing = function (initializing) {
-	var _v0 = initializing.s;
+	var _v0 = initializing.u;
 	if (_v0.$ === 1) {
-		var _v1 = initializing.L;
+		var _v1 = initializing.O;
 		if (!_v1.b) {
 			return _Utils_update(
 				initializing,
-				{M: true});
+				{N: true});
 		} else {
 			var nextMoves = _v1.a;
 			var restList = _v1.b;
 			return _Utils_update(
 				initializing,
 				{
-					s: $elm$core$Maybe$Just($author$project$Aoc24$initTile),
-					j: '->',
-					G: nextMoves,
-					L: restList
+					u: $elm$core$Maybe$Just($author$project$Aoc24$initTile),
+					g: '->',
+					H: nextMoves,
+					O: restList
 				});
 		}
 	} else {
 		var tile = _v0.a;
-		var _v2 = initializing.G;
+		var _v2 = initializing.H;
 		if (!_v2.b) {
-			var currentlyPlaced = initializing.B;
+			var currentlyPlaced = initializing.y;
 			var nextPlaced = A2($elm$core$Set$member, tile, currentlyPlaced) ? A2($elm$core$Set$remove, tile, currentlyPlaced) : A2($elm$core$Set$insert, tile, currentlyPlaced);
 			return _Utils_update(
 				initializing,
-				{s: $elm$core$Maybe$Nothing, B: nextPlaced});
+				{u: $elm$core$Maybe$Nothing, y: nextPlaced});
 		} else {
 			var move = _v2.a;
 			var restMoves = _v2.b;
 			var moved = A2($author$project$Aoc24$adjacent, tile, move);
 			var moveStr = $author$project$Aoc24$toMoveStr(move);
-			var debug = initializing.j;
+			var debug = initializing.g;
 			var dbg = $elm$core$String$isEmpty(debug) ? moveStr : (debug + ('-' + moveStr));
 			return _Utils_update(
 				initializing,
 				{
-					s: $elm$core$Maybe$Just(moved),
-					j: dbg,
-					G: restMoves
+					u: $elm$core$Maybe$Just(moved),
+					g: dbg,
+					H: restMoves
 				});
 		}
 	}
 };
 var $author$project$Aoc24$updateStep = function (model) {
-	var _v0 = model.e;
-	var initializing = _v0;
-	return _Utils_update(
-		model,
-		{
-			e: $author$project$Aoc24$updateInitializing(initializing)
-		});
+	var _v0 = model.a;
+	if (!_v0.$) {
+		var initializing = _v0.a;
+		if (initializing.N) {
+			var blackTiles = initializing.y;
+			var anim = $author$project$Aoc24$initAnimating(blackTiles);
+			return _Utils_update(
+				model,
+				{
+					a: $author$project$Aoc24$Animating(anim)
+				});
+		} else {
+			return _Utils_update(
+				model,
+				{
+					a: $author$project$Aoc24$Initializing(
+						$author$project$Aoc24$updateInitializing(initializing))
+				});
+		}
+	} else {
+		var animating = _v0.a;
+		return _Utils_update(
+			model,
+			{
+				a: $author$project$Aoc24$Animating(
+					$author$project$Aoc24$updateAnimating(animating))
+			});
+	}
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc24$updateTogglePlay = function (model) {
-	var _v0 = model.e;
-	var initializing = _v0;
-	var paused = !initializing.v;
-	return _Utils_update(
-		model,
-		{
-			e: _Utils_update(
-				initializing,
-				{v: paused})
-		});
+	var _v0 = model.a;
+	if (!_v0.$) {
+		var initializing = _v0.a;
+		var paused = !initializing.i;
+		return _Utils_update(
+			model,
+			{
+				a: $author$project$Aoc24$Initializing(
+					_Utils_update(
+						initializing,
+						{i: paused}))
+			});
+	} else {
+		var animating = _v0.a;
+		var paused = !animating.i;
+		return _Utils_update(
+			model,
+			{
+				a: $author$project$Aoc24$Animating(
+					_Utils_update(
+						animating,
+						{i: paused}))
+			});
+	}
 };
 var $author$project$Aoc24$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
-			case 5:
+			case 6:
 				return _Utils_Tuple2(
 					$author$project$Aoc24$updateReset(model),
+					$elm$core$Platform$Cmd$none);
+			case 5:
+				return _Utils_Tuple2(
+					$author$project$Aoc24$updateRestart(model),
 					$elm$core$Platform$Cmd$none);
 			case 0:
 				return _Utils_Tuple2(
@@ -6299,13 +6540,14 @@ var $author$project$Aoc24$update = F2(
 		}
 	});
 var $author$project$Aoc24$Faster = {$: 1};
-var $author$project$Aoc24$Reset = {$: 5};
+var $author$project$Aoc24$Reset = {$: 6};
+var $author$project$Aoc24$Restart = {$: 5};
 var $author$project$Aoc24$Sample = 1;
 var $author$project$Aoc24$Slower = {$: 2};
 var $author$project$Aoc24$Step = {$: 3};
 var $author$project$Aoc24$TogglePlay = {$: 4};
 var $author$project$Aoc24$UseDataSource = function (a) {
-	return {$: 6, a: a};
+	return {$: 7, a: a};
 };
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$json$Json$Encode$string = _Json_wrap;
@@ -6327,6 +6569,7 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 			$elm$json$Json$Encode$bool(bool));
 	});
 var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
+var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$Attributes$href = function (url) {
 	return A2(
@@ -6387,14 +6630,7 @@ var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
+var $author$project$Aoc24$hexSize = 3;
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $author$project$Aoc24$f2s = $elm$core$String$fromFloat;
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
@@ -6490,12 +6726,18 @@ var $author$project$Aoc24$toHexagonElement = F3(
 			]);
 		return A2($elm$svg$Svg$polygon, attrs, _List_Nil);
 	});
+var $author$project$Aoc24$toAnimatingElements = function (animating) {
+	return A2(
+		$elm$core$List$map,
+		A2($author$project$Aoc24$toHexagonElement, true, $author$project$Aoc24$hexSize),
+		$elm$core$Set$toList(animating.A));
+};
 var $author$project$Aoc24$toInitializingElements = function (initializing) {
 	var placedElements = A2(
 		$elm$core$List$map,
-		A2($author$project$Aoc24$toHexagonElement, true, 8),
-		$elm$core$Set$toList(initializing.B));
-	var currentTile = initializing.s;
+		A2($author$project$Aoc24$toHexagonElement, true, $author$project$Aoc24$hexSize),
+		$elm$core$Set$toList(initializing.y));
+	var currentTile = initializing.u;
 	var currentElements = function () {
 		if (currentTile.$ === 1) {
 			return _List_Nil;
@@ -6503,7 +6745,7 @@ var $author$project$Aoc24$toInitializingElements = function (initializing) {
 			var tile = currentTile.a;
 			return _List_fromArray(
 				[
-					A3($author$project$Aoc24$toHexagonElement, false, 8, tile)
+					A3($author$project$Aoc24$toHexagonElement, false, $author$project$Aoc24$hexSize, tile)
 				]);
 		}
 	}();
@@ -6513,17 +6755,22 @@ var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $author$project$Aoc24$toSvg = function (model) {
 	var elements = function () {
-		var _v0 = model.e;
-		var initializing = _v0;
-		return $author$project$Aoc24$toInitializingElements(initializing);
+		var _v0 = model.a;
+		if (!_v0.$) {
+			var initializing = _v0.a;
+			return $author$project$Aoc24$toInitializingElements(initializing);
+		} else {
+			var animating = _v0.a;
+			return $author$project$Aoc24$toAnimatingElements(animating);
+		}
 	}();
 	return A2(
 		$elm$svg$Svg$svg,
 		_List_fromArray(
 			[
-				$elm$svg$Svg$Attributes$viewBox('-300 -200 600 400'),
-				$elm$svg$Svg$Attributes$width('600'),
-				$elm$svg$Svg$Attributes$height('400'),
+				$elm$svg$Svg$Attributes$viewBox('-320 -300 640 600'),
+				$elm$svg$Svg$Attributes$width('640'),
+				$elm$svg$Svg$Attributes$height('600'),
 				$elm$svg$Svg$Attributes$style('max-width: 100%; background-color:white')
 			]),
 		elements);
@@ -6532,21 +6779,44 @@ var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Aoc24$viewBody = function (model) {
 	var svg = $author$project$Aoc24$toSvg(model);
+	var restartDisabled = function () {
+		var _v3 = model.a;
+		if (!_v3.$) {
+			return true;
+		} else {
+			return false;
+		}
+	}();
 	var playButtonText = function () {
-		var _v2 = model.e;
-		var initializing = _v2;
-		return initializing.v ? 'Initialize' : 'Pause';
+		var _v2 = model.a;
+		if (!_v2.$) {
+			var initializing = _v2.a;
+			return initializing.i ? 'Initialize' : 'Pause';
+		} else {
+			var animating = _v2.a;
+			return animating.i ? 'Animate' : 'Pause';
+		}
 	}();
 	var debugStr = function () {
-		var _v1 = model.e;
-		var initializing = _v1;
-		return initializing.j;
+		var _v1 = model.a;
+		if (!_v1.$) {
+			var initializing = _v1.a;
+			return initializing.g;
+		} else {
+			var animating = _v1.a;
+			return animating.g;
+		}
 	}();
 	var count = 0;
 	var blackTilesCount = function () {
-		var _v0 = model.e;
-		var initializing = _v0;
-		return $elm$core$Set$size(initializing.B);
+		var _v0 = model.a;
+		if (!_v0.$) {
+			var initializing = _v0.a;
+			return $elm$core$Set$size(initializing.y);
+		} else {
+			var animating = _v0.a;
+			return $elm$core$Set$size(animating.A);
+		}
 	}();
 	return A2(
 		$elm$html$Html$table,
@@ -6714,7 +6984,7 @@ var $author$project$Aoc24$viewBody = function (model) {
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(
 										$author$project$Aoc24$UseDataSource(0)),
-										$elm$html$Html$Attributes$checked(!model.E)
+										$elm$html$Html$Attributes$checked(!model.F)
 									]),
 								_List_Nil),
 								A2(
@@ -6731,7 +7001,7 @@ var $author$project$Aoc24$viewBody = function (model) {
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(
 										$author$project$Aoc24$UseDataSource(1)),
-										$elm$html$Html$Attributes$checked(model.E === 1)
+										$elm$html$Html$Attributes$checked(model.F === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -6767,6 +7037,18 @@ var $author$project$Aoc24$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text('Reset')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick($author$project$Aoc24$Restart),
+										$elm$html$Html$Attributes$disabled(restartDisabled)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Restart')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -6874,7 +7156,7 @@ var $author$project$Aoc24$viewBody = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(model.j)
+										$elm$html$Html$text(model.g)
 									]))
 							]))
 					]))
@@ -6882,15 +7164,15 @@ var $author$project$Aoc24$viewBody = function (model) {
 };
 var $author$project$Aoc24$view = function (model) {
 	return {
-		aw: _List_fromArray(
+		ay: _List_fromArray(
 			[
 				$author$project$Aoc24$viewBody(model)
 			]),
-		aL: 'Advent of Code 2020 | Day 24: Lobby Layout'
+		aM: 'Advent of Code 2020 | Day 24: Lobby Layout'
 	};
 };
 var $author$project$Aoc24$main = $elm$browser$Browser$document(
-	{aE: $author$project$Aoc24$init, aK: $author$project$Aoc24$subscriptions, aM: $author$project$Aoc24$update, aN: $author$project$Aoc24$view});
+	{aF: $author$project$Aoc24$init, aL: $author$project$Aoc24$subscriptions, aN: $author$project$Aoc24$update, aO: $author$project$Aoc24$view});
 _Platform_export({'Aoc24':{'init':$author$project$Aoc24$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
 
