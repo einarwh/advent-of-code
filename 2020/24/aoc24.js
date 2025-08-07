@@ -5279,12 +5279,12 @@ var $author$project$Main$initTileMovesList = function (dataSource) {
 };
 var $author$project$Main$initInitializationModel = function (dataSource) {
 	var tilesToPlace = $author$project$Main$initTileMovesList(dataSource);
-	return {u: $elm$core$Maybe$Nothing, h: '?', N: false, H: _List_Nil, f: true, g: 40, y: $elm$core$Set$empty, O: tilesToPlace};
+	return {u: $elm$core$Maybe$Nothing, i: '?', N: false, H: _List_Nil, f: true, g: 40, y: $elm$core$Set$empty, O: tilesToPlace};
 };
 var $author$project$Main$initModel = function (dataSource) {
 	var state = $author$project$Main$Initializing(
 		$author$project$Main$initInitializationModel(dataSource));
-	return {F: dataSource, h: '?', a: state};
+	return {F: dataSource, i: '?', a: state};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -5763,7 +5763,7 @@ var $author$project$Main$updateReset = function (model) {
 	return $author$project$Main$initModel(model.F);
 };
 var $author$project$Main$initAnimating = function (blackTiles) {
-	return {A: blackTiles, M: 0, h: '?', f: true, U: blackTiles, g: 100};
+	return {A: blackTiles, M: 0, i: '?', f: true, U: blackTiles, g: 100};
 };
 var $author$project$Main$updateRestart = function (model) {
 	var _v0 = model.a;
@@ -6356,7 +6356,7 @@ var $author$project$Main$updateAnimating = function (animating) {
 		{
 			A: blackTiles,
 			M: days + 1,
-			h: $elm$core$String$fromInt(days + 1),
+			i: $elm$core$String$fromInt(days + 1),
 			f: pause
 		});
 };
@@ -6399,7 +6399,7 @@ var $author$project$Main$updateInitializing = function (initializing) {
 				initializing,
 				{
 					u: $elm$core$Maybe$Just($author$project$Main$initTile),
-					h: '->',
+					i: '->',
 					H: nextMoves,
 					O: restList
 				});
@@ -6418,13 +6418,13 @@ var $author$project$Main$updateInitializing = function (initializing) {
 			var restMoves = _v2.b;
 			var moved = A2($author$project$Main$adjacent, tile, move);
 			var moveStr = $author$project$Main$toMoveStr(move);
-			var debug = initializing.h;
+			var debug = initializing.i;
 			var dbg = $elm$core$String$isEmpty(debug) ? moveStr : (debug + ('-' + moveStr));
 			return _Utils_update(
 				initializing,
 				{
 					u: $elm$core$Maybe$Just(moved),
-					h: dbg,
+					i: dbg,
 					H: restMoves
 				});
 		}
@@ -6787,10 +6787,10 @@ var $author$project$Main$view = function (model) {
 		var _v1 = model.a;
 		if (!_v1.$) {
 			var initializing = _v1.a;
-			return initializing.h;
+			return initializing.i;
 		} else {
 			var animating = _v1.a;
-			return animating.h;
+			return animating.i;
 		}
 	}();
 	var count = 0;
@@ -7123,28 +7123,6 @@ var $author$project$Main$view = function (model) {
 							]),
 						_List_fromArray(
 							[svg]))
-					])),
-				A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$td,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$align('center')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$label,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(model.h)
-									]))
-							]))
 					]))
 			]));
 };

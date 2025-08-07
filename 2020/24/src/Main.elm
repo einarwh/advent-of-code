@@ -959,10 +959,4 @@ view model =
               , Html.Attributes.style "padding" "10px" ] 
               [ 
                 svg
-              ] ] 
-      , Html.tr 
-          []
-          [ Html.td 
-              [ Html.Attributes.align "center" ]
-              [ Html.label [] [ Html.text model.debug ]
-            ] ] ]
+              ] ] ]
