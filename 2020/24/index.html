@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.Q.E === region.W.E)
+	if (region.R.F === region.W.F)
 	{
-		return 'on line ' + region.Q.E;
+		return 'on line ' + region.R.F;
 	}
-	return 'on lines ' + region.Q.E + ' through ' + region.W.E;
+	return 'on lines ' + region.R.F + ' through ' + region.W.F;
 }
 
 
@@ -2734,8 +2734,8 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
 		p: func(record.p),
-		R: record.R,
-		O: record.O
+		S: record.S,
+		P: record.P
 	}
 });
 
@@ -3004,10 +3004,10 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 
 		var value = result.a;
 		var message = !tag ? value : tag < 3 ? value.a : value.p;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.R;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.S;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.O) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.P) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3997,7 +3997,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 		impl.aK,
 		impl.aI,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.P && impl.P(sendToApp)
+			var divertHrefToApp = impl.Q && impl.Q(sendToApp)
 			var view = impl.aL;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
@@ -4072,7 +4072,7 @@ function _Browser_application(impl)
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		P: function(sendToApp)
+		Q: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -5291,11 +5291,11 @@ var $author$project$Aoc24$initTileMovesList = function (dataSource) {
 };
 var $author$project$Aoc24$initInitializationModel = function (dataSource) {
 	var tilesToPlace = $author$project$Aoc24$initTileMovesList(dataSource);
-	return {s: $elm$core$Maybe$Nothing, l: '?', L: false, F: _List_Nil, y: true, S: 50, A: $elm$core$Set$empty, K: tilesToPlace};
+	return {s: $elm$core$Maybe$Nothing, l: '?', M: false, G: _List_Nil, z: true, w: 50, B: $elm$core$Set$empty, L: tilesToPlace};
 };
 var $author$project$Aoc24$initModel = function (dataSource) {
 	var state = $author$project$Aoc24$initInitializationModel(dataSource);
-	return {D: dataSource, l: '?', i: state};
+	return {E: dataSource, l: '?', e: state};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -5718,22 +5718,46 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc24$subscriptions = function (model) {
-	var _v0 = model.i;
+	var _v0 = model.e;
 	var initializing = _v0;
-	return initializing.y ? $elm$core$Platform$Sub$none : A2(
+	return initializing.z ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		initializing.S,
+		initializing.w,
 		function (_v1) {
 			return $author$project$Aoc24$Tick;
 		});
 };
 var $author$project$Aoc24$updateClear = function (model) {
-	return $author$project$Aoc24$initModel(model.D);
+	return $author$project$Aoc24$initModel(model.E);
 };
 var $author$project$Aoc24$updateDataSource = F2(
 	function (dataSource, model) {
 		return $author$project$Aoc24$initModel(dataSource);
 	});
+var $author$project$Aoc24$updateFaster = function (model) {
+	var _v0 = model.e;
+	var initializing = _v0;
+	var tickInterval = initializing.w / 2;
+	return _Utils_update(
+		model,
+		{
+			e: _Utils_update(
+				initializing,
+				{w: tickInterval})
+		});
+};
+var $author$project$Aoc24$updateSlower = function (model) {
+	var _v0 = model.e;
+	var initializing = _v0;
+	var tickInterval = initializing.w * 2;
+	return _Utils_update(
+		model,
+		{
+			e: _Utils_update(
+				initializing,
+				{w: tickInterval})
+		});
+};
 var $author$project$Aoc24$adjacent = F2(
 	function (_v0, move) {
 		var a = _v0.a;
@@ -6175,11 +6199,11 @@ var $author$project$Aoc24$toMoveStr = function (move) {
 var $author$project$Aoc24$updateInitializing = function (initializing) {
 	var _v0 = initializing.s;
 	if (_v0.$ === 1) {
-		var _v1 = initializing.K;
+		var _v1 = initializing.L;
 		if (!_v1.b) {
 			return _Utils_update(
 				initializing,
-				{L: true});
+				{M: true});
 		} else {
 			var nextMoves = _v1.a;
 			var restList = _v1.b;
@@ -6188,19 +6212,19 @@ var $author$project$Aoc24$updateInitializing = function (initializing) {
 				{
 					s: $elm$core$Maybe$Just($author$project$Aoc24$initTile),
 					l: '->',
-					F: nextMoves,
-					K: restList
+					G: nextMoves,
+					L: restList
 				});
 		}
 	} else {
 		var tile = _v0.a;
-		var _v2 = initializing.F;
+		var _v2 = initializing.G;
 		if (!_v2.b) {
-			var currentlyPlaced = initializing.A;
+			var currentlyPlaced = initializing.B;
 			var nextPlaced = A2($elm$core$Set$member, tile, currentlyPlaced) ? A2($elm$core$Set$remove, tile, currentlyPlaced) : A2($elm$core$Set$insert, tile, currentlyPlaced);
 			return _Utils_update(
 				initializing,
-				{s: $elm$core$Maybe$Nothing, A: nextPlaced});
+				{s: $elm$core$Maybe$Nothing, B: nextPlaced});
 		} else {
 			var move = _v2.a;
 			var restMoves = _v2.b;
@@ -6213,37 +6237,37 @@ var $author$project$Aoc24$updateInitializing = function (initializing) {
 				{
 					s: $elm$core$Maybe$Just(moved),
 					l: dbg,
-					F: restMoves
+					G: restMoves
 				});
 		}
 	}
 };
 var $author$project$Aoc24$updateStep = function (model) {
-	var _v0 = model.i;
+	var _v0 = model.e;
 	var initializing = _v0;
 	return _Utils_update(
 		model,
 		{
-			i: $author$project$Aoc24$updateInitializing(initializing)
+			e: $author$project$Aoc24$updateInitializing(initializing)
 		});
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc24$updateTogglePlay = function (model) {
-	var _v0 = model.i;
+	var _v0 = model.e;
 	var initializing = _v0;
-	var paused = !initializing.y;
+	var paused = !initializing.z;
 	return _Utils_update(
 		model,
 		{
-			i: _Utils_update(
+			e: _Utils_update(
 				initializing,
-				{y: paused})
+				{z: paused})
 		});
 };
 var $author$project$Aoc24$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
-			case 3:
+			case 5:
 				return _Utils_Tuple2(
 					$author$project$Aoc24$updateClear(model),
 					$elm$core$Platform$Cmd$none);
@@ -6253,9 +6277,17 @@ var $author$project$Aoc24$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 1:
 				return _Utils_Tuple2(
-					$author$project$Aoc24$updateStep(model),
+					$author$project$Aoc24$updateFaster(model),
 					$elm$core$Platform$Cmd$none);
 			case 2:
+				return _Utils_Tuple2(
+					$author$project$Aoc24$updateSlower(model),
+					$elm$core$Platform$Cmd$none);
+			case 3:
+				return _Utils_Tuple2(
+					$author$project$Aoc24$updateStep(model),
+					$elm$core$Platform$Cmd$none);
+			case 4:
 				return _Utils_Tuple2(
 					$author$project$Aoc24$updateTogglePlay(model),
 					$elm$core$Platform$Cmd$none);
@@ -6266,12 +6298,14 @@ var $author$project$Aoc24$update = F2(
 					$elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Aoc24$Clear = {$: 3};
+var $author$project$Aoc24$Clear = {$: 5};
+var $author$project$Aoc24$Faster = {$: 1};
 var $author$project$Aoc24$Sample = 1;
-var $author$project$Aoc24$Step = {$: 1};
-var $author$project$Aoc24$TogglePlay = {$: 2};
+var $author$project$Aoc24$Slower = {$: 2};
+var $author$project$Aoc24$Step = {$: 3};
+var $author$project$Aoc24$TogglePlay = {$: 4};
 var $author$project$Aoc24$UseDataSource = function (a) {
-	return {$: 4, a: a};
+	return {$: 6, a: a};
 };
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$json$Json$Encode$string = _Json_wrap;
@@ -6460,7 +6494,7 @@ var $author$project$Aoc24$toInitializingElements = function (initializing) {
 	var placedElements = A2(
 		$elm$core$List$map,
 		A2($author$project$Aoc24$toHexagonElement, true, 8),
-		$elm$core$Set$toList(initializing.A));
+		$elm$core$Set$toList(initializing.B));
 	var currentTile = initializing.s;
 	var currentElements = function () {
 		if (currentTile.$ === 1) {
@@ -6473,21 +6507,13 @@ var $author$project$Aoc24$toInitializingElements = function (initializing) {
 				]);
 		}
 	}();
-	return A2(
-		$elm$core$List$append,
-		_List_fromArray(
-			[
-				A3($author$project$Aoc24$toHexagonElement, false, 8, $author$project$Aoc24$initTile)
-			]),
-		A2($elm$core$List$append, placedElements, currentElements));
+	return A2($elm$core$List$append, placedElements, currentElements);
 };
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $author$project$Aoc24$toSvg = function (model) {
-	var svgWidth = $elm$core$String$fromInt(500);
-	var svgHeight = $elm$core$String$fromInt(500);
 	var elements = function () {
-		var _v0 = model.i;
+		var _v0 = model.e;
 		var initializing = _v0;
 		return $author$project$Aoc24$toInitializingElements(initializing);
 	}();
@@ -6495,9 +6521,9 @@ var $author$project$Aoc24$toSvg = function (model) {
 		$elm$svg$Svg$svg,
 		_List_fromArray(
 			[
-				$elm$svg$Svg$Attributes$viewBox('-300 -300 600 600'),
+				$elm$svg$Svg$Attributes$viewBox('-300 -200 600 400'),
 				$elm$svg$Svg$Attributes$width('600'),
-				$elm$svg$Svg$Attributes$height('600'),
+				$elm$svg$Svg$Attributes$height('400'),
 				$elm$svg$Svg$Attributes$style('max-width: 100%; background-color:white')
 			]),
 		elements);
@@ -6507,20 +6533,20 @@ var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('
 var $author$project$Aoc24$viewBody = function (model) {
 	var svg = $author$project$Aoc24$toSvg(model);
 	var playButtonText = function () {
-		var _v2 = model.i;
+		var _v2 = model.e;
 		var initializing = _v2;
-		return initializing.y ? 'Initialize' : 'Pause';
+		return initializing.z ? 'Initialize' : 'Pause';
 	}();
 	var debugStr = function () {
-		var _v1 = model.i;
+		var _v1 = model.e;
 		var initializing = _v1;
 		return initializing.l;
 	}();
 	var count = 0;
 	var blackTilesCount = function () {
-		var _v0 = model.i;
+		var _v0 = model.e;
 		var initializing = _v0;
-		return $elm$core$Set$size(initializing.A);
+		return $elm$core$Set$size(initializing.B);
 	}();
 	return A2(
 		$elm$html$Html$table,
@@ -6688,7 +6714,7 @@ var $author$project$Aoc24$viewBody = function (model) {
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(
 										$author$project$Aoc24$UseDataSource(0)),
-										$elm$html$Html$Attributes$checked(!model.D)
+										$elm$html$Html$Attributes$checked(!model.E)
 									]),
 								_List_Nil),
 								A2(
@@ -6705,7 +6731,7 @@ var $author$project$Aoc24$viewBody = function (model) {
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(
 										$author$project$Aoc24$UseDataSource(1)),
-										$elm$html$Html$Attributes$checked(model.D === 1)
+										$elm$html$Html$Attributes$checked(model.E === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -6740,7 +6766,18 @@ var $author$project$Aoc24$viewBody = function (model) {
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Clear')
+										$elm$html$Html$text('Reset')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick($author$project$Aoc24$Slower)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Slower')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -6752,6 +6789,17 @@ var $author$project$Aoc24$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(playButtonText)
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick($author$project$Aoc24$Faster)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Faster')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -6788,13 +6836,6 @@ var $author$project$Aoc24$viewBody = function (model) {
 									[
 										$elm$html$Html$text(
 										$elm$core$String$fromInt(blackTilesCount))
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(debugStr)
 									]))
 							]))
 					])),

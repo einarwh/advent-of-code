@@ -506,6 +506,8 @@ init _ =
 
 type Msg = 
   Tick 
+  | Faster 
+  | Slower 
   | Step 
   | TogglePlay 
   | Clear 
@@ -582,6 +584,22 @@ updateDataSource : DataSource -> Model -> Model
 updateDataSource dataSource model = 
   initModel dataSource  
 
+updateFaster model = 
+  case model.state of 
+    Initializing initializing -> 
+      let 
+        tickInterval = initializing.tickInterval / 2
+      in 
+        { model | state = Initializing { initializing | tickInterval = tickInterval } }
+
+updateSlower model = 
+  case model.state of 
+    Initializing initializing -> 
+      let 
+        tickInterval = initializing.tickInterval * 2
+      in 
+        { model | state = Initializing { initializing | tickInterval = tickInterval } }
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
@@ -589,6 +607,10 @@ update msg model =
       (updateClear model, Cmd.none)
     Tick ->
       (updateStep model, Cmd.none)
+    Faster -> 
+      (updateFaster model, Cmd.none)
+    Slower -> 
+      (updateSlower model, Cmd.none)
     Step ->
       (updateStep model, Cmd.none)
     TogglePlay -> 
@@ -687,21 +709,19 @@ toInitializingElements initializing =
       Just tile -> [ toHexagonElement False 8 tile ]
     placedElements = initializing.tilesPlaced |> Set.toList |> List.map (toHexagonElement True 8)
   in 
-    List.append [ toHexagonElement False 8 initTile ] (List.append placedElements currentElements)
+    List.append placedElements currentElements
 
 toSvg : Model -> Html Msg 
 toSvg model = 
   let 
-    svgWidth = 500 |> String.fromInt
-    svgHeight = 500 |> String.fromInt
     elements = 
       case model.state of 
         Initializing initializing -> toInitializingElements initializing
   in 
     svg
-      [ viewBox "-300 -300 600 600"
+      [ viewBox "-300 -200 600 400"
       , width "600"
-      , height "600"
+      , height "400"
       , Svg.Attributes.style "max-width: 100%; background-color:white"
       ]
       elements
@@ -798,10 +818,16 @@ viewBody model =
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Clear ] 
-                [ Html.text "Clear"]
+                [ Html.text "Reset"]
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Slower ] 
+                [ Html.text "Slower" ]
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick TogglePlay ] 
                 [ Html.text playButtonText ] 
+              , Html.button 
+                [ Html.Attributes.style "width" "80px", onClick Faster ] 
+                [ Html.text "Faster" ]
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Step ] 
                 [ Html.text "Step" ]
@@ -814,7 +840,7 @@ viewBody model =
               , Html.Attributes.style "font-size" "24px" ] 
               [ 
                 Html.div [] [ Html.text (String.fromInt blackTilesCount) ]
-              , Html.div [] [ Html.text debugStr ]
+              -- , Html.div [] [ Html.text debugStr ]
               ] ]
       , Html.tr 
           []
