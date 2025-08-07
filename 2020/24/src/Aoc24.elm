@@ -43,6 +43,12 @@ type alias InitializingModel =
   , finished : Bool 
   , debug : String }
 
+type alias AnimatingModel = 
+  { blackTiles : Set Hecs 
+  , paused : Bool 
+  , days : Int
+  , debug : String }
+
 type State = 
   Initializing InitializingModel
 
@@ -510,11 +516,11 @@ type Msg =
   | Slower 
   | Step 
   | TogglePlay 
-  | Clear 
+  | Reset 
   | UseDataSource DataSource
 
-updateClear : Model -> Model
-updateClear model = initModel model.dataSource
+updateReset : Model -> Model
+updateReset model = initModel model.dataSource
 
 adjacent : Hecs -> Move -> Hecs
 adjacent (a, (r, c)) move = 
@@ -565,6 +571,52 @@ updateInitializing initializing =
           in 
             { initializing | currentTile = Just moved, movesLeft = restMoves, debug = dbg } 
 
+-- let findWhiteTiles (blackTiles : Set<Hecs>) : Set<Hecs> = 
+--     let neighbours = blackTiles |> Set.toList |> List.collect getAdjacentTiles |> Set.ofList 
+--     Set.difference neighbours blackTiles 
+
+-- let evolveStep (blackTiles : Set<Hecs>) = 
+--     let whiteTiles = findWhiteTiles blackTiles 
+--     let remainsBlack (t : Hecs) : bool = 
+--         let count = getAdjacentTiles t |> List.filter (fun a -> Set.contains a blackTiles) |> List.length 
+--         count = 1 || count = 2 
+--     let becomesBlack (t : Hecs) : bool = 
+--         let count = getAdjacentTiles t |> List.filter (fun a -> Set.contains a blackTiles) |> List.length 
+--         count = 2 
+--     let black1 = blackTiles |> Set.filter remainsBlack
+--     let black2 = whiteTiles |> Set.filter becomesBlack
+--     Set.union black1 black2 
+
+findWhiteTiles : Set Hecs -> Set Hecs 
+findWhiteTiles blackTiles = 
+  let 
+    neighbours = blackTiles |> Set.toList |> List.concatMap getAdjacentTiles |> Set.fromList 
+  in 
+    Set.diff neighbours blackTiles
+
+remainsBlack : Set Hecs -> Hecs -> Bool 
+remainsBlack blackTiles tile = 
+  let 
+    count = tile |> getAdjacentTiles |> List.filter (\t -> Set.member t blackTiles) |> List.length
+  in 
+    count == 1 || count == 2 
+
+becomesBlack : Set Hecs -> Hecs -> Bool 
+becomesBlack blackTiles tile = 
+  let 
+    count = tile |> getAdjacentTiles |> List.filter (\t -> Set.member t blackTiles) |> List.length
+  in 
+    count == 2 
+
+evolveStep : Set Hecs -> Set Hecs 
+evolveStep blackTiles = 
+  let 
+    whiteTiles = findWhiteTiles blackTiles 
+    black1 = blackTiles |> Set.filter (remainsBlack blackTiles)
+    black2 = whiteTiles |> Set.filter (becomesBlack blackTiles)
+  in 
+    Set.union black1 black2 
+
 updateStep : Model -> Model
 updateStep model = 
   case model.state of 
@@ -603,8 +655,8 @@ updateSlower model =
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    Clear -> 
-      (updateClear model, Cmd.none)
+    Reset -> 
+      (updateReset model, Cmd.none)
     Tick ->
       (updateStep model, Cmd.none)
     Faster -> 
@@ -817,7 +869,7 @@ viewBody model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
-                [ Html.Attributes.style "width" "80px", onClick Clear ] 
+                [ Html.Attributes.style "width" "80px", onClick Reset ] 
                 [ Html.text "Reset"]
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Slower ] 
