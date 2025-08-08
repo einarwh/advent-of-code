@@ -66,10 +66,9 @@ let tokenize (s : string) =
     
 let calculate = tokenize >> parseExp >> evaluate
    
-[<EntryPoint>]
-let main argv =
+let run fileName =
     let lines =
-        File.ReadAllLines "C:/einarwh/Aoc/18/input"
+        File.ReadAllLines fileName
         |> Array.toList
         |> List.filter (fun s -> s.Length > 0)
     lines
@@ -77,3 +76,5 @@ let main argv =
     |> List.sum
     |> printfn "%d"
     0 
+
+"input.txt" |> run

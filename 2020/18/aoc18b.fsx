@@ -38,6 +38,7 @@ and parseNext (prev : Exp) (tokens : string list) : Exp * string list =
             parseNext exp after
         | ")" ->
             (prev, t)
+        | _ -> failwith <| sprintf "%s?" h
 and parse (tokens : string list) : Exp * string list =
     let (first, remaining) = parseValue tokens
     if List.isEmpty remaining then
@@ -79,10 +80,9 @@ let tokenize (s : string) =
     
 let calculate = tokenize >> parseExp >> evaluate
    
-[<EntryPoint>]
-let main argv =
+let run fileName =
     let lines =
-        File.ReadAllLines "C:/einarwh/Aoc/18/input"
+        File.ReadAllLines fileName
         |> Array.toList
         |> List.filter (fun s -> s.Length > 0)
     lines
@@ -90,3 +90,5 @@ let main argv =
     |> List.sum
     |> printfn "%d"
     0 
+
+"input.txt" |> run

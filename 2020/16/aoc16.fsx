@@ -1,3 +1,6 @@
+// Advent of Code 2020. Day 16: Ticket Translation.
+// dotnet fsi aoc16.fsx
+
 open System.IO
 open System.Text.RegularExpressions
 
@@ -121,16 +124,16 @@ let part2 (text : string) =
     let nearbyTickets = parts.[2] |> parseNearbyTickets
     let validNearbyTickets = nearbyTickets |> List.filter (valid rules)
     let validTickets = myTicket :: validNearbyTickets
-    let checked = validTickets |> List.map (checkTicket rules)
+    let checkedTickets = validTickets |> List.map (checkTicket rules)
     let fields = 
         [0 .. fieldCount - 1]
-        |> List.map (fun fieldNo -> checked |> List.map (List.item fieldNo) |> Set.intersectMany)
+        |> List.map (fun fieldNo -> checkedTickets |> List.map (List.item fieldNo) |> Set.intersectMany)
         |> solve
     departures myTicket fields |> printfn "%d"
 
-[<EntryPoint>]
-let main argv =
-    let text = File.ReadAllText argv.[0]
+let run fileName =
+    let text = File.ReadAllText fileName
     part1 text
     part2 text
-    0 
+
+"input.txt" |> run 

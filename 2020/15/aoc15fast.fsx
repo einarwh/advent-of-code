@@ -1,3 +1,6 @@
+// Advent of Code 2020. Day 15: Rambunctious Recitation.
+// dotnet fsi aoc15.fsx
+
 open System.Diagnostics
 
 let solve times startNumbers =

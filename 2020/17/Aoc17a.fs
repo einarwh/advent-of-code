@@ -59,7 +59,7 @@ let rec times n fn =
         
 [<EntryPoint>]
 let main argv =
-    let lines = File.ReadAllLines "C:/einarwh/Aoc/17/input" |> Array.toList |> List.filter (fun s -> s.Length > 0)
+    let lines = File.ReadAllLines "input.txt" |> Array.toList |> List.filter (fun s -> s.Length > 0)
     let startCells = lines |> List.mapi (fun i line -> readCells (i, line)) |> List.collect id
     let grid =
         startCells

@@ -1,3 +1,6 @@
+// Advent of Code 2020. Day 15: Rambunctious Recitation.
+// dotnet fsi aoc15.fsx
+
 type Spoken =
     | Once of int
     | More of int * int 
