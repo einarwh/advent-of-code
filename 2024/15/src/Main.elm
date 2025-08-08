@@ -501,6 +501,17 @@ toRowElements : String -> List (Html Msg)
 toRowElements rowText = 
   [ Html.text rowText, Html.br [] [] ]
 
+toRowElementsHack : String -> List (Html Msg)
+toRowElementsHack rowText = 
+  case String.split "@" rowText of 
+    [ before, after ] -> 
+      let 
+        player = Html.span [ Html.Attributes.class "hero adaptive" ] [ Html.text "@" ]
+      in 
+        [ Html.text before, player, Html.text after, Html.br [] [] ]
+    _ -> 
+        [ Html.text rowText, Html.br [] [] ]
+
 isBox wh (x, y) = 
   if (Array2D.get y x wh == Just 'O' || Array2D.get y x wh == Just '[') then Just (x, y) else Nothing
 
@@ -511,7 +522,7 @@ view model =
     warehouse = model.warehouse
     rows = toWarehouseRows warehouse
     -- Insert robot symbol.
-    elements = rows |> List.concatMap (toRowElements)
+    elements = rows |> List.concatMap (toRowElementsHack)
 
     gpsSum = 
       if List.isEmpty model.moves then

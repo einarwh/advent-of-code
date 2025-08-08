@@ -4,6 +4,34 @@
     <meta charset="UTF-8" />
     <title>My Elm App</title>
     <script src="aoc15.js"></script>
+    <style>
+      .hero {
+        color: #3e9c3e;
+      }
+      .mark-ok {
+        background: #afe1af;
+      }
+      .mark-err {
+        background: #faa0a0;
+      }
+      .greyed {
+        color: #808080;
+      }
+      @media (prefers-color-scheme: dark) {
+        .hero.adaptive {
+          color: #afe1af;
+        }
+        .mark-err.adaptive {
+          background: #e34444;
+        }
+        .mark-ok.adaptive {
+          background: #3e9c3e;
+        }
+        .greyed.adaptive {
+          color: #d0d0d0;
+        }
+      }
+    </style>
   </head>
   <body>
     <div id="elm-app"></div>
