@@ -1,4 +1,4 @@
-// Advent of Code 2020. Day 20: Jurassic Jigsaw
+// Advent of Code 2020. Day 20: Jurassic Jigsaw.
 // dotnet fsi aoc20.fsx
 
 open System.IO
@@ -228,4 +228,4 @@ let run fileName =
     tiles |> solvePart1 |> printfn "%d"
     tiles |> solvePart2 |> printfn "%d" 
 
-"input" |> run
+"input.txt" |> run

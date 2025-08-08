@@ -1,4 +1,4 @@
-// Advent of Code 2020. Day 21.
+// Advent of Code 2020. Day 21: Allergen Assessment.
 // dotnet fsi aoc21.fsx
 
 open System.IO
@@ -63,8 +63,8 @@ let canonical dangerousList =
     |> List.map snd 
     |> String.concat "," 
 
-let run lines = 
-    let foodList = lines |> Array.choose parseLine
+let run fileName = 
+    let foodList = File.ReadAllLines fileName |> Array.choose parseLine
     let allergensListList = foodList |> Array.map snd
     let ingredientsListList = foodList |> Array.map fst
     let uniqueAllergens = allergensListList |> Set.unionMany
@@ -88,6 +88,4 @@ let run lines =
     let dangerous = identifyDangerousIngredients [] allergensWithIngredients
     dangerous |> canonical |> printfn "%s"
     
-"input"
-|> File.ReadAllLines
-|> run
+"input.txt" |> run

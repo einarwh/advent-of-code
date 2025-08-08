@@ -1,4 +1,4 @@
-// Advent of Code 2020. Day 22, Part A.
+// Advent of Code 2020. Day 22: Crab Combat. Part A.
 // dotnet fsi aoc22a.fsx
 
 open System.IO
@@ -31,7 +31,7 @@ let rec play (round : int) (cards1 : int list) (cards2 : int list) : int =
 let run (cardArray : int list array) = 
     play 0 cardArray.[0] cardArray.[1] |> printfn "%d"
 
-"input"
+"input.txt"
 |> File.ReadAllText
 |> split "\n\n"
 |> Array.map parsePlayer

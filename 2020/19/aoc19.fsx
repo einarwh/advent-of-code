@@ -1,3 +1,6 @@
+// Advent of Code 2020. Day 19: Monster Messages.
+// dotnet fsi aoc19.fsx
+
 open System.IO
 open System.Text.RegularExpressions
 
@@ -33,11 +36,27 @@ let read path =
     let parts = File.ReadAllText(path).Replace("\r", "").Split("\n\n")
     (parts.[0].Split("\n"), parts.[1].Split("\n"))
 
-[<EntryPoint>]
-let main argv =
-    let (ruleLines, messages) = read argv.[0]
-    let textMap = ruleLines |> Array.map parseLine |> Map.ofArray
-    let (rule, _) = parse 0 Map.empty textMap
-    let pattern = sprintf "^%s$" rule
+let rule0PatternForPart1 textMap =
+    let (rule0, _) = parse 0 Map.empty textMap
+    sprintf "^%s$" rule0
+
+let rule0PatternForPart2 textMap =
+    let map0 = Map.empty
+    let (rule42, map1) = parse 42 map0 textMap
+    let (rule31, map2) = parse 31 map1 textMap
+    let rule8 = sprintf "(%s)+" rule42
+    let rule11 = sprintf "(?<rule>%s)+(?<-rule>%s)+" rule42 rule31
+    let map = map2 |> Map.add 8 rule8 |> Map.add 11 rule11
+    let (rule0, _) = parse 0 map textMap
+    sprintf "^%s$" rule0
+
+let solve messages pattern =
     messages |> Array.choose (check pattern) |> Array.length |> printfn "%d"
-    0 
+
+let run fileName =
+    let (ruleLines, messages) = read fileName
+    let textMap = ruleLines |> Array.map parseLine |> Map.ofArray
+    rule0PatternForPart1 textMap |> solve messages 
+    rule0PatternForPart2 textMap |> solve messages 
+
+"input.txt" |> run 
