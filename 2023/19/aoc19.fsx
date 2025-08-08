@@ -1,4 +1,4 @@
-// Advent of Code 2023. Day 19: Aplenty
+// Advent of Code 2023. Day 19: Aplenty.
 // dotnet fsi aoc19.fsx
 
 open System
@@ -193,4 +193,4 @@ let run fileName =
         part2 workflows
     | _ -> failwith "?" 
 
-"input" |> run
+"input.txt" |> run

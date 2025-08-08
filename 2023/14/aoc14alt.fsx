@@ -177,4 +177,4 @@ let run fileName =
     | None -> printfn "?"
     | Some load -> printfn "%d" load 
     
-"input" |> run
+"input.txt" |> run

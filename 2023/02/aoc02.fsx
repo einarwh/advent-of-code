@@ -1,4 +1,4 @@
-// Advent of Code 2023. Day 2: Cube Conundrum
+// Advent of Code 2023. Day 2: Cube Conundrum.
 // dotnet fsi aoc02.fsx
 
 open System
@@ -43,4 +43,4 @@ let run fileName =
     lines |> Array.sumBy possible |> printfn "%d"
     lines |> Array.sumBy power |> printfn "%d"
 
-run "input"
+run "input.txt"

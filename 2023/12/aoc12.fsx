@@ -76,4 +76,4 @@ let run fileName =
     |> List.sumBy (parseLine >> unfold 5 >> solve)
     |> printfn "%d"
 
-"input" |> run
+"input.txt" |> run

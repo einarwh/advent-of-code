@@ -70,6 +70,7 @@ let readLines =
 
 let run fileName =
     let lines = readLines fileName
+    printfn "Not solved."
     ()
 
-"sample" |> run
+"input.txt" |> run

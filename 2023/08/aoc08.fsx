@@ -1,5 +1,5 @@
-// Advent of Code 2023. Day 8: Haunted Wasteland
-// dotnet fsi aoc08.fsx
+// Advent of Code 2023. Day 8: Haunted Wasteland.
+// dotnet fsi aoc08inf.fsx
 
 open System
 open System.IO
@@ -47,4 +47,4 @@ let run fileName =
         |> printfn "%d"
     | _ -> failwith "Wrong"
 
-"input" |> run 
+"input.txt" |> run 

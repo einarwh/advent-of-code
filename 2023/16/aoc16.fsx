@@ -78,4 +78,4 @@ let run fileName =
     seen |> Set.map fst |> Set.count |> printfn "%d"
     solve grid |> printfn "%d"
 
-"input" |> run
+"input.txt" |> run

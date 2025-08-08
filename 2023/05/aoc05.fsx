@@ -1,4 +1,5 @@
-// Advent of Code 2023. Day 5: If You Give A Seed A Fertilizer
+// Advent of Code 2023. Day 5: If You Give A Seed A Fertilizer.
+// This takes a long while to execute.
 // dotnet fsi aoc05.fsx
 
 open System.IO
@@ -49,4 +50,4 @@ let run fileName =
         |> List.min
         |> printfn "%d"
     
-"input" |> run 
+"input.txt" |> run 

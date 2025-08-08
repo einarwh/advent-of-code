@@ -1,4 +1,4 @@
-// Advent of Code 2023. Day 15: Lens Library
+// Advent of Code 2023. Day 15: Lens Library.
 // dotnet fsi aoc15.fsx
 
 open System.IO
@@ -78,4 +78,4 @@ let run fileName =
     input |> part1 |> printfn "%d"
     input |> part2 |> printfn "%d"
     
-"input" |> run
+"input.txt" |> run

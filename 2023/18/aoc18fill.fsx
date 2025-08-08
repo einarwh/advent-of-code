@@ -80,4 +80,4 @@ let run fileName =
     let lagoon = instructions |> digLagoon
     lagoon |> getVolume |> printfn "%d"
 
-"input" |> run
+"input.txt" |> run

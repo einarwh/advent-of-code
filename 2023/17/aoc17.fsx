@@ -1,4 +1,4 @@
-// Advent of Code 2023. Day 17: Clumsy Crucible
+// Advent of Code 2023. Day 17: Clumsy Crucible.
 // dotnet fsi aoc17.fsx
 
 open System
@@ -105,4 +105,4 @@ let run fileName =
     solve 0 3 map |> printfn "%d"
     solve 4 10 map |> printfn "%d"
 
-"input" |> run
+"input.txt" |> run

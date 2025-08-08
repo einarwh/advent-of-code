@@ -85,4 +85,4 @@ let run fileName =
     parsed |> runWith rateHand rateCard |> printfn "%d"
     parsed |> runWith rateHandJoker rateCardJoker |> printfn "%d"
 
-"input" |> run 
+"input.txt" |> run 

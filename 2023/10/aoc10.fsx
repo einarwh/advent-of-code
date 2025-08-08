@@ -1,4 +1,4 @@
-// Advent of Code 2023. Day 10: Pipe Maze
+// Advent of Code 2023. Day 10: Pipe Maze.
 // dotnet fsi aoc10.fsx
 
 open System
@@ -139,4 +139,4 @@ let run fileName =
     |> List.sumBy countInside
     |> printfn "%d"
 
-"input" |> run 
+"input.txt" |> run 

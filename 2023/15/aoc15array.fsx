@@ -1,4 +1,4 @@
-// Advent of Code 2023. Day 15: Lens Library
+// Advent of Code 2023. Day 15: Lens Library.
 // dotnet fsi aoc15.fsx
 
 open System

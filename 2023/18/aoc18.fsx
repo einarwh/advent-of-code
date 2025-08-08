@@ -1,4 +1,4 @@
-// Advent of Code 2023. Day 18: Lavaduct Lagoon
+// Advent of Code 2023. Day 18: Lavaduct Lagoon.
 // dotnet fsi aoc18.fsx
 
 open System
@@ -84,4 +84,4 @@ let run fileName =
     lines |> solve parseInstruction |> printfn "%d"
     lines |> solve parseHexCode |> printfn "%d"
 
-"input" |> run
+"input.txt" |> run

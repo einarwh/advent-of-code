@@ -1,5 +1,5 @@
-// Advent of Code 2023. Day 20: Pulse Propagation.
-// dotnet fsi aoc20.fsx
+// Advent of Code 2023. Day 21: Step Counter. Part 1.
+// dotnet fsi aoc21.fsx
 
 open System
 open System.IO
@@ -51,4 +51,4 @@ let run fileName =
     let result = fill start steps space 
     result |> List.length |> printfn "%d" 
 
-"input" |> run
+"input.txt" |> run

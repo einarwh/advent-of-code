@@ -1,4 +1,4 @@
-// Advent of Code 2023. Day 3: Gear Ratios
+// Advent of Code 2023. Day 3: Gear Ratios.
 // dotnet fsi aoc03.fsx
 
 open System

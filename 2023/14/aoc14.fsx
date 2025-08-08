@@ -1,4 +1,4 @@
-// Advent of Code 2023. Day 14: Parabolic Reflector Dish
+// Advent of Code 2023. Day 14: Parabolic Reflector Dish.
 // dotnet fsi aoc14.fsx
 
 open System
@@ -87,7 +87,7 @@ let solve limit lines =
                 let sequence = seen |> List.rev |> List.skip preceding
                 let ix = (limit - preceding) % (interval)
                 let chosen = sequence |> List.item ix 
-                chosen |> List.iter (printfn "%A")
+                // chosen |> List.iter (printfn "%A")
                 let load = chosen |> calculateLoad
                 Some load
             else 
@@ -103,4 +103,4 @@ let run fileName =
     | None -> printfn "?"
     | Some load -> printfn "%d" load 
 
-"sample" |> run
+"input.txt" |> run

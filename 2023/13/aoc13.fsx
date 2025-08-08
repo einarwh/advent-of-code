@@ -90,4 +90,4 @@ let run fileName =
     chunks |> List.map countSymmetries |> List.sum |> printfn "%d"
     chunks |> List.map countSymmetriesWithSmudge |> List.sum |> printfn "%d"
 
-"input" |> run
+"input.txt" |> run

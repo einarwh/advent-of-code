@@ -38,4 +38,4 @@ let run fileName =
         solve (time, distance) |> printfn "%d"
     | _ -> failwith "Wrong"
 
-"input" |> run 
+"input.txt" |> run 

@@ -1,4 +1,4 @@
-// Advent of Code 2023. Day 9: Mirage Maintenance
+// Advent of Code 2023. Day 9: Mirage Maintenance.
 // dotnet fsi aoc09.fsx
 
 open System
@@ -41,4 +41,4 @@ let run fileName =
     forwards |> List.sum |> printfn "%d"
     backwards |> List.sum |> printfn "%d"
 
-"input" |> run 
+"input.txt" |> run 
