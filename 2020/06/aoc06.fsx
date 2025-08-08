@@ -1,4 +1,4 @@
-// Advent of Code 2020. Day 6.
+// Advent of Code 2020. Day 6: Custom Customs.
 // dotnet fsi aoc06.fsx
 
 open System.IO
@@ -20,4 +20,4 @@ let run (text : string) =
     groups |> countBy anyone 
     groups |> countBy everyone 
 
-"input" |> File.ReadAllText |> run 
+"input.txt" |> File.ReadAllText |> run 

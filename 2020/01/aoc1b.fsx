@@ -22,7 +22,7 @@ let check (values : int array) (a : int, b : int, c : int) : int option =
     let vc = values.[c]
     if va + vb + vc = 2020 then Some (va * vb * vc) else None
 
-let expenses = read "input"
+let expenses = read "input.txt"
 indexes (Array.length expenses)
 |> Seq.choose (check expenses)
 |> Seq.head

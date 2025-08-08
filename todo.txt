@@ -1,6 +1,11 @@
 TODO: 
 
+2020/01: Combine solutions.
+2020/02: Combine solutions.
+2020/04: Combine solutions.
 2021/02: Combine solutions.
 2021/05: Combine solutions.
 2021/09: Combine solutions.
 2021/11: Missing F# solution. 
+
+Fix PostScript solutions, trim input.

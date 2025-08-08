@@ -19,7 +19,7 @@ let check (s : string) : string option =
     else
         None
 
-File.ReadAllLines "input"
+File.ReadAllLines "input.txt"
 |> Array.choose check
 |> Array.length
 |> printfn "%d"

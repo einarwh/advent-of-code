@@ -1,4 +1,4 @@
-// Advent of Code 2020. Day 5.
+// Advent of Code 2020. Day 5: Binary Boarding.
 // dotnet fsi aoc05.fsx
 
 open System.IO
@@ -37,4 +37,4 @@ let run lines =
     seatIds |> Seq.last |> printfn "Highest seat ID %d"
     seatIds |> findMySeat |> printfn "My seat ID %d"
 
-"input" |> File.ReadLines |> run 
+"input.txt" |> File.ReadLines |> run 

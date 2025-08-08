@@ -1,4 +1,4 @@
-// Advent of Code 2020. Day 3.
+// Advent of Code 2020. Day 3: Toboggan Trajectory.
 // dotnet fsi aoc03.fsx
 
 open System.IO

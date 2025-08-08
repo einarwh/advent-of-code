@@ -39,7 +39,7 @@ let createTree (values : int array) : Tree =
       t
   Empty |> grow 0 
 
-let values = read "input"
+let values = read "input.txt"
 let tree = createTree values
 let sortedValues = values |> Array.sort
 let value = sortedValues |> Array.find (fun v -> (contains (2020 - v) tree))
