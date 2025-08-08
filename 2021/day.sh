@@ -3,7 +3,7 @@ mkdir $1
 touch $1/sample
 touch $1/input
 cat > $1/aoc$1.fsx << EOF
-// Advent of Code 2021. Day $1
+// Advent of Code 2021. Day $1.
 // dotnet fsi aoc$1.fsx
 
 open System
@@ -17,6 +17,10 @@ let readLines =
 let run fileName = 
     let lines = readLines fileName
     lines |> printfn "%A"
+    let text = File.ReadAllText(fileName).Trim()
+    text |> printfn "%s"
+    printfn "Not solved."
 
-run "input"
+run "input.txt"
 EOF
+

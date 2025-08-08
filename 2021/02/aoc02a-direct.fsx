@@ -19,7 +19,7 @@ let evaluate (h, d) line =
     else 
         (h, d)
 
-"input"
+"input.txt"
 |> File.ReadAllLines 
 |> Array.fold evaluate (0, 0)
 |> fun (h, d) -> h * d

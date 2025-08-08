@@ -30,7 +30,7 @@ let apply (horizontal, depth, aim) (cmd : Command) =
     | Down steps -> (horizontal, depth, aim + steps)
     | Up steps -> (horizontal, depth, aim - steps)
 
-"input"
+"input.txt"
 |> File.ReadAllLines 
 |> Array.choose parse
 |> Array.fold apply (0, 0, 0)

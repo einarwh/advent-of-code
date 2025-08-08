@@ -19,6 +19,7 @@ let run fileName =
     lines |> printfn "%A"
     let text = File.ReadAllText(fileName).Trim()
     text |> printfn "%s"
+    printfn "Not solved."
 
 run "input.txt"
 EOF
