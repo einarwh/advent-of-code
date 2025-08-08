@@ -15,4 +15,4 @@ let run (lines : string array) =
     |> (fun (bus, minutes) -> bus*minutes)
     |> printfn "%d"
 
-"input" |> File.ReadAllLines |> run
+"input.txt" |> File.ReadAllLines |> run

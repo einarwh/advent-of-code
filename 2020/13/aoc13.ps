@@ -139,7 +139,7 @@
 } def 
 
 /part-1 {
-    (input) read-input              % A
+    (input.txt) read-input          % A
     dup                             % A A 
     0 get cvi                       % A t %%% timestamp 
     exch                            % t A 
@@ -189,7 +189,7 @@
 } def 
 
 /part-2 {
-    (input) read-input              % A
+    (input.txt) read-input          % A
     1 get                           % (s)
     (,) split-string                % S
     indexed-array
@@ -210,3 +210,6 @@
     fold-array
     0 get 
 } def
+
+part-1
+part-2

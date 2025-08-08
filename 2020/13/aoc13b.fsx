@@ -26,4 +26,4 @@ let run (lines : string array) =
         |> fst
         |> printfn "%d"    
 
-"input" |> File.ReadAllLines |> run 
+"input.txt" |> File.ReadAllLines |> run 
