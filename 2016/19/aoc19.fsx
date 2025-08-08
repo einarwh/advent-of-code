@@ -1,5 +1,6 @@
-// Advent of Code 2016. Day 19: An Elephant Named Joseph.
+// Advent of Code 2016. Day 19: An Elephant Named Joseph. 
 // See: https://en.wikipedia.org/wiki/Josephus_problem
+// TODO: Part 2.
 // dotnet fsi aoc19.fsx
 
 open System

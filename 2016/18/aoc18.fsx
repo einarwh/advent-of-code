@@ -1,4 +1,5 @@
 // Advent of Code 2016. Day 18: Like a Rogue.
+// TODO: Find loop?
 // dotnet fsi aoc18.fsx
 
 open System
@@ -16,7 +17,6 @@ let elements = [
 ]
 
 let lookup = Map(elements)
-
 
 let getNextRow (row : string) =
     let exp = "." + row + "."

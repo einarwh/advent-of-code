@@ -16,5 +16,6 @@ let run fileName =
     text |> printfn "%s"
     let password = "abcdefgh"
     password |> printfn "%s"
+    "Not solved." |> printfn "%s"
 
 run "input.txt"
