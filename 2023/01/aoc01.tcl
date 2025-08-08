@@ -1,7 +1,7 @@
 # Advent of Code 2023. Day 1: Trebuchet?!
 # tclsh aoc01.tcl
 
-set fp [open "input" r]
+set fp [open "input.txt" r]
 set fileData [read $fp]
 close $fp
 

@@ -11,6 +11,6 @@ let run fileName =
     fileName 
     |> readLines 
     |> Array.map (sprintf "<li><s>%s</li></s>")
-    |> writeLines "output"
+    |> writeLines "output.txt"
 
-"input" |> run 
+"input.txt" |> run 
