@@ -82,4 +82,4 @@ let run fileName =
     |> List.length 
     |> printfn "%d"
 
-run "input"
+run "input.txt"

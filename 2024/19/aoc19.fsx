@@ -34,4 +34,4 @@ let run fileName =
     results |> List.filter ((<) 0L) |> List.length |> printfn "%d"
     results |> List.sum |> printfn "%d"
 
-run "input"
+run "input.txt"

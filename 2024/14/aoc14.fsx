@@ -135,4 +135,4 @@ let run width height searchForTree fileName =
 
 // run 11 7 false "sample.txt"
 // run 101 103 true "input.txt"
-run 101 103 true "not-a-tree.txt"
+run 101 103 true "input.txt"

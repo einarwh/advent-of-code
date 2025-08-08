@@ -1,4 +1,4 @@
-// Advent of Code 2024. Day 03: Mull It Over
+// Advent of Code 2024. Day 03: Mull It Over.
 // dotnet fsi aoc03.fsx
 
 open System
@@ -41,4 +41,4 @@ let run fileName =
     calc1 0 ops |> printfn "%d"
     calc2 0 true ops |> printfn "%d"
 
-run "input"
+run "input.txt"

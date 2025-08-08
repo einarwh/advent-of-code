@@ -67,4 +67,4 @@ let run fileName =
     board |> countAntinodes findAntinodes |> printfn "%d"
     board |> countAntinodes findAntinodesWithHarmonics |> printfn "%d"
 
-run "input"
+run "input.txt"

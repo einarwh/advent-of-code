@@ -172,4 +172,4 @@ let run fileName =
     computer |> execute |> printProgram 
     computer |> quine |> printfn "%d"
 
-run "input"
+run "input.txt"

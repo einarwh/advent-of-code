@@ -51,4 +51,4 @@ let run fileName =
     updates |> part1 rules |> printfn "%d"
     updates |> part2 rules |> printfn "%d"
 
-run "input"
+run "input.txt"

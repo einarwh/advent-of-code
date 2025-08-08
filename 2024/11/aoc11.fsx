@@ -1,9 +1,7 @@
 // Advent of Code 2024. Day 11: Plutonian Pebbles.
 // dotnet fsi aoc11.fsx
 
-open System
 open System.IO
-open System.Diagnostics
 
 let applyRules stone = 
     if stone = 0L then [1L]
@@ -38,7 +36,6 @@ let run fileName =
     let text = File.ReadAllText fileName 
     let stones = text.Trim().Split(" ") |> Array.toList |> List.map int64 
     stones |> blinking 25 |> printfn "%d"
-    let sw = Stopwatch.StartNew()
     stones |> blinking 75 |> printfn "%d"
 
-run "input"
+run "input.txt"

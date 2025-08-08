@@ -1,4 +1,0 @@
-
-
-/Users/einarwh/hub/advent-of-code/2024/12/aoc12plant.fsx(71,10): error FS0010: Unexpected symbol ':' in interaction. Expected incomplete structured construct at or before this point, ';', ';;' or other token.
-

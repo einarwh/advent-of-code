@@ -1,0 +1,24 @@
+sample.txt
+140 ✓
+80 ✓
+
+sample-xo.txt
+772 ✓
+436 ✓
+
+sample-larger.txt
+1930 ✓
+1206 ✓
+
+sample-e.txt
+692
+236 ✓
+
+sample-abba.txt
+1184
+368 ✓
+
+input.txt
+1489582
+914966
+

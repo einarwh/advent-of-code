@@ -93,4 +93,4 @@ let run fileName =
     posDistList |> solve 2 
     posDistList |> solve 20
 
-run "input"
+run "input.txt"

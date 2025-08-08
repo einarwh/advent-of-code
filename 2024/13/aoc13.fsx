@@ -62,4 +62,4 @@ let run fileName =
     machines |> List.choose calculate1 |> List.sum |> printfn "%d"
     machines |> List.choose calculate2 |> List.sum |> printfn "%d"
 
-run "input"
+run "input.txt"

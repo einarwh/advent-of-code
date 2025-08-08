@@ -63,4 +63,4 @@ let run fileName =
     |> List.sumBy (findMasX board)
     |> printfn "%d"
 
-run "input"
+run "input.txt"

@@ -101,4 +101,4 @@ let run dim byteCount fileName =
     corrupted |> findBlocker dim byteCount |> printfn "%s"
 
 // run 6 12 "sample"
-run 70 1024 "input"
+run 70 1024 "input.txt"

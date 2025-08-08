@@ -50,4 +50,4 @@ let run fileName =
     trailheads |> List.sumBy (findScore board) |> printfn "%d"
     trailheads |> List.sumBy (findRating board) |> printfn "%d"
 
-run "input"
+run "input.txt"

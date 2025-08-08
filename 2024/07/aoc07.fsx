@@ -1,4 +1,4 @@
-// Advent of Code 2024. Day 07
+// Advent of Code 2024. Day 07: Bridge Repair.
 // dotnet fsi aoc07.fsx
 
 open System
@@ -43,4 +43,4 @@ let run fileName =
     |> List.sum 
     |> printfn "%d"
 
-run "input"
+run "input.txt"

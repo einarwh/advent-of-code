@@ -36,4 +36,4 @@ let run fileName =
     reports |> List.filter isSafe |> List.length |> printfn "%d" 
     reports |> List.filter isSafeLenient |> List.length |> printfn "%d" 
 
-run "input"
+run "input.txt"

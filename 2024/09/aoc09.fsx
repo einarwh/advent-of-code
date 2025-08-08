@@ -82,4 +82,4 @@ let run fileName =
     entries |> compact false |> List.fold checksum (0, 0) |> snd |> printfn "%d"
     0
 
-run "input"
+run "input.txt"

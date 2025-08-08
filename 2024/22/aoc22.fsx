@@ -76,4 +76,4 @@ let run fileName =
     printfn "KEEEEYYYS %A" keys
     ()
 
-run "sample"
+run "input.txt"

@@ -188,6 +188,5 @@ let run fileName =
     let moves = movesText |> joinUp |> parseMoves 
     warehouseText |> solve false moves 
     warehouseText |> solve true moves 
-    0
 
-run "input"
+run "input.txt"

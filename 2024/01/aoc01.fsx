@@ -1,4 +1,4 @@
-// Advent of Code 2024. Day 01: Historian Hysteria
+// Advent of Code 2024. Day 01: Historian Hysteria.
 // dotnet fsi aoc01.fsx
 
 open System
@@ -39,4 +39,4 @@ let run fileName =
     part1 fstList sndList |> printfn "%d"
     part2 fstList sndList |> printfn "%d"
 
-run "input"
+run "input.txt"

@@ -117,4 +117,4 @@ let run fileName =
     let startPos = findStartPos maze 
     solve startPos maze |> printfn "%A"
 
-"input" |> run
+"input.txt" |> run
