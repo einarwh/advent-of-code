@@ -57,7 +57,7 @@ let run fileName =
     positions |> List.map t |> List.distinct |> List.length |> printfn "%d"
     positions |> applyTransformations transformations |> draw
 
-run "input"
+run "input.txt"
 
 // ###..#..#..##..#....###...##..###...##.
 // #..#.#..#.#..#.#....#..#.#..#.#..#.#..#

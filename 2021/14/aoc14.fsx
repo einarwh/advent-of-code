@@ -78,4 +78,4 @@ let run fileName =
     |> printfn "%d"
     0
 
-run "input"
+run "input.txt"
