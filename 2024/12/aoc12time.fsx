@@ -187,9 +187,9 @@ let run fileName maybeExpectedPart1 maybeExpectedPart2 =
     printfn "%f ms" (sw.Elapsed.TotalMilliseconds)
     printfn ""
 
-run "sample" (Some 140) (Some 80)       
-run "sample-xo" (Some 772) (Some 436)    
-run "sample-larger" (Some 1930) (Some 1206) 
-run "sample-e" None (Some 236) 
-run "sample-abba" None (Some 368)
-run "input" None None
+run "sample.txt" (Some 140) (Some 80)       
+run "sample-xo.txt" (Some 772) (Some 436)    
+run "sample-larger.txt" (Some 1930) (Some 1206) 
+run "sample-e.txt" None (Some 236) 
+run "sample-abba.txt" None (Some 368)
+run "input.txt" None None

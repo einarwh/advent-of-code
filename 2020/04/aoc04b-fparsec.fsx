@@ -141,7 +141,7 @@ let getValidPassports input =
         parsed |> List.choose (function | Valid p -> Some p | Invalid _ -> None)
     | Failure (str, _, _) -> failwith str 
 
-"input"
+"input.txt"
 |> readInput
 |> getValidPassports
 |> List.length

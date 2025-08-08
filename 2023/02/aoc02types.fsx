@@ -1,4 +1,4 @@
-// Advent of Code 2023. Day 1: Cube Conundrum
+// Advent of Code 2023. Day 1: Cube Conundrum.
 // dotnet fsi aoc02.fsx
 
 open System
@@ -95,4 +95,4 @@ let run fileName =
         games |> Array.sumBy power
     printfn "%d" powers
 
-run "input"
+run "input.txt"

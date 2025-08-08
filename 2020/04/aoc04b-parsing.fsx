@@ -236,4 +236,4 @@ let run (text : string) =
     |> Array.length
     |> printfn "Valid passports: %d"
 
-"input" |> File.ReadAllText |> run 
+"input.txt" |> File.ReadAllText |> run 

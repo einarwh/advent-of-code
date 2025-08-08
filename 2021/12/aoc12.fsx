@@ -1,4 +1,4 @@
-// Advent of Code 2021. Day 12: Passage Pathing
+// Advent of Code 2021. Day 12: Passage Pathing.
 // dotnet fsi aoc12.fsx
 
 open System
@@ -59,4 +59,4 @@ let run fileName =
     |> solve2
     |> printfn "%d"
 
-"input" |> run
+"input.txt" |> run

@@ -9,4 +9,4 @@ let run input =
     let url = text.Trim().Replace("\n", "%A0")
     printfn "%s" url
 
-run "input"
+run "input.txt"

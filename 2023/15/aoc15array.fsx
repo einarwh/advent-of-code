@@ -81,4 +81,4 @@ let run fileName =
     input |> part1 |> printfn "%d"
     input |> part2 |> printfn "%d"
     
-"input" |> run
+"input.txt" |> run
