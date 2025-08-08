@@ -160,12 +160,6 @@ let groups vals =
 
 let solve2 = getPairs >> groups
 
-// printfn "?"
-// //solve "flqrgnkx" |> printfn "%A"
-// //solve2 "flqrgnkx" |> printfn "%A"
-// solve2 "hfdlxzhv" |> printfn "%A" 
-// printfn "."
-
 let readText fileName = 
     File.ReadAllText(fileName).Trim()
 

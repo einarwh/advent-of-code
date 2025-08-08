@@ -17,5 +17,6 @@ let run fileName =
     lines |> printfn "%A"
     let text = readText fileName
     text |> printfn "%s"
+    "Not solved." |> printfn "%s"
 
-run "input"
+run "input.txt"
