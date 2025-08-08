@@ -1,4 +1,4 @@
-// Advent of Code 2020. Day 9.
+// Advent of Code 2020. Day 9: Encoding Error.
 // dotnet fsi aoc09.fsx
 
 open System.IO
@@ -59,4 +59,4 @@ let run lines =
         | Some weakness ->
             weakness |> printfn "%d" 
 
-"input" |> File.ReadAllLines |> run 
+"input.txt" |> File.ReadAllLines |> run 
