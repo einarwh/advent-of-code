@@ -1,5 +1,7 @@
 TODO: 
 
+2019/02: Sort out PostScript solutions.
+2019/04: Missing F# solution.
 2020/01: Combine F# solutions.
 2020/02: Combine F# solutions.
 2020/04: Combine F# solutions.

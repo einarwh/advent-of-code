@@ -1,4 +1,4 @@
-// Advent of Code 2019. Day 05
+// Advent of Code 2019. Day 05: Sunny with a Chance of Asteroids.
 // dotnet fsi aoc05.fsx
 
 open System
@@ -17,5 +17,6 @@ let run fileName =
     lines |> printfn "%A"
     let text = readText fileName
     text |> printfn "%s"
+    "Not solved." |> printfn "%s"
 
 run "input.txt"

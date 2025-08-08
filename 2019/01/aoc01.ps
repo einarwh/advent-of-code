@@ -1,7 +1,6 @@
 % Advent of Code 2019. 
 % Day 1: The Tyranny of the Rocket Equation. 
-% Part B.
-% gs -DNOSAFER aoc01b.ps
+% gs -DNOSAFER aoc01.ps
 
 /map { [ 3 1 roll forall ] } def
 
@@ -15,4 +14,15 @@
 
 /zeno { [ exch gen ] sum } def
 
-[ (input) run ] { zeno } map sum
+/part-1 {
+    [ (input.txt) run ] { 3 idiv 2 sub } map sum
+} def 
+
+/part-2 {
+[ (input.txt) run ] { zeno } map sum
+} def 
+
+part-1
+part-2
+
+

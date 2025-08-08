@@ -1,4 +1,4 @@
-// Advent of Code 2019. Day 3: Crossed Wires
+// Advent of Code 2019. Day 3: Crossed Wires.
 // dotnet fsi aoc03.fsx
 
 open System
