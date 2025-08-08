@@ -1,4 +1,4 @@
-// Advent of Code 2020. Day 7.
+// Advent of Code 2020. Day 7: Handy Haversacks.
 // dotnet fsi aoc07.fsx
 
 open System.IO
@@ -69,4 +69,4 @@ let run lines =
     countContainedBags goldBag
     |> printfn "%d contained bags"
 
-"input" |> File.ReadAllLines |> run 
+"input.txt" |> File.ReadAllLines |> run 

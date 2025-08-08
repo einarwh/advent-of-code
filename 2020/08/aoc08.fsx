@@ -1,4 +1,4 @@
-// Advent of Code 2020. Day 8.
+// Advent of Code 2020. Day 8: Handheld Halting.
 // dotnet fsi aoc08.fsx
 
 open System.IO
@@ -89,4 +89,4 @@ let solve lines =
     instructions |> runOnce |> printfn "%d" 
     instructions |> runUntilFixed |> printfn "%d" 
 
-"input" |> File.ReadAllLines |> solve 
+"input.txt" |> File.ReadAllLines |> solve 
