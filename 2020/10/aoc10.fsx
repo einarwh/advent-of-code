@@ -1,4 +1,4 @@
-// Advent of Code 2020. Day 10.
+// Advent of Code 2020. Day 10: Adapter Array.
 // dotnet fsi aoc10.fsx
 
 open System.IO
@@ -58,7 +58,7 @@ let part2 (input : Adapter array) : Count =
     |> arrangements device 
 
 let run input =
-    input |> part1 |> printfn "Part 1: %d"
-    input |> part2 |> printfn "Part 2: %d"
+    input |> part1 |> printfn "%d"
+    input |> part2 |> printfn "%d"
 
-"input" |> read |> run 
+"input.txt" |> read |> run 

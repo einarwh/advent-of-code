@@ -127,4 +127,4 @@ let run lines =
     |> distance
     |> printfn "Manhattan distance (Part 1): %d"
 
-"input" |> File.ReadAllLines |> run 
+"input.txt" |> File.ReadAllLines |> run 

@@ -138,4 +138,4 @@ let run lines =
     layout |> evolve1 |> printfn "%d"
     layout |> evolve2 |> printfn "%d"
 
-"input" |> File.ReadAllLines |> run 
+"input.txt" |> File.ReadAllLines |> run 

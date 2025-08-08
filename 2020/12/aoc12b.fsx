@@ -86,6 +86,6 @@ let run lines =
         lines    
         |> read
         |> List.fold (fun state inst -> next inst state) start
-    ship |> distance |> printfn "Manhattan distance (Part 1): %d"
+    ship |> distance |> printfn "Manhattan distance (Part 2): %d"
 
-"input" |> File.ReadAllLines |> run 
+"input.txt" |> File.ReadAllLines |> run 
