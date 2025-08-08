@@ -24,11 +24,11 @@ let run pairs =
     pairs
     |> Array.filter (fun (p1, p2) -> contains p1 p2 || contains p2 p1)
     |> Array.length
-    |> printfn "%A"
+    |> printfn "%d"
     pairs
     |> Array.filter (fun (p1, p2) -> overlaps p1 p2 || overlaps p2 p1)
     |> Array.length
-    |> printfn "%A"
+    |> printfn "%d"
 
 "input.txt"
 |> File.ReadAllLines 

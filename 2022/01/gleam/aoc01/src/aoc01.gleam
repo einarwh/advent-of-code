@@ -18,7 +18,7 @@ fn summarize(lines: List(String)) -> Int {
 }
 
 pub fn main() {
-  let filepath = "input"
+  let filepath = "input.txt"
   let assert Ok(content) = simplifile.read(from: filepath)
   let chunks = string.split(content, on: "\n\n")
   let elves =

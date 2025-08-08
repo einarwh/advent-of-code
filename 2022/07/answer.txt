@@ -1,0 +1,2 @@
+Sum of small dirs: 1306611
+Size of dir to delete: 13210366

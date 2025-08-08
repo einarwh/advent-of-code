@@ -26,13 +26,13 @@ let run lines =
     lines 
     |> Array.map findItem
     |> Array.sum
-    |> printfn "Part A: %A"
+    |> printfn "%d"
     // Part B
     lines 
     |> Array.map Set.ofSeq
     |> Array.chunkBySize 3
     |> Array.sumBy (Set.intersectMany >> Set.toList >> List.head >> toPriority)
-    |> printfn "Part B: %A"
+    |> printfn "%d"
 
 "input.txt"
 |> File.ReadAllLines 
