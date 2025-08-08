@@ -44,4 +44,4 @@ let run fileName =
     text |> walk |> printfn "%d"
     text |> doubleWalk |> printfn "%d"
 
-run "input"
+run "input.txt"

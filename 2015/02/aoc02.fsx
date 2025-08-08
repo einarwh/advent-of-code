@@ -27,4 +27,4 @@ let run fileName =
     boxes |> List.map paper |> List.sum |> printfn "%d"
     boxes |> List.map ribbon |> List.sum |> printfn "%d"
 
-run "input"
+run "input.txt"

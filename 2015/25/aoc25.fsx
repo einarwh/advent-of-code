@@ -35,18 +35,9 @@ let solve row col =
             n
     loop 1 20151125L
 
-let readLines = 
-    File.ReadAllLines
-    >> Array.filter (fun line -> line <> String.Empty)
-    >> Array.toList
-
 let run fileName = 
     let text = File.ReadAllText(fileName).Trim()
     let (row, col) = text |> parse
-    // // 18361853
-    // solve 3 3 |> printfn "%d"
-    // solve 5 5 |> printfn "%d"
-    // solve 5 1 |> printfn "%d"
     solve row col |> printfn "%d"
 
 run "input.txt"
