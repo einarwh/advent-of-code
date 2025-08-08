@@ -65,8 +65,6 @@ let evolveUntilRepeat maxSteps initialArea =
     let rec loop (i : int) (seen : Map<Acre[,], int>) (area : Acre[,]) = 
         if Map.containsKey area seen then 
             let firstIndex = seen[area]
-            printfn "loop at %d" i
-            printfn "firstIndex. %d" firstIndex
             let loopSize = i - firstIndex
             let numberInLoop = (maxSteps - firstIndex) % loopSize
             seen |> Map.toList |> List.find (fun (_, n) -> numberInLoop + firstIndex = n) |> fst

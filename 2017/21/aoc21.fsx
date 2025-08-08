@@ -19,4 +19,4 @@ let run fileName =
     text |> printfn "%s"
     "Not solved." |> printfn "%s"
 
-run "input"
+run "input.txt"
