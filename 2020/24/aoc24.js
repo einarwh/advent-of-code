@@ -6555,6 +6555,7 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 			$elm$json$Json$Encode$bool(bool));
 	});
 var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$Attributes$href = function (url) {
@@ -6700,12 +6701,12 @@ var $author$project$Main$toHexagonElement = F3(
 		}();
 		var attrs = placed ? _List_fromArray(
 			[
+				$elm$svg$Svg$Attributes$fill('currentcolor'),
 				$elm$svg$Svg$Attributes$stroke('none'),
-				$elm$svg$Svg$Attributes$fill('black'),
 				$elm$svg$Svg$Attributes$points(ptsStr)
 			]) : _List_fromArray(
 			[
-				$elm$svg$Svg$Attributes$stroke('black'),
+				$elm$svg$Svg$Attributes$stroke('currentcolor'),
 				$elm$svg$Svg$Attributes$strokeWidth('1px'),
 				$elm$svg$Svg$Attributes$fill('none'),
 				$elm$svg$Svg$Attributes$points(ptsStr)
@@ -6757,7 +6758,7 @@ var $author$project$Main$toSvg = function (model) {
 				$elm$svg$Svg$Attributes$viewBox('-320 -300 640 600'),
 				$elm$svg$Svg$Attributes$width('640'),
 				$elm$svg$Svg$Attributes$height('600'),
-				$elm$svg$Svg$Attributes$style('max-width: 100%; background-color:white')
+				$elm$svg$Svg$Attributes$style('max-width: 100%')
 			]),
 		elements);
 };
@@ -7043,7 +7044,8 @@ var $author$project$Main$view = function (model) {
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
 								A2($elm$html$Html$Attributes$style, 'font-size', '24px'),
-								A2($elm$html$Html$Attributes$style, 'padding', '10px')
+								A2($elm$html$Html$Attributes$style, 'padding', '10px'),
+								$elm$html$Html$Attributes$class('draw adaptive')
 							]),
 						_List_fromArray(
 							[svg]))

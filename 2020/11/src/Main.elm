@@ -1,6 +1,8 @@
 module Main exposing (..)
 
-import Browser exposing (Document)
+{- Advent of Code 2020 | Day 11: Seating System -}
+
+import Browser
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
@@ -401,7 +403,7 @@ type alias Circle =
   { x : Int
   , y : Int
   , r : Int
-  , color : String }
+  , status : Status }
 
 toSeatColor : Status -> String
 toSeatColor status =
@@ -413,7 +415,7 @@ toMaybeCircle : Int -> Pos -> Space -> Maybe Circle
 toMaybeCircle radius pos space =
   case space of
     Seat seat ->
-      let circle = { x = pos.x, y = pos.y, r = radius, color = toSeatColor seat }
+      let circle = { x = pos.x, y = pos.y, r = radius, status = seat }
       in
         Just circle
     Floor -> Nothing
@@ -437,9 +439,12 @@ toCircleElement c =
     xStr = String.fromInt c.x
     yStr = String.fromInt c.y
     rStr = String.fromInt c.r
-    colorStr = c.color
+    circleClass = 
+      case c.status of 
+        Occupied -> "err adaptive"
+        Empty -> "ok adaptive"
   in
-    circle [ cx xStr, cy yStr, r rStr, fill colorStr ] []
+    circle [ class circleClass, cx xStr, cy yStr, r rStr, fill "currentcolor" ] []
 
 view : Model -> Html Msg
 view model =

@@ -1,8 +1,6 @@
 module Main exposing (..)
 
-{-| 
-  Advent of Code 2024. Day 15: Warehouse Woes. 
--}
+{-| Advent of Code 2024 | Day 15: Warehouse Woes. -}
 
 import Browser
 import Html exposing (Html)

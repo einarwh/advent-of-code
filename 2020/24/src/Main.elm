@@ -1,5 +1,7 @@
 module Main exposing (..)
 
+{- Advent of Code 2020 | Day 24: Lobby Layout -} 
+
 import Browser
 import Html exposing (Html)
 import Html.Attributes
@@ -785,9 +787,9 @@ toHexagonElement placed size (a, (r, c)) =
         pts |> List.map str |> String.join " "
     attrs = 
       if placed then 
-        [ stroke "none", fill "black", points ptsStr ] 
+        [ fill "currentcolor", stroke "none", points ptsStr ] 
       else 
-        [ stroke "black", strokeWidth "1px", fill "none", points ptsStr ]
+        [ stroke "currentcolor", strokeWidth "1px", fill "none", points ptsStr ]
   in 
     Svg.polygon attrs []
 
@@ -822,7 +824,7 @@ toSvg model =
       [ viewBox "-320 -300 640 600"
       , width "640"
       , height "600"
-      , Svg.Attributes.style "max-width: 100%; background-color:white"
+      , Svg.Attributes.style "max-width: 100%"
       ]
       elements
 
@@ -935,7 +937,8 @@ view model =
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "24px"
-              , Html.Attributes.style "padding" "10px" ] 
+              , Html.Attributes.style "padding" "10px"
+              , Html.Attributes.class "draw adaptive" ] 
               [ 
                 svg
               ] ] ]

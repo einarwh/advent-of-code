@@ -3,8 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <title>My Elm App</title>
-    <script src="aoc24.js"></script>
+    <script src="aoc11.js"></script>
     <style>
+      .ok {
+        color: #3e9c3e;
+      }
+      .err {
+        color: #e34444;
+      }
       .fill-ok {
         fill: #3e9c3e;
       }
@@ -37,9 +43,15 @@
           color: #d0d0d0;
         }
         .fill-ok.adaptive {
-          color: #afe1af;
+          fill: #afe1af;
         }
         .fill-err.adaptive {
+          fill: #faa0a0;
+        }
+        .ok.adaptive {
+          color: #afe1af;
+        }
+        .err.adaptive {
           color: #faa0a0;
         }
       }

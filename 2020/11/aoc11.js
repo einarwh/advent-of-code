@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.S.G === region.X.G)
+	if (region.R.G === region.X.G)
 	{
-		return 'on line ' + region.S.G;
+		return 'on line ' + region.R.G;
 	}
-	return 'on lines ' + region.S.G + ' through ' + region.X.G;
+	return 'on lines ' + region.R.G + ' through ' + region.X.G;
 }
 
 
@@ -2721,7 +2721,7 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 	return {
 		q: func(record.q),
 		T: record.T,
-		P: record.P
+		O: record.O
 	}
 });
 
@@ -2993,7 +2993,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.T;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.P) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.O) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3983,7 +3983,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 		impl.aJ,
 		impl.aH,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.R && impl.R(sendToApp)
+			var divertHrefToApp = impl.Q && impl.Q(sendToApp)
 			var view = impl.aK;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
@@ -4058,7 +4058,7 @@ function _Browser_application(impl)
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		R: function(sendToApp)
+		Q: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -5647,7 +5647,7 @@ var $author$project$Main$initModel = F2(
 			A2($elm$core$List$map, $author$project$Main$toSpaceRow, strs));
 		return {
 			k: dataSource,
-			M: $author$project$Main$getEvolver(strategy),
+			L: $author$project$Main$getEvolver(strategy),
 			F: false,
 			p: layout,
 			m: true,
@@ -6096,7 +6096,7 @@ var $author$project$Main$updateStep = function (model) {
 	if (model.F) {
 		return model;
 	} else {
-		var evolvedLayout = model.M(model.p);
+		var evolvedLayout = model.L(model.p);
 		var finished = _Utils_eq(evolvedLayout, model.p);
 		var paused = model.m || finished;
 		return _Utils_update(
@@ -6256,6 +6256,7 @@ var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
+var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
 var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
 var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
@@ -6263,16 +6264,24 @@ var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
 var $author$project$Main$toCircleElement = function (c) {
 	var yStr = $elm$core$String$fromInt(c.D);
 	var xStr = $elm$core$String$fromInt(c.C);
-	var rStr = $elm$core$String$fromInt(c.Q);
-	var colorStr = c.L;
+	var rStr = $elm$core$String$fromInt(c.P);
+	var circleClass = function () {
+		var _v0 = c.S;
+		if (_v0 === 1) {
+			return 'err adaptive';
+		} else {
+			return 'ok adaptive';
+		}
+	}();
 	return A2(
 		$elm$svg$Svg$circle,
 		_List_fromArray(
 			[
+				$elm$svg$Svg$Attributes$class(circleClass),
 				$elm$svg$Svg$Attributes$cx(xStr),
 				$elm$svg$Svg$Attributes$cy(yStr),
 				$elm$svg$Svg$Attributes$r(rStr),
-				$elm$svg$Svg$Attributes$fill(colorStr)
+				$elm$svg$Svg$Attributes$fill('currentcolor')
 			]),
 		_List_Nil);
 };
@@ -6315,23 +6324,11 @@ var $elm$core$Array$map = F2(
 var $author$project$Main$id = function (x) {
 	return x;
 };
-var $author$project$Main$toSeatColor = function (status) {
-	if (!status) {
-		return '#228B22';
-	} else {
-		return '#D70040';
-	}
-};
 var $author$project$Main$toMaybeCircle = F3(
 	function (radius, pos, space) {
 		if (!space.$) {
 			var seat = space.a;
-			var circle = {
-				L: $author$project$Main$toSeatColor(seat),
-				Q: radius,
-				C: pos.C,
-				D: pos.D
-			};
+			var circle = {P: radius, S: seat, C: pos.C, D: pos.D};
 			return $elm$core$Maybe$Just(circle);
 		} else {
 			return $elm$core$Maybe$Nothing;
