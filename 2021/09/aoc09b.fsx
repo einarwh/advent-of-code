@@ -73,7 +73,7 @@ let run (map : int[,]) =
         |> List.fold (*) 1
     printfn "Basin number: %A" basins
     
-"input"
+"input.txt"
 |> File.ReadAllLines
 |> Array.filter (fun s -> s.Length > 0)
 |> Array.map parseNumbers

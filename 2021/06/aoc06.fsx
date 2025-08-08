@@ -1,8 +1,7 @@
-// Advent of Code 2021. Day 6.
+// Advent of Code 2021. Day 6: Lanternfish.
 // dotnet fsi aoc06.fsx
 
 open System.IO
-open System.Linq
 
 let simulate times map = 
     let rec evolve times zero one two three four five six seven eight = 
@@ -31,5 +30,5 @@ let run file times =
     |> simulate times
     |> printfn "%d"    
 
-run "input" 80
-run "input" 256
+run "input.txt" 80
+run "input.txt" 256

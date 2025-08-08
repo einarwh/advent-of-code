@@ -63,4 +63,4 @@ let run fileName =
     |> List.sum 
     |> printfn "%d"
 
-run "input"
+run "input.txt"

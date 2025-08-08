@@ -1,7 +1,6 @@
-// Advent of Code 2021. Day 4.
+// Advent of Code 2021. Day 4: Giant Squid.
 // dotnet fsi aoc04.fsx
 
-open System
 open System.IO
 open System.Text.RegularExpressions
 
@@ -55,8 +54,6 @@ let winningBoard (board : Board) : bool =
     let lists = rows board @ columns board 
     lists |> List.exists winningSequence
 
-let losingBoard board = board |> winningBoard |> not
-
 let calculateScore lastNumber board = 
     let sumOfUnmarked = 
         board 
@@ -91,6 +88,6 @@ let run (text : string) =
         let (losingNumber, losingBoard) = play false numbers boards
         calculateScore losingNumber losingBoard |> printfn "Lose: %d"
 
-"input"
+"input.txt"
 |> File.ReadAllText
 |> run 

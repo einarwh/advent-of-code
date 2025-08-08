@@ -1,0 +1,2 @@
+Error points: 341823
+Middle completion score: 2801302861

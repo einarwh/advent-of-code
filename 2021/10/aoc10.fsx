@@ -73,4 +73,4 @@ let run fileName =
     let scores = completes |> List.map toCompletionScore |> List.sort
     scores |> List.item ((List.length scores) / 2) |> printfn "Middle completion score: %d"
 
-run "input"
+run "input.txt"

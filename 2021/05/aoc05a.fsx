@@ -48,7 +48,7 @@ let parseLineSegment (s : string) : LineSegment option =
     else 
         None
 
-"input"
+"input.txt"
 |> File.ReadAllLines 
 |> Array.toList 
 |> List.choose parseLineSegment

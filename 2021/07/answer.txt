@@ -1,0 +1,2 @@
+Part A (uniform cost): 343441
+Part B (triangular cost): 98925151

@@ -1,4 +1,4 @@
-// Advent of Code 2021. Day 3.
+// Advent of Code 2021. Day 3: Binary Diagnostic.
 // dotnet fsi aoc03.fsx
 
 open System.IO
@@ -67,4 +67,4 @@ let run file =
     let lifeSupportRating = decimal oxygenGeneratorRating * decimal co2ScrubberRating
     printfn "Life support rating: %d" lifeSupportRating
 
-run "input"
+run "input.txt"

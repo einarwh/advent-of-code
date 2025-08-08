@@ -23,7 +23,7 @@ let run (positions : int array) =
     positions |> optimal uniform |> printfn "Part A (uniform cost): %d" 
     positions |> optimal triangular |> printfn "Part B (triangular cost): %d" 
 
-"input"
+"input.txt"
 |> File.ReadAllText 
 |> parseNumbers 
 |> Array.sort 

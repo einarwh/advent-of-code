@@ -39,7 +39,7 @@ let run (map : int[,]) =
         lowPoints |> List.map (fun d -> d + 1) |> List.sum
     printfn "Risk level sum: %d" riskLevelSum
     
-"input"
+"input.txt"
 |> File.ReadAllLines
 |> Array.filter (fun s -> s.Length > 0)
 |> Array.map parseNumbers
