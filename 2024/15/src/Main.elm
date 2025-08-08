@@ -499,10 +499,6 @@ toWarehouseRows warehouse =
 
 toRowElements : String -> List (Html Msg)
 toRowElements rowText = 
-  [ Html.text rowText, Html.br [] [] ]
-
-toRowElementsHack : String -> List (Html Msg)
-toRowElementsHack rowText = 
   case String.split "@" rowText of 
     [ before, after ] -> 
       let 
@@ -522,7 +518,7 @@ view model =
     warehouse = model.warehouse
     rows = toWarehouseRows warehouse
     -- Insert robot symbol.
-    elements = rows |> List.concatMap (toRowElementsHack)
+    elements = rows |> List.concatMap (toRowElements)
 
     gpsSum = 
       if List.isEmpty model.moves then

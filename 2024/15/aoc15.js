@@ -7159,7 +7159,7 @@ var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$br = _VirtualDom_node('br');
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$span = _VirtualDom_node('span');
-var $author$project$Main$toRowElementsHack = function (rowText) {
+var $author$project$Main$toRowElements = function (rowText) {
 	var _v0 = A2($elm$core$String$split, '@', rowText);
 	if ((_v0.b && _v0.b.b) && (!_v0.b.b.b)) {
 		var before = _v0.a;
@@ -7234,7 +7234,7 @@ var $author$project$Main$view = function (model) {
 			return '?';
 		}
 	}();
-	var elements = A2($elm$core$List$concatMap, $author$project$Main$toRowElementsHack, rows);
+	var elements = A2($elm$core$List$concatMap, $author$project$Main$toRowElements, rows);
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
