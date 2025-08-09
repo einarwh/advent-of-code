@@ -138,6 +138,25 @@ let rotatePosition ch password =
     // printfn "%s -> %s" (asStr password) (asStr result)
     result
 
+let unrotatePosition ch password =
+    // printfn "\nunrotate based on position of %c in %s " ch (asStr password)
+    let ix = password |> List.indexed |> List.find (fun (_, c) -> c = ch) |> fst
+    // printfn "ix %d" ix
+    // let unmodIx = ix + List.length password 
+    let reversedIx =
+        if ix = 0 then 
+            (ix + 2 * List.length password - 2) / 2
+        else if ix % 2 = 0 then 
+            (ix + List.length password - 2) / 2
+        else 
+            (ix - 1) / 2
+    // printfn "reversedIx %d" reversedIx
+    let steps = if reversedIx >= 4 then reversedIx + 2 else reversedIx + 1 // Simplify?
+    // printfn "steps %d" steps
+    let result = rotateLeft steps password 
+    // printfn "%s" (asStr result)
+    result
+
 let reversePositions pos1 pos2 password =
     // printfn "\nreverse positions [%d - %d] in %s " pos1 pos2 (asStr password)
     let section = password |> List.take (pos2 + 1) |> List.skip pos1
@@ -155,7 +174,7 @@ let movePosition pos1 pos2 password =
     // printfn "%s -> %s" (asStr password) (asStr result)
     result
 
-let scramble password op =
+let scramble op password =
     match op with
     | SwapPositions (pos1, pos2) -> swapPositions pos1 pos2 password
     | SwapLetters (ch1, ch2) -> swapLetters ch1 ch2 password
@@ -165,14 +184,33 @@ let scramble password op =
     | ReversePositions (pos1, pos2) -> reversePositions pos1 pos2 password
     | MovePosition (pos1, pos2) -> movePosition pos1 pos2 password
 
+let unscramble op password =
+    match op with
+    | SwapPositions (pos1, pos2) -> swapPositions pos1 pos2 password
+    | SwapLetters (ch1, ch2) -> swapLetters ch1 ch2 password
+    | RotateLeft steps -> rotateRight steps password
+    | RotateRight steps -> rotateLeft steps password
+    | RotatePosition ch -> unrotatePosition ch password
+    | ReversePositions (pos1, pos2) -> reversePositions pos1 pos2 password
+    | MovePosition (pos1, pos2) -> movePosition pos2 pos1 password
+
 let scrambleAll (password : string) operations =
     let rec loop pwd ops =
         match ops with
         | [] -> pwd
         | op :: rest ->
-            loop (scramble pwd op) rest
+            loop (scramble op pwd) rest
     let scrambled = loop (password |> Seq.toList) operations
     new string(scrambled |> List.toArray)
+
+// let inverse op = 
+//     match op with 
+//     | SwapLetters (_, _) -> op 
+//     | SwapPositions (_, _) -> op 
+//     | RotateLeft steps -> RotateRight steps 
+//     | RotateRight steps -> RotateLeft steps 
+//     | ReversePositions (_, _) -> op 
+//     | MovePosition (pos1, pos2) -> MovePosition (pos2, pos1)
 
 let readLines =
     File.ReadAllLines
@@ -182,11 +220,21 @@ let readLines =
 let verify (s : string) (pwd : string) (expected : string) =
     match tryParse s with
     | Some op ->
-        let result = scramble (pwd |> Seq.toList) op |> (fun cs -> new string(cs|> List.toArray))
+        let result = scramble op (pwd |> Seq.toList) |> (fun cs -> new string(cs|> List.toArray))
         if result = expected then
-            printfn "%s: %s -> %s ✓" s pwd result
+            printfn "%s: %s -> %s ✓" s pwd expected
         else
-            printfn "%s: %s -> %s ✗" s pwd result
+            printfn "%s: %s -> %s [%s] ✗" s pwd expected result
+    | None -> failwith "?"
+
+let unverify (s : string) (pwd : string) =
+    match tryParse s with
+    | Some op ->
+        let result = pwd |> Seq.toList |> scramble op |> unscramble op |> (fun cs -> new string(cs|> List.toArray))
+        if result = pwd then
+            printfn "%s: %s -> %s ✓" s pwd pwd
+        else
+            printfn "%s: %s -> %s [%s] ✗" s pwd pwd result
     | None -> failwith "?"
 
 let verifySample() =
@@ -218,6 +266,51 @@ let verifyInput() =
     verify "rotate left 0 steps" "abcde" "abcde"
     printfn "============="
 
+let verifyRotatePosition() =
+    printfn "VERIFY ROTATE BASED ON POSITION"
+    printfn "============="
+    verify "rotate based on position of letter a" "abcdefgh" "habcdefg" // 0 -> 1      | 1R     | 1L 
+    verify "rotate based on position of letter a" "bacdefgh" "ghbacdef" // 1 -> 3      | 2R     | 2L
+    verify "rotate based on position of letter a" "bcadefgh" "fghbcade" // 2 -> 5      | 3R     | 3L
+    verify "rotate based on position of letter a" "bcdaefgh" "efghbcda" // 3 -> 7      | 4R     | 4L
+    verify "rotate based on position of letter a" "bcdeafgh" "deafghbc" // 4 -> 2[10]  | 6R/2L
+    verify "rotate based on position of letter a" "bcdefagh" "cdefaghb" // 5 -> 4[12]  | 7R/1L
+    verify "rotate based on position of letter a" "bcdefgah" "bcdefgah" // 6 -> 6[14]  | 8R/0
+    verify "rotate based on position of letter a" "bcdefgha" "abcdefgh" // 7 -> 0[16]  | 9R/1R
+    printfn "============="
+
+let verifyUnscramble() =
+    printfn "VERIFY UNSCRAMBLE"
+    printfn "============="
+    unverify "rotate based on position of letter a" "abcdefgh" 
+    unverify "rotate based on position of letter a" "bacdefgh"
+    unverify "rotate based on position of letter a" "bcadefgh"
+    unverify "rotate based on position of letter a" "bcdaefgh"
+    unverify "rotate based on position of letter a" "bcdeafgh" 
+    unverify "rotate based on position of letter a" "bcdefagh" 
+    unverify "rotate based on position of letter a" "bcdefgah" 
+    unverify "rotate based on position of letter a" "bcdefgha" 
+    unverify "rotate right 4 steps" "abcdefgh"
+    unverify "swap letter b with letter e" "efghabcd" 
+    unverify "swap position 1 with position 3" "bfghaecd"
+    unverify "reverse positions 0 through 4" "bhgfaecd" 
+    unverify "rotate left 5 steps" "afghbecd" 
+    unverify "swap position 6 with position 5" "ecdafghb" 
+    unverify "move position 3 to position 2" "ecdafhgb" 
+    unverify "move position 6 to position 5" "ecadfhgb" 
+    unverify "reverse positions 1 through 4" "ecadfghb" 
+    unverify "rotate right 0 steps" "abcde" 
+    unverify "rotate left 0 steps" "abcde" 
+    unverify "swap position 4 with position 0" "abcde" 
+    unverify "swap letter d with letter b" "ebcda"
+    unverify "reverse positions 0 through 4" "edcba" 
+    unverify "rotate left 1 step" "abcde" 
+    unverify "move position 1 to position 4" "bcdea" 
+    unverify "move position 3 to position 0" "bdeac" 
+    unverify "rotate based on position of letter b" "abdec" 
+    unverify "rotate based on position of letter d" "ecabd" 
+    printfn "============="
+
 let run fileName =
     let lines = readLines fileName
     let operations = lines |> List.choose tryParse
@@ -225,7 +318,8 @@ let run fileName =
     let testPwd = "abcde"
     verifySample()
     verifyInput()
-    0
+    verifyRotatePosition()
+    verifyUnscramble()
     scrambleAll password operations |> printfn "scrambled! %s"
     // password |> printfn "%s"
     // "Not solved." |> printfn "%s"
