@@ -1,13 +1,12 @@
 module Main exposing (..)
 
-import Browser 
+import Browser
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
-import Dict exposing (Dict)
-import Array exposing (Array)
 import Set exposing (Set)
-import Array2D exposing (Array2D)
+import Svg exposing (..)
+import Svg.Attributes exposing (..)
 import Html exposing (text)
 import Time
 
@@ -31,212 +30,119 @@ type alias Pos = (Int, Int)
 
 type Dir = N | W | S | E
 
-type Move = Turn | Forward
+type Instruction = R Int | L Int 
+
+type Step = TurnLeft | TurnRight | MoveForward
 
 type Visit = Vertical | Horizontal | Both 
 
-type Cell = Highlight Char | Plain Char 
-
-type Mode = Part1 | Part2 
-
 type alias Model = 
-  { board : Array2D Char
-  , vizBoard : Array2D Cell 
-  , guardPos : Pos 
-  , guardDir : Dir
-  , routeWalked : List (Pos, Dir, Move)
-  , routeRemaining : List (Pos, Dir, Move)
-  , mode : Mode 
-  , calculating : Bool
-  , candidateObstructions : List Pos
-  , verifiedLoops : Array Pos
-  , currentLoopIndex : Int
-  , dataSource : DataSource
+  { pos : Pos 
+  , dir : Dir 
+  , twice : Maybe Pos
+  , path : List (Dir, Pos)
+  , steps : List (Dir, Pos)
+  , walked : List Pos
+  , seen : Set Pos 
   , paused : Bool 
   , finished : Bool 
   , tickInterval : Float 
-  , calcInterval : Float 
-  , message : String
-  , counter : Int 
   , debug : String }
 
-sample : String
-sample = """....#.....
-.........#
-..........
-..#.......
-.......#..
-..........
-.#..^.....
-........#.
-#.........
-......#..."""
+input : String 
+input = """L5, R1, L5, L1, R5, R1, R1, L4, L1, L3, R2, R4, L4, L1, L1, R2, R4, R3, L1, R4, L4, L5, L4, R4, L5, R1, R5, L2, R1, R3, L2, L4, L4, R1, L192, R5, R1, R4, L5, L4, R5, L1, L1, R48, R5, R5, L2, R4, R4, R1, R3, L1, L4, L5, R1, L4, L2, L5, R5, L2, R74, R4, L1, R188, R5, L4, L2, R5, R2, L4, R4, R3, R3, R2, R1, L3, L2, L5, L5, L2, L1, R1, R5, R4, L3, R5, L1, L3, R4, L1, L3, L2, R1, R3, R2, R5, L3, L1, L1, R5, L4, L5, R5, R2, L5, R2, L1, L5, L3, L5, L5, L1, R1, L4, L3, L1, R2, R5, L1, L3, R4, R5, L4, L1, R5, L1, R5, R5, R5, R2, R1, R2, L5, L5, L5, R4, L5, L4, L4, R5, L2, R1, R5, L1, L5, R4, L3, R4, L2, R3, R3, R3, L2, L2, L2, L1, L4, R3, L4, L2, R2, R5, L1, R2"""
 
-input : String
-input = """........#.............................................#.........#..............#.......#....................#....................#
-......................#........#........................#.............##............................#.#.............#..........#..
-....#..................................#..................#.........#....#..............#..#......................#........#...#..
-.....#...#...............#................#..........................#......#.....................#.......................#.......
-......................................................##.#....#..................................................................#
-#....#....................#..................................#.....................................#......................#.......
-.......#...........................#.......................#......#...#.................................................#...#.....
-....................##..........................#................#..........................#.#..................#....#.........#.
-#..................................#...............#...............#.........................#............##......................
-.............................#....................................#...............#.........#..........#.......................#..
-.................................#............###.......#............##......#...............................#...............#.#..
-.#..........................................#.......#.......................##..#........#........#...............#...............
-......#...#............#.#..............#...................#..........................................................##.........
-#................##....................................................................#........#.................#...#...........
-...#..........#..........................##......#....#..............................#......................................#.....
-..............................##.#..........................................................#..............................#......
-......#...........#....#..................#............#....................................................................#.....
-.....................#........................#.......................................................#...........................
-...................#.#..........................................................................................#.#...............
-.........................................##.........................................................#.......#...###......#........
-...............................................................##.......................#..........................#..............
-...#...........#.................#..............#......#.....#..........................#....................#....#...............
-.................................#................#................#..............................................#.......##.....#
-........#..........................#................#.......................#...................#.................................
-.............................#.............................#..........#.........................#........#........................
-....#................#.#................#...........................................................#...#....#......#......#......
-........#..............................#...............................#.................#........................................
-...........................................#..#........#...#...........#..#.............#.........................................
-.#.................#.#................................#................#.#..................................#........#............
-.......#..........................................#.................................................................#.............
-...................#....................................................#..#...............................................#......
-...#.#........#...#.....#.....................................................................................................#...
-......#.........................#......................#.............#.....................#......................................
-..........................#............#.................................#..#..........#........#......................#..........
-...#..#......#.......................#........................#...................................................................
-............#...........#................#..............#.........................................................................
-.#........#....#.........................................#........................................#...............................
-...#......................##.........#.......#.#...........#................................................#...#.................
-...........#......#.........#....#.....#.......................................................#.............#....................
-.............#...#..............................................#.........#.....##....................#...#.........#.............
-...............#................................#..........................................#.....#.#.........................#...#
-................#.....#..#.............#..............#..............#.......#....................................................
-......#.........................................................................................................#.........##......
-..#...........................#.#...........................................#..#.....#............................................
-...#...#..................#..................................#.........#...................#..................................#...
-............#..#.....................#.........................................#.......#..................................#.......
-...#.......................................................................#.............................#........................
-......#..................#....................................#......##...........................................................
-.#...............#.....#..........................................................................................#...............
-...#.............#.........................#.....................#...#..........#....#............................#...............
-...#............................#.......#...........#.........#........#.....#...........#...................................#....
-.....................#...................#................................#...............................#......#.........#..##..
-.............#........................................................................................#........................##.
-.....#.......#.......#............................................................................................................
-............................................#................................................................#..............#.....
-....#..#......................................................#...................................................#...............
-.................................#...##..................#.................................................#....#.................
-........#...................................#...#..........................................................#......................
-........................#........##...........#.......#........#...................................#..............................
-...........#...#...................................................#..............#......#...............#.#..................#...
-........#.............................................#...........................................................................
-........#................#......#..........#..#........#.#.......#...#........................#..#......................#.......#.
-.......#..........................................................................................................#.....#.....#...
-......................##....................#.....#.................#...........#.......................#.##..........#......#....
-....................................##....................................................................#.................#.....
-..#.................................#.#...........#............................................#....#.............................
-#...................................#...........................................#............#.........#...............#..........
-.......................#.............................................................#..........#...#.............#.....#.........
-#..................#.#.............................................................................#.................#............
-.....................#......#.......#...........#..........................................^...............................#......
-................................#......................#.#.....#..............#..................#....#.#......#....#.............
-............................................................................#........#.....................................#......
-.............#......................................................#...................................#......##..#....#.........
-...............#.................#...................#...............#............................................................
-..............#...........#..#...........................................#...................................#..........#.........
-..........#...........................#...................#..............#...#.......#..........#...................#.............
-.............#.#..................................#....#..#............#.....................#................#...#.....#.........
-...................#..........................................................#............##.....................................
-...........................................#............#........................................................................#
-..#..............................#....#...........................................................................................
-..#..#............#...........................#...#...........#............#.....#.................#..............................
-....#...................#.........#...............................................................................................
-.......#..........................#....................................##........#.................##...#.#........#..#...........
-.#........................#....#.......#.....#...................#.............................................#..................
-..#...............................................................#................................................#..............
-.....#........................................#...................................................................................
-..........................................#..........................................................#............................
-....................###.........................#............................#...#...........#............#.......................
-.....#.....#...............#........#.#....#...................#...........#........#...........#.................................
-................................................................................................#...##............................
-......................#............#.........................#.......................#.....#...........#...#.#....................
-............................#....................#..................#..............#..................................#...........
-...........................#...................................#..............................................................#...
-..................#................#.....................#...................#........#..............#............................
-............#.............#.....................#..................#.........#......................#............#............#...
-....#..........................#...............................................................................................#..
-................#.....................................#.............................#...........#........................#........
-#.##...........#.........................................#...............#..........................................#.#...........
-........................................#..............#.....................#............#.....#.................................
-.......#....##..#..#.....#........................................................................................................
-....##.............#..............................#...............................................................................
-.....#........................#.........#..#......#........#......................#.......#..............#..........#.......#.....
-..#....#.........................#.#....................#..#.......#.............#..................#........#..................#.
-..........##....#........................................................................#........................................
-........#......#................................................................................................#................#
-.....#.......#...#.............#....................................#..#........................#...#..............#....#.........
-.............#...................................................##...#...........................................................
-..............#.............................................#.............#................#.............#..............#.........
-..#....#..........#.....#......#......................#................................#...............................#..........
-.................................................................................##......#...........................#.....#......
-..#....#..........#.......#.........................................#...............#..#............................#........#....
-...........#........#.#....................#........#.....................................#..................#....................
-.......#............#................#...........#.............#......#.........#...........................#.....................
-#.#....#.#...............#....#.....#.......................#...............................#...................##...#............
-.................##...#.................................................................#...........................#.............
-.....#........................................#.........#...................................................#.....................
-....................#.....................#................................................#...##.....................#...........
-...............#...............................................................#....#.............................................
-.................#................#...#.....................................#......#....................#...............#.#.......
-...................#............................................#..#....#..#........#...............................#.........#...
-..#........#...............#..................#.....#..................#.....................................#........##...#......
-.....#.....#....#.....#................#.#.....................##.............................................................#...
-................#............#......#......#.......................................................#....................#........#
-........#..............#..#......................................................................##.....##........................
-.........#.............................#.........#.......................................#..........................#.##..........
-.#...................#........................................................#....#......................................#.......
-....#..........#.....#.........................................................................................#..................
-.......#.............................#............#.........................#....#....#........#......#.....#.......#.............
-..#.......#........................#........................#.....................................................................
-........................#...............................#.#.............#................................#..................#....."""
+tryParseInstruction : String -> Maybe Instruction
+tryParseInstruction s = 
+  case String.left 1 s of 
+    "L" -> 
+      s |> String.dropLeft 1 |> String.toInt |> Maybe.map L
+    "R" -> 
+      s |> String.dropLeft 1 |> String.toInt |> Maybe.map R
+    _ ->
+      Nothing
 
-initBoard : DataSource -> Array2D Char
-initBoard dataSource = 
+parseInstructionList : String -> List Instruction
+parseInstructionList s = 
+  s |> String.split ", " |> List.filterMap tryParseInstruction
+
+move inst (dir, pos, path) = 
+  case inst of 
+    R steps -> 
+      let 
+        nextDir = turnRight dir 
+        nextPos = moveForward nextDir steps pos 
+      in 
+        (nextDir, nextPos, (nextDir, nextPos) :: path)
+    L steps -> 
+      let 
+        nextDir = turnLeft dir 
+        nextPos = moveForward nextDir steps pos 
+      in 
+        (nextDir, nextPos,(nextDir, nextPos) :: path)
+
+moveInSteps inst (dir, pos, path) = 
+  case inst of 
+    R steps -> 
+      let 
+        nextDir = turnRight dir 
+        nextPositions = moveForwardInSteps nextDir steps pos 
+        nextPos = nextPositions |> List.head |> Maybe.withDefault pos
+        nextPathSegment = nextPositions |> List.map (\p -> (nextDir, p))
+      in 
+        (nextDir, nextPos, List.append nextPathSegment path)
+    L steps -> 
+      let 
+        nextDir = turnLeft dir 
+        nextPositions = moveForwardInSteps nextDir steps pos 
+        nextPos = nextPositions |> List.head |> Maybe.withDefault pos
+        nextPathSegment = nextPositions |> List.map (\p -> (nextDir, p))
+      in 
+        (nextDir, nextPos, List.append nextPathSegment path)
+
+walk : Dir -> Pos -> List Instruction -> List (Dir, Pos)
+walk dir pos instructions = 
   let 
-    data = 
-      case dataSource of 
-        Sample -> sample 
-        Input -> input 
+    (_, _, result) = instructions |> List.foldl move (dir, pos, [])
   in 
-    data |> String.split "\n" |> List.map (String.toList) |> Array2D.fromList
+    result |> List.reverse
 
-findStartPos : Array2D Char -> (Int, Int)
-findStartPos board = 
+walkInSteps : Dir -> Pos -> List Instruction -> List (Dir, Pos)
+walkInSteps dir pos instructions = 
   let 
-    columns = Array2D.columns board 
-    loop (x, y) = 
-      case Array2D.get y x board of 
-        Nothing -> (0, 0)
-        Just '^' -> (x, y)
-        _ -> 
-          let 
-            next = if (x + 1 == columns) then (0, y + 1) else (x + 1, y)
-          in 
-            loop next
+    (_, _, result) = instructions |> List.foldl moveInSteps (dir, pos, [])
   in 
-    loop (0, 0)
+    result |> List.reverse
 
-moveForward : Dir -> Pos -> Pos 
-moveForward dir (x, y) = 
+moveForward : Dir -> Int -> Pos -> Pos 
+moveForward dir steps (x, y) = 
+  case dir of 
+    N -> (x, y - steps)
+    W -> (x - steps, y)
+    S -> (x, y + steps)
+    E -> (x + steps, y)
+
+moveForwardOneStep : Dir -> Pos -> Pos 
+moveForwardOneStep dir (x, y) = 
   case dir of 
     N -> (x, y - 1)
     W -> (x - 1, y)
     S -> (x, y + 1)
     E -> (x + 1, y)
+
+moveForwardLoop : List Pos -> Dir -> Int -> Pos -> List Pos 
+moveForwardLoop acc dir stepsLeft (x, y) = 
+  if stepsLeft > 0 then 
+    let 
+      nextPos = moveForwardOneStep dir (x, y)
+    in 
+      moveForwardLoop (nextPos :: acc) dir (stepsLeft - 1) nextPos
+  else 
+    acc
+
+moveForwardInSteps : Dir -> Int -> Pos -> List Pos 
+moveForwardInSteps dir steps (x, y) = 
+  moveForwardLoop [] dir steps (x, y)
 
 turnRight : Dir -> Dir 
 turnRight dir = 
@@ -246,56 +152,50 @@ turnRight dir =
     S -> W
     W -> N
 
-walk : Array2D Char -> List (Pos, Dir, Move) -> Dir -> Move -> Pos -> List (Pos, Dir, Move) 
-walk board visited dir move pos = 
-  let 
-    nextPos = moveForward dir pos 
-    (nextX, nextY) = nextPos 
-  in 
-    case Array2D.get nextY nextX board of 
-      Nothing -> -- Leaving the board.
-        ((pos, dir, move) :: visited) |> List.reverse
-      Just '#' -> -- Found an obstacle.
-        walk board visited (turnRight dir) Turn pos  
-      _ -> -- Go ahead.
-        walk board ((pos, dir, move) :: visited) dir Forward nextPos
+turnLeft : Dir -> Dir 
+turnLeft dir = 
+  case dir of 
+    N -> W
+    E -> N
+    S -> E
+    W -> S
 
-initModel : Mode -> DataSource -> Model 
-initModel mode dataSource = 
+instToStr inst = 
+  case inst of 
+    L steps -> "L" ++ String.fromInt steps 
+    R steps -> "R" ++ String.fromInt steps 
+
+dirToStr dir = 
+  case dir of 
+    N -> "N"
+    W -> "W"
+    S -> "S"
+    E -> "E"
+
+initModel : Model 
+initModel = 
   let 
-    board = initBoard dataSource
-    startPos = findStartPos board 
-    (xStart, yStart) = startPos
-    guardless = board |> Array2D.set yStart xStart '.'
-    vizBoard  = board |> Array2D.map Plain
-    dir = N
-    route = walk board [] N Forward startPos
-    candidateObstructions = route |> List.map (\(p, _, _) -> p)
-    msg = (String.fromInt xStart) ++ "," ++ (String.fromInt yStart)
+    instructions = parseInstructionList input
+    path = walk N (0, 0) instructions
+    steps = walkInSteps N (0, 0) instructions
+    -- debug = steps |> List.map (\(d, p) -> dirToStr d ++ ": (" ++ posToStr p ++ ")") |> String.join " "
+    debug = " "
   in 
-    { board = guardless
-    , vizBoard = vizBoard
-    , guardPos = startPos
-    , guardDir = dir
-    , routeRemaining = route
-    , routeWalked = []
-    , message = msg
-    , dataSource = dataSource
-    , calculating = False 
-    , candidateObstructions = candidateObstructions
-    , verifiedLoops = Array.empty
-    , currentLoopIndex = 0
-    , mode = mode 
+    { pos = (0, 0)
+    , dir = N
+    , twice = Nothing
+    , path = path
+    , steps = steps
+    , walked = []
+    , seen = Set.empty
     , paused = True
     , finished = False 
     , tickInterval = defaultTickInterval
-    , calcInterval = 100
-    , counter = 0
-    , debug = "" }
+    , debug = debug }
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel Part1 Input, Cmd.none)
+  (initModel, Cmd.none)
 
 -- UPDATE
 
@@ -306,99 +206,47 @@ type Msg =
   | Faster 
   | Slower 
   | Clear 
-  | UseSample 
-  | UseInput 
-  | EnablePart1 
-  | EnablePart2
-  | Calculate
 
-getAllPositions : Array2D Char -> List Pos
-getAllPositions board = 
+getNestedPositions : (Int, Int) -> (Int, Int) -> List (List Pos)
+getNestedPositions (xMin, yMin) (xMax, yMax) = 
   let
-    ys = List.range 0 (Array2D.rows board - 1)
-    xs = List.range 0 (Array2D.columns board - 1)
+    ys = List.range yMin (yMax - 1)
+    xs = List.range xMin (xMax - 1)
   in 
-    ys |> List.concatMap (\y -> xs |> List.map (\x -> (x, y)))
+    ys |> List.map (\y -> xs |> List.map (\x -> (x, y)))
 
 updateClear : Model -> Model
-updateClear model = 
-  initModel model.mode model.dataSource
+updateClear _ = 
+  initModel
 
 updateStep : Model -> Model
 updateStep model = 
-  let 
-    dir = model.guardDir 
-  in 
-    case model.routeRemaining of 
-      (p, d, m) :: rest -> 
-        -- Update vizBoard!
-        let 
-          guardPos = p 
-          (x, y) = p
-          guardDir = d 
-          newCell = 
-            case m of 
-              Turn -> Highlight '+'
-              Forward -> 
-                case Array2D.get y x model.vizBoard of 
-                  Nothing -> Plain '?' 
-                  Just cell ->
-                    case cell of 
-                      Highlight ch -> 
-                        case ch of 
-                          '|' -> Highlight (if dir == E || dir == W then '+' else '|')
-                          '-' -> Highlight (if dir == N || dir == S then '+' else '-')
-                          _ -> Highlight '?'
-                      Plain _ -> 
-                        if dir == E || dir == W then Highlight '-' else Highlight '|'
-
-          vizBoard = Array2D.set y x newCell model.vizBoard 
-        in 
-          { model | vizBoard = vizBoard
-          , guardPos = guardPos
-          , guardDir = guardDir
-          , routeRemaining = rest
-          , routeWalked = (p, d, m) :: model.routeWalked }
-      _ -> 
-        { model | paused = True, finished = True }
+  case model.steps of 
+    [] -> { model | finished = True}
+    (d, pos) :: rest ->
+      let 
+        (twice, seen) = 
+          case model.twice of 
+            Just _ -> (model.twice, model.seen) 
+            Nothing -> 
+              if Set.member pos model.seen then 
+                (Just pos, model.seen)
+              else 
+                (Nothing, Set.insert pos model.seen)
+        walked = pos :: model.walked 
+        dbg = walked |> List.length |> String.fromInt
+      in 
+        { model | dir = d, pos = pos, walked = walked, steps = rest, twice = twice, seen = seen }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
   if model.finished then 
     let 
-      m = initModel model.mode model.dataSource
+      m = initModel 
     in 
       {m | paused = False }
   else 
     { model | paused = not model.paused }
-
-updateUseSample : Model -> Model
-updateUseSample model = 
-  initModel model.mode Sample 
-
-updateUseInput : Model -> Model
-updateUseInput model = 
-  initModel model.mode Input 
-
-findLoop : List (Pos, Dir) -> Dir -> Pos -> Array2D Char -> Bool 
-findLoop visited dir pos board = 
-  if List.member (pos, dir) visited then True 
-  else 
-    let 
-      (x, y) = moveForward dir pos
-    in 
-      case Array2D.get y x board of 
-        Nothing -> False 
-        Just '#' -> findLoop visited (turnRight dir) pos board 
-        _ -> findLoop ((pos, dir) :: visited) dir (x, y) board
-
-hasLoop : Pos -> Array2D Char -> Bool 
-hasLoop startPos board =
-  findLoop [] N startPos board
-
-addObstruction : Array2D Char -> Pos -> Array2D Char 
-addObstruction board (x, y) =
-  Array2D.set y x '#' board 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -413,40 +261,8 @@ update msg model =
       ({model | tickInterval = model.tickInterval / 2 }, Cmd.none)
     Slower -> 
       ({model | tickInterval = model.tickInterval * 2 }, Cmd.none)
-    EnablePart1 -> 
-      ({model | mode = Part1 }, Cmd.none)
-    EnablePart2 -> 
-      let 
-        freshModel = initModel Part2 model.dataSource
-        m = { freshModel | calculating = True }
-      in 
-        (m, Cmd.none)
     TogglePlay -> 
       (updateTogglePlay model, Cmd.none)
-    UseSample -> 
-      (updateUseSample model, Cmd.none)
-    UseInput -> 
-      (updateUseInput model, Cmd.none)
-    Calculate -> 
-      let 
-        batchSize = 1
-        candidates = model.candidateObstructions |> List.take batchSize 
-      in 
-        if List.length candidates > 0 then 
-          let 
-            remaining = model.candidateObstructions |> List.drop batchSize
-            board = model.board
-            startPos = model.guardPos 
-            newVerified = 
-              candidates 
-              |> List.filterMap (\obs -> if hasLoop startPos (addObstruction board obs) then Just (obs) else Nothing)
-              |> Array.fromList 
-            verifiedLoops = Array.append model.verifiedLoops newVerified
-
-          in 
-            ({ model | verifiedLoops = verifiedLoops, candidateObstructions = remaining }, Cmd.none)
-        else 
-          ({model | calculating = False}, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -454,85 +270,59 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
   let 
     tickSub = if model.paused then Sub.none else Time.every model.tickInterval (\_ -> Tick)
-    calcSub = if model.calculating then Time.every model.calcInterval (\_ -> Calculate) else Sub.none 
   in 
-    Sub.batch [ tickSub, calcSub ]
+    tickSub
 
 -- VIEW
 
-chooseChar : Model -> Pos -> Char -> Char 
-chooseChar model pos ch = 
-  if pos == model.guardPos then 
-    case model.guardDir of 
-      N -> '^'
-      W -> '<'
-      S -> 'v'
-      E -> '>'
-  else 
-    let 
-      dirs = model.routeWalked |> List.filterMap (\(p, d, m) -> if p == pos then Just (d, m) else Nothing)
-    in 
-      case dirs of 
-        [] -> ch 
-        [(dir, move)] -> 
-          case move of 
-            Turn -> '+'
-            Forward -> 
-              case dir of  
-                N -> '|'
-                W -> '-'
-                S -> '|'
-                E -> '-'
-        _ -> '+'
+posToStr : Pos -> String
+posToStr (x, y) = 
+  String.fromInt x ++ ", " ++ String.fromInt y
 
-toCharElement : Array2D Cell -> Pos -> Html Msg 
-toCharElement vizBoard (x, y) = 
-    case Array2D.get y x vizBoard of 
-      Nothing -> Html.text "?"
-      Just cell -> 
-        case cell of 
-          Highlight ch -> 
-            (Html.span [Html.Attributes.style "background-color" "#AAAAAA" ] [ Html.text (String.fromChar ch) ]) 
-          Plain ch -> 
-            Html.text (String.fromChar ch)
+toPolyline : List Pos -> Html Msg
+toPolyline path = 
+  -- <polyline points="60, 110 65, 120 70, 115 75, 130 80, 125 85, 140 90, 135 95, 150 100, 145"/>
+  let 
+    ptsStr = path |> List.map posToStr |> String.join " " 
+    attrs = [ stroke "currentcolor", strokeWidth "1px", fill "none", points ptsStr ]
+  in 
+    Svg.polyline attrs []
+
+toSvg : Model -> Html Msg 
+toSvg model = 
+  let 
+    topLeft = (-30, -60)
+    botRight = (170, 160)
+    positions = model.path |> List.map Tuple.second
+    polyline = toPolyline model.walked
+    maybeTwiceElement = 
+      case model.twice of 
+        Just (xt, yt) -> [ Svg.circle [ cx (String.fromInt xt), cy (String.fromInt yt), r "3", stroke "currentcolor", strokeWidth "1px", fill "none" ] [] ]
+        Nothing -> []
+    elements = List.append [ polyline ] maybeTwiceElement
+  in 
+    svg
+      [ viewBox "-170 -170 340 340"
+      , width "340"
+      , height "340"
+      , Svg.Attributes.style "max-width: 100%"
+      ]
+      elements
+
+manhattan : Pos -> Int 
+manhattan (x, y) = 
+  abs x + abs y 
 
 view : Model -> Html Msg
 view model =
   let
-    guardChar = 
-      case model.guardDir of 
-        N -> '^'
-        W -> '<'
-        S -> 'v'
-        E -> '>'
-    (xGuard, yGuard) = model.guardPos
-    board = Array2D.set yGuard xGuard (Highlight guardChar) model.vizBoard 
-    ys = List.range 0 (Array2D.rows board - 1)
-    xs = List.range 0 (Array2D.columns board - 1)
-    nestedPositions = ys |> List.map (\y -> xs |> List.map (\x -> (x, y)))
-    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement board))
-    elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
-    positionsVisited = model.routeWalked |> List.map (\(p, _, _) -> p) |> Set.fromList |> Set.size 
-    textFontSize = 
-      case model.dataSource of 
-        Sample -> "24px"
-        Input -> "8px"
-
-    (text1, text2) = 
-      if model.calculating then 
-        let 
-          obsCountStr = String.fromInt (List.length model.candidateObstructions)
-          loopCountStr = String.fromInt (Array.length model.verifiedLoops)
-          str = obsCountStr ++ " candidates left, " ++ loopCountStr ++ " verified"
-        in 
-          ("Calculating", str)
-      else 
-        if model.mode == Part1 then 
-          let 
-            t1 = "(" ++ (String.fromInt xGuard) ++ ", " ++ (String.fromInt yGuard) ++ ")"
-          in 
-            (t1, String.fromInt positionsVisited)
-        else ("Loop X of Y", String.fromInt positionsVisited)
+    -- Grid: (-29, -58) to (168, 158)
+    svgElement = toSvg model 
+    distanceStr = manhattan model.pos |> String.fromInt
+    twiceStr = 
+      case model.twice of 
+        Just p -> manhattan p |> String.fromInt
+        Nothing -> "?"
   in 
     Html.table 
       [ Html.Attributes.align "center"
@@ -545,8 +335,8 @@ view model =
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "32px"
               , Html.Attributes.style "padding" "20px"]
-              [ Html.div [] [Html.text "Advent of Code 2024" ]
-              , Html.div [] [Html.text "Day 6: Guard Gallivant (Part 1)" ] ] ]
+              [ Html.div [] [Html.text "Advent of Code 2016" ]
+              , Html.div [] [Html.text "Day 1: No Time for a Taxicab" ] ] ]
       , Html.tr 
           []
           [ Html.td 
@@ -560,35 +350,19 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "16px" ]
-              [ 
-                Html.input 
-                [ Html.Attributes.type_ "radio", onClick UseInput, Html.Attributes.checked (model.dataSource == Input) ] 
-                []
-              , Html.label [] [ Html.text "Input" ]
-              , Html.input 
-                [ Html.Attributes.type_ "radio", onClick UseSample, Html.Attributes.checked (model.dataSource == Sample) ] 
-                []
-              , Html.label [] [ Html.text "Sample" ]
-            ] ]
-      , Html.tr 
-          []
-          [ Html.td 
-              [ Html.Attributes.align "center"
               , Html.Attributes.style "padding" "10px" ]
               [ Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Clear ] 
                 [ Html.text "Clear"]
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Slower ] 
-                [ text "Slower" ]
+                [ Html.text "Slower" ]
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick TogglePlay ] 
-                [ if model.paused then text "Play" else text "Pause" ] 
+                [ if model.paused then Html.text "Play" else Html.text "Pause" ] 
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Faster ] 
-                [ text "Faster" ]
+                [ Html.text "Faster" ]
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Step ] 
                 [ Html.text "Step" ]
@@ -598,20 +372,18 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "24px"] 
+              , Html.Attributes.style "font-size" "24px" ] 
               [ 
-                Html.div [] [ Html.text text1 ]
-              , Html.div [] [ Html.text text2 ]
+                Html.div [] [ Html.text distanceStr ]
+              , Html.div [] [ Html.text twiceStr ]
               ] ]
       , Html.tr 
           []
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Source Code Pro, monospace"
-              , Html.Attributes.style "font-size" textFontSize
+              , Html.Attributes.style "font-size" "4px"
               , Html.Attributes.style "padding" "10px" ] 
               [ 
-                Html.div [
-                  Html.Attributes.style "max-width" "100%"
-                ] elements
+                Html.div [] [ svgElement ]
               ] ] ]

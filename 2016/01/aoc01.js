@@ -1,17 +1,3 @@
-<!DOCTYPE HTML>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Aoc01</title>
-  <style>body { padding: 0; margin: 0; }</style>
-</head>
-
-<body>
-
-<pre id="elm"></pre>
-
-<script>
-try {
 (function(scope){
 'use strict';
 
@@ -5212,14 +5198,14 @@ var $elm$core$Task$perform = F2(
 		return $elm$core$Task$command(
 			A2($elm$core$Task$map, toMessage, task));
 	});
-var $elm$browser$Browser$document = _Browser_document;
-var $author$project$Aoc01$N = 0;
-var $author$project$Aoc01$defaultTickInterval = 10;
+var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Main$N = 0;
+var $author$project$Main$defaultTickInterval = 10;
 var $elm$core$Set$Set_elm_builtin = $elm$core$Basics$identity;
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $elm$core$Set$empty = $elm$core$Dict$empty;
-var $author$project$Aoc01$input = 'L5, R1, L5, L1, R5, R1, R1, L4, L1, L3, R2, R4, L4, L1, L1, R2, R4, R3, L1, R4, L4, L5, L4, R4, L5, R1, R5, L2, R1, R3, L2, L4, L4, R1, L192, R5, R1, R4, L5, L4, R5, L1, L1, R48, R5, R5, L2, R4, R4, R1, R3, L1, L4, L5, R1, L4, L2, L5, R5, L2, R74, R4, L1, R188, R5, L4, L2, R5, R2, L4, R4, R3, R3, R2, R1, L3, L2, L5, L5, L2, L1, R1, R5, R4, L3, R5, L1, L3, R4, L1, L3, L2, R1, R3, R2, R5, L3, L1, L1, R5, L4, L5, R5, R2, L5, R2, L1, L5, L3, L5, L5, L1, R1, L4, L3, L1, R2, R5, L1, L3, R4, R5, L4, L1, R5, L1, R5, R5, R5, R2, R1, R2, L5, L5, L5, R4, L5, L4, L4, R5, L2, R1, R5, L1, L5, R4, L3, R4, L2, R3, R3, R3, L2, L2, L2, L1, L4, R3, L4, L2, R2, R5, L1, R2';
+var $author$project$Main$input = 'L5, R1, L5, L1, R5, R1, R1, L4, L1, L3, R2, R4, L4, L1, L1, R2, R4, R3, L1, R4, L4, L5, L4, R4, L5, R1, R5, L2, R1, R3, L2, L4, L4, R1, L192, R5, R1, R4, L5, L4, R5, L1, L1, R48, R5, R5, L2, R4, R4, R1, R3, L1, L4, L5, R1, L4, L2, L5, R5, L2, R74, R4, L1, R188, R5, L4, L2, R5, R2, L4, R4, R3, R3, R2, R1, L3, L2, L5, L5, L2, L1, R1, R5, R4, L3, R5, L1, L3, R4, L1, L3, L2, R1, R3, R2, R5, L3, L1, L1, R5, L4, L5, R5, R2, L5, R2, L1, L5, L3, L5, L5, L1, R1, L4, L3, L1, R2, R5, L1, L3, R4, R5, L4, L1, R5, L1, R5, R5, R5, R2, R1, R2, L5, L5, L5, R4, L5, L4, L4, R5, L2, R1, R5, L1, L5, R4, L3, R4, L2, R3, R3, R3, L2, L2, L2, L1, L4, R3, L4, L2, R2, R5, L1, R2';
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
 		var _v0 = f(mx);
@@ -5238,10 +5224,10 @@ var $elm$core$List$filterMap = F2(
 			_List_Nil,
 			xs);
 	});
-var $author$project$Aoc01$L = function (a) {
+var $author$project$Main$L = function (a) {
 	return {$: 1, a: a};
 };
-var $author$project$Aoc01$R = function (a) {
+var $author$project$Main$R = function (a) {
 	return {$: 0, a: a};
 };
 var $elm$core$Maybe$map = F2(
@@ -5254,32 +5240,32 @@ var $elm$core$Maybe$map = F2(
 			return $elm$core$Maybe$Nothing;
 		}
 	});
-var $author$project$Aoc01$tryParseInstruction = function (s) {
+var $author$project$Main$tryParseInstruction = function (s) {
 	var _v0 = A2($elm$core$String$left, 1, s);
 	switch (_v0) {
 		case 'L':
 			return A2(
 				$elm$core$Maybe$map,
-				$author$project$Aoc01$L,
+				$author$project$Main$L,
 				$elm$core$String$toInt(
 					A2($elm$core$String$dropLeft, 1, s)));
 		case 'R':
 			return A2(
 				$elm$core$Maybe$map,
-				$author$project$Aoc01$R,
+				$author$project$Main$R,
 				$elm$core$String$toInt(
 					A2($elm$core$String$dropLeft, 1, s)));
 		default:
 			return $elm$core$Maybe$Nothing;
 	}
 };
-var $author$project$Aoc01$parseInstructionList = function (s) {
+var $author$project$Main$parseInstructionList = function (s) {
 	return A2(
 		$elm$core$List$filterMap,
-		$author$project$Aoc01$tryParseInstruction,
+		$author$project$Main$tryParseInstruction,
 		A2($elm$core$String$split, ', ', s));
 };
-var $author$project$Aoc01$moveForward = F3(
+var $author$project$Main$moveForward = F3(
 	function (dir, steps, _v0) {
 		var x = _v0.a;
 		var y = _v0.b;
@@ -5294,10 +5280,10 @@ var $author$project$Aoc01$moveForward = F3(
 				return _Utils_Tuple2(x + steps, y);
 		}
 	});
-var $author$project$Aoc01$E = 3;
-var $author$project$Aoc01$S = 2;
-var $author$project$Aoc01$W = 1;
-var $author$project$Aoc01$turnLeft = function (dir) {
+var $author$project$Main$E = 3;
+var $author$project$Main$S = 2;
+var $author$project$Main$W = 1;
+var $author$project$Main$turnLeft = function (dir) {
 	switch (dir) {
 		case 0:
 			return 1;
@@ -5309,7 +5295,7 @@ var $author$project$Aoc01$turnLeft = function (dir) {
 			return 2;
 	}
 };
-var $author$project$Aoc01$turnRight = function (dir) {
+var $author$project$Main$turnRight = function (dir) {
 	switch (dir) {
 		case 0:
 			return 3;
@@ -5321,15 +5307,15 @@ var $author$project$Aoc01$turnRight = function (dir) {
 			return 0;
 	}
 };
-var $author$project$Aoc01$move = F2(
+var $author$project$Main$move = F2(
 	function (inst, _v0) {
 		var dir = _v0.a;
 		var pos = _v0.b;
 		var path = _v0.c;
 		if (!inst.$) {
 			var steps = inst.a;
-			var nextDir = $author$project$Aoc01$turnRight(dir);
-			var nextPos = A3($author$project$Aoc01$moveForward, nextDir, steps, pos);
+			var nextDir = $author$project$Main$turnRight(dir);
+			var nextPos = A3($author$project$Main$moveForward, nextDir, steps, pos);
 			return _Utils_Tuple3(
 				nextDir,
 				nextPos,
@@ -5339,8 +5325,8 @@ var $author$project$Aoc01$move = F2(
 					path));
 		} else {
 			var steps = inst.a;
-			var nextDir = $author$project$Aoc01$turnLeft(dir);
-			var nextPos = A3($author$project$Aoc01$moveForward, nextDir, steps, pos);
+			var nextDir = $author$project$Main$turnLeft(dir);
+			var nextPos = A3($author$project$Main$moveForward, nextDir, steps, pos);
 			return _Utils_Tuple3(
 				nextDir,
 				nextPos,
@@ -5350,11 +5336,11 @@ var $author$project$Aoc01$move = F2(
 					path));
 		}
 	});
-var $author$project$Aoc01$walk = F3(
+var $author$project$Main$walk = F3(
 	function (dir, pos, instructions) {
 		var _v0 = A3(
 			$elm$core$List$foldl,
-			$author$project$Aoc01$move,
+			$author$project$Main$move,
 			_Utils_Tuple3(dir, pos, _List_Nil),
 			instructions);
 		var result = _v0.c;
@@ -5377,7 +5363,7 @@ var $elm$core$List$head = function (list) {
 		return $elm$core$Maybe$Nothing;
 	}
 };
-var $author$project$Aoc01$moveForwardOneStep = F2(
+var $author$project$Main$moveForwardOneStep = F2(
 	function (dir, _v0) {
 		var x = _v0.a;
 		var y = _v0.b;
@@ -5392,7 +5378,7 @@ var $author$project$Aoc01$moveForwardOneStep = F2(
 				return _Utils_Tuple2(x + 1, y);
 		}
 	});
-var $author$project$Aoc01$moveForwardLoop = F4(
+var $author$project$Main$moveForwardLoop = F4(
 	function (acc, dir, stepsLeft, _v0) {
 		moveForwardLoop:
 		while (true) {
@@ -5400,7 +5386,7 @@ var $author$project$Aoc01$moveForwardLoop = F4(
 			var y = _v0.b;
 			if (stepsLeft > 0) {
 				var nextPos = A2(
-					$author$project$Aoc01$moveForwardOneStep,
+					$author$project$Main$moveForwardOneStep,
 					dir,
 					_Utils_Tuple2(x, y));
 				var $temp$acc = A2($elm$core$List$cons, nextPos, acc),
@@ -5417,12 +5403,12 @@ var $author$project$Aoc01$moveForwardLoop = F4(
 			}
 		}
 	});
-var $author$project$Aoc01$moveForwardInSteps = F3(
+var $author$project$Main$moveForwardInSteps = F3(
 	function (dir, steps, _v0) {
 		var x = _v0.a;
 		var y = _v0.b;
 		return A4(
-			$author$project$Aoc01$moveForwardLoop,
+			$author$project$Main$moveForwardLoop,
 			_List_Nil,
 			dir,
 			steps,
@@ -5437,15 +5423,15 @@ var $elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
-var $author$project$Aoc01$moveInSteps = F2(
+var $author$project$Main$moveInSteps = F2(
 	function (inst, _v0) {
 		var dir = _v0.a;
 		var pos = _v0.b;
 		var path = _v0.c;
 		if (!inst.$) {
 			var steps = inst.a;
-			var nextDir = $author$project$Aoc01$turnRight(dir);
-			var nextPositions = A3($author$project$Aoc01$moveForwardInSteps, nextDir, steps, pos);
+			var nextDir = $author$project$Main$turnRight(dir);
+			var nextPositions = A3($author$project$Main$moveForwardInSteps, nextDir, steps, pos);
 			var nextPathSegment = A2(
 				$elm$core$List$map,
 				function (p) {
@@ -5462,8 +5448,8 @@ var $author$project$Aoc01$moveInSteps = F2(
 				A2($elm$core$List$append, nextPathSegment, path));
 		} else {
 			var steps = inst.a;
-			var nextDir = $author$project$Aoc01$turnLeft(dir);
-			var nextPositions = A3($author$project$Aoc01$moveForwardInSteps, nextDir, steps, pos);
+			var nextDir = $author$project$Main$turnLeft(dir);
+			var nextPositions = A3($author$project$Main$moveForwardInSteps, nextDir, steps, pos);
 			var nextPathSegment = A2(
 				$elm$core$List$map,
 				function (p) {
@@ -5480,49 +5466,49 @@ var $author$project$Aoc01$moveInSteps = F2(
 				A2($elm$core$List$append, nextPathSegment, path));
 		}
 	});
-var $author$project$Aoc01$walkInSteps = F3(
+var $author$project$Main$walkInSteps = F3(
 	function (dir, pos, instructions) {
 		var _v0 = A3(
 			$elm$core$List$foldl,
-			$author$project$Aoc01$moveInSteps,
+			$author$project$Main$moveInSteps,
 			_Utils_Tuple3(dir, pos, _List_Nil),
 			instructions);
 		var result = _v0.c;
 		return $elm$core$List$reverse(result);
 	});
-var $author$project$Aoc01$initModel = function () {
-	var instructions = $author$project$Aoc01$parseInstructionList($author$project$Aoc01$input);
+var $author$project$Main$initModel = function () {
+	var instructions = $author$project$Main$parseInstructionList($author$project$Main$input);
 	var path = A3(
-		$author$project$Aoc01$walk,
+		$author$project$Main$walk,
 		0,
 		_Utils_Tuple2(0, 0),
 		instructions);
 	var steps = A3(
-		$author$project$Aoc01$walkInSteps,
+		$author$project$Main$walkInSteps,
 		0,
 		_Utils_Tuple2(0, 0),
 		instructions);
 	var debug = ' ';
 	return {
 		X: debug,
-		K: 0,
-		L: false,
+		M: 0,
+		J: false,
 		P: path,
 		t: true,
-		E: _Utils_Tuple2(0, 0),
+		K: _Utils_Tuple2(0, 0),
 		v: $elm$core$Set$empty,
-		M: steps,
-		w: $author$project$Aoc01$defaultTickInterval,
+		L: steps,
+		w: $author$project$Main$defaultTickInterval,
 		x: $elm$core$Maybe$Nothing,
-		J: _List_Nil
+		I: _List_Nil
 	};
 }();
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Aoc01$init = function (_v0) {
-	return _Utils_Tuple2($author$project$Aoc01$initModel, $elm$core$Platform$Cmd$none);
+var $author$project$Main$init = function (_v0) {
+	return _Utils_Tuple2($author$project$Main$initModel, $elm$core$Platform$Cmd$none);
 };
-var $author$project$Aoc01$Tick = 0;
+var $author$project$Main$Tick = 0;
 var $elm$time$Time$Every = F2(
 	function (a, b) {
 		return {$: 0, a: a, b: b};
@@ -5936,7 +5922,7 @@ var $elm$time$Time$every = F2(
 	});
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $author$project$Aoc01$subscriptions = function (model) {
+var $author$project$Main$subscriptions = function (model) {
 	var tickSub = model.t ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
 		model.w,
@@ -5945,8 +5931,8 @@ var $author$project$Aoc01$subscriptions = function (model) {
 		});
 	return tickSub;
 };
-var $author$project$Aoc01$updateClear = function (_v0) {
-	return $author$project$Aoc01$initModel;
+var $author$project$Main$updateClear = function (_v0) {
+	return $author$project$Main$initModel;
 };
 var $elm$core$Set$insert = F2(
 	function (key, _v0) {
@@ -5967,18 +5953,18 @@ var $elm$core$Set$member = F2(
 		var dict = _v0;
 		return A2($elm$core$Dict$member, key, dict);
 	});
-var $author$project$Aoc01$updateStep = function (model) {
-	var _v0 = model.M;
+var $author$project$Main$updateStep = function (model) {
+	var _v0 = model.L;
 	if (!_v0.b) {
 		return _Utils_update(
 			model,
-			{L: true});
+			{J: true});
 	} else {
 		var _v1 = _v0.a;
 		var d = _v1.a;
 		var pos = _v1.b;
 		var rest = _v0.b;
-		var walked = A2($elm$core$List$cons, pos, model.J);
+		var walked = A2($elm$core$List$cons, pos, model.I);
 		var dbg = $elm$core$String$fromInt(
 			$elm$core$List$length(walked));
 		var _v2 = function () {
@@ -5997,13 +5983,13 @@ var $author$project$Aoc01$updateStep = function (model) {
 		var seen = _v2.b;
 		return _Utils_update(
 			model,
-			{K: d, E: pos, v: seen, M: rest, x: twice, J: walked});
+			{M: d, K: pos, v: seen, L: rest, x: twice, I: walked});
 	}
 };
 var $elm$core$Basics$not = _Basics_not;
-var $author$project$Aoc01$updateTogglePlay = function (model) {
-	if (model.L) {
-		var m = $author$project$Aoc01$initModel;
+var $author$project$Main$updateTogglePlay = function (model) {
+	if (model.J) {
+		var m = $author$project$Main$initModel;
 		return _Utils_update(
 			m,
 			{t: false});
@@ -6013,20 +5999,20 @@ var $author$project$Aoc01$updateTogglePlay = function (model) {
 			{t: !model.t});
 	}
 };
-var $author$project$Aoc01$update = F2(
+var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg) {
 			case 5:
 				return _Utils_Tuple2(
-					$author$project$Aoc01$updateClear(model),
+					$author$project$Main$updateClear(model),
 					$elm$core$Platform$Cmd$none);
 			case 0:
 				return _Utils_Tuple2(
-					$author$project$Aoc01$updateStep(model),
+					$author$project$Main$updateStep(model),
 					$elm$core$Platform$Cmd$none);
 			case 1:
 				return _Utils_Tuple2(
-					$author$project$Aoc01$updateStep(model),
+					$author$project$Main$updateStep(model),
 					$elm$core$Platform$Cmd$none);
 			case 3:
 				return _Utils_Tuple2(
@@ -6042,15 +6028,15 @@ var $author$project$Aoc01$update = F2(
 					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(
-					$author$project$Aoc01$updateTogglePlay(model),
+					$author$project$Main$updateTogglePlay(model),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Aoc01$Clear = 5;
-var $author$project$Aoc01$Faster = 3;
-var $author$project$Aoc01$Slower = 4;
-var $author$project$Aoc01$Step = 1;
-var $author$project$Aoc01$TogglePlay = 2;
+var $author$project$Main$Clear = 5;
+var $author$project$Main$Faster = 3;
+var $author$project$Main$Slower = 4;
+var $author$project$Main$Step = 1;
+var $author$project$Main$TogglePlay = 2;
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -6075,7 +6061,7 @@ var $elm$core$Basics$negate = function (n) {
 var $elm$core$Basics$abs = function (n) {
 	return (n < 0) ? (-n) : n;
 };
-var $author$project$Aoc01$manhattan = function (_v0) {
+var $author$project$Main$manhattan = function (_v0) {
 	var x = _v0.a;
 	var y = _v0.b;
 	return $elm$core$Basics$abs(x) + $elm$core$Basics$abs(y);
@@ -6120,16 +6106,16 @@ var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$svg$Svg$Attributes$points = _VirtualDom_attribute('points');
 var $elm$svg$Svg$polyline = $elm$svg$Svg$trustedNode('polyline');
-var $author$project$Aoc01$posToStr = function (_v0) {
+var $author$project$Main$posToStr = function (_v0) {
 	var x = _v0.a;
 	var y = _v0.b;
 	return $elm$core$String$fromInt(x) + (', ' + $elm$core$String$fromInt(y));
 };
-var $author$project$Aoc01$toPolyline = function (path) {
+var $author$project$Main$toPolyline = function (path) {
 	var ptsStr = A2(
 		$elm$core$String$join,
 		' ',
-		A2($elm$core$List$map, $author$project$Aoc01$posToStr, path));
+		A2($elm$core$List$map, $author$project$Main$posToStr, path));
 	var attrs = _List_fromArray(
 		[
 			$elm$svg$Svg$Attributes$stroke('currentcolor'),
@@ -6141,10 +6127,10 @@ var $author$project$Aoc01$toPolyline = function (path) {
 };
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
-var $author$project$Aoc01$toSvg = function (model) {
+var $author$project$Main$toSvg = function (model) {
 	var topLeft = _Utils_Tuple2(-30, -60);
 	var positions = A2($elm$core$List$map, $elm$core$Tuple$second, model.P);
-	var polyline = $author$project$Aoc01$toPolyline(model.J);
+	var polyline = $author$project$Main$toPolyline(model.I);
 	var maybeTwiceElement = function () {
 		var _v0 = model.x;
 		if (!_v0.$) {
@@ -6190,20 +6176,20 @@ var $author$project$Aoc01$toSvg = function (model) {
 		elements);
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $author$project$Aoc01$viewBody = function (model) {
+var $author$project$Main$view = function (model) {
 	var twiceStr = function () {
 		var _v0 = model.x;
 		if (!_v0.$) {
 			var p = _v0.a;
 			return $elm$core$String$fromInt(
-				$author$project$Aoc01$manhattan(p));
+				$author$project$Main$manhattan(p));
 		} else {
 			return '?';
 		}
 	}();
-	var svgElement = $author$project$Aoc01$toSvg(model);
+	var svgElement = $author$project$Main$toSvg(model);
 	var distanceStr = $elm$core$String$fromInt(
-		$author$project$Aoc01$manhattan(model.E));
+		$author$project$Main$manhattan(model.K));
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
@@ -6244,82 +6230,6 @@ var $author$project$Aoc01$viewBody = function (model) {
 									[
 										$elm$html$Html$text('Day 1: No Time for a Taxicab')
 									]))
-							]))
-					])),
-				A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$td,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'padding-bottom', '10px')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2024/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2024')
-									])),
-								$elm$html$Html$text('] '),
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2023/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2023')
-									])),
-								$elm$html$Html$text('] '),
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2022/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2022')
-									])),
-								$elm$html$Html$text('] '),
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2021/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2021')
-									])),
-								$elm$html$Html$text('] '),
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2020/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2020')
-									])),
-								$elm$html$Html$text('] ')
 							]))
 					])),
 				A2(
@@ -6475,34 +6385,7 @@ var $author$project$Aoc01$viewBody = function (model) {
 					]))
 			]));
 };
-var $author$project$Aoc01$view = function (model) {
-	return {
-		aw: _List_fromArray(
-			[
-				$author$project$Aoc01$viewBody(model)
-			]),
-		aK: 'Advent of Code 2016 | Day 1: No Time for a Taxicab'
-	};
-};
-var $author$project$Aoc01$main = $elm$browser$Browser$document(
-	{aD: $author$project$Aoc01$init, aJ: $author$project$Aoc01$subscriptions, aL: $author$project$Aoc01$update, aM: $author$project$Aoc01$view});
-_Platform_export({'Aoc01':{'init':$author$project$Aoc01$main(
+var $author$project$Main$main = $elm$browser$Browser$element(
+	{aD: $author$project$Main$init, aJ: $author$project$Main$subscriptions, aL: $author$project$Main$update, aM: $author$project$Main$view});
+_Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
-
-  var app = Elm.Aoc01.init({ node: document.getElementById("elm") });
-}
-catch (e)
-{
-  // display initialization errors (e.g. bad flags, infinite recursion)
-  var header = document.createElement("h1");
-  header.style.fontFamily = "monospace";
-  header.innerText = "Initialization Error";
-  var pre = document.getElementById("elm");
-  document.body.insertBefore(header, pre);
-  pre.innerText = e;
-  throw e;
-}
-</script>
-
-</body>
-</html>
