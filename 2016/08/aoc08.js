@@ -5427,7 +5427,7 @@ var $author$project$Main$initScreen = function (dataSource) {
 var $author$project$Main$initModel = function (dataSource) {
 	var screen = $author$project$Main$initScreen(dataSource);
 	var operations = $author$project$Main$initOperations(dataSource);
-	var model = {W: 0, A: dataSource, Y: '', u: $author$project$Main$defaultDelay, C: 'press play to start', N: 0, D: operations, r: true, I: $elm$core$Maybe$Nothing, y: screen};
+	var model = {W: 0, A: dataSource, Y: '', v: $author$project$Main$defaultDelay, C: 'press play to start', N: 0, D: operations, r: true, I: $elm$core$Maybe$Nothing, t: screen};
 	return model;
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
@@ -5856,7 +5856,7 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (model) {
 	var tickSub = model.r ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.u,
+		model.v,
 		function (_v0) {
 			return 0;
 		});
@@ -6182,14 +6182,14 @@ var $author$project$Main$updateModel = function (model) {
 	} else {
 		var op = _v0.a;
 		var rest = _v0.b;
-		var screen = A2($author$project$Main$execute, op, model.y);
+		var screen = A2($author$project$Main$execute, op, model.t);
 		return _Utils_update(
 			model,
 			{
 				C: 'updated',
 				D: rest,
 				I: $elm$core$Maybe$Just(op),
-				y: screen
+				t: screen
 			});
 	}
 };
@@ -6201,7 +6201,7 @@ var $author$project$Main$updateDataSource = F2(
 				A: dataSource,
 				N: 0,
 				D: $author$project$Main$initOperations(dataSource),
-				y: $author$project$Main$initScreen(dataSource)
+				t: $author$project$Main$initScreen(dataSource)
 			});
 	});
 var $author$project$Main$updateUseInput = function (model) {
@@ -6240,13 +6240,13 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{u: model.u / 2}),
+						{v: model.v / 2}),
 					$elm$core$Platform$Cmd$none);
 			case 4:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{u: model.u * 2}),
+						{v: model.v * 2}),
 					$elm$core$Platform$Cmd$none);
 			case 6:
 				return _Utils_Tuple2(
@@ -6346,22 +6346,42 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$Main$toCharElement = F2(
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $elm$html$Html$span = _VirtualDom_node('span');
+var $author$project$Main$toStyledCharElement = F2(
 	function (model, _v0) {
 		var x = _v0.a;
 		var y = _v0.b;
-		var _v1 = A3($tortus$elm_array_2d$Array2D$get, y, x, model.y);
+		var _v1 = A3($tortus$elm_array_2d$Array2D$get, y, x, model.t);
 		if (_v1.$ === 1) {
 			return $elm$html$Html$text('?');
 		} else {
 			var lit = _v1.a;
-			return lit ? $elm$html$Html$text('#') : $elm$html$Html$text('.');
+			return lit ? A2(
+				$elm$html$Html$span,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('draw adaptive')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('#')
+					])) : A2(
+				$elm$html$Html$span,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('draw-empty adaptive')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('.')
+					]));
 		}
 	});
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$view = function (model) {
-	var screen = model.y;
+	var screen = model.t;
 	var xs = A2(
 		$elm$core$List$range,
 		0,
@@ -6411,7 +6431,7 @@ var $author$project$Main$view = function (model) {
 		function (positions) {
 			return A2(
 				$elm$core$List$map,
-				$author$project$Main$toCharElement(model),
+				$author$project$Main$toStyledCharElement(model),
 				positions);
 		},
 		nestedPositions);

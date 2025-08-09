@@ -1,5 +1,7 @@
 module Main exposing (..)
 
+{- Advent of Code 2022. Day 17: Pyroclastic Flow. -}
+
 import Browser 
 import Html exposing (Html)
 import Html.Attributes
@@ -98,7 +100,7 @@ initModel dataSource =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel Sample, Cmd.none)
+  (initModel Input, Cmd.none)
 
 -- UPDATE
 
@@ -454,6 +456,24 @@ toRowElements : String -> List (Html Msg)
 toRowElements rowText = 
   [ Html.text rowText, Html.br [] [] ]
 
+toStyledHtmlElement : String -> Html Msg
+toStyledHtmlElement symbol = 
+  let
+    cssClass = 
+      case symbol of 
+        "." -> "draw-empty adaptive"
+        _ -> "draw adaptive"
+  in
+    Html.span [ Html.Attributes.class cssClass ]  [ Html.text symbol ]
+
+toStyledRowElements : String -> List (Html Msg)
+toStyledRowElements rowText = 
+  let
+    chars = rowText |> String.toList   
+    elements = chars |> List.map (String.fromChar >> toStyledHtmlElement) 
+  in
+    List.append elements [ Html.br [] [] ]
+
 isBox wh (x, y) = 
   if (Array2D.get y x wh == Just 'O' || Array2D.get y x wh == Just '[') then Just (x, y) else Nothing
 
@@ -494,10 +514,9 @@ toRockPositions rock =
 view : Model -> Html Msg
 view model =
   let
-    textFontSize = "20px"
     rockPositions = model.rock |> toRockPositions |> Set.fromList 
     rows = toChamberRows rockPositions model.highestRock model.chamber
-    elements = rows |> List.concatMap (toRowElements)
+    elements = rows |> List.concatMap (toStyledRowElements)
     rockPosStr = 
       case model.rock of 
         Moving ((x, y), shape) -> "(" ++ String.fromInt x ++ ", " ++ String.fromInt y ++  ")"

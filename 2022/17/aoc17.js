@@ -5236,7 +5236,7 @@ var $elm$core$Task$perform = F2(
 			A2($elm$core$Task$map, toMessage, task));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Main$Sample = 1;
+var $author$project$Main$Input = 0;
 var $author$project$Main$Blow = 0;
 var $author$project$Main$Dash = 0;
 var $author$project$Main$Moving = function (a) {
@@ -5334,7 +5334,7 @@ var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		$author$project$Main$initModel(1),
+		$author$project$Main$initModel(0),
 		$elm$core$Platform$Cmd$none);
 };
 var $author$project$Main$KeyDown = function (a) {
@@ -5981,7 +5981,7 @@ var $author$project$Main$subscriptions = function (model) {
 		_List_fromArray(
 			[tickSub, keySub]));
 };
-var $author$project$Main$Input = 0;
+var $author$project$Main$Sample = 1;
 var $ohanhi$keyboard$Keyboard$ArrowDown = {$: 18};
 var $ohanhi$keyboard$Keyboard$ArrowLeft = {$: 19};
 var $ohanhi$keyboard$Keyboard$ArrowRight = {$: 20};
@@ -7119,17 +7119,49 @@ var $author$project$Main$toChamberRows = F3(
 			A2($elm$core$List$cons, '+-------+', rows));
 	});
 var $elm$html$Html$br = _VirtualDom_node('br');
-var $author$project$Main$toRowElements = function (rowText) {
-	return _List_fromArray(
-		[
-			$elm$html$Html$text(rowText),
-			A2($elm$html$Html$br, _List_Nil, _List_Nil)
-		]);
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $elm$html$Html$span = _VirtualDom_node('span');
+var $author$project$Main$toStyledHtmlElement = function (symbol) {
+	var cssClass = function () {
+		if (symbol === '.') {
+			return 'draw-empty adaptive';
+		} else {
+			return 'draw adaptive';
+		}
+	}();
+	return A2(
+		$elm$html$Html$span,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class(cssClass)
+			]),
+		_List_fromArray(
+			[
+				$elm$html$Html$text(symbol)
+			]));
+};
+var $author$project$Main$toStyledRowElements = function (rowText) {
+	var chars = $elm$core$String$toList(rowText);
+	var elements = A2(
+		$elm$core$List$map,
+		A2($elm$core$Basics$composeR, $elm$core$String$fromChar, $author$project$Main$toStyledHtmlElement),
+		chars);
+	return A2(
+		$elm$core$List$append,
+		elements,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$br, _List_Nil, _List_Nil)
+			]));
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$view = function (model) {
-	var textFontSize = '20px';
 	var rockPositions = $elm$core$Set$fromList(
 		$author$project$Main$toRockPositions(model.b));
 	var rows = A3($author$project$Main$toChamberRows, rockPositions, model.x, model.o);
@@ -7146,7 +7178,7 @@ var $author$project$Main$view = function (model) {
 			return '_';
 		}
 	}();
-	var elements = A2($elm$core$List$concatMap, $author$project$Main$toRowElements, rows);
+	var elements = A2($elm$core$List$concatMap, $author$project$Main$toStyledRowElements, rows);
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(

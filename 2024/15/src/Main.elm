@@ -210,7 +210,7 @@ initModel wide dataSource =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel False SampleLarger, Cmd.none)
+  (initModel False Input, Cmd.none)
 
 -- UPDATE
 

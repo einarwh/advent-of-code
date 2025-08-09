@@ -1,5 +1,7 @@
 module Main exposing (..)
 
+{- Advent of Code 2016. Day 08: Two-Factor Authentication. -}
+
 import Browser 
 import Html exposing (Html)
 import Html.Attributes
@@ -510,6 +512,16 @@ toCharElement model (x, y) =
       Just lit -> 
         if lit then Html.text "#" else Html.text "."
 
+toStyledCharElement : Model -> Pos -> Html Msg 
+toStyledCharElement model (x, y) = 
+    case Array2D.get y x model.screen of 
+      Nothing -> Html.text "?"
+      Just lit -> 
+        if lit then 
+          Html.span [ Html.Attributes.class "draw adaptive" ]  [ Html.text "#" ]
+        else 
+          Html.span [ Html.Attributes.class "draw-empty adaptive" ]  [ Html.text "." ]
+
 countLit : Screen -> Int 
 countLit screen = 
   let 
@@ -526,7 +538,7 @@ view model =
     ys = List.range 0 (Array2D.rows screen - 1)
     xs = List.range 0 (Array2D.columns screen - 1)
     nestedPositions = ys |> List.map (\y -> xs |> List.map (\x -> (x, y)))
-    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement model))
+    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toStyledCharElement model))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
     commandsStr = model.lastCommandText
     litStr = screen |> countLit |> String.fromInt

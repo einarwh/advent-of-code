@@ -1,5 +1,7 @@
 module Main exposing (..)
 
+{- Advent of Code 2018. Day 13: Mine Cart Madness -}
+
 import Browser 
 import Html exposing (Html)
 import Html.Attributes
@@ -567,11 +569,11 @@ toCharElement mine carts (x, y) =
     if isCart symbol then 
       Html.span [ Html.Attributes.style "color" "#2E8B57", Html.Attributes.style "background-color" "#CCCCCC" ] [ Html.text (String.fromChar symbol) ]
     else if isBlank symbol then 
-      Html.span [ Html.Attributes.style "color" "#FFFFFF" ] [ Html.text "." ]
+      Html.span [ Html.Attributes.style "opacity" "0.0" ] [ Html.text "." ]
     else if isCrash symbol then 
       Html.span [ Html.Attributes.style "color" "#D2042D", Html.Attributes.style "background-color" "#CCCCCC" ] [ Html.text "X" ]
     else 
-      Html.text (String.fromChar symbol)
+      Html.span [ Html.Attributes.class "draw-wall adaptive" ] [ Html.text (String.fromChar symbol) ]
 
 view : Model -> Html Msg
 view model =

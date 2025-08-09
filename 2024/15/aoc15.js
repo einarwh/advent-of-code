@@ -5236,7 +5236,6 @@ var $elm$core$Task$perform = F2(
 			A2($elm$core$Task$map, toMessage, task));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Main$SampleLarger = 2;
 var $author$project$Main$Input = 0;
 var $author$project$Main$defaultTickInterval = 10;
 var $elm$core$Maybe$andThen = F2(
@@ -5822,7 +5821,7 @@ var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		A2($author$project$Main$initModel, false, 2),
+		A2($author$project$Main$initModel, false, 0),
 		$elm$core$Platform$Cmd$none);
 };
 var $author$project$Main$KeyDown = function (a) {
@@ -6469,6 +6468,7 @@ var $author$project$Main$subscriptions = function (model) {
 		_List_fromArray(
 			[tickSub, keySub]));
 };
+var $author$project$Main$SampleLarger = 2;
 var $author$project$Main$SampleSituation = 3;
 var $author$project$Main$SampleSmaller = 1;
 var $ohanhi$keyboard$Keyboard$ArrowDown = {$: 18};

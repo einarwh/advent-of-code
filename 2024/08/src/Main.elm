@@ -1,6 +1,8 @@
 module Main exposing (..)
 
-import Browser exposing (Document)
+{- Advent of Code 2024. Day 08: Resonant Collinearity. -}
+
+import Browser 
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
@@ -285,6 +287,20 @@ toCharElement board antinodes (x, y) =
         else 
           Html.text (String.fromChar ch) 
 
+toStyledCharElement : Array2D Char -> Set (Int, Int) -> Pos -> Html Msg 
+toStyledCharElement board antinodes (x, y) = 
+  case Array2D.get y x board of 
+    Nothing -> Html.text "?"
+    Just ch ->
+      case ch of 
+        '.' -> 
+          if Set.member (x, y) antinodes then 
+            Html.span [Html.Attributes.class "draw-dark-green adaptive" ] [ Html.text "#" ]
+          else 
+            Html.span [Html.Attributes.class "draw-empty adaptive" ] [ Html.text "." ]
+        _ -> 
+          Html.text (String.fromChar ch) 
+
 view : Model -> Html Msg
 view model =
   let
@@ -293,7 +309,7 @@ view model =
     ys = List.range 0 (Array2D.rows board - 1)
     xs = List.range 0 (Array2D.columns board - 1)
     nestedPositions = ys |> List.map (\y -> xs |> List.map (\x -> (x, y)))
-    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement board antinodes))
+    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toStyledCharElement board antinodes))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
     textFontSize = 
       case model.dataSource of 

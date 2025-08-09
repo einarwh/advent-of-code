@@ -1558,6 +1558,13 @@ toCharElement : Set Pos -> Pos -> Html Msg
 toCharElement robotSet (x, y) = 
   Html.text (if Set.member (x, y) robotSet then "#" else ".")
 
+toStyledCharElement : Set Pos -> Pos -> Html Msg 
+toStyledCharElement robotSet (x, y) = 
+  if Set.member (x, y) robotSet then 
+    Html.text "#"
+  else 
+    Html.span [Html.Attributes.class "draw-empty adaptive" ] [ Html.text "." ]
+
 view : Model -> Html Msg
 view model =
   let
@@ -1568,7 +1575,7 @@ view model =
         Bonus -> "12px"
     robotPositions = model.robots |> List.map (\r -> r.position) |> Set.fromList 
     nestedPositions = getNestedPositions model.width model.height 
-    nestedElements = nestedPositions |> List.map (\ps -> ps |> List.map (toCharElement robotPositions))
+    nestedElements = nestedPositions |> List.map (\ps -> ps |> List.map (toStyledCharElement robotPositions))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
     safetyFactor = calculateSafetyFactor model.width model.height model.robots
   in 

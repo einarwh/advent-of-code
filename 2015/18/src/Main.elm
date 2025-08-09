@@ -1,5 +1,7 @@
 module Main exposing (..)
 
+{- Advent of Code 2015. Day 18: Like a GIF For Your Yard -}
+
 import Browser
 import Html exposing (Html)
 import Html.Attributes
@@ -344,6 +346,19 @@ isLightOn : Array2D Bool -> Pos -> Bool
 isLightOn grid (x, y) = 
   Array2D.get y x grid |> Maybe.withDefault False
 
+toStyledCharElement : Array2D Bool -> Pos -> Html Msg 
+toStyledCharElement grid (x, y) = 
+  let 
+    enabled = isLightOn grid (x, y)
+    symbol = if enabled then "#" else "."
+    cssClass =
+      case symbol of 
+        "#" -> "draw-yellow adaptive"
+        _ -> "draw-empty adaptive"
+  in  
+    Html.span [ Html.Attributes.class cssClass ]  [ Html.text symbol ]
+
+
 toCharElement : Array2D Bool -> Pos -> Html Msg 
 toCharElement grid (x, y) = 
   let 
@@ -356,7 +371,7 @@ view model =
   let
     grid = model.grid
     nestedPositions = getNestedPositions grid
-    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement grid))
+    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toStyledCharElement grid))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
     lightCount = getAllPositions grid |> List.filter (isLightOn grid) |> List.length
     textFontSize = 

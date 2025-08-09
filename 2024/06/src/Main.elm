@@ -496,6 +496,19 @@ toCharElement vizBoard (x, y) =
           Plain ch -> 
             Html.text (String.fromChar ch)
 
+toStyledCharElement : Array2D Cell -> Pos -> Html Msg 
+toStyledCharElement vizBoard (x, y) = 
+    case Array2D.get y x vizBoard of 
+      Nothing -> Html.text "?"
+      Just cell -> 
+        case cell of 
+          Highlight ch -> 
+            (Html.span [Html.Attributes.style "background-color" "#AAAAAA" ] [ Html.text (String.fromChar ch) ]) 
+          Plain ch -> 
+            case ch of 
+              '.' -> Html.span [Html.Attributes.class "draw-empty adaptive" ] [ Html.text "." ]
+              _ -> Html.text (String.fromChar ch)
+
 view : Model -> Html Msg
 view model =
   let
@@ -510,7 +523,7 @@ view model =
     ys = List.range 0 (Array2D.rows board - 1)
     xs = List.range 0 (Array2D.columns board - 1)
     nestedPositions = ys |> List.map (\y -> xs |> List.map (\x -> (x, y)))
-    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement board))
+    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toStyledCharElement board))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
     positionsVisited = model.routeWalked |> List.map (\(p, _, _) -> p) |> Set.fromList |> Set.size 
     textFontSize = 

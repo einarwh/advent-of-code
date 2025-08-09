@@ -6768,6 +6768,7 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
@@ -6832,7 +6833,7 @@ var $author$project$Main$toCharElement = F3(
 			$elm$html$Html$span,
 			_List_fromArray(
 				[
-					A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF')
+					A2($elm$html$Html$Attributes$style, 'opacity', '0.0')
 				]),
 			_List_fromArray(
 				[
@@ -6847,8 +6848,17 @@ var $author$project$Main$toCharElement = F3(
 			_List_fromArray(
 				[
 					$elm$html$Html$text('X')
-				])) : $elm$html$Html$text(
-			$elm$core$String$fromChar(symbol))));
+				])) : A2(
+			$elm$html$Html$span,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('draw-wall adaptive')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text(
+					$elm$core$String$fromChar(symbol))
+				]))));
 	});
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
