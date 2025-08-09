@@ -14,4 +14,3 @@ TODO:
 2021/09: Combine F# solutions.
 2021/11: Missing F# solution. 
 
-Fix PostScript solutions, trim input.
