@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>My Elm App</title>
+    <script src="aoc18.js"></script>
+    <style>
+      .hero {
+        color: #3e9c3e;
+      }
+      .ok {
+        color: #3e9c3e;
+      }
+      .wrong {
+        color: #e34444;
+      }
+      .mark-ok {
+        background: #afe1af;
+      }
+      .mark-err {
+        background: #faa0a0;
+      }
+      .greyed {
+        color: #808080;
+      }
+      .draw-hero {
+        color: #3e9c3e;
+      }
+      .draw-green {
+        color: #3e9c3e;
+      }
+      .draw-brown {
+        color: #a0522d;
+      }
+      .draw-empty {
+        color: #404040;
+      }
+      .draw-wall {
+        color: #808080;
+      }
+      @media (prefers-color-scheme: dark) {
+        .hero.adaptive {
+          color: #afe1af;
+        }
+        .ok.adaptive {
+          color: #afe1af;
+        }
+        .wrong.adaptive {
+          color: #faa0a0;
+        }
+        .mark-err.adaptive {
+          background: #e34444;
+        }
+        .mark-ok.adaptive {
+          background: #3e9c3e;
+        }
+        .greyed.adaptive {
+          color: #d0d0d0;
+        }
+        .draw-hero.adaptive {
+          color: #afe1af;
+        }
+        .draw-green.adaptive {
+          color: #afe1af;
+        }
+        .draw-brown.adaptive {
+          color: #f4cb95;
+        }
+        .draw-empty.adaptive {
+          color: #e0e0e0;
+        }
+        .draw-wall.adaptive {
+          color: #c9c9c9;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="elm-app"></div>
+    <script>
+      function lambda() {
+        const app = Elm.Main.init({
+          node: document.getElementById("elm-app"),
+        });
+      }
+      document.addEventListener("DOMContentLoaded", lambda);
+    </script>
+  </body>
+</html>

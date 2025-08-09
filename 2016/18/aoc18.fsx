@@ -1,5 +1,5 @@
 // Advent of Code 2016. Day 18: Like a Rogue.
-// TODO: Find loop?
+// This takes a while, but there doesn't appear to be any loop.
 // dotnet fsi aoc18.fsx
 
 open System
