@@ -24,15 +24,6 @@ main =
 
 type PasswordState = Scrambled | PlainText
 
--- type Operation =
---   SwapLetters (String, String)
---   | SwapPositions (Int, Int)
---   | RotateLeft Int
---   | RotateRight Int
---   | RotatePosition Char
---   | ReversePositions (Int, Int)
---   | MovePosition (Int, Int)
-
 type alias Model = 
   { state : PasswordState
   , password : String
@@ -152,32 +143,6 @@ rotate based on position of letter f
 rotate left 7 steps
 rotate based on position of letter e
 swap position 6 with position 1"""
-
--- tryParseSwapLetters : String -> Maybe Operation
--- tryParseSwapLetters s = 
---   case s |> String.split " " of 
---     [ _, _, s1, _, _, s2 ] -> 
---       case (String.toInt s1, String.toInt s2) of 
---         (Just )
-
--- tryParse : String -> Maybe Operation 
--- tryParse s = 
---   if s |> String.startsWith "swap letter" then 
---     tryParseSwapLetters s 
---   else if s |> String.startsWith "swap position" then 
---     tryParseSwapPositions s 
---   else if s |> String.startsWith "rotate left" then 
---     tryParseRotateLeft s 
---   else if s |> String.startsWith "rotate right" then 
---     tryParseRotateRight s 
---   else if s |> String.startsWith "rotate based" then 
---     tryParseRotatePosition s 
---   else if s |> String.startsWith "reverse positions" then 
---     tryParseReversePositions s 
---   else if s |> String.startsWith "move position" then 
---     tryParseMovePosition s 
---   else 
---     Nothing
 
 initModel : PasswordState -> Bool -> Model 
 initModel state descramble = 
