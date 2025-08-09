@@ -7,7 +7,7 @@ TODO:
 2020/04: Combine F# solutions.
 2020/13: Combine F# solutions. 
 2020/14: Combine F# solutions. 
-2020/17: Combine F# solutions, convert to fsx. 
+2020/17: Combine F# solutions? 3D/4D. 
 2020/18: Combine F# solutions. 
 2021/02: Combine F# solutions.
 2021/05: Combine F# solutions.

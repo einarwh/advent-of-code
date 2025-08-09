@@ -1,3 +1,6 @@
+// Advent of Code 2017. Day 17: Conway Cubes. Part 1.
+// dotnet fsi aoc17a.fsx
+
 open System.IO
 
 type Cell = int*int*int
@@ -57,13 +60,13 @@ let rec times n fn =
     if n < 1 then id
     else fn >> (times (n-1) fn)
         
-[<EntryPoint>]
-let main argv =
-    let lines = File.ReadAllLines "input.txt" |> Array.toList |> List.filter (fun s -> s.Length > 0)
+let run fileName =
+    let lines = File.ReadAllLines fileName |> Array.toList |> List.filter (fun s -> s.Length > 0)
     let startCells = lines |> List.mapi (fun i line -> readCells (i, line)) |> List.collect id
     let grid =
         startCells
         |> Grid.initWith
         |> times 6 Grid.evolve
-    printfn "Cells: %A" (Grid.count grid)
-    0 
+    printfn "Cells: %d" (Grid.count grid)
+
+run "input.txt"
