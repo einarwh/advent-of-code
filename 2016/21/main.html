@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>My Elm App</title>
+    <script src="aoc21.js"></script>
+    <style>
+      .mark-ok {
+        background: #afe1af;
+      }
+      .mark-err {
+        background: #faa0a0;
+      }
+      .greyed {
+        color: #808080;
+      }
+      @media (prefers-color-scheme: dark) {
+        .mark-err.adaptive {
+          background: #e34444;
+        }
+        .mark-ok.adaptive {
+          background: #3e9c3e;
+        }
+        .greyed.adaptive {
+          color: #d0d0d0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="elm-app"></div>
+    <script>
+      function lambda() {
+        const app = Elm.Main.init({
+          node: document.getElementById("elm-app"),
+        });
+      }
+      document.addEventListener("DOMContentLoaded", lambda);
+    </script>
+  </body>
+</html>
