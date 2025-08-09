@@ -203,6 +203,15 @@ let scrambleAll (password : string) operations =
     let scrambled = loop (password |> Seq.toList) operations
     new string(scrambled |> List.toArray)
 
+let unscrambleAll (password : string) operations =
+    let rec loop pwd ops =
+        match ops with
+        | [] -> pwd
+        | op :: rest ->
+            loop (unscramble op pwd) rest
+    let scrambled = loop (password |> Seq.toList) operations
+    new string(scrambled |> List.toArray)
+
 // let inverse op = 
 //     match op with 
 //     | SwapLetters (_, _) -> op 
@@ -316,11 +325,13 @@ let run fileName =
     let operations = lines |> List.choose tryParse
     let password = "abcdefgh"
     let testPwd = "abcde"
+    let scrambled = "fbgdceah"
     verifySample()
     verifyInput()
     verifyRotatePosition()
     verifyUnscramble()
-    scrambleAll password operations |> printfn "scrambled! %s"
+    scrambleAll password operations |> printfn "part 1: %s"
+    unscrambleAll scrambled (List.rev operations) |> printfn "part 2: %s"
     // password |> printfn "%s"
     // "Not solved." |> printfn "%s"
 
