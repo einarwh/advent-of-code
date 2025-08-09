@@ -98,30 +98,49 @@ let fillFromPosition (positions : Set<Pos>) startPos =
     let positionsToAdd = Set.empty |> Set.add startPos 
     fill positions positionsToAdd Set.empty
 
-let tryFindTree (positions : Pos list)  =
+let tryFindTreeSlow (positions : Pos list)  =
     let rec loop posList = 
         match posList with 
-        | [] -> None  
+        | [] -> false  
         | pos :: remaining -> 
             let possible = Set.ofList remaining
             let (connected, updatedPossible) = fillFromPosition possible pos 
             if Set.count connected > 100 then 
-                Some connected 
+                true
             else 
                 let rem = updatedPossible |> Set.toList 
                 loop rem 
     loop positions
 
-let findTree width height robots = 
+let longLine posSet (xStart, y) = 
+  [ xStart .. (xStart + 10) ] |> List.forall (fun x -> Set.contains (x, y) posSet)
+
+let checkEasterEgg (posList : Pos list)  = 
+  let 
+    posSet = posList |> Set.ofList 
+  in 
+    posList |> List.exists (longLine posSet)
+
+let findTreeSlow width height robots = 
     let clock = Stopwatch.StartNew()
     let rec loop seconds robots = 
         if seconds > 0 && seconds % 100 = 0 then printfn "Simulated %d 'seconds' in %d seconds" seconds ((int) clock.Elapsed.TotalSeconds)
         let positions = robots |> List.map (fun r -> r.p)
-        match tryFindTree positions with 
-        | Some connected -> 
+        if tryFindTreeSlow positions then 
             printfn "Is this a tree? After %d 'seconds'." seconds 
             visualize width height robots
-        | None -> 
+        else
+            let moved = simulate width height 1 robots 
+            loop (seconds + 1) moved 
+    loop 0 robots 
+
+let findTreeFast width height robots = 
+    let rec loop seconds robots = 
+        let positions = robots |> List.map (fun r -> r.p)
+        if checkEasterEgg positions then 
+            printfn "Is this a tree? After %d 'seconds'." seconds 
+            visualize width height robots
+        else 
             let moved = simulate width height 1 robots 
             loop (seconds + 1) moved 
     loop 0 robots 
@@ -131,7 +150,7 @@ let run width height searchForTree fileName =
     let robots = lines |> List.map parseRobot
     let moved = robots |> simulate width height 100
     moved |> calculateSafetyFactor width height |> printfn "%A"
-    if searchForTree then findTree width height robots 
+    if searchForTree then findTreeFast width height robots 
 
 // run 11 7 false "sample.txt"
 // run 101 103 true "input.txt"
