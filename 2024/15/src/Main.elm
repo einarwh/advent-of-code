@@ -506,6 +506,29 @@ toRowElements rowText =
     _ -> 
         [ Html.text rowText, Html.br [] [] ]
 
+toStyledHtmlElement : String -> Html Msg
+toStyledHtmlElement symbol = 
+  let
+    cssClass = 
+      case symbol of 
+        "." -> "draw-empty adaptive"
+        "#" -> "draw-wall adaptive"
+        "O" -> "draw-brown adaptive"
+        "[" -> "draw-brown adaptive"
+        "]" -> "draw-brown adaptive"
+        "@" -> "draw-hero adaptive"
+        _ -> "draw adaptive"
+  in
+    Html.span [ Html.Attributes.class cssClass ]  [ Html.text symbol ]
+
+toStyledRowElements : String -> List (Html Msg)
+toStyledRowElements rowText = 
+  let
+    chars = rowText |> String.toList   
+    elements = chars |> List.map (String.fromChar >> toStyledHtmlElement) 
+  in
+    List.append elements [ Html.br [] [] ]
+
 isBox wh (x, y) = 
   if (Array2D.get y x wh == Just 'O' || Array2D.get y x wh == Just '[') then Just (x, y) else Nothing
 
@@ -516,7 +539,7 @@ view model =
     warehouse = model.warehouse
     rows = toWarehouseRows warehouse
     -- Insert robot symbol.
-    elements = rows |> List.concatMap (toRowElements)
+    elements = rows |> List.concatMap (toStyledRowElements)
 
     gpsSum = 
       if List.isEmpty model.moves then

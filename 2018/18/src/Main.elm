@@ -313,12 +313,24 @@ toCharElement area (x, y) =
   in  
     Html.text symbol
 
+toStyledCharElement : Area -> Pos -> Html Msg 
+toStyledCharElement area (x, y) = 
+  let 
+    symbol = getAcreSymbolAtPos area (x, y) |> String.fromChar
+    cssClass =
+      case symbol of 
+        "|" -> "draw-dark-green adaptive"
+        "#" -> "draw-brown adaptive"
+        _ -> "draw-empty adaptive"
+  in  
+    Html.span [ Html.Attributes.class cssClass ]  [ Html.text symbol ]
+
 view : Model -> Html Msg
 view model =
   let
     area = model.area
     nestedPositions = getNestedPositions area
-    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement area))
+    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toStyledCharElement area))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
     resourceValue = getResourceValue area 
     prognosisStr =

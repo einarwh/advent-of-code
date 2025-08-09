@@ -7157,38 +7157,60 @@ var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$br = _VirtualDom_node('br');
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$span = _VirtualDom_node('span');
-var $author$project$Main$toRowElements = function (rowText) {
-	var _v0 = A2($elm$core$String$split, '@', rowText);
-	if ((_v0.b && _v0.b.b) && (!_v0.b.b.b)) {
-		var before = _v0.a;
-		var _v1 = _v0.b;
-		var after = _v1.a;
-		var player = A2(
-			$elm$html$Html$span,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$class('hero adaptive')
-				]),
-			_List_fromArray(
-				[
-					$elm$html$Html$text('@')
-				]));
-		return _List_fromArray(
+var $author$project$Main$toStyledHtmlElement = function (symbol) {
+	var cssClass = function () {
+		switch (symbol) {
+			case '.':
+				return 'draw-empty adaptive';
+			case '#':
+				return 'draw-wall adaptive';
+			case 'O':
+				return 'draw-brown adaptive';
+			case '[':
+				return 'draw-brown adaptive';
+			case ']':
+				return 'draw-brown adaptive';
+			case '@':
+				return 'draw-hero adaptive';
+			default:
+				return 'draw adaptive';
+		}
+	}();
+	return A2(
+		$elm$html$Html$span,
+		_List_fromArray(
 			[
-				$elm$html$Html$text(before),
-				player,
-				$elm$html$Html$text(after),
-				A2($elm$html$Html$br, _List_Nil, _List_Nil)
-			]);
-	} else {
-		return _List_fromArray(
+				$elm$html$Html$Attributes$class(cssClass)
+			]),
+		_List_fromArray(
 			[
-				$elm$html$Html$text(rowText),
+				$elm$html$Html$text(symbol)
+			]));
+};
+var $author$project$Main$toStyledRowElements = function (rowText) {
+	var chars = $elm$core$String$toList(rowText);
+	var elements = A2(
+		$elm$core$List$map,
+		A2($elm$core$Basics$composeR, $elm$core$String$fromChar, $author$project$Main$toStyledHtmlElement),
+		chars);
+	return A2(
+		$elm$core$List$append,
+		elements,
+		_List_fromArray(
+			[
 				A2($elm$html$Html$br, _List_Nil, _List_Nil)
-			]);
-	}
+			]));
 };
 var $elm$core$String$fromList = _String_fromList;
 var $author$project$Main$toWarehouseRows = function (warehouse) {
@@ -7234,7 +7256,7 @@ var $author$project$Main$view = function (model) {
 			return '?';
 		}
 	}();
-	var elements = A2($elm$core$List$concatMap, $author$project$Main$toRowElements, rows);
+	var elements = A2($elm$core$List$concatMap, $author$project$Main$toStyledRowElements, rows);
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(

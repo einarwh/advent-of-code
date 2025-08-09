@@ -6499,6 +6499,7 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
@@ -6515,7 +6516,8 @@ var $author$project$Main$getAcreSymbolAtPos = F2(
 			return '.';
 		}
 	});
-var $author$project$Main$toCharElement = F2(
+var $elm$html$Html$span = _VirtualDom_node('span');
+var $author$project$Main$toStyledCharElement = F2(
 	function (area, _v0) {
 		var x = _v0.a;
 		var y = _v0.b;
@@ -6524,7 +6526,26 @@ var $author$project$Main$toCharElement = F2(
 				$author$project$Main$getAcreSymbolAtPos,
 				area,
 				_Utils_Tuple2(x, y)));
-		return $elm$html$Html$text(symbol);
+		var cssClass = function () {
+			switch (symbol) {
+				case '|':
+					return 'draw-dark-green adaptive';
+				case '#':
+					return 'draw-brown adaptive';
+				default:
+					return 'draw-empty adaptive';
+			}
+		}();
+		return A2(
+			$elm$html$Html$span,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class(cssClass)
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text(symbol)
+				]));
 	});
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
@@ -6553,7 +6574,7 @@ var $author$project$Main$view = function (model) {
 		function (positions) {
 			return A2(
 				$elm$core$List$map,
-				$author$project$Main$toCharElement(area),
+				$author$project$Main$toStyledCharElement(area),
 				positions);
 		},
 		nestedPositions);
