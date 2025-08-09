@@ -5214,7 +5214,7 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$document = _Browser_document;
 var $author$project$Aoc21$PlainText = 1;
-var $author$project$Aoc21$defaultTickInterval = 10;
+var $author$project$Aoc21$defaultTickInterval = 100;
 var $author$project$Aoc21$input = 'rotate right 4 steps\nswap letter b with letter e\nswap position 1 with position 3\nreverse positions 0 through 4\nrotate left 5 steps\nswap position 6 with position 5\nmove position 3 to position 2\nmove position 6 to position 5\nreverse positions 1 through 4\nrotate based on position of letter e\nreverse positions 3 through 7\nreverse positions 4 through 7\nrotate left 1 step\nreverse positions 2 through 6\nswap position 7 with position 5\nswap letter e with letter c\nswap letter f with letter d\nswap letter a with letter e\nswap position 2 with position 7\nswap position 1 with position 7\nswap position 6 with position 3\nswap letter g with letter h\nreverse positions 2 through 5\nrotate based on position of letter f\nrotate left 1 step\nrotate right 2 steps\nreverse positions 2 through 7\nreverse positions 5 through 6\nrotate left 6 steps\nmove position 2 to position 6\nrotate based on position of letter a\nrotate based on position of letter a\nswap letter f with letter a\nrotate right 5 steps\nreverse positions 0 through 4\nswap letter d with letter c\nswap position 4 with position 7\nswap letter f with letter h\nswap letter h with letter a\nrotate left 0 steps\nrotate based on position of letter e\nswap position 5 with position 4\nswap letter e with letter h\nswap letter h with letter d\nrotate right 2 steps\nrotate right 3 steps\nswap position 1 with position 7\nswap letter b with letter e\nswap letter b with letter e\nrotate based on position of letter e\nrotate based on position of letter h\nswap letter a with letter h\nmove position 7 to position 2\nrotate left 2 steps\nmove position 3 to position 2\nswap position 4 with position 6\nrotate right 7 steps\nreverse positions 1 through 4\nmove position 7 to position 0\nmove position 2 to position 0\nreverse positions 4 through 6\nrotate left 3 steps\nrotate left 7 steps\nmove position 2 to position 3\nrotate left 6 steps\nswap letter a with letter h\nrotate based on position of letter f\nswap letter f with letter c\nswap position 3 with position 0\nreverse positions 1 through 3\nswap letter h with letter a\nswap letter b with letter a\nreverse positions 2 through 3\nrotate left 5 steps\nswap position 7 with position 5\nrotate based on position of letter g\nrotate based on position of letter h\nrotate right 6 steps\nswap letter a with letter e\nswap letter b with letter g\nmove position 4 to position 6\nmove position 6 to position 5\nrotate based on position of letter e\nreverse positions 2 through 6\nswap letter c with letter f\nswap letter h with letter g\nmove position 7 to position 2\nreverse positions 1 through 7\nreverse positions 1 through 2\nrotate right 0 steps\nmove position 5 to position 6\nswap letter f with letter a\nmove position 3 to position 1\nmove position 2 to position 4\nreverse positions 1 through 2\nswap letter g with letter c\nrotate based on position of letter f\nrotate left 7 steps\nrotate based on position of letter e\nswap position 6 with position 1';
 var $author$project$Aoc21$inputPlain = 'abcdefgh';
 var $author$project$Aoc21$inputScrambled = 'fbgdceah';
@@ -5679,11 +5679,19 @@ var $author$project$Aoc21$Scrambled = 0;
 var $author$project$Aoc21$updateReset = function (model) {
 	return A2($author$project$Aoc21$initModel, model.q, model.s);
 };
-var $author$project$Aoc21$descramblePassword = F2(
-	function (op, pwd) {
-		return pwd;
+var $author$project$Aoc21$movePosition = F3(
+	function (pos1, pos2, pwd) {
+		var ch = A3($elm$core$String$slice, pos1, pos1 + 1, pwd);
+		var before1 = A2($elm$core$String$left, pos1, pwd);
+		var after1 = A2($elm$core$String$dropLeft, pos1 + 1, pwd);
+		var removed = _Utils_ap(before1, after1);
+		var after2 = A2($elm$core$String$dropLeft, pos2, removed);
+		var before2 = A2($elm$core$String$left, pos2, removed);
+		return _Utils_ap(
+			before2,
+			_Utils_ap(ch, after2));
 	});
-var $author$project$Aoc21$tryMovePosition = F2(
+var $author$project$Aoc21$tryMovePositionInverse = F2(
 	function (op, pwd) {
 		var _v0 = A2($elm$core$String$split, ' ', op);
 		if ((((((_v0.b && _v0.b.b) && _v0.b.b.b) && _v0.b.b.b.b) && _v0.b.b.b.b.b) && _v0.b.b.b.b.b.b) && (!_v0.b.b.b.b.b.b.b)) {
@@ -5700,15 +5708,7 @@ var $author$project$Aoc21$tryMovePosition = F2(
 			if ((!_v6.a.$) && (!_v6.b.$)) {
 				var pos1 = _v6.a.a;
 				var pos2 = _v6.b.a;
-				var ch = A3($elm$core$String$slice, pos1, pos1 + 1, pwd);
-				var before1 = A2($elm$core$String$left, pos1, pwd);
-				var after1 = A2($elm$core$String$dropLeft, pos1 + 1, pwd);
-				var removed = _Utils_ap(before1, after1);
-				var after2 = A2($elm$core$String$dropLeft, pos2, removed);
-				var before2 = A2($elm$core$String$left, pos2, removed);
-				return _Utils_ap(
-					before2,
-					_Utils_ap(ch, after2));
+				return A3($author$project$Aoc21$movePosition, pos2, pos1, pwd);
 			} else {
 				return pwd;
 			}
@@ -5756,41 +5756,7 @@ var $author$project$Aoc21$tryReversePositions = F2(
 			return pwd;
 		}
 	});
-var $author$project$Aoc21$rotateLeft = F2(
-	function (steps, pwd) {
-		var right = A2($elm$core$String$dropLeft, steps, pwd);
-		var left = A2($elm$core$String$left, steps, pwd);
-		return _Utils_ap(right, left);
-	});
-var $author$project$Aoc21$tryRotateLeft = F2(
-	function (op, pwd) {
-		var _v0 = A2($elm$core$String$split, ' ', op);
-		if ((((_v0.b && _v0.b.b) && _v0.b.b.b) && _v0.b.b.b.b) && (!_v0.b.b.b.b.b)) {
-			var _v1 = _v0.b;
-			var _v2 = _v1.b;
-			var str = _v2.a;
-			var _v3 = _v2.b;
-			var _v4 = $elm$core$String$toInt(str);
-			if (!_v4.$) {
-				var steps = _v4.a;
-				return A2($author$project$Aoc21$rotateLeft, steps, pwd);
-			} else {
-				return pwd;
-			}
-		} else {
-			return pwd;
-		}
-	});
-var $elm$core$Basics$ge = _Utils_ge;
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
+var $author$project$Aoc21$tryReversePositionsInverse = $author$project$Aoc21$tryReversePositions;
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
@@ -5812,26 +5778,6 @@ var $author$project$Aoc21$rotateRight = F2(
 		var left = A2($elm$core$String$dropRight, steps, pwd);
 		return _Utils_ap(right, left);
 	});
-var $author$project$Aoc21$tryRotatePosition = F2(
-	function (op, pwd) {
-		var _v0 = $elm$core$List$head(
-			$elm$core$List$reverse(
-				A2($elm$core$String$split, ' ', op)));
-		if (!_v0.$) {
-			var letter = _v0.a;
-			var _v1 = $elm$core$List$head(
-				A2($elm$core$String$indexes, letter, pwd));
-			if (!_v1.$) {
-				var ix = _v1.a;
-				var steps = (ix >= 4) ? (ix + 2) : (ix + 1);
-				return A2($author$project$Aoc21$rotateRight, steps, pwd);
-			} else {
-				return pwd;
-			}
-		} else {
-			return pwd;
-		}
-	});
 var $author$project$Aoc21$tryRotateRight = F2(
 	function (op, pwd) {
 		var _v0 = A2($elm$core$String$split, ' ', op);
@@ -5851,6 +5797,65 @@ var $author$project$Aoc21$tryRotateRight = F2(
 			return pwd;
 		}
 	});
+var $author$project$Aoc21$tryRotateLeftInverse = $author$project$Aoc21$tryRotateRight;
+var $elm$core$Basics$ge = _Utils_ge;
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$Basics$modBy = _Basics_modBy;
+var $author$project$Aoc21$rotateLeft = F2(
+	function (steps, pwd) {
+		var right = A2($elm$core$String$dropLeft, steps, pwd);
+		var left = A2($elm$core$String$left, steps, pwd);
+		return _Utils_ap(right, left);
+	});
+var $author$project$Aoc21$tryRotatePositionInverse = F2(
+	function (op, pwd) {
+		var _v0 = $elm$core$List$head(
+			$elm$core$List$reverse(
+				A2($elm$core$String$split, ' ', op)));
+		if (!_v0.$) {
+			var letter = _v0.a;
+			var _v1 = $elm$core$List$head(
+				A2($elm$core$String$indexes, letter, pwd));
+			if (!_v1.$) {
+				var ix = _v1.a;
+				var reversedIx = (!ix) ? ((((2 * $elm$core$String$length(pwd)) - 2) / 2) | 0) : ((!A2($elm$core$Basics$modBy, 2, ix)) ? ((((ix + $elm$core$String$length(pwd)) - 2) / 2) | 0) : (((ix - 1) / 2) | 0));
+				var steps = (reversedIx >= 4) ? (reversedIx + 2) : (reversedIx + 1);
+				return A2($author$project$Aoc21$rotateLeft, steps, pwd);
+			} else {
+				return pwd;
+			}
+		} else {
+			return pwd;
+		}
+	});
+var $author$project$Aoc21$tryRotateLeft = F2(
+	function (op, pwd) {
+		var _v0 = A2($elm$core$String$split, ' ', op);
+		if ((((_v0.b && _v0.b.b) && _v0.b.b.b) && _v0.b.b.b.b) && (!_v0.b.b.b.b.b)) {
+			var _v1 = _v0.b;
+			var _v2 = _v1.b;
+			var str = _v2.a;
+			var _v3 = _v2.b;
+			var _v4 = $elm$core$String$toInt(str);
+			if (!_v4.$) {
+				var steps = _v4.a;
+				return A2($author$project$Aoc21$rotateLeft, steps, pwd);
+			} else {
+				return pwd;
+			}
+		} else {
+			return pwd;
+		}
+	});
+var $author$project$Aoc21$tryRotateRightInverse = $author$project$Aoc21$tryRotateLeft;
 var $elm$core$String$replace = F3(
 	function (before, after, string) {
 		return A2(
@@ -5886,6 +5891,7 @@ var $author$project$Aoc21$trySwapLetters = F2(
 			return pwd;
 		}
 	});
+var $author$project$Aoc21$trySwapLettersInverse = $author$project$Aoc21$trySwapLetters;
 var $author$project$Aoc21$trySwapPositions = F2(
 	function (op, pwd) {
 		var _v0 = A2($elm$core$String$split, ' ', op);
@@ -5906,6 +5912,56 @@ var $author$project$Aoc21$trySwapPositions = F2(
 				var letter2 = A3($elm$core$String$slice, pos2, pos2 + 1, pwd);
 				var letter1 = A3($elm$core$String$slice, pos1, pos1 + 1, pwd);
 				return A3($author$project$Aoc21$swapLetters, letter1, letter2, pwd);
+			} else {
+				return pwd;
+			}
+		} else {
+			return pwd;
+		}
+	});
+var $author$project$Aoc21$trySwapPositionsInverse = $author$project$Aoc21$trySwapPositions;
+var $author$project$Aoc21$descramblePassword = F2(
+	function (op, pwd) {
+		return A2($elm$core$String$startsWith, 'swap letter', op) ? A2($author$project$Aoc21$trySwapLettersInverse, op, pwd) : (A2($elm$core$String$startsWith, 'swap position', op) ? A2($author$project$Aoc21$trySwapPositionsInverse, op, pwd) : (A2($elm$core$String$startsWith, 'rotate left', op) ? A2($author$project$Aoc21$tryRotateLeftInverse, op, pwd) : (A2($elm$core$String$startsWith, 'rotate right', op) ? A2($author$project$Aoc21$tryRotateRightInverse, op, pwd) : (A2($elm$core$String$startsWith, 'rotate based', op) ? A2($author$project$Aoc21$tryRotatePositionInverse, op, pwd) : (A2($elm$core$String$startsWith, 'reverse positions', op) ? A2($author$project$Aoc21$tryReversePositionsInverse, op, pwd) : (A2($elm$core$String$startsWith, 'move position', op) ? A2($author$project$Aoc21$tryMovePositionInverse, op, pwd) : pwd))))));
+	});
+var $author$project$Aoc21$tryMovePosition = F2(
+	function (op, pwd) {
+		var _v0 = A2($elm$core$String$split, ' ', op);
+		if ((((((_v0.b && _v0.b.b) && _v0.b.b.b) && _v0.b.b.b.b) && _v0.b.b.b.b.b) && _v0.b.b.b.b.b.b) && (!_v0.b.b.b.b.b.b.b)) {
+			var _v1 = _v0.b;
+			var _v2 = _v1.b;
+			var str1 = _v2.a;
+			var _v3 = _v2.b;
+			var _v4 = _v3.b;
+			var _v5 = _v4.b;
+			var str2 = _v5.a;
+			var _v6 = _Utils_Tuple2(
+				$elm$core$String$toInt(str1),
+				$elm$core$String$toInt(str2));
+			if ((!_v6.a.$) && (!_v6.b.$)) {
+				var pos1 = _v6.a.a;
+				var pos2 = _v6.b.a;
+				return A3($author$project$Aoc21$movePosition, pos1, pos2, pwd);
+			} else {
+				return pwd;
+			}
+		} else {
+			return pwd;
+		}
+	});
+var $author$project$Aoc21$tryRotatePosition = F2(
+	function (op, pwd) {
+		var _v0 = $elm$core$List$head(
+			$elm$core$List$reverse(
+				A2($elm$core$String$split, ' ', op)));
+		if (!_v0.$) {
+			var letter = _v0.a;
+			var _v1 = $elm$core$List$head(
+				A2($elm$core$String$indexes, letter, pwd));
+			if (!_v1.$) {
+				var ix = _v1.a;
+				var steps = (ix >= 4) ? (ix + 2) : (ix + 1);
+				return A2($author$project$Aoc21$rotateRight, steps, pwd);
 			} else {
 				return pwd;
 			}

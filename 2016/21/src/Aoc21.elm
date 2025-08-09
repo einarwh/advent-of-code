@@ -9,7 +9,7 @@ import Array exposing (Array)
 import Time
 
 defaultTickInterval : Float
-defaultTickInterval = 10
+defaultTickInterval = 100
 
 -- MAIN
 
@@ -231,6 +231,8 @@ trySwapLetters op pwd =
     _ ->
       pwd
 
+trySwapLettersInverse = trySwapLetters
+
 trySwapPositions : String -> String -> String 
 trySwapPositions op pwd =
   case op |> String.split " " of 
@@ -247,11 +249,21 @@ trySwapPositions op pwd =
     _ ->
       pwd
 
+trySwapPositionsInverse = trySwapPositions
+
 rotateLeft : Int -> String -> String
 rotateLeft steps pwd = 
   let 
     left = String.left steps pwd 
     right = String.dropLeft steps pwd 
+  in 
+    right ++ left
+
+rotateRight : Int -> String -> String
+rotateRight steps pwd = 
+  let 
+    right = String.right steps pwd 
+    left = String.dropRight steps pwd 
   in 
     right ++ left
 
@@ -267,13 +279,7 @@ tryRotateLeft op pwd =
     _ ->
       pwd
 
-rotateRight : Int -> String -> String
-rotateRight steps pwd = 
-  let 
-    right = String.right steps pwd 
-    left = String.dropRight steps pwd 
-  in 
-    right ++ left
+tryRotateLeftInverse = tryRotateRight
 
 tryRotateRight : String -> String -> String 
 tryRotateRight op pwd = 
@@ -287,6 +293,8 @@ tryRotateRight op pwd =
     _ ->
       pwd
 
+tryRotateRightInverse = tryRotateLeft 
+
 tryRotatePosition : String -> String -> String 
 tryRotatePosition op pwd = 
   -- rotate based on position of letter e
@@ -298,6 +306,29 @@ tryRotatePosition op pwd =
             steps = if ix >= 4 then ix + 2 else ix + 1 
           in 
             rotateRight steps pwd 
+        Nothing -> 
+          pwd  
+    Nothing ->
+      pwd 
+
+tryRotatePositionInverse : String -> String -> String 
+tryRotatePositionInverse op pwd = 
+  -- rotate based on position of letter e
+  case op |> String.split " " |> List.reverse |> List.head of 
+    Just letter -> 
+      case pwd |> String.indexes letter |> List.head of 
+        Just ix -> 
+          let
+            reversedIx = 
+              if ix == 0 then 
+                (2 * String.length pwd - 2) // 2
+              else if (ix |> modBy 2) == 0 then 
+                (ix + String.length pwd - 2) // 2
+              else 
+                (ix - 1) // 2        
+            steps = if reversedIx >= 4 then reversedIx + 2 else reversedIx + 1 
+          in 
+            rotateLeft steps pwd 
         Nothing -> 
           pwd  
     Nothing ->
@@ -322,6 +353,20 @@ tryReversePositions op pwd =
     _ ->
       pwd
 
+tryReversePositionsInverse = tryReversePositions
+
+movePosition : Int -> Int -> String -> String
+movePosition pos1 pos2 pwd = 
+  let 
+    ch = String.slice pos1 (pos1 + 1) pwd 
+    before1 = String.left pos1 pwd 
+    after1 = String.dropLeft (pos1 + 1) pwd 
+    removed = before1 ++ after1 
+    before2 = String.left pos2 removed 
+    after2 = String.dropLeft (pos2) removed 
+  in 
+    before2 ++ ch ++ after2
+
 tryMovePosition : String -> String -> String 
 tryMovePosition op pwd =
   -- move position 3 to position 2
@@ -329,15 +374,20 @@ tryMovePosition op pwd =
     [ _, _, str1, _, _, str2 ] -> 
       case (String.toInt str1, String.toInt str2) of 
         (Just pos1, Just pos2) -> 
-          let 
-            ch = String.slice pos1 (pos1 + 1) pwd 
-            before1 = String.left pos1 pwd 
-            after1 = String.dropLeft (pos1 + 1) pwd 
-            removed = before1 ++ after1 
-            before2 = String.left pos2 removed 
-            after2 = String.dropLeft (pos2) removed 
-          in 
-            before2 ++ ch ++ after2
+          movePosition pos1 pos2 pwd 
+        _ -> 
+          pwd 
+    _ ->
+      pwd
+
+tryMovePositionInverse : String -> String -> String 
+tryMovePositionInverse op pwd =
+  -- move position 3 to position 2
+  case op |> String.split " " of 
+    [ _, _, str1, _, _, str2 ] -> 
+      case (String.toInt str1, String.toInt str2) of 
+        (Just pos1, Just pos2) -> 
+          movePosition pos2 pos1 pwd 
         _ -> 
           pwd 
     _ ->
@@ -361,7 +411,23 @@ scramblePassword op pwd =
   else 
     pwd
 
-descramblePassword op pwd = pwd
+descramblePassword op pwd = 
+  if op |> String.startsWith "swap letter" then 
+    trySwapLettersInverse op pwd
+  else if op |> String.startsWith "swap position" then 
+    trySwapPositionsInverse op pwd 
+  else if op |> String.startsWith "rotate left" then 
+    tryRotateLeftInverse op pwd 
+  else if op |> String.startsWith "rotate right" then 
+    tryRotateRightInverse op pwd 
+  else if op |> String.startsWith "rotate based" then 
+    tryRotatePositionInverse op pwd 
+  else if op |> String.startsWith "reverse positions" then 
+    tryReversePositionsInverse op pwd  
+  else if op |> String.startsWith "move position" then 
+    tryMovePositionInverse op pwd 
+  else 
+    pwd
 
 updateStep : Model -> Model
 updateStep model = 
