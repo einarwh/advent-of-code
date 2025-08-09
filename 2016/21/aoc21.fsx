@@ -140,7 +140,7 @@ let movePosition pos1 pos2 password =
     let ch = List.item pos1 password
     password |> List.removeAt pos1 |> List.insertAt pos2 ch
 
-let scramble op password =
+let scrambleChars op password =
     match op with
     | SwapPositions (pos1, pos2) -> swapPositions pos1 pos2 password
     | SwapLetters (ch1, ch2) -> swapLetters ch1 ch2 password
@@ -150,7 +150,10 @@ let scramble op password =
     | ReversePositions (pos1, pos2) -> reversePositions pos1 pos2 password
     | MovePosition (pos1, pos2) -> movePosition pos1 pos2 password
 
-let unscramble op password =
+let scramble password op =
+    new string(scrambleChars op (password |> Seq.toList) |> List.toArray)
+
+let unscrambleChars op password =
     match op with
     | SwapPositions (pos1, pos2) -> swapPositions pos1 pos2 password
     | SwapLetters (ch1, ch2) -> swapLetters ch1 ch2 password
@@ -160,23 +163,8 @@ let unscramble op password =
     | ReversePositions (pos1, pos2) -> reversePositions pos1 pos2 password
     | MovePosition (pos1, pos2) -> movePosition pos2 pos1 password
 
-let scrambleAll (password : string) operations =
-    let rec loop pwd ops =
-        match ops with
-        | [] -> pwd
-        | op :: rest ->
-            loop (scramble op pwd) rest
-    let scrambled = loop (password |> Seq.toList) operations
-    new string(scrambled |> List.toArray)
-
-let unscrambleAll (password : string) operations =
-    let rec loop pwd ops =
-        match ops with
-        | [] -> pwd
-        | op :: rest ->
-            loop (unscramble op pwd) rest
-    let scrambled = loop (password |> Seq.toList) operations
-    new string(scrambled |> List.toArray)
+let unscramble password op =
+    new string(unscrambleChars op (password |> Seq.toList) |> List.toArray)
 
 let readLines =
     File.ReadAllLines
@@ -188,7 +176,7 @@ let run fileName =
     let operations = lines |> List.choose tryParse
     let password = "abcdefgh"
     let scrambled = "fbgdceah"
-    scrambleAll password operations |> printfn "%s"
-    unscrambleAll scrambled (List.rev operations) |> printfn "%s"
+    operations |> List.fold scramble password |> printfn "%s"
+    List.rev operations |> List.fold unscramble scrambled |> printfn "%s"
 
 run "input.txt"
