@@ -16,5 +16,3 @@ TODO:
 2024/14: Faster solution.
 
 Fix PostScript solutions, trim input.
-
-Clean-up 2020.
