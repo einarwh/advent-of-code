@@ -13,7 +13,10 @@
         {
             exch            % F (s) ... |
             closefile       % (s) ... |
-            ]               % | (s) ... |
+            dup length      % l (s) ... | 
+            0 eq            % 0? (s) ... |
+            { pop } if 
+            ]               % | (s)? ... |
             exit
         } ifelse 
     } loop                  % Rs
@@ -228,11 +231,11 @@
 } def
 
 /part-1 {
-    (inputps.txt) read-input find-highest
+    (input.txt) read-input find-highest
 } def 
 
 /part-2 {
-    (inputps.txt) read-input find-my-seat
+    (input.txt) read-input find-my-seat
 } def 
 
 part-1
