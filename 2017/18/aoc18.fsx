@@ -24,10 +24,12 @@ type Instruction =
 type State = Terminated | Waiting | Running 
 
 type Program = {
+    programId : int 
     ptr : int 
     instructions : Instruction array 
     state : State
     duet : bool
+    count : int
     sound : int64
     registers : Map<RegName, int64>
     inbox : Queue<int64> 
@@ -144,11 +146,12 @@ let executeInstruction (inst : Instruction) (program : Program) : Program =
     | Snd r -> 
         let n = readValue r program.registers
         if program.duet then 
+            // printfn "[%d] snd %s | sound <- %d" program.programId r n
             let outbox = program.outbox
-            outbox.Enqueue n 
-            { program with outbox = outbox; ptr = program.ptr + 1 }
+            outbox.Enqueue n
+            { program with outbox = outbox; ptr = program.ptr + 1; count = program.count + 1 }
         else 
-            // printfn "snd %s | sound <- %d" r n
+            // printfn "[%d] snd %s | sound <- %d" program.programId r n
             { program with sound = n; ptr = program.ptr + 1 }
     | Rcv r -> 
         if program.duet then 
@@ -157,6 +160,7 @@ let executeInstruction (inst : Instruction) (program : Program) : Program =
                 { program with state = Waiting }
             else 
                 let received = inbox.Dequeue()
+                // printfn "Program %d received value %d from program %d" program.programId received pid
                 let registers = writeValue r received program.registers
                 { program with registers = registers; ptr = program.ptr + 1 }
         else 
@@ -207,7 +211,8 @@ let executeInstruction (inst : Instruction) (program : Program) : Program =
 let executeProgramStep (program : Program) = 
     match program.state with 
     | Terminated -> program 
-    | Waiting -> program 
+    | Waiting -> 
+        if program.inbox.Count = 0 then program else { program with state = Running}
     | Running -> 
         let ptr = program.ptr 
         if ptr < 0 || ptr >= Array.length program.instructions then 
@@ -219,7 +224,7 @@ let executeProgramStep (program : Program) =
 let rec executeLoop (program : Program) = 
     match program.state with 
     | Terminated -> 
-        printfn "rcv %d" program.sound
+        printfn "%d" program.sound
     | Waiting -> failwith "?" 
     | Running -> 
         program |> executeProgramStep |> executeLoop
@@ -232,26 +237,28 @@ let rec transferMessages (sender : Program, receiver : Program) =
         receiver.inbox.Enqueue(outbox.Dequeue()) 
         transferMessages (sender, receiver)
 
-let rec executeDuetLoop (program1 : Program, program2 : Program) = 
-    match (program1.state, program2.state) with 
+let rec executeDuetLoop (program0 : Program, program1 : Program) = 
+    match (program0.state, program1.state) with 
     | Terminated, Terminated -> 
-        printfn "Terminated."
+        program1.count |> printfn "%d"
     | Waiting, Waiting -> 
-        printfn "Deadlocked"
+        program1.count |> printfn "%d"
     | _ -> 
+        let p0 = executeProgramStep program0
         let p1 = executeProgramStep program1
-        let p2 = executeProgramStep program2
-        let (p11, p22) = transferMessages (p1, p2)
-        let (p222, p111) = transferMessages (p22, p11)
-        executeDuetLoop (p111, p222)
+        let (p00, p11) = transferMessages (p0, p1)
+        let (p111, p000) = transferMessages (p11, p00)
+        executeDuetLoop (p000, p111)
 
-let initProgram duet instructions = 
-    { ptr = 0  
+let initProgram pid duet instructions = 
+    { programId = pid
+      ptr = 0  
       instructions = instructions
       state = Running
       duet = duet
+      count = 0
       sound = 0
-      registers = Map.empty
+      registers = Map.empty |> Map.add "p" pid
       inbox = new Queue<int64>()
       outbox = new Queue<int64>()
     }
@@ -259,10 +266,10 @@ let initProgram duet instructions =
 let run fileName = 
     let lines = readLines fileName
     let instructions = lines |> Array.choose tryParse
-    let program = initProgram false instructions
+    let program = initProgram 0 false instructions
     executeLoop program 
-    let program1 = initProgram true instructions
-    let program2 = initProgram true instructions
-    executeDuetLoop (program1, program2) 
+    let program0 = initProgram 0 true instructions
+    let program1 = initProgram 1 true instructions
+    executeDuetLoop (program0, program1) 
 
 run "input.txt"
