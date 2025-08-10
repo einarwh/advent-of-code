@@ -5223,15 +5223,15 @@ var $author$project$Main$initRowText = function (dataSource) {
 var $author$project$Main$initModel = function (dataSource) {
 	var row = $author$project$Main$initRowText(dataSource);
 	return {
-		x: dataSource,
+		r: dataSource,
 		K: '',
 		L: false,
 		C: _List_Nil,
 		o: true,
-		u: row,
+		v: row,
 		E: 1,
 		F: $author$project$Main$countSafe(row),
-		v: $author$project$Main$defaultTickInterval
+		w: $author$project$Main$defaultTickInterval
 	};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
@@ -5660,7 +5660,7 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (model) {
 	var tickSub = (model.o || model.L) ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.v,
+		model.w,
 		function (_v0) {
 			return 0;
 		});
@@ -5668,7 +5668,7 @@ var $author$project$Main$subscriptions = function (model) {
 };
 var $author$project$Main$Sample = 1;
 var $author$project$Main$updateClear = function (model) {
-	return $author$project$Main$initModel(model.x);
+	return $author$project$Main$initModel(model.r);
 };
 var $author$project$Main$updateDataSource = F2(
 	function (dataSource, model) {
@@ -5913,12 +5913,20 @@ var $elm$core$List$take = F2(
 var $author$project$Main$updateStep = function (model) {
 	var rowCount = model.E + 1;
 	var pause = model.o || ((rowCount === 40) || (rowCount === 400000));
-	var next = $author$project$Main$getNextRow(model.u);
+	var next = $author$project$Main$getNextRow(model.v);
 	var safe = model.F + $author$project$Main$countSafe(next);
+	var cap = function () {
+		var _v0 = model.r;
+		if (!_v0) {
+			return 24;
+		} else {
+			return 10;
+		}
+	}();
 	var history = A2(
 		$elm$core$List$take,
-		24,
-		A2($elm$core$List$cons, model.u, model.C));
+		cap,
+		A2($elm$core$List$cons, model.v, model.C));
 	return _Utils_update(
 		model,
 		{
@@ -5926,7 +5934,7 @@ var $author$project$Main$updateStep = function (model) {
 				$elm$core$String$length(next)),
 			C: history,
 			o: pause,
-			u: next,
+			v: next,
 			E: rowCount,
 			F: safe
 		});
@@ -5956,13 +5964,13 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{v: model.v / 2}),
+						{w: model.w / 2}),
 					$elm$core$Platform$Cmd$none);
 			case 4:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{v: model.v * 2}),
+						{w: model.w * 2}),
 					$elm$core$Platform$Cmd$none);
 			case 2:
 				return _Utils_Tuple2(
@@ -6094,14 +6102,14 @@ var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$view = function (model) {
 	var textFontSize = function () {
-		var _v0 = model.x;
+		var _v0 = model.r;
 		if (_v0 === 1) {
 			return '24px';
 		} else {
 			return '12px';
 		}
 	}();
-	var rows = A2($elm$core$List$cons, model.u, model.C);
+	var rows = A2($elm$core$List$cons, model.v, model.C);
 	var nestedElements = A2(
 		$elm$core$List$map,
 		function (r) {
@@ -6126,7 +6134,7 @@ var $author$project$Main$view = function (model) {
 		_List_Nil,
 		nestedElements);
 	var debugStr = $elm$core$String$fromInt(
-		$elm$core$String$length(model.u));
+		$elm$core$String$length(model.v));
 	var dbg = '?';
 	return A2(
 		$elm$html$Html$table,
@@ -6217,7 +6225,7 @@ var $author$project$Main$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(7),
-										$elm$html$Html$Attributes$checked(!model.x)
+										$elm$html$Html$Attributes$checked(!model.r)
 									]),
 								_List_Nil),
 								A2(
@@ -6233,7 +6241,7 @@ var $author$project$Main$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(6),
-										$elm$html$Html$Attributes$checked(model.x === 1)
+										$elm$html$Html$Attributes$checked(model.r === 1)
 									]),
 								_List_Nil),
 								A2(

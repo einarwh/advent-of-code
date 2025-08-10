@@ -120,7 +120,11 @@ updateStep : Model -> Model
 updateStep model = 
   let 
     next = getNextRow model.row 
-    history = (model.row :: model.history) |> List.take 24
+    cap = 
+      case model.dataSource of 
+        Input -> 24 
+        Sample -> 10
+    history = (model.row :: model.history) |> List.take cap
     safe = model.safe + countSafe next
     rowCount = model.rowCount + 1
     pause = model.paused || rowCount == 40 || rowCount == 400000
