@@ -165,7 +165,7 @@ let executeInstruction (inst : Instruction) (program : Program) : Program =
                 // printfn "rcv skipped"
                 { program with ptr = program.ptr + 1 }
             else 
-                printfn "rcv %d" program.sound
+                // printfn "rcv %d" program.sound
                 { program with state = Terminated }
     | Set (r, v) -> 
         let n = resolveValue v program.registers
@@ -218,10 +218,32 @@ let executeProgramStep (program : Program) =
 
 let rec executeLoop (program : Program) = 
     match program.state with 
-    | Terminated -> program 
-    | Waiting -> program 
+    | Terminated -> 
+        printfn "rcv %d" program.sound
+    | Waiting -> failwith "?" 
     | Running -> 
         program |> executeProgramStep |> executeLoop
+
+let rec transferMessages (sender : Program, receiver : Program) = 
+    let outbox = sender.outbox
+    if outbox.Count = 0 then 
+        (sender, receiver)
+    else 
+        receiver.inbox.Enqueue(outbox.Dequeue()) 
+        transferMessages (sender, receiver)
+
+let rec executeDuetLoop (program1 : Program, program2 : Program) = 
+    match (program1.state, program2.state) with 
+    | Terminated, Terminated -> 
+        printfn "Terminated."
+    | Waiting, Waiting -> 
+        printfn "Deadlocked"
+    | _ -> 
+        let p1 = executeProgramStep program1
+        let p2 = executeProgramStep program2
+        let (p11, p22) = transferMessages (p1, p2)
+        let (p222, p111) = transferMessages (p22, p11)
+        executeDuetLoop (p111, p222)
 
 let initProgram duet instructions = 
     { ptr = 0  
@@ -238,6 +260,9 @@ let run fileName =
     let lines = readLines fileName
     let instructions = lines |> Array.choose tryParse
     let program = initProgram false instructions
-    executeLoop program |> ignore 
+    executeLoop program 
+    let program1 = initProgram true instructions
+    let program2 = initProgram true instructions
+    executeDuetLoop (program1, program2) 
 
 run "input.txt"
