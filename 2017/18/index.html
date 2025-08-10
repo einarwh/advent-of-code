@@ -2735,7 +2735,7 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 	return {
 		q: func(record.q),
 		X: record.X,
-		S: record.S
+		T: record.T
 	}
 });
 
@@ -3007,7 +3007,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.X;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.S) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.T) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3997,7 +3997,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 		impl.aQ,
 		impl.aO,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.U && impl.U(sendToApp)
+			var divertHrefToApp = impl.V && impl.V(sendToApp)
 			var view = impl.aR;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
@@ -4072,7 +4072,7 @@ function _Browser_application(impl)
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		U: function(sendToApp)
+		V: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -5380,7 +5380,7 @@ var $author$project$Aoc18$initRegisters = F2(
 var $author$project$Aoc18$initProgram = F2(
 	function (pid, regNames) {
 		var registers = A2($author$project$Aoc18$initRegisters, pid, regNames);
-		return {G: $owanturist$elm_queue$Queue$empty, N: $owanturist$elm_queue$Queue$empty, R: pid, a: 0, b: registers, O: 0, V: 0, x: 0};
+		return {G: $owanturist$elm_queue$Queue$empty, N: $owanturist$elm_queue$Queue$empty, S: pid, a: 0, b: registers, O: 0, P: $elm$core$Maybe$Nothing, x: 0};
 	});
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
@@ -5670,7 +5670,7 @@ var $author$project$Aoc18$initModel = function (duet) {
 		u: $author$project$Aoc18$instructions,
 		B: true,
 		C: A2($author$project$Aoc18$initProgram, 0, $author$project$Aoc18$registerNames),
-		T: A2($author$project$Aoc18$initProgram, 1, $author$project$Aoc18$registerNames),
+		U: A2($author$project$Aoc18$initProgram, 1, $author$project$Aoc18$registerNames),
 		y: $author$project$Aoc18$defaultTickInterval
 	};
 };
@@ -6109,7 +6109,10 @@ var $author$project$Aoc18$executeInstruction = F3(
 				} else {
 					return _Utils_update(
 						program,
-						{a: program.a + 1, V: n});
+						{
+							a: program.a + 1,
+							P: $elm$core$Maybe$Just(n)
+						});
 				}
 			case 1:
 				var r = inst.a;
@@ -6451,8 +6454,8 @@ var $author$project$Aoc18$unparse = function (inst) {
 			return 'jgz ' + ($author$project$Aoc18$unparseValue(v) + (' ' + $author$project$Aoc18$unparseValue(w)));
 	}
 };
-var $author$project$Aoc18$programTable = F2(
-	function (instArr, program) {
+var $author$project$Aoc18$programTable = F3(
+	function (duet, instArr, program) {
 		var stateStr = function () {
 			var _v0 = program.x;
 			switch (_v0) {
@@ -6470,7 +6473,7 @@ var $author$project$Aoc18$programTable = F2(
 			$elm$core$List$map,
 			$author$project$Aoc18$toRegisterElement,
 			$elm$core$Dict$toList(program.b));
-		var programStr = 'program ' + $elm$core$String$fromInt(program.R);
+		var programStr = 'program ' + $elm$core$String$fromInt(program.S);
 		var pointerStr = 'ptr: ' + $elm$core$String$fromInt(program.a);
 		var instStr = A2(
 			$elm$core$Maybe$withDefault,
@@ -6479,18 +6482,33 @@ var $author$project$Aoc18$programTable = F2(
 				$elm$core$Maybe$map,
 				$author$project$Aoc18$unparse,
 				A2($elm$core$Array$get, program.a, instArr)));
-		var inboxElements = A2(
-			$elm$core$List$map,
-			$author$project$Aoc18$toMessageElement,
-			$owanturist$elm_queue$Queue$toList(program.G));
 		var brElement = A2($elm$html$Html$br, _List_Nil, _List_Nil);
-		var inboxCellElements = A2(
-			$elm$core$List$intersperse,
-			brElement,
-			A2(
-				$elm$core$List$cons,
-				$elm$html$Html$text('inbox'),
-				inboxElements));
+		var cellElements = function () {
+			if (duet) {
+				var inboxElements = A2(
+					$elm$core$List$map,
+					$author$project$Aoc18$toMessageElement,
+					$owanturist$elm_queue$Queue$toList(program.G));
+				return A2(
+					$elm$core$List$intersperse,
+					brElement,
+					A2(
+						$elm$core$List$cons,
+						$elm$html$Html$text('inbox'),
+						inboxElements));
+			} else {
+				var soundStr = A2(
+					$elm$core$Maybe$withDefault,
+					'?',
+					A2($elm$core$Maybe$map, $elm$core$String$fromInt, program.P));
+				return _List_fromArray(
+					[
+						$elm$html$Html$text('sound'),
+						brElement,
+						$elm$html$Html$text(soundStr)
+					]);
+			}
+		}();
 		var regCellElements = A2(
 			$elm$core$List$intersperse,
 			brElement,
@@ -6503,7 +6521,7 @@ var $author$project$Aoc18$programTable = F2(
 			_List_fromArray(
 				[
 					A2($elm$html$Html$Attributes$style, 'border', 'solid'),
-					A2($elm$html$Html$Attributes$style, 'width', '200px')
+					A2($elm$html$Html$Attributes$style, 'width', '220px')
 				]),
 			_List_fromArray(
 				[
@@ -6601,7 +6619,7 @@ var $author$project$Aoc18$programTable = F2(
 									A2($elm$html$Html$Attributes$style, 'padding', '4px 10px'),
 									A2($elm$html$Html$Attributes$style, 'border', 'solid')
 								]),
-							inboxCellElements)
+							cellElements)
 						]))
 				]));
 	});
@@ -6621,14 +6639,14 @@ var $author$project$Aoc18$duetTable = function (model) {
 						_List_Nil,
 						_List_fromArray(
 							[
-								A2($author$project$Aoc18$programTable, model.u, model.C)
+								A3($author$project$Aoc18$programTable, true, model.u, model.C)
 							])),
 						A2(
 						$elm$html$Html$td,
 						_List_Nil,
 						_List_fromArray(
 							[
-								A2($author$project$Aoc18$programTable, model.u, model.T)
+								A3($author$project$Aoc18$programTable, true, model.u, model.U)
 							]))
 					]))
 			]));
@@ -6649,7 +6667,7 @@ var $author$project$Aoc18$singleTable = function (model) {
 						_List_Nil,
 						_List_fromArray(
 							[
-								A2($author$project$Aoc18$programTable, model.u, model.C)
+								A3($author$project$Aoc18$programTable, false, model.u, model.C)
 							]))
 					]))
 			]));

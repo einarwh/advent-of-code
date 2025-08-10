@@ -50,7 +50,7 @@ type alias Program =
   , ptr : Int
   , state : State
   , sent : Int
-  , sound : Int
+  , sound : Maybe Int
   , registers : Dict String Int 
   , inbox : Queue Int 
   , outbox : Queue Int }
@@ -219,7 +219,7 @@ initProgram pid regNames =
   , ptr = 0  
   , state = Ready
   , sent = 0
-  , sound = 0
+  , sound = Nothing
   , registers = registers
   , inbox = Queue.empty
   , outbox = Queue.empty }
@@ -283,7 +283,7 @@ executeInstruction duet inst program =
           in 
             { program | outbox = outbox, ptr = ptr, sent = sent }
         else 
-          { program | sound = n, ptr = program.ptr + 1}
+          { program | sound = Just n, ptr = program.ptr + 1}
     Rcv r -> 
       if duet then 
         case program.inbox |> Queue.dequeue of 
@@ -444,8 +444,8 @@ unparse inst =
     Mod (r, v) -> "mod " ++ r ++ " " ++ unparseValue v
     Jgz (v, w) -> "jgz " ++ unparseValue v ++ " " ++ unparseValue w
 
-programTable : Array Instruction -> Program -> Html Msg 
-programTable instArr program = 
+programTable : Bool -> Array Instruction -> Program -> Html Msg 
+programTable duet instArr program = 
   let 
     programStr = "program " ++ String.fromInt program.pid
     pointerStr = "ptr: " ++ String.fromInt program.ptr
@@ -460,13 +460,21 @@ programTable instArr program =
     regElements = program.registers |> Dict.toList |> List.map toRegisterElement     
     regCellElements = 
       (Html.text "registers") :: regElements |> List.intersperse brElement
-    inboxElements = program.inbox |> Queue.toList |> List.map toMessageElement
-    inboxCellElements = 
-      (Html.text "inbox") :: inboxElements |> List.intersperse brElement
+    cellElements = 
+      if duet then 
+        let 
+          inboxElements = program.inbox |> Queue.toList |> List.map toMessageElement
+        in 
+          (Html.text "inbox") :: inboxElements |> List.intersperse brElement
+      else 
+        let 
+          soundStr = program.sound |> Maybe.map String.fromInt |> Maybe.withDefault "?"
+        in 
+          [ Html.text "sound", brElement, Html.text soundStr ]
   in 
     Html.table 
       [ Html.Attributes.style "border" "solid"
-      , Html.Attributes.style "width" "200px" ]
+      , Html.Attributes.style "width" "220px" ]
       [ Html.tr 
           [ ] 
           [ Html.td 
@@ -511,7 +519,7 @@ programTable instArr program =
           [ Html.td 
             [ Html.Attributes.style "padding" "4px 10px"
             , Html.Attributes.style "border" "solid" ] 
-            inboxCellElements
+            cellElements
           ]
     ]
 
@@ -521,7 +529,7 @@ singleTable model =
     []
     [ Html.tr 
         [ ] 
-        [ Html.td [] [ programTable model.instructions model.program0 ] ]
+        [ Html.td [] [ programTable False model.instructions model.program0 ] ]
     ]
 
 duetTable : Model -> Html Msg 
@@ -530,8 +538,8 @@ duetTable model =
     []
     [ Html.tr 
         [] 
-        [ Html.td [] [ programTable model.instructions model.program0 ]
-        , Html.td [] [ programTable model.instructions model.program1] ]
+        [ Html.td [] [ programTable True model.instructions model.program0 ]
+        , Html.td [] [ programTable True model.instructions model.program1] ]
     ]
 
 contentTable : Model -> Html Msg 
