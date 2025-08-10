@@ -141,17 +141,14 @@ let resolveValue (v : Value) (registers : Map<RegName, int64>) : int64 =
         readValue r registers
 
 let executeInstruction (inst : Instruction) (program : Program) : Program = 
-    // printfn "Execute %A" inst
     match inst with 
     | Snd r -> 
         let n = readValue r program.registers
         if program.duet then 
-            // printfn "[%d] snd %s | sound <- %d" program.programId r n
             let outbox = program.outbox
             outbox.Enqueue n
             { program with outbox = outbox; ptr = program.ptr + 1; count = program.count + 1 }
         else 
-            // printfn "[%d] snd %s | sound <- %d" program.programId r n
             { program with sound = n; ptr = program.ptr + 1 }
     | Rcv r -> 
         if program.duet then 
@@ -160,52 +157,40 @@ let executeInstruction (inst : Instruction) (program : Program) : Program =
                 { program with state = Waiting }
             else 
                 let received = inbox.Dequeue()
-                // printfn "Program %d received value %d from program %d" program.programId received pid
                 let registers = writeValue r received program.registers
                 { program with registers = registers; ptr = program.ptr + 1 }
         else 
             let n = readValue r program.registers
             if n = 0 then 
-                // printfn "rcv skipped"
                 { program with ptr = program.ptr + 1 }
             else 
-                // printfn "rcv %d" program.sound
                 { program with state = Terminated }
     | Set (r, v) -> 
         let n = resolveValue v program.registers
         let registers = writeValue r n program.registers
-        // printfn "set %s <- %d" r n
         { program with registers = registers; ptr = program.ptr + 1 }
     | Add (r, v) -> 
         let n = readValue r program.registers
         let m = resolveValue v program.registers
-        let result = n + m
-        // printfn "add %s <- %d+%d=%d" r n m result
-        let registers = writeValue r result program.registers
+        let registers = writeValue r (n + m) program.registers
         { program with registers = registers; ptr = program.ptr + 1 }
     | Mul (r, v) -> 
         let n = readValue r program.registers
         let m = resolveValue v program.registers
-        let result = n * m
-        // printfn "mul %s <- %d+%d=%d" r n m result
-        let registers = writeValue r result program.registers
+        let registers = writeValue r (n * m) program.registers
         { program with registers = registers; ptr = program.ptr + 1 }
     | Mod (r, v) -> 
         let n = readValue r program.registers
         let m = resolveValue v program.registers
-        let result = n % m
-        // printfn "mul %s <- %d+%d=%d" r n m result
-        let registers = writeValue r result program.registers
+        let registers = writeValue r (n % m) program.registers
         { program with registers = registers; ptr = program.ptr + 1 }
     | Jgz (v1, v2) -> 
         let x = resolveValue v1 program.registers
         let y = resolveValue v2 program.registers
         if x > 0 then 
             let ptr = program.ptr + int y
-            // printfn "jgz %d %d to %d" x y ptr 
             { program with ptr = ptr}
         else 
-            // printfn "jgz %d %d skipped" x y 
             { program with ptr = program.ptr + 1 }
 
 let executeProgramStep (program : Program) = 
@@ -230,11 +215,8 @@ let rec executeLoop (program : Program) =
         program |> executeProgramStep |> executeLoop
 
 let rec transferMessages (sender : Program, receiver : Program) = 
-    let outbox = sender.outbox
-    if outbox.Count = 0 then 
-        (sender, receiver)
-    else 
-        receiver.inbox.Enqueue(outbox.Dequeue()) 
+    if sender.outbox.Count > 0 then 
+        receiver.inbox.Enqueue(sender.outbox.Dequeue()) 
         transferMessages (sender, receiver)
 
 let rec executeDuetLoop (program0 : Program, program1 : Program) = 
@@ -246,9 +228,9 @@ let rec executeDuetLoop (program0 : Program, program1 : Program) =
     | _ -> 
         let p0 = executeProgramStep program0
         let p1 = executeProgramStep program1
-        let (p00, p11) = transferMessages (p0, p1)
-        let (p111, p000) = transferMessages (p11, p00)
-        executeDuetLoop (p000, p111)
+        transferMessages (p0, p1)
+        transferMessages (p1, p0)
+        executeDuetLoop (p0, p1)
 
 let initProgram pid duet instructions = 
     { programId = pid
