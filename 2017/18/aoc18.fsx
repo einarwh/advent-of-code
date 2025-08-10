@@ -10,7 +10,7 @@ type RegName = string
 
 type Value = 
     | Reg of RegName
-    | Num of int
+    | Num of int64
 
 type Instruction = 
     | Snd of RegName 
@@ -28,10 +28,10 @@ type Program = {
     instructions : Instruction array 
     state : State
     duet : bool
-    sound : int 
-    registers : Map<RegName, int>
-    inbox : Queue<int> 
-    outbox : Queue<int>
+    sound : int64
+    registers : Map<RegName, int64>
+    inbox : Queue<int64> 
+    outbox : Queue<int64>
 }
 
 let parseValue (s : string) : Value = 
@@ -124,15 +124,15 @@ let readLines =
     File.ReadAllLines
     >> Array.filter (fun line -> line <> String.Empty)
 
-let readValue (r : string) (registers : Map<RegName, int>) : int =
+let readValue (r : string) (registers : Map<RegName, int64>) : int64 =
     match Map.tryFind r registers with 
     | Some n -> n 
     | None -> 0
 
-let writeValue (r : string) (n : int) (registers : Map<RegName, int>) : Map<RegName, int> = 
+let writeValue (r : string) (n : int64) (registers : Map<RegName, int64>) : Map<RegName, int64> = 
     Map.add r n registers
 
-let resolveValue (v : Value) (registers : Map<RegName, int>) : int = 
+let resolveValue (v : Value) (registers : Map<RegName, int64>) : int64 = 
     match v with 
     | Num n -> n 
     | Reg r -> 
@@ -148,7 +148,7 @@ let executeInstruction (inst : Instruction) (program : Program) : Program =
             outbox.Enqueue n 
             { program with outbox = outbox; ptr = program.ptr + 1 }
         else 
-            printfn "snd %s | sound <- %d" r n
+            // printfn "snd %s | sound <- %d" r n
             { program with sound = n; ptr = program.ptr + 1 }
     | Rcv r -> 
         if program.duet then 
@@ -162,7 +162,7 @@ let executeInstruction (inst : Instruction) (program : Program) : Program =
         else 
             let n = readValue r program.registers
             if n = 0 then 
-                printfn "rcv skipped"
+                // printfn "rcv skipped"
                 { program with ptr = program.ptr + 1 }
             else 
                 printfn "rcv %d" program.sound
@@ -170,38 +170,38 @@ let executeInstruction (inst : Instruction) (program : Program) : Program =
     | Set (r, v) -> 
         let n = resolveValue v program.registers
         let registers = writeValue r n program.registers
-        printfn "set %s <- %d" r n
+        // printfn "set %s <- %d" r n
         { program with registers = registers; ptr = program.ptr + 1 }
     | Add (r, v) -> 
         let n = readValue r program.registers
         let m = resolveValue v program.registers
         let result = n + m
-        printfn "add %s <- %d+%d=%d" r n m result
+        // printfn "add %s <- %d+%d=%d" r n m result
         let registers = writeValue r result program.registers
         { program with registers = registers; ptr = program.ptr + 1 }
     | Mul (r, v) -> 
         let n = readValue r program.registers
         let m = resolveValue v program.registers
         let result = n * m
-        printfn "mul %s <- %d+%d=%d" r n m result
+        // printfn "mul %s <- %d+%d=%d" r n m result
         let registers = writeValue r result program.registers
         { program with registers = registers; ptr = program.ptr + 1 }
     | Mod (r, v) -> 
         let n = readValue r program.registers
         let m = resolveValue v program.registers
         let result = n % m
-        printfn "mul %s <- %d+%d=%d" r n m result
+        // printfn "mul %s <- %d+%d=%d" r n m result
         let registers = writeValue r result program.registers
         { program with registers = registers; ptr = program.ptr + 1 }
     | Jgz (v1, v2) -> 
         let x = resolveValue v1 program.registers
         let y = resolveValue v2 program.registers
         if x > 0 then 
-            let ptr = program.ptr + y
-            printfn "jgz %d %d to %d" x y ptr 
+            let ptr = program.ptr + int y
+            // printfn "jgz %d %d to %d" x y ptr 
             { program with ptr = ptr}
         else 
-            printfn "jgz %d %d skipped" x y 
+            // printfn "jgz %d %d skipped" x y 
             { program with ptr = program.ptr + 1 }
 
 let executeProgramStep (program : Program) = 
@@ -230,15 +230,14 @@ let initProgram duet instructions =
       duet = duet
       sound = 0
       registers = Map.empty
-      inbox = new Queue<int>()
-      outbox = new Queue<int>()
+      inbox = new Queue<int64>()
+      outbox = new Queue<int64>()
     }
 
 let run fileName = 
     let lines = readLines fileName
     let instructions = lines |> Array.choose tryParse
-    instructions |> printfn "%A"
     let program = initProgram false instructions
-    executeLoop program |> printfn "%A"
+    executeLoop program |> ignore 
 
-run "sample.txt"
+run "input.txt"
