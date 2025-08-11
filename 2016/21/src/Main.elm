@@ -6,7 +6,6 @@ import Browser
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
-import Html exposing (text)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Time
@@ -16,6 +15,7 @@ defaultTickInterval = 100
 
 -- MAIN
 
+main : Program () Model Msg
 main =
   Browser.element
     { init = init
@@ -153,7 +153,6 @@ initModel : PasswordState -> Bool -> Model
 initModel state descramble = 
   let
     operations = input |> String.split "\n"
-    debug = operations |> List.length |> String.fromInt
     password = 
       case state of 
         Scrambled -> inputScrambled
@@ -203,6 +202,7 @@ trySwapLetters op pwd =
     _ ->
       pwd
 
+trySwapLettersInverse : String -> String -> String 
 trySwapLettersInverse = trySwapLetters
 
 trySwapPositions : String -> String -> String 
@@ -221,6 +221,7 @@ trySwapPositions op pwd =
     _ ->
       pwd
 
+trySwapPositionsInverse : String -> String -> String 
 trySwapPositionsInverse = trySwapPositions
 
 rotateLeft : Int -> String -> String
@@ -251,6 +252,7 @@ tryRotateLeft op pwd =
     _ ->
       pwd
 
+tryRotateLeftInverse : String -> String -> String 
 tryRotateLeftInverse = tryRotateRight
 
 tryRotateRight : String -> String -> String 
@@ -265,6 +267,7 @@ tryRotateRight op pwd =
     _ ->
       pwd
 
+tryRotateRightInverse : String -> String -> String 
 tryRotateRightInverse = tryRotateLeft 
 
 tryRotatePosition : String -> String -> String 
@@ -325,6 +328,7 @@ tryReversePositions op pwd =
     _ ->
       pwd
 
+tryReversePositionsInverse : String -> String -> String 
 tryReversePositionsInverse = tryReversePositions
 
 movePosition : Int -> Int -> String -> String
@@ -365,6 +369,7 @@ tryMovePositionInverse op pwd =
     _ ->
       pwd
 
+scramblePassword : String -> String -> String 
 scramblePassword op pwd =
   if op |> String.startsWith "swap letter" then 
     trySwapLetters op pwd
@@ -383,6 +388,7 @@ scramblePassword op pwd =
   else 
     pwd
 
+descramblePassword : String -> String -> String 
 descramblePassword op pwd = 
   if op |> String.startsWith "swap letter" then 
     trySwapLettersInverse op pwd
@@ -572,12 +578,6 @@ toSvg model =
 view : Model -> Html Msg
 view model =
   let
-    pwdText = 
-      if model.finished || String.isEmpty model.prevPassword then 
-        model.password 
-      else 
-        model.prevPassword ++ " -> " ++ model.password
-    pwdElement = Html.span [] [ Html.text pwdText ]
     dbgStr = model.debug
     playButtonText =
       if model.descramble then "Unscramble" else "Scramble"
