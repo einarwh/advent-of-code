@@ -5861,85 +5861,45 @@ var $author$project$Aoc16$createLetterElements = F3(
 				}),
 			$elm$core$String$toList(order));
 	});
-var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
-var $elm$svg$Svg$Attributes$id = _VirtualDom_attribute('id');
-var $elm$svg$Svg$marker = $elm$svg$Svg$trustedNode('marker');
-var $elm$svg$Svg$Attributes$markerHeight = _VirtualDom_attribute('markerHeight');
-var $elm$svg$Svg$Attributes$markerUnits = _VirtualDom_attribute('markerUnits');
-var $elm$svg$Svg$Attributes$markerWidth = _VirtualDom_attribute('markerWidth');
-var $elm$svg$Svg$Attributes$orient = _VirtualDom_attribute('orient');
-var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
-var $elm$svg$Svg$Attributes$refX = _VirtualDom_attribute('refX');
-var $elm$svg$Svg$Attributes$refY = _VirtualDom_attribute('refY');
-var $author$project$Aoc16$createMarker = function (markerId) {
-	return A2(
-		$elm$svg$Svg$marker,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$id(markerId),
-				$elm$svg$Svg$Attributes$markerWidth('10'),
-				$elm$svg$Svg$Attributes$markerHeight('10'),
-				$elm$svg$Svg$Attributes$refX('9'),
-				$elm$svg$Svg$Attributes$refY('3'),
-				$elm$svg$Svg$Attributes$orient('auto'),
-				$elm$svg$Svg$Attributes$markerUnits('strokeWidth')
-			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$svg$Svg$path,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$d('M0,0 L0,6 L9,3 z'),
-						$elm$svg$Svg$Attributes$fill('currentcolor')
-					]),
-				_List_Nil)
-			]));
-};
-var $elm$svg$Svg$defs = $elm$svg$Svg$trustedNode('defs');
 var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
-var $elm$svg$Svg$line = $elm$svg$Svg$trustedNode('line');
-var $elm$svg$Svg$Attributes$markerEnd = _VirtualDom_attribute('marker-end');
-var $elm$svg$Svg$Attributes$strokeLinecap = _VirtualDom_attribute('stroke-linecap');
-var $elm$svg$Svg$Attributes$strokeLinejoin = _VirtualDom_attribute('stroke-linejoin');
-var $elm$svg$Svg$Attributes$x1 = _VirtualDom_attribute('x1');
-var $elm$svg$Svg$Attributes$x2 = _VirtualDom_attribute('x2');
-var $elm$svg$Svg$Attributes$y1 = _VirtualDom_attribute('y1');
-var $elm$svg$Svg$Attributes$y2 = _VirtualDom_attribute('y2');
-var $author$project$Aoc16$toConnectionElement = F2(
+var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
+var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
+var $author$project$Aoc16$toConnexionElement = F2(
 	function (boxSize, _v0) {
 		var xIntSrc = _v0.a;
 		var xIntTgt = _v0.b;
-		var y2s = $elm$core$String$fromFloat(5 * boxSize);
-		var y1s = $elm$core$String$fromFloat(1 * boxSize);
-		var x2s = $elm$core$String$fromFloat((0.5 + xIntTgt) * boxSize);
-		var x1s = $elm$core$String$fromFloat((0.5 + xIntSrc) * boxSize);
+		var yTgt = 5 * boxSize;
+		var ySrc = 1 * boxSize;
+		var xTgt = (0.5 + xIntTgt) * boxSize;
+		var xSrc = (0.5 + xIntSrc) * boxSize;
+		var toStr = function (_v1) {
+			var x = _v1.a;
+			var y = _v1.b;
+			return $elm$core$String$fromFloat(x) + (' ' + $elm$core$String$fromFloat(y));
+		};
+		var pt4 = _Utils_Tuple2(xTgt, yTgt);
+		var pt4s = toStr(pt4);
+		var pt3 = _Utils_Tuple2(xTgt, yTgt - (2 * boxSize));
+		var pt3s = toStr(pt3);
+		var pt2 = _Utils_Tuple2(xSrc, ySrc + (2 * boxSize));
+		var pt2s = toStr(pt2);
+		var pt1 = _Utils_Tuple2(xSrc, ySrc);
+		var pt1s = toStr(pt1);
+		var dval = 'M' + (pt1s + (' C ' + (pt2s + (', ' + (pt3s + (', ' + pt4s))))));
 		return A2(
-			$elm$svg$Svg$line,
+			$elm$svg$Svg$path,
 			_List_fromArray(
 				[
-					$elm$svg$Svg$Attributes$x1(x1s),
-					$elm$svg$Svg$Attributes$y1(y1s),
-					$elm$svg$Svg$Attributes$x2(x2s),
-					$elm$svg$Svg$Attributes$y2(y2s),
 					$elm$svg$Svg$Attributes$stroke('currentcolor'),
-					$elm$svg$Svg$Attributes$strokeLinecap('round'),
-					$elm$svg$Svg$Attributes$strokeLinejoin('round'),
 					$elm$svg$Svg$Attributes$strokeWidth('1px'),
-					$elm$svg$Svg$Attributes$markerEnd('url(#arrowhead)')
+					$elm$svg$Svg$Attributes$fill('None'),
+					$elm$svg$Svg$Attributes$d(dval)
 				]),
 			_List_Nil);
 	});
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $author$project$Aoc16$toSvg = function (model) {
-	var defs = A2(
-		$elm$svg$Svg$defs,
-		_List_Nil,
-		_List_fromArray(
-			[
-				$author$project$Aoc16$createMarker('arrowhead')
-			]));
 	var connections = _List_fromArray(
 		[
 			_Utils_Tuple2(1, 8),
@@ -5949,7 +5909,7 @@ var $author$project$Aoc16$toSvg = function (model) {
 	var boxSize = 24;
 	var connectionElements = A2(
 		$elm$core$List$map,
-		$author$project$Aoc16$toConnectionElement(boxSize),
+		$author$project$Aoc16$toConnexionElement(boxSize),
 		connections);
 	var topRowLetterElements = A3($author$project$Aoc16$createLetterElements, boxSize, 1, model.H);
 	var boxElements = A2(
@@ -5960,13 +5920,7 @@ var $author$project$Aoc16$toSvg = function (model) {
 	var letterElements = A2($elm$core$List$append, topRowLetterElements, botRowLetterElements);
 	var elements = $elm$core$List$concat(
 		_List_fromArray(
-			[
-				_List_fromArray(
-				[defs]),
-				boxElements,
-				connectionElements,
-				letterElements
-			]));
+			[boxElements, connectionElements, letterElements]));
 	return A2(
 		$elm$svg$Svg$svg,
 		_List_fromArray(

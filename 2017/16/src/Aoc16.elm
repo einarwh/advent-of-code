@@ -397,32 +397,57 @@ toConnectionElement boxSize (xIntSrc, xIntTgt) =
       ]
       []
 
-createMarker : String -> Svg msg
-createMarker markerId = 
-  Svg.marker 
-    [ id markerId
-    , markerWidth "10"
-    , markerHeight "10"
-    , refX "9"
-    , refY "3"
-    , orient "auto"
-    , markerUnits "strokeWidth" ] 
-    [ Svg.path 
-      [ d "M0,0 L0,6 L9,3 z"
-      , fill "currentcolor" ] [] ]
+toConnexionElement : Float -> (Int, Int) -> Svg Msg 
+toConnexionElement boxSize (xIntSrc, xIntTgt) = 
+  let 
+    toStr (x, y) = (String.fromFloat x) ++ " " ++ (String.fromFloat y)
+    xSrc = (0.5 + toFloat xIntSrc) * boxSize
+    xTgt = (0.5 + toFloat xIntTgt) * boxSize
+    ySrc = 1 * boxSize 
+    yTgt = 5 * boxSize  
+    pt1 = (xSrc, ySrc)
+    pt2 = (xSrc, ySrc + 2 * boxSize)
+    pt3 = (xTgt, yTgt - 2 * boxSize)
+    pt4 = (xTgt, yTgt)
+    pt1s = toStr pt1
+    pt2s = toStr pt2 
+    pt3s = toStr pt3 
+    pt4s = toStr pt4 
+    dval = "M" ++ pt1s ++ " C " ++ pt2s ++ ", " ++ pt3s ++ ", " ++ pt4s
+  in 
+    Svg.path 
+      [ stroke "currentcolor"
+      , strokeWidth "1px"
+      , fill "None"
+      -- , markerEnd <| "url(#arrowhead)"
+      , d dval ] []
+
+-- createMarker : String -> Svg msg
+-- createMarker markerId = 
+--   Svg.marker 
+--     [ id markerId
+--     , markerWidth "10"
+--     , markerHeight "10"
+--     , refX "9"
+--     , refY "3"
+--     , orient "auto"
+--     , markerUnits "strokeWidth" ] 
+--     [ Svg.path 
+--       [ d "M0,0 L0,6 L9,3 z"
+--       , fill "currentcolor" ] [] ]
 
 toSvg : Model -> Html Msg 
 toSvg model = 
   let 
     boxSize = toFloat 24 
     connections = [(1, 8), (3, 5), (8, 4)]
-    connectionElements = connections |> List.map (toConnectionElement boxSize)
+    connectionElements = connections |> List.map (toConnexionElement boxSize)
     topRowLetterElements = createLetterElements boxSize 1 model.order
     botRowLetterElements = createLetterElements boxSize 6 model.order
     letterElements = List.append topRowLetterElements botRowLetterElements
     boxElements = List.append (createBoxes boxSize 0) (createBoxes boxSize 5)
-    defs = Svg.defs [] [ createMarker "arrowhead" ]
-    elements = List.concat [ [defs], boxElements, connectionElements, letterElements ]
+    -- defs = Svg.defs [] [ createMarker "arrowhead" ]
+    elements = List.concat [ boxElements, connectionElements, letterElements ]
   in 
     svg
       [ viewBox "-5 -5 395 195"
