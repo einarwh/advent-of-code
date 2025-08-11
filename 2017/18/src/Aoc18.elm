@@ -380,6 +380,15 @@ transferMessages (p0, p1) =
         Nothing -> 
           (p0, p1) 
 
+checkInbox : Program -> Program 
+checkInbox program = 
+  case program.state of 
+    Waiting -> 
+      if Queue.isEmpty program.inbox then program 
+      else { program | state = Running } 
+    _ -> 
+      program
+
 updateDuetStep : Model -> Model
 updateDuetStep model = 
   let 
@@ -393,8 +402,8 @@ updateDuetStep model =
         { model | finished = True, result = Just (program1.sent) } 
       _ -> 
         let 
-          p0 = { program0 | state = Running } |> executeNextInstruction model.duet model.instructions
-          p1 = { program1 | state = Running } |> executeNextInstruction model.duet model.instructions
+          p0 = program0 |> checkInbox |> executeNextInstruction model.duet model.instructions
+          p1 = program1 |> checkInbox |> executeNextInstruction model.duet model.instructions
           (p0t, p1t) = transferMessages (p0, p1)
         in 
           { model | program0 = p0t, program1 = p1t }

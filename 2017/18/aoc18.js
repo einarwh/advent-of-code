@@ -1,17 +1,3 @@
-<!DOCTYPE HTML>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Aoc18</title>
-  <style>body { padding: 0; margin: 0; }</style>
-</head>
-
-<body>
-
-<pre id="elm"></pre>
-
-<script>
-try {
 (function(scope){
 'use strict';
 
@@ -5249,9 +5235,9 @@ var $elm$core$Task$perform = F2(
 		return $elm$core$Task$command(
 			A2($elm$core$Task$map, toMessage, task));
 	});
-var $elm$browser$Browser$document = _Browser_document;
-var $author$project$Aoc18$defaultTickInterval = 100;
-var $author$project$Aoc18$Ready = 0;
+var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Main$defaultTickInterval = 100;
+var $author$project$Main$Ready = 0;
 var $owanturist$elm_queue$Queue$Empty = {$: 0};
 var $owanturist$elm_queue$Queue$empty = $owanturist$elm_queue$Queue$Empty;
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
@@ -5365,7 +5351,7 @@ var $elm$core$Dict$insert = F3(
 			return x;
 		}
 	});
-var $author$project$Aoc18$initRegisters = F2(
+var $author$project$Main$initRegisters = F2(
 	function (pid, regNames) {
 		var register = A3(
 			$elm$core$List$foldl,
@@ -5377,9 +5363,9 @@ var $author$project$Aoc18$initRegisters = F2(
 			regNames);
 		return A3($elm$core$Dict$insert, 'p', pid, register);
 	});
-var $author$project$Aoc18$initProgram = F2(
+var $author$project$Main$initProgram = F2(
 	function (pid, regNames) {
-		var registers = A2($author$project$Aoc18$initRegisters, pid, regNames);
+		var registers = A2($author$project$Main$initRegisters, pid, regNames);
 		return {m: $owanturist$elm_queue$Queue$empty, o: $owanturist$elm_queue$Queue$empty, U: pid, a: 0, b: registers, B: 0, N: $elm$core$Maybe$Nothing, k: 0};
 	});
 var $elm$core$List$maybeCons = F3(
@@ -5435,8 +5421,8 @@ var $elm$core$Array$fromList = function (list) {
 		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
 	}
 };
-var $author$project$Aoc18$input = 'set i 31\nset a 1\nmul p 17\njgz p p\nmul a 2\nadd i -1\njgz i -2\nadd a -1\nset i 127\nset p 680\nmul p 8505\nmod p a\nmul p 129749\nadd p 12345\nmod p a\nset b p\nmod b 10000\nsnd b\nadd i -1\njgz i -9\njgz a 3\nrcv b\njgz b -1\nset f 0\nset i 126\nrcv a\nrcv b\nset p a\nmul p -1\nadd p b\njgz p 4\nsnd a\nset a b\njgz 1 3\nsnd b\nset f 1\nadd i -1\njgz i -11\nsnd a\njgz f -16\njgz a -19';
-var $author$project$Aoc18$orElseWith = F2(
+var $author$project$Main$input = 'set i 31\nset a 1\nmul p 17\njgz p p\nmul a 2\nadd i -1\njgz i -2\nadd a -1\nset i 127\nset p 680\nmul p 8505\nmod p a\nmul p 129749\nadd p 12345\nmod p a\nset b p\nmod b 10000\nsnd b\nadd i -1\njgz i -9\njgz a 3\nrcv b\njgz b -1\nset f 0\nset i 126\nrcv a\nrcv b\nset p a\nmul p -1\nadd p b\njgz p 4\nsnd a\nset a b\njgz 1 3\nsnd b\nset f 1\nadd i -1\njgz i -11\nsnd a\njgz f -16\njgz a -19';
+var $author$project$Main$orElseWith = F2(
 	function (ifNoneThunk, maybe) {
 		if (!maybe.$) {
 			var a = maybe.a;
@@ -5445,182 +5431,182 @@ var $author$project$Aoc18$orElseWith = F2(
 			return ifNoneThunk(0);
 		}
 	});
-var $author$project$Aoc18$Add = function (a) {
+var $author$project$Main$Add = function (a) {
 	return {$: 3, a: a};
 };
-var $author$project$Aoc18$Num = function (a) {
+var $author$project$Main$Num = function (a) {
 	return {$: 1, a: a};
 };
-var $author$project$Aoc18$Reg = function (a) {
+var $author$project$Main$Reg = function (a) {
 	return {$: 0, a: a};
 };
-var $author$project$Aoc18$parseValue = function (s) {
+var $author$project$Main$parseValue = function (s) {
 	var _v0 = $elm$core$String$toInt(s);
 	if (!_v0.$) {
 		var n = _v0.a;
-		return $author$project$Aoc18$Num(n);
+		return $author$project$Main$Num(n);
 	} else {
-		return $author$project$Aoc18$Reg(s);
+		return $author$project$Main$Reg(s);
 	}
 };
-var $author$project$Aoc18$parseAdd = function (parts) {
+var $author$project$Main$parseAdd = function (parts) {
 	if ((((parts.b && (parts.a === 'add')) && parts.b.b) && parts.b.b.b) && (!parts.b.b.b.b)) {
 		var _v1 = parts.b;
 		var r = _v1.a;
 		var _v2 = _v1.b;
 		var s = _v2.a;
 		return $elm$core$Maybe$Just(
-			$author$project$Aoc18$Add(
+			$author$project$Main$Add(
 				_Utils_Tuple2(
 					r,
-					$author$project$Aoc18$parseValue(s))));
+					$author$project$Main$parseValue(s))));
 	} else {
 		return $elm$core$Maybe$Nothing;
 	}
 };
-var $author$project$Aoc18$Jgz = function (a) {
+var $author$project$Main$Jgz = function (a) {
 	return {$: 6, a: a};
 };
-var $author$project$Aoc18$parseJgz = function (parts) {
+var $author$project$Main$parseJgz = function (parts) {
 	if ((((parts.b && (parts.a === 'jgz')) && parts.b.b) && parts.b.b.b) && (!parts.b.b.b.b)) {
 		var _v1 = parts.b;
 		var s1 = _v1.a;
 		var _v2 = _v1.b;
 		var s2 = _v2.a;
 		return $elm$core$Maybe$Just(
-			$author$project$Aoc18$Jgz(
+			$author$project$Main$Jgz(
 				_Utils_Tuple2(
-					$author$project$Aoc18$parseValue(s1),
-					$author$project$Aoc18$parseValue(s2))));
+					$author$project$Main$parseValue(s1),
+					$author$project$Main$parseValue(s2))));
 	} else {
 		return $elm$core$Maybe$Nothing;
 	}
 };
-var $author$project$Aoc18$Mod = function (a) {
+var $author$project$Main$Mod = function (a) {
 	return {$: 5, a: a};
 };
-var $author$project$Aoc18$parseMod = function (parts) {
+var $author$project$Main$parseMod = function (parts) {
 	if ((((parts.b && (parts.a === 'mod')) && parts.b.b) && parts.b.b.b) && (!parts.b.b.b.b)) {
 		var _v1 = parts.b;
 		var r = _v1.a;
 		var _v2 = _v1.b;
 		var s = _v2.a;
 		return $elm$core$Maybe$Just(
-			$author$project$Aoc18$Mod(
+			$author$project$Main$Mod(
 				_Utils_Tuple2(
 					r,
-					$author$project$Aoc18$parseValue(s))));
+					$author$project$Main$parseValue(s))));
 	} else {
 		return $elm$core$Maybe$Nothing;
 	}
 };
-var $author$project$Aoc18$Mul = function (a) {
+var $author$project$Main$Mul = function (a) {
 	return {$: 4, a: a};
 };
-var $author$project$Aoc18$parseMul = function (parts) {
+var $author$project$Main$parseMul = function (parts) {
 	if ((((parts.b && (parts.a === 'mul')) && parts.b.b) && parts.b.b.b) && (!parts.b.b.b.b)) {
 		var _v1 = parts.b;
 		var r = _v1.a;
 		var _v2 = _v1.b;
 		var s = _v2.a;
 		return $elm$core$Maybe$Just(
-			$author$project$Aoc18$Mul(
+			$author$project$Main$Mul(
 				_Utils_Tuple2(
 					r,
-					$author$project$Aoc18$parseValue(s))));
+					$author$project$Main$parseValue(s))));
 	} else {
 		return $elm$core$Maybe$Nothing;
 	}
 };
-var $author$project$Aoc18$Rcv = function (a) {
+var $author$project$Main$Rcv = function (a) {
 	return {$: 1, a: a};
 };
-var $author$project$Aoc18$parseRcv = function (parts) {
+var $author$project$Main$parseRcv = function (parts) {
 	if (((parts.b && (parts.a === 'rcv')) && parts.b.b) && (!parts.b.b.b)) {
 		var _v1 = parts.b;
 		var r = _v1.a;
 		return $elm$core$Maybe$Just(
-			$author$project$Aoc18$Rcv(r));
+			$author$project$Main$Rcv(r));
 	} else {
 		return $elm$core$Maybe$Nothing;
 	}
 };
-var $author$project$Aoc18$Set = function (a) {
+var $author$project$Main$Set = function (a) {
 	return {$: 2, a: a};
 };
-var $author$project$Aoc18$parseSet = function (parts) {
+var $author$project$Main$parseSet = function (parts) {
 	if ((((parts.b && (parts.a === 'set')) && parts.b.b) && parts.b.b.b) && (!parts.b.b.b.b)) {
 		var _v1 = parts.b;
 		var r = _v1.a;
 		var _v2 = _v1.b;
 		var s = _v2.a;
 		return $elm$core$Maybe$Just(
-			$author$project$Aoc18$Set(
+			$author$project$Main$Set(
 				_Utils_Tuple2(
 					r,
-					$author$project$Aoc18$parseValue(s))));
+					$author$project$Main$parseValue(s))));
 	} else {
 		return $elm$core$Maybe$Nothing;
 	}
 };
-var $author$project$Aoc18$Snd = function (a) {
+var $author$project$Main$Snd = function (a) {
 	return {$: 0, a: a};
 };
-var $author$project$Aoc18$parseSnd = function (parts) {
+var $author$project$Main$parseSnd = function (parts) {
 	if (((parts.b && (parts.a === 'snd')) && parts.b.b) && (!parts.b.b.b)) {
 		var _v1 = parts.b;
 		var r = _v1.a;
 		return $elm$core$Maybe$Just(
-			$author$project$Aoc18$Snd(r));
+			$author$project$Main$Snd(r));
 	} else {
 		return $elm$core$Maybe$Nothing;
 	}
 };
-var $author$project$Aoc18$parseInstruction = function (line) {
+var $author$project$Main$parseInstruction = function (line) {
 	var parts = A2($elm$core$String$split, ' ', line);
 	return A2(
-		$author$project$Aoc18$orElseWith,
+		$author$project$Main$orElseWith,
 		function (_v6) {
 			return $elm$core$Maybe$Nothing;
 		},
 		A2(
-			$author$project$Aoc18$orElseWith,
+			$author$project$Main$orElseWith,
 			function (_v5) {
-				return $author$project$Aoc18$parseJgz(parts);
+				return $author$project$Main$parseJgz(parts);
 			},
 			A2(
-				$author$project$Aoc18$orElseWith,
+				$author$project$Main$orElseWith,
 				function (_v4) {
-					return $author$project$Aoc18$parseMod(parts);
+					return $author$project$Main$parseMod(parts);
 				},
 				A2(
-					$author$project$Aoc18$orElseWith,
+					$author$project$Main$orElseWith,
 					function (_v3) {
-						return $author$project$Aoc18$parseMul(parts);
+						return $author$project$Main$parseMul(parts);
 					},
 					A2(
-						$author$project$Aoc18$orElseWith,
+						$author$project$Main$orElseWith,
 						function (_v2) {
-							return $author$project$Aoc18$parseAdd(parts);
+							return $author$project$Main$parseAdd(parts);
 						},
 						A2(
-							$author$project$Aoc18$orElseWith,
+							$author$project$Main$orElseWith,
 							function (_v1) {
-								return $author$project$Aoc18$parseSet(parts);
+								return $author$project$Main$parseSet(parts);
 							},
 							A2(
-								$author$project$Aoc18$orElseWith,
+								$author$project$Main$orElseWith,
 								function (_v0) {
-									return $author$project$Aoc18$parseRcv(parts);
+									return $author$project$Main$parseRcv(parts);
 								},
-								$author$project$Aoc18$parseSnd(parts))))))));
+								$author$project$Main$parseSnd(parts))))))));
 };
-var $author$project$Aoc18$instructions = $elm$core$Array$fromList(
+var $author$project$Main$instructions = $elm$core$Array$fromList(
 	A2(
 		$elm$core$List$filterMap,
-		$author$project$Aoc18$parseInstruction,
-		A2($elm$core$String$split, '\n', $author$project$Aoc18$input)));
-var $author$project$Aoc18$getRegisterName = function (inst) {
+		$author$project$Main$parseInstruction,
+		A2($elm$core$String$split, '\n', $author$project$Main$input)));
+var $author$project$Main$getRegisterName = function (inst) {
 	_v0$6:
 	while (true) {
 		switch (inst.$) {
@@ -5656,33 +5642,33 @@ var $author$project$Aoc18$getRegisterName = function (inst) {
 	}
 	return $elm$core$Maybe$Nothing;
 };
-var $author$project$Aoc18$registerNames = A2(
+var $author$project$Main$registerNames = A2(
 	$elm$core$List$filterMap,
-	$author$project$Aoc18$getRegisterName,
-	$elm$core$Array$toList($author$project$Aoc18$instructions));
-var $author$project$Aoc18$initModel = function (duet) {
-	var p1 = $author$project$Aoc18$initProgram(1);
-	var p0 = $author$project$Aoc18$initProgram(0);
+	$author$project$Main$getRegisterName,
+	$elm$core$Array$toList($author$project$Main$instructions));
+var $author$project$Main$initModel = function (duet) {
+	var p1 = $author$project$Main$initProgram(1);
+	var p0 = $author$project$Main$initProgram(0);
 	return {
 		ab: '',
 		l: duet,
 		F: false,
-		q: $author$project$Aoc18$instructions,
+		q: $author$project$Main$instructions,
 		G: true,
-		w: A2($author$project$Aoc18$initProgram, 0, $author$project$Aoc18$registerNames),
-		M: A2($author$project$Aoc18$initProgram, 1, $author$project$Aoc18$registerNames),
+		w: A2($author$project$Main$initProgram, 0, $author$project$Main$registerNames),
+		M: A2($author$project$Main$initProgram, 1, $author$project$Main$registerNames),
 		H: $elm$core$Maybe$Nothing,
-		C: $author$project$Aoc18$defaultTickInterval
+		C: $author$project$Main$defaultTickInterval
 	};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Aoc18$init = function (_v0) {
+var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		$author$project$Aoc18$initModel(false),
+		$author$project$Main$initModel(false),
 		$elm$core$Platform$Cmd$none);
 };
-var $author$project$Aoc18$Tick = 0;
+var $author$project$Main$Tick = 0;
 var $elm$time$Time$Every = F2(
 	function (a, b) {
 		return {$: 0, a: a, b: b};
@@ -5987,7 +5973,7 @@ var $elm$time$Time$every = F2(
 	});
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $author$project$Aoc18$subscriptions = function (model) {
+var $author$project$Main$subscriptions = function (model) {
 	var tickSub = (model.G || model.F) ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
 		model.C,
@@ -5996,12 +5982,12 @@ var $author$project$Aoc18$subscriptions = function (model) {
 		});
 	return tickSub;
 };
-var $author$project$Aoc18$updateClear = function (model) {
-	return $author$project$Aoc18$initModel(model.l);
+var $author$project$Main$updateClear = function (model) {
+	return $author$project$Main$initModel(model.l);
 };
-var $author$project$Aoc18$Running = 1;
+var $author$project$Main$Running = 1;
 var $owanturist$elm_queue$Queue$isEmpty = $elm$core$Basics$eq($owanturist$elm_queue$Queue$Empty);
-var $author$project$Aoc18$checkInbox = function (program) {
+var $author$project$Main$checkInbox = function (program) {
 	var _v0 = program.k;
 	if (_v0 === 2) {
 		return $owanturist$elm_queue$Queue$isEmpty(program.m) ? program : _Utils_update(
@@ -6011,8 +5997,8 @@ var $author$project$Aoc18$checkInbox = function (program) {
 		return program;
 	}
 };
-var $author$project$Aoc18$Terminated = 3;
-var $author$project$Aoc18$Waiting = 2;
+var $author$project$Main$Terminated = 3;
+var $author$project$Main$Waiting = 2;
 var $owanturist$elm_queue$Queue$Queue = F5(
 	function (a, b, c, d, e) {
 		return {$: 1, a: a, b: b, c: c, d: d, e: e};
@@ -6082,33 +6068,33 @@ var $elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
-var $author$project$Aoc18$readValue = F2(
+var $author$project$Main$readValue = F2(
 	function (r, registers) {
 		return A2(
 			$elm$core$Maybe$withDefault,
 			0,
 			A2($elm$core$Dict$get, r, registers));
 	});
-var $author$project$Aoc18$resolveValue = F2(
+var $author$project$Main$resolveValue = F2(
 	function (v, registers) {
 		if (v.$ === 1) {
 			var n = v.a;
 			return n;
 		} else {
 			var r = v.a;
-			return A2($author$project$Aoc18$readValue, r, registers);
+			return A2($author$project$Main$readValue, r, registers);
 		}
 	});
-var $author$project$Aoc18$writeValue = F3(
+var $author$project$Main$writeValue = F3(
 	function (r, n, registers) {
 		return A3($elm$core$Dict$insert, r, n, registers);
 	});
-var $author$project$Aoc18$executeInstruction = F3(
+var $author$project$Main$executeInstruction = F3(
 	function (duet, inst, program) {
 		switch (inst.$) {
 			case 0:
 				var r = inst.a;
-				var n = A2($author$project$Aoc18$readValue, r, program.b);
+				var n = A2($author$project$Main$readValue, r, program.b);
 				if (duet) {
 					var sent = program.B + 1;
 					var ptr = program.a + 1;
@@ -6132,7 +6118,7 @@ var $author$project$Aoc18$executeInstruction = F3(
 						var _v2 = _v1.a;
 						var received = _v2.a;
 						var inbox = _v2.b;
-						var registers = A3($author$project$Aoc18$writeValue, r, received, program.b);
+						var registers = A3($author$project$Main$writeValue, r, received, program.b);
 						return _Utils_update(
 							program,
 							{m: inbox, a: program.a + 1, b: registers});
@@ -6142,7 +6128,7 @@ var $author$project$Aoc18$executeInstruction = F3(
 							{k: 2});
 					}
 				} else {
-					var n = A2($author$project$Aoc18$readValue, r, program.b);
+					var n = A2($author$project$Main$readValue, r, program.b);
 					return (!n) ? _Utils_update(
 						program,
 						{a: program.a + 1}) : _Utils_update(
@@ -6153,8 +6139,8 @@ var $author$project$Aoc18$executeInstruction = F3(
 				var _v3 = inst.a;
 				var r = _v3.a;
 				var v = _v3.b;
-				var n = A2($author$project$Aoc18$resolveValue, v, program.b);
-				var registers = A3($author$project$Aoc18$writeValue, r, n, program.b);
+				var n = A2($author$project$Main$resolveValue, v, program.b);
+				var registers = A3($author$project$Main$writeValue, r, n, program.b);
 				return _Utils_update(
 					program,
 					{a: program.a + 1, b: registers});
@@ -6162,9 +6148,9 @@ var $author$project$Aoc18$executeInstruction = F3(
 				var _v4 = inst.a;
 				var r = _v4.a;
 				var v = _v4.b;
-				var n = A2($author$project$Aoc18$readValue, r, program.b);
-				var m = A2($author$project$Aoc18$resolveValue, v, program.b);
-				var registers = A3($author$project$Aoc18$writeValue, r, n + m, program.b);
+				var n = A2($author$project$Main$readValue, r, program.b);
+				var m = A2($author$project$Main$resolveValue, v, program.b);
+				var registers = A3($author$project$Main$writeValue, r, n + m, program.b);
 				return _Utils_update(
 					program,
 					{a: program.a + 1, b: registers});
@@ -6172,9 +6158,9 @@ var $author$project$Aoc18$executeInstruction = F3(
 				var _v5 = inst.a;
 				var r = _v5.a;
 				var v = _v5.b;
-				var n = A2($author$project$Aoc18$readValue, r, program.b);
-				var m = A2($author$project$Aoc18$resolveValue, v, program.b);
-				var registers = A3($author$project$Aoc18$writeValue, r, n * m, program.b);
+				var n = A2($author$project$Main$readValue, r, program.b);
+				var m = A2($author$project$Main$resolveValue, v, program.b);
+				var registers = A3($author$project$Main$writeValue, r, n * m, program.b);
 				return _Utils_update(
 					program,
 					{a: program.a + 1, b: registers});
@@ -6182,10 +6168,10 @@ var $author$project$Aoc18$executeInstruction = F3(
 				var _v6 = inst.a;
 				var r = _v6.a;
 				var v = _v6.b;
-				var n = A2($author$project$Aoc18$readValue, r, program.b);
-				var m = A2($author$project$Aoc18$resolveValue, v, program.b);
+				var n = A2($author$project$Main$readValue, r, program.b);
+				var m = A2($author$project$Main$resolveValue, v, program.b);
 				var registers = A3(
-					$author$project$Aoc18$writeValue,
+					$author$project$Main$writeValue,
 					r,
 					A2($elm$core$Basics$modBy, m, n),
 					program.b);
@@ -6196,8 +6182,8 @@ var $author$project$Aoc18$executeInstruction = F3(
 				var _v7 = inst.a;
 				var v1 = _v7.a;
 				var v2 = _v7.b;
-				var y = A2($author$project$Aoc18$resolveValue, v2, program.b);
-				var x = A2($author$project$Aoc18$resolveValue, v1, program.b);
+				var y = A2($author$project$Main$resolveValue, v2, program.b);
+				var x = A2($author$project$Main$resolveValue, v1, program.b);
 				return (x > 0) ? _Utils_update(
 					program,
 					{a: program.a + y}) : _Utils_update(
@@ -6247,19 +6233,19 @@ var $elm$core$Array$get = F2(
 			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
 			A3($elm$core$Array$getHelp, startShift, index, tree)));
 	});
-var $author$project$Aoc18$executeNextInstruction = F3(
+var $author$project$Main$executeNextInstruction = F3(
 	function (duet, instArr, program) {
 		var _v0 = A2($elm$core$Array$get, program.a, instArr);
 		if (!_v0.$) {
 			var inst = _v0.a;
-			return A3($author$project$Aoc18$executeInstruction, duet, inst, program);
+			return A3($author$project$Main$executeInstruction, duet, inst, program);
 		} else {
 			return _Utils_update(
 				program,
 				{k: 3});
 		}
 	});
-var $author$project$Aoc18$transferMessages = function (_v0) {
+var $author$project$Main$transferMessages = function (_v0) {
 	var p0 = _v0.a;
 	var p1 = _v0.b;
 	var _v1 = _Utils_Tuple2(
@@ -6275,7 +6261,7 @@ var $author$project$Aoc18$transferMessages = function (_v0) {
 				var msg = _v5.a;
 				var outbox = _v5.b;
 				var inbox = A2($owanturist$elm_queue$Queue$enqueue, msg, p0.m);
-				return $author$project$Aoc18$transferMessages(
+				return $author$project$Main$transferMessages(
 					_Utils_Tuple2(
 						_Utils_update(
 							p0,
@@ -6294,7 +6280,7 @@ var $author$project$Aoc18$transferMessages = function (_v0) {
 			var msg = _v3.a;
 			var outbox = _v3.b;
 			var inbox = A2($owanturist$elm_queue$Queue$enqueue, msg, p1.m);
-			return $author$project$Aoc18$transferMessages(
+			return $author$project$Main$transferMessages(
 				_Utils_Tuple2(
 					_Utils_update(
 						p0,
@@ -6307,7 +6293,7 @@ var $author$project$Aoc18$transferMessages = function (_v0) {
 		}
 	}
 };
-var $author$project$Aoc18$updateDuetStep = function (model) {
+var $author$project$Main$updateDuetStep = function (model) {
 	var program1 = model.M;
 	var program0 = model.w;
 	var _v0 = _Utils_Tuple2(program0.k, program1.k);
@@ -6345,16 +6331,16 @@ var $author$project$Aoc18$updateDuetStep = function (model) {
 		}
 	}
 	var p1 = A3(
-		$author$project$Aoc18$executeNextInstruction,
+		$author$project$Main$executeNextInstruction,
 		model.l,
 		model.q,
-		$author$project$Aoc18$checkInbox(program1));
+		$author$project$Main$checkInbox(program1));
 	var p0 = A3(
-		$author$project$Aoc18$executeNextInstruction,
+		$author$project$Main$executeNextInstruction,
 		model.l,
 		model.q,
-		$author$project$Aoc18$checkInbox(program0));
-	var _v5 = $author$project$Aoc18$transferMessages(
+		$author$project$Main$checkInbox(program0));
+	var _v5 = $author$project$Main$transferMessages(
 		_Utils_Tuple2(p0, p1));
 	var p0t = _v5.a;
 	var p1t = _v5.b;
@@ -6362,7 +6348,7 @@ var $author$project$Aoc18$updateDuetStep = function (model) {
 		model,
 		{w: p0t, M: p1t});
 };
-var $author$project$Aoc18$updateSoloStep = function (model) {
+var $author$project$Main$updateSoloStep = function (model) {
 	var program = model.w;
 	var _v0 = program.k;
 	switch (_v0) {
@@ -6373,39 +6359,39 @@ var $author$project$Aoc18$updateSoloStep = function (model) {
 		case 2:
 			return model;
 		default:
-			var p = A3($author$project$Aoc18$executeNextInstruction, model.l, model.q, program);
+			var p = A3($author$project$Main$executeNextInstruction, model.l, model.q, program);
 			return _Utils_update(
 				model,
 				{w: p});
 	}
 };
-var $author$project$Aoc18$updateStep = function (model) {
-	return model.l ? $author$project$Aoc18$updateDuetStep(model) : $author$project$Aoc18$updateSoloStep(model);
+var $author$project$Main$updateStep = function (model) {
+	return model.l ? $author$project$Main$updateDuetStep(model) : $author$project$Main$updateSoloStep(model);
 };
 var $elm$core$Basics$not = _Basics_not;
-var $author$project$Aoc18$updateToggleDuet = function (model) {
+var $author$project$Main$updateToggleDuet = function (model) {
 	var duet = !model.l;
-	return $author$project$Aoc18$initModel(duet);
+	return $author$project$Main$initModel(duet);
 };
-var $author$project$Aoc18$updateTogglePlay = function (model) {
+var $author$project$Main$updateTogglePlay = function (model) {
 	return _Utils_update(
 		model,
 		{G: !model.G});
 };
-var $author$project$Aoc18$update = F2(
+var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg) {
 			case 6:
 				return _Utils_Tuple2(
-					$author$project$Aoc18$updateClear(model),
+					$author$project$Main$updateClear(model),
 					$elm$core$Platform$Cmd$none);
 			case 0:
 				return _Utils_Tuple2(
-					$author$project$Aoc18$updateStep(model),
+					$author$project$Main$updateStep(model),
 					$elm$core$Platform$Cmd$none);
 			case 1:
 				return _Utils_Tuple2(
-					$author$project$Aoc18$updateStep(model),
+					$author$project$Main$updateStep(model),
 					$elm$core$Platform$Cmd$none);
 			case 4:
 				return _Utils_Tuple2(
@@ -6421,20 +6407,20 @@ var $author$project$Aoc18$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 2:
 				return _Utils_Tuple2(
-					$author$project$Aoc18$updateTogglePlay(model),
+					$author$project$Main$updateTogglePlay(model),
 					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(
-					$author$project$Aoc18$updateToggleDuet(model),
+					$author$project$Main$updateToggleDuet(model),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Aoc18$Clear = 6;
-var $author$project$Aoc18$Faster = 4;
-var $author$project$Aoc18$Slower = 5;
-var $author$project$Aoc18$Step = 1;
-var $author$project$Aoc18$ToggleDuet = 3;
-var $author$project$Aoc18$TogglePlay = 2;
+var $author$project$Main$Clear = 6;
+var $author$project$Main$Faster = 4;
+var $author$project$Main$Slower = 5;
+var $author$project$Main$Step = 1;
+var $author$project$Main$ToggleDuet = 3;
+var $author$project$Main$TogglePlay = 2;
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -6507,14 +6493,14 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$Aoc18$toRegisterElement = function (_v0) {
+var $author$project$Main$toRegisterElement = function (_v0) {
 	var r = _v0.a;
 	var v = _v0.b;
 	var str = r + (': ' + $elm$core$String$fromInt(v));
 	return $elm$html$Html$text(str);
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $author$project$Aoc18$unparseValue = function (v) {
+var $author$project$Main$unparseValue = function (v) {
 	if (!v.$) {
 		var r = v.a;
 		return r;
@@ -6523,7 +6509,7 @@ var $author$project$Aoc18$unparseValue = function (v) {
 		return $elm$core$String$fromInt(n);
 	}
 };
-var $author$project$Aoc18$unparse = function (inst) {
+var $author$project$Main$unparse = function (inst) {
 	switch (inst.$) {
 		case 0:
 			var r = inst.a;
@@ -6535,30 +6521,30 @@ var $author$project$Aoc18$unparse = function (inst) {
 			var _v1 = inst.a;
 			var r = _v1.a;
 			var v = _v1.b;
-			return 'set ' + (r + (' ' + $author$project$Aoc18$unparseValue(v)));
+			return 'set ' + (r + (' ' + $author$project$Main$unparseValue(v)));
 		case 3:
 			var _v2 = inst.a;
 			var r = _v2.a;
 			var v = _v2.b;
-			return 'add ' + (r + (' ' + $author$project$Aoc18$unparseValue(v)));
+			return 'add ' + (r + (' ' + $author$project$Main$unparseValue(v)));
 		case 4:
 			var _v3 = inst.a;
 			var r = _v3.a;
 			var v = _v3.b;
-			return 'mul ' + (r + (' ' + $author$project$Aoc18$unparseValue(v)));
+			return 'mul ' + (r + (' ' + $author$project$Main$unparseValue(v)));
 		case 5:
 			var _v4 = inst.a;
 			var r = _v4.a;
 			var v = _v4.b;
-			return 'mod ' + (r + (' ' + $author$project$Aoc18$unparseValue(v)));
+			return 'mod ' + (r + (' ' + $author$project$Main$unparseValue(v)));
 		default:
 			var _v5 = inst.a;
 			var v = _v5.a;
 			var w = _v5.b;
-			return 'jgz ' + ($author$project$Aoc18$unparseValue(v) + (' ' + $author$project$Aoc18$unparseValue(w)));
+			return 'jgz ' + ($author$project$Main$unparseValue(v) + (' ' + $author$project$Main$unparseValue(w)));
 	}
 };
-var $author$project$Aoc18$programTable = F3(
+var $author$project$Main$programTable = F3(
 	function (duet, instArr, program) {
 		var stateStr = function () {
 			var _v0 = program.k;
@@ -6575,7 +6561,7 @@ var $author$project$Aoc18$programTable = F3(
 		}();
 		var regElements = A2(
 			$elm$core$List$map,
-			$author$project$Aoc18$toRegisterElement,
+			$author$project$Main$toRegisterElement,
 			$elm$core$Dict$toList(program.b));
 		var programStr = 'program ' + $elm$core$String$fromInt(program.U);
 		var pointerStr = 'ptr: ' + $elm$core$String$fromInt(program.a);
@@ -6584,7 +6570,7 @@ var $author$project$Aoc18$programTable = F3(
 			'?',
 			A2(
 				$elm$core$Maybe$map,
-				$author$project$Aoc18$unparse,
+				$author$project$Main$unparse,
 				A2($elm$core$Array$get, program.a, instArr)));
 		var brElement = A2($elm$html$Html$br, _List_Nil, _List_Nil);
 		var cellElements = function () {
@@ -6756,7 +6742,7 @@ var $author$project$Aoc18$programTable = F3(
 				]),
 			rowElements);
 	});
-var $author$project$Aoc18$duetTable = function (model) {
+var $author$project$Main$duetTable = function (model) {
 	return A2(
 		$elm$html$Html$table,
 		_List_Nil,
@@ -6772,19 +6758,19 @@ var $author$project$Aoc18$duetTable = function (model) {
 						_List_Nil,
 						_List_fromArray(
 							[
-								A3($author$project$Aoc18$programTable, true, model.q, model.w)
+								A3($author$project$Main$programTable, true, model.q, model.w)
 							])),
 						A2(
 						$elm$html$Html$td,
 						_List_Nil,
 						_List_fromArray(
 							[
-								A3($author$project$Aoc18$programTable, true, model.q, model.M)
+								A3($author$project$Main$programTable, true, model.q, model.M)
 							]))
 					]))
 			]));
 };
-var $author$project$Aoc18$singleTable = function (model) {
+var $author$project$Main$singleTable = function (model) {
 	return A2(
 		$elm$html$Html$table,
 		_List_Nil,
@@ -6800,13 +6786,13 @@ var $author$project$Aoc18$singleTable = function (model) {
 						_List_Nil,
 						_List_fromArray(
 							[
-								A3($author$project$Aoc18$programTable, false, model.q, model.w)
+								A3($author$project$Main$programTable, false, model.q, model.w)
 							]))
 					]))
 			]));
 };
-var $author$project$Aoc18$contentTable = function (model) {
-	return model.l ? $author$project$Aoc18$duetTable(model) : $author$project$Aoc18$singleTable(model);
+var $author$project$Main$contentTable = function (model) {
+	return model.l ? $author$project$Main$duetTable(model) : $author$project$Main$singleTable(model);
 };
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$Attributes$href = function (url) {
@@ -6839,7 +6825,7 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		$elm$json$Json$Decode$succeed(msg));
 };
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
-var $author$project$Aoc18$viewBody = function (model) {
+var $author$project$Main$view = function (model) {
 	var resultStr = function () {
 		var _v0 = model.H;
 		if (_v0.$ === 1) {
@@ -6851,7 +6837,7 @@ var $author$project$Aoc18$viewBody = function (model) {
 	}();
 	var elements = _List_fromArray(
 		[
-			$author$project$Aoc18$contentTable(model)
+			$author$project$Main$contentTable(model)
 		]);
 	var debug = 'Instructions: ' + $elm$core$String$fromInt(
 		$elm$core$Array$length(model.q));
@@ -6895,82 +6881,6 @@ var $author$project$Aoc18$viewBody = function (model) {
 									[
 										$elm$html$Html$text('Day 18: Duet')
 									]))
-							]))
-					])),
-				A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$td,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'padding-bottom', '10px')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2024/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2024')
-									])),
-								$elm$html$Html$text('] '),
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2023/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2023')
-									])),
-								$elm$html$Html$text('] '),
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2022/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2022')
-									])),
-								$elm$html$Html$text('] '),
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2021/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2021')
-									])),
-								$elm$html$Html$text('] '),
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2020/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2020')
-									])),
-								$elm$html$Html$text('] ')
 							]))
 					])),
 				A2(
@@ -7146,34 +7056,7 @@ var $author$project$Aoc18$viewBody = function (model) {
 					]))
 			]));
 };
-var $author$project$Aoc18$view = function (model) {
-	return {
-		aC: _List_fromArray(
-			[
-				$author$project$Aoc18$viewBody(model)
-			]),
-		aQ: 'Advent of Code 2017 | Day 18: Duet'
-	};
-};
-var $author$project$Aoc18$main = $elm$browser$Browser$document(
-	{aJ: $author$project$Aoc18$init, aP: $author$project$Aoc18$subscriptions, aR: $author$project$Aoc18$update, aS: $author$project$Aoc18$view});
-_Platform_export({'Aoc18':{'init':$author$project$Aoc18$main(
+var $author$project$Main$main = $elm$browser$Browser$element(
+	{aJ: $author$project$Main$init, aP: $author$project$Main$subscriptions, aR: $author$project$Main$update, aS: $author$project$Main$view});
+_Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
-
-  var app = Elm.Aoc18.init({ node: document.getElementById("elm") });
-}
-catch (e)
-{
-  // display initialization errors (e.g. bad flags, infinite recursion)
-  var header = document.createElement("h1");
-  header.style.fontFamily = "monospace";
-  header.innerText = "Initialization Error";
-  var pre = document.getElementById("elm");
-  document.body.insertBefore(header, pre);
-  pre.innerText = e;
-  throw e;
-}
-</script>
-
-</body>
-</html>
