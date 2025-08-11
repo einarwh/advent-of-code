@@ -24,8 +24,6 @@ main =
 
 -- MODEL
 
-type DataSource = Input | Sample | Bonus 
-
 type alias Name = String
 
 type Value = Reg Name | Num Int 
@@ -60,6 +58,7 @@ type alias Model =
   , program1 : Program 
   , duet : Bool
   , instructions : Array Instruction 
+  , result : Maybe Int 
   , paused : Bool 
   , finished : Bool 
   , tickInterval : Float 
@@ -196,13 +195,6 @@ registerNames : List String
 registerNames = 
   instructions |> Array.toList |> List.filterMap getRegisterName 
 
-initDim : DataSource -> (Int, Int)
-initDim dataSource = 
-  case dataSource of 
-    Sample -> (11, 7)
-    Input -> (101, 103)
-    Bonus -> (101, 103)
-
 initRegisters : Int -> List String -> Dict String Int 
 initRegisters pid regNames = 
   let 
@@ -234,6 +226,7 @@ initModel duet =
     , program1 = initProgram 1 registerNames
     , duet = duet 
     , instructions = instructions  
+    , result = Nothing 
     , paused = True 
     , finished = False  
     , tickInterval = defaultTickInterval 
@@ -355,7 +348,7 @@ updateSoloStep model =
     program = model.program0 
   in 
     case program.state of 
-      Terminated -> { model | finished = True } 
+      Terminated -> { model | finished = True, result = program.sound } 
       Waiting -> model 
       _ -> 
         let 
@@ -363,8 +356,49 @@ updateSoloStep model =
         in 
           { model | program0 = p }
 
+transferMessages : (Program, Program) -> (Program, Program) 
+transferMessages (p0, p1) = 
+  case (Queue.isEmpty p0.outbox, Queue.isEmpty p1.outbox) of 
+    (True, True) ->
+      (p0, p1)
+    (False, _) -> 
+      case Queue.dequeue p0.outbox of 
+        Just (msg, outbox) -> 
+          let 
+            inbox = Queue.enqueue msg p1.inbox 
+          in 
+            ({p0 | outbox = outbox}, {p1 | inbox = inbox}) |> transferMessages
+        Nothing -> 
+          (p0, p1) 
+    (_, False) -> 
+      case Queue.dequeue p1.outbox of 
+        Just (msg, outbox) -> 
+          let 
+            inbox = Queue.enqueue msg p0.inbox 
+          in 
+            ({p0 | inbox = inbox}, {p1 | outbox = outbox}) |> transferMessages
+        Nothing -> 
+          (p0, p1) 
+
 updateDuetStep : Model -> Model
-updateDuetStep model = model 
+updateDuetStep model = 
+  let 
+    program0 = model.program0 
+    program1 = model.program1
+  in 
+    case (program0.state, program1.state) of 
+      (Terminated, Terminated) -> 
+        { model | finished = True, result = Just (program1.sent) } 
+      (Waiting, Waiting) -> 
+        { model | finished = True, result = Just (program1.sent) } 
+      _ -> 
+        let 
+          p0 = { program0 | state = Running } |> executeNextInstruction model.duet model.instructions
+          p1 = { program1 | state = Running } |> executeNextInstruction model.duet model.instructions
+          (p0t, p1t) = transferMessages (p0, p1)
+        in 
+          { model | program0 = p0t, program1 = p1t }
+          
 
 updateStep : Model -> Model
 updateStep model = 
@@ -463,18 +497,15 @@ programTable duet instArr program =
     cellElements = 
       if duet then 
         let 
-          inboxElements = program.inbox |> Queue.toList |> List.map toMessageElement
+          sentStr = program.sent |> String.fromInt
         in 
-          (Html.text "inbox") :: inboxElements |> List.intersperse brElement
+          [ Html.text "sent", brElement, Html.text sentStr ]
       else 
         let 
           soundStr = program.sound |> Maybe.map String.fromInt |> Maybe.withDefault "?"
         in 
           [ Html.text "sound", brElement, Html.text soundStr ]
-  in 
-    Html.table 
-      [ Html.Attributes.style "border" "solid"
-      , Html.Attributes.style "width" "220px" ]
+    rows = 
       [ Html.tr 
           [ ] 
           [ Html.td 
@@ -521,7 +552,28 @@ programTable duet instArr program =
             , Html.Attributes.style "border" "solid" ] 
             cellElements
           ]
-    ]
+      ]
+    rowElements = 
+      if duet then  
+        let 
+          inboxSizeStr = program.inbox |> Queue.length |> String.fromInt
+          extraRow = 
+            Html.tr 
+              [] 
+              [ Html.td 
+                [ Html.Attributes.style "padding" "4px 10px"
+                , Html.Attributes.style "border" "solid" ] 
+                [ Html.text "inbox", brElement, Html.text inboxSizeStr ]
+            ] 
+        in 
+          List.append rows [ extraRow ] 
+      else 
+        rows         
+  in 
+    Html.table 
+      [ Html.Attributes.style "border" "solid"
+      , Html.Attributes.style "width" "220px" ]
+      rowElements
 
 singleTable : Model -> Html Msg 
 singleTable model =
@@ -556,6 +608,10 @@ viewBody model =
   let
     elements = [ contentTable model ]
     debug = "Instructions: " ++ String.fromInt (Array.length model.instructions)
+    resultStr = 
+      case model.result of 
+        Nothing -> "?"
+        Just res -> String.fromInt res
   in 
     Html.table 
       [ Html.Attributes.align "center"
@@ -637,7 +693,7 @@ viewBody model =
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "24px" ] 
               [ 
-                Html.div [] [ Html.text debug ]
+                Html.div [] [ Html.text resultStr ]
               ] ]
       , Html.tr 
           []

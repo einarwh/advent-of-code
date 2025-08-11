@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.W.H === region.ab.H)
+	if (region.X.L === region.ac.L)
 	{
-		return 'on line ' + region.W.H;
+		return 'on line ' + region.X.L;
 	}
-	return 'on lines ' + region.W.H + ' through ' + region.ab.H;
+	return 'on lines ' + region.X.L + ' through ' + region.ac.L;
 }
 
 
@@ -1871,9 +1871,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aI,
-		impl.aQ,
-		impl.aO,
+		impl.aJ,
+		impl.aR,
+		impl.aP,
 		function() { return function() {} }
 	);
 });
@@ -2733,9 +2733,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		q: func(record.q),
-		X: record.X,
-		T: record.T
+		u: func(record.u),
+		Y: record.Y,
+		V: record.V
 	}
 });
 
@@ -3003,11 +3003,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.q;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.X;
+		var message = !tag ? value : tag < 3 ? value.a : value.u;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.Y;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.T) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.V) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3957,11 +3957,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aI,
-		impl.aQ,
-		impl.aO,
+		impl.aJ,
+		impl.aR,
+		impl.aP,
 		function(sendToApp, initialModel) {
-			var view = impl.aR;
+			var view = impl.aS;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3993,12 +3993,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aI,
-		impl.aQ,
-		impl.aO,
+		impl.aJ,
+		impl.aR,
+		impl.aP,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.V && impl.V(sendToApp)
-			var view = impl.aR;
+			var divertHrefToApp = impl.W && impl.W(sendToApp)
+			var view = impl.aS;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -4006,12 +4006,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aB);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aC);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.aP) && (_VirtualDom_doc.title = title = doc.aP);
+				(title !== doc.aQ) && (_VirtualDom_doc.title = title = doc.aQ);
 			});
 		}
 	);
@@ -4067,12 +4067,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aK;
-	var onUrlRequest = impl.aL;
+	var onUrlChange = impl.aL;
+	var onUrlRequest = impl.aM;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		V: function(sendToApp)
+		W: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4088,9 +4088,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.ao === next.ao
-							&& curr.af === next.af
-							&& curr.al.a === next.al.a
+							&& curr.ap === next.ap
+							&& curr.ag === next.ag
+							&& curr.am.a === next.am.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4098,13 +4098,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aI: function(flags)
+		aJ: function(flags)
 		{
-			return A3(impl.aI, flags, _Browser_getUrl(), key);
+			return A3(impl.aJ, flags, _Browser_getUrl(), key);
 		},
+		aS: impl.aS,
 		aR: impl.aR,
-		aQ: impl.aQ,
-		aO: impl.aO
+		aP: impl.aP
 	});
 }
 
@@ -4170,17 +4170,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aG: 'hidden', aC: 'visibilitychange' }
+		? { aH: 'hidden', aD: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aG: 'mozHidden', aC: 'mozvisibilitychange' }
+		? { aH: 'mozHidden', aD: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aG: 'msHidden', aC: 'msvisibilitychange' }
+		? { aH: 'msHidden', aD: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aG: 'webkitHidden', aC: 'webkitvisibilitychange' }
-		: { aG: 'hidden', aC: 'visibilitychange' };
+		? { aH: 'webkitHidden', aD: 'webkitvisibilitychange' }
+		: { aH: 'hidden', aD: 'visibilitychange' };
 }
 
 
@@ -4261,12 +4261,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		as: _Browser_getScene(),
-		av: {
-			ax: _Browser_window.pageXOffset,
-			ay: _Browser_window.pageYOffset,
-			aw: _Browser_doc.documentElement.clientWidth,
-			ae: _Browser_doc.documentElement.clientHeight
+		at: _Browser_getScene(),
+		aw: {
+			ay: _Browser_window.pageXOffset,
+			az: _Browser_window.pageYOffset,
+			ax: _Browser_doc.documentElement.clientWidth,
+			af: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4276,8 +4276,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		aw: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		ae: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		ax: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		af: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4300,15 +4300,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			as: {
-				aw: node.scrollWidth,
-				ae: node.scrollHeight
+			at: {
+				ax: node.scrollWidth,
+				af: node.scrollHeight
 			},
-			av: {
-				ax: node.scrollLeft,
-				ay: node.scrollTop,
-				aw: node.clientWidth,
-				ae: node.clientHeight
+			aw: {
+				ay: node.scrollLeft,
+				az: node.scrollTop,
+				ax: node.clientWidth,
+				af: node.clientHeight
 			}
 		};
 	});
@@ -4338,18 +4338,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			as: _Browser_getScene(),
-			av: {
-				ax: x,
-				ay: y,
-				aw: _Browser_doc.documentElement.clientWidth,
-				ae: _Browser_doc.documentElement.clientHeight
+			at: _Browser_getScene(),
+			aw: {
+				ay: x,
+				az: y,
+				ax: _Browser_doc.documentElement.clientWidth,
+				af: _Browser_doc.documentElement.clientHeight
 			},
-			aE: {
-				ax: x + rect.left,
-				ay: y + rect.top,
-				aw: rect.width,
-				ae: rect.height
+			aF: {
+				ay: x + rect.left,
+				az: y + rect.top,
+				ax: rect.width,
+				af: rect.height
 			}
 		};
 	});
@@ -4971,7 +4971,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {ad: fragment, af: host, aj: path, al: port_, ao: protocol, ap: query};
+		return {ae: fragment, ag: host, ak: path, am: port_, ap: protocol, aq: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5380,7 +5380,7 @@ var $author$project$Aoc18$initRegisters = F2(
 var $author$project$Aoc18$initProgram = F2(
 	function (pid, regNames) {
 		var registers = A2($author$project$Aoc18$initRegisters, pid, regNames);
-		return {G: $owanturist$elm_queue$Queue$empty, N: $owanturist$elm_queue$Queue$empty, S: pid, a: 0, b: registers, O: 0, P: $elm$core$Maybe$Nothing, x: 0};
+		return {p: $owanturist$elm_queue$Queue$empty, n: $owanturist$elm_queue$Queue$empty, U: pid, a: 0, b: registers, B: 0, N: $elm$core$Maybe$Nothing, k: 0};
 	});
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
@@ -5664,14 +5664,15 @@ var $author$project$Aoc18$initModel = function (duet) {
 	var p1 = $author$project$Aoc18$initProgram(1);
 	var p0 = $author$project$Aoc18$initProgram(0);
 	return {
-		aa: '',
-		p: duet,
-		M: false,
-		u: $author$project$Aoc18$instructions,
-		B: true,
-		C: A2($author$project$Aoc18$initProgram, 0, $author$project$Aoc18$registerNames),
-		U: A2($author$project$Aoc18$initProgram, 1, $author$project$Aoc18$registerNames),
-		y: $author$project$Aoc18$defaultTickInterval
+		ab: '',
+		l: duet,
+		F: false,
+		q: $author$project$Aoc18$instructions,
+		G: true,
+		w: A2($author$project$Aoc18$initProgram, 0, $author$project$Aoc18$registerNames),
+		M: A2($author$project$Aoc18$initProgram, 1, $author$project$Aoc18$registerNames),
+		H: $elm$core$Maybe$Nothing,
+		C: $author$project$Aoc18$defaultTickInterval
 	};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
@@ -5688,7 +5689,7 @@ var $elm$time$Time$Every = F2(
 	});
 var $elm$time$Time$State = F2(
 	function (taggers, processes) {
-		return {an: processes, au: taggers};
+		return {ao: processes, av: taggers};
 	});
 var $elm$time$Time$init = $elm$core$Task$succeed(
 	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
@@ -5869,7 +5870,7 @@ var $elm$time$Time$spawnHelp = F3(
 	});
 var $elm$time$Time$onEffects = F3(
 	function (router, subs, _v0) {
-		var processes = _v0.an;
+		var processes = _v0.ao;
 		var rightStep = F3(
 			function (_v6, id, _v7) {
 				var spawns = _v7.a;
@@ -5938,7 +5939,7 @@ var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
 var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $elm$time$Time$onSelfMsg = F3(
 	function (router, interval, state) {
-		var _v0 = A2($elm$core$Dict$get, interval, state.au);
+		var _v0 = A2($elm$core$Dict$get, interval, state.av);
 		if (_v0.$ === 1) {
 			return $elm$core$Task$succeed(state);
 		} else {
@@ -5987,20 +5988,18 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc18$subscriptions = function (model) {
-	var tickSub = (model.B || model.M) ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = (model.G || model.F) ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.y,
+		model.C,
 		function (_v0) {
 			return 0;
 		});
 	return tickSub;
 };
 var $author$project$Aoc18$updateClear = function (model) {
-	return $author$project$Aoc18$initModel(model.p);
+	return $author$project$Aoc18$initModel(model.l);
 };
-var $author$project$Aoc18$updateDuetStep = function (model) {
-	return model;
-};
+var $author$project$Aoc18$Running = 1;
 var $author$project$Aoc18$Terminated = 3;
 var $author$project$Aoc18$Waiting = 2;
 var $owanturist$elm_queue$Queue$Queue = F5(
@@ -6100,24 +6099,24 @@ var $author$project$Aoc18$executeInstruction = F3(
 				var r = inst.a;
 				var n = A2($author$project$Aoc18$readValue, r, program.b);
 				if (duet) {
-					var sent = program.O + 1;
+					var sent = program.B + 1;
 					var ptr = program.a + 1;
-					var outbox = A2($owanturist$elm_queue$Queue$enqueue, n, program.N);
+					var outbox = A2($owanturist$elm_queue$Queue$enqueue, n, program.n);
 					return _Utils_update(
 						program,
-						{N: outbox, a: ptr, O: sent});
+						{n: outbox, a: ptr, B: sent});
 				} else {
 					return _Utils_update(
 						program,
 						{
 							a: program.a + 1,
-							P: $elm$core$Maybe$Just(n)
+							N: $elm$core$Maybe$Just(n)
 						});
 				}
 			case 1:
 				var r = inst.a;
 				if (duet) {
-					var _v1 = $owanturist$elm_queue$Queue$dequeue(program.G);
+					var _v1 = $owanturist$elm_queue$Queue$dequeue(program.p);
 					if (!_v1.$) {
 						var _v2 = _v1.a;
 						var received = _v2.a;
@@ -6125,11 +6124,11 @@ var $author$project$Aoc18$executeInstruction = F3(
 						var registers = A3($author$project$Aoc18$writeValue, r, received, program.b);
 						return _Utils_update(
 							program,
-							{G: inbox, a: program.a + 1, b: registers});
+							{p: inbox, a: program.a + 1, b: registers});
 					} else {
 						return _Utils_update(
 							program,
-							{x: 2});
+							{k: 2});
 					}
 				} else {
 					var n = A2($author$project$Aoc18$readValue, r, program.b);
@@ -6137,7 +6136,7 @@ var $author$project$Aoc18$executeInstruction = F3(
 						program,
 						{a: program.a + 1}) : _Utils_update(
 						program,
-						{x: 3});
+						{k: 3});
 				}
 			case 2:
 				var _v3 = inst.a;
@@ -6246,38 +6245,146 @@ var $author$project$Aoc18$executeNextInstruction = F3(
 		} else {
 			return _Utils_update(
 				program,
-				{x: 3});
+				{k: 3});
 		}
 	});
+var $owanturist$elm_queue$Queue$isEmpty = $elm$core$Basics$eq($owanturist$elm_queue$Queue$Empty);
+var $author$project$Aoc18$transferMessages = function (_v0) {
+	var p0 = _v0.a;
+	var p1 = _v0.b;
+	var _v1 = _Utils_Tuple2(
+		$owanturist$elm_queue$Queue$isEmpty(p0.n),
+		$owanturist$elm_queue$Queue$isEmpty(p1.n));
+	if (_v1.a) {
+		if (_v1.b) {
+			return _Utils_Tuple2(p0, p1);
+		} else {
+			var _v4 = $owanturist$elm_queue$Queue$dequeue(p1.n);
+			if (!_v4.$) {
+				var _v5 = _v4.a;
+				var msg = _v5.a;
+				var outbox = _v5.b;
+				var inbox = A2($owanturist$elm_queue$Queue$enqueue, msg, p0.p);
+				return $author$project$Aoc18$transferMessages(
+					_Utils_Tuple2(
+						_Utils_update(
+							p0,
+							{p: inbox}),
+						_Utils_update(
+							p1,
+							{n: outbox})));
+			} else {
+				return _Utils_Tuple2(p0, p1);
+			}
+		}
+	} else {
+		var _v2 = $owanturist$elm_queue$Queue$dequeue(p0.n);
+		if (!_v2.$) {
+			var _v3 = _v2.a;
+			var msg = _v3.a;
+			var outbox = _v3.b;
+			var inbox = A2($owanturist$elm_queue$Queue$enqueue, msg, p1.p);
+			return $author$project$Aoc18$transferMessages(
+				_Utils_Tuple2(
+					_Utils_update(
+						p0,
+						{n: outbox}),
+					_Utils_update(
+						p1,
+						{p: inbox})));
+		} else {
+			return _Utils_Tuple2(p0, p1);
+		}
+	}
+};
+var $author$project$Aoc18$updateDuetStep = function (model) {
+	var program1 = model.M;
+	var program0 = model.w;
+	var _v0 = _Utils_Tuple2(program0.k, program1.k);
+	_v0$2:
+	while (true) {
+		switch (_v0.a) {
+			case 3:
+				if (_v0.b === 3) {
+					var _v1 = _v0.a;
+					var _v2 = _v0.b;
+					return _Utils_update(
+						model,
+						{
+							F: true,
+							H: $elm$core$Maybe$Just(program1.B)
+						});
+				} else {
+					break _v0$2;
+				}
+			case 2:
+				if (_v0.b === 2) {
+					var _v3 = _v0.a;
+					var _v4 = _v0.b;
+					return _Utils_update(
+						model,
+						{
+							F: true,
+							H: $elm$core$Maybe$Just(program1.B)
+						});
+				} else {
+					break _v0$2;
+				}
+			default:
+				break _v0$2;
+		}
+	}
+	var p1 = A3(
+		$author$project$Aoc18$executeNextInstruction,
+		model.l,
+		model.q,
+		_Utils_update(
+			program1,
+			{k: 1}));
+	var p0 = A3(
+		$author$project$Aoc18$executeNextInstruction,
+		model.l,
+		model.q,
+		_Utils_update(
+			program0,
+			{k: 1}));
+	var _v5 = $author$project$Aoc18$transferMessages(
+		_Utils_Tuple2(p0, p1));
+	var p0t = _v5.a;
+	var p1t = _v5.b;
+	return _Utils_update(
+		model,
+		{w: p0t, M: p1t});
+};
 var $author$project$Aoc18$updateSoloStep = function (model) {
-	var program = model.C;
-	var _v0 = program.x;
+	var program = model.w;
+	var _v0 = program.k;
 	switch (_v0) {
 		case 3:
 			return _Utils_update(
 				model,
-				{M: true});
+				{F: true, H: program.N});
 		case 2:
 			return model;
 		default:
-			var p = A3($author$project$Aoc18$executeNextInstruction, model.p, model.u, program);
+			var p = A3($author$project$Aoc18$executeNextInstruction, model.l, model.q, program);
 			return _Utils_update(
 				model,
-				{C: p});
+				{w: p});
 	}
 };
 var $author$project$Aoc18$updateStep = function (model) {
-	return model.p ? $author$project$Aoc18$updateDuetStep(model) : $author$project$Aoc18$updateSoloStep(model);
+	return model.l ? $author$project$Aoc18$updateDuetStep(model) : $author$project$Aoc18$updateSoloStep(model);
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc18$updateToggleDuet = function (model) {
-	var duet = !model.p;
+	var duet = !model.l;
 	return $author$project$Aoc18$initModel(duet);
 };
 var $author$project$Aoc18$updateTogglePlay = function (model) {
 	return _Utils_update(
 		model,
-		{B: !model.B});
+		{G: !model.G});
 };
 var $author$project$Aoc18$update = F2(
 	function (msg, model) {
@@ -6298,13 +6405,13 @@ var $author$project$Aoc18$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{y: model.y / 2}),
+						{C: model.C / 2}),
 					$elm$core$Platform$Cmd$none);
 			case 5:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{y: model.y * 2}),
+						{C: model.C * 2}),
 					$elm$core$Platform$Cmd$none);
 			case 2:
 				return _Utils_Tuple2(
@@ -6342,6 +6449,14 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 			$elm$json$Json$Encode$bool(bool));
 	});
 var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
 var $elm$html$Html$br = _VirtualDom_node('br');
 var $elm$core$List$intersperse = F2(
 	function (sep, xs) {
@@ -6361,6 +6476,15 @@ var $elm$core$List$intersperse = F2(
 			return A2($elm$core$List$cons, hd, spersed);
 		}
 	});
+var $owanturist$elm_queue$Queue$length = function (queue) {
+	if (!queue.$) {
+		return 0;
+	} else {
+		var sizeIn = queue.b;
+		var sizeOut = queue.c;
+		return (sizeIn + sizeOut) + 1;
+	}
+};
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
 		if (!maybe.$) {
@@ -6377,32 +6501,6 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $owanturist$elm_queue$Queue$foldr = F3(
-	function (fn, acc, queue) {
-		if (!queue.$) {
-			return acc;
-		} else {
-			var peek = queue.a;
-			var input = queue.d;
-			var output = queue.e;
-			return A3(
-				$elm$core$List$foldr,
-				fn,
-				A3(
-					$elm$core$List$foldl,
-					fn,
-					A2(fn, peek, acc),
-					output),
-				input);
-		}
-	});
-var $owanturist$elm_queue$Queue$toList = function (queue) {
-	return A3($owanturist$elm_queue$Queue$foldr, $elm$core$List$cons, _List_Nil, queue);
-};
-var $author$project$Aoc18$toMessageElement = function (v) {
-	var str = $elm$core$String$fromInt(v);
-	return $elm$html$Html$text(str);
-};
 var $author$project$Aoc18$toRegisterElement = function (_v0) {
 	var r = _v0.a;
 	var v = _v0.b;
@@ -6457,7 +6555,7 @@ var $author$project$Aoc18$unparse = function (inst) {
 var $author$project$Aoc18$programTable = F3(
 	function (duet, instArr, program) {
 		var stateStr = function () {
-			var _v0 = program.x;
+			var _v0 = program.k;
 			switch (_v0) {
 				case 0:
 					return 'ready';
@@ -6473,7 +6571,7 @@ var $author$project$Aoc18$programTable = F3(
 			$elm$core$List$map,
 			$author$project$Aoc18$toRegisterElement,
 			$elm$core$Dict$toList(program.b));
-		var programStr = 'program ' + $elm$core$String$fromInt(program.S);
+		var programStr = 'program ' + $elm$core$String$fromInt(program.U);
 		var pointerStr = 'ptr: ' + $elm$core$String$fromInt(program.a);
 		var instStr = A2(
 			$elm$core$Maybe$withDefault,
@@ -6485,22 +6583,18 @@ var $author$project$Aoc18$programTable = F3(
 		var brElement = A2($elm$html$Html$br, _List_Nil, _List_Nil);
 		var cellElements = function () {
 			if (duet) {
-				var inboxElements = A2(
-					$elm$core$List$map,
-					$author$project$Aoc18$toMessageElement,
-					$owanturist$elm_queue$Queue$toList(program.G));
-				return A2(
-					$elm$core$List$intersperse,
-					brElement,
-					A2(
-						$elm$core$List$cons,
-						$elm$html$Html$text('inbox'),
-						inboxElements));
+				var sentStr = $elm$core$String$fromInt(program.B);
+				return _List_fromArray(
+					[
+						$elm$html$Html$text('sent'),
+						brElement,
+						$elm$html$Html$text(sentStr)
+					]);
 			} else {
 				var soundStr = A2(
 					$elm$core$Maybe$withDefault,
 					'?',
-					A2($elm$core$Maybe$map, $elm$core$String$fromInt, program.P));
+					A2($elm$core$Maybe$map, $elm$core$String$fromInt, program.N));
 				return _List_fromArray(
 					[
 						$elm$html$Html$text('sound'),
@@ -6516,6 +6610,137 @@ var $author$project$Aoc18$programTable = F3(
 				$elm$core$List$cons,
 				$elm$html$Html$text('registers'),
 				regElements));
+		var rows = _List_fromArray(
+			[
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'padding', '4px 10px'),
+								A2($elm$html$Html$Attributes$style, 'border', 'solid')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(programStr)
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'padding', '4px 10px'),
+								A2($elm$html$Html$Attributes$style, 'border', 'solid')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(stateStr)
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'padding', '4px 10px'),
+								A2($elm$html$Html$Attributes$style, 'border', 'solid')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(pointerStr)
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'padding', '4px 10px'),
+								A2($elm$html$Html$Attributes$style, 'border', 'solid')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(instStr)
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'padding', '4px 10px'),
+								A2($elm$html$Html$Attributes$style, 'border', 'solid')
+							]),
+						regCellElements)
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'padding', '4px 10px'),
+								A2($elm$html$Html$Attributes$style, 'border', 'solid')
+							]),
+						cellElements)
+					]))
+			]);
+		var rowElements = function () {
+			if (duet) {
+				var inboxSizeStr = $elm$core$String$fromInt(
+					$owanturist$elm_queue$Queue$length(program.p));
+				var extraRow = A2(
+					$elm$html$Html$tr,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$td,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'padding', '4px 10px'),
+									A2($elm$html$Html$Attributes$style, 'border', 'solid')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('inbox'),
+									brElement,
+									$elm$html$Html$text(inboxSizeStr)
+								]))
+						]));
+				return A2(
+					$elm$core$List$append,
+					rows,
+					_List_fromArray(
+						[extraRow]));
+			} else {
+				return rows;
+			}
+		}();
 		return A2(
 			$elm$html$Html$table,
 			_List_fromArray(
@@ -6523,105 +6748,7 @@ var $author$project$Aoc18$programTable = F3(
 					A2($elm$html$Html$Attributes$style, 'border', 'solid'),
 					A2($elm$html$Html$Attributes$style, 'width', '220px')
 				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$tr,
-					_List_Nil,
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$td,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'padding', '4px 10px'),
-									A2($elm$html$Html$Attributes$style, 'border', 'solid')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text(programStr)
-								]))
-						])),
-					A2(
-					$elm$html$Html$tr,
-					_List_Nil,
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$td,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'padding', '4px 10px'),
-									A2($elm$html$Html$Attributes$style, 'border', 'solid')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text(stateStr)
-								]))
-						])),
-					A2(
-					$elm$html$Html$tr,
-					_List_Nil,
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$td,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'padding', '4px 10px'),
-									A2($elm$html$Html$Attributes$style, 'border', 'solid')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text(pointerStr)
-								]))
-						])),
-					A2(
-					$elm$html$Html$tr,
-					_List_Nil,
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$td,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'padding', '4px 10px'),
-									A2($elm$html$Html$Attributes$style, 'border', 'solid')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text(instStr)
-								]))
-						])),
-					A2(
-					$elm$html$Html$tr,
-					_List_Nil,
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$td,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'padding', '4px 10px'),
-									A2($elm$html$Html$Attributes$style, 'border', 'solid')
-								]),
-							regCellElements)
-						])),
-					A2(
-					$elm$html$Html$tr,
-					_List_Nil,
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$td,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'padding', '4px 10px'),
-									A2($elm$html$Html$Attributes$style, 'border', 'solid')
-								]),
-							cellElements)
-						]))
-				]));
+			rowElements);
 	});
 var $author$project$Aoc18$duetTable = function (model) {
 	return A2(
@@ -6639,14 +6766,14 @@ var $author$project$Aoc18$duetTable = function (model) {
 						_List_Nil,
 						_List_fromArray(
 							[
-								A3($author$project$Aoc18$programTable, true, model.u, model.C)
+								A3($author$project$Aoc18$programTable, true, model.q, model.w)
 							])),
 						A2(
 						$elm$html$Html$td,
 						_List_Nil,
 						_List_fromArray(
 							[
-								A3($author$project$Aoc18$programTable, true, model.u, model.U)
+								A3($author$project$Aoc18$programTable, true, model.q, model.M)
 							]))
 					]))
 			]));
@@ -6667,13 +6794,13 @@ var $author$project$Aoc18$singleTable = function (model) {
 						_List_Nil,
 						_List_fromArray(
 							[
-								A3($author$project$Aoc18$programTable, false, model.u, model.C)
+								A3($author$project$Aoc18$programTable, false, model.q, model.w)
 							]))
 					]))
 			]));
 };
 var $author$project$Aoc18$contentTable = function (model) {
-	return model.p ? $author$project$Aoc18$duetTable(model) : $author$project$Aoc18$singleTable(model);
+	return model.l ? $author$project$Aoc18$duetTable(model) : $author$project$Aoc18$singleTable(model);
 };
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$Attributes$href = function (url) {
@@ -6707,12 +6834,21 @@ var $elm$html$Html$Events$onClick = function (msg) {
 };
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Aoc18$viewBody = function (model) {
+	var resultStr = function () {
+		var _v0 = model.H;
+		if (_v0.$ === 1) {
+			return '?';
+		} else {
+			var res = _v0.a;
+			return $elm$core$String$fromInt(res);
+		}
+	}();
 	var elements = _List_fromArray(
 		[
 			$author$project$Aoc18$contentTable(model)
 		]);
 	var debug = 'Instructions: ' + $elm$core$String$fromInt(
-		$elm$core$Array$length(model.u));
+		$elm$core$Array$length(model.q));
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
@@ -6902,7 +7038,7 @@ var $author$project$Aoc18$viewBody = function (model) {
 									]),
 								_List_fromArray(
 									[
-										model.B ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
+										model.G ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -6947,7 +7083,7 @@ var $author$project$Aoc18$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('checkbox'),
 										$elm$html$Html$Events$onClick(3),
-										$elm$html$Html$Attributes$checked(model.p)
+										$elm$html$Html$Attributes$checked(model.l)
 									]),
 								_List_Nil),
 								A2(
@@ -6979,7 +7115,7 @@ var $author$project$Aoc18$viewBody = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(debug)
+										$elm$html$Html$text(resultStr)
 									]))
 							]))
 					])),
@@ -7006,15 +7142,15 @@ var $author$project$Aoc18$viewBody = function (model) {
 };
 var $author$project$Aoc18$view = function (model) {
 	return {
-		aB: _List_fromArray(
+		aC: _List_fromArray(
 			[
 				$author$project$Aoc18$viewBody(model)
 			]),
-		aP: 'Advent of Code 2017 | Day 18: Duet'
+		aQ: 'Advent of Code 2017 | Day 18: Duet'
 	};
 };
 var $author$project$Aoc18$main = $elm$browser$Browser$document(
-	{aI: $author$project$Aoc18$init, aO: $author$project$Aoc18$subscriptions, aQ: $author$project$Aoc18$update, aR: $author$project$Aoc18$view});
+	{aJ: $author$project$Aoc18$init, aP: $author$project$Aoc18$subscriptions, aR: $author$project$Aoc18$update, aS: $author$project$Aoc18$view});
 _Platform_export({'Aoc18':{'init':$author$project$Aoc18$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
 
