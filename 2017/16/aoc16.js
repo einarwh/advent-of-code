@@ -6145,7 +6145,8 @@ var $author$project$Main$toLetterElement = F3(
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$x(xStr),
-					$elm$svg$Svg$Attributes$y(yStr)
+					$elm$svg$Svg$Attributes$y(yStr),
+					$elm$svg$Svg$Attributes$fill('currentcolor')
 				]),
 			_List_fromArray(
 				[

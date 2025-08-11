@@ -483,7 +483,7 @@ toLetterElement boxSize ch (xInt, yInt) =
     xStr = String.fromFloat (toFloat xInt * boxSize + 6)
     yStr = String.fromFloat (toFloat yInt * boxSize - 6)
   in
-    Svg.text_ [ x xStr, y yStr ] [ Svg.text (String.fromChar ch) ]
+    Svg.text_ [ x xStr, y yStr, fill "currentcolor" ] [ Svg.text (String.fromChar ch) ]
 
 createLetterElements : Float -> Int -> String -> List (Svg Msg)
 createLetterElements boxSize y order =
