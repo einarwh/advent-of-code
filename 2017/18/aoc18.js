@@ -5366,7 +5366,7 @@ var $author$project$Main$initRegisters = F2(
 var $author$project$Main$initProgram = F2(
 	function (pid, regNames) {
 		var registers = A2($author$project$Main$initRegisters, pid, regNames);
-		return {m: $owanturist$elm_queue$Queue$empty, o: $owanturist$elm_queue$Queue$empty, U: pid, a: 0, b: registers, B: 0, N: $elm$core$Maybe$Nothing, k: 0};
+		return {m: $owanturist$elm_queue$Queue$empty, o: $owanturist$elm_queue$Queue$empty, U: pid, a: 0, b: registers, B: 0, N: $elm$core$Maybe$Nothing, j: 0};
 	});
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
@@ -5987,14 +5987,19 @@ var $author$project$Main$updateClear = function (model) {
 };
 var $author$project$Main$Running = 1;
 var $owanturist$elm_queue$Queue$isEmpty = $elm$core$Basics$eq($owanturist$elm_queue$Queue$Empty);
-var $author$project$Main$checkInbox = function (program) {
-	var _v0 = program.k;
-	if (_v0 === 2) {
-		return $owanturist$elm_queue$Queue$isEmpty(program.m) ? program : _Utils_update(
-			program,
-			{k: 1});
-	} else {
-		return program;
+var $author$project$Main$checkState = function (program) {
+	var _v0 = program.j;
+	switch (_v0) {
+		case 0:
+			return _Utils_update(
+				program,
+				{j: 1});
+		case 2:
+			return $owanturist$elm_queue$Queue$isEmpty(program.m) ? program : _Utils_update(
+				program,
+				{j: 1});
+		default:
+			return program;
 	}
 };
 var $author$project$Main$Terminated = 3;
@@ -6125,7 +6130,7 @@ var $author$project$Main$executeInstruction = F3(
 					} else {
 						return _Utils_update(
 							program,
-							{k: 2});
+							{j: 2});
 					}
 				} else {
 					var n = A2($author$project$Main$readValue, r, program.b);
@@ -6133,7 +6138,7 @@ var $author$project$Main$executeInstruction = F3(
 						program,
 						{a: program.a + 1}) : _Utils_update(
 						program,
-						{k: 3});
+						{j: 3});
 				}
 			case 2:
 				var _v3 = inst.a;
@@ -6242,7 +6247,7 @@ var $author$project$Main$executeNextInstruction = F3(
 		} else {
 			return _Utils_update(
 				program,
-				{k: 3});
+				{j: 3});
 		}
 	});
 var $author$project$Main$transferMessages = function (_v0) {
@@ -6296,7 +6301,7 @@ var $author$project$Main$transferMessages = function (_v0) {
 var $author$project$Main$updateDuetStep = function (model) {
 	var program1 = model.M;
 	var program0 = model.w;
-	var _v0 = _Utils_Tuple2(program0.k, program1.k);
+	var _v0 = _Utils_Tuple2(program0.j, program1.j);
 	_v0$2:
 	while (true) {
 		switch (_v0.a) {
@@ -6334,12 +6339,12 @@ var $author$project$Main$updateDuetStep = function (model) {
 		$author$project$Main$executeNextInstruction,
 		model.l,
 		model.q,
-		$author$project$Main$checkInbox(program1));
+		$author$project$Main$checkState(program1));
 	var p0 = A3(
 		$author$project$Main$executeNextInstruction,
 		model.l,
 		model.q,
-		$author$project$Main$checkInbox(program0));
+		$author$project$Main$checkState(program0));
 	var _v5 = $author$project$Main$transferMessages(
 		_Utils_Tuple2(p0, p1));
 	var p0t = _v5.a;
@@ -6350,7 +6355,7 @@ var $author$project$Main$updateDuetStep = function (model) {
 };
 var $author$project$Main$updateSoloStep = function (model) {
 	var program = model.w;
-	var _v0 = program.k;
+	var _v0 = program.j;
 	switch (_v0) {
 		case 3:
 			return _Utils_update(
@@ -6547,7 +6552,7 @@ var $author$project$Main$unparse = function (inst) {
 var $author$project$Main$programTable = F3(
 	function (duet, instArr, program) {
 		var stateStr = function () {
-			var _v0 = program.k;
+			var _v0 = program.j;
 			switch (_v0) {
 				case 0:
 					return 'ready';
