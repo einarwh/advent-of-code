@@ -1,0 +1,6552 @@
+(function(scope){
+'use strict';
+
+function F(arity, fun, wrapper) {
+  wrapper.a = arity;
+  wrapper.f = fun;
+  return wrapper;
+}
+
+function F2(fun) {
+  return F(2, fun, function(a) { return function(b) { return fun(a,b); }; })
+}
+function F3(fun) {
+  return F(3, fun, function(a) {
+    return function(b) { return function(c) { return fun(a, b, c); }; };
+  });
+}
+function F4(fun) {
+  return F(4, fun, function(a) { return function(b) { return function(c) {
+    return function(d) { return fun(a, b, c, d); }; }; };
+  });
+}
+function F5(fun) {
+  return F(5, fun, function(a) { return function(b) { return function(c) {
+    return function(d) { return function(e) { return fun(a, b, c, d, e); }; }; }; };
+  });
+}
+function F6(fun) {
+  return F(6, fun, function(a) { return function(b) { return function(c) {
+    return function(d) { return function(e) { return function(f) {
+    return fun(a, b, c, d, e, f); }; }; }; }; };
+  });
+}
+function F7(fun) {
+  return F(7, fun, function(a) { return function(b) { return function(c) {
+    return function(d) { return function(e) { return function(f) {
+    return function(g) { return fun(a, b, c, d, e, f, g); }; }; }; }; }; };
+  });
+}
+function F8(fun) {
+  return F(8, fun, function(a) { return function(b) { return function(c) {
+    return function(d) { return function(e) { return function(f) {
+    return function(g) { return function(h) {
+    return fun(a, b, c, d, e, f, g, h); }; }; }; }; }; }; };
+  });
+}
+function F9(fun) {
+  return F(9, fun, function(a) { return function(b) { return function(c) {
+    return function(d) { return function(e) { return function(f) {
+    return function(g) { return function(h) { return function(i) {
+    return fun(a, b, c, d, e, f, g, h, i); }; }; }; }; }; }; }; };
+  });
+}
+
+function A2(fun, a, b) {
+  return fun.a === 2 ? fun.f(a, b) : fun(a)(b);
+}
+function A3(fun, a, b, c) {
+  return fun.a === 3 ? fun.f(a, b, c) : fun(a)(b)(c);
+}
+function A4(fun, a, b, c, d) {
+  return fun.a === 4 ? fun.f(a, b, c, d) : fun(a)(b)(c)(d);
+}
+function A5(fun, a, b, c, d, e) {
+  return fun.a === 5 ? fun.f(a, b, c, d, e) : fun(a)(b)(c)(d)(e);
+}
+function A6(fun, a, b, c, d, e, f) {
+  return fun.a === 6 ? fun.f(a, b, c, d, e, f) : fun(a)(b)(c)(d)(e)(f);
+}
+function A7(fun, a, b, c, d, e, f, g) {
+  return fun.a === 7 ? fun.f(a, b, c, d, e, f, g) : fun(a)(b)(c)(d)(e)(f)(g);
+}
+function A8(fun, a, b, c, d, e, f, g, h) {
+  return fun.a === 8 ? fun.f(a, b, c, d, e, f, g, h) : fun(a)(b)(c)(d)(e)(f)(g)(h);
+}
+function A9(fun, a, b, c, d, e, f, g, h, i) {
+  return fun.a === 9 ? fun.f(a, b, c, d, e, f, g, h, i) : fun(a)(b)(c)(d)(e)(f)(g)(h)(i);
+}
+
+
+
+
+// EQUALITY
+
+function _Utils_eq(x, y)
+{
+	for (
+		var pair, stack = [], isEqual = _Utils_eqHelp(x, y, 0, stack);
+		isEqual && (pair = stack.pop());
+		isEqual = _Utils_eqHelp(pair.a, pair.b, 0, stack)
+		)
+	{}
+
+	return isEqual;
+}
+
+function _Utils_eqHelp(x, y, depth, stack)
+{
+	if (x === y)
+	{
+		return true;
+	}
+
+	if (typeof x !== 'object' || x === null || y === null)
+	{
+		typeof x === 'function' && _Debug_crash(5);
+		return false;
+	}
+
+	if (depth > 100)
+	{
+		stack.push(_Utils_Tuple2(x,y));
+		return true;
+	}
+
+	/**_UNUSED/
+	if (x.$ === 'Set_elm_builtin')
+	{
+		x = $elm$core$Set$toList(x);
+		y = $elm$core$Set$toList(y);
+	}
+	if (x.$ === 'RBNode_elm_builtin' || x.$ === 'RBEmpty_elm_builtin')
+	{
+		x = $elm$core$Dict$toList(x);
+		y = $elm$core$Dict$toList(y);
+	}
+	//*/
+
+	/**/
+	if (x.$ < 0)
+	{
+		x = $elm$core$Dict$toList(x);
+		y = $elm$core$Dict$toList(y);
+	}
+	//*/
+
+	for (var key in x)
+	{
+		if (!_Utils_eqHelp(x[key], y[key], depth + 1, stack))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+var _Utils_equal = F2(_Utils_eq);
+var _Utils_notEqual = F2(function(a, b) { return !_Utils_eq(a,b); });
+
+
+
+// COMPARISONS
+
+// Code in Generate/JavaScript.hs, Basics.js, and List.js depends on
+// the particular integer values assigned to LT, EQ, and GT.
+
+function _Utils_cmp(x, y, ord)
+{
+	if (typeof x !== 'object')
+	{
+		return x === y ? /*EQ*/ 0 : x < y ? /*LT*/ -1 : /*GT*/ 1;
+	}
+
+	/**_UNUSED/
+	if (x instanceof String)
+	{
+		var a = x.valueOf();
+		var b = y.valueOf();
+		return a === b ? 0 : a < b ? -1 : 1;
+	}
+	//*/
+
+	/**/
+	if (typeof x.$ === 'undefined')
+	//*/
+	/**_UNUSED/
+	if (x.$[0] === '#')
+	//*/
+	{
+		return (ord = _Utils_cmp(x.a, y.a))
+			? ord
+			: (ord = _Utils_cmp(x.b, y.b))
+				? ord
+				: _Utils_cmp(x.c, y.c);
+	}
+
+	// traverse conses until end of a list or a mismatch
+	for (; x.b && y.b && !(ord = _Utils_cmp(x.a, y.a)); x = x.b, y = y.b) {} // WHILE_CONSES
+	return ord || (x.b ? /*GT*/ 1 : y.b ? /*LT*/ -1 : /*EQ*/ 0);
+}
+
+var _Utils_lt = F2(function(a, b) { return _Utils_cmp(a, b) < 0; });
+var _Utils_le = F2(function(a, b) { return _Utils_cmp(a, b) < 1; });
+var _Utils_gt = F2(function(a, b) { return _Utils_cmp(a, b) > 0; });
+var _Utils_ge = F2(function(a, b) { return _Utils_cmp(a, b) >= 0; });
+
+var _Utils_compare = F2(function(x, y)
+{
+	var n = _Utils_cmp(x, y);
+	return n < 0 ? $elm$core$Basics$LT : n ? $elm$core$Basics$GT : $elm$core$Basics$EQ;
+});
+
+
+// COMMON VALUES
+
+var _Utils_Tuple0 = 0;
+var _Utils_Tuple0_UNUSED = { $: '#0' };
+
+function _Utils_Tuple2(a, b) { return { a: a, b: b }; }
+function _Utils_Tuple2_UNUSED(a, b) { return { $: '#2', a: a, b: b }; }
+
+function _Utils_Tuple3(a, b, c) { return { a: a, b: b, c: c }; }
+function _Utils_Tuple3_UNUSED(a, b, c) { return { $: '#3', a: a, b: b, c: c }; }
+
+function _Utils_chr(c) { return c; }
+function _Utils_chr_UNUSED(c) { return new String(c); }
+
+
+// RECORDS
+
+function _Utils_update(oldRecord, updatedFields)
+{
+	var newRecord = {};
+
+	for (var key in oldRecord)
+	{
+		newRecord[key] = oldRecord[key];
+	}
+
+	for (var key in updatedFields)
+	{
+		newRecord[key] = updatedFields[key];
+	}
+
+	return newRecord;
+}
+
+
+// APPEND
+
+var _Utils_append = F2(_Utils_ap);
+
+function _Utils_ap(xs, ys)
+{
+	// append Strings
+	if (typeof xs === 'string')
+	{
+		return xs + ys;
+	}
+
+	// append Lists
+	if (!xs.b)
+	{
+		return ys;
+	}
+	var root = _List_Cons(xs.a, ys);
+	xs = xs.b
+	for (var curr = root; xs.b; xs = xs.b) // WHILE_CONS
+	{
+		curr = curr.b = _List_Cons(xs.a, ys);
+	}
+	return root;
+}
+
+
+
+var _List_Nil = { $: 0 };
+var _List_Nil_UNUSED = { $: '[]' };
+
+function _List_Cons(hd, tl) { return { $: 1, a: hd, b: tl }; }
+function _List_Cons_UNUSED(hd, tl) { return { $: '::', a: hd, b: tl }; }
+
+
+var _List_cons = F2(_List_Cons);
+
+function _List_fromArray(arr)
+{
+	var out = _List_Nil;
+	for (var i = arr.length; i--; )
+	{
+		out = _List_Cons(arr[i], out);
+	}
+	return out;
+}
+
+function _List_toArray(xs)
+{
+	for (var out = []; xs.b; xs = xs.b) // WHILE_CONS
+	{
+		out.push(xs.a);
+	}
+	return out;
+}
+
+var _List_map2 = F3(function(f, xs, ys)
+{
+	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
+	{
+		arr.push(A2(f, xs.a, ys.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map3 = F4(function(f, xs, ys, zs)
+{
+	for (var arr = []; xs.b && ys.b && zs.b; xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A3(f, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map4 = F5(function(f, ws, xs, ys, zs)
+{
+	for (var arr = []; ws.b && xs.b && ys.b && zs.b; ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
+{
+	for (var arr = []; vs.b && ws.b && xs.b && ys.b && zs.b; vs = vs.b, ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_sortBy = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		return _Utils_cmp(f(a), f(b));
+	}));
+});
+
+var _List_sortWith = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		var ord = A2(f, a, b);
+		return ord === $elm$core$Basics$EQ ? 0 : ord === $elm$core$Basics$LT ? -1 : 1;
+	}));
+});
+
+
+
+var _JsArray_empty = [];
+
+function _JsArray_singleton(value)
+{
+    return [value];
+}
+
+function _JsArray_length(array)
+{
+    return array.length;
+}
+
+var _JsArray_initialize = F3(function(size, offset, func)
+{
+    var result = new Array(size);
+
+    for (var i = 0; i < size; i++)
+    {
+        result[i] = func(offset + i);
+    }
+
+    return result;
+});
+
+var _JsArray_initializeFromList = F2(function (max, ls)
+{
+    var result = new Array(max);
+
+    for (var i = 0; i < max && ls.b; i++)
+    {
+        result[i] = ls.a;
+        ls = ls.b;
+    }
+
+    result.length = i;
+    return _Utils_Tuple2(result, ls);
+});
+
+var _JsArray_unsafeGet = F2(function(index, array)
+{
+    return array[index];
+});
+
+var _JsArray_unsafeSet = F3(function(index, value, array)
+{
+    var length = array.length;
+    var result = new Array(length);
+
+    for (var i = 0; i < length; i++)
+    {
+        result[i] = array[i];
+    }
+
+    result[index] = value;
+    return result;
+});
+
+var _JsArray_push = F2(function(value, array)
+{
+    var length = array.length;
+    var result = new Array(length + 1);
+
+    for (var i = 0; i < length; i++)
+    {
+        result[i] = array[i];
+    }
+
+    result[length] = value;
+    return result;
+});
+
+var _JsArray_foldl = F3(function(func, acc, array)
+{
+    var length = array.length;
+
+    for (var i = 0; i < length; i++)
+    {
+        acc = A2(func, array[i], acc);
+    }
+
+    return acc;
+});
+
+var _JsArray_foldr = F3(function(func, acc, array)
+{
+    for (var i = array.length - 1; i >= 0; i--)
+    {
+        acc = A2(func, array[i], acc);
+    }
+
+    return acc;
+});
+
+var _JsArray_map = F2(function(func, array)
+{
+    var length = array.length;
+    var result = new Array(length);
+
+    for (var i = 0; i < length; i++)
+    {
+        result[i] = func(array[i]);
+    }
+
+    return result;
+});
+
+var _JsArray_indexedMap = F3(function(func, offset, array)
+{
+    var length = array.length;
+    var result = new Array(length);
+
+    for (var i = 0; i < length; i++)
+    {
+        result[i] = A2(func, offset + i, array[i]);
+    }
+
+    return result;
+});
+
+var _JsArray_slice = F3(function(from, to, array)
+{
+    return array.slice(from, to);
+});
+
+var _JsArray_appendN = F3(function(n, dest, source)
+{
+    var destLen = dest.length;
+    var itemsToCopy = n - destLen;
+
+    if (itemsToCopy > source.length)
+    {
+        itemsToCopy = source.length;
+    }
+
+    var size = destLen + itemsToCopy;
+    var result = new Array(size);
+
+    for (var i = 0; i < destLen; i++)
+    {
+        result[i] = dest[i];
+    }
+
+    for (var i = 0; i < itemsToCopy; i++)
+    {
+        result[i + destLen] = source[i];
+    }
+
+    return result;
+});
+
+
+
+// LOG
+
+var _Debug_log = F2(function(tag, value)
+{
+	return value;
+});
+
+var _Debug_log_UNUSED = F2(function(tag, value)
+{
+	console.log(tag + ': ' + _Debug_toString(value));
+	return value;
+});
+
+
+// TODOS
+
+function _Debug_todo(moduleName, region)
+{
+	return function(message) {
+		_Debug_crash(8, moduleName, region, message);
+	};
+}
+
+function _Debug_todoCase(moduleName, region, value)
+{
+	return function(message) {
+		_Debug_crash(9, moduleName, region, value, message);
+	};
+}
+
+
+// TO STRING
+
+function _Debug_toString(value)
+{
+	return '<internals>';
+}
+
+function _Debug_toString_UNUSED(value)
+{
+	return _Debug_toAnsiString(false, value);
+}
+
+function _Debug_toAnsiString(ansi, value)
+{
+	if (typeof value === 'function')
+	{
+		return _Debug_internalColor(ansi, '<function>');
+	}
+
+	if (typeof value === 'boolean')
+	{
+		return _Debug_ctorColor(ansi, value ? 'True' : 'False');
+	}
+
+	if (typeof value === 'number')
+	{
+		return _Debug_numberColor(ansi, value + '');
+	}
+
+	if (value instanceof String)
+	{
+		return _Debug_charColor(ansi, "'" + _Debug_addSlashes(value, true) + "'");
+	}
+
+	if (typeof value === 'string')
+	{
+		return _Debug_stringColor(ansi, '"' + _Debug_addSlashes(value, false) + '"');
+	}
+
+	if (typeof value === 'object' && '$' in value)
+	{
+		var tag = value.$;
+
+		if (typeof tag === 'number')
+		{
+			return _Debug_internalColor(ansi, '<internals>');
+		}
+
+		if (tag[0] === '#')
+		{
+			var output = [];
+			for (var k in value)
+			{
+				if (k === '$') continue;
+				output.push(_Debug_toAnsiString(ansi, value[k]));
+			}
+			return '(' + output.join(',') + ')';
+		}
+
+		if (tag === 'Set_elm_builtin')
+		{
+			return _Debug_ctorColor(ansi, 'Set')
+				+ _Debug_fadeColor(ansi, '.fromList') + ' '
+				+ _Debug_toAnsiString(ansi, $elm$core$Set$toList(value));
+		}
+
+		if (tag === 'RBNode_elm_builtin' || tag === 'RBEmpty_elm_builtin')
+		{
+			return _Debug_ctorColor(ansi, 'Dict')
+				+ _Debug_fadeColor(ansi, '.fromList') + ' '
+				+ _Debug_toAnsiString(ansi, $elm$core$Dict$toList(value));
+		}
+
+		if (tag === 'Array_elm_builtin')
+		{
+			return _Debug_ctorColor(ansi, 'Array')
+				+ _Debug_fadeColor(ansi, '.fromList') + ' '
+				+ _Debug_toAnsiString(ansi, $elm$core$Array$toList(value));
+		}
+
+		if (tag === '::' || tag === '[]')
+		{
+			var output = '[';
+
+			value.b && (output += _Debug_toAnsiString(ansi, value.a), value = value.b)
+
+			for (; value.b; value = value.b) // WHILE_CONS
+			{
+				output += ',' + _Debug_toAnsiString(ansi, value.a);
+			}
+			return output + ']';
+		}
+
+		var output = '';
+		for (var i in value)
+		{
+			if (i === '$') continue;
+			var str = _Debug_toAnsiString(ansi, value[i]);
+			var c0 = str[0];
+			var parenless = c0 === '{' || c0 === '(' || c0 === '[' || c0 === '<' || c0 === '"' || str.indexOf(' ') < 0;
+			output += ' ' + (parenless ? str : '(' + str + ')');
+		}
+		return _Debug_ctorColor(ansi, tag) + output;
+	}
+
+	if (typeof DataView === 'function' && value instanceof DataView)
+	{
+		return _Debug_stringColor(ansi, '<' + value.byteLength + ' bytes>');
+	}
+
+	if (typeof File !== 'undefined' && value instanceof File)
+	{
+		return _Debug_internalColor(ansi, '<' + value.name + '>');
+	}
+
+	if (typeof value === 'object')
+	{
+		var output = [];
+		for (var key in value)
+		{
+			var field = key[0] === '_' ? key.slice(1) : key;
+			output.push(_Debug_fadeColor(ansi, field) + ' = ' + _Debug_toAnsiString(ansi, value[key]));
+		}
+		if (output.length === 0)
+		{
+			return '{}';
+		}
+		return '{ ' + output.join(', ') + ' }';
+	}
+
+	return _Debug_internalColor(ansi, '<internals>');
+}
+
+function _Debug_addSlashes(str, isChar)
+{
+	var s = str
+		.replace(/\\/g, '\\\\')
+		.replace(/\n/g, '\\n')
+		.replace(/\t/g, '\\t')
+		.replace(/\r/g, '\\r')
+		.replace(/\v/g, '\\v')
+		.replace(/\0/g, '\\0');
+
+	if (isChar)
+	{
+		return s.replace(/\'/g, '\\\'');
+	}
+	else
+	{
+		return s.replace(/\"/g, '\\"');
+	}
+}
+
+function _Debug_ctorColor(ansi, string)
+{
+	return ansi ? '\x1b[96m' + string + '\x1b[0m' : string;
+}
+
+function _Debug_numberColor(ansi, string)
+{
+	return ansi ? '\x1b[95m' + string + '\x1b[0m' : string;
+}
+
+function _Debug_stringColor(ansi, string)
+{
+	return ansi ? '\x1b[93m' + string + '\x1b[0m' : string;
+}
+
+function _Debug_charColor(ansi, string)
+{
+	return ansi ? '\x1b[92m' + string + '\x1b[0m' : string;
+}
+
+function _Debug_fadeColor(ansi, string)
+{
+	return ansi ? '\x1b[37m' + string + '\x1b[0m' : string;
+}
+
+function _Debug_internalColor(ansi, string)
+{
+	return ansi ? '\x1b[36m' + string + '\x1b[0m' : string;
+}
+
+function _Debug_toHexDigit(n)
+{
+	return String.fromCharCode(n < 10 ? 48 + n : 55 + n);
+}
+
+
+// CRASH
+
+
+function _Debug_crash(identifier)
+{
+	throw new Error('https://github.com/elm/core/blob/1.0.0/hints/' + identifier + '.md');
+}
+
+
+function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
+{
+	switch(identifier)
+	{
+		case 0:
+			throw new Error('What node should I take over? In JavaScript I need something like:\n\n    Elm.Main.init({\n        node: document.getElementById("elm-node")\n    })\n\nYou need to do this with any Browser.sandbox or Browser.element program.');
+
+		case 1:
+			throw new Error('Browser.application programs cannot handle URLs like this:\n\n    ' + document.location.href + '\n\nWhat is the root? The root of your file system? Try looking at this program with `elm reactor` or some other server.');
+
+		case 2:
+			var jsonErrorString = fact1;
+			throw new Error('Problem with the flags given to your Elm program on initialization.\n\n' + jsonErrorString);
+
+		case 3:
+			var portName = fact1;
+			throw new Error('There can only be one port named `' + portName + '`, but your program has multiple.');
+
+		case 4:
+			var portName = fact1;
+			var problem = fact2;
+			throw new Error('Trying to send an unexpected type of value through port `' + portName + '`:\n' + problem);
+
+		case 5:
+			throw new Error('Trying to use `(==)` on functions.\nThere is no way to know if functions are "the same" in the Elm sense.\nRead more about this at https://package.elm-lang.org/packages/elm/core/latest/Basics#== which describes why it is this way and what the better version will look like.');
+
+		case 6:
+			var moduleName = fact1;
+			throw new Error('Your page is loading multiple Elm scripts with a module named ' + moduleName + '. Maybe a duplicate script is getting loaded accidentally? If not, rename one of them so I know which is which!');
+
+		case 8:
+			var moduleName = fact1;
+			var region = fact2;
+			var message = fact3;
+			throw new Error('TODO in module `' + moduleName + '` ' + _Debug_regionToString(region) + '\n\n' + message);
+
+		case 9:
+			var moduleName = fact1;
+			var region = fact2;
+			var value = fact3;
+			var message = fact4;
+			throw new Error(
+				'TODO in module `' + moduleName + '` from the `case` expression '
+				+ _Debug_regionToString(region) + '\n\nIt received the following value:\n\n    '
+				+ _Debug_toString(value).replace('\n', '\n    ')
+				+ '\n\nBut the branch that handles it says:\n\n    ' + message.replace('\n', '\n    ')
+			);
+
+		case 10:
+			throw new Error('Bug in https://github.com/elm/virtual-dom/issues');
+
+		case 11:
+			throw new Error('Cannot perform mod 0. Division by zero error.');
+	}
+}
+
+function _Debug_regionToString(region)
+{
+	if (region.T.G === region.Z.G)
+	{
+		return 'on line ' + region.T.G;
+	}
+	return 'on lines ' + region.T.G + ' through ' + region.Z.G;
+}
+
+
+
+// MATH
+
+var _Basics_add = F2(function(a, b) { return a + b; });
+var _Basics_sub = F2(function(a, b) { return a - b; });
+var _Basics_mul = F2(function(a, b) { return a * b; });
+var _Basics_fdiv = F2(function(a, b) { return a / b; });
+var _Basics_idiv = F2(function(a, b) { return (a / b) | 0; });
+var _Basics_pow = F2(Math.pow);
+
+var _Basics_remainderBy = F2(function(b, a) { return a % b; });
+
+// https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/divmodnote-letter.pdf
+var _Basics_modBy = F2(function(modulus, x)
+{
+	var answer = x % modulus;
+	return modulus === 0
+		? _Debug_crash(11)
+		:
+	((answer > 0 && modulus < 0) || (answer < 0 && modulus > 0))
+		? answer + modulus
+		: answer;
+});
+
+
+// TRIGONOMETRY
+
+var _Basics_pi = Math.PI;
+var _Basics_e = Math.E;
+var _Basics_cos = Math.cos;
+var _Basics_sin = Math.sin;
+var _Basics_tan = Math.tan;
+var _Basics_acos = Math.acos;
+var _Basics_asin = Math.asin;
+var _Basics_atan = Math.atan;
+var _Basics_atan2 = F2(Math.atan2);
+
+
+// MORE MATH
+
+function _Basics_toFloat(x) { return x; }
+function _Basics_truncate(n) { return n | 0; }
+function _Basics_isInfinite(n) { return n === Infinity || n === -Infinity; }
+
+var _Basics_ceiling = Math.ceil;
+var _Basics_floor = Math.floor;
+var _Basics_round = Math.round;
+var _Basics_sqrt = Math.sqrt;
+var _Basics_log = Math.log;
+var _Basics_isNaN = isNaN;
+
+
+// BOOLEANS
+
+function _Basics_not(bool) { return !bool; }
+var _Basics_and = F2(function(a, b) { return a && b; });
+var _Basics_or  = F2(function(a, b) { return a || b; });
+var _Basics_xor = F2(function(a, b) { return a !== b; });
+
+
+
+var _String_cons = F2(function(chr, str)
+{
+	return chr + str;
+});
+
+function _String_uncons(string)
+{
+	var word = string.charCodeAt(0);
+	return !isNaN(word)
+		? $elm$core$Maybe$Just(
+			0xD800 <= word && word <= 0xDBFF
+				? _Utils_Tuple2(_Utils_chr(string[0] + string[1]), string.slice(2))
+				: _Utils_Tuple2(_Utils_chr(string[0]), string.slice(1))
+		)
+		: $elm$core$Maybe$Nothing;
+}
+
+var _String_append = F2(function(a, b)
+{
+	return a + b;
+});
+
+function _String_length(str)
+{
+	return str.length;
+}
+
+var _String_map = F2(function(func, string)
+{
+	var len = string.length;
+	var array = new Array(len);
+	var i = 0;
+	while (i < len)
+	{
+		var word = string.charCodeAt(i);
+		if (0xD800 <= word && word <= 0xDBFF)
+		{
+			array[i] = func(_Utils_chr(string[i] + string[i+1]));
+			i += 2;
+			continue;
+		}
+		array[i] = func(_Utils_chr(string[i]));
+		i++;
+	}
+	return array.join('');
+});
+
+var _String_filter = F2(function(isGood, str)
+{
+	var arr = [];
+	var len = str.length;
+	var i = 0;
+	while (i < len)
+	{
+		var char = str[i];
+		var word = str.charCodeAt(i);
+		i++;
+		if (0xD800 <= word && word <= 0xDBFF)
+		{
+			char += str[i];
+			i++;
+		}
+
+		if (isGood(_Utils_chr(char)))
+		{
+			arr.push(char);
+		}
+	}
+	return arr.join('');
+});
+
+function _String_reverse(str)
+{
+	var len = str.length;
+	var arr = new Array(len);
+	var i = 0;
+	while (i < len)
+	{
+		var word = str.charCodeAt(i);
+		if (0xD800 <= word && word <= 0xDBFF)
+		{
+			arr[len - i] = str[i + 1];
+			i++;
+			arr[len - i] = str[i - 1];
+			i++;
+		}
+		else
+		{
+			arr[len - i] = str[i];
+			i++;
+		}
+	}
+	return arr.join('');
+}
+
+var _String_foldl = F3(function(func, state, string)
+{
+	var len = string.length;
+	var i = 0;
+	while (i < len)
+	{
+		var char = string[i];
+		var word = string.charCodeAt(i);
+		i++;
+		if (0xD800 <= word && word <= 0xDBFF)
+		{
+			char += string[i];
+			i++;
+		}
+		state = A2(func, _Utils_chr(char), state);
+	}
+	return state;
+});
+
+var _String_foldr = F3(function(func, state, string)
+{
+	var i = string.length;
+	while (i--)
+	{
+		var char = string[i];
+		var word = string.charCodeAt(i);
+		if (0xDC00 <= word && word <= 0xDFFF)
+		{
+			i--;
+			char = string[i] + char;
+		}
+		state = A2(func, _Utils_chr(char), state);
+	}
+	return state;
+});
+
+var _String_split = F2(function(sep, str)
+{
+	return str.split(sep);
+});
+
+var _String_join = F2(function(sep, strs)
+{
+	return strs.join(sep);
+});
+
+var _String_slice = F3(function(start, end, str) {
+	return str.slice(start, end);
+});
+
+function _String_trim(str)
+{
+	return str.trim();
+}
+
+function _String_trimLeft(str)
+{
+	return str.replace(/^\s+/, '');
+}
+
+function _String_trimRight(str)
+{
+	return str.replace(/\s+$/, '');
+}
+
+function _String_words(str)
+{
+	return _List_fromArray(str.trim().split(/\s+/g));
+}
+
+function _String_lines(str)
+{
+	return _List_fromArray(str.split(/\r\n|\r|\n/g));
+}
+
+function _String_toUpper(str)
+{
+	return str.toUpperCase();
+}
+
+function _String_toLower(str)
+{
+	return str.toLowerCase();
+}
+
+var _String_any = F2(function(isGood, string)
+{
+	var i = string.length;
+	while (i--)
+	{
+		var char = string[i];
+		var word = string.charCodeAt(i);
+		if (0xDC00 <= word && word <= 0xDFFF)
+		{
+			i--;
+			char = string[i] + char;
+		}
+		if (isGood(_Utils_chr(char)))
+		{
+			return true;
+		}
+	}
+	return false;
+});
+
+var _String_all = F2(function(isGood, string)
+{
+	var i = string.length;
+	while (i--)
+	{
+		var char = string[i];
+		var word = string.charCodeAt(i);
+		if (0xDC00 <= word && word <= 0xDFFF)
+		{
+			i--;
+			char = string[i] + char;
+		}
+		if (!isGood(_Utils_chr(char)))
+		{
+			return false;
+		}
+	}
+	return true;
+});
+
+var _String_contains = F2(function(sub, str)
+{
+	return str.indexOf(sub) > -1;
+});
+
+var _String_startsWith = F2(function(sub, str)
+{
+	return str.indexOf(sub) === 0;
+});
+
+var _String_endsWith = F2(function(sub, str)
+{
+	return str.length >= sub.length &&
+		str.lastIndexOf(sub) === str.length - sub.length;
+});
+
+var _String_indexes = F2(function(sub, str)
+{
+	var subLen = sub.length;
+
+	if (subLen < 1)
+	{
+		return _List_Nil;
+	}
+
+	var i = 0;
+	var is = [];
+
+	while ((i = str.indexOf(sub, i)) > -1)
+	{
+		is.push(i);
+		i = i + subLen;
+	}
+
+	return _List_fromArray(is);
+});
+
+
+// TO STRING
+
+function _String_fromNumber(number)
+{
+	return number + '';
+}
+
+
+// INT CONVERSIONS
+
+function _String_toInt(str)
+{
+	var total = 0;
+	var code0 = str.charCodeAt(0);
+	var start = code0 == 0x2B /* + */ || code0 == 0x2D /* - */ ? 1 : 0;
+
+	for (var i = start; i < str.length; ++i)
+	{
+		var code = str.charCodeAt(i);
+		if (code < 0x30 || 0x39 < code)
+		{
+			return $elm$core$Maybe$Nothing;
+		}
+		total = 10 * total + code - 0x30;
+	}
+
+	return i == start
+		? $elm$core$Maybe$Nothing
+		: $elm$core$Maybe$Just(code0 == 0x2D ? -total : total);
+}
+
+
+// FLOAT CONVERSIONS
+
+function _String_toFloat(s)
+{
+	// check if it is a hex, octal, or binary number
+	if (s.length === 0 || /[\sxbo]/.test(s))
+	{
+		return $elm$core$Maybe$Nothing;
+	}
+	var n = +s;
+	// faster isNaN check
+	return n === n ? $elm$core$Maybe$Just(n) : $elm$core$Maybe$Nothing;
+}
+
+function _String_fromList(chars)
+{
+	return _List_toArray(chars).join('');
+}
+
+
+
+
+function _Char_toCode(char)
+{
+	var code = char.charCodeAt(0);
+	if (0xD800 <= code && code <= 0xDBFF)
+	{
+		return (code - 0xD800) * 0x400 + char.charCodeAt(1) - 0xDC00 + 0x10000
+	}
+	return code;
+}
+
+function _Char_fromCode(code)
+{
+	return _Utils_chr(
+		(code < 0 || 0x10FFFF < code)
+			? '\uFFFD'
+			:
+		(code <= 0xFFFF)
+			? String.fromCharCode(code)
+			:
+		(code -= 0x10000,
+			String.fromCharCode(Math.floor(code / 0x400) + 0xD800, code % 0x400 + 0xDC00)
+		)
+	);
+}
+
+function _Char_toUpper(char)
+{
+	return _Utils_chr(char.toUpperCase());
+}
+
+function _Char_toLower(char)
+{
+	return _Utils_chr(char.toLowerCase());
+}
+
+function _Char_toLocaleUpper(char)
+{
+	return _Utils_chr(char.toLocaleUpperCase());
+}
+
+function _Char_toLocaleLower(char)
+{
+	return _Utils_chr(char.toLocaleLowerCase());
+}
+
+
+
+/**_UNUSED/
+function _Json_errorToString(error)
+{
+	return $elm$json$Json$Decode$errorToString(error);
+}
+//*/
+
+
+// CORE DECODERS
+
+function _Json_succeed(msg)
+{
+	return {
+		$: 0,
+		a: msg
+	};
+}
+
+function _Json_fail(msg)
+{
+	return {
+		$: 1,
+		a: msg
+	};
+}
+
+function _Json_decodePrim(decoder)
+{
+	return { $: 2, b: decoder };
+}
+
+var _Json_decodeInt = _Json_decodePrim(function(value) {
+	return (typeof value !== 'number')
+		? _Json_expecting('an INT', value)
+		:
+	(-2147483647 < value && value < 2147483647 && (value | 0) === value)
+		? $elm$core$Result$Ok(value)
+		:
+	(isFinite(value) && !(value % 1))
+		? $elm$core$Result$Ok(value)
+		: _Json_expecting('an INT', value);
+});
+
+var _Json_decodeBool = _Json_decodePrim(function(value) {
+	return (typeof value === 'boolean')
+		? $elm$core$Result$Ok(value)
+		: _Json_expecting('a BOOL', value);
+});
+
+var _Json_decodeFloat = _Json_decodePrim(function(value) {
+	return (typeof value === 'number')
+		? $elm$core$Result$Ok(value)
+		: _Json_expecting('a FLOAT', value);
+});
+
+var _Json_decodeValue = _Json_decodePrim(function(value) {
+	return $elm$core$Result$Ok(_Json_wrap(value));
+});
+
+var _Json_decodeString = _Json_decodePrim(function(value) {
+	return (typeof value === 'string')
+		? $elm$core$Result$Ok(value)
+		: (value instanceof String)
+			? $elm$core$Result$Ok(value + '')
+			: _Json_expecting('a STRING', value);
+});
+
+function _Json_decodeList(decoder) { return { $: 3, b: decoder }; }
+function _Json_decodeArray(decoder) { return { $: 4, b: decoder }; }
+
+function _Json_decodeNull(value) { return { $: 5, c: value }; }
+
+var _Json_decodeField = F2(function(field, decoder)
+{
+	return {
+		$: 6,
+		d: field,
+		b: decoder
+	};
+});
+
+var _Json_decodeIndex = F2(function(index, decoder)
+{
+	return {
+		$: 7,
+		e: index,
+		b: decoder
+	};
+});
+
+function _Json_decodeKeyValuePairs(decoder)
+{
+	return {
+		$: 8,
+		b: decoder
+	};
+}
+
+function _Json_mapMany(f, decoders)
+{
+	return {
+		$: 9,
+		f: f,
+		g: decoders
+	};
+}
+
+var _Json_andThen = F2(function(callback, decoder)
+{
+	return {
+		$: 10,
+		b: decoder,
+		h: callback
+	};
+});
+
+function _Json_oneOf(decoders)
+{
+	return {
+		$: 11,
+		g: decoders
+	};
+}
+
+
+// DECODING OBJECTS
+
+var _Json_map1 = F2(function(f, d1)
+{
+	return _Json_mapMany(f, [d1]);
+});
+
+var _Json_map2 = F3(function(f, d1, d2)
+{
+	return _Json_mapMany(f, [d1, d2]);
+});
+
+var _Json_map3 = F4(function(f, d1, d2, d3)
+{
+	return _Json_mapMany(f, [d1, d2, d3]);
+});
+
+var _Json_map4 = F5(function(f, d1, d2, d3, d4)
+{
+	return _Json_mapMany(f, [d1, d2, d3, d4]);
+});
+
+var _Json_map5 = F6(function(f, d1, d2, d3, d4, d5)
+{
+	return _Json_mapMany(f, [d1, d2, d3, d4, d5]);
+});
+
+var _Json_map6 = F7(function(f, d1, d2, d3, d4, d5, d6)
+{
+	return _Json_mapMany(f, [d1, d2, d3, d4, d5, d6]);
+});
+
+var _Json_map7 = F8(function(f, d1, d2, d3, d4, d5, d6, d7)
+{
+	return _Json_mapMany(f, [d1, d2, d3, d4, d5, d6, d7]);
+});
+
+var _Json_map8 = F9(function(f, d1, d2, d3, d4, d5, d6, d7, d8)
+{
+	return _Json_mapMany(f, [d1, d2, d3, d4, d5, d6, d7, d8]);
+});
+
+
+// DECODE
+
+var _Json_runOnString = F2(function(decoder, string)
+{
+	try
+	{
+		var value = JSON.parse(string);
+		return _Json_runHelp(decoder, value);
+	}
+	catch (e)
+	{
+		return $elm$core$Result$Err(A2($elm$json$Json$Decode$Failure, 'This is not valid JSON! ' + e.message, _Json_wrap(string)));
+	}
+});
+
+var _Json_run = F2(function(decoder, value)
+{
+	return _Json_runHelp(decoder, _Json_unwrap(value));
+});
+
+function _Json_runHelp(decoder, value)
+{
+	switch (decoder.$)
+	{
+		case 2:
+			return decoder.b(value);
+
+		case 5:
+			return (value === null)
+				? $elm$core$Result$Ok(decoder.c)
+				: _Json_expecting('null', value);
+
+		case 3:
+			if (!_Json_isArray(value))
+			{
+				return _Json_expecting('a LIST', value);
+			}
+			return _Json_runArrayDecoder(decoder.b, value, _List_fromArray);
+
+		case 4:
+			if (!_Json_isArray(value))
+			{
+				return _Json_expecting('an ARRAY', value);
+			}
+			return _Json_runArrayDecoder(decoder.b, value, _Json_toElmArray);
+
+		case 6:
+			var field = decoder.d;
+			if (typeof value !== 'object' || value === null || !(field in value))
+			{
+				return _Json_expecting('an OBJECT with a field named `' + field + '`', value);
+			}
+			var result = _Json_runHelp(decoder.b, value[field]);
+			return ($elm$core$Result$isOk(result)) ? result : $elm$core$Result$Err(A2($elm$json$Json$Decode$Field, field, result.a));
+
+		case 7:
+			var index = decoder.e;
+			if (!_Json_isArray(value))
+			{
+				return _Json_expecting('an ARRAY', value);
+			}
+			if (index >= value.length)
+			{
+				return _Json_expecting('a LONGER array. Need index ' + index + ' but only see ' + value.length + ' entries', value);
+			}
+			var result = _Json_runHelp(decoder.b, value[index]);
+			return ($elm$core$Result$isOk(result)) ? result : $elm$core$Result$Err(A2($elm$json$Json$Decode$Index, index, result.a));
+
+		case 8:
+			if (typeof value !== 'object' || value === null || _Json_isArray(value))
+			{
+				return _Json_expecting('an OBJECT', value);
+			}
+
+			var keyValuePairs = _List_Nil;
+			// TODO test perf of Object.keys and switch when support is good enough
+			for (var key in value)
+			{
+				if (value.hasOwnProperty(key))
+				{
+					var result = _Json_runHelp(decoder.b, value[key]);
+					if (!$elm$core$Result$isOk(result))
+					{
+						return $elm$core$Result$Err(A2($elm$json$Json$Decode$Field, key, result.a));
+					}
+					keyValuePairs = _List_Cons(_Utils_Tuple2(key, result.a), keyValuePairs);
+				}
+			}
+			return $elm$core$Result$Ok($elm$core$List$reverse(keyValuePairs));
+
+		case 9:
+			var answer = decoder.f;
+			var decoders = decoder.g;
+			for (var i = 0; i < decoders.length; i++)
+			{
+				var result = _Json_runHelp(decoders[i], value);
+				if (!$elm$core$Result$isOk(result))
+				{
+					return result;
+				}
+				answer = answer(result.a);
+			}
+			return $elm$core$Result$Ok(answer);
+
+		case 10:
+			var result = _Json_runHelp(decoder.b, value);
+			return (!$elm$core$Result$isOk(result))
+				? result
+				: _Json_runHelp(decoder.h(result.a), value);
+
+		case 11:
+			var errors = _List_Nil;
+			for (var temp = decoder.g; temp.b; temp = temp.b) // WHILE_CONS
+			{
+				var result = _Json_runHelp(temp.a, value);
+				if ($elm$core$Result$isOk(result))
+				{
+					return result;
+				}
+				errors = _List_Cons(result.a, errors);
+			}
+			return $elm$core$Result$Err($elm$json$Json$Decode$OneOf($elm$core$List$reverse(errors)));
+
+		case 1:
+			return $elm$core$Result$Err(A2($elm$json$Json$Decode$Failure, decoder.a, _Json_wrap(value)));
+
+		case 0:
+			return $elm$core$Result$Ok(decoder.a);
+	}
+}
+
+function _Json_runArrayDecoder(decoder, value, toElmValue)
+{
+	var len = value.length;
+	var array = new Array(len);
+	for (var i = 0; i < len; i++)
+	{
+		var result = _Json_runHelp(decoder, value[i]);
+		if (!$elm$core$Result$isOk(result))
+		{
+			return $elm$core$Result$Err(A2($elm$json$Json$Decode$Index, i, result.a));
+		}
+		array[i] = result.a;
+	}
+	return $elm$core$Result$Ok(toElmValue(array));
+}
+
+function _Json_isArray(value)
+{
+	return Array.isArray(value) || (typeof FileList !== 'undefined' && value instanceof FileList);
+}
+
+function _Json_toElmArray(array)
+{
+	return A2($elm$core$Array$initialize, array.length, function(i) { return array[i]; });
+}
+
+function _Json_expecting(type, value)
+{
+	return $elm$core$Result$Err(A2($elm$json$Json$Decode$Failure, 'Expecting ' + type, _Json_wrap(value)));
+}
+
+
+// EQUALITY
+
+function _Json_equality(x, y)
+{
+	if (x === y)
+	{
+		return true;
+	}
+
+	if (x.$ !== y.$)
+	{
+		return false;
+	}
+
+	switch (x.$)
+	{
+		case 0:
+		case 1:
+			return x.a === y.a;
+
+		case 2:
+			return x.b === y.b;
+
+		case 5:
+			return x.c === y.c;
+
+		case 3:
+		case 4:
+		case 8:
+			return _Json_equality(x.b, y.b);
+
+		case 6:
+			return x.d === y.d && _Json_equality(x.b, y.b);
+
+		case 7:
+			return x.e === y.e && _Json_equality(x.b, y.b);
+
+		case 9:
+			return x.f === y.f && _Json_listEquality(x.g, y.g);
+
+		case 10:
+			return x.h === y.h && _Json_equality(x.b, y.b);
+
+		case 11:
+			return _Json_listEquality(x.g, y.g);
+	}
+}
+
+function _Json_listEquality(aDecoders, bDecoders)
+{
+	var len = aDecoders.length;
+	if (len !== bDecoders.length)
+	{
+		return false;
+	}
+	for (var i = 0; i < len; i++)
+	{
+		if (!_Json_equality(aDecoders[i], bDecoders[i]))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+
+// ENCODE
+
+var _Json_encode = F2(function(indentLevel, value)
+{
+	return JSON.stringify(_Json_unwrap(value), null, indentLevel) + '';
+});
+
+function _Json_wrap_UNUSED(value) { return { $: 0, a: value }; }
+function _Json_unwrap_UNUSED(value) { return value.a; }
+
+function _Json_wrap(value) { return value; }
+function _Json_unwrap(value) { return value; }
+
+function _Json_emptyArray() { return []; }
+function _Json_emptyObject() { return {}; }
+
+var _Json_addField = F3(function(key, value, object)
+{
+	object[key] = _Json_unwrap(value);
+	return object;
+});
+
+function _Json_addEntry(func)
+{
+	return F2(function(entry, array)
+	{
+		array.push(_Json_unwrap(func(entry)));
+		return array;
+	});
+}
+
+var _Json_encodeNull = _Json_wrap(null);
+
+
+
+// TASKS
+
+function _Scheduler_succeed(value)
+{
+	return {
+		$: 0,
+		a: value
+	};
+}
+
+function _Scheduler_fail(error)
+{
+	return {
+		$: 1,
+		a: error
+	};
+}
+
+function _Scheduler_binding(callback)
+{
+	return {
+		$: 2,
+		b: callback,
+		c: null
+	};
+}
+
+var _Scheduler_andThen = F2(function(callback, task)
+{
+	return {
+		$: 3,
+		b: callback,
+		d: task
+	};
+});
+
+var _Scheduler_onError = F2(function(callback, task)
+{
+	return {
+		$: 4,
+		b: callback,
+		d: task
+	};
+});
+
+function _Scheduler_receive(callback)
+{
+	return {
+		$: 5,
+		b: callback
+	};
+}
+
+
+// PROCESSES
+
+var _Scheduler_guid = 0;
+
+function _Scheduler_rawSpawn(task)
+{
+	var proc = {
+		$: 0,
+		e: _Scheduler_guid++,
+		f: task,
+		g: null,
+		h: []
+	};
+
+	_Scheduler_enqueue(proc);
+
+	return proc;
+}
+
+function _Scheduler_spawn(task)
+{
+	return _Scheduler_binding(function(callback) {
+		callback(_Scheduler_succeed(_Scheduler_rawSpawn(task)));
+	});
+}
+
+function _Scheduler_rawSend(proc, msg)
+{
+	proc.h.push(msg);
+	_Scheduler_enqueue(proc);
+}
+
+var _Scheduler_send = F2(function(proc, msg)
+{
+	return _Scheduler_binding(function(callback) {
+		_Scheduler_rawSend(proc, msg);
+		callback(_Scheduler_succeed(_Utils_Tuple0));
+	});
+});
+
+function _Scheduler_kill(proc)
+{
+	return _Scheduler_binding(function(callback) {
+		var task = proc.f;
+		if (task.$ === 2 && task.c)
+		{
+			task.c();
+		}
+
+		proc.f = null;
+
+		callback(_Scheduler_succeed(_Utils_Tuple0));
+	});
+}
+
+
+/* STEP PROCESSES
+
+type alias Process =
+  { $ : tag
+  , id : unique_id
+  , root : Task
+  , stack : null | { $: SUCCEED | FAIL, a: callback, b: stack }
+  , mailbox : [msg]
+  }
+
+*/
+
+
+var _Scheduler_working = false;
+var _Scheduler_queue = [];
+
+
+function _Scheduler_enqueue(proc)
+{
+	_Scheduler_queue.push(proc);
+	if (_Scheduler_working)
+	{
+		return;
+	}
+	_Scheduler_working = true;
+	while (proc = _Scheduler_queue.shift())
+	{
+		_Scheduler_step(proc);
+	}
+	_Scheduler_working = false;
+}
+
+
+function _Scheduler_step(proc)
+{
+	while (proc.f)
+	{
+		var rootTag = proc.f.$;
+		if (rootTag === 0 || rootTag === 1)
+		{
+			while (proc.g && proc.g.$ !== rootTag)
+			{
+				proc.g = proc.g.i;
+			}
+			if (!proc.g)
+			{
+				return;
+			}
+			proc.f = proc.g.b(proc.f.a);
+			proc.g = proc.g.i;
+		}
+		else if (rootTag === 2)
+		{
+			proc.f.c = proc.f.b(function(newRoot) {
+				proc.f = newRoot;
+				_Scheduler_enqueue(proc);
+			});
+			return;
+		}
+		else if (rootTag === 5)
+		{
+			if (proc.h.length === 0)
+			{
+				return;
+			}
+			proc.f = proc.f.b(proc.h.shift());
+		}
+		else // if (rootTag === 3 || rootTag === 4)
+		{
+			proc.g = {
+				$: rootTag === 3 ? 0 : 1,
+				b: proc.f.b,
+				i: proc.g
+			};
+			proc.f = proc.f.d;
+		}
+	}
+}
+
+
+
+function _Process_sleep(time)
+{
+	return _Scheduler_binding(function(callback) {
+		var id = setTimeout(function() {
+			callback(_Scheduler_succeed(_Utils_Tuple0));
+		}, time);
+
+		return function() { clearTimeout(id); };
+	});
+}
+
+
+
+
+// PROGRAMS
+
+
+var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
+{
+	return _Platform_initialize(
+		flagDecoder,
+		args,
+		impl.aG,
+		impl.aO,
+		impl.aM,
+		function() { return function() {} }
+	);
+});
+
+
+
+// INITIALIZE A PROGRAM
+
+
+function _Platform_initialize(flagDecoder, args, init, update, subscriptions, stepperBuilder)
+{
+	var result = A2(_Json_run, flagDecoder, _Json_wrap(args ? args['flags'] : undefined));
+	$elm$core$Result$isOk(result) || _Debug_crash(2 /**_UNUSED/, _Json_errorToString(result.a) /**/);
+	var managers = {};
+	var initPair = init(result.a);
+	var model = initPair.a;
+	var stepper = stepperBuilder(sendToApp, model);
+	var ports = _Platform_setupEffects(managers, sendToApp);
+
+	function sendToApp(msg, viewMetadata)
+	{
+		var pair = A2(update, msg, model);
+		stepper(model = pair.a, viewMetadata);
+		_Platform_enqueueEffects(managers, pair.b, subscriptions(model));
+	}
+
+	_Platform_enqueueEffects(managers, initPair.b, subscriptions(model));
+
+	return ports ? { ports: ports } : {};
+}
+
+
+
+// TRACK PRELOADS
+//
+// This is used by code in elm/browser and elm/http
+// to register any HTTP requests that are triggered by init.
+//
+
+
+var _Platform_preload;
+
+
+function _Platform_registerPreload(url)
+{
+	_Platform_preload.add(url);
+}
+
+
+
+// EFFECT MANAGERS
+
+
+var _Platform_effectManagers = {};
+
+
+function _Platform_setupEffects(managers, sendToApp)
+{
+	var ports;
+
+	// setup all necessary effect managers
+	for (var key in _Platform_effectManagers)
+	{
+		var manager = _Platform_effectManagers[key];
+
+		if (manager.a)
+		{
+			ports = ports || {};
+			ports[key] = manager.a(key, sendToApp);
+		}
+
+		managers[key] = _Platform_instantiateManager(manager, sendToApp);
+	}
+
+	return ports;
+}
+
+
+function _Platform_createManager(init, onEffects, onSelfMsg, cmdMap, subMap)
+{
+	return {
+		b: init,
+		c: onEffects,
+		d: onSelfMsg,
+		e: cmdMap,
+		f: subMap
+	};
+}
+
+
+function _Platform_instantiateManager(info, sendToApp)
+{
+	var router = {
+		g: sendToApp,
+		h: undefined
+	};
+
+	var onEffects = info.c;
+	var onSelfMsg = info.d;
+	var cmdMap = info.e;
+	var subMap = info.f;
+
+	function loop(state)
+	{
+		return A2(_Scheduler_andThen, loop, _Scheduler_receive(function(msg)
+		{
+			var value = msg.a;
+
+			if (msg.$ === 0)
+			{
+				return A3(onSelfMsg, router, value, state);
+			}
+
+			return cmdMap && subMap
+				? A4(onEffects, router, value.i, value.j, state)
+				: A3(onEffects, router, cmdMap ? value.i : value.j, state);
+		}));
+	}
+
+	return router.h = _Scheduler_rawSpawn(A2(_Scheduler_andThen, loop, info.b));
+}
+
+
+
+// ROUTING
+
+
+var _Platform_sendToApp = F2(function(router, msg)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		router.g(msg);
+		callback(_Scheduler_succeed(_Utils_Tuple0));
+	});
+});
+
+
+var _Platform_sendToSelf = F2(function(router, msg)
+{
+	return A2(_Scheduler_send, router.h, {
+		$: 0,
+		a: msg
+	});
+});
+
+
+
+// BAGS
+
+
+function _Platform_leaf(home)
+{
+	return function(value)
+	{
+		return {
+			$: 1,
+			k: home,
+			l: value
+		};
+	};
+}
+
+
+function _Platform_batch(list)
+{
+	return {
+		$: 2,
+		m: list
+	};
+}
+
+
+var _Platform_map = F2(function(tagger, bag)
+{
+	return {
+		$: 3,
+		n: tagger,
+		o: bag
+	}
+});
+
+
+
+// PIPE BAGS INTO EFFECT MANAGERS
+//
+// Effects must be queued!
+//
+// Say your init contains a synchronous command, like Time.now or Time.here
+//
+//   - This will produce a batch of effects (FX_1)
+//   - The synchronous task triggers the subsequent `update` call
+//   - This will produce a batch of effects (FX_2)
+//
+// If we just start dispatching FX_2, subscriptions from FX_2 can be processed
+// before subscriptions from FX_1. No good! Earlier versions of this code had
+// this problem, leading to these reports:
+//
+//   https://github.com/elm/core/issues/980
+//   https://github.com/elm/core/pull/981
+//   https://github.com/elm/compiler/issues/1776
+//
+// The queue is necessary to avoid ordering issues for synchronous commands.
+
+
+// Why use true/false here? Why not just check the length of the queue?
+// The goal is to detect "are we currently dispatching effects?" If we
+// are, we need to bail and let the ongoing while loop handle things.
+//
+// Now say the queue has 1 element. When we dequeue the final element,
+// the queue will be empty, but we are still actively dispatching effects.
+// So you could get queue jumping in a really tricky category of cases.
+//
+var _Platform_effectsQueue = [];
+var _Platform_effectsActive = false;
+
+
+function _Platform_enqueueEffects(managers, cmdBag, subBag)
+{
+	_Platform_effectsQueue.push({ p: managers, q: cmdBag, r: subBag });
+
+	if (_Platform_effectsActive) return;
+
+	_Platform_effectsActive = true;
+	for (var fx; fx = _Platform_effectsQueue.shift(); )
+	{
+		_Platform_dispatchEffects(fx.p, fx.q, fx.r);
+	}
+	_Platform_effectsActive = false;
+}
+
+
+function _Platform_dispatchEffects(managers, cmdBag, subBag)
+{
+	var effectsDict = {};
+	_Platform_gatherEffects(true, cmdBag, effectsDict, null);
+	_Platform_gatherEffects(false, subBag, effectsDict, null);
+
+	for (var home in managers)
+	{
+		_Scheduler_rawSend(managers[home], {
+			$: 'fx',
+			a: effectsDict[home] || { i: _List_Nil, j: _List_Nil }
+		});
+	}
+}
+
+
+function _Platform_gatherEffects(isCmd, bag, effectsDict, taggers)
+{
+	switch (bag.$)
+	{
+		case 1:
+			var home = bag.k;
+			var effect = _Platform_toEffect(isCmd, home, taggers, bag.l);
+			effectsDict[home] = _Platform_insert(isCmd, effect, effectsDict[home]);
+			return;
+
+		case 2:
+			for (var list = bag.m; list.b; list = list.b) // WHILE_CONS
+			{
+				_Platform_gatherEffects(isCmd, list.a, effectsDict, taggers);
+			}
+			return;
+
+		case 3:
+			_Platform_gatherEffects(isCmd, bag.o, effectsDict, {
+				s: bag.n,
+				t: taggers
+			});
+			return;
+	}
+}
+
+
+function _Platform_toEffect(isCmd, home, taggers, value)
+{
+	function applyTaggers(x)
+	{
+		for (var temp = taggers; temp; temp = temp.t)
+		{
+			x = temp.s(x);
+		}
+		return x;
+	}
+
+	var map = isCmd
+		? _Platform_effectManagers[home].e
+		: _Platform_effectManagers[home].f;
+
+	return A2(map, applyTaggers, value)
+}
+
+
+function _Platform_insert(isCmd, newEffect, effects)
+{
+	effects = effects || { i: _List_Nil, j: _List_Nil };
+
+	isCmd
+		? (effects.i = _List_Cons(newEffect, effects.i))
+		: (effects.j = _List_Cons(newEffect, effects.j));
+
+	return effects;
+}
+
+
+
+// PORTS
+
+
+function _Platform_checkPortName(name)
+{
+	if (_Platform_effectManagers[name])
+	{
+		_Debug_crash(3, name)
+	}
+}
+
+
+
+// OUTGOING PORTS
+
+
+function _Platform_outgoingPort(name, converter)
+{
+	_Platform_checkPortName(name);
+	_Platform_effectManagers[name] = {
+		e: _Platform_outgoingPortMap,
+		u: converter,
+		a: _Platform_setupOutgoingPort
+	};
+	return _Platform_leaf(name);
+}
+
+
+var _Platform_outgoingPortMap = F2(function(tagger, value) { return value; });
+
+
+function _Platform_setupOutgoingPort(name)
+{
+	var subs = [];
+	var converter = _Platform_effectManagers[name].u;
+
+	// CREATE MANAGER
+
+	var init = _Process_sleep(0);
+
+	_Platform_effectManagers[name].b = init;
+	_Platform_effectManagers[name].c = F3(function(router, cmdList, state)
+	{
+		for ( ; cmdList.b; cmdList = cmdList.b) // WHILE_CONS
+		{
+			// grab a separate reference to subs in case unsubscribe is called
+			var currentSubs = subs;
+			var value = _Json_unwrap(converter(cmdList.a));
+			for (var i = 0; i < currentSubs.length; i++)
+			{
+				currentSubs[i](value);
+			}
+		}
+		return init;
+	});
+
+	// PUBLIC API
+
+	function subscribe(callback)
+	{
+		subs.push(callback);
+	}
+
+	function unsubscribe(callback)
+	{
+		// copy subs into a new array in case unsubscribe is called within a
+		// subscribed callback
+		subs = subs.slice();
+		var index = subs.indexOf(callback);
+		if (index >= 0)
+		{
+			subs.splice(index, 1);
+		}
+	}
+
+	return {
+		subscribe: subscribe,
+		unsubscribe: unsubscribe
+	};
+}
+
+
+
+// INCOMING PORTS
+
+
+function _Platform_incomingPort(name, converter)
+{
+	_Platform_checkPortName(name);
+	_Platform_effectManagers[name] = {
+		f: _Platform_incomingPortMap,
+		u: converter,
+		a: _Platform_setupIncomingPort
+	};
+	return _Platform_leaf(name);
+}
+
+
+var _Platform_incomingPortMap = F2(function(tagger, finalTagger)
+{
+	return function(value)
+	{
+		return tagger(finalTagger(value));
+	};
+});
+
+
+function _Platform_setupIncomingPort(name, sendToApp)
+{
+	var subs = _List_Nil;
+	var converter = _Platform_effectManagers[name].u;
+
+	// CREATE MANAGER
+
+	var init = _Scheduler_succeed(null);
+
+	_Platform_effectManagers[name].b = init;
+	_Platform_effectManagers[name].c = F3(function(router, subList, state)
+	{
+		subs = subList;
+		return init;
+	});
+
+	// PUBLIC API
+
+	function send(incomingValue)
+	{
+		var result = A2(_Json_run, converter, _Json_wrap(incomingValue));
+
+		$elm$core$Result$isOk(result) || _Debug_crash(4, name, result.a);
+
+		var value = result.a;
+		for (var temp = subs; temp.b; temp = temp.b) // WHILE_CONS
+		{
+			sendToApp(temp.a(value));
+		}
+	}
+
+	return { send: send };
+}
+
+
+
+// EXPORT ELM MODULES
+//
+// Have DEBUG and PROD versions so that we can (1) give nicer errors in
+// debug mode and (2) not pay for the bits needed for that in prod mode.
+//
+
+
+function _Platform_export(exports)
+{
+	scope['Elm']
+		? _Platform_mergeExportsProd(scope['Elm'], exports)
+		: scope['Elm'] = exports;
+}
+
+
+function _Platform_mergeExportsProd(obj, exports)
+{
+	for (var name in exports)
+	{
+		(name in obj)
+			? (name == 'init')
+				? _Debug_crash(6)
+				: _Platform_mergeExportsProd(obj[name], exports[name])
+			: (obj[name] = exports[name]);
+	}
+}
+
+
+function _Platform_export_UNUSED(exports)
+{
+	scope['Elm']
+		? _Platform_mergeExportsDebug('Elm', scope['Elm'], exports)
+		: scope['Elm'] = exports;
+}
+
+
+function _Platform_mergeExportsDebug(moduleName, obj, exports)
+{
+	for (var name in exports)
+	{
+		(name in obj)
+			? (name == 'init')
+				? _Debug_crash(6, moduleName)
+				: _Platform_mergeExportsDebug(moduleName + '.' + name, obj[name], exports[name])
+			: (obj[name] = exports[name]);
+	}
+}
+
+
+
+
+// HELPERS
+
+
+var _VirtualDom_divertHrefToApp;
+
+var _VirtualDom_doc = typeof document !== 'undefined' ? document : {};
+
+
+function _VirtualDom_appendChild(parent, child)
+{
+	parent.appendChild(child);
+}
+
+var _VirtualDom_init = F4(function(virtualNode, flagDecoder, debugMetadata, args)
+{
+	// NOTE: this function needs _Platform_export available to work
+
+	/**/
+	var node = args['node'];
+	//*/
+	/**_UNUSED/
+	var node = args && args['node'] ? args['node'] : _Debug_crash(0);
+	//*/
+
+	node.parentNode.replaceChild(
+		_VirtualDom_render(virtualNode, function() {}),
+		node
+	);
+
+	return {};
+});
+
+
+
+// TEXT
+
+
+function _VirtualDom_text(string)
+{
+	return {
+		$: 0,
+		a: string
+	};
+}
+
+
+
+// NODE
+
+
+var _VirtualDom_nodeNS = F2(function(namespace, tag)
+{
+	return F2(function(factList, kidList)
+	{
+		for (var kids = [], descendantsCount = 0; kidList.b; kidList = kidList.b) // WHILE_CONS
+		{
+			var kid = kidList.a;
+			descendantsCount += (kid.b || 0);
+			kids.push(kid);
+		}
+		descendantsCount += kids.length;
+
+		return {
+			$: 1,
+			c: tag,
+			d: _VirtualDom_organizeFacts(factList),
+			e: kids,
+			f: namespace,
+			b: descendantsCount
+		};
+	});
+});
+
+
+var _VirtualDom_node = _VirtualDom_nodeNS(undefined);
+
+
+
+// KEYED NODE
+
+
+var _VirtualDom_keyedNodeNS = F2(function(namespace, tag)
+{
+	return F2(function(factList, kidList)
+	{
+		for (var kids = [], descendantsCount = 0; kidList.b; kidList = kidList.b) // WHILE_CONS
+		{
+			var kid = kidList.a;
+			descendantsCount += (kid.b.b || 0);
+			kids.push(kid);
+		}
+		descendantsCount += kids.length;
+
+		return {
+			$: 2,
+			c: tag,
+			d: _VirtualDom_organizeFacts(factList),
+			e: kids,
+			f: namespace,
+			b: descendantsCount
+		};
+	});
+});
+
+
+var _VirtualDom_keyedNode = _VirtualDom_keyedNodeNS(undefined);
+
+
+
+// CUSTOM
+
+
+function _VirtualDom_custom(factList, model, render, diff)
+{
+	return {
+		$: 3,
+		d: _VirtualDom_organizeFacts(factList),
+		g: model,
+		h: render,
+		i: diff
+	};
+}
+
+
+
+// MAP
+
+
+var _VirtualDom_map = F2(function(tagger, node)
+{
+	return {
+		$: 4,
+		j: tagger,
+		k: node,
+		b: 1 + (node.b || 0)
+	};
+});
+
+
+
+// LAZY
+
+
+function _VirtualDom_thunk(refs, thunk)
+{
+	return {
+		$: 5,
+		l: refs,
+		m: thunk,
+		k: undefined
+	};
+}
+
+var _VirtualDom_lazy = F2(function(func, a)
+{
+	return _VirtualDom_thunk([func, a], function() {
+		return func(a);
+	});
+});
+
+var _VirtualDom_lazy2 = F3(function(func, a, b)
+{
+	return _VirtualDom_thunk([func, a, b], function() {
+		return A2(func, a, b);
+	});
+});
+
+var _VirtualDom_lazy3 = F4(function(func, a, b, c)
+{
+	return _VirtualDom_thunk([func, a, b, c], function() {
+		return A3(func, a, b, c);
+	});
+});
+
+var _VirtualDom_lazy4 = F5(function(func, a, b, c, d)
+{
+	return _VirtualDom_thunk([func, a, b, c, d], function() {
+		return A4(func, a, b, c, d);
+	});
+});
+
+var _VirtualDom_lazy5 = F6(function(func, a, b, c, d, e)
+{
+	return _VirtualDom_thunk([func, a, b, c, d, e], function() {
+		return A5(func, a, b, c, d, e);
+	});
+});
+
+var _VirtualDom_lazy6 = F7(function(func, a, b, c, d, e, f)
+{
+	return _VirtualDom_thunk([func, a, b, c, d, e, f], function() {
+		return A6(func, a, b, c, d, e, f);
+	});
+});
+
+var _VirtualDom_lazy7 = F8(function(func, a, b, c, d, e, f, g)
+{
+	return _VirtualDom_thunk([func, a, b, c, d, e, f, g], function() {
+		return A7(func, a, b, c, d, e, f, g);
+	});
+});
+
+var _VirtualDom_lazy8 = F9(function(func, a, b, c, d, e, f, g, h)
+{
+	return _VirtualDom_thunk([func, a, b, c, d, e, f, g, h], function() {
+		return A8(func, a, b, c, d, e, f, g, h);
+	});
+});
+
+
+
+// FACTS
+
+
+var _VirtualDom_on = F2(function(key, handler)
+{
+	return {
+		$: 'a0',
+		n: key,
+		o: handler
+	};
+});
+var _VirtualDom_style = F2(function(key, value)
+{
+	return {
+		$: 'a1',
+		n: key,
+		o: value
+	};
+});
+var _VirtualDom_property = F2(function(key, value)
+{
+	return {
+		$: 'a2',
+		n: key,
+		o: value
+	};
+});
+var _VirtualDom_attribute = F2(function(key, value)
+{
+	return {
+		$: 'a3',
+		n: key,
+		o: value
+	};
+});
+var _VirtualDom_attributeNS = F3(function(namespace, key, value)
+{
+	return {
+		$: 'a4',
+		n: key,
+		o: { f: namespace, o: value }
+	};
+});
+
+
+
+// XSS ATTACK VECTOR CHECKS
+//
+// For some reason, tabs can appear in href protocols and it still works.
+// So '\tjava\tSCRIPT:alert("!!!")' and 'javascript:alert("!!!")' are the same
+// in practice. That is why _VirtualDom_RE_js and _VirtualDom_RE_js_html look
+// so freaky.
+//
+// Pulling the regular expressions out to the top level gives a slight speed
+// boost in small benchmarks (4-10%) but hoisting values to reduce allocation
+// can be unpredictable in large programs where JIT may have a harder time with
+// functions are not fully self-contained. The benefit is more that the js and
+// js_html ones are so weird that I prefer to see them near each other.
+
+
+var _VirtualDom_RE_script = /^script$/i;
+var _VirtualDom_RE_on_formAction = /^(on|formAction$)/i;
+var _VirtualDom_RE_js = /^\s*j\s*a\s*v\s*a\s*s\s*c\s*r\s*i\s*p\s*t\s*:/i;
+var _VirtualDom_RE_js_html = /^\s*(j\s*a\s*v\s*a\s*s\s*c\s*r\s*i\s*p\s*t\s*:|d\s*a\s*t\s*a\s*:\s*t\s*e\s*x\s*t\s*\/\s*h\s*t\s*m\s*l\s*(,|;))/i;
+
+
+function _VirtualDom_noScript(tag)
+{
+	return _VirtualDom_RE_script.test(tag) ? 'p' : tag;
+}
+
+function _VirtualDom_noOnOrFormAction(key)
+{
+	return _VirtualDom_RE_on_formAction.test(key) ? 'data-' + key : key;
+}
+
+function _VirtualDom_noInnerHtmlOrFormAction(key)
+{
+	return key == 'innerHTML' || key == 'outerHTML' || key == 'formAction' ? 'data-' + key : key;
+}
+
+function _VirtualDom_noJavaScriptUri(value)
+{
+	return _VirtualDom_RE_js.test(value)
+		? /**/''//*//**_UNUSED/'javascript:alert("This is an XSS vector. Please use ports or web components instead.")'//*/
+		: value;
+}
+
+function _VirtualDom_noJavaScriptOrHtmlUri(value)
+{
+	return _VirtualDom_RE_js_html.test(value)
+		? /**/''//*//**_UNUSED/'javascript:alert("This is an XSS vector. Please use ports or web components instead.")'//*/
+		: value;
+}
+
+function _VirtualDom_noJavaScriptOrHtmlJson(value)
+{
+	return (typeof _Json_unwrap(value) === 'string' && _VirtualDom_RE_js_html.test(_Json_unwrap(value)))
+		? _Json_wrap(
+			/**/''//*//**_UNUSED/'javascript:alert("This is an XSS vector. Please use ports or web components instead.")'//*/
+		) : value;
+}
+
+
+
+// MAP FACTS
+
+
+var _VirtualDom_mapAttribute = F2(function(func, attr)
+{
+	return (attr.$ === 'a0')
+		? A2(_VirtualDom_on, attr.n, _VirtualDom_mapHandler(func, attr.o))
+		: attr;
+});
+
+function _VirtualDom_mapHandler(func, handler)
+{
+	var tag = $elm$virtual_dom$VirtualDom$toHandlerInt(handler);
+
+	// 0 = Normal
+	// 1 = MayStopPropagation
+	// 2 = MayPreventDefault
+	// 3 = Custom
+
+	return {
+		$: handler.$,
+		a:
+			!tag
+				? A2($elm$json$Json$Decode$map, func, handler.a)
+				:
+			A3($elm$json$Json$Decode$map2,
+				tag < 3
+					? _VirtualDom_mapEventTuple
+					: _VirtualDom_mapEventRecord,
+				$elm$json$Json$Decode$succeed(func),
+				handler.a
+			)
+	};
+}
+
+var _VirtualDom_mapEventTuple = F2(function(func, tuple)
+{
+	return _Utils_Tuple2(func(tuple.a), tuple.b);
+});
+
+var _VirtualDom_mapEventRecord = F2(function(func, record)
+{
+	return {
+		ae: func(record.ae),
+		U: record.U,
+		R: record.R
+	}
+});
+
+
+
+// ORGANIZE FACTS
+
+
+function _VirtualDom_organizeFacts(factList)
+{
+	for (var facts = {}; factList.b; factList = factList.b) // WHILE_CONS
+	{
+		var entry = factList.a;
+
+		var tag = entry.$;
+		var key = entry.n;
+		var value = entry.o;
+
+		if (tag === 'a2')
+		{
+			(key === 'className')
+				? _VirtualDom_addClass(facts, key, _Json_unwrap(value))
+				: facts[key] = _Json_unwrap(value);
+
+			continue;
+		}
+
+		var subFacts = facts[tag] || (facts[tag] = {});
+		(tag === 'a3' && key === 'class')
+			? _VirtualDom_addClass(subFacts, key, value)
+			: subFacts[key] = value;
+	}
+
+	return facts;
+}
+
+function _VirtualDom_addClass(object, key, newClass)
+{
+	var classes = object[key];
+	object[key] = classes ? classes + ' ' + newClass : newClass;
+}
+
+
+
+// RENDER
+
+
+function _VirtualDom_render(vNode, eventNode)
+{
+	var tag = vNode.$;
+
+	if (tag === 5)
+	{
+		return _VirtualDom_render(vNode.k || (vNode.k = vNode.m()), eventNode);
+	}
+
+	if (tag === 0)
+	{
+		return _VirtualDom_doc.createTextNode(vNode.a);
+	}
+
+	if (tag === 4)
+	{
+		var subNode = vNode.k;
+		var tagger = vNode.j;
+
+		while (subNode.$ === 4)
+		{
+			typeof tagger !== 'object'
+				? tagger = [tagger, subNode.j]
+				: tagger.push(subNode.j);
+
+			subNode = subNode.k;
+		}
+
+		var subEventRoot = { j: tagger, p: eventNode };
+		var domNode = _VirtualDom_render(subNode, subEventRoot);
+		domNode.elm_event_node_ref = subEventRoot;
+		return domNode;
+	}
+
+	if (tag === 3)
+	{
+		var domNode = vNode.h(vNode.g);
+		_VirtualDom_applyFacts(domNode, eventNode, vNode.d);
+		return domNode;
+	}
+
+	// at this point `tag` must be 1 or 2
+
+	var domNode = vNode.f
+		? _VirtualDom_doc.createElementNS(vNode.f, vNode.c)
+		: _VirtualDom_doc.createElement(vNode.c);
+
+	if (_VirtualDom_divertHrefToApp && vNode.c == 'a')
+	{
+		domNode.addEventListener('click', _VirtualDom_divertHrefToApp(domNode));
+	}
+
+	_VirtualDom_applyFacts(domNode, eventNode, vNode.d);
+
+	for (var kids = vNode.e, i = 0; i < kids.length; i++)
+	{
+		_VirtualDom_appendChild(domNode, _VirtualDom_render(tag === 1 ? kids[i] : kids[i].b, eventNode));
+	}
+
+	return domNode;
+}
+
+
+
+// APPLY FACTS
+
+
+function _VirtualDom_applyFacts(domNode, eventNode, facts)
+{
+	for (var key in facts)
+	{
+		var value = facts[key];
+
+		key === 'a1'
+			? _VirtualDom_applyStyles(domNode, value)
+			:
+		key === 'a0'
+			? _VirtualDom_applyEvents(domNode, eventNode, value)
+			:
+		key === 'a3'
+			? _VirtualDom_applyAttrs(domNode, value)
+			:
+		key === 'a4'
+			? _VirtualDom_applyAttrsNS(domNode, value)
+			:
+		((key !== 'value' && key !== 'checked') || domNode[key] !== value) && (domNode[key] = value);
+	}
+}
+
+
+
+// APPLY STYLES
+
+
+function _VirtualDom_applyStyles(domNode, styles)
+{
+	var domNodeStyle = domNode.style;
+
+	for (var key in styles)
+	{
+		domNodeStyle[key] = styles[key];
+	}
+}
+
+
+
+// APPLY ATTRS
+
+
+function _VirtualDom_applyAttrs(domNode, attrs)
+{
+	for (var key in attrs)
+	{
+		var value = attrs[key];
+		typeof value !== 'undefined'
+			? domNode.setAttribute(key, value)
+			: domNode.removeAttribute(key);
+	}
+}
+
+
+
+// APPLY NAMESPACED ATTRS
+
+
+function _VirtualDom_applyAttrsNS(domNode, nsAttrs)
+{
+	for (var key in nsAttrs)
+	{
+		var pair = nsAttrs[key];
+		var namespace = pair.f;
+		var value = pair.o;
+
+		typeof value !== 'undefined'
+			? domNode.setAttributeNS(namespace, key, value)
+			: domNode.removeAttributeNS(namespace, key);
+	}
+}
+
+
+
+// APPLY EVENTS
+
+
+function _VirtualDom_applyEvents(domNode, eventNode, events)
+{
+	var allCallbacks = domNode.elmFs || (domNode.elmFs = {});
+
+	for (var key in events)
+	{
+		var newHandler = events[key];
+		var oldCallback = allCallbacks[key];
+
+		if (!newHandler)
+		{
+			domNode.removeEventListener(key, oldCallback);
+			allCallbacks[key] = undefined;
+			continue;
+		}
+
+		if (oldCallback)
+		{
+			var oldHandler = oldCallback.q;
+			if (oldHandler.$ === newHandler.$)
+			{
+				oldCallback.q = newHandler;
+				continue;
+			}
+			domNode.removeEventListener(key, oldCallback);
+		}
+
+		oldCallback = _VirtualDom_makeCallback(eventNode, newHandler);
+		domNode.addEventListener(key, oldCallback,
+			_VirtualDom_passiveSupported
+			&& { passive: $elm$virtual_dom$VirtualDom$toHandlerInt(newHandler) < 2 }
+		);
+		allCallbacks[key] = oldCallback;
+	}
+}
+
+
+
+// PASSIVE EVENTS
+
+
+var _VirtualDom_passiveSupported;
+
+try
+{
+	window.addEventListener('t', null, Object.defineProperty({}, 'passive', {
+		get: function() { _VirtualDom_passiveSupported = true; }
+	}));
+}
+catch(e) {}
+
+
+
+// EVENT HANDLERS
+
+
+function _VirtualDom_makeCallback(eventNode, initialHandler)
+{
+	function callback(event)
+	{
+		var handler = callback.q;
+		var result = _Json_runHelp(handler.a, event);
+
+		if (!$elm$core$Result$isOk(result))
+		{
+			return;
+		}
+
+		var tag = $elm$virtual_dom$VirtualDom$toHandlerInt(handler);
+
+		// 0 = Normal
+		// 1 = MayStopPropagation
+		// 2 = MayPreventDefault
+		// 3 = Custom
+
+		var value = result.a;
+		var message = !tag ? value : tag < 3 ? value.a : value.ae;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.U;
+		var currentEventNode = (
+			stopPropagation && event.stopPropagation(),
+			(tag == 2 ? value.b : tag == 3 && value.R) && event.preventDefault(),
+			eventNode
+		);
+		var tagger;
+		var i;
+		while (tagger = currentEventNode.j)
+		{
+			if (typeof tagger == 'function')
+			{
+				message = tagger(message);
+			}
+			else
+			{
+				for (var i = tagger.length; i--; )
+				{
+					message = tagger[i](message);
+				}
+			}
+			currentEventNode = currentEventNode.p;
+		}
+		currentEventNode(message, stopPropagation); // stopPropagation implies isSync
+	}
+
+	callback.q = initialHandler;
+
+	return callback;
+}
+
+function _VirtualDom_equalEvents(x, y)
+{
+	return x.$ == y.$ && _Json_equality(x.a, y.a);
+}
+
+
+
+// DIFF
+
+
+// TODO: Should we do patches like in iOS?
+//
+// type Patch
+//   = At Int Patch
+//   | Batch (List Patch)
+//   | Change ...
+//
+// How could it not be better?
+//
+function _VirtualDom_diff(x, y)
+{
+	var patches = [];
+	_VirtualDom_diffHelp(x, y, patches, 0);
+	return patches;
+}
+
+
+function _VirtualDom_pushPatch(patches, type, index, data)
+{
+	var patch = {
+		$: type,
+		r: index,
+		s: data,
+		t: undefined,
+		u: undefined
+	};
+	patches.push(patch);
+	return patch;
+}
+
+
+function _VirtualDom_diffHelp(x, y, patches, index)
+{
+	if (x === y)
+	{
+		return;
+	}
+
+	var xType = x.$;
+	var yType = y.$;
+
+	// Bail if you run into different types of nodes. Implies that the
+	// structure has changed significantly and it's not worth a diff.
+	if (xType !== yType)
+	{
+		if (xType === 1 && yType === 2)
+		{
+			y = _VirtualDom_dekey(y);
+			yType = 1;
+		}
+		else
+		{
+			_VirtualDom_pushPatch(patches, 0, index, y);
+			return;
+		}
+	}
+
+	// Now we know that both nodes are the same $.
+	switch (yType)
+	{
+		case 5:
+			var xRefs = x.l;
+			var yRefs = y.l;
+			var i = xRefs.length;
+			var same = i === yRefs.length;
+			while (same && i--)
+			{
+				same = xRefs[i] === yRefs[i];
+			}
+			if (same)
+			{
+				y.k = x.k;
+				return;
+			}
+			y.k = y.m();
+			var subPatches = [];
+			_VirtualDom_diffHelp(x.k, y.k, subPatches, 0);
+			subPatches.length > 0 && _VirtualDom_pushPatch(patches, 1, index, subPatches);
+			return;
+
+		case 4:
+			// gather nested taggers
+			var xTaggers = x.j;
+			var yTaggers = y.j;
+			var nesting = false;
+
+			var xSubNode = x.k;
+			while (xSubNode.$ === 4)
+			{
+				nesting = true;
+
+				typeof xTaggers !== 'object'
+					? xTaggers = [xTaggers, xSubNode.j]
+					: xTaggers.push(xSubNode.j);
+
+				xSubNode = xSubNode.k;
+			}
+
+			var ySubNode = y.k;
+			while (ySubNode.$ === 4)
+			{
+				nesting = true;
+
+				typeof yTaggers !== 'object'
+					? yTaggers = [yTaggers, ySubNode.j]
+					: yTaggers.push(ySubNode.j);
+
+				ySubNode = ySubNode.k;
+			}
+
+			// Just bail if different numbers of taggers. This implies the
+			// structure of the virtual DOM has changed.
+			if (nesting && xTaggers.length !== yTaggers.length)
+			{
+				_VirtualDom_pushPatch(patches, 0, index, y);
+				return;
+			}
+
+			// check if taggers are "the same"
+			if (nesting ? !_VirtualDom_pairwiseRefEqual(xTaggers, yTaggers) : xTaggers !== yTaggers)
+			{
+				_VirtualDom_pushPatch(patches, 2, index, yTaggers);
+			}
+
+			// diff everything below the taggers
+			_VirtualDom_diffHelp(xSubNode, ySubNode, patches, index + 1);
+			return;
+
+		case 0:
+			if (x.a !== y.a)
+			{
+				_VirtualDom_pushPatch(patches, 3, index, y.a);
+			}
+			return;
+
+		case 1:
+			_VirtualDom_diffNodes(x, y, patches, index, _VirtualDom_diffKids);
+			return;
+
+		case 2:
+			_VirtualDom_diffNodes(x, y, patches, index, _VirtualDom_diffKeyedKids);
+			return;
+
+		case 3:
+			if (x.h !== y.h)
+			{
+				_VirtualDom_pushPatch(patches, 0, index, y);
+				return;
+			}
+
+			var factsDiff = _VirtualDom_diffFacts(x.d, y.d);
+			factsDiff && _VirtualDom_pushPatch(patches, 4, index, factsDiff);
+
+			var patch = y.i(x.g, y.g);
+			patch && _VirtualDom_pushPatch(patches, 5, index, patch);
+
+			return;
+	}
+}
+
+// assumes the incoming arrays are the same length
+function _VirtualDom_pairwiseRefEqual(as, bs)
+{
+	for (var i = 0; i < as.length; i++)
+	{
+		if (as[i] !== bs[i])
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+function _VirtualDom_diffNodes(x, y, patches, index, diffKids)
+{
+	// Bail if obvious indicators have changed. Implies more serious
+	// structural changes such that it's not worth it to diff.
+	if (x.c !== y.c || x.f !== y.f)
+	{
+		_VirtualDom_pushPatch(patches, 0, index, y);
+		return;
+	}
+
+	var factsDiff = _VirtualDom_diffFacts(x.d, y.d);
+	factsDiff && _VirtualDom_pushPatch(patches, 4, index, factsDiff);
+
+	diffKids(x, y, patches, index);
+}
+
+
+
+// DIFF FACTS
+
+
+// TODO Instead of creating a new diff object, it's possible to just test if
+// there *is* a diff. During the actual patch, do the diff again and make the
+// modifications directly. This way, there's no new allocations. Worth it?
+function _VirtualDom_diffFacts(x, y, category)
+{
+	var diff;
+
+	// look for changes and removals
+	for (var xKey in x)
+	{
+		if (xKey === 'a1' || xKey === 'a0' || xKey === 'a3' || xKey === 'a4')
+		{
+			var subDiff = _VirtualDom_diffFacts(x[xKey], y[xKey] || {}, xKey);
+			if (subDiff)
+			{
+				diff = diff || {};
+				diff[xKey] = subDiff;
+			}
+			continue;
+		}
+
+		// remove if not in the new facts
+		if (!(xKey in y))
+		{
+			diff = diff || {};
+			diff[xKey] =
+				!category
+					? (typeof x[xKey] === 'string' ? '' : null)
+					:
+				(category === 'a1')
+					? ''
+					:
+				(category === 'a0' || category === 'a3')
+					? undefined
+					:
+				{ f: x[xKey].f, o: undefined };
+
+			continue;
+		}
+
+		var xValue = x[xKey];
+		var yValue = y[xKey];
+
+		// reference equal, so don't worry about it
+		if (xValue === yValue && xKey !== 'value' && xKey !== 'checked'
+			|| category === 'a0' && _VirtualDom_equalEvents(xValue, yValue))
+		{
+			continue;
+		}
+
+		diff = diff || {};
+		diff[xKey] = yValue;
+	}
+
+	// add new stuff
+	for (var yKey in y)
+	{
+		if (!(yKey in x))
+		{
+			diff = diff || {};
+			diff[yKey] = y[yKey];
+		}
+	}
+
+	return diff;
+}
+
+
+
+// DIFF KIDS
+
+
+function _VirtualDom_diffKids(xParent, yParent, patches, index)
+{
+	var xKids = xParent.e;
+	var yKids = yParent.e;
+
+	var xLen = xKids.length;
+	var yLen = yKids.length;
+
+	// FIGURE OUT IF THERE ARE INSERTS OR REMOVALS
+
+	if (xLen > yLen)
+	{
+		_VirtualDom_pushPatch(patches, 6, index, {
+			v: yLen,
+			i: xLen - yLen
+		});
+	}
+	else if (xLen < yLen)
+	{
+		_VirtualDom_pushPatch(patches, 7, index, {
+			v: xLen,
+			e: yKids
+		});
+	}
+
+	// PAIRWISE DIFF EVERYTHING ELSE
+
+	for (var minLen = xLen < yLen ? xLen : yLen, i = 0; i < minLen; i++)
+	{
+		var xKid = xKids[i];
+		_VirtualDom_diffHelp(xKid, yKids[i], patches, ++index);
+		index += xKid.b || 0;
+	}
+}
+
+
+
+// KEYED DIFF
+
+
+function _VirtualDom_diffKeyedKids(xParent, yParent, patches, rootIndex)
+{
+	var localPatches = [];
+
+	var changes = {}; // Dict String Entry
+	var inserts = []; // Array { index : Int, entry : Entry }
+	// type Entry = { tag : String, vnode : VNode, index : Int, data : _ }
+
+	var xKids = xParent.e;
+	var yKids = yParent.e;
+	var xLen = xKids.length;
+	var yLen = yKids.length;
+	var xIndex = 0;
+	var yIndex = 0;
+
+	var index = rootIndex;
+
+	while (xIndex < xLen && yIndex < yLen)
+	{
+		var x = xKids[xIndex];
+		var y = yKids[yIndex];
+
+		var xKey = x.a;
+		var yKey = y.a;
+		var xNode = x.b;
+		var yNode = y.b;
+
+		var newMatch = undefined;
+		var oldMatch = undefined;
+
+		// check if keys match
+
+		if (xKey === yKey)
+		{
+			index++;
+			_VirtualDom_diffHelp(xNode, yNode, localPatches, index);
+			index += xNode.b || 0;
+
+			xIndex++;
+			yIndex++;
+			continue;
+		}
+
+		// look ahead 1 to detect insertions and removals.
+
+		var xNext = xKids[xIndex + 1];
+		var yNext = yKids[yIndex + 1];
+
+		if (xNext)
+		{
+			var xNextKey = xNext.a;
+			var xNextNode = xNext.b;
+			oldMatch = yKey === xNextKey;
+		}
+
+		if (yNext)
+		{
+			var yNextKey = yNext.a;
+			var yNextNode = yNext.b;
+			newMatch = xKey === yNextKey;
+		}
+
+
+		// swap x and y
+		if (newMatch && oldMatch)
+		{
+			index++;
+			_VirtualDom_diffHelp(xNode, yNextNode, localPatches, index);
+			_VirtualDom_insertNode(changes, localPatches, xKey, yNode, yIndex, inserts);
+			index += xNode.b || 0;
+
+			index++;
+			_VirtualDom_removeNode(changes, localPatches, xKey, xNextNode, index);
+			index += xNextNode.b || 0;
+
+			xIndex += 2;
+			yIndex += 2;
+			continue;
+		}
+
+		// insert y
+		if (newMatch)
+		{
+			index++;
+			_VirtualDom_insertNode(changes, localPatches, yKey, yNode, yIndex, inserts);
+			_VirtualDom_diffHelp(xNode, yNextNode, localPatches, index);
+			index += xNode.b || 0;
+
+			xIndex += 1;
+			yIndex += 2;
+			continue;
+		}
+
+		// remove x
+		if (oldMatch)
+		{
+			index++;
+			_VirtualDom_removeNode(changes, localPatches, xKey, xNode, index);
+			index += xNode.b || 0;
+
+			index++;
+			_VirtualDom_diffHelp(xNextNode, yNode, localPatches, index);
+			index += xNextNode.b || 0;
+
+			xIndex += 2;
+			yIndex += 1;
+			continue;
+		}
+
+		// remove x, insert y
+		if (xNext && xNextKey === yNextKey)
+		{
+			index++;
+			_VirtualDom_removeNode(changes, localPatches, xKey, xNode, index);
+			_VirtualDom_insertNode(changes, localPatches, yKey, yNode, yIndex, inserts);
+			index += xNode.b || 0;
+
+			index++;
+			_VirtualDom_diffHelp(xNextNode, yNextNode, localPatches, index);
+			index += xNextNode.b || 0;
+
+			xIndex += 2;
+			yIndex += 2;
+			continue;
+		}
+
+		break;
+	}
+
+	// eat up any remaining nodes with removeNode and insertNode
+
+	while (xIndex < xLen)
+	{
+		index++;
+		var x = xKids[xIndex];
+		var xNode = x.b;
+		_VirtualDom_removeNode(changes, localPatches, x.a, xNode, index);
+		index += xNode.b || 0;
+		xIndex++;
+	}
+
+	while (yIndex < yLen)
+	{
+		var endInserts = endInserts || [];
+		var y = yKids[yIndex];
+		_VirtualDom_insertNode(changes, localPatches, y.a, y.b, undefined, endInserts);
+		yIndex++;
+	}
+
+	if (localPatches.length > 0 || inserts.length > 0 || endInserts)
+	{
+		_VirtualDom_pushPatch(patches, 8, rootIndex, {
+			w: localPatches,
+			x: inserts,
+			y: endInserts
+		});
+	}
+}
+
+
+
+// CHANGES FROM KEYED DIFF
+
+
+var _VirtualDom_POSTFIX = '_elmW6BL';
+
+
+function _VirtualDom_insertNode(changes, localPatches, key, vnode, yIndex, inserts)
+{
+	var entry = changes[key];
+
+	// never seen this key before
+	if (!entry)
+	{
+		entry = {
+			c: 0,
+			z: vnode,
+			r: yIndex,
+			s: undefined
+		};
+
+		inserts.push({ r: yIndex, A: entry });
+		changes[key] = entry;
+
+		return;
+	}
+
+	// this key was removed earlier, a match!
+	if (entry.c === 1)
+	{
+		inserts.push({ r: yIndex, A: entry });
+
+		entry.c = 2;
+		var subPatches = [];
+		_VirtualDom_diffHelp(entry.z, vnode, subPatches, entry.r);
+		entry.r = yIndex;
+		entry.s.s = {
+			w: subPatches,
+			A: entry
+		};
+
+		return;
+	}
+
+	// this key has already been inserted or moved, a duplicate!
+	_VirtualDom_insertNode(changes, localPatches, key + _VirtualDom_POSTFIX, vnode, yIndex, inserts);
+}
+
+
+function _VirtualDom_removeNode(changes, localPatches, key, vnode, index)
+{
+	var entry = changes[key];
+
+	// never seen this key before
+	if (!entry)
+	{
+		var patch = _VirtualDom_pushPatch(localPatches, 9, index, undefined);
+
+		changes[key] = {
+			c: 1,
+			z: vnode,
+			r: index,
+			s: patch
+		};
+
+		return;
+	}
+
+	// this key was inserted earlier, a match!
+	if (entry.c === 0)
+	{
+		entry.c = 2;
+		var subPatches = [];
+		_VirtualDom_diffHelp(vnode, entry.z, subPatches, index);
+
+		_VirtualDom_pushPatch(localPatches, 9, index, {
+			w: subPatches,
+			A: entry
+		});
+
+		return;
+	}
+
+	// this key has already been removed or moved, a duplicate!
+	_VirtualDom_removeNode(changes, localPatches, key + _VirtualDom_POSTFIX, vnode, index);
+}
+
+
+
+// ADD DOM NODES
+//
+// Each DOM node has an "index" assigned in order of traversal. It is important
+// to minimize our crawl over the actual DOM, so these indexes (along with the
+// descendantsCount of virtual nodes) let us skip touching entire subtrees of
+// the DOM if we know there are no patches there.
+
+
+function _VirtualDom_addDomNodes(domNode, vNode, patches, eventNode)
+{
+	_VirtualDom_addDomNodesHelp(domNode, vNode, patches, 0, 0, vNode.b, eventNode);
+}
+
+
+// assumes `patches` is non-empty and indexes increase monotonically.
+function _VirtualDom_addDomNodesHelp(domNode, vNode, patches, i, low, high, eventNode)
+{
+	var patch = patches[i];
+	var index = patch.r;
+
+	while (index === low)
+	{
+		var patchType = patch.$;
+
+		if (patchType === 1)
+		{
+			_VirtualDom_addDomNodes(domNode, vNode.k, patch.s, eventNode);
+		}
+		else if (patchType === 8)
+		{
+			patch.t = domNode;
+			patch.u = eventNode;
+
+			var subPatches = patch.s.w;
+			if (subPatches.length > 0)
+			{
+				_VirtualDom_addDomNodesHelp(domNode, vNode, subPatches, 0, low, high, eventNode);
+			}
+		}
+		else if (patchType === 9)
+		{
+			patch.t = domNode;
+			patch.u = eventNode;
+
+			var data = patch.s;
+			if (data)
+			{
+				data.A.s = domNode;
+				var subPatches = data.w;
+				if (subPatches.length > 0)
+				{
+					_VirtualDom_addDomNodesHelp(domNode, vNode, subPatches, 0, low, high, eventNode);
+				}
+			}
+		}
+		else
+		{
+			patch.t = domNode;
+			patch.u = eventNode;
+		}
+
+		i++;
+
+		if (!(patch = patches[i]) || (index = patch.r) > high)
+		{
+			return i;
+		}
+	}
+
+	var tag = vNode.$;
+
+	if (tag === 4)
+	{
+		var subNode = vNode.k;
+
+		while (subNode.$ === 4)
+		{
+			subNode = subNode.k;
+		}
+
+		return _VirtualDom_addDomNodesHelp(domNode, subNode, patches, i, low + 1, high, domNode.elm_event_node_ref);
+	}
+
+	// tag must be 1 or 2 at this point
+
+	var vKids = vNode.e;
+	var childNodes = domNode.childNodes;
+	for (var j = 0; j < vKids.length; j++)
+	{
+		low++;
+		var vKid = tag === 1 ? vKids[j] : vKids[j].b;
+		var nextLow = low + (vKid.b || 0);
+		if (low <= index && index <= nextLow)
+		{
+			i = _VirtualDom_addDomNodesHelp(childNodes[j], vKid, patches, i, low, nextLow, eventNode);
+			if (!(patch = patches[i]) || (index = patch.r) > high)
+			{
+				return i;
+			}
+		}
+		low = nextLow;
+	}
+	return i;
+}
+
+
+
+// APPLY PATCHES
+
+
+function _VirtualDom_applyPatches(rootDomNode, oldVirtualNode, patches, eventNode)
+{
+	if (patches.length === 0)
+	{
+		return rootDomNode;
+	}
+
+	_VirtualDom_addDomNodes(rootDomNode, oldVirtualNode, patches, eventNode);
+	return _VirtualDom_applyPatchesHelp(rootDomNode, patches);
+}
+
+function _VirtualDom_applyPatchesHelp(rootDomNode, patches)
+{
+	for (var i = 0; i < patches.length; i++)
+	{
+		var patch = patches[i];
+		var localDomNode = patch.t
+		var newNode = _VirtualDom_applyPatch(localDomNode, patch);
+		if (localDomNode === rootDomNode)
+		{
+			rootDomNode = newNode;
+		}
+	}
+	return rootDomNode;
+}
+
+function _VirtualDom_applyPatch(domNode, patch)
+{
+	switch (patch.$)
+	{
+		case 0:
+			return _VirtualDom_applyPatchRedraw(domNode, patch.s, patch.u);
+
+		case 4:
+			_VirtualDom_applyFacts(domNode, patch.u, patch.s);
+			return domNode;
+
+		case 3:
+			domNode.replaceData(0, domNode.length, patch.s);
+			return domNode;
+
+		case 1:
+			return _VirtualDom_applyPatchesHelp(domNode, patch.s);
+
+		case 2:
+			if (domNode.elm_event_node_ref)
+			{
+				domNode.elm_event_node_ref.j = patch.s;
+			}
+			else
+			{
+				domNode.elm_event_node_ref = { j: patch.s, p: patch.u };
+			}
+			return domNode;
+
+		case 6:
+			var data = patch.s;
+			for (var i = 0; i < data.i; i++)
+			{
+				domNode.removeChild(domNode.childNodes[data.v]);
+			}
+			return domNode;
+
+		case 7:
+			var data = patch.s;
+			var kids = data.e;
+			var i = data.v;
+			var theEnd = domNode.childNodes[i];
+			for (; i < kids.length; i++)
+			{
+				domNode.insertBefore(_VirtualDom_render(kids[i], patch.u), theEnd);
+			}
+			return domNode;
+
+		case 9:
+			var data = patch.s;
+			if (!data)
+			{
+				domNode.parentNode.removeChild(domNode);
+				return domNode;
+			}
+			var entry = data.A;
+			if (typeof entry.r !== 'undefined')
+			{
+				domNode.parentNode.removeChild(domNode);
+			}
+			entry.s = _VirtualDom_applyPatchesHelp(domNode, data.w);
+			return domNode;
+
+		case 8:
+			return _VirtualDom_applyPatchReorder(domNode, patch);
+
+		case 5:
+			return patch.s(domNode);
+
+		default:
+			_Debug_crash(10); // 'Ran into an unknown patch!'
+	}
+}
+
+
+function _VirtualDom_applyPatchRedraw(domNode, vNode, eventNode)
+{
+	var parentNode = domNode.parentNode;
+	var newNode = _VirtualDom_render(vNode, eventNode);
+
+	if (!newNode.elm_event_node_ref)
+	{
+		newNode.elm_event_node_ref = domNode.elm_event_node_ref;
+	}
+
+	if (parentNode && newNode !== domNode)
+	{
+		parentNode.replaceChild(newNode, domNode);
+	}
+	return newNode;
+}
+
+
+function _VirtualDom_applyPatchReorder(domNode, patch)
+{
+	var data = patch.s;
+
+	// remove end inserts
+	var frag = _VirtualDom_applyPatchReorderEndInsertsHelp(data.y, patch);
+
+	// removals
+	domNode = _VirtualDom_applyPatchesHelp(domNode, data.w);
+
+	// inserts
+	var inserts = data.x;
+	for (var i = 0; i < inserts.length; i++)
+	{
+		var insert = inserts[i];
+		var entry = insert.A;
+		var node = entry.c === 2
+			? entry.s
+			: _VirtualDom_render(entry.z, patch.u);
+		domNode.insertBefore(node, domNode.childNodes[insert.r]);
+	}
+
+	// add end inserts
+	if (frag)
+	{
+		_VirtualDom_appendChild(domNode, frag);
+	}
+
+	return domNode;
+}
+
+
+function _VirtualDom_applyPatchReorderEndInsertsHelp(endInserts, patch)
+{
+	if (!endInserts)
+	{
+		return;
+	}
+
+	var frag = _VirtualDom_doc.createDocumentFragment();
+	for (var i = 0; i < endInserts.length; i++)
+	{
+		var insert = endInserts[i];
+		var entry = insert.A;
+		_VirtualDom_appendChild(frag, entry.c === 2
+			? entry.s
+			: _VirtualDom_render(entry.z, patch.u)
+		);
+	}
+	return frag;
+}
+
+
+function _VirtualDom_virtualize(node)
+{
+	// TEXT NODES
+
+	if (node.nodeType === 3)
+	{
+		return _VirtualDom_text(node.textContent);
+	}
+
+
+	// WEIRD NODES
+
+	if (node.nodeType !== 1)
+	{
+		return _VirtualDom_text('');
+	}
+
+
+	// ELEMENT NODES
+
+	var attrList = _List_Nil;
+	var attrs = node.attributes;
+	for (var i = attrs.length; i--; )
+	{
+		var attr = attrs[i];
+		var name = attr.name;
+		var value = attr.value;
+		attrList = _List_Cons( A2(_VirtualDom_attribute, name, value), attrList );
+	}
+
+	var tag = node.tagName.toLowerCase();
+	var kidList = _List_Nil;
+	var kids = node.childNodes;
+
+	for (var i = kids.length; i--; )
+	{
+		kidList = _List_Cons(_VirtualDom_virtualize(kids[i]), kidList);
+	}
+	return A3(_VirtualDom_node, tag, attrList, kidList);
+}
+
+function _VirtualDom_dekey(keyedNode)
+{
+	var keyedKids = keyedNode.e;
+	var len = keyedKids.length;
+	var kids = new Array(len);
+	for (var i = 0; i < len; i++)
+	{
+		kids[i] = keyedKids[i].b;
+	}
+
+	return {
+		$: 1,
+		c: keyedNode.c,
+		d: keyedNode.d,
+		e: kids,
+		f: keyedNode.f,
+		b: keyedNode.b
+	};
+}
+
+
+
+
+// ELEMENT
+
+
+var _Debugger_element;
+
+var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debugMetadata, args)
+{
+	return _Platform_initialize(
+		flagDecoder,
+		args,
+		impl.aG,
+		impl.aO,
+		impl.aM,
+		function(sendToApp, initialModel) {
+			var view = impl.aP;
+			/**/
+			var domNode = args['node'];
+			//*/
+			/**_UNUSED/
+			var domNode = args && args['node'] ? args['node'] : _Debug_crash(0);
+			//*/
+			var currNode = _VirtualDom_virtualize(domNode);
+
+			return _Browser_makeAnimator(initialModel, function(model)
+			{
+				var nextNode = view(model);
+				var patches = _VirtualDom_diff(currNode, nextNode);
+				domNode = _VirtualDom_applyPatches(domNode, currNode, patches, sendToApp);
+				currNode = nextNode;
+			});
+		}
+	);
+});
+
+
+
+// DOCUMENT
+
+
+var _Debugger_document;
+
+var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, debugMetadata, args)
+{
+	return _Platform_initialize(
+		flagDecoder,
+		args,
+		impl.aG,
+		impl.aO,
+		impl.aM,
+		function(sendToApp, initialModel) {
+			var divertHrefToApp = impl.S && impl.S(sendToApp)
+			var view = impl.aP;
+			var title = _VirtualDom_doc.title;
+			var bodyNode = _VirtualDom_doc.body;
+			var currNode = _VirtualDom_virtualize(bodyNode);
+			return _Browser_makeAnimator(initialModel, function(model)
+			{
+				_VirtualDom_divertHrefToApp = divertHrefToApp;
+				var doc = view(model);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.az);
+				var patches = _VirtualDom_diff(currNode, nextNode);
+				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
+				currNode = nextNode;
+				_VirtualDom_divertHrefToApp = 0;
+				(title !== doc.aN) && (_VirtualDom_doc.title = title = doc.aN);
+			});
+		}
+	);
+});
+
+
+
+// ANIMATION
+
+
+var _Browser_cancelAnimationFrame =
+	typeof cancelAnimationFrame !== 'undefined'
+		? cancelAnimationFrame
+		: function(id) { clearTimeout(id); };
+
+var _Browser_requestAnimationFrame =
+	typeof requestAnimationFrame !== 'undefined'
+		? requestAnimationFrame
+		: function(callback) { return setTimeout(callback, 1000 / 60); };
+
+
+function _Browser_makeAnimator(model, draw)
+{
+	draw(model);
+
+	var state = 0;
+
+	function updateIfNeeded()
+	{
+		state = state === 1
+			? 0
+			: ( _Browser_requestAnimationFrame(updateIfNeeded), draw(model), 1 );
+	}
+
+	return function(nextModel, isSync)
+	{
+		model = nextModel;
+
+		isSync
+			? ( draw(model),
+				state === 2 && (state = 1)
+				)
+			: ( state === 0 && _Browser_requestAnimationFrame(updateIfNeeded),
+				state = 2
+				);
+	};
+}
+
+
+
+// APPLICATION
+
+
+function _Browser_application(impl)
+{
+	var onUrlChange = impl.aI;
+	var onUrlRequest = impl.aJ;
+	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
+
+	return _Browser_document({
+		S: function(sendToApp)
+		{
+			key.a = sendToApp;
+			_Browser_window.addEventListener('popstate', key);
+			_Browser_window.navigator.userAgent.indexOf('Trident') < 0 || _Browser_window.addEventListener('hashchange', key);
+
+			return F2(function(domNode, event)
+			{
+				if (!event.ctrlKey && !event.metaKey && !event.shiftKey && event.button < 1 && !domNode.target && !domNode.hasAttribute('download'))
+				{
+					event.preventDefault();
+					var href = domNode.href;
+					var curr = _Browser_getUrl();
+					var next = $elm$url$Url$fromString(href).a;
+					sendToApp(onUrlRequest(
+						(next
+							&& curr.am === next.am
+							&& curr.ac === next.ac
+							&& curr.aj.a === next.aj.a
+						)
+							? $elm$browser$Browser$Internal(next)
+							: $elm$browser$Browser$External(href)
+					));
+				}
+			});
+		},
+		aG: function(flags)
+		{
+			return A3(impl.aG, flags, _Browser_getUrl(), key);
+		},
+		aP: impl.aP,
+		aO: impl.aO,
+		aM: impl.aM
+	});
+}
+
+function _Browser_getUrl()
+{
+	return $elm$url$Url$fromString(_VirtualDom_doc.location.href).a || _Debug_crash(1);
+}
+
+var _Browser_go = F2(function(key, n)
+{
+	return A2($elm$core$Task$perform, $elm$core$Basics$never, _Scheduler_binding(function() {
+		n && history.go(n);
+		key();
+	}));
+});
+
+var _Browser_pushUrl = F2(function(key, url)
+{
+	return A2($elm$core$Task$perform, $elm$core$Basics$never, _Scheduler_binding(function() {
+		history.pushState({}, '', url);
+		key();
+	}));
+});
+
+var _Browser_replaceUrl = F2(function(key, url)
+{
+	return A2($elm$core$Task$perform, $elm$core$Basics$never, _Scheduler_binding(function() {
+		history.replaceState({}, '', url);
+		key();
+	}));
+});
+
+
+
+// GLOBAL EVENTS
+
+
+var _Browser_fakeNode = { addEventListener: function() {}, removeEventListener: function() {} };
+var _Browser_doc = typeof document !== 'undefined' ? document : _Browser_fakeNode;
+var _Browser_window = typeof window !== 'undefined' ? window : _Browser_fakeNode;
+
+var _Browser_on = F3(function(node, eventName, sendToSelf)
+{
+	return _Scheduler_spawn(_Scheduler_binding(function(callback)
+	{
+		function handler(event)	{ _Scheduler_rawSpawn(sendToSelf(event)); }
+		node.addEventListener(eventName, handler, _VirtualDom_passiveSupported && { passive: true });
+		return function() { node.removeEventListener(eventName, handler); };
+	}));
+});
+
+var _Browser_decodeEvent = F2(function(decoder, event)
+{
+	var result = _Json_runHelp(decoder, event);
+	return $elm$core$Result$isOk(result) ? $elm$core$Maybe$Just(result.a) : $elm$core$Maybe$Nothing;
+});
+
+
+
+// PAGE VISIBILITY
+
+
+function _Browser_visibilityInfo()
+{
+	return (typeof _VirtualDom_doc.hidden !== 'undefined')
+		? { aE: 'hidden', aA: 'visibilitychange' }
+		:
+	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
+		? { aE: 'mozHidden', aA: 'mozvisibilitychange' }
+		:
+	(typeof _VirtualDom_doc.msHidden !== 'undefined')
+		? { aE: 'msHidden', aA: 'msvisibilitychange' }
+		:
+	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
+		? { aE: 'webkitHidden', aA: 'webkitvisibilitychange' }
+		: { aE: 'hidden', aA: 'visibilitychange' };
+}
+
+
+
+// ANIMATION FRAMES
+
+
+function _Browser_rAF()
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var id = _Browser_requestAnimationFrame(function() {
+			callback(_Scheduler_succeed(Date.now()));
+		});
+
+		return function() {
+			_Browser_cancelAnimationFrame(id);
+		};
+	});
+}
+
+
+function _Browser_now()
+{
+	return _Scheduler_binding(function(callback)
+	{
+		callback(_Scheduler_succeed(Date.now()));
+	});
+}
+
+
+
+// DOM STUFF
+
+
+function _Browser_withNode(id, doStuff)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		_Browser_requestAnimationFrame(function() {
+			var node = document.getElementById(id);
+			callback(node
+				? _Scheduler_succeed(doStuff(node))
+				: _Scheduler_fail($elm$browser$Browser$Dom$NotFound(id))
+			);
+		});
+	});
+}
+
+
+function _Browser_withWindow(doStuff)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		_Browser_requestAnimationFrame(function() {
+			callback(_Scheduler_succeed(doStuff()));
+		});
+	});
+}
+
+
+// FOCUS and BLUR
+
+
+var _Browser_call = F2(function(functionName, id)
+{
+	return _Browser_withNode(id, function(node) {
+		node[functionName]();
+		return _Utils_Tuple0;
+	});
+});
+
+
+
+// WINDOW VIEWPORT
+
+
+function _Browser_getViewport()
+{
+	return {
+		aq: _Browser_getScene(),
+		at: {
+			av: _Browser_window.pageXOffset,
+			aw: _Browser_window.pageYOffset,
+			au: _Browser_doc.documentElement.clientWidth,
+			ab: _Browser_doc.documentElement.clientHeight
+		}
+	};
+}
+
+function _Browser_getScene()
+{
+	var body = _Browser_doc.body;
+	var elem = _Browser_doc.documentElement;
+	return {
+		au: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		ab: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+	};
+}
+
+var _Browser_setViewport = F2(function(x, y)
+{
+	return _Browser_withWindow(function()
+	{
+		_Browser_window.scroll(x, y);
+		return _Utils_Tuple0;
+	});
+});
+
+
+
+// ELEMENT VIEWPORT
+
+
+function _Browser_getViewportOf(id)
+{
+	return _Browser_withNode(id, function(node)
+	{
+		return {
+			aq: {
+				au: node.scrollWidth,
+				ab: node.scrollHeight
+			},
+			at: {
+				av: node.scrollLeft,
+				aw: node.scrollTop,
+				au: node.clientWidth,
+				ab: node.clientHeight
+			}
+		};
+	});
+}
+
+
+var _Browser_setViewportOf = F3(function(id, x, y)
+{
+	return _Browser_withNode(id, function(node)
+	{
+		node.scrollLeft = x;
+		node.scrollTop = y;
+		return _Utils_Tuple0;
+	});
+});
+
+
+
+// ELEMENT
+
+
+function _Browser_getElement(id)
+{
+	return _Browser_withNode(id, function(node)
+	{
+		var rect = node.getBoundingClientRect();
+		var x = _Browser_window.pageXOffset;
+		var y = _Browser_window.pageYOffset;
+		return {
+			aq: _Browser_getScene(),
+			at: {
+				av: x,
+				aw: y,
+				au: _Browser_doc.documentElement.clientWidth,
+				ab: _Browser_doc.documentElement.clientHeight
+			},
+			aC: {
+				av: x + rect.left,
+				aw: y + rect.top,
+				au: rect.width,
+				ab: rect.height
+			}
+		};
+	});
+}
+
+
+
+// LOAD and RELOAD
+
+
+function _Browser_reload(skipCache)
+{
+	return A2($elm$core$Task$perform, $elm$core$Basics$never, _Scheduler_binding(function(callback)
+	{
+		_VirtualDom_doc.location.reload(skipCache);
+	}));
+}
+
+function _Browser_load(url)
+{
+	return A2($elm$core$Task$perform, $elm$core$Basics$never, _Scheduler_binding(function(callback)
+	{
+		try
+		{
+			_Browser_window.location = url;
+		}
+		catch(err)
+		{
+			// Only Firefox can throw a NS_ERROR_MALFORMED_URI exception here.
+			// Other browsers reload the page, so let's be consistent about that.
+			_VirtualDom_doc.location.reload(false);
+		}
+	}));
+}
+
+
+
+function _Time_now(millisToPosix)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		callback(_Scheduler_succeed(millisToPosix(Date.now())));
+	});
+}
+
+var _Time_setInterval = F2(function(interval, task)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var id = setInterval(function() { _Scheduler_rawSpawn(task); }, interval);
+		return function() { clearInterval(id); };
+	});
+});
+
+function _Time_here()
+{
+	return _Scheduler_binding(function(callback)
+	{
+		callback(_Scheduler_succeed(
+			A2($elm$time$Time$customZone, -(new Date().getTimezoneOffset()), _List_Nil)
+		));
+	});
+}
+
+
+function _Time_getZoneName()
+{
+	return _Scheduler_binding(function(callback)
+	{
+		try
+		{
+			var name = $elm$time$Time$Name(Intl.DateTimeFormat().resolvedOptions().timeZone);
+		}
+		catch (e)
+		{
+			var name = $elm$time$Time$Offset(new Date().getTimezoneOffset());
+		}
+		callback(_Scheduler_succeed(name));
+	});
+}
+var $elm$core$Basics$EQ = 1;
+var $elm$core$Basics$GT = 2;
+var $elm$core$Basics$LT = 0;
+var $elm$core$List$cons = _List_cons;
+var $elm$core$Dict$foldr = F3(
+	function (func, acc, t) {
+		foldr:
+		while (true) {
+			if (t.$ === -2) {
+				return acc;
+			} else {
+				var key = t.b;
+				var value = t.c;
+				var left = t.d;
+				var right = t.e;
+				var $temp$func = func,
+					$temp$acc = A3(
+					func,
+					key,
+					value,
+					A3($elm$core$Dict$foldr, func, acc, right)),
+					$temp$t = left;
+				func = $temp$func;
+				acc = $temp$acc;
+				t = $temp$t;
+				continue foldr;
+			}
+		}
+	});
+var $elm$core$Dict$toList = function (dict) {
+	return A3(
+		$elm$core$Dict$foldr,
+		F3(
+			function (key, value, list) {
+				return A2(
+					$elm$core$List$cons,
+					_Utils_Tuple2(key, value),
+					list);
+			}),
+		_List_Nil,
+		dict);
+};
+var $elm$core$Dict$keys = function (dict) {
+	return A3(
+		$elm$core$Dict$foldr,
+		F3(
+			function (key, value, keyList) {
+				return A2($elm$core$List$cons, key, keyList);
+			}),
+		_List_Nil,
+		dict);
+};
+var $elm$core$Set$toList = function (_v0) {
+	var dict = _v0;
+	return $elm$core$Dict$keys(dict);
+};
+var $elm$core$Elm$JsArray$foldr = _JsArray_foldr;
+var $elm$core$Array$foldr = F3(
+	function (func, baseCase, _v0) {
+		var tree = _v0.c;
+		var tail = _v0.d;
+		var helper = F2(
+			function (node, acc) {
+				if (!node.$) {
+					var subTree = node.a;
+					return A3($elm$core$Elm$JsArray$foldr, helper, acc, subTree);
+				} else {
+					var values = node.a;
+					return A3($elm$core$Elm$JsArray$foldr, func, acc, values);
+				}
+			});
+		return A3(
+			$elm$core$Elm$JsArray$foldr,
+			helper,
+			A3($elm$core$Elm$JsArray$foldr, func, baseCase, tail),
+			tree);
+	});
+var $elm$core$Array$toList = function (array) {
+	return A3($elm$core$Array$foldr, $elm$core$List$cons, _List_Nil, array);
+};
+var $elm$core$Result$Err = function (a) {
+	return {$: 1, a: a};
+};
+var $elm$json$Json$Decode$Failure = F2(
+	function (a, b) {
+		return {$: 3, a: a, b: b};
+	});
+var $elm$json$Json$Decode$Field = F2(
+	function (a, b) {
+		return {$: 0, a: a, b: b};
+	});
+var $elm$json$Json$Decode$Index = F2(
+	function (a, b) {
+		return {$: 1, a: a, b: b};
+	});
+var $elm$core$Result$Ok = function (a) {
+	return {$: 0, a: a};
+};
+var $elm$json$Json$Decode$OneOf = function (a) {
+	return {$: 2, a: a};
+};
+var $elm$core$Basics$False = 1;
+var $elm$core$Basics$add = _Basics_add;
+var $elm$core$Maybe$Just = function (a) {
+	return {$: 0, a: a};
+};
+var $elm$core$Maybe$Nothing = {$: 1};
+var $elm$core$String$all = _String_all;
+var $elm$core$Basics$and = _Basics_and;
+var $elm$core$Basics$append = _Utils_append;
+var $elm$json$Json$Encode$encode = _Json_encode;
+var $elm$core$String$fromInt = _String_fromNumber;
+var $elm$core$String$join = F2(
+	function (sep, chunks) {
+		return A2(
+			_String_join,
+			sep,
+			_List_toArray(chunks));
+	});
+var $elm$core$String$split = F2(
+	function (sep, string) {
+		return _List_fromArray(
+			A2(_String_split, sep, string));
+	});
+var $elm$json$Json$Decode$indent = function (str) {
+	return A2(
+		$elm$core$String$join,
+		'\n    ',
+		A2($elm$core$String$split, '\n', str));
+};
+var $elm$core$List$foldl = F3(
+	function (func, acc, list) {
+		foldl:
+		while (true) {
+			if (!list.b) {
+				return acc;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				var $temp$func = func,
+					$temp$acc = A2(func, x, acc),
+					$temp$list = xs;
+				func = $temp$func;
+				acc = $temp$acc;
+				list = $temp$list;
+				continue foldl;
+			}
+		}
+	});
+var $elm$core$List$length = function (xs) {
+	return A3(
+		$elm$core$List$foldl,
+		F2(
+			function (_v0, i) {
+				return i + 1;
+			}),
+		0,
+		xs);
+};
+var $elm$core$List$map2 = _List_map2;
+var $elm$core$Basics$le = _Utils_le;
+var $elm$core$Basics$sub = _Basics_sub;
+var $elm$core$List$rangeHelp = F3(
+	function (lo, hi, list) {
+		rangeHelp:
+		while (true) {
+			if (_Utils_cmp(lo, hi) < 1) {
+				var $temp$lo = lo,
+					$temp$hi = hi - 1,
+					$temp$list = A2($elm$core$List$cons, hi, list);
+				lo = $temp$lo;
+				hi = $temp$hi;
+				list = $temp$list;
+				continue rangeHelp;
+			} else {
+				return list;
+			}
+		}
+	});
+var $elm$core$List$range = F2(
+	function (lo, hi) {
+		return A3($elm$core$List$rangeHelp, lo, hi, _List_Nil);
+	});
+var $elm$core$List$indexedMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$map2,
+			f,
+			A2(
+				$elm$core$List$range,
+				0,
+				$elm$core$List$length(xs) - 1),
+			xs);
+	});
+var $elm$core$Char$toCode = _Char_toCode;
+var $elm$core$Char$isLower = function (_char) {
+	var code = $elm$core$Char$toCode(_char);
+	return (97 <= code) && (code <= 122);
+};
+var $elm$core$Char$isUpper = function (_char) {
+	var code = $elm$core$Char$toCode(_char);
+	return (code <= 90) && (65 <= code);
+};
+var $elm$core$Basics$or = _Basics_or;
+var $elm$core$Char$isAlpha = function (_char) {
+	return $elm$core$Char$isLower(_char) || $elm$core$Char$isUpper(_char);
+};
+var $elm$core$Char$isDigit = function (_char) {
+	var code = $elm$core$Char$toCode(_char);
+	return (code <= 57) && (48 <= code);
+};
+var $elm$core$Char$isAlphaNum = function (_char) {
+	return $elm$core$Char$isLower(_char) || ($elm$core$Char$isUpper(_char) || $elm$core$Char$isDigit(_char));
+};
+var $elm$core$List$reverse = function (list) {
+	return A3($elm$core$List$foldl, $elm$core$List$cons, _List_Nil, list);
+};
+var $elm$core$String$uncons = _String_uncons;
+var $elm$json$Json$Decode$errorOneOf = F2(
+	function (i, error) {
+		return '\n\n(' + ($elm$core$String$fromInt(i + 1) + (') ' + $elm$json$Json$Decode$indent(
+			$elm$json$Json$Decode$errorToString(error))));
+	});
+var $elm$json$Json$Decode$errorToString = function (error) {
+	return A2($elm$json$Json$Decode$errorToStringHelp, error, _List_Nil);
+};
+var $elm$json$Json$Decode$errorToStringHelp = F2(
+	function (error, context) {
+		errorToStringHelp:
+		while (true) {
+			switch (error.$) {
+				case 0:
+					var f = error.a;
+					var err = error.b;
+					var isSimple = function () {
+						var _v1 = $elm$core$String$uncons(f);
+						if (_v1.$ === 1) {
+							return false;
+						} else {
+							var _v2 = _v1.a;
+							var _char = _v2.a;
+							var rest = _v2.b;
+							return $elm$core$Char$isAlpha(_char) && A2($elm$core$String$all, $elm$core$Char$isAlphaNum, rest);
+						}
+					}();
+					var fieldName = isSimple ? ('.' + f) : ('[\'' + (f + '\']'));
+					var $temp$error = err,
+						$temp$context = A2($elm$core$List$cons, fieldName, context);
+					error = $temp$error;
+					context = $temp$context;
+					continue errorToStringHelp;
+				case 1:
+					var i = error.a;
+					var err = error.b;
+					var indexName = '[' + ($elm$core$String$fromInt(i) + ']');
+					var $temp$error = err,
+						$temp$context = A2($elm$core$List$cons, indexName, context);
+					error = $temp$error;
+					context = $temp$context;
+					continue errorToStringHelp;
+				case 2:
+					var errors = error.a;
+					if (!errors.b) {
+						return 'Ran into a Json.Decode.oneOf with no possibilities' + function () {
+							if (!context.b) {
+								return '!';
+							} else {
+								return ' at json' + A2(
+									$elm$core$String$join,
+									'',
+									$elm$core$List$reverse(context));
+							}
+						}();
+					} else {
+						if (!errors.b.b) {
+							var err = errors.a;
+							var $temp$error = err,
+								$temp$context = context;
+							error = $temp$error;
+							context = $temp$context;
+							continue errorToStringHelp;
+						} else {
+							var starter = function () {
+								if (!context.b) {
+									return 'Json.Decode.oneOf';
+								} else {
+									return 'The Json.Decode.oneOf at json' + A2(
+										$elm$core$String$join,
+										'',
+										$elm$core$List$reverse(context));
+								}
+							}();
+							var introduction = starter + (' failed in the following ' + ($elm$core$String$fromInt(
+								$elm$core$List$length(errors)) + ' ways:'));
+							return A2(
+								$elm$core$String$join,
+								'\n\n',
+								A2(
+									$elm$core$List$cons,
+									introduction,
+									A2($elm$core$List$indexedMap, $elm$json$Json$Decode$errorOneOf, errors)));
+						}
+					}
+				default:
+					var msg = error.a;
+					var json = error.b;
+					var introduction = function () {
+						if (!context.b) {
+							return 'Problem with the given value:\n\n';
+						} else {
+							return 'Problem with the value at json' + (A2(
+								$elm$core$String$join,
+								'',
+								$elm$core$List$reverse(context)) + ':\n\n    ');
+						}
+					}();
+					return introduction + ($elm$json$Json$Decode$indent(
+						A2($elm$json$Json$Encode$encode, 4, json)) + ('\n\n' + msg));
+			}
+		}
+	});
+var $elm$core$Array$branchFactor = 32;
+var $elm$core$Array$Array_elm_builtin = F4(
+	function (a, b, c, d) {
+		return {$: 0, a: a, b: b, c: c, d: d};
+	});
+var $elm$core$Elm$JsArray$empty = _JsArray_empty;
+var $elm$core$Basics$ceiling = _Basics_ceiling;
+var $elm$core$Basics$fdiv = _Basics_fdiv;
+var $elm$core$Basics$logBase = F2(
+	function (base, number) {
+		return _Basics_log(number) / _Basics_log(base);
+	});
+var $elm$core$Basics$toFloat = _Basics_toFloat;
+var $elm$core$Array$shiftStep = $elm$core$Basics$ceiling(
+	A2($elm$core$Basics$logBase, 2, $elm$core$Array$branchFactor));
+var $elm$core$Array$empty = A4($elm$core$Array$Array_elm_builtin, 0, $elm$core$Array$shiftStep, $elm$core$Elm$JsArray$empty, $elm$core$Elm$JsArray$empty);
+var $elm$core$Elm$JsArray$initialize = _JsArray_initialize;
+var $elm$core$Array$Leaf = function (a) {
+	return {$: 1, a: a};
+};
+var $elm$core$Basics$apL = F2(
+	function (f, x) {
+		return f(x);
+	});
+var $elm$core$Basics$apR = F2(
+	function (x, f) {
+		return f(x);
+	});
+var $elm$core$Basics$eq = _Utils_equal;
+var $elm$core$Basics$floor = _Basics_floor;
+var $elm$core$Elm$JsArray$length = _JsArray_length;
+var $elm$core$Basics$gt = _Utils_gt;
+var $elm$core$Basics$max = F2(
+	function (x, y) {
+		return (_Utils_cmp(x, y) > 0) ? x : y;
+	});
+var $elm$core$Basics$mul = _Basics_mul;
+var $elm$core$Array$SubTree = function (a) {
+	return {$: 0, a: a};
+};
+var $elm$core$Elm$JsArray$initializeFromList = _JsArray_initializeFromList;
+var $elm$core$Array$compressNodes = F2(
+	function (nodes, acc) {
+		compressNodes:
+		while (true) {
+			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, nodes);
+			var node = _v0.a;
+			var remainingNodes = _v0.b;
+			var newAcc = A2(
+				$elm$core$List$cons,
+				$elm$core$Array$SubTree(node),
+				acc);
+			if (!remainingNodes.b) {
+				return $elm$core$List$reverse(newAcc);
+			} else {
+				var $temp$nodes = remainingNodes,
+					$temp$acc = newAcc;
+				nodes = $temp$nodes;
+				acc = $temp$acc;
+				continue compressNodes;
+			}
+		}
+	});
+var $elm$core$Tuple$first = function (_v0) {
+	var x = _v0.a;
+	return x;
+};
+var $elm$core$Array$treeFromBuilder = F2(
+	function (nodeList, nodeListSize) {
+		treeFromBuilder:
+		while (true) {
+			var newNodeSize = $elm$core$Basics$ceiling(nodeListSize / $elm$core$Array$branchFactor);
+			if (newNodeSize === 1) {
+				return A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, nodeList).a;
+			} else {
+				var $temp$nodeList = A2($elm$core$Array$compressNodes, nodeList, _List_Nil),
+					$temp$nodeListSize = newNodeSize;
+				nodeList = $temp$nodeList;
+				nodeListSize = $temp$nodeListSize;
+				continue treeFromBuilder;
+			}
+		}
+	});
+var $elm$core$Array$builderToArray = F2(
+	function (reverseNodeList, builder) {
+		if (!builder.a) {
+			return A4(
+				$elm$core$Array$Array_elm_builtin,
+				$elm$core$Elm$JsArray$length(builder.c),
+				$elm$core$Array$shiftStep,
+				$elm$core$Elm$JsArray$empty,
+				builder.c);
+		} else {
+			var treeLen = builder.a * $elm$core$Array$branchFactor;
+			var depth = $elm$core$Basics$floor(
+				A2($elm$core$Basics$logBase, $elm$core$Array$branchFactor, treeLen - 1));
+			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.d) : builder.d;
+			var tree = A2($elm$core$Array$treeFromBuilder, correctNodeList, builder.a);
+			return A4(
+				$elm$core$Array$Array_elm_builtin,
+				$elm$core$Elm$JsArray$length(builder.c) + treeLen,
+				A2($elm$core$Basics$max, 5, depth * $elm$core$Array$shiftStep),
+				tree,
+				builder.c);
+		}
+	});
+var $elm$core$Basics$idiv = _Basics_idiv;
+var $elm$core$Basics$lt = _Utils_lt;
+var $elm$core$Array$initializeHelp = F5(
+	function (fn, fromIndex, len, nodeList, tail) {
+		initializeHelp:
+		while (true) {
+			if (fromIndex < 0) {
+				return A2(
+					$elm$core$Array$builderToArray,
+					false,
+					{d: nodeList, a: (len / $elm$core$Array$branchFactor) | 0, c: tail});
+			} else {
+				var leaf = $elm$core$Array$Leaf(
+					A3($elm$core$Elm$JsArray$initialize, $elm$core$Array$branchFactor, fromIndex, fn));
+				var $temp$fn = fn,
+					$temp$fromIndex = fromIndex - $elm$core$Array$branchFactor,
+					$temp$len = len,
+					$temp$nodeList = A2($elm$core$List$cons, leaf, nodeList),
+					$temp$tail = tail;
+				fn = $temp$fn;
+				fromIndex = $temp$fromIndex;
+				len = $temp$len;
+				nodeList = $temp$nodeList;
+				tail = $temp$tail;
+				continue initializeHelp;
+			}
+		}
+	});
+var $elm$core$Basics$remainderBy = _Basics_remainderBy;
+var $elm$core$Array$initialize = F2(
+	function (len, fn) {
+		if (len <= 0) {
+			return $elm$core$Array$empty;
+		} else {
+			var tailLen = len % $elm$core$Array$branchFactor;
+			var tail = A3($elm$core$Elm$JsArray$initialize, tailLen, len - tailLen, fn);
+			var initialFromIndex = (len - tailLen) - $elm$core$Array$branchFactor;
+			return A5($elm$core$Array$initializeHelp, fn, initialFromIndex, len, _List_Nil, tail);
+		}
+	});
+var $elm$core$Basics$True = 0;
+var $elm$core$Result$isOk = function (result) {
+	if (!result.$) {
+		return true;
+	} else {
+		return false;
+	}
+};
+var $elm$json$Json$Decode$map = _Json_map1;
+var $elm$json$Json$Decode$map2 = _Json_map2;
+var $elm$json$Json$Decode$succeed = _Json_succeed;
+var $elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
+	switch (handler.$) {
+		case 0:
+			return 0;
+		case 1:
+			return 1;
+		case 2:
+			return 2;
+		default:
+			return 3;
+	}
+};
+var $elm$browser$Browser$External = function (a) {
+	return {$: 1, a: a};
+};
+var $elm$browser$Browser$Internal = function (a) {
+	return {$: 0, a: a};
+};
+var $elm$core$Basics$identity = function (x) {
+	return x;
+};
+var $elm$browser$Browser$Dom$NotFound = $elm$core$Basics$identity;
+var $elm$url$Url$Http = 0;
+var $elm$url$Url$Https = 1;
+var $elm$url$Url$Url = F6(
+	function (protocol, host, port_, path, query, fragment) {
+		return {aa: fragment, ac: host, ah: path, aj: port_, am: protocol, an: query};
+	});
+var $elm$core$String$contains = _String_contains;
+var $elm$core$String$length = _String_length;
+var $elm$core$String$slice = _String_slice;
+var $elm$core$String$dropLeft = F2(
+	function (n, string) {
+		return (n < 1) ? string : A3(
+			$elm$core$String$slice,
+			n,
+			$elm$core$String$length(string),
+			string);
+	});
+var $elm$core$String$indexes = _String_indexes;
+var $elm$core$String$isEmpty = function (string) {
+	return string === '';
+};
+var $elm$core$String$left = F2(
+	function (n, string) {
+		return (n < 1) ? '' : A3($elm$core$String$slice, 0, n, string);
+	});
+var $elm$core$String$toInt = _String_toInt;
+var $elm$url$Url$chompBeforePath = F5(
+	function (protocol, path, params, frag, str) {
+		if ($elm$core$String$isEmpty(str) || A2($elm$core$String$contains, '@', str)) {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			var _v0 = A2($elm$core$String$indexes, ':', str);
+			if (!_v0.b) {
+				return $elm$core$Maybe$Just(
+					A6($elm$url$Url$Url, protocol, str, $elm$core$Maybe$Nothing, path, params, frag));
+			} else {
+				if (!_v0.b.b) {
+					var i = _v0.a;
+					var _v1 = $elm$core$String$toInt(
+						A2($elm$core$String$dropLeft, i + 1, str));
+					if (_v1.$ === 1) {
+						return $elm$core$Maybe$Nothing;
+					} else {
+						var port_ = _v1;
+						return $elm$core$Maybe$Just(
+							A6(
+								$elm$url$Url$Url,
+								protocol,
+								A2($elm$core$String$left, i, str),
+								port_,
+								path,
+								params,
+								frag));
+					}
+				} else {
+					return $elm$core$Maybe$Nothing;
+				}
+			}
+		}
+	});
+var $elm$url$Url$chompBeforeQuery = F4(
+	function (protocol, params, frag, str) {
+		if ($elm$core$String$isEmpty(str)) {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			var _v0 = A2($elm$core$String$indexes, '/', str);
+			if (!_v0.b) {
+				return A5($elm$url$Url$chompBeforePath, protocol, '/', params, frag, str);
+			} else {
+				var i = _v0.a;
+				return A5(
+					$elm$url$Url$chompBeforePath,
+					protocol,
+					A2($elm$core$String$dropLeft, i, str),
+					params,
+					frag,
+					A2($elm$core$String$left, i, str));
+			}
+		}
+	});
+var $elm$url$Url$chompBeforeFragment = F3(
+	function (protocol, frag, str) {
+		if ($elm$core$String$isEmpty(str)) {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			var _v0 = A2($elm$core$String$indexes, '?', str);
+			if (!_v0.b) {
+				return A4($elm$url$Url$chompBeforeQuery, protocol, $elm$core$Maybe$Nothing, frag, str);
+			} else {
+				var i = _v0.a;
+				return A4(
+					$elm$url$Url$chompBeforeQuery,
+					protocol,
+					$elm$core$Maybe$Just(
+						A2($elm$core$String$dropLeft, i + 1, str)),
+					frag,
+					A2($elm$core$String$left, i, str));
+			}
+		}
+	});
+var $elm$url$Url$chompAfterProtocol = F2(
+	function (protocol, str) {
+		if ($elm$core$String$isEmpty(str)) {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			var _v0 = A2($elm$core$String$indexes, '#', str);
+			if (!_v0.b) {
+				return A3($elm$url$Url$chompBeforeFragment, protocol, $elm$core$Maybe$Nothing, str);
+			} else {
+				var i = _v0.a;
+				return A3(
+					$elm$url$Url$chompBeforeFragment,
+					protocol,
+					$elm$core$Maybe$Just(
+						A2($elm$core$String$dropLeft, i + 1, str)),
+					A2($elm$core$String$left, i, str));
+			}
+		}
+	});
+var $elm$core$String$startsWith = _String_startsWith;
+var $elm$url$Url$fromString = function (str) {
+	return A2($elm$core$String$startsWith, 'http://', str) ? A2(
+		$elm$url$Url$chompAfterProtocol,
+		0,
+		A2($elm$core$String$dropLeft, 7, str)) : (A2($elm$core$String$startsWith, 'https://', str) ? A2(
+		$elm$url$Url$chompAfterProtocol,
+		1,
+		A2($elm$core$String$dropLeft, 8, str)) : $elm$core$Maybe$Nothing);
+};
+var $elm$core$Basics$never = function (_v0) {
+	never:
+	while (true) {
+		var nvr = _v0;
+		var $temp$_v0 = nvr;
+		_v0 = $temp$_v0;
+		continue never;
+	}
+};
+var $elm$core$Task$Perform = $elm$core$Basics$identity;
+var $elm$core$Task$succeed = _Scheduler_succeed;
+var $elm$core$Task$init = $elm$core$Task$succeed(0);
+var $elm$core$List$foldrHelper = F4(
+	function (fn, acc, ctr, ls) {
+		if (!ls.b) {
+			return acc;
+		} else {
+			var a = ls.a;
+			var r1 = ls.b;
+			if (!r1.b) {
+				return A2(fn, a, acc);
+			} else {
+				var b = r1.a;
+				var r2 = r1.b;
+				if (!r2.b) {
+					return A2(
+						fn,
+						a,
+						A2(fn, b, acc));
+				} else {
+					var c = r2.a;
+					var r3 = r2.b;
+					if (!r3.b) {
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(fn, c, acc)));
+					} else {
+						var d = r3.a;
+						var r4 = r3.b;
+						var res = (ctr > 500) ? A3(
+							$elm$core$List$foldl,
+							fn,
+							acc,
+							$elm$core$List$reverse(r4)) : A4($elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(
+									fn,
+									c,
+									A2(fn, d, res))));
+					}
+				}
+			}
+		}
+	});
+var $elm$core$List$foldr = F3(
+	function (fn, acc, ls) {
+		return A4($elm$core$List$foldrHelper, fn, acc, 0, ls);
+	});
+var $elm$core$List$map = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, acc) {
+					return A2(
+						$elm$core$List$cons,
+						f(x),
+						acc);
+				}),
+			_List_Nil,
+			xs);
+	});
+var $elm$core$Task$andThen = _Scheduler_andThen;
+var $elm$core$Task$map = F2(
+	function (func, taskA) {
+		return A2(
+			$elm$core$Task$andThen,
+			function (a) {
+				return $elm$core$Task$succeed(
+					func(a));
+			},
+			taskA);
+	});
+var $elm$core$Task$map2 = F3(
+	function (func, taskA, taskB) {
+		return A2(
+			$elm$core$Task$andThen,
+			function (a) {
+				return A2(
+					$elm$core$Task$andThen,
+					function (b) {
+						return $elm$core$Task$succeed(
+							A2(func, a, b));
+					},
+					taskB);
+			},
+			taskA);
+	});
+var $elm$core$Task$sequence = function (tasks) {
+	return A3(
+		$elm$core$List$foldr,
+		$elm$core$Task$map2($elm$core$List$cons),
+		$elm$core$Task$succeed(_List_Nil),
+		tasks);
+};
+var $elm$core$Platform$sendToApp = _Platform_sendToApp;
+var $elm$core$Task$spawnCmd = F2(
+	function (router, _v0) {
+		var task = _v0;
+		return _Scheduler_spawn(
+			A2(
+				$elm$core$Task$andThen,
+				$elm$core$Platform$sendToApp(router),
+				task));
+	});
+var $elm$core$Task$onEffects = F3(
+	function (router, commands, state) {
+		return A2(
+			$elm$core$Task$map,
+			function (_v0) {
+				return 0;
+			},
+			$elm$core$Task$sequence(
+				A2(
+					$elm$core$List$map,
+					$elm$core$Task$spawnCmd(router),
+					commands)));
+	});
+var $elm$core$Task$onSelfMsg = F3(
+	function (_v0, _v1, _v2) {
+		return $elm$core$Task$succeed(0);
+	});
+var $elm$core$Task$cmdMap = F2(
+	function (tagger, _v0) {
+		var task = _v0;
+		return A2($elm$core$Task$map, tagger, task);
+	});
+_Platform_effectManagers['Task'] = _Platform_createManager($elm$core$Task$init, $elm$core$Task$onEffects, $elm$core$Task$onSelfMsg, $elm$core$Task$cmdMap);
+var $elm$core$Task$command = _Platform_leaf('Task');
+var $elm$core$Task$perform = F2(
+	function (toMessage, task) {
+		return $elm$core$Task$command(
+			A2($elm$core$Task$map, toMessage, task));
+	});
+var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Main$defaultTickInterval = 100;
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (!_v0.$) {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $author$project$Main$initialOrder = 'abcdefghijklmnop';
+var $author$project$Main$input = 'x12/6,pk/e,s1,x5/7,s6,x15/4,pn/j,x10/3,s3,x4/9,s11,x10/7,s8,x4/15,pa/p,x5/1,pk/f,x15/3,pd/e,x14/12,s15,x6/8,pp/o,x4/7,pg/d,x5/14,s15,x2/7,pc/i,x0/4,pj/e,x1/2,ph/b,x6/7,pe/l,x9/4,pa/f,x11/6,pn/e,s5,x8/12,pb/a,s7,x13/10,pk/f,x12/1,s14,x2/7,s7,pd/a,x8/15,s9,pp/e,s4,x4/3,po/g,x7/5,s6,x13/4,s10,x11/10,s13,x6/8,pj/m,x4/9,s1,x13/6,pc/k,x4/15,pn/f,x13/12,pl/i,x3/2,pg/k,x6/13,s5,x7/0,s10,x9/12,s15,x13/5,pi/l,x14/8,s6,x12/10,s8,x0/14,s4,x8/11,s15,x15/10,s15,pn/e,x9/0,s9,x10/15,pm/c,x9/2,pa/i,x10/13,s4,x14/9,s13,x6/3,s3,x15/14,s4,x4/11,po/l,s14,x5/0,s8,x11/12,pm/h,x1/3,s4,x10/8,s13,x1/0,s15,x9/7,pd/a,x11/10,pe/l,s6,x2/0,s2,x11/3,s2,x1/2,s4,x14/6,pn/d,x11/9,s6,x0/5,pb/c,x4/12,s10,x15/2,pd/g,x11/9,pj/p,s3,x4/8,pd/a,x0/1,s10,x3/4,pe/g,x10/9,pc/a,x5/13,s13,x14/2,s12,x15/12,s11,x4/11,pj/n,s10,x0/8,s2,x5/2,s10,x0/15,s11,pk/c,x6/1,s8,x11/0,s14,x3/2,s7,x4/10,s8,x1/13,pa/h,s5,x4/5,s3,x10/8,s13,x4/11,s6,x0/3,s5,x13/12,pd/o,x3/1,pp/f,x11/13,s5,x10/6,s4,x1/3,pn/l,x7/4,s15,x9/12,pa/j,x5/3,s1,x15/9,s6,x4/7,pn/k,x15/5,s14,x2/10,s4,x9/5,s3,x2/10,s15,pi/p,x3/11,s2,x10/1,pg/m,x12/2,s13,x8/9,pi/b,x14/10,s1,x9/6,pe/k,x7/4,s10,x15/2,s2,pf/a,x13/14,s11,x15/10,pi/h,x6/2,pa/e,x14/5,s3,x2/7,pj/l,x14/6,pp/h,x13/15,pg/b,s4,pd/e,x8/3,po/k,x15/6,pj/b,x5/3,pk/e,x12/15,s10,x14/1,s9,x0/7,s1,x6/4,s2,pn/g,x8/0,s9,x3/10,s3,x7/2,pl/f,x8/6,pj/p,x4/12,pe/h,s13,x3/13,pk/i,x9/1,s12,x11/5,s11,x1/7,pj/f,x4/2,pi/m,x9/3,s4,x5/8,pd/a,x2/1,pc/f,x9/8,s3,x1/2,pn/o,x0/15,s5,x11/6,pj/l,x4/0,s4,x9/12,s13,x11/13,po/n,x14/6,pa/h,x5/13,s12,pp/j,x15/10,s13,x3/1,s11,x0/6,pi/f,s1,x8/1,pe/c,x7/12,s1,x5/3,s3,x10/0,pb/k,s14,x3/4,s2,x9/15,s12,x3/14,s14,x0/1,s10,x14/9,s6,x12/0,s9,x13/10,ph/c,x11/12,s6,x5/4,s9,pg/k,s11,x1/9,pa/i,x6/3,s14,x4/15,s11,x10/12,s3,x7/5,pn/e,x13/0,pk/h,s6,x2/7,s11,x10/0,pl/d,x3/14,s14,x9/10,s9,x5/0,ph/a,x8/7,s15,x5/13,s5,x8/0,pk/g,x12/13,s5,x15/0,s5,x6/11,s9,x2/5,ph/i,x6/15,s2,x9/7,pa/l,x3/10,s6,x0/8,pn/i,s7,x10/4,s9,x15/13,s11,x3/8,s7,x12/7,s8,x13/5,pg/b,x15/10,s14,pi/n,x1/14,pa/g,x15/0,s7,x14/1,s14,x13/0,pm/n,x9/1,pi/f,x0/6,pe/b,x3/2,pj/a,x10/13,s13,x9/5,pg/m,x11/13,s6,x6/15,s10,po/d,s14,x8/7,s6,x11/3,ph/c,x10/6,s13,x9/14,s4,x7/1,pm/k,x11/13,pl/a,x2/8,ph/f,x7/15,s11,x12/14,s1,x1/5,s14,x10/7,s6,x5/6,pk/l,x1/7,pp/b,s4,x12/3,pc/l,x4/5,pn/g,x1/11,s4,x14/3,s15,x12/13,pi/d,x0/10,s9,x12/5,s2,x9/7,s14,x14/3,s8,x1/15,s15,pb/n,x10/13,pa/j,x3/4,s7,x12/1,s4,x9/11,pm/d,x0/7,s15,x13/1,pe/c,x5/7,s14,x0/12,s14,x5/7,s5,x12/1,pm/h,s3,pl/p,x6/3,pc/f,x15/11,pe/l,x5/12,s13,x13/7,s3,x9/1,s11,x4/5,s6,x11/12,pm/c,x13/1,pn/j,x5/11,pc/i,x15/14,s10,x2/0,ph/m,x15/1,pe/b,x7/8,s4,x14/4,ph/f,x10/11,pp/j,x1/9,pn/a,x0/4,s4,x11/12,s9,pb/d,x8/4,s2,x11/5,s6,x14/0,pk/a,s2,x1/6,pn/i,x9/13,s11,x7/5,pa/k,x0/8,s15,x7/2,s13,x8/10,s14,x9/15,pn/f,x4/6,s3,x13/3,pe/g,x1/4,s13,x10/13,pj/i,x5/6,s10,x0/12,pc/f,x5/1,s7,x7/4,s1,x5/3,s1,x8/1,s2,x12/14,pe/i,x2/13,s1,x1/14,po/f,x6/10,s15,x5/3,pn/j,x9/6,ph/b,x2/14,s7,x8/9,s10,x10/4,pk/g,x11/14,pf/l,x10/13,s13,x6/7,s6,x3/4,pj/h,s7,x1/15,pf/d,x13/3,pn/c,x1/12,s8,x13/2,s10,x9/11,s1,x5/14,s4,x15/11,pl/e,x13/3,s8,x0/6,po/a,x14/7,pe/j,x10/3,pi/k,x8/9,s12,x14/6,s7,x12/9,s15,x7/4,s11,x2/3,pb/a,x8/14,s14,x12/0,s1,x13/1,s7,x3/2,s5,x7/10,pd/f,x8/6,pa/n,x10/9,s5,x5/1,s12,x14/6,s14,x8/9,ph/e,x10/7,s12,x5/9,s10,x8/2,s4,x0/14,s6,pj/n,x9/10,pd/l,s3,x8/2,s13,x0/9,s10,x1/15,pa/n,x12/6,s10,x14/11,pe/g,x8/13,s15,x14/10,s6,x9/12,s8,x5/2,pn/o,s3,x3/15,s4,pg/d,x1/11,pk/i,x14/9,s10,x6/13,s5,x15/2,pp/f,s14,x0/3,s1,x7/1,s10,x3/12,ph/j,x4/10,s15,x2/7,pm/n,x0/1,s4,pp/a,x8/13,s15,x4/3,ph/d,x9/2,pe/f,x4/12,pl/c,x11/10,s8,x8/9,s9,x2/7,s8,x10/9,pd/a,x5/3,pg/j,s4,x15/8,s8,x12/3,s2,x15/14,s12,x6/1,s4,x4/14,pd/h,x13/3,pc/j,x11/9,pf/g,x0/6,s15,x1/7,pe/l,x3/12,pm/k,x14/15,s4,x6/12,s11,pn/p,x7/14,s14,x10/3,pj/a,x4/5,pm/k,s6,x9/6,s9,x11/2,s2,x10/13,s9,x4/14,s2,x5/2,s3,x8/15,s15,x3/5,s5,x10/14,s5,x2/3,pf/p,x11/6,s3,pb/d,x10/9,pn/m,x12/13,s3,po/k,x14/6,pf/n,x2/11,pj/d,x3/13,pp/g,s14,x14/0,s2,x4/7,s8,x2/14,pf/a,x3/12,s4,x5/13,pp/k,x7/6,s6,x12/5,s12,x2/0,pi/o,x6/8,s2,x5/14,s3,x15/10,s13,x3/0,s1,x15/8,s8,pm/l,x5/0,pa/c,s8,po/h,x2/15,pp/e,x4/11,s5,x3/10,s6,x1/9,ph/k,x6/2,s9,x13/11,pl/f,x3/8,s6,x6/0,s4,x13/2,pk/h,x9/5,pp/d,x1/10,pf/c,x3/14,pi/m,x13/9,ph/a,x10/11,s12,x13/6,s1,x14/10,s13,x12/9,pi/g,x4/11,pc/k,s13,x9/14,s15,x3/11,s5,x14/6,pa/f,x1/2,s14,x14/5,s8,x8/6,pd/l,x4/11,s7,x1/15,s3,x14/4,pj/g,x9/5,pd/a,x13/0,s5,po/g,x6/1,pn/p,x13/14,s10,x3/11,pc/f,x8/10,pg/h,x6/12,pf/i,x0/3,po/n,x8/7,s3,x14/11,pe/l,x6/0,pb/j,x11/13,pl/h,s12,x7/6,s13,x5/2,s3,x7/0,s3,x10/11,s4,x1/9,s11,x0/10,s7,x7/6,s9,x5/12,s14,x2/11,s8,x4/15,pi/m,x6/3,pj/l,x13/14,s12,x7/10,pb/d,x15/2,s14,x9/8,s12,x10/15,pe/g,x6/14,pa/c,x10/2,pd/g,x0/6,s1,x9/3,s2,x5/13,s1,x10/15,pc/j,x0/6,s8,x3/9,s11,x8/14,pe/a,x15/7,s14,pc/l,x6/5,pa/i,x2/15,pe/d,x6/1,s4,pc/h,x13/3,pg/d,s13,x5/2,s10,x15/12,pe/c,x8/4,s14,x5/6,s14,ph/p,x10/15,s1,x7/9,pk/o,x3/0,pm/j,x8/10,s7,x14/15,pa/n,x12/5,s4,x11/3,s8,x14/7,s5,ph/b,x2/11,pc/a,x4/14,po/b,x2/13,s2,x3/4,pj/f,s5,x13/7,po/d,x10/1,pe/c,x13/7,pl/m,x14/4,s5,x7/8,pk/g,x2/14,s15,x5/13,s11,po/j,s15,x4/1,pb/g,x15/5,s7,x2/13,s14,pl/i,s11,pc/j,x10/15,s2,x13/4,pi/l,x11/15,s4,x3/14,s9,x11/2,s9,x6/12,s15,x11/14,pe/m,x1/9,s15,x6/7,pl/a,x14/2,s4,x1/13,pk/f,x0/14,s6,pp/n,x7/1,s12,x0/6,s2,x3/10,s5,x11/8,s13,x14/1,s7,x3/6,s6,x14/11,pe/d,s12,pf/b,x3/13,s6,x14/4,pk/g,x10/8,pb/i,x14/6,ph/k,x15/8,s2,x1/7,pb/l,x9/5,s8,x10/13,s8,x11/14,s6,x12/4,s14,x3/14,pp/e,x15/12,s1,x11/7,pk/a,x15/0,s10,x1/8,pb/c,x10/5,s2,x11/1,pl/e,x5/6,pa/o,x12/3,pf/n,s7,x10/14,s15,x9/2,s5,po/j,x10/14,s2,pc/k,x9/11,s10,pp/a,x14/2,pi/e,x3/6,s5,x13/11,s1,x6/3,s15,x8/12,pc/g,x10/11,s14,x7/1,s14,x5/3,s4,x15/14,po/h,x0/7,s11,pd/j,x13/6,s1,x12/9,s12,x4/10,s14,x6/8,s3,x14/10,pe/m,x2/13,pb/f,s15,x6/8,ph/p,x10/15,s4,x8/5,s11,x7/2,s6,x0/9,s7,x2/7,pc/o,x1/13,s3,x12/6,pj/a,x14/8,s10,x10/1,s3,x2/14,s10,x11/9,s1,x10/15,s14,x0/2,pd/l,s13,pj/o,x1/8,pb/d,s8,x2/6,s14,x14/13,po/g,s8,x8/2,s12,x3/15,s8,x14/8,pc/i,x2/4,pm/n,s15,x0/13,pl/i,x3/14,s9,x13/5,s7,pk/h,x9/4,s8,x8/14,s1,x7/9,pn/b,x6/2,pl/h,x10/13,s14,x5/15,s15,x14/2,pd/c,x7/15,s13,x5/13,s8,x1/12,s2,x2/5,pe/o,x12/6,s1,x13/5,s10,x10/11,pn/a,x4/12,s13,x3/5,s6,x2/10,s12,x14/12,pe/h,s9,x8/13,s15,x11/7,s8,x14/1,s11,x9/12,pk/c,x2/10,pe/d,s6,x13/12,s2,x4/2,s14,x0/8,pg/m,x14/5,s11,x15/3,s15,x11/6,s4,x7/13,s14,x15/10,s1,x0/7,s10,x4/12,s7,x13/2,s4,x4/0,pb/a,x6/10,s10,x7/8,s5,pp/c,x13/10,s9,x11/9,s4,x8/6,pd/n,x10/1,s11,x7/5,pg/m,x13/9,s6,pa/f,x0/12,s3,x2/1,pp/l,x12/7,s2,x1/13,pe/c,x5/10,pk/m,x8/3,po/i,s7,x6/14,pb/d,x11/3,po/m,x2/15,ph/c,x5/10,s12,x6/4,s15,x5/7,s5,x0/10,pa/i,x6/7,s12,x15/0,s5,x7/9,s12,pb/p,x0/8,s2,x12/7,pa/c,x5/9,pm/p,x3/8,s12,x1/5,pn/l,x13/4,ph/o,x6/1,s5,x7/11,s1,pm/f,s15,x6/3,pi/c,x14/13,s3,x10/5,pa/b,x7/6,po/j,x11/5,pe/k,x15/1,pd/b,x9/10,pn/h,x3/12,s1,x6/4,s5,x14/11,s3,x0/5,s5,x12/10,s9,x1/6,s13,x14/15,s13,x4/13,pp/m,x7/10,pi/o,x6/2,s12,x9/14,pb/l,x10/5,s4,x9/2,s11,x11/8,pc/d,x4/12,pl/j,x2/3,s4,x1/4,s4,x8/14,po/b,x9/11,s10,x6/12,s1,x13/14,pk/f,x10/7,ph/b,x6/9,pj/c,x12/0,pf/l,s12,x1/7,s4,pg/k,x5/15,s6,x11/2,s4,x13/12,pi/j,x14/4,s11,x13/7,s14,x3/8,s8,x0/2,s1,x10/3,s14,pg/k,x0/5,s12,x12/8,s7,x0/13,po/i,x6/12,s3,x11/8,s15,x7/2,s15,x8/5,s13,x14/0,s15,x11/9,s10,pe/k,x0/1,pm/n,s8,x9/13,s7,x6/4,s3,x3/1,s2,x4/13,s2,x9/14,s11,x2/0,pg/h,x11/9,s13,x0/7,s11,x11/3,pc/p,x10/14,s9,x9/3,ph/g,x14/5,pl/j,x2/8,s11,x5/12,pe/k,x7/2,s3,x10/13,s13,x5/6,pg/a,x10/14,pf/i,x6/7,s10,x5/8,pp/a,x11/3,s11,x7/2,s15,x8/4,ph/n,x9/13,pl/j,x4/5,pa/b,s11,x11/1,s9,x14/6,pk/h,x11/10,s6,pb/l,x14/0,s3,x11/1,s12,x12/7,s14,x3/13,s5,x14/12,s2,x5/6,s1,x3/14,s11,x9/11,pk/m,x0/15,pb/e,x10/12,ph/f,x9/2,s4,pj/a,x4/6,pd/o,x14/10,pe/n,x7/5,s5,x2/1,s3,pg/o,x6/3,s2,x9/13,pk/p,x11/10,s12,x0/13,s3,x11/2,s13,pd/o,x7/8,s1,x14/10,s3,x0/2,s11,x8/13,ph/a,x5/14,s2,x2/4,pk/m,x15/8,s9,x10/6,s14,x9/0,pe/l,s3,x7/3,pc/f,x10/15,pg/p,x5/8,s9,x13/15,pa/f,x7/10,pj/d,x8/4,pc/k,x1/14,s1,x11/2,pd/i,x0/14,s15,x15/5,s14,pa/e,x1/10,s3,x12/0,po/h,x8/6,s7,x9/7,s2,pn/f,x14/12,pd/p,x9/7,s9,x0/14,pa/k,x5/13,s5,x11/2,s14,x12/5,s1,x14/11,pi/e,x0/7,s7,x15/11,pb/g,x13/6,s1,x11/7,s8,x8/3,s4,x11/15,pp/h,x7/14,pj/d,x8/3,s10,x0/15,s5,x7/2,pc/f,x13/3,s11,x2/12,ph/g,x5/9,s2,x12/0,pi/n,x14/10,s12,x0/6,s11,x1/4,s7,x3/13,s4,x11/0,pe/g,x6/3,pf/i,x9/13,pd/o,s12,x4/5,pg/b,x15/2,pe/i,x14/5,pc/o,x6/10,s7,x2/14,s7,x13/1,pi/g,x2/11,pk/m,s1,x1/9,pe/l,x6/4,po/n,x12/0,s2,x11/5,s12,x8/12,s10,x5/1,s2,x8/10,s14,pk/l,s1,pd/c,x7/11,pg/a,x10/13,s6,x6/2,s6,x12/10,s8,x5/2,pn/i,x12/3,pa/l,s2,x9/11,s8,x2/1,s15,x11/14,pc/g,x2/9,s11,x15/10,pn/a,x9/8,s13,pp/e,x13/14,s14,x9/1,pi/j,s2,x4/15,s13,x10/14,ph/n,x5/8,pe/l,s15,x3/4,pn/p,x0/1,s8,x15/3,s7,x14/5,pj/b,x15/9,s4,x2/13,pe/n,x3/10,s10,x15/5,pa/l,x11/9,po/k,x10/8,s4,x11/3,s15,x8/14,s12,x10/9,s11,x3/12,pm/c,x15/7,po/h,x8/9,s4,x1/2,s3,x6/10,pb/c,x3/12,pj/o,x13/9,s10,x2/3,s4,x9/1,pa/m,x12/8,pg/d,x11/2,pf/e,x5/3,s15,x7/8,s15,x4/12,s9,x11/7,pj/h,x6/0,pi/g,x3/10,s13,x15/13,s12,x7/6,s1,x2/12,s4,x4/0,s10,x12/8,po/p,x15/0,s10,pj/l,x13/1,s6,x6/7,pf/p,s5,x15/1,pi/o,x2/12,s5,x9/8,s5,x6/3,pg/h,x14/15,s12,x0/10,pa/e,s15,x5/15,pc/f,x8/4,s12,x2/3,s12,x5/12,pk/g,x10/14,pb/e,x3/2,pi/p,x13/14,s10,x4/5,pk/n,x10/0,s7,x7/3,pd/i,x4/9,s14,x5/3,s15,x13/1,s5,ph/o,x11/3,s4,pf/d,x15/10,s10,x1/12,ph/p,x11/10,s5,x7/0,pc/e,x12/2,pd/g,s10,pp/e,x11/1,s1,x12/3,pi/m,x10/0,s4,ph/o,x13/2,s12,x9/11,s5,x4/6,pn/b,x5/11,s15,x12/2,s5,pk/f,x1/14,pl/g,x4/6,s14,x8/9,pp/a,x14/2,s12,x7/0,s2,x14/3,s12,x8/13,s12,x12/7,pk/c,x13/4,pa/m,x9/8,s7,x10/11,s1,x2/9,pi/j,x0/4,s1,x9/5,s11,x11/8,s12,x12/7,po/m,x11/15,pn/p,x5/4,s10,x3/14,s10,x6/12,s1,x5/9,pg/i,x15/8,pc/k,x9/11,s4,x6/8,pn/g,x14/7,s5,x6/9,pk/b,x5/10,s11,x3/7,s8,x14/13,s11,x15/0,pp/n,s3,x1/7,pl/j,s10,x10/0,pc/h,s14,x1/15,s15,pm/d,x12/14,pc/e,x1/5,s15,x7/4,s11,x14/8,ph/n,x2/10,s15,pk/p,x8/15,pn/g,x14/6,s5,x2/5,pj/e,x12/0,s5,x6/14,s6,x10/8,s13,x9/12,s14,x6/15,s6,x3/0,pd/o,s14,x2/10,pa/k,x4/0,s14,x8/11,s7,x5/15,s12,pi/l,x6/0,s11,x1/10,pk/e,x12/9,s14,x15/3,pi/j,s12,x6/14,s15,x15/1,s3,x9/14,s6,x10/4,s9,x2/6,pb/h,x8/15,s3,x13/10,pj/k,x11/3,s5,x5/1,s13,x10/0,s13,x4/5,pe/m,s13,x7/15,po/h,x2/13,s4,x5/3,s11,x11/4,s11,x10/12,s13,x14/0,pl/k,x12/11,s14,ph/e,x1/14,s7,x6/7,s6,pf/d,x8/11,s6,x0/14,pg/e,s9,x2/11,s15,x3/5,pf/b,s6,x7/8,s2,x12/14,s13,x7/3,pj/c,x6/11,s6,x4/12,pe/p,x8/6,pd/g,x7/5,s9,x14/13,s7,x6/9,s3,x14/3,pp/l,s14,x5/13,pe/b,x7/8,s2,x11/5,pm/p,x13/2,s10,x0/6,s14,x9/10,pf/k,x1/2,s9,x0/6,s5,x2/7,s8,x12/13,s9,x4/1,s14,x8/10,s1,x12/13,s13,x3/2,s11,pl/i,s13,x0/5,pd/h,x14/12,s11,x0/13,s13,x2/4,s15,x12/0,s8,x11/13,pe/o,x2/12,s13,x3/8,s8,x12/6,pn/m,x13/9,s8,x4/10,pf/k,x6/0,pj/l,x9/10,s3,x11/7,pn/a,x3/6,pb/i,s7,x2/14,s9,x11/6,s7,x10/0,pa/e,x7/13,s4,x14/10,s8,x0/5,po/j,x4/10,pl/m,x3/0,pa/k,x14/1,s6,x8/3,pf/i,x14/4,pa/j,x12/11,s11,x15/4,s3,x9/2,s5,x1/5,s2,x4/10,s10,x12/7,s3,pb/h,x3/6,pj/e,x8/10,s13,x12/6,s8,po/i,x5/2,s10,x7/14,s2,x12/15,s12,x5/0,s4,x1/12,s13,x7/6,pj/m,x5/4,s13,x12/2,s2,x1/15,s11,x10/8,s15,x7/6,pg/l,x2/1,s10,x4/0,s7,x14/15,s8,x8/10,s2,x3/11,s6,x10/12,s15,x4/6,pk/f,x15/7,s9,x5/4,s1,pj/a,x13/0,s2,x10/1,s1,x14/7,ph/d,x12/9,pg/j,x10/5,s15,x11/14,pc/o,x4/1,s13,x10/12,s6,x7/5,s6,x2/12,s8,x8/6,pf/a,x4/2,s11,x11/15,po/j,x5/6,s7,x1/11,pk/i,x12/2,pc/n,x9/13,pf/b,x14/7,s11,x15/10,s9,x9/8,s10,x5/2,s6,pm/e,x10/15,s1,x5/11,s6,x8/15,s6,x2/1,s11,x4/8,ph/a,x3/15,pk/b,s12,x11/4,s8,x12/7,pp/l,x1/2,s8,x0/9,s4,x15/10,s13,x5/14,s1,x12/2,pg/o,x10/13,ph/m,x2/9,s1,x8/15,s2,x14/7,s2,x13/10,pb/p,x9/2,s8,ph/o,x0/10,pm/g,x3/5,po/l,s13,x12/9,pi/j,x4/0,s4,x8/15,pn/e,x0/12,s6,x13/7,s1,x3/5,s2,pm/o,s15,x13/14,pf/n,s5,x10/8,s13,x9/1,po/e,x0/7,s15,x14/9,s13,x8/15,s4,x9/1,pd/c,x5/11,s7,x0/8,pf/k,x10/9,s2,pg/d,x0/11,s4,x1/3,pb/o,x6/13,s11,x10/7,s14,x9/8,pg/e,x5/11,s3,x14/8,pm/p,x7/4,pl/h,s1,x14/0,s8,x11/13,s5,x2/9,pd/e,x11/14,pb/m,x3/7,pl/f,x9/13,s5,x8/5,pn/p,x1/12,pk/e,x5/10,pl/o,x1/13,s9,x7/4,s5,x10/9,pb/c,x7/15,po/l,x11/13,s7,pa/i,s8,x7/15,ph/k,s15,x1/13,pm/j,x9/8,s1,x7/3,s8,x1/5,s1,x10/3,pn/k,x12/13,s15,x0/9,pa/c,x10/11,s11,x5/7,s15,pi/k,x6/4,s5,x3/15,s5,x8/0,s9,x13/11,s13,x2/4,s1,x0/6,s12,x2/1,ph/f,x9/6,po/m,x5/1,pc/d,x6/12,s12,x3/11,pg/e,x5/9,s7,x11/4,pd/c,x15/2,pe/b,x7/5,s2,x8/12,ph/j,x9/1,s10,x12/4,pc/f,x15/5,s13,x3/9,pk/j,x6/12,s9,x11/15,s6,x1/14,ph/d,x0/13,s8,x15/4,pc/n,x13/0,s13,x6/10,s8,x15/9,s6,x12/7,s11,pj/k,x6/11,s3,pm/e,s3,pa/i,s7,x14/15,pf/n,x7/0,ph/o,x4/3,pd/n,x5/10,s4,x4/3,s1,x8/6,s14,x12/10,ph/k,x1/13,pb/p,x0/11,s5,x6/10,ph/e,x0/8,s5,x5/15,s13,x10/2,s6,x6/7,pk/m,s6,x5/10,s8,x12/1,s1,x6/2,s1,x12/7,s8,x10/15,pp/o,x4/6,s12,pi/c,x7/15,pb/o,s5,x2/4,s9,x6/9,pd/h,s4,x1/7,pe/g,x10/11,s11,x15/7,pk/o,x8/9,s4,x2/10,s3,x7/8,pa/m,x1/14,pb/h,x5/3,pl/d,x6/15,s5,x7/4,s3,x8/13,s5,pi/h,x7/4,s5,x1/15,pg/a,x9/0,s1,x12/2,pl/h,s5,x0/15,pm/b,x10/4,s4,x7/8,s11,x0/9,pi/h,x14/5,s10,x13/2,s3,x12/5,pc/k,x15/14,pp/j,x12/6,s15,x5/2,s15,x1/15,pe/f,x2/11,s13,x7/0,pi/b,x11/5,pf/p,x2/8,pd/g,s2,x3/12,pj/c,x1/11,s9,po/m,x6/12,pf/p,x14/0,pj/b,x8/15,s7,x1/2,pf/i,x10/5,pe/p,x14/7,s7,x9/12,s3,x6/0,pl/d,x8/3,pa/p,x7/2,s4,x8/15,pm/o,s6,x7/6,s8,x9/13,pc/n,x15/8,pf/k,x2/11,pn/b,s5,x9/15,pe/k,x13/2,s11,x6/8,s4,x14/4,s3,x11/6,s1,x8/15,s14,pp/i,x0/12,s13,x11/6,ph/a,x15/5,s15,x11/2,s3,x4/13,s1,x15/9,pb/c,x14/8,s12,x1/11,pm/d,x3/12,pb/c,x4/7,pa/k,s7,x6/14,s3,x7/1,pf/l,x2/8,s4,x3/0,pk/c,x11/4,s8,x1/13,s6,x0/7,s3,x15/10,s3,x12/7,s13,x2/8,ph/o,x4/6,s7,x8/12,s6,x15/14,pe/b,s8,x1/6,s14,x4/5,s15,x11/2,s8,x5/1,s15,x6/7,s4,x12/9,s1,x13/8,s8,x5/11,pk/p,x2/15,s10,x13/6,s6,x11/5,s10,x2/13,s12,x5/0,pf/h,x11/15,s1,x3/12,s2,x11/8,s14,x12/7,pb/k,x13/9,s6,x14/0,s14,x12/2,s14,x14/1,s3,x7/2,po/e,x5/0,pm/g,x12/10,s1,x9/15,s2,x8/5,po/c,s12,x12/6,s5,x11/10,s10,x4/9,s2,x11/7,s9,x2/1,pm/i,x7/10,pd/l,x4/15,pb/i,x10/7,pc/o,x11/14,s6,x10/0,pi/n,x9/6,pa/k,x8/1,s5,x3/4,pi/e,x6/13,pl/p,x9/0,s6,pc/h,x14/11,s3,x0/1,s13,x15/13,po/m,x11/7,pc/e,x10/2,po/h,x14/4,s8,x0/1,pd/a,s1,x5/15,s11,x3/14,s12,x0/8,s10,x6/11,s9,x13/7,s5,x15/14,pe/n,x2/12,s8,pi/d,x5/10,s10,x9/0,pj/b,x4/15,ph/l,x10/2,s8,x9/6,pp/g,x12/10,s4,pd/k,s7,x6/11,s8,x8/13,s8,x15/7,s2,x0/14,pl/a,x7/3,s9,x4/5,s9,x11/1,s11,x2/14,pp/h,x13/0,s4,x1/7,pg/f,x15/10,s5,x9/6,s7,x13/10,s7,x2/5,s4,x1/0,s13,x4/5,s2,x15/6,s4,x0/12,s15,x2/4,pn/o,x13/7,s9,x4/12,s11,x14/9,pi/b,s13,pm/c,x0/6,s11,x2/3,s3,x11/10,pg/j,s10,x5/12,s6,x9/2,pc/p,x5/1,s2,x2/11,pe/d,x0/12,s7,x3/6,s2,x0/5,pc/b,x3/12,pp/d,s11,x1/7,s14,x2/5,pk/h,x1/7,pg/o,x4/2,s11,pm/l,x10/15,s11,x14/7,s13,pg/k,x8/1,s10,x2/12,ph/a,x10/8,s8,x4/9,s3,x10/13,s8,x11/4,pf/o,x8/13,pa/h,x5/14,pl/i,x0/7,pf/m,x6/13,pb/p,x5/12,s4,x4/15,s4,x10/11,po/i,x5/1,pj/e,x10/9,s14,x6/1,pp/n,x13/0,pf/g,x6/8,s2,x9/2,s14,x7/3,s12,x6/15,s3,x1/5,s4,x15/3,s7,x10/7,s13,x4/2,pc/e,x14/12,pi/d,x15/0,s9,pf/p,x9/4,pi/j,x10/1,s14,x2/5,pd/e,x10/8,s4,x11/13,pp/k,x15/4,s5,x9/14,pj/g,x13/7,pk/n,s9,x8/14,s11,x10/11,s5,x7/12,s15,x9/8,s14,x2/12,s4,x14/1,s6,x10/6,pa/g,s8,pi/f,x13/3,s9,x12/6,s14,x7/15,pj/h,s9,x6/0,pn/l,x13/7,pk/o,x1/0,s13,x9/8,s3,x14/10,pl/g,x3/2,s4,x9/15,s1,x4/10,po/k,s15,x14/13,pg/l,x8/6,pb/n,x11/9,pe/d,x13/7,ph/l,x8/2,s2,x15/11,s8,x1/12,s11,x2/8,s7,x12/5,pd/a,x10/8,pi/n,s12,x7/2,s4,x11/5,s13,x10/4,ph/g,x9/7,s5,pm/b,x1/8,s8,x11/12,s5,x0/8,po/g,x11/9,pc/a,s8,x4/7,pd/g,x2/14,s4,x10/9,s1,x5/4,pa/p,x3/9,po/d,x10/15,s10,x7/11,s13,x1/5,pe/f,x10/3,s2,x14/8,pj/p,x2/15,s10,x6/5,s7,x9/11,po/g,x1/8,s6,x6/2,s12,x4/7,ph/a,x9/2,s1,x11/0,s4,x5/15,pf/d,x2/10,s2,x1/5,pe/a,s7,x3/6,s12,x7/8,ph/f,x12/6,s13,x10/1,s1,x14/5,pk/b,x13/15,pa/g,x9/7,s9,x6/8,s13,x12/10,s12,x3/15,s9,x0/10,pf/c,x15/9,s13,pj/l,x0/1,s15,x12/10,s5,x0/11,s12,pg/b,x14/5,pe/l,x4/9,pd/m,s11,x11/15,s15,x13/3,s12,x10/14,s9,x0/11,pc/o,x7/10,s7,x2/13,pf/m,x4/1,pa/l,x2/11,pi/k,x0/7,s13,x14/8,pm/j,x2/4,s9,x9/13,s13,pi/k,x10/15,s7,x6/11,s3,x13/3,pp/m,x2/4,s13,x14/10,pf/b,x7/0,s5,x3/2,s9,x1/5,pm/o,x14/4,s4,x15/0,s12,x12/13,s8,x6/14,pl/i,x8/11,s4,x6/4,s12,x8/1,s1,x14/0,s14,x8/9,s9,po/c,s8,x12/2,s11,x0/10,s7,x11/9,pl/e,x15/14,s12,x6/2,s12,x12/4,s3,x10/9,po/p,x11/6,pf/e,x15/0,s14,x6/2,pl/n,x7/9,s8,x13/3,ph/f,x8/9,s14,x1/14,pd/e,x0/10,s12,x3/11,pn/f,x2/10,po/m,x4/0,s11,x14/11,pj/b,s8,x13/10,s3,x15/5,s5,x12/9,s5,x3/2,s13,x9/12,pa/i,x13/6,ph/e,x3/7,s2,pc/o,x11/6,pg/l,x15/8,s14,x6/5,s5,x0/10,s5,x9/15,pf/p,x1/10,po/h,s14,x0/6,s3,x3/5,pb/j,x9/15,s8,x8/4,pe/o,s10,x9/5,pk/n,x3/8,s2,x2/7,s7,x12/15,pm/h,x8/13,pp/g,s14,x4/7,s1,x6/12,s2,x13/9,pa/m,x8/0,s7,x4/5,s9,x7/8,s13,x15/4,s5,x11/0,pb/k,x6/2,s12,x12/11,pm/j,x9/6,s2,x8/15,po/n,s15,x5/11,pj/b,x12/3,s7,x13/10,s13,x9/5,s7,x7/3,s5,x2/4,s13,x9/14,s14,x2/3,s9,x9/12,pk/d,x0/4,s5,x5/6,s12,x12/10,s1,x2/5,pa/m,x9/7,pe/f,x0/8,s7,x5/15,pl/o,x3/0,s8,x11/10,s7,ph/c,x2/0,pk/e,x1/13,s15,po/i,x3/7,s5,x6/10,s3,x0/14,s13,x2/13,s15,x7/3,pd/c,x5/8,s3,x1/15,pf/g,x5/8,pk/l,x1/10,pn/p,x0/11,s8,pd/f,x2/8,s10,x9/13,s10,x3/11,pj/l,x15/2,s2,x10/9,pm/b,x2/0,s3,pa/i,x14/12,s7,x9/10,s6,x15/13,pg/n,x6/7,s14,x14/3,pd/b,x0/6,pf/i,s13,x7/4,s14,x13/8,s13,x4/11,pc/l,s14,x12/15,pa/h,x13/1,pd/c,x8/15,s8,pk/j,s2,x1/9,pa/b,x14/0,s10,x5/8,s9,x4/15,s6,x12/3,pg/e,x9/2,s2,x7/1,s6,x0/9,s7,x1/10,po/f,x8/5,pj/g,x14/1,s7,x10/12,s3,x0/3,s3,x15/14,s6,x11/5,pm/p,x15/0,s9,x14/7,pg/k,x2/4,pd/b,x10/11,pe/c,x7/2,pd/h,x13/10,pm/n,x11/5,s7,x12/8,s5,pb/d,x14/3,s14,x5/10,pe/f,x13/1,s15,x9/3,s4,x10/7,pn/l,x6/13,pf/d,x9/7,s4,pc/g,x10/4,s2,x6/1,s8,x9/15,s3,x3/6,pp/h,x8/2,s1,x1/12,pm/k,x4/8,ph/l,x14/2,s4,x10/7,pc/k,s2,x0/3,pn/j,x2/4,s2,x11/8,s11,x6/0,pl/e,x8/1,s14,x0/15,s7,x8/5,s11,x14/10,s4,x15/6,pk/d,x7/5,pp/m,x0/14,s6,x10/1,s3,x15/11,pc/d,x1/5,s11,x2/0,s3,x11/8,s13,x5/6,pn/a,x2/15,s3,x6/11,s3,x7/10,s5,x3/5,s5,x1/13,s11,x10/6,s4,x14/5,s10,x1/12,s2,x5/8,s11,pi/c,x1/0,s9,x9/12,s2,x14/7,pd/j,x12/4,s14,x9/6,s9,pe/p,x8/3,s5,x12/5,pm/g,x10/7,s2,pn/h,x9/1,s6,x3/10,s9,x14/2,s15,x12/10,s14,x14/11,s4,x3/2,pp/l,x13/4,s7,x12/15,ph/f,s10,x0/10,pc/g,x15/13,s7,x1/9,s9,x11/14,s3,x2/7,pf/n,x3/14,pg/j,x15/4,pl/k,x14/12,pd/b,x15/7,pi/j,x8/2,s2,x11/4,s9,x14/12,pf/a,s5,ph/j,x4/0,s3,x14/8,s14,x13/7,pn/k,x2/15,s13,x12/3,pi/o,x15/2,s15,x7/0,s9,x5/4,s10,x6/15,s14,x0/11,pl/j,s3,x14/6,s5,ph/p,x3/2,s6,x7/15,s5,x4/5,s10,x3/7,po/d,x0/12,pi/c,x1/13,pl/h,x0/15,pp/a,x4/6,s13,x13/3,s14,x4/5,pc/h,s12,x15/0,pa/i,s15,x9/11,po/f,x1/0,pl/h,x13/3,pj/c,x0/12,s5,x2/7,pl/g,x0/10,pc/b,x8/3,s13,x13/7,po/a,x1/2,s2,x7/0,pk/b,x10/4,pl/j,x3/5,s6,x14/9,s12,x4/13,po/h,x0/6,pd/k,x10/7,s2,x4/12,s8,x13/8,pi/h,x2/14,pk/j,x6/7,s2,x1/4,pl/a,x11/6,pp/i,x13/14,pf/c,x12/10,s9,x9/2,s5,x14/1,pm/a,x2/3,s4,x10/11,pn/c,x5/1,s9,x6/10,s1,x15/4,pe/k,x13/3,po/g,x12/1,pd/l,x0/8,s2,x4/14,s1,x10/7,pn/c,x12/3,s8,x6/11,s4,x12/7,s6,pj/h,x13/9,s13,x5/8,s2,x6/13,s12,x4/15,s12,x13/1,pn/e,x3/2,pg/k,x11/1,s6,x12/4,s5,x13/1,s4,x11/7,pl/f,x3/2,s1,x14/4,s12,x9/7,s15,x2/8,pd/p,x9/12,pc/k,x4/0,s4,x11/5,s6,x0/12,pe/b,x13/14,pn/c,x7/1,po/a,x10/3,s5,x14/2,s15,x12/9,s10,x1/11,pd/j,x9/0,s11,x13/3,pn/i,x4/11,s3,x8/2,s3,pp/o,x15/12,pa/h,x10/2,s15,x12/8,s5,x9/2,pc/b,x12/3,s6,x11/2,s6,x15/8,pn/d,x14/9,pa/g,x13/10,s15,x14/4,pe/b,x13/3,s10,x9/0,s5,x3/5,pp/a,x12/11,pf/o,x0/6,s12,x4/14,s6,x8/15,s15,x4/13,s10,x7/11,s12,pm/n,x12/3,s6,x10/2,pi/o,x15/11,ph/e,x12/14,pm/d,x3/5,s8,x2/9,s7,x10/11,s7,x9/15,s9,pj/k,x6/5,s6,x15/11,s9,x5/13,pl/a,x9/4,s5,x13/0,pe/c,x9/10,pg/m,x12/11,s4,x15/9,s13,pa/l,x4/12,pc/g,x7/6,s6,x4/5,pa/o,x6/14,pj/n,x3/7,pm/i,x6/11,s7,x0/2,s1,x3/7,s11,x8/5,pa/g,s12,x12/9,pl/m,x8/15,s15,pc/f,s2,x9/2,pk/p,x1/5,s7,x15/0,pa/c,x9/6,s12,x15/3,s9,x14/7,s6,pp/i,x10/1,ph/e,x4/12,pm/k,x1/6,pb/e,x14/3,pp/m,x7/9,s13,x14/4,s1,x3/13,pi/d,x1/5,s4,x13/12,ph/a,x15/2,s2,x14/3,pe/c,x0/4,pa/n,x6/2,pe/o,x0/7,s2,x6/14,s11,x3/11,pd/m,x5/2,s4,x1/9,pn/k,x6/0,pe/j,x7/11,s14,x9/0,s2,x5/2,ph/l,x8/0,s6,x4/11,s9,x1/2,s10,x13/3,s3,pb/o,x15/12,pj/m,x13/4,s10,x0/3,pn/d,x6/7,s15,pf/b,x8/9,s10,x1/2,s8,x14/12,s13,x2/13,s2,pi/g,x9/5,pj/p,x15/14,s4,x12/2,s3,x14/13,pd/n,x6/11,pa/i,x14/0,pj/n,s15,x3/9,pp/i,x2/1,po/g,x4/12,s6,x13/6,s15,x5/2,pi/e,x10/0,s5,x7/15,pp/l,s14,x4/0,s5,x1/7,s4,x9/3,s14,x7/0,pn/k,x13/5,pb/a,x0/15,pe/m,x13/2,s3,x9/12,ph/j,x14/3,s13,x4/12,s4,pd/l,x10/6,pn/p,x4/14,pd/o,s5,x10/2,s12,x14/9,s11,x1/13,s6,x2/10,pm/g,s9,x4/15,pf/h,s15,x2/14,s12,x7/10,pe/o,x8/13,s4,x0/15,s4,x6/10,pc/k,x14/2,s8,x4/3,pd/f,x13/5,pp/g,x0/12,s2,pa/l,x15/7,s9,x2/11,s5,x9/1,s7,x8/13,s9,x4/0,s7,x2/5,s11,pn/f,x12/9,pe/i,x7/0,s12,x6/14,pd/h,x9/13,s12,x1/10,pb/l,x5/13,s12,x9/1,s8,x2/6,pj/k,x13/10,s7,x15/11,s10,x7/3,s11,x14/11,s6,x0/4,s2,x3/8,pb/i,x2/0,s4,x12/5,pl/d,x3/0,s9,x11/4,pf/i,x14/15,pc/j,x2/7,s14,x3/5,pa/m,x9/13,ph/k,x4/0,pp/o,s3,x7/9,s3,x3/0,s10,x5/15,ph/g,x10/8,s11,x1/14,s3,x8/13,s4,x15/10,pb/l,x8/0,pm/g,x3/15,po/e,x0/8,s15,x1/15,s10,pm/b,x12/7,pn/h,x11/5,pl/e,x12/10,s4,x1/14,s14,x9/15,s2,x3/5,ph/d,s6,x0/8,s14,x7/6,pc/p,s15,x1/15,s5,x7/14,s14,x11/0,pk/i,x3/1,s10,x14/8,s5,x7/3,s15,x4/13,s14,x0/10,pl/a,x4/6,s15,x12/7,pd/e,s2,x1/15,pk/j,x13/3,s15,pc/l,x5/0,pk/m,x3/2,s12,pl/p,x14/1,s2,x13/8,pb/a,x14/15,s11,x8/11,pi/c,x7/0,s2,x12/4,s15,x13/1,pn/d,x12/5,pk/h,x6/11,pf/b,x8/15,s2,x5/14,pm/c,s3,x2/3,s9,x6/14,po/d,x0/15,s14,x6/12,pl/c,x14/10,pj/f,x13/7,s4,x5/10,s14,x6/4,pg/c,x10/7,s5,x3/9,s11,x6/7,pm/o,x2/4,s5,x5/11,pk/a,x4/8,pg/n,x3/14,ph/i,s15,x0/11,pg/e,x8/4,s9,x11/0,pb/d,x5/14,s7,x12/8,s4,x6/9,s5,x2/11,pg/h,s10,x14/15,pp/n,x13/2,s5,x9/6,s12,pb/a,x13/11,s10,x12/0,pe/j,x11/5,po/l,x6/1,pa/b,x3/8,s11,x0/9,pp/l,x1/12,s2,x10/6,s5,x13/14,s4,x8/15,pf/g,s3,x2/4,pk/i,x12/5,s7,x14/7,s12,x8/2,s3,x3/12,pl/j,x9/11,po/m,x13/3,pk/c,x14/6,ph/p,x4/3,pd/b,x8/14,pa/c,x13/7,pm/g,x5/4,pd/e,s1,x15/13,s6,x3/6,s6,pi/h,x7/2,s5,x4/11,s8,x1/8,po/m,s7,x2/3,s3,x14/0,s9,x6/10,s15,x4/14,s7,pi/l,x7/12,s1,x15/3,pp/c,x13/2,pk/l,x5/8,s12,x4/0,pg/p,x8/12,s11,x10/13,s8,x0/11,s15,x5/2,s7,x6/8,s13,x5/11,pm/f,s3,x10/2,pk/n,x3/5,pj/a,x13/12,s6,x0/7,s14,x14/1,pb/n,x5/10,s12,x15/7,s6,x9/1,pc/j,x14/10,pd/l,x15/6,pe/a,x8/3,s9,x10/14,s2,ph/j,x15/7,s13,x5/9,pf/c,x3/11,pg/a,x13/10,pe/d,s4,x5/4,s13,x7/10,s13,x11/9,s7,x14/1,pm/j,x6/13,s9,x8/15,pk/i,x7/6,ph/j,x1/12,po/i,x4/10,s14,pm/n,s10,x9/3,s11,x13/8,s15,x1/10,s4,x7/2,s5,x4/3,s3,x10/8,pl/h,x11/12,pb/n,x9/7,s8,x0/10,s1,pj/i,x9/5,s9,x10/14,pf/b,x15/1,s1,pk/a,x3/5,s7,x9/12,s14,x11/7,pi/l,x0/14,pm/j,s9,x1/5,pb/p,x7/9,pc/e,x13/10,s6,x7/3,s8,x5/0,s11,x8/9,ph/p,x6/11,pd/c,x8/9,s9,x12/10,s12,x11/1,pn/e,x14/13,s7,x8/2,pl/h,x9/10,pp/j,x6/11,s2,x12/14,pc/i,x8/2,pf/e,x5/15,s5,x4/8,s7,x2/15,s10,x1/10,pg/j,s6,x2/7,pe/c,x13/6,po/b,s12,x15/9,s13,x0/4,pa/l,s9,pp/g,x8/2,pn/m,x13/1,s1,x11/4,pg/a,x10/1,pm/d,x12/15,s14,x8/6,s13,x12/1,pn/g,x5/2,pi/e,s3,x13/7,s14,x5/14,s5,x3/10,pc/l,x15/14,s7,x2/10,s15,pj/f,s11,x12/5,s7,x0/14,s8,x2/11,s13,x10/6,s11,x11/7,s3,x14/1,pk/m,x7/12,s15,x4/11,pp/o,x0/2,s13,x14/9,pg/d,s12,x10/1,pi/m,x0/7,s1,x1/4,s12,x14/7,s2,x3/4,s3,x12/14,s4,x7/6,s1,x4/8,s9,x6/0,s13,x9/5,pd/f,x15/14,po/b,x7/11,s11,x2/12,s10,x9/11,s9,x5/3,s13,x0/12,pc/n,x10/2,s5,x8/12,pk/f,x2/4,s1,x13/1,s3,x8/12,s3,x15/0,po/h,x14/6,pm/a,x15/9,s3,x12/13,pf/p,x10/9,s5,x6/8,po/d,x9/5,pm/h,x10/0,s12,x14/1,pg/b,x4/8,s1,x6/11,s3,x2/12,s12,x3/5,s11,x9/7,s14,x14/5,s7,x13/7,s12,x3/5,pd/n,x4/2,pe/a,x15/12,pg/b,x3/10,s13,x2/0,s13,x1/3,pa/h,x14/13,pm/p,x5/2,s14,x1/12,pb/f,x10/8,s12,x0/2,pg/c,x5/3,pm/l,s6,x13/6,ph/a,x1/3,s14,x8/5,s7,x7/4,pd/l,x8/12,pb/a,s12,x5/14,po/f,x9/6,s9,x7/12,s11,x3/6,s5,x1/10,s10,x0/14,s9,x6/5,s3,x13/4,pi/e,x3/10,s3,x4/8,pn/o,x5/12,pe/i,x1/2,pb/n,x4/3,s11,x9/7,pa/d,s2,x15/11,s15,x7/0,pm/f,x15/8,ph/k,x5/7,s4,x0/12,s10,x5/3,s4,x11/13,s10,x14/7,pg/b,x10/12,pk/o,x9/3,s6,x2/4,s9,x11/14,s7,x5/1,s8,pn/l,x6/2,pd/b,x1/13,ph/f,x4/15,pn/j,x14/5,s2,x6/15,s3,x9/2,s15,x3/4,s7,x9/14,ph/l,x0/10,pj/g,x6/13,pf/b,x11/8,pe/c,x6/9,pd/b,x0/13,s3,x9/7,pi/g,x1/2,pf/h,x9/13,s3,x10/2,pe/c,x13/3,s12,x15/7,s8,x5/13,s14,x10/8,s2,x13/6,s10,x0/8,s1,x9/11,s4,pp/n,x3/0,pm/g,x4/1,pl/h,x5/12,s12,x10/6,s5,x4/3,po/b,x7/5,pl/c,x2/10,s7,x5/12,pa/n,x6/0,s9,x14/12,s3,x4/15,s9,x3/11,s1,x1/4,s5,x13/3,s4,x12/15,s11,x6/2,s5,x5/8,s11,x10/3,s2,x6/1,s1,x8/15,s7,x13/2,pi/c,x9/10,s13,x14/0,s13,x4/5,s4,pe/j,x1/13,s5,pp/f,x8/5,s12,x1/4,s4,pk/i,x2/0,s11,x5/13,pe/f,x9/14,s5,x2/3,s12,pl/n,x6/0,s11,pc/k,x14/3,s5,x9/4,s13,x8/3,pl/f,x1/0,pb/i,x7/2,s11,x4/1,s10,x2/10,po/p,x11/12,pn/m,x15/5,s12,x1/9,pk/g,x3/4,pn/j,x15/8,pb/k,x4/2,pf/o,x9/15,pa/p,x13/4,s10,x10/8,s3,x15/7,s5,x4/10,s14,x11/14,s14,x15/10,s3,x8/4,s12,x2/1,s15,x10/7,pb/l,x3/13,s4,x7/8,s11,x14/9,pn/a,x0/7,s10,x6/9,pc/m,x1/8,s3,x11/7,pi/l,x4/9,s7,ph/k,s10,x11/13,s9,pc/n,x1/7,pl/m,x6/3,s11,x0/2,s5,x9/14,pg/h,x1/2,po/k,x8/0,pb/l,x10/5,ph/k,s3,x8/15,pg/e,x7/3,s13,x6/14,po/p,x13/5,s2,x10/9,s11,x0/11,s15,x3/7,pn/g,s7,x9/10,pl/i,x14/3,pk/j,x10/13,s10,x0/6,s15,x9/14,s11,x12/4,pi/g,x10/8,po/m,x4/11,s1,x14/7,s2,x8/10,s11,x1/15,s9,x2/6,s7,ph/k,x10/3,pl/n,x2/12,pi/f,x7/0,s1,x8/12,pk/g,x1/9,pf/m,x13/15,pb/j,x7/0,po/p,x12/5,pc/i,s4,x2/8,pf/j,x5/9,s12,x13/2,s1,x5/14,s13,x0/11,pk/e,x1/4,s15,pi/f,x3/12,pb/g,x7/13,pn/d,x11/0,s11,x13/14,s6,x7/1,s5,x11/0,pf/e,x10/15,pm/n,x9/5,pa/p,x0/14,pf/l,s13,x7/13,s2,x2/9,pp/e,x13/10,s4,x15/7,s3,x14/1,s6,x7/2,pf/n,x8/11,s1,x5/4,pk/a,x2/0,s9,x7/14,pg/l,x13/10,pc/k,x3/12,s11,pm/g,x13/10,pa/p,x5/7,pi/f,x3/0,s11,x5/11,s11,x13/15,ph/o,s11,x0/14,s6,pp/m,x9/8,s8,x2/12,pa/l,x6/10,s6,x5/8,pf/h,s3,x3/11,s13,x14/4,s14,x8/6,s8,x1/7,s7,x6/3,pk/m,x2/15,s10,pi/p,x10/12,s8,x2/15,s6,x14/13,s10,x1/0,pg/f,x6/9,pj/i,x15/4,pd/e,s14,x11/8,s1,pl/j,x9/6,s3,x10/0,po/d,x9/13,s7,x5/2,pa/l,x7/0,s10,x3/1,s7,x0/11,pb/n,s7,x2/12,pm/a,x5/4,s9,x10/3,s11,x12/0,s15,pf/l,x6/1,po/h,x7/5,s8,x15/8,pa/n,s9,x12/4,s2,x3/8,s7,x4/10,s2,x2/5,s4,x13/0,s9,x6/5,pg/o,x13/11,s1,x10/9,s15,x8/15,s11,x0/9,pc/l,x1/11,pd/g,x13/10,pk/o,x7/2,pp/h,x14/4,pi/k,x5/0,s12,x4/9,pn/d,x13/3,s8,x12/8,s1,x13/5,s11,x15/11,ph/j,x1/2,s6,x5/3,pl/p,x14/1,s14,x0/5,s15,x9/10,s12,x3/4,pd/m,x0/5,ph/j,s13,x15/7,s2,pm/o,s6,x2/12,s5,x10/7,s14,x15/4,pe/k,x7/14,po/m,x2/4,s5,x5/10,s13,x4/15,s6,x1/8,pn/c,x12/14,s9,x8/1,pb/p,x2/15,s4,x10/14,s7,x0/2,pc/a,x5/6,ph/e,x7/12,s11,x5/9,s7,x7/3,s5,x9/2,pd/c,x5/7,pk/a,x8/3,pn/f,x11/12,pc/b,s9,x6/5,pm/a,x9/15,pb/e,x7/11,s12,x2/15,s7,x5/6,s5,x1/8,s10,x7/15,po/l,s15,x0/10,s1,x5/11,s11,x8/15,pa/m,x11/4,s3,x5/0,s11,x13/14,s4,x8/2,pc/h,x0/7,s6,x13/1,s8,x0/9,pg/e,x2/1,s6,x13/0,pj/o,x7/12,pi/l,x6/11,s10,x8/10,s15,x4/7,s11,x15/0,pe/d,x12/8,pp/j,s1,pa/l,x14/7,s10,pe/b,x15/8,s6,x5/6,s2,x9/4,pn/h,x10/8,s15,x7/0,s14,x11/4,pm/d,s7,x6/10,pn/a,x3/0,s9,x14/4,pk/b,x5/6,pj/d,x4/2,ph/i,x14/6,pg/j,x7/2,pa/l,x5/3,s11,x6/8,s15,x11/10,pn/m,x3/9,s3,x12/2,pc/f,x0/8,po/i,x14/5,pf/e,x10/12,pl/p,s11,x2/3,pf/k,x1/12,s14,x4/3,s11,x11/14,s7,pb/e,x5/10,s7,x13/8,s15,x3/10,po/p,x9/2,pd/h,x13/6,s6,x1/15,s8,x5/14,pa/n,x10/7,s9,x15/6,s2,x0/10,s4,x6/15,s8,x3/9,s2,x11/0,s10,x14/5,pp/c,x12/0,pk/b,x13/10,pc/h,s15,x5/4,s6,x1/2,s12,x3/14,pk/g,x4/15,pd/e,s15,x9/3,s10,x7/15,pc/b,x2/0,pp/m,x15/12,s3,x3/11,pe/o,x13/10,pp/g,x5/6,s9,x1/9,s13,x13/12,pb/n,x5/3,s13,pe/c,x10/9,s4,x1/15,pp/j,x8/13,pd/i,x2/3,pm/h,s14,x15/8,pe/f,x3/13,po/i,x14/4,s13,x15/9,s11,pb/k,x13/6,s12,x11/3,pe/g,x8/5,s13,x3/1,s11,x5/9,s13,pc/i,x4/14,pk/m,s14,x3/9,s2,x10/14,s8,x5/0,s5,x2/12,s10,x9/7,s13,x13/15,pn/i,x7/5,s8,x2/14,pb/h,x3/8,s9,x14/6,s4,x3/10,s11,pd/j,x7/11,pa/l,x12/3,pd/h,x4/11,s14,x2/13,s10,x4/6,pi/o,x7/0,s12,x14/2,s5,x1/11,s12,x2/4,pe/p,x13/7,s11,x12/9,pf/a,x0/7,s6,x14/2,s7,x7/12,pm/c,x11/4,s1,x14/9,s3,x7/13,ph/p,x1/12,pn/k,s12,x2/10,pa/b,x3/15,s9,x1/8,ph/k,x9/0,pd/i,x10/11,pc/p,s12,x5/9,s13,x2/12,s15,pk/m,x15/13,s13,x11/2,pi/j,x6/7,s5,x11/0,pe/d,x5/15,s7,pp/l,s4,x3/0,s9,x1/4,s15,x12/5,po/g,x10/15,pb/d,x12/4,s12,x8/6,ph/o,s9,x15/7,pg/j,x3/1,s1,x8/13,s5,x2/15,s14,x9/10,ph/b,s13,x5/6,s7,x9/10,s4,x2/14,s10,x9/10,s8,x11/6,pi/k,x8/4,s4,x15/3,s10,x13/2,s1,x0/7,pd/e,x10/13,pa/c,x0/8,s3,x4/9,s9,pi/j,x15/12,pp/b,x11/7,s4,x4/0,s13,x10/6,pn/l,x12/3,pa/k,x2/13,s8,pb/j,x3/7,s15,x6/15,pg/m,x3/5,s12,x11/13,pl/k,s13,x6/7,s7,x14/11,s1,x4/7,s4,x2/1,s13,pm/a,x0/15,pp/e,x10/3,ph/a,x11/13,pe/i,x8/7,s14,x4/2,s7,x12/7,s14,x13/0,s15,x6/9,ph/n,x2/0,s1,x15/1,s1,x14/13,pe/l,x0/12,pn/o,x8/9,s14,x1/2,s13,x12/6,pf/e,x15/11,pp/o,x0/1,s6,x4/9,s11,x15/14,pe/c,s2,x3/13,pm/n,x4/11,s6,x14/9,s15,x5/6,ph/d,x10/1,pk/l,x9/8,s4,pn/p,x14/4,pg/i,s2,x13/7,s8,pc/n,x2/15,pa/k,x8/14,s1,x2/1,s4,x7/15,po/j,x0/2,pk/m,x13/12,s15,pl/j,x1/3,s13,x2/14,pb/e,x7/0,s8,pl/k,x1/14,s11,pc/o,x10/0,s12,x14/6,pl/h,x3/15,s9,pm/a,x6/1,s6,x10/3,s14,x11/15,s3,x9/13,s13,x7/1,pf/i,x15/10,s14,x7/14,s12,x5/3,pk/j,x15/12,s11,x8/3,pn/c,x15/5,s8,x13/4,pp/b,x11/14,pc/g,x6/5,s9,x8/9,pk/m,x11/10,s1,x14/13,s11,x5/3,po/j,x0/10,pg/c,x11/5,ph/b,x10/7,s7,x12/9,pk/p,x13/5,s1,x0/4,pd/n,x10/8,pp/k,x6/13,pe/i,x12/4,pf/m,s12,x11/2,s14,pd/p,x9/3,pl/m,x13/7,s2,x4/10,s5,x9/13,s6,x5/14,pa/f,x3/4,s6,pn/p,x12/10,s4,pm/c,x15/1,pb/e,x5/14,s10,x10/3,pm/h,x9/5,s8,x7/8,s3,x6/0,pg/f,x12/15,pd/h,x11/13,pm/l,s12,x4/10,s10,x2/8,s10,x15/6,po/d,x11/1,s8,x3/4,s11,x2/8,pp/h,x3/10,pg/n,x6/7,s14,x11/1,s6,x2/4,pe/o,x0/11,pk/b,x2/13,pj/f,x9/6,s14,x1/5,pa/g,s10,x6/10,s1,pf/h,s6,x1/2,pm/i,x3/6,pk/n,x14/8,s15,x4/2,s1,x14/5,s6,x9/11,s2,x7/8,pa/p,x12/5,s8,x1/0,pc/n,x9/7,s5,pa/k,x1/4,pp/h,x15/5,po/n,x3/0,pb/c,x10/11,pf/j,x7/14,s2,x6/15,s2,ph/d,x7/2,pg/n,x11/5,s11,x2/6,s10,x4/13,s13,x12/11,pa/f,x5/6,s9,x9/3,s5,x15/5,s14,x4/12,s14,x6/15,s12,x11/10,s7,x6/14,s6,pb/m,x0/3,ph/a,s12,x11/13,s12,x0/10,s1,pf/m,x14/1,s8,x5/0,pn/c,x15/11,pe/m,x2/7,pk/h,s3,x8/11,pa/d,x4/15,s1,x11/14,s8,x7/13,pb/j,x2/1,s1,x11/12,pa/m,s3,x8/7,s13,x10/1,s11,x2/15,pk/d,x6/3,pa/j,x4/0,pg/o,s14,x14/15,pp/h,x10/12,s1,x14/11,s5,pa/o,x8/3,s15,x15/10,s12,x12/9,s15,x15/1,pi/c,x6/12,s5,x2/10,s9,x13/9,pa/p,x0/4,s11,x6/12,pe/c,s13,x8/13,pb/p,x12/15,ph/g,s8,x0/2,pm/e,x6/4,s4,x12/2,po/h,x4/13,pf/l,x5/11,s15,x6/0,ph/p,x8/4,s8,x1/14,pa/k,x6/10,pb/h,x14/13,s8,x6/12,s9,x9/7,s6,x0/11,s14,pp/i,x6/5,s2,x0/2,s11,x14/4,s10,x7/9,pb/c,x13/4,po/k,x15/5,pp/b,x6/2,s12,x1/8,s13,x4/13,s6,x15/10,pn/m,x9/7,s10,x13/10,pa/b,x6/4,pl/p,x5/14,s10,x3/12,pk/b,x6/9,pg/m,x8/2,s4,x3/15,pj/l,x6/7,s8,x4/10,s7,x1/8,s2,x6/14,s6,x0/13,s13,pg/b,x14/9,s13,x13/6,pa/i,x15/4,s5,x0/2,pm/f,x12/7,s15,x5/15,s7,x4/12,s8,x14/6,s6,x1/0,s10,x10/9,s2,x8/1,po/g,s5,pd/j,x5/0,pf/a,x1/8,s15,pg/i,x4/0,s9,x11/15,s7,x9/5,pk/b,x6/7,pi/d,x10/11,s12,x2/1,pf/a,x3/11,s6,x1/4,pg/h,x7/5,pk/m,x3/10,ph/n,x14/2,s13,x9/15,s2,x6/14,s13,pp/b,x8/2,s9,x1/4,pe/g,x3/2,s12,x4/6,s9,x8/13,s9,x4/11,s15,x15/2,s8,x12/3,s7,pl/p,x4/1,pa/j,x0/13,pf/i,x7/9,pk/a,s11,x3/5,s13,x2/7,pi/h,x8/13,s15,x9/3,s14,x10/5,s2,x9/8,s8,x0/3,pm/o,x8/6,pc/j,s10,x12/4,pa/p,x6/14,s9,po/k,x5/13,pl/h,s13,x4/0,s10,x3/13,s12,x2/10,po/d,x13/8,s15,x0/5,s5,x13/4,s13,x15/10,s14,x9/11,ph/m,x7/2,s4,x15/1,s6,x13/11,pi/b,s14,x10/1,s12,x2/8,pf/c,x5/0,s15,x15/3,s8,x9/6,pg/i,x2/11,pe/d,x9/5,s14,pb/p,x14/2,pg/h,x1/0,s8,x5/14,s12,x0/10,pn/o,x8/5,pe/c,x9/7,s2,x2/5,pf/n,x15/13,pl/d,x10/9,s8,pg/k,s15,x0/15,pn/d,x4/3,pf/h,x6/12,s15,x2/14,pi/e,x3/0,s15,x15/4,s12,x0/5,s5,x9/14,s15,x6/7,s14,x11/10,s9,x3/6,s12,x5/9,pf/n,x6/14,pd/m,x3/13,pi/g,s5,x1/0,pe/p,x8/12,pa/i,x2/13,s6,x5/9,s11,pj/c,x3/6,po/m,x15/13,s14,x3/6,s1,x5/15,pe/k,s10,x2/9,pd/b,x11/13,s15,x7/4,s1,x14/8,s11,x6/15,po/k,s14,x12/2,s1,x10/15,s9,x6/11,pe/l,x9/7,s8,pd/o,x8/14,pn/g,x7/10,s9,x4/13,s13,x1/6,s5,x3/8,pm/d,x4/2,pj/f,x3/8,s1,x10/13,pp/d,x15/6,pa/k,x11/13,s9,x14/5,s4,x1/7,s7,x5/8,s10,x14/4,pg/j,x0/12,s7,x7/6,pc/d,s9,x10/5,s5,x13/7,pg/m,x2/6,pn/c,s1,x1/5,pm/b,x12/7,pd/e,s10,x1/8,s10,x0/6,pl/n,x13/2,s8,x10/14,s11,x9/0,s5,pf/c,x6/7,s7,pd/e,x15/5,pm/n,s8,pe/l,x10/6,s7,x11/4,s5,x7/3,s1,x10/1,pi/f,x9/5,s11,x7/2,pb/g,x15/12,s2,x9/5,s6,x10/14,s6,x4/3,s6,x10/9,pc/h,x3/0,s9,x11/4,s10,x3/14,s6,x4/8,s1,pk/o,s11,x2/5,s11,x12/8,s9,x11/2,s9,x4/1,pj/g,x15/7,s1,x2/0,s13,x11/6,s15,x12/10,s8,x6/15,pb/l,x14/7,s14,x11/2,s10,x9/15,s3,x8/2,s14,x15/3,s4,x11/2,s11,x4/12,s10,pp/c,x9/2,po/j,x0/14,s7,x12/3,s3,x15/9,s6,x5/4,pn/d,x7/9,s3,x14/0,po/f,x1/4,s14,x5/9,pi/l,x2/8,pd/b,x4/13,s10,x6/15,pk/n,x13/9,s7,x3/8,pg/p,x1/13,s15,x5/6,pj/e,x11/10,s3,x9/5,s6,x12/13,s5,x6/4,ph/a,x0/10,s1,x8/14,s12,x9/13,s1,pb/d,x4/6,pg/i,x10/2,pj/a,x14/5,pm/p,x7/15,s1,pl/i,x13/0,s4,x3/14,s11,x1/7,pb/f,x8/15,s7,x4/11,pg/j,x2/6,s7,x10/1,s4,x11/4,pl/m,x15/14,s3,x1/9,pd/k,x3/4,pg/i,x0/2,s14,x9/4,pj/d,x1/12,pe/l,x8/10,s14,x15/3,pg/p,x12/6,pe/b,x10/0,ph/l,s11,x1/11,s3,pd/a,x3/7,pl/g,x5/14,pb/n,s5,x0/4,s6,x13/2,pf/c,x11/6,s11,x12/15,s13,x10/9,pm/k,x8/15,pg/h,s8,pb/p,x3/10,pf/n,x7/14,pe/g,x10/3,s10,x9/13,pm/b,x7/2,pp/g,x0/12,pe/k,x10/14,s5,x13/1,pj/o,x8/12,s15,x3/13,pm/f,x9/1,s7,x8/12,ph/l,x6/14,pa/c,x13/2,s5,pd/m,x7/12,pb/h,x2/8,s12,x14/3,pj/f,x12/15,pp/i,x4/10,s7,x12/3,pn/a,x5/9,s15,x11/8,s5,x1/3,s10,x14/6,s5,x1/0,pd/c,x4/14,s7,x9/7,s10,x10/2,pp/h,x3/12,s12,x0/14,pn/l,x15/9,s9,x13/4,s1,pi/c,x5/2,s9,x15/6,s12,x7/11,s2,x13/3,s3,x1/15,pf/m,x3/7,s13,x15/10,s8,po/n,x2/13,s1,x9/15,pi/g,x0/5,s1,x3/13,pp/n,x1/6,s12,x13/10,s14,x0/11,pe/h,s15,x10/13,pl/b,x12/1,pg/d,s6,x15/13,s5,x9/3,s1,x0/12,pj/b,s7,x1/3,s3,x2/15,s15,x5/13,s13,x3/6,pk/o,x4/13,s12,x3/15,pp/i,x2/10,s12,x5/1,pc/g,x3/0,s1,x10/4,s8,x15/14,s7,x4/1,s3,x0/13,s7,x1/2,ph/f,s9,x6/5,s13,pl/e,s9,x4/11,s2,x10/6,s3,x9/1,s11,x11/2,ph/f,x15/13,pp/k,s4,x5/11,pa/n,x13/15,s5,x9/4,s8,x11/15,pi/p,x7/14,s8,x1/13,pe/m,x0/11,s8,x6/9,pa/o,x10/13,s7,x12/5,s2,x4/13,pg/c,x12/2,pj/h,x9/3,s3,x2/14,s4,x15/10,s13,x8/11,pd/e,x15/4,s4,x2/9,pj/g,x14/5,pl/k,x6/13,s10,x11/3,ph/c,x6/0,pb/f,x2/14,s1,x12/13,s3,x14/4,ph/c,x11/15,s5,x9/8,pm/a,x13/10,s2,x6/8,pf/h,s7,x9/10,pm/k,x14/0,s6,x3/8,pi/l,x11/12,s5,pm/b,x13/3,s11,po/a,s7,x8/10,s2,x7/12,s2,x0/1,s13,x7/3,s10,x12/2,s14,x3/7,s1,x12/13,pf/b,x5/3,pa/l,x10/4,po/h,x5/3,pi/n,x6/1,s5,x15/14,s6,pd/a,x3/0,s12,x12/6,pp/f,x11/4,s7,pa/d,x3/12,s15,x9/8,pb/e,x0/1,s13,pj/o,x5/8,pn/f,x10/7,po/i,x14/12,pe/g,x4/15,s2,x7/2,po/d,x0/9,s3,x8/2,ph/l,x15/3,s8,x12/9,pf/g,x4/14,pi/c,x12/15,pa/h,x6/3,pk/e,x1/15,s14,x5/10,s13,x13/6,s9,x15/10,pd/g,x1/12,s8,x10/15,s11,x8/0,pp/h,x1/6,pb/l,x3/9,s7,x15/0,s11,x9/4,s3,x2/7,ph/p,x11/12,s9,x2/5,s10,x3/12,pj/n,x4/6,pa/o,x13/5,s2,pf/c,s4,x1/10,s1,x15/7,s14,x4/0,s5,x3/15,pi/m,x11/13,s13,x5/12,pl/o,s10,x9/3,pm/d,s4,x10/12,pj/a,x4/5,pp/b,x7/11,s1,x1/3,s8,x5/10,s10,x1/2,s4,x5/8,pk/d,x1/9,pe/f,s10,x5/4,s13,x0/12,ph/b,x3/5,s11,pc/l,x15/1,s11,x4/7,s6,x11/2,pd/f,x4/0,pe/b,x2/12,s6,x9/7,s3,x11/12,pa/g,x6/10,s1,pp/i,x11/12,pe/b,x13/10,pf/i,x8/14,s15,x1/11,pm/p,x12/3,s7,x0/5,s4,x11/3,s13,x6/5,pd/b,x12/7,pk/o,s13,x0/2,s9,x13/9,s10,pe/a,x7/3,s1,x11/13,pd/n,x3/5,s4,x0/6,s2,x4/14,s4,x6/2,pb/e,s3,pj/m,x13/7,s12,x8/5,pb/f,x10/6,s5,x5/3,pe/a,x0/2,pc/b,x3/11,s8,x14/5,s4,x3/9,ph/g,x0/11,pp/k,x4/5,pc/h,s15,x6/9,pl/p,x0/10,pc/a,x13/9,s13,x8/7,pm/k,x10/4,po/c,x6/5,s13,x8/9,pe/h,x12/6,s8,x7/15,s14,x3/6,s1,x13/4,pb/a,x7/9,pi/c,x1/5,s6,x2/13,pk/p,x0/7,pg/l,x5/2,s11,pp/e,x12/6,s1,x3/2,s6,x10/9,s10,x11/13,s12,x15/6,pi/l,x11/9,s1,x10/6,s9,x11/15,s5,x6/0,s7,x5/10,s3,x2/6,s2,x9/15,pn/o,x10/4,s14,x5/7,ph/a,s3,x4/15,pl/k,x12/6,s12,x7/8,s6,x13/4,s13,x11/3,pa/b,x12/14,s5,x6/8,s4,x0/10,s2,x11/9,pe/l,s1,x14/7,s5,x0/10,pi/n,x9/5,pm/o,x13/3,s6,x2/11,s15,x3/9,s3,x1/6,pb/e,x5/9,s10,x0/11,s14,pc/p,s1,x15/14,s11,x9/13,pg/j,s6,x6/8,ph/e,x3/2,s5,x13/7,s3,po/i,x3/10,s13,pm/a,x2/13,pp/f,x7/15,pi/n,x14/13,pp/a,x15/4,s4,x7/6,s15,x14/11,s5,x12/15,s11,x13/7,pf/j,x8/9,s7,po/a,x2/6,s2,x13/3,s6,x14/6,s2,x5/11,pi/b,x1/0,s11,x13/12,pc/m,s12,pb/d,x14/8,s11,x15/3,s13,x8/5,s12,x12/0,pa/c,x3/15,pi/k,s3,x14/13,s12,x5/4,s6,x9/6,pj/c,x8/4,pf/n,x9/1,s3,x12/3,pp/e,x13/5,s9,x15/10,pl/m,x13/9,pa/i,x10/7,s6,x0/15,ph/l,x3/4,s11,pf/i,s1,x12/1,s4,x4/2,pj/d,x11/13,pf/g,s1,x14/7,ph/d,s4,pg/i,x12/5,pa/p,s1,x10/13,s4,x3/1,pd/c,x6/7,s3,x13/11,pk/f,x9/8,pb/p,x2/4,pi/f,x0/12,s7,x7/15,s15,x13/10,s1,x5/9,s12,x4/7,pp/d,x8/10,s3,pe/n,x3/7,pc/k,x11/14,pi/g,s11,pm/a,s4,x0/9,s8,x10/5,pf/o,s4,pk/m,x2/0,pa/n,x11/9,s3,x2/7,s1,x4/6,s6,x8/13,s1,x14/5,pg/i,x10/9,pe/a,s1,x2/0,pp/d,s11,x10/13,s14,x3/7,pl/a,s11,pb/i,x4/14,pc/j,x8/11,s15,x9/10,s4,x8/6,ph/n,x4/7,s8,x14/11,s15,x4/15,pc/i,x10/13,pn/m,s13,x1/3,s7,x5/4,s9,x10/8,s3,x5/9,pp/b,x8/13,pn/g,x7/10,s7,x13/1,pi/e,x14/4,pc/p,x9/1,s6,x12/11,s2,x4/14,pj/h,x13/5,s1,x1/7,pb/d,x11/9,pi/c,x10/8,s13,x9/5,s4,x3/15,s2,x6/0,s3,x14/2,s11,x12/1,s7,x10/15,s9,x13/3,s1,x7/5,pa/k,x14/1,pj/b,x10/7,s8,x4/1,pi/l,x14/7,s15,ph/m,x13/9,s13,x2/1,pk/f,x12/4,s11,x9/15,pb/d,s4,x1/14,pm/e,x2/10,s8,x13/15,s5,x12/5,s2,x2/14,s12,x15/5,s10,x11/13,pn/o,x0/7,s3,x15/13,s5,x4/14,s9,x12/7,pb/m,x15/5,pc/e,x6/7,pa/l,x15/10,pm/f,x1/11,s12,x12/7,s14,x9/14,s7,x11/3,pd/n,x9/1,s10,x10/14,pa/b,x3/15,pc/i,x4/2,pd/m,x7/5,s3,x11/2,pb/p,x14/9,pn/j,x10/5,s12,x15/12,s5,x8/9,s9,x3/12,s7,x7/0,s11,x5/15,s8,x14/3,ph/f,x12/10,s15,x13/15,pk/l,x11/10,s13,x9/6,s14,x14/5,s11,x15/8,s4,x9/4,pa/i,s2,x7/6,pn/g,x15/0,pi/l,x11/8,s10,pf/o,x5/1,s8,x9/0,s5,x10/12,s9,pj/k,x8/2,s11,x13/9,s9,x14/4,pg/d,x11/13,pj/f,x9/1,s4,x5/3,s1,x2/7,s12,x10/14,pl/o,x7/15,s14,x13/9,s1,x7/14,s9,x6/8,s5,x5/9,s11,x1/8,s7,x6/15,s14,x7/11,s10,x12/0,pb/d,x15/13,s6,pc/a,s10,x9/8,s12,x15/14,s7,x6/10,pd/f,x12/7,s3,x11/2,pk/p,x0/8,s11,x13/12,s9,x14/10,s15,x8/1,pf/l,x6/0,s8,pm/n,x13/9,pg/p,x10/14,s9,x11/1,s12,x4/10,pf/i,x1/12,s9,x3/8,s10,x9/4,s1,x14/10,pa/m,x7/13,s9,x0/9,pj/e,s5,x8/4,s3,x13/11,s7,x10/8,s2,x13/3,s12,x0/7,pm/l,x4/1,s4,x9/8,pf/a,x11/5,s5,x3/10,s4,x6/1,s8,x11/13,s2,x14/12,pb/h,x3/9,pn/j,x10/0,s11,x15/7,pb/a,x2/13,pp/j,s12,x1/9,s12,x2/6,s5,x12/10,s6,x4/9,pg/n,x14/5,s8,x15/9,pd/h,s5,x13/7,s8,x11/6,s4,x3/4,s9,x12/8,s10,x2/14,pj/o,x5/15,pg/e,x14/4,s14,x10/15,s9,x3/0,pi/o,x6/8,s14,x1/12,s7,x15/2,pn/h,x6/13,s5,pj/m,x2/15,pb/g,x8/12,pa/p,x1/5,pg/n,x8/0,pm/c,x6/1,s3,x11/15,s13,x1/0,s12,x8/15,pb/o,x0/10,pm/p,x2/13,pc/h,s9,po/n,s5,pk/c,x8/1,pd/g,x3/12,s2,pa/i,x2/7,s6,x4/9,s12,x6/10,s8,x2/1,s14,x8/15,s9,x3/10,pp/f,x5/6,s3,x9/1,pj/n,x2/7,pf/p,s6,x12/1,s3,x8/13,pm/e,x2/7,s10,x14/12,s11,x3/1,s5,x11/12,s5,x13/9,s13,x3/11,pl/k,s12,x12/10,pp/j,s14,x13/15,s4,x0/1,pg/e,s11,x5/3,s5,x11/8,s1,x1/6,s14,x10/5,s15,x9/15,s15,x2/11,pk/a,s14,x6/9,pf/e,x10/0,pa/h,x15/6,po/b,x1/4,pg/e,x12/9,s2,x8/11,pl/k,s4,x2/7,s15,x15/11,pf/d,x14/5,s3,x3/7,s3,x10/2,pc/k,s6,x1/12,pj/b,x11/5,po/n,x12/10,pi/h,x7/9,pb/j,x6/15,s4,x5/11,s3,x10/1,pp/o,s5,x8/2,s8,x3/12,s5,x2/15,s5,pf/e,x7/4,s12,x15/0,s13,x5/4,s5,x8/14,s5,pl/p,x2/10,pc/o,x15/6,s15,x4/5,s12,x10/14,s8,x11/13,s3,x12/6,s13,x9/8,pk/f,x7/4,pa/j,x6/1,pn/l,x15/8,s10,x11/1,s15,x4/7,s8,pc/a,x10/14,pl/f,x11/4,pd/j,x1/0,s6,x5/13,pg/f,x14/10,pe/c,x12/7,pn/h,x2/4,pk/j,x5/9,pb/m,x2/14,s10,x1/6,s9,x15/9,pg/d,x8/11,s6,x7/10,s8,x14/2,po/f,x6/13,pm/n,x4/11,pf/p,x0/5,pg/a,x11/4,pb/i,x9/12,s2,pk/n,x2/6,s12,x0/10,s4,x4/15,pc/m,s11,x10/0,pe/i,x9/4,pm/j,x11/5,pc/i,x4/10,s4,x2/12,s11,x3/9,s13,x8/2,pf/d,x9/7,s1,x15/3,s3,x12/10,pk/m,s6,x3/11,s7,x10/0,s3,x5/2,pj/l,x1/10,s12,x12/3,s1,x6/8,s10,pd/e,x13/7,po/l,x14/6,s6,x8/1,pc/p,s2,x3/10,s3,x7/4,s10,x1/9,s3,x4/12,s14,x2/14,s10,x1/9,s4,x11/5,s12,pd/a,x13/8,pb/g,x3/7,s11,x9/6,pm/n,x10/12,pl/c,x8/13,s6,x4/6,s1,po/p,x7/11,s15,x9/12,s2,x3/14,s15,x6/5,s8,x4/7,s1,x15/5,s5,x6/10,s12,x12/5,s13,x10/4,s5,x15/6,s5,x1/13,pf/c,x14/5,s3,x13/8,pk/m,x11/2,s6,x7/13,s9,x4/8,s1,x1/11,pf/l,s7,pk/g,x3/5,s5,x13/11,s13,x1/7,pc/b,x12/10,s3,x1/11,pp/o,x3/2,s7,x14/11,s10,x9/3,pd/m,x0/6,s4,x7/10,s6,x9/1,s8,x3/14,s8,ph/i,x0/4,s4,x14/9,s10,x11/6,s9,pd/m,x13/8,s14,x6/3,s14,x8/4,pf/n,x15/0,pc/m,x2/13,s3,pl/j,x6/12,s5,x4/2,pc/i,s10,x12/1,ph/p,x14/9,s8,x3/2,pd/e,x1/10,pb/o,x6/3,s12,x14/0,s2,pd/j,x12/5,s11,pl/f,s13,x10/14,s7,x7/6,s3,x13/10,pi/c,x9/14,s10,x13/8,s5,x5/10,s3,x7/6,s10,x0/8,pe/l,x5/14,s3,x12/13,s2,x4/8,s6,x13/3,s11,x15/10,s15,x6/11,s1,pk/h,x4/2,pa/e,x6/3,pi/o,s1,x8/2,pl/n,x13/9,pf/o,x0/14,s2,x4/10,s4,x6/13,s15,pg/l,x8/1,s2,x4/10,pd/m,x11/7,s6,x0/3,s3,x10/8,s5,x15/12,s1,x11/9,s1,x8/5,pe/f,x7/6,po/a,x5/9,s9,x10/12,s7,x4/6,pi/d,x2/8,s12,x9/6,s12,x15/13,s3,x1/9,pf/h,s2,x2/0,s12,x15/13,s7,x8/10,po/e,x0/9,pn/d,x3/2,pp/l,x9/11,pf/i,x2/8,s8,x11/4,s12,pl/a,x7/1,pn/d,s5,pi/l,x0/10,pk/m,x3/8,s3,x14/12,s5,pp/h,x0/1,s15,x15/2,pl/b,x4/3,pe/g,x12/8,s6,x10/7,s5,x1/2,s3,pp/n,x15/14,pc/l,x1/11,s2,x3/15,s6,x2/14,s1,x6/7,s15,x15/13,pd/m,x9/0,s9,x14/4,pc/g,x7/6,s4,x5/14,pk/l,x6/4,s3,x2/10,s12,x12/4,pj/p,x3/7,s5,x10/9,pe/d,x1/6,pc/j,x7/5,s5,x13/10,pa/m,x4/15,s12,pb/f,x13/1,pd/k,x8/0,pc/n,x13/7,po/l,s14,x4/15,pa/b,x8/10,s5,x15/12,s10,x0/6,s3,x10/11,s1,x3/6,pi/d,x8/5,s6,pp/g,x10/6,pa/e,x15/7,s12,x2/13,s6,x7/4,s10,x10/1,pk/p,x8/2,s15,x4/12,pa/e,x15/0,s3,pm/g,x2/6,s12,x4/5,pe/d,x7/2,s1,x0/10,s14,x14/13,s4,x9/12,pi/p,x10/4,s7,x11/12,s14,x4/6,s6,x11/3,pm/g,x9/4,s2,x1/10,pc/i,x2/3,s13,x7/10,pd/o,x0/9,s15,x10/4,s8,x9/14,pi/h,x13/1,pk/d,x3/0,pi/h,x10/9,s13,pp/e,x11/14,s15,x13/1,pk/a,s15,x11/8,s12,x14/10,pp/m,x11/15,s12,pf/j,x14/12,s3,x4/6,s3,x7/3,ph/p,x11/14,s1,x7/12,s8,x8/4,pi/a,x1/7,s6,x6/13,pc/b,x12/10,pp/m,x4/3,pc/f,x7/12,s10,pi/p,x13/15,s2,x2/7,s6,x5/13,s4,x1/6,pn/j,x9/13,pf/a,x8/2,s12,x13/3,s10,x4/7,s14,x10/2,s11,pi/h,x11/0,pa/d,x7/14,s14,x13/4,pm/k,x0/7,s9,x8/10,s8,x12/7,pl/o,x14/11,s9,pk/a,x8/13,pe/d,s8,x4/12,pi/m,x8/2,s13,ph/a,x12/6,pe/k,s12,x5/14,s8,x9/8,ph/o,s14,x5/15,pn/g,x4/6,s1,x3/8,s3,x15/11,pp/l,x10/8,pj/b,x9/5,pn/h,x8/6,pd/i,x5/4,s11,x8/12,s6,x11/1,s12,x14/0,s3,x12/7,pe/p,x6/1,pd/j,x15/0,s8,x9/8,pl/f,x4/13,s12,x2/0,pa/m,x12/9,s5,x8/3,pn/c,x12/10,s12,x6/0,s7,x9/7,pm/a,x12/0,s13,po/c,x2/8,s9,pi/e,s12,x9/14,s1,x12/7,s7,x10/5,pn/k,x0/6,s7,pg/m,x15/2,pb/c,x0/9,pe/j,s10,x8/2,s9,x0/14,pg/f,x6/12,pb/i,x15/7,pg/f,x12/14,s2,pn/a,x1/15,pg/p,x7/9,pj/h,x0/10,pd/f,x14/6,s1,x15/8,s15,x11/0,pg/p,x1/5,pi/k,x9/4,pc/l,s14,x8/13,s1,x7/2,s3,x4/8,pb/a,x2/3,s5,pl/e,x5/14,s9,x1/15,s13,x11/4,s9,x1/10,pi/j,s2,x6/4,pc/b,x15/8,s10,x2/6,pm/l,x11/1,s3,x14/10,s10,x0/9,s4,x4/6,s9,x2/8,s5,x3/15,pf/b,x12/4,po/c,x3/11,pf/g,x13/5,s12,x9/10,pn/b,x8/2,s10,x5/12,s6,x1/4,pi/a,x6/11,s14,x13/12,s1,x14/15,pl/g,x11/9,pk/i,x0/13,pc/n,s14,x6/8,pd/l,x10/1,s12,x4/11,s3,x8/6,pc/b,x12/4,s11,x10/11,s14,x3/13,pf/o,x10/1,pa/k,x0/4,s6,x13/11,s5,x3/6,pm/p,x9/4,s6,x11/14,s8,x12/3,pf/a,s11,x8/4,s7,x9/14,s2,x0/10,s11,x9/13,pl/n,x2/10,s6,x3/6,s9,x5/4,s9,x0/6,pb/k,x3/12,s7,x7/14,s1,x0/10,s7,x5/7,pg/j,x2/9,pl/k,x12/1,s13,x13/5,s3,x2/11,s2,x10/5,s13,x15/3,s13,x10/11,s8,x6/1,s13,pp/c,x11/15,ph/l,x1/5,pj/k,x0/13,s10,x12/15,s13,x14/10,s9,x7/13,s10,x14/8,pl/o,x5/0,pa/g,s11,x3/1,s11,x9/2,pi/e,x4/5,pb/k,x1/8,pn/m,x12/6,s1,x8/3,pe/d,x5/2,s13,x13/8,s9,x12/15,pk/n,x8/13,s3,x2/14,s2,x13/11,pd/e,x15/6,s14,x14/0,s7,x8/10,s15,po/p,x2/12,s14,pa/f,x5/11,s12,x10/3,s13,x6/9,pl/n,x10/7,po/b,x12/9,s13,x15/11,s5,x2/13,pl/k,x6/9,s3,x3/4,s5,x11/0,pi/m,x14/7,pf/j,x3/8,s13,x0/2,s8,x12/11,pn/d,s4,x2/14,s7,x10/7,pl/a,x3/6,s1,x2/0,s12,pd/p,s6,x5/14,pe/b,x1/4,pd/h,x3/10,pn/k,x11/9,po/f,x14/2,s15,x13/8,pb/c,x5/1,s5,x2/8,pp/g,x11/4,pj/h,s13,x15/14,pd/i,x4/8,s3,x6/10,pp/n,x14/1,s12,x11/15,s8,x0/10,s10,x12/15,s9,pg/c,x4/5,s14,x9/2,s7,pn/a,x3/7,pp/l,x9/10,s7,x5/11,pm/k,x0/10,pi/o,x15/6,s13,pa/e,x1/0,s10,x8/11,s14,x15/12,s5,pm/g,x5/9,pk/h,x6/12,pd/m,x11/4,s9,x5/8,pk/j,x4/2,s3,x5/11,pd/m,x0/6,s5,x1/4,s14,x8/0,s3,x15/6,s5,x0/11,pl/k,x3/1,pj/m,x6/14,s8,x13/0,s2,x6/15,s5,x0/12,s9,x9/4,s1,x8/1,ph/k,x15/4,pb/l,x9/14,pe/f,x4/1,s5,x5/11,pn/j,x4/15,pe/o,s2,x7/1,pi/a,x2/13,pg/b,x14/8,s14,x13/7,s10,x0/11,s11,x3/15,s6,x4/5,s8,x10/12,s7,x3/2,pp/n,s5,x7/1,pb/d,s3,x14/9,pl/h,x4/1,pc/i,s1,x2/12,pk/b,x9/13,s11,x8/0,ph/c,x9/3,s10,x2/6,s4,x1/14,s7,x12/15,s13,x4/1,s7,x0/5,pn/k,x12/2,s5,x10/9,s14,x0/2,s15,x14/7,pf/d,x15/6,s12,x5/7,s4,x2/12,s13,x15/10,s1,x5/14,s10,pc/k,x12/1,s6,x2/4,pg/l,x12/0,s15,x13/3,s4,x2/0,s7,x9/12,pd/c,x7/11,s3,x3/15,pn/l,x10/0,s13,x8/4,pk/j,x0/13,pi/c,x14/1,s11,x8/12,s10,x5/10,s7,x15/11,s14,x10/13,pd/e,x3/1,pc/p,x6/0,s15,x5/4,pl/k,x10/0,pe/j,x9/2,s5,x10/11,s14,x2/8,s8,x10/1,pc/n,x12/9,s2,x0/4,pl/o,x6/12,s14,x1/11,s8,x0/3,s11,x6/11,s1,x9/5,pi/p,x1/13,pj/n,x5/7,pl/e,x13/12,pd/c,x15/10,s7,x4/7,pm/h,s3,x2/9,pn/j,x1/0,pl/h,s6,x5/12,pi/g,x15/6,s3,x3/11,pf/k,x14/1,pi/c,x5/10,pp/d,x12/4,s15,x1/2,s15,x5/11,po/f,x13/7,pk/m,x12/11,s4,x6/4,s9,x15/5,s13,x0/10,ph/j,x11/8,s7,x3/2,s1,x5/14,pi/e,x1/12,s3,x2/5,pn/d,x3/11,s14,x5/12,pi/m,x10/0,s4,x15/13,pk/l,x10/8,s2,x5/12,s10,x1/10,s14,x5/12,s15,x6/15,s11,x0/1,s10,x2/15,pm/d,x0/14,s2,x1/13,pc/k,x9/4,s2,x13/8,s5,x15/14,pm/g,x2/7,pl/c,s10,x14/6,pp/i,x9/3,pl/e,x10/11,pk/d,x6/12,pj/l,x14/15,s12,x8/13,pg/a,s1,x4/9,pl/h,x14/2,s1,x7/8,po/g,x1/4,s12,x3/12,s12,x9/2,s3,x0/1,s7,x3/7,pp/i,x13/1,s6,pa/f,x2/12,s6,x1/3,s3,x11/4,s14,x12/5,pp/c,x6/4,ph/o,x3/0,pn/c,x2/13,pg/k,x11/5,s14,x12/4,pn/i,x8/5,s11,pp/b,x9/1,pn/m,s12,x4/13,s6,x7/1,pl/h,x11/12,s11,pm/a,s15,x2/6,s14,x12/0,s9,x5/3,pe/g,x1/10,pl/j,x5/4,s5,pk/p,x13/8,s7,x0/4,pb/g,x5/8,s7,x6/3,s12,x12/14,s9,x5/0,s6,x13/15,s2,x12/4,s6,x6/1,s10,x8/14,s14,x0/1,pk/d,x12/5,s5,x10/9,pm/h,s12,x15/2,po/p,x6/3,s14,x9/7,s5,x1/4,s13,x10/7,s2,x4/8,s12,x13/6,s10,x3/5,s15,x14/11,s13,x12/7,s2,x4/8,s9,x9/14,pf/e,x4/12,pp/m,x1/10,s14,x12/11,s12,pc/o,x5/3,s4,x0/8,s15,x9/13,pm/i,s7,x14/8,pn/p,x5/0,pk/a,x1/13,s6,x15/2,pe/n,s6,x9/6,s12,x14/3,pd/m,x1/8,s10,x6/10,s12,pg/a,x0/15,s3,x7/14,pn/i,s11,x15/4,s8,x9/7,pf/c,x5/0,s15,x12/14,s12,x3/8,s11,x1/11,pk/m,x5/14,s9,pi/g,x4/12,pc/l,x10/0,s13,x1/7,s12,x5/11,pm/g,x1/9,pn/j,x7/4,pi/p,x13/12,ph/l,x11/1,pb/n,x3/5,pa/m,x7/4,s11,x13/11,s14,pp/b,x6/7,s1,x5/12,pd/k,x3/14,s14,x2/11,pe/a,x10/6,s9,x11/8,s4,x7/6,s13,x8/15,s14,x0/10,s13,x3/1,pk/n,x6/0,s12,x5/9,pg/p,x2/12,s3,x9/0,s10,x4/7,s10,x8/10,s13,pd/i,s5,x11/15,s12,x13/14,s9,pk/f,s3,x2/3,s13,x10/9,ph/j,x13/8,pn/a,x3/2,s6,x12/8,s12,x9/3,pe/h,x10/11,pb/d,x13/12,pk/c,x15/6,s9,x7/10,pp/l,s9,pe/d,x9/12,s8,x8/13,s6,x9/1,s2,pk/l,x11/14,s10,x3/1,pp/i,s8,x4/14,s9,x2/15,s7,x13/0,pa/f,x3/6,s1,ph/m,x15/10,s9,x3/2,s1,x6/12,s14,x5/7,s8,x2/3,pp/a,x13/9,s8,x2/0,pb/f,x9/13,s13,x1/0,po/c,x5/14,s13,x4/2,s15,x13/10,s15,x4/3,s7,x6/0,s7,x1/12,pp/j,x9/7,s6,pd/f,x13/3,pb/k,x2/12,pl/n,x3/8,pm/h,x6/14,pk/f,x11/1,s11,x15/4,pc/l,s9,x3/5,s8,x4/7,s13,x6/13,po/b,x5/1,pf/k,s9,x11/3,s6,x15/6,s9,x11/8,s12,x12/1,pa/n,x9/8,pj/m,x0/2,pe/h,x5/15,pn/d,x1/10,s10,pp/m,s5,x14/9,pj/d,x2/5,pi/g,x0/7,s5,x2/15,s10,x12/11,s13,x1/4,s5,x8/6,s9,x12/1,s14,x2/13,s14,pp/b,x4/6,po/f,x15/8,pg/m,s13,x13/4,s3,x9/14,s15,x13/0,pk/b,x2/4,pe/f,s10,x6/1,pg/c,x4/5,s12,x0/10,s15,x11/5,s1,x15/3,s1,x12/1,pk/p,x5/0,s5,x7/10,s7,x1/3,pa/f,x4/13,s11,x1/2,po/i,x3/14,s9,x5/10,s12,x1/12,s6,x9/13,s5,pm/h,x2/5,pf/p,s4,x13/9,pn/i,x2/10,s11,x0/1,pf/k,x3/6,s2,x10/7,s3,x13/11,s11,x1/9,po/i,x11/4,pb/n,s7,x5/2,pa/f,x10/9,s6,x6/5,s15,x12/13,pc/p,x10/5,s7,x13/4,pk/i,s12,x8/1,s14,x3/13,pb/g,x0/1,s4,x4/15,s2,x1/0,pf/h,x9/7,pp/i,x12/15,pn/o,x11/13,s5,x14/9,s6,x11/12,pk/f,x4/3,po/e,x7/12,s1,x8/3,s3,pf/i,x4/7,pk/d,x12/10,s4,x1/14,pn/g,x9/6,pl/h,x1/5,s7,x4/11,pc/o,s2,x12/6,pn/b,x2/8,pm/e,s12,x3/14,pb/h,x5/4,pl/a,x6/2,pe/m,x9/7,s11,x4/14,s11,x0/13,pc/p,x3/15,pa/j,x1/13,pc/i,x14/11,s8,x3/9,pp/k,x15/1,s4,x11/7,pm/l,x14/3,pd/p,x1/8,s8,x10/12,pm/n,x14/7,s1,x11/8,s1,x10/12,s15,x2/4,pb/o,x13/8,pj/l,x3/9,pi/e,s5,x0/13,s12,x4/9,pk/l,s6,x3/10,pf/g,x2/6,s9,x3/11,s6,x7/5,pm/n,x12/9,s8,x8/15,s1,pc/h,s6,x14/9,s11,x4/10,pe/j,x0/12,s15,x4/14,s7,x11/15,s3,x5/14,pa/f,x4/9,pb/m,x5/10,s10,x12/3,po/g,x6/5,pk/n,x11/13,po/p,s1,x10/1,s5,pj/e,x13/0,s5,x6/11,s2,x10/7,s10,x14/3,s6,x10/11,pk/l,x7/15,s11,pb/o,x9/8,s9,x2/10,pf/p,x13/1,s11,x8/12,s4,x10/0,s13,x14/3,s13,x5/4,s8,x7/1,s6,pi/g,s11,x11/0,s4,x6/15,s7,x1/4,s5,x8/3,s13,x2/0,s2,pe/f,x7/14,s2,x4/13,pb/m,x14/15,s4,x9/12,s2,x14/11,s15,x6/15,s8,pk/i,s2,x13/4,pb/m,x2/12,pa/d,x1/14,pc/o,x6/13,pb/j,x1/8,s13,x15/10,pi/n,x2/9,s2,x10/15,s6,x8/4,s3,x2/5,pd/j,s15,x15/7,ph/e,x14/11,s5,x9/6,s10,x10/13,pa/g,x8/3,s7,x7/6,s5,x0/3,s6,x1/12,pe/c,x14/13,s3,x4/5,s1,x12/10,s6,x7/1,pi/f,x12/5,s5,x11/14,pn/o,x13/6,s3,x8/1,pl/d,s14,x13/7,s7,x6/8,pf/o,x2/11,s11,x1/10,s10,x12/9,pa/g,s7,x10/11,pn/l,x12/1,s15,x13/10,s11,x2/11,s6,x0/1,s13,x11/8,po/j,x0/5,pk/l,s14,x2/12,s13,pg/b,x8/13,pf/m,x1/6,s3,x14/12,s15,x5/9,s1,pn/o,x7/12,s6,x10/11,pl/e,x4/9,s10,pa/i,x15/5,s15,x6/4,pe/j,x5/0,s2,x7/6,s14,x9/8,pd/o,s8,x6/13,s5,x0/3,s6,x9/13,s8,x2/3,ph/m,x9/0,s13,x6/12,pe/o,x5/14,pn/j,x0/3,s1,x6/2,s9,x8/1,s15,x10/12,s1,x1/14,pd/h,x15/7,s6,x14/9,s7,x15/7,pp/n,x4/6,s12,x5/2,s2,pk/c,x14/0,s9,x9/10,s11,x13/2,s7,x15/6,s15,x14/1,s14,x11/12,s2,x15/13,pa/l,s11,x10/12,s13,x4/13,s7,x11/12,pc/g,x1/10,pd/e,x13/11,ph/l,x1/5,s5,x8/13,s10,x2/0,pd/j,x1/15,pe/p,x12/5,s11,pn/j,x0/15,po/b,x9/2,pg/a,x1/15,pj/e,x8/11,s8,x15/13,s8,x7/9,pd/i,x3/4,s2,x10/7,pf/p,x3/1,s14,x14/7,pk/n,s1,x13/8,s14,ph/f,x10/7,s13,x0/6,s5,x8/10,pg/j,x5/6,s3,pk/b,x4/14,s13,x9/0,pn/c,x4/15,po/e,x6/5,s1,x13/0,s15,x5/10,pl/i,x7/8,s5,x2/1,s10,x7/9,pm/a,x14/11,s13,x6/8,pd/j,x10/12,s10,x0/3,s8,x11/6,s3,x10/15,s8,x5/8,s2,x13/6,s9,pp/e,x9/10,s7,x11/14,pd/b,x13/5,pp/h,x3/4,s14,x1/14,pc/d,x9/10,pe/o,s4,x4/12,s3,x8/2,pi/p,x9/0,s10,x12/14,pk/j,x3/9,po/i,x0/12,s8,x9/11,pj/d,x8/14,s11,x15/4,po/l,s13,x2/9,s4,x11/15,s14,x2/5,s9,x15/4,pk/m,x13/10,pj/p,x0/8,pg/a,x10/13,pb/h,x2/0,s6,pl/m,x8/7,ph/f,x3/4,s6,x13/5,s10,x14/1,s5,x10/6,s15,x3/9,s1,x10/13,s11,pm/b,x7/3,s14,x15/13,pl/a,x2/10,pm/i,x13/8,pa/h,x15/11,s1,x10/8,pi/c,x7/2,pb/g,x15/9,pe/c,x1/3,s1,x11/14,pl/d,x0/10,s15,x3/1,s2,x6/15,ph/b,x7/12,pl/e,s11,x3/1,s10,x9/10,pf/o,x11/5,s7,x8/15,pc/k,x2/13,pa/h,x5/15,s15,x11/8,pc/b,x10/0,s9,x7/1,pg/h,x6/12,s10,x11/13,po/a,x12/1,s12,x9/11,pm/e,s2,x6/0,pa/g,x9/3,pb/n,s5,x7/1,pl/h,x11/2,s3,x5/3,pf/b,x15/0,s9,pn/e,x3/13,s10,x8/15,s15,x2/7,s15,x9/14,s11,x2/15,s12,x5/4,s5,x9/3,s5,x4/11,ph/a,x3/0,s5,x14/9,s15,pi/e,x12/13,s7,x3/0,pm/k,x12/2,s7,x6/7,s10,x2/8,po/p,x11/6,pf/h,s11,po/a,x12/13,pb/e,x14/0,s1,x13/15,pk/i,x1/9,pf/b,x13/11,s14,x14/2,pd/o,x5/15,s11,x3/1,pg/m,x10/13,s6,x14/6,pk/n,x5/9,s11,x1/13,s15,x10/15,pg/m,x3/6,s9,x15/4,s12,pn/f,x0/12,s13,x11/15,s11,x6/0,s6,pk/c,s10,x15/3,pp/n,x5/14,pb/m,x12/3,s1,x13/6,pp/c,x12/8,s10,x3/14,pa/l,x0/1,s2,x10/14,s15,x6/8,s14,x4/12,s5,x13/3,s3,x8/6,s1,x10/2,s11,x0/1,s14,x13/5,s4,x11/2,s12,x13/8,s10,x14/1,s1,x3/6,pn/j,x1/10,s7,x8/9,pc/b,x11/14,pk/p,s5,x2/10,ph/j,s2,x8/0,s6,x2/13,s3,pb/l,x7/4,po/c,x8/14,s14,x0/13,pl/h,x15/1,po/m,x9/12,ph/d,x1/4';
+var $author$project$Main$orElseWith = F2(
+	function (ifNoneThunk, maybe) {
+		if (!maybe.$) {
+			var a = maybe.a;
+			return $elm$core$Maybe$Just(a);
+		} else {
+			return ifNoneThunk(0);
+		}
+	});
+var $author$project$Main$Exchange = function (a) {
+	return {$: 1, a: a};
+};
+var $author$project$Main$parseExchange = function (s) {
+	if (A2($elm$core$String$startsWith, 'x', s)) {
+		var _v0 = A2(
+			$elm$core$String$split,
+			'/',
+			A2($elm$core$String$dropLeft, 1, s));
+		if ((_v0.b && _v0.b.b) && (!_v0.b.b.b)) {
+			var a = _v0.a;
+			var _v1 = _v0.b;
+			var b = _v1.a;
+			var _v2 = _Utils_Tuple2(
+				$elm$core$String$toInt(a),
+				$elm$core$String$toInt(b));
+			if ((!_v2.a.$) && (!_v2.b.$)) {
+				var pos1 = _v2.a.a;
+				var pos2 = _v2.b.a;
+				return $elm$core$Maybe$Just(
+					$author$project$Main$Exchange(
+						_Utils_Tuple2(pos1, pos2)));
+			} else {
+				return $elm$core$Maybe$Nothing;
+			}
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Main$Partner = function (a) {
+	return {$: 2, a: a};
+};
+var $author$project$Main$parsePartner = function (s) {
+	if (A2($elm$core$String$startsWith, 'p', s)) {
+		var _v0 = A2(
+			$elm$core$String$split,
+			'/',
+			A2($elm$core$String$dropLeft, 1, s));
+		if ((_v0.b && _v0.b.b) && (!_v0.b.b.b)) {
+			var a = _v0.a;
+			var _v1 = _v0.b;
+			var b = _v1.a;
+			var _v2 = _Utils_Tuple2(
+				$elm$core$String$toInt(a),
+				$elm$core$String$toInt(b));
+			if ((_v2.a.$ === 1) && (_v2.b.$ === 1)) {
+				var _v3 = _v2.a;
+				var _v4 = _v2.b;
+				return $elm$core$Maybe$Just(
+					$author$project$Main$Partner(
+						_Utils_Tuple2(a, b)));
+			} else {
+				return $elm$core$Maybe$Nothing;
+			}
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Main$Spin = function (a) {
+	return {$: 0, a: a};
+};
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $author$project$Main$parseSpin = function (s) {
+	return A2(
+		$elm$core$Maybe$map,
+		$author$project$Main$Spin,
+		$elm$core$String$toInt(
+			A2($elm$core$String$dropLeft, 1, s)));
+};
+var $author$project$Main$parseMove = function (s) {
+	return A2(
+		$author$project$Main$orElseWith,
+		function (_v2) {
+			return $elm$core$Maybe$Nothing;
+		},
+		A2(
+			$author$project$Main$orElseWith,
+			function (_v1) {
+				return $author$project$Main$parsePartner(s);
+			},
+			A2(
+				$author$project$Main$orElseWith,
+				function (_v0) {
+					return $author$project$Main$parseExchange(s);
+				},
+				$author$project$Main$parseSpin(s))));
+};
+var $author$project$Main$initModel = function (wholeDance) {
+	var moves = A2(
+		$elm$core$List$filterMap,
+		$author$project$Main$parseMove,
+		A2($elm$core$String$split, ',', $author$project$Main$input));
+	return {X: _List_Nil, O: moves, v: 0, L: '', F: false, M: $elm$core$Maybe$Nothing, ae: '', f: $author$project$Main$initialOrder, q: true, n: '', N: moves, s: _List_Nil, z: $author$project$Main$defaultTickInterval, u: wholeDance};
+};
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$Main$init = function (_v0) {
+	return _Utils_Tuple2(
+		$author$project$Main$initModel(false),
+		$elm$core$Platform$Cmd$none);
+};
+var $author$project$Main$Tick = 0;
+var $elm$time$Time$Every = F2(
+	function (a, b) {
+		return {$: 0, a: a, b: b};
+	});
+var $elm$time$Time$State = F2(
+	function (taggers, processes) {
+		return {al: processes, as: taggers};
+	});
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
+var $elm$time$Time$init = $elm$core$Task$succeed(
+	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
+var $elm$core$Basics$compare = _Utils_compare;
+var $elm$core$Dict$get = F2(
+	function (targetKey, dict) {
+		get:
+		while (true) {
+			if (dict.$ === -2) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
+				switch (_v1) {
+					case 0:
+						var $temp$targetKey = targetKey,
+							$temp$dict = left;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+					case 1:
+						return $elm$core$Maybe$Just(value);
+					default:
+						var $temp$targetKey = targetKey,
+							$temp$dict = right;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+				}
+			}
+		}
+	});
+var $elm$core$Dict$Black = 1;
+var $elm$core$Dict$RBNode_elm_builtin = F5(
+	function (a, b, c, d, e) {
+		return {$: -1, a: a, b: b, c: c, d: d, e: e};
+	});
+var $elm$core$Dict$Red = 0;
+var $elm$core$Dict$balance = F5(
+	function (color, key, value, left, right) {
+		if ((right.$ === -1) && (!right.a)) {
+			var _v1 = right.a;
+			var rK = right.b;
+			var rV = right.c;
+			var rLeft = right.d;
+			var rRight = right.e;
+			if ((left.$ === -1) && (!left.a)) {
+				var _v3 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var lLeft = left.d;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					0,
+					key,
+					value,
+					A5($elm$core$Dict$RBNode_elm_builtin, 1, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, 1, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					color,
+					rK,
+					rV,
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, key, value, left, rLeft),
+					rRight);
+			}
+		} else {
+			if ((((left.$ === -1) && (!left.a)) && (left.d.$ === -1)) && (!left.d.a)) {
+				var _v5 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var _v6 = left.d;
+				var _v7 = _v6.a;
+				var llK = _v6.b;
+				var llV = _v6.c;
+				var llLeft = _v6.d;
+				var llRight = _v6.e;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					0,
+					lK,
+					lV,
+					A5($elm$core$Dict$RBNode_elm_builtin, 1, llK, llV, llLeft, llRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, 1, key, value, lRight, right));
+			} else {
+				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
+			}
+		}
+	});
+var $elm$core$Dict$insertHelp = F3(
+	function (key, value, dict) {
+		if (dict.$ === -2) {
+			return A5($elm$core$Dict$RBNode_elm_builtin, 0, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
+		} else {
+			var nColor = dict.a;
+			var nKey = dict.b;
+			var nValue = dict.c;
+			var nLeft = dict.d;
+			var nRight = dict.e;
+			var _v1 = A2($elm$core$Basics$compare, key, nKey);
+			switch (_v1) {
+				case 0:
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						A3($elm$core$Dict$insertHelp, key, value, nLeft),
+						nRight);
+				case 1:
+					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
+				default:
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						nLeft,
+						A3($elm$core$Dict$insertHelp, key, value, nRight));
+			}
+		}
+	});
+var $elm$core$Dict$insert = F3(
+	function (key, value, dict) {
+		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
+		if ((_v0.$ === -1) && (!_v0.a)) {
+			var _v1 = _v0.a;
+			var k = _v0.b;
+			var v = _v0.c;
+			var l = _v0.d;
+			var r = _v0.e;
+			return A5($elm$core$Dict$RBNode_elm_builtin, 1, k, v, l, r);
+		} else {
+			var x = _v0;
+			return x;
+		}
+	});
+var $elm$time$Time$addMySub = F2(
+	function (_v0, state) {
+		var interval = _v0.a;
+		var tagger = _v0.b;
+		var _v1 = A2($elm$core$Dict$get, interval, state);
+		if (_v1.$ === 1) {
+			return A3(
+				$elm$core$Dict$insert,
+				interval,
+				_List_fromArray(
+					[tagger]),
+				state);
+		} else {
+			var taggers = _v1.a;
+			return A3(
+				$elm$core$Dict$insert,
+				interval,
+				A2($elm$core$List$cons, tagger, taggers),
+				state);
+		}
+	});
+var $elm$core$Process$kill = _Scheduler_kill;
+var $elm$core$Dict$foldl = F3(
+	function (func, acc, dict) {
+		foldl:
+		while (true) {
+			if (dict.$ === -2) {
+				return acc;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var $temp$func = func,
+					$temp$acc = A3(
+					func,
+					key,
+					value,
+					A3($elm$core$Dict$foldl, func, acc, left)),
+					$temp$dict = right;
+				func = $temp$func;
+				acc = $temp$acc;
+				dict = $temp$dict;
+				continue foldl;
+			}
+		}
+	});
+var $elm$core$Dict$merge = F6(
+	function (leftStep, bothStep, rightStep, leftDict, rightDict, initialResult) {
+		var stepState = F3(
+			function (rKey, rValue, _v0) {
+				stepState:
+				while (true) {
+					var list = _v0.a;
+					var result = _v0.b;
+					if (!list.b) {
+						return _Utils_Tuple2(
+							list,
+							A3(rightStep, rKey, rValue, result));
+					} else {
+						var _v2 = list.a;
+						var lKey = _v2.a;
+						var lValue = _v2.b;
+						var rest = list.b;
+						if (_Utils_cmp(lKey, rKey) < 0) {
+							var $temp$rKey = rKey,
+								$temp$rValue = rValue,
+								$temp$_v0 = _Utils_Tuple2(
+								rest,
+								A3(leftStep, lKey, lValue, result));
+							rKey = $temp$rKey;
+							rValue = $temp$rValue;
+							_v0 = $temp$_v0;
+							continue stepState;
+						} else {
+							if (_Utils_cmp(lKey, rKey) > 0) {
+								return _Utils_Tuple2(
+									list,
+									A3(rightStep, rKey, rValue, result));
+							} else {
+								return _Utils_Tuple2(
+									rest,
+									A4(bothStep, lKey, lValue, rValue, result));
+							}
+						}
+					}
+				}
+			});
+		var _v3 = A3(
+			$elm$core$Dict$foldl,
+			stepState,
+			_Utils_Tuple2(
+				$elm$core$Dict$toList(leftDict),
+				initialResult),
+			rightDict);
+		var leftovers = _v3.a;
+		var intermediateResult = _v3.b;
+		return A3(
+			$elm$core$List$foldl,
+			F2(
+				function (_v4, result) {
+					var k = _v4.a;
+					var v = _v4.b;
+					return A3(leftStep, k, v, result);
+				}),
+			intermediateResult,
+			leftovers);
+	});
+var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
+var $elm$time$Time$Name = function (a) {
+	return {$: 0, a: a};
+};
+var $elm$time$Time$Offset = function (a) {
+	return {$: 1, a: a};
+};
+var $elm$time$Time$Zone = F2(
+	function (a, b) {
+		return {$: 0, a: a, b: b};
+	});
+var $elm$time$Time$customZone = $elm$time$Time$Zone;
+var $elm$time$Time$setInterval = _Time_setInterval;
+var $elm$core$Process$spawn = _Scheduler_spawn;
+var $elm$time$Time$spawnHelp = F3(
+	function (router, intervals, processes) {
+		if (!intervals.b) {
+			return $elm$core$Task$succeed(processes);
+		} else {
+			var interval = intervals.a;
+			var rest = intervals.b;
+			var spawnTimer = $elm$core$Process$spawn(
+				A2(
+					$elm$time$Time$setInterval,
+					interval,
+					A2($elm$core$Platform$sendToSelf, router, interval)));
+			var spawnRest = function (id) {
+				return A3(
+					$elm$time$Time$spawnHelp,
+					router,
+					rest,
+					A3($elm$core$Dict$insert, interval, id, processes));
+			};
+			return A2($elm$core$Task$andThen, spawnRest, spawnTimer);
+		}
+	});
+var $elm$time$Time$onEffects = F3(
+	function (router, subs, _v0) {
+		var processes = _v0.al;
+		var rightStep = F3(
+			function (_v6, id, _v7) {
+				var spawns = _v7.a;
+				var existing = _v7.b;
+				var kills = _v7.c;
+				return _Utils_Tuple3(
+					spawns,
+					existing,
+					A2(
+						$elm$core$Task$andThen,
+						function (_v5) {
+							return kills;
+						},
+						$elm$core$Process$kill(id)));
+			});
+		var newTaggers = A3($elm$core$List$foldl, $elm$time$Time$addMySub, $elm$core$Dict$empty, subs);
+		var leftStep = F3(
+			function (interval, taggers, _v4) {
+				var spawns = _v4.a;
+				var existing = _v4.b;
+				var kills = _v4.c;
+				return _Utils_Tuple3(
+					A2($elm$core$List$cons, interval, spawns),
+					existing,
+					kills);
+			});
+		var bothStep = F4(
+			function (interval, taggers, id, _v3) {
+				var spawns = _v3.a;
+				var existing = _v3.b;
+				var kills = _v3.c;
+				return _Utils_Tuple3(
+					spawns,
+					A3($elm$core$Dict$insert, interval, id, existing),
+					kills);
+			});
+		var _v1 = A6(
+			$elm$core$Dict$merge,
+			leftStep,
+			bothStep,
+			rightStep,
+			newTaggers,
+			processes,
+			_Utils_Tuple3(
+				_List_Nil,
+				$elm$core$Dict$empty,
+				$elm$core$Task$succeed(0)));
+		var spawnList = _v1.a;
+		var existingDict = _v1.b;
+		var killTask = _v1.c;
+		return A2(
+			$elm$core$Task$andThen,
+			function (newProcesses) {
+				return $elm$core$Task$succeed(
+					A2($elm$time$Time$State, newTaggers, newProcesses));
+			},
+			A2(
+				$elm$core$Task$andThen,
+				function (_v2) {
+					return A3($elm$time$Time$spawnHelp, router, spawnList, existingDict);
+				},
+				killTask));
+	});
+var $elm$time$Time$Posix = $elm$core$Basics$identity;
+var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
+var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
+var $elm$time$Time$onSelfMsg = F3(
+	function (router, interval, state) {
+		var _v0 = A2($elm$core$Dict$get, interval, state.as);
+		if (_v0.$ === 1) {
+			return $elm$core$Task$succeed(state);
+		} else {
+			var taggers = _v0.a;
+			var tellTaggers = function (time) {
+				return $elm$core$Task$sequence(
+					A2(
+						$elm$core$List$map,
+						function (tagger) {
+							return A2(
+								$elm$core$Platform$sendToApp,
+								router,
+								tagger(time));
+						},
+						taggers));
+			};
+			return A2(
+				$elm$core$Task$andThen,
+				function (_v1) {
+					return $elm$core$Task$succeed(state);
+				},
+				A2($elm$core$Task$andThen, tellTaggers, $elm$time$Time$now));
+		}
+	});
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $elm$time$Time$subMap = F2(
+	function (f, _v0) {
+		var interval = _v0.a;
+		var tagger = _v0.b;
+		return A2(
+			$elm$time$Time$Every,
+			interval,
+			A2($elm$core$Basics$composeL, f, tagger));
+	});
+_Platform_effectManagers['Time'] = _Platform_createManager($elm$time$Time$init, $elm$time$Time$onEffects, $elm$time$Time$onSelfMsg, 0, $elm$time$Time$subMap);
+var $elm$time$Time$subscription = _Platform_leaf('Time');
+var $elm$time$Time$every = F2(
+	function (interval, tagger) {
+		return $elm$time$Time$subscription(
+			A2($elm$time$Time$Every, interval, tagger));
+	});
+var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
+var $author$project$Main$subscriptions = function (model) {
+	var tickSub = (model.q || model.F) ? $elm$core$Platform$Sub$none : A2(
+		$elm$time$Time$every,
+		model.z,
+		function (_v0) {
+			return 0;
+		});
+	return tickSub;
+};
+var $author$project$Main$updateReset = function (model) {
+	return $author$project$Main$initModel(model.u);
+};
+var $elm$core$List$drop = F2(
+	function (n, list) {
+		drop:
+		while (true) {
+			if (n <= 0) {
+				return list;
+			} else {
+				if (!list.b) {
+					return list;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs;
+					n = $temp$n;
+					list = $temp$list;
+					continue drop;
+				}
+			}
+		}
+	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$String$replace = F3(
+	function (before, after, string) {
+		return A2(
+			$elm$core$String$join,
+			after,
+			A2($elm$core$String$split, before, string));
+	});
+var $author$project$Main$partner = F3(
+	function (p1, p2, s) {
+		return A3(
+			$elm$core$String$replace,
+			'_',
+			p2,
+			A3(
+				$elm$core$String$replace,
+				p2,
+				p1,
+				A3($elm$core$String$replace, p1, '_', s)));
+	});
+var $author$project$Main$exchange = F3(
+	function (ix1, ix2, s) {
+		var p2 = A3($elm$core$String$slice, ix2, ix2 + 1, s);
+		var p1 = A3($elm$core$String$slice, ix1, ix1 + 1, s);
+		return A3($author$project$Main$partner, p1, p2, s);
+	});
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $elm$core$String$dropRight = F2(
+	function (n, string) {
+		return (n < 1) ? string : A3($elm$core$String$slice, 0, -n, string);
+	});
+var $elm$core$String$right = F2(
+	function (n, string) {
+		return (n < 1) ? '' : A3(
+			$elm$core$String$slice,
+			-n,
+			$elm$core$String$length(string),
+			string);
+	});
+var $author$project$Main$spin = F2(
+	function (n, s) {
+		var right = A2($elm$core$String$right, n, s);
+		var left = A2($elm$core$String$dropRight, n, s);
+		return _Utils_ap(right, left);
+	});
+var $author$project$Main$makeMove = F2(
+	function (move, order) {
+		switch (move.$) {
+			case 0:
+				var n = move.a;
+				return A2($author$project$Main$spin, n, order);
+			case 1:
+				var _v1 = move.a;
+				var ix1 = _v1.a;
+				var ix2 = _v1.b;
+				return A3($author$project$Main$exchange, ix1, ix2, order);
+			default:
+				var _v2 = move.a;
+				var p1 = _v2.a;
+				var p2 = _v2.b;
+				return A3($author$project$Main$partner, p1, p2, order);
+		}
+	});
+var $author$project$Main$makeDance = F2(
+	function (moves, order) {
+		return A3($elm$core$List$foldl, $author$project$Main$makeMove, order, moves);
+	});
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
+var $elm$core$Basics$modBy = _Basics_modBy;
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Main$updateStepDance = function (model) {
+	if (A2($elm$core$List$member, model.f, model.s)) {
+		var len = $elm$core$List$length(model.s);
+		var ix = (len - A2($elm$core$Basics$modBy, len, 1000000000)) - 1;
+		var order = A2(
+			$elm$core$Maybe$withDefault,
+			model.f,
+			$elm$core$List$head(
+				A2($elm$core$List$drop, ix, model.s)));
+		var prevOrder = A2(
+			$elm$core$Maybe$withDefault,
+			model.f,
+			$elm$core$List$head(
+				A2($elm$core$List$drop, ix - 1, model.s)));
+		return _Utils_update(
+			model,
+			{v: 1000000000, L: 'LOOP', f: order, n: prevOrder});
+	} else {
+		var seen = A2($elm$core$List$cons, model.f, model.s);
+		var prevOrder = model.f;
+		var nextOrder = A2($author$project$Main$makeDance, model.O, prevOrder);
+		return _Utils_update(
+			model,
+			{v: model.v + 1, f: nextOrder, n: prevOrder, s: seen});
+	}
+};
+var $author$project$Main$updateStepMove = function (model) {
+	var _v0 = model.N;
+	if (!_v0.b) {
+		return _Utils_update(
+			model,
+			{L: '', F: true, q: true});
+	} else {
+		var move = _v0.a;
+		var rest = _v0.b;
+		var prevOrder = model.f;
+		var nextOrder = A2($author$project$Main$makeMove, move, prevOrder);
+		return _Utils_update(
+			model,
+			{
+				M: $elm$core$Maybe$Just(move),
+				f: nextOrder,
+				n: prevOrder,
+				N: rest
+			});
+	}
+};
+var $author$project$Main$updateStep = function (model) {
+	return model.u ? $author$project$Main$updateStepDance(model) : $author$project$Main$updateStepMove(model);
+};
+var $elm$core$Basics$not = _Basics_not;
+var $author$project$Main$updateTogglePlay = function (model) {
+	if (model.F) {
+		var m = $author$project$Main$initModel(model.u);
+		return _Utils_update(
+			m,
+			{q: false});
+	} else {
+		return _Utils_update(
+			model,
+			{q: !model.q});
+	}
+};
+var $author$project$Main$updateToggleWholeDance = function (model) {
+	var wholeDance = !model.u;
+	return $author$project$Main$initModel(wholeDance);
+};
+var $author$project$Main$update = F2(
+	function (msg, model) {
+		switch (msg) {
+			case 6:
+				return _Utils_Tuple2(
+					$author$project$Main$updateReset(model),
+					$elm$core$Platform$Cmd$none);
+			case 0:
+				return _Utils_Tuple2(
+					$author$project$Main$updateStep(model),
+					$elm$core$Platform$Cmd$none);
+			case 1:
+				return _Utils_Tuple2(
+					$author$project$Main$updateStep(model),
+					$elm$core$Platform$Cmd$none);
+			case 2:
+				return _Utils_Tuple2(
+					$author$project$Main$updateTogglePlay(model),
+					$elm$core$Platform$Cmd$none);
+			case 3:
+				return _Utils_Tuple2(
+					$author$project$Main$updateToggleWholeDance(model),
+					$elm$core$Platform$Cmd$none);
+			case 4:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{z: model.z / 2}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{z: model.z * 2}),
+					$elm$core$Platform$Cmd$none);
+		}
+	});
+var $author$project$Main$Faster = 4;
+var $author$project$Main$Reset = 6;
+var $author$project$Main$Slower = 5;
+var $author$project$Main$Step = 1;
+var $author$project$Main$TogglePlay = 2;
+var $author$project$Main$ToggleWholeDance = 3;
+var $elm$html$Html$a = _VirtualDom_node('a');
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$align = $elm$html$Html$Attributes$stringProperty('align');
+var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
+var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$html$Html$Attributes$href = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'href',
+		_VirtualDom_noJavaScriptUri(url));
+};
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$label = _VirtualDom_node('label');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 0, a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $elm$html$Html$table = _VirtualDom_node('table');
+var $elm$html$Html$td = _VirtualDom_node('td');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$core$String$fromFloat = _String_fromNumber;
+var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
+var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
+var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
+var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
+var $author$project$Main$toBoxElement = F2(
+	function (boxSize, _v0) {
+		var xInt = _v0.a;
+		var yInt = _v0.b;
+		var yStr = $elm$core$String$fromFloat(yInt * boxSize);
+		var xStr = $elm$core$String$fromFloat(xInt * boxSize);
+		var widthStr = $elm$core$String$fromFloat(boxSize);
+		var heightStr = $elm$core$String$fromFloat(boxSize);
+		return A2(
+			$elm$svg$Svg$rect,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x(xStr),
+					$elm$svg$Svg$Attributes$y(yStr),
+					$elm$svg$Svg$Attributes$width(widthStr),
+					$elm$svg$Svg$Attributes$height(heightStr),
+					$elm$svg$Svg$Attributes$fill('none'),
+					$elm$svg$Svg$Attributes$stroke('currentcolor'),
+					$elm$svg$Svg$Attributes$strokeWidth('1px')
+				]),
+			_List_Nil);
+	});
+var $author$project$Main$createBoxes = F2(
+	function (boxSize, y) {
+		return A2(
+			$elm$core$List$map,
+			function (x) {
+				return A2(
+					$author$project$Main$toBoxElement,
+					boxSize,
+					_Utils_Tuple2(x, y));
+			},
+			A2($elm$core$List$range, 0, 15));
+	});
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
+var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
+var $author$project$Main$toLetterElement = F3(
+	function (boxSize, ch, _v0) {
+		var xInt = _v0.a;
+		var yInt = _v0.b;
+		var yStr = $elm$core$String$fromFloat((yInt * boxSize) - 6);
+		var xStr = $elm$core$String$fromFloat((xInt * boxSize) + 6);
+		return A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x(xStr),
+					$elm$svg$Svg$Attributes$y(yStr)
+				]),
+			_List_fromArray(
+				[
+					$elm$svg$Svg$text(
+					$elm$core$String$fromChar(ch))
+				]));
+	});
+var $elm$core$String$foldr = _String_foldr;
+var $elm$core$String$toList = function (string) {
+	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
+};
+var $author$project$Main$createLetterElements = F3(
+	function (boxSize, y, order) {
+		return A2(
+			$elm$core$List$indexedMap,
+			F2(
+				function (x, ch) {
+					return A3(
+						$author$project$Main$toLetterElement,
+						boxSize,
+						ch,
+						_Utils_Tuple2(x, y));
+				}),
+			$elm$core$String$toList(order));
+	});
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $author$project$Main$indexOf = F2(
+	function (p, order) {
+		return A2(
+			$elm$core$Maybe$withDefault,
+			0,
+			$elm$core$List$head(
+				A2($elm$core$String$indexes, p, order)));
+	});
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$Main$findConnections = F2(
+	function (prevOrder, order) {
+		if ($elm$core$String$isEmpty(prevOrder)) {
+			return _List_Nil;
+		} else {
+			var programList = A2(
+				$elm$core$List$map,
+				$elm$core$String$fromChar,
+				$elm$core$String$toList($author$project$Main$initialOrder));
+			return A2(
+				$elm$core$List$filter,
+				function (_v0) {
+					var ix1 = _v0.a;
+					var ix2 = _v0.b;
+					return !_Utils_eq(ix1, ix2);
+				},
+				A2(
+					$elm$core$List$map,
+					function (p) {
+						return _Utils_Tuple2(
+							A2($author$project$Main$indexOf, p, prevOrder),
+							A2($author$project$Main$indexOf, p, order));
+					},
+					programList));
+		}
+	});
+var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
+var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
+var $elm$svg$Svg$Attributes$markerEnd = _VirtualDom_attribute('marker-end');
+var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
+var $author$project$Main$toConnexionElement = F2(
+	function (boxSize, _v0) {
+		var xIntSrc = _v0.a;
+		var xIntTgt = _v0.b;
+		var yTgt = 5 * boxSize;
+		var ySrc = 1 * boxSize;
+		var xTgt = (0.5 + xIntTgt) * boxSize;
+		var xSrc = (0.5 + xIntSrc) * boxSize;
+		var toStr = function (_v1) {
+			var x = _v1.a;
+			var y = _v1.b;
+			return $elm$core$String$fromFloat(x) + (' ' + $elm$core$String$fromFloat(y));
+		};
+		var pt4 = _Utils_Tuple2(xTgt, yTgt);
+		var pt4s = toStr(pt4);
+		var pt3 = _Utils_Tuple2(xTgt, yTgt - (2 * boxSize));
+		var pt3s = toStr(pt3);
+		var pt2 = _Utils_Tuple2(xSrc, ySrc + (2 * boxSize));
+		var pt2s = toStr(pt2);
+		var pt1 = _Utils_Tuple2(xSrc, ySrc);
+		var pt1s = toStr(pt1);
+		var dval = 'M' + (pt1s + (' C ' + (pt2s + (', ' + (pt3s + (', ' + pt4s))))));
+		return A2(
+			$elm$svg$Svg$path,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$stroke('currentcolor'),
+					$elm$svg$Svg$Attributes$strokeWidth('1px'),
+					$elm$svg$Svg$Attributes$fill('None'),
+					$elm$svg$Svg$Attributes$markerEnd('url(#arrowhead)'),
+					$elm$svg$Svg$Attributes$d(dval)
+				]),
+			_List_Nil);
+	});
+var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
+var $author$project$Main$toSvg = function (model) {
+	var connections = A2($author$project$Main$findConnections, model.n, model.f);
+	var boxSize = 24;
+	var connectionElements = A2(
+		$elm$core$List$map,
+		$author$project$Main$toConnexionElement(boxSize),
+		connections);
+	var letterElements = function () {
+		if ($elm$core$String$isEmpty(model.n)) {
+			return A3($author$project$Main$createLetterElements, boxSize, 1, model.f);
+		} else {
+			var topRowLetterElements = A3($author$project$Main$createLetterElements, boxSize, 1, model.n);
+			var botRowLetterElements = A3($author$project$Main$createLetterElements, boxSize, 6, model.f);
+			return A2($elm$core$List$append, topRowLetterElements, botRowLetterElements);
+		}
+	}();
+	var boxElements = $elm$core$String$isEmpty(model.n) ? A2($author$project$Main$createBoxes, boxSize, 0) : A2(
+		$elm$core$List$append,
+		A2($author$project$Main$createBoxes, boxSize, 0),
+		A2($author$project$Main$createBoxes, boxSize, 5));
+	var elements = $elm$core$List$concat(
+		_List_fromArray(
+			[boxElements, connectionElements, letterElements]));
+	return A2(
+		$elm$svg$Svg$svg,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$viewBox('-5 -15 395 170'),
+				$elm$svg$Svg$Attributes$width('400'),
+				$elm$svg$Svg$Attributes$height('175'),
+				$elm$svg$Svg$Attributes$style('font-family:Source Code Pro,monospace')
+			]),
+		elements);
+};
+var $elm$html$Html$tr = _VirtualDom_node('tr');
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $author$project$Main$unparse = function (move) {
+	switch (move.$) {
+		case 0:
+			var n = move.a;
+			return 's' + $elm$core$String$fromInt(n);
+		case 1:
+			var _v1 = move.a;
+			var ix1 = _v1.a;
+			var ix2 = _v1.b;
+			return 'x' + ($elm$core$String$fromInt(ix1) + ('/' + $elm$core$String$fromInt(ix2)));
+		default:
+			var _v2 = move.a;
+			var p1 = _v2.a;
+			var p2 = _v2.b;
+			return 'x' + (p1 + ('/' + p2));
+	}
+};
+var $author$project$Main$view = function (model) {
+	var svgElement = $author$project$Main$toSvg(model);
+	var moveStr = function () {
+		if (model.u) {
+			return (model.v > 0) ? $elm$core$String$fromInt(model.v) : '';
+		} else {
+			var _v0 = model.M;
+			if (!_v0.$) {
+				var move = _v0.a;
+				return $author$project$Main$unparse(move);
+			} else {
+				return '';
+			}
+		}
+	}();
+	var dbgStr = '';
+	return A2(
+		$elm$html$Html$table,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$align('center'),
+				A2($elm$html$Html$Attributes$style, 'width', '100%'),
+				A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '32px'),
+								A2($elm$html$Html$Attributes$style, 'padding', '20px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Advent of Code 2017')
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Day 16: Permutation Promenade')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'padding-bottom', '10px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$a,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$href('https://adventofcode.com/2017/day/16')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('https://adventofcode.com/2017/day/16')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'padding', '10px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick(6)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Reset')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick(5)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Slower')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '100px'),
+										$elm$html$Html$Events$onClick(2)
+									]),
+								_List_fromArray(
+									[
+										model.q ? $elm$html$Html$text('Dance') : $elm$html$Html$text('Pause')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick(4)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Faster')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '80px'),
+										$elm$html$Html$Events$onClick(1)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Step')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('checkbox'),
+										$elm$html$Html$Events$onClick(3),
+										$elm$html$Html$Attributes$checked(model.u)
+									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(' Whole dance')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'Source Code Pro, monospace'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '20px'),
+								A2($elm$html$Html$Attributes$style, 'padding', '10px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[svgElement]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$align('center'),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'Source Code Pro, monospace'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '16px'),
+								A2($elm$html$Html$Attributes$style, 'padding', '0px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(moveStr)
+									]))
+							]))
+					]))
+			]));
+};
+var $author$project$Main$main = $elm$browser$Browser$element(
+	{aG: $author$project$Main$init, aM: $author$project$Main$subscriptions, aO: $author$project$Main$update, aP: $author$project$Main$view});
+_Platform_export({'Main':{'init':$author$project$Main$main(
+	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
