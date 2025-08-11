@@ -1,4 +1,4 @@
-// Advent of Code 2015. Day 22
+// Advent of Code 2015. Day 22: Wizard Simulator 20XX. 
 // dotnet fsi aoc22.fsx
 
 open System

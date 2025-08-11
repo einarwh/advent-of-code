@@ -23,7 +23,7 @@ let exchange i j lst =
     let (a, b) = List.item i lst, List.item j lst
     partner a b lst 
 
-let splitdash (s : string) = 
+let splitslash (s : string) = 
     match s.Split([|'/'|], StringSplitOptions.None) with 
     | [|s1; s2|] -> (s1, s2)
     | _ -> failwith "?"
@@ -32,10 +32,10 @@ let readop (s : string) : char list -> char list =
     match s.[0], s.Substring(1) with 
     | 's', a -> spin (int a)
     | 'x', b -> 
-        let (s1, s2) = splitdash b
+        let (s1, s2) = splitslash b
         exchange (int s1) (int s2)
     | 'p', c -> 
-        let (s1, s2) = splitdash c
+        let (s1, s2) = splitslash c
         partner s1.[0] s2.[0]
     | _ -> failwith "?"
 

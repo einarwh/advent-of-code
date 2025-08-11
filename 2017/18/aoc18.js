@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.X.L === region.ac.L)
+	if (region.X.K === region.ac.K)
 	{
-		return 'on line ' + region.X.L;
+		return 'on line ' + region.X.K;
 	}
-	return 'on lines ' + region.X.L + ' through ' + region.ac.L;
+	return 'on lines ' + region.X.K + ' through ' + region.ac.K;
 }
 
 
@@ -2719,7 +2719,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		u: func(record.u),
+		v: func(record.v),
 		Y: record.Y,
 		V: record.V
 	}
@@ -2989,7 +2989,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.u;
+		var message = !tag ? value : tag < 3 ? value.a : value.v;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.Y;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -5366,7 +5366,7 @@ var $author$project$Main$initRegisters = F2(
 var $author$project$Main$initProgram = F2(
 	function (pid, regNames) {
 		var registers = A2($author$project$Main$initRegisters, pid, regNames);
-		return {m: $owanturist$elm_queue$Queue$empty, o: $owanturist$elm_queue$Queue$empty, U: pid, a: 0, b: registers, B: 0, N: $elm$core$Maybe$Nothing, j: 0};
+		return {q: $owanturist$elm_queue$Queue$empty, n: $owanturist$elm_queue$Queue$empty, S: pid, a: 0, b: registers, C: 0, N: $elm$core$Maybe$Nothing, h: 0};
 	});
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
@@ -5652,13 +5652,13 @@ var $author$project$Main$initModel = function (duet) {
 	return {
 		ab: '',
 		l: duet,
-		F: false,
-		q: $author$project$Main$instructions,
+		p: false,
+		r: $author$project$Main$instructions,
 		G: true,
-		w: A2($author$project$Main$initProgram, 0, $author$project$Main$registerNames),
-		M: A2($author$project$Main$initProgram, 1, $author$project$Main$registerNames),
-		H: $elm$core$Maybe$Nothing,
-		C: $author$project$Main$defaultTickInterval
+		x: A2($author$project$Main$initProgram, 0, $author$project$Main$registerNames),
+		L: A2($author$project$Main$initProgram, 1, $author$project$Main$registerNames),
+		M: $elm$core$Maybe$Nothing,
+		D: $author$project$Main$defaultTickInterval
 	};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
@@ -5974,9 +5974,9 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (model) {
-	var tickSub = (model.G || model.F) ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = (model.G || model.p) ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.C,
+		model.D,
 		function (_v0) {
 			return 0;
 		});
@@ -5988,16 +5988,16 @@ var $author$project$Main$updateClear = function (model) {
 var $author$project$Main$Running = 1;
 var $owanturist$elm_queue$Queue$isEmpty = $elm$core$Basics$eq($owanturist$elm_queue$Queue$Empty);
 var $author$project$Main$checkState = function (program) {
-	var _v0 = program.j;
+	var _v0 = program.h;
 	switch (_v0) {
 		case 0:
 			return _Utils_update(
 				program,
-				{j: 1});
+				{h: 1});
 		case 2:
-			return $owanturist$elm_queue$Queue$isEmpty(program.m) ? program : _Utils_update(
+			return $owanturist$elm_queue$Queue$isEmpty(program.q) ? program : _Utils_update(
 				program,
-				{j: 1});
+				{h: 1});
 		default:
 			return program;
 	}
@@ -6101,12 +6101,12 @@ var $author$project$Main$executeInstruction = F3(
 				var r = inst.a;
 				var n = A2($author$project$Main$readValue, r, program.b);
 				if (duet) {
-					var sent = program.B + 1;
+					var sent = program.C + 1;
 					var ptr = program.a + 1;
-					var outbox = A2($owanturist$elm_queue$Queue$enqueue, n, program.o);
+					var outbox = A2($owanturist$elm_queue$Queue$enqueue, n, program.n);
 					return _Utils_update(
 						program,
-						{o: outbox, a: ptr, B: sent});
+						{n: outbox, a: ptr, C: sent});
 				} else {
 					return _Utils_update(
 						program,
@@ -6118,7 +6118,7 @@ var $author$project$Main$executeInstruction = F3(
 			case 1:
 				var r = inst.a;
 				if (duet) {
-					var _v1 = $owanturist$elm_queue$Queue$dequeue(program.m);
+					var _v1 = $owanturist$elm_queue$Queue$dequeue(program.q);
 					if (!_v1.$) {
 						var _v2 = _v1.a;
 						var received = _v2.a;
@@ -6126,11 +6126,11 @@ var $author$project$Main$executeInstruction = F3(
 						var registers = A3($author$project$Main$writeValue, r, received, program.b);
 						return _Utils_update(
 							program,
-							{m: inbox, a: program.a + 1, b: registers});
+							{q: inbox, a: program.a + 1, b: registers});
 					} else {
 						return _Utils_update(
 							program,
-							{j: 2});
+							{h: 2});
 					}
 				} else {
 					var n = A2($author$project$Main$readValue, r, program.b);
@@ -6138,7 +6138,7 @@ var $author$project$Main$executeInstruction = F3(
 						program,
 						{a: program.a + 1}) : _Utils_update(
 						program,
-						{j: 3});
+						{h: 3});
 				}
 			case 2:
 				var _v3 = inst.a;
@@ -6247,61 +6247,61 @@ var $author$project$Main$executeNextInstruction = F3(
 		} else {
 			return _Utils_update(
 				program,
-				{j: 3});
+				{h: 3});
 		}
 	});
 var $author$project$Main$transferMessages = function (_v0) {
 	var p0 = _v0.a;
 	var p1 = _v0.b;
 	var _v1 = _Utils_Tuple2(
-		$owanturist$elm_queue$Queue$isEmpty(p0.o),
-		$owanturist$elm_queue$Queue$isEmpty(p1.o));
+		$owanturist$elm_queue$Queue$isEmpty(p0.n),
+		$owanturist$elm_queue$Queue$isEmpty(p1.n));
 	if (_v1.a) {
 		if (_v1.b) {
 			return _Utils_Tuple2(p0, p1);
 		} else {
-			var _v4 = $owanturist$elm_queue$Queue$dequeue(p1.o);
+			var _v4 = $owanturist$elm_queue$Queue$dequeue(p1.n);
 			if (!_v4.$) {
 				var _v5 = _v4.a;
 				var msg = _v5.a;
 				var outbox = _v5.b;
-				var inbox = A2($owanturist$elm_queue$Queue$enqueue, msg, p0.m);
+				var inbox = A2($owanturist$elm_queue$Queue$enqueue, msg, p0.q);
 				return $author$project$Main$transferMessages(
 					_Utils_Tuple2(
 						_Utils_update(
 							p0,
-							{m: inbox}),
+							{q: inbox}),
 						_Utils_update(
 							p1,
-							{o: outbox})));
+							{n: outbox})));
 			} else {
 				return _Utils_Tuple2(p0, p1);
 			}
 		}
 	} else {
-		var _v2 = $owanturist$elm_queue$Queue$dequeue(p0.o);
+		var _v2 = $owanturist$elm_queue$Queue$dequeue(p0.n);
 		if (!_v2.$) {
 			var _v3 = _v2.a;
 			var msg = _v3.a;
 			var outbox = _v3.b;
-			var inbox = A2($owanturist$elm_queue$Queue$enqueue, msg, p1.m);
+			var inbox = A2($owanturist$elm_queue$Queue$enqueue, msg, p1.q);
 			return $author$project$Main$transferMessages(
 				_Utils_Tuple2(
 					_Utils_update(
 						p0,
-						{o: outbox}),
+						{n: outbox}),
 					_Utils_update(
 						p1,
-						{m: inbox})));
+						{q: inbox})));
 		} else {
 			return _Utils_Tuple2(p0, p1);
 		}
 	}
 };
 var $author$project$Main$updateDuetStep = function (model) {
-	var program1 = model.M;
-	var program0 = model.w;
-	var _v0 = _Utils_Tuple2(program0.j, program1.j);
+	var program1 = model.L;
+	var program0 = model.x;
+	var _v0 = _Utils_Tuple2(program0.h, program1.h);
 	_v0$2:
 	while (true) {
 		switch (_v0.a) {
@@ -6312,8 +6312,8 @@ var $author$project$Main$updateDuetStep = function (model) {
 					return _Utils_update(
 						model,
 						{
-							F: true,
-							H: $elm$core$Maybe$Just(program1.B)
+							p: true,
+							M: $elm$core$Maybe$Just(program1.C)
 						});
 				} else {
 					break _v0$2;
@@ -6325,8 +6325,8 @@ var $author$project$Main$updateDuetStep = function (model) {
 					return _Utils_update(
 						model,
 						{
-							F: true,
-							H: $elm$core$Maybe$Just(program1.B)
+							p: true,
+							M: $elm$core$Maybe$Just(program1.C)
 						});
 				} else {
 					break _v0$2;
@@ -6338,12 +6338,12 @@ var $author$project$Main$updateDuetStep = function (model) {
 	var p1 = A3(
 		$author$project$Main$executeNextInstruction,
 		model.l,
-		model.q,
+		model.r,
 		$author$project$Main$checkState(program1));
 	var p0 = A3(
 		$author$project$Main$executeNextInstruction,
 		model.l,
-		model.q,
+		model.r,
 		$author$project$Main$checkState(program0));
 	var _v5 = $author$project$Main$transferMessages(
 		_Utils_Tuple2(p0, p1));
@@ -6351,23 +6351,27 @@ var $author$project$Main$updateDuetStep = function (model) {
 	var p1t = _v5.b;
 	return _Utils_update(
 		model,
-		{w: p0t, M: p1t});
+		{x: p0t, L: p1t});
 };
 var $author$project$Main$updateSoloStep = function (model) {
-	var program = model.w;
-	var _v0 = program.j;
+	var program = model.x;
+	var _v0 = program.h;
 	switch (_v0) {
 		case 3:
 			return _Utils_update(
 				model,
-				{F: true, H: program.N});
+				{p: true, M: program.N});
 		case 2:
 			return model;
 		default:
-			var p = A3($author$project$Main$executeNextInstruction, model.l, model.q, program);
+			var p = A3(
+				$author$project$Main$executeNextInstruction,
+				model.l,
+				model.r,
+				$author$project$Main$checkState(program));
 			return _Utils_update(
 				model,
-				{w: p});
+				{x: p});
 	}
 };
 var $author$project$Main$updateStep = function (model) {
@@ -6402,13 +6406,13 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{C: model.C / 2}),
+						{D: model.D / 2}),
 					$elm$core$Platform$Cmd$none);
 			case 5:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{C: model.C * 2}),
+						{D: model.D * 2}),
 					$elm$core$Platform$Cmd$none);
 			case 2:
 				return _Utils_Tuple2(
@@ -6446,15 +6450,8 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 			$elm$json$Json$Encode$bool(bool));
 	});
 var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
 var $elm$html$Html$br = _VirtualDom_node('br');
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$core$List$intersperse = F2(
 	function (sep, xs) {
 		if (!xs.b) {
@@ -6473,15 +6470,6 @@ var $elm$core$List$intersperse = F2(
 			return A2($elm$core$List$cons, hd, spersed);
 		}
 	});
-var $owanturist$elm_queue$Queue$length = function (queue) {
-	if (!queue.$) {
-		return 0;
-	} else {
-		var sizeIn = queue.b;
-		var sizeOut = queue.c;
-		return (sizeIn + sizeOut) + 1;
-	}
-};
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
 		if (!maybe.$) {
@@ -6549,11 +6537,11 @@ var $author$project$Main$unparse = function (inst) {
 			return 'jgz ' + ($author$project$Main$unparseValue(v) + (' ' + $author$project$Main$unparseValue(w)));
 	}
 };
-var $author$project$Main$programTable = F3(
-	function (duet, instArr, program) {
+var $author$project$Main$programTable = F4(
+	function (finished, duet, instArr, program) {
 		var stateStr = function () {
-			var _v0 = program.j;
-			switch (_v0) {
+			var _v1 = program.h;
+			switch (_v1) {
 				case 0:
 					return 'ready';
 				case 1:
@@ -6568,7 +6556,7 @@ var $author$project$Main$programTable = F3(
 			$elm$core$List$map,
 			$author$project$Main$toRegisterElement,
 			$elm$core$Dict$toList(program.b));
-		var programStr = 'program ' + $elm$core$String$fromInt(program.U);
+		var programStr = 'program ' + $elm$core$String$fromInt(program.S);
 		var pointerStr = 'ptr: ' + $elm$core$String$fromInt(program.a);
 		var instStr = A2(
 			$elm$core$Maybe$withDefault,
@@ -6577,10 +6565,11 @@ var $author$project$Main$programTable = F3(
 				$elm$core$Maybe$map,
 				$author$project$Main$unparse,
 				A2($elm$core$Array$get, program.a, instArr)));
+		var highlightCell = finished && ((duet && (program.S === 1)) || (!duet));
 		var brElement = A2($elm$html$Html$br, _List_Nil, _List_Nil);
 		var cellElements = function () {
 			if (duet) {
-				var sentStr = $elm$core$String$fromInt(program.B);
+				var sentStr = $elm$core$String$fromInt(program.C);
 				return _List_fromArray(
 					[
 						$elm$html$Html$text('sent'),
@@ -6607,6 +6596,38 @@ var $author$project$Main$programTable = F3(
 				$elm$core$List$cons,
 				$elm$html$Html$text('registers'),
 				regElements));
+		var basicCellStyling = _List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'padding', '4px 10px'),
+				A2($elm$html$Html$Attributes$style, 'border', 'solid')
+			]);
+		var finalCellStyling = highlightCell ? A2(
+			$elm$core$List$cons,
+			$elm$html$Html$Attributes$class('mark-highlight adaptive'),
+			basicCellStyling) : basicCellStyling;
+		var headerCellStyling = basicCellStyling;
+		var stateCellStyling = function () {
+			var _v0 = program.h;
+			switch (_v0) {
+				case 1:
+					return A2(
+						$elm$core$List$cons,
+						$elm$html$Html$Attributes$class('mark-ok adaptive'),
+						basicCellStyling);
+				case 2:
+					return A2(
+						$elm$core$List$cons,
+						$elm$html$Html$Attributes$class('mark-uncertain adaptive'),
+						basicCellStyling);
+				case 3:
+					return A2(
+						$elm$core$List$cons,
+						$elm$html$Html$Attributes$class('mark-err adaptive'),
+						basicCellStyling);
+				default:
+					return basicCellStyling;
+			}
+		}();
 		var rows = _List_fromArray(
 			[
 				A2(
@@ -6616,11 +6637,7 @@ var $author$project$Main$programTable = F3(
 					[
 						A2(
 						$elm$html$Html$td,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'padding', '4px 10px'),
-								A2($elm$html$Html$Attributes$style, 'border', 'solid')
-							]),
+						headerCellStyling,
 						_List_fromArray(
 							[
 								$elm$html$Html$text(programStr)
@@ -6633,11 +6650,7 @@ var $author$project$Main$programTable = F3(
 					[
 						A2(
 						$elm$html$Html$td,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'padding', '4px 10px'),
-								A2($elm$html$Html$Attributes$style, 'border', 'solid')
-							]),
+						stateCellStyling,
 						_List_fromArray(
 							[
 								$elm$html$Html$text(stateStr)
@@ -6650,11 +6663,7 @@ var $author$project$Main$programTable = F3(
 					[
 						A2(
 						$elm$html$Html$td,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'padding', '4px 10px'),
-								A2($elm$html$Html$Attributes$style, 'border', 'solid')
-							]),
+						basicCellStyling,
 						_List_fromArray(
 							[
 								$elm$html$Html$text(pointerStr)
@@ -6667,11 +6676,7 @@ var $author$project$Main$programTable = F3(
 					[
 						A2(
 						$elm$html$Html$td,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'padding', '4px 10px'),
-								A2($elm$html$Html$Attributes$style, 'border', 'solid')
-							]),
+						basicCellStyling,
 						_List_fromArray(
 							[
 								$elm$html$Html$text(instStr)
@@ -6682,62 +6687,17 @@ var $author$project$Main$programTable = F3(
 				_List_Nil,
 				_List_fromArray(
 					[
-						A2(
-						$elm$html$Html$td,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'padding', '4px 10px'),
-								A2($elm$html$Html$Attributes$style, 'border', 'solid')
-							]),
-						regCellElements)
+						A2($elm$html$Html$td, basicCellStyling, regCellElements)
 					])),
 				A2(
 				$elm$html$Html$tr,
 				_List_Nil,
 				_List_fromArray(
 					[
-						A2(
-						$elm$html$Html$td,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'padding', '4px 10px'),
-								A2($elm$html$Html$Attributes$style, 'border', 'solid')
-							]),
-						cellElements)
+						A2($elm$html$Html$td, finalCellStyling, cellElements)
 					]))
 			]);
-		var rowElements = function () {
-			if (duet) {
-				var inboxSizeStr = $elm$core$String$fromInt(
-					$owanturist$elm_queue$Queue$length(program.m));
-				var extraRow = A2(
-					$elm$html$Html$tr,
-					_List_Nil,
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$td,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'padding', '4px 10px'),
-									A2($elm$html$Html$Attributes$style, 'border', 'solid')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('inbox'),
-									brElement,
-									$elm$html$Html$text(inboxSizeStr)
-								]))
-						]));
-				return A2(
-					$elm$core$List$append,
-					rows,
-					_List_fromArray(
-						[extraRow]));
-			} else {
-				return rows;
-			}
-		}();
+		var rowElements = rows;
 		return A2(
 			$elm$html$Html$table,
 			_List_fromArray(
@@ -6763,14 +6723,14 @@ var $author$project$Main$duetTable = function (model) {
 						_List_Nil,
 						_List_fromArray(
 							[
-								A3($author$project$Main$programTable, true, model.q, model.w)
+								A4($author$project$Main$programTable, model.p, true, model.r, model.x)
 							])),
 						A2(
 						$elm$html$Html$td,
 						_List_Nil,
 						_List_fromArray(
 							[
-								A3($author$project$Main$programTable, true, model.q, model.M)
+								A4($author$project$Main$programTable, model.p, true, model.r, model.L)
 							]))
 					]))
 			]));
@@ -6791,7 +6751,7 @@ var $author$project$Main$singleTable = function (model) {
 						_List_Nil,
 						_List_fromArray(
 							[
-								A3($author$project$Main$programTable, false, model.q, model.w)
+								A4($author$project$Main$programTable, model.p, false, model.r, model.x)
 							]))
 					]))
 			]));
@@ -6831,21 +6791,12 @@ var $elm$html$Html$Events$onClick = function (msg) {
 };
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$view = function (model) {
-	var resultStr = function () {
-		var _v0 = model.H;
-		if (_v0.$ === 1) {
-			return '?';
-		} else {
-			var res = _v0.a;
-			return $elm$core$String$fromInt(res);
-		}
-	}();
 	var elements = _List_fromArray(
 		[
 			$author$project$Main$contentTable(model)
 		]);
 	var debug = 'Instructions: ' + $elm$core$String$fromInt(
-		$elm$core$Array$length(model.q));
+		$elm$core$Array$length(model.r));
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
@@ -7013,30 +6964,6 @@ var $author$project$Main$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(' Duet')
-									]))
-							]))
-					])),
-				A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$td,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '24px')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(resultStr)
 									]))
 							]))
 					])),

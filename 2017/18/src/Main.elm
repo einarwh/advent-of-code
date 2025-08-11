@@ -352,7 +352,7 @@ updateSoloStep model =
       Waiting -> model 
       _ -> 
         let 
-          p = executeNextInstruction model.duet model.instructions program
+          p = program |> checkState |> executeNextInstruction model.duet model.instructions
         in 
           { model | program0 = p }
 
@@ -380,8 +380,7 @@ transferMessages (p0, p1) =
         Nothing -> 
           (p0, p1) 
 
-checkInbox : Program -> Program 
-checkInbox program = 
+checkState : Program -> Program 
 checkState program = 
   case program.state of 
     Ready -> { program | state = Running } 
@@ -489,8 +488,8 @@ unparse inst =
     Mod (r, v) -> "mod " ++ r ++ " " ++ unparseValue v
     Jgz (v, w) -> "jgz " ++ unparseValue v ++ " " ++ unparseValue w
 
-programTable : Bool -> Array Instruction -> Program -> Html Msg 
-programTable duet instArr program = 
+programTable : Bool -> Bool -> Array Instruction -> Program -> Html Msg 
+programTable finished duet instArr program = 
   let 
     programStr = "program " ++ String.fromInt program.pid
     pointerStr = "ptr: " ++ String.fromInt program.ptr
@@ -516,70 +515,80 @@ programTable duet instArr program =
           soundStr = program.sound |> Maybe.map String.fromInt |> Maybe.withDefault "?"
         in 
           [ Html.text "sound", brElement, Html.text soundStr ]
+    basicCellStyling = 
+      [ Html.Attributes.style "padding" "4px 10px"
+      , Html.Attributes.style "border" "solid" ]
+    highlightCell = finished && ((duet && program.pid == 1) || not duet)
+    headerCellStyling = basicCellStyling
+    stateCellStyling = 
+      case program.state of 
+        Running -> 
+          Html.Attributes.class "mark-ok adaptive" :: basicCellStyling 
+        Waiting -> 
+          Html.Attributes.class "mark-uncertain adaptive" :: basicCellStyling 
+        Terminated -> 
+          Html.Attributes.class "mark-err adaptive" :: basicCellStyling 
+        _ -> 
+          basicCellStyling
+    finalCellStyling = 
+      if highlightCell then 
+        Html.Attributes.class "mark-highlight adaptive" :: basicCellStyling 
+      else 
+        basicCellStyling
     rows = 
       [ Html.tr 
           [ ] 
           [ Html.td 
-            [ Html.Attributes.style "padding" "4px 10px"
-            , Html.Attributes.style "border" "solid" ] 
-            [ Html.text programStr
-            ] 
+            headerCellStyling
+            [ Html.text programStr ] 
           ] 
       , Html.tr 
           [ ] 
           [ Html.td 
-            [ Html.Attributes.style "padding" "4px 10px"
-            , Html.Attributes.style "border" "solid" ] 
-            [ Html.text stateStr
-            ]
+            stateCellStyling
+            [ Html.text stateStr ]
           ] 
       , Html.tr 
           [ ] 
           [ Html.td 
-            [ Html.Attributes.style "padding" "4px 10px"
-            , Html.Attributes.style "border" "solid" ] 
-            [ Html.text pointerStr
-            ]
+            basicCellStyling
+            [ Html.text pointerStr ]
           ] 
       , Html.tr 
           [ ] 
           [ Html.td 
-            [ Html.Attributes.style "padding" "4px 10px"
-            , Html.Attributes.style "border" "solid" ] 
-            [ Html.text instStr
-            ]
+            basicCellStyling
+            [ Html.text instStr ]
           ] 
       , Html.tr 
           [ ] 
           [ Html.td 
-            [ Html.Attributes.style "padding" "4px 10px"
-            , Html.Attributes.style "border" "solid" ] 
+            basicCellStyling
             regCellElements
           ]  
       , Html.tr 
           [ ] 
           [ Html.td 
-            [ Html.Attributes.style "padding" "4px 10px"
-            , Html.Attributes.style "border" "solid" ] 
+            finalCellStyling
             cellElements
           ]
       ]
-    rowElements = 
-      if duet then  
-        let 
-          inboxSizeStr = program.inbox |> Queue.length |> String.fromInt
-          extraRow = 
-            Html.tr 
-              [] 
-              [ Html.td 
-                [ Html.Attributes.style "padding" "4px 10px"
-                , Html.Attributes.style "border" "solid" ] 
-                [ Html.text "inbox", brElement, Html.text inboxSizeStr ]
-            ] 
-        in 
-          List.append rows [ extraRow ] 
-      else 
-        rows         
+    rowElements = rows 
+      -- if duet then  
+      --   let 
+      --     inboxSizeStr = program.inbox |> Queue.length |> String.fromInt
+      --     extraRow = 
+      --       Html.tr 
+      --         [] 
+      --         [ Html.td 
+      --           [ Html.Attributes.style "padding" "4px 10px"
+      --           , Html.Attributes.style "border" "solid" ] 
+      --           [ Html.text "inbox", brElement, Html.text inboxSizeStr ]
+      --       ] 
+      --   in 
+      --     List.append rows [ extraRow ] 
+      -- else 
+      --   rows         
   in 
     Html.table 
       [ Html.Attributes.style "border" "solid"
@@ -592,7 +601,7 @@ singleTable model =
     []
     [ Html.tr 
         [ ] 
-        [ Html.td [] [ programTable False model.instructions model.program0 ] ]
+        [ Html.td [] [ programTable model.finished False model.instructions model.program0 ] ]
     ]
 
 duetTable : Model -> Html Msg 
@@ -601,8 +610,8 @@ duetTable model =
     []
     [ Html.tr 
         [] 
-        [ Html.td [] [ programTable True model.instructions model.program0 ]
-        , Html.td [] [ programTable True model.instructions model.program1] ]
+        [ Html.td [] [ programTable model.finished True model.instructions model.program0 ]
+        , Html.td [] [ programTable model.finished True model.instructions model.program1] ]
     ]
 
 contentTable : Model -> Html Msg 
@@ -614,10 +623,10 @@ view model =
   let
     elements = [ contentTable model ]
     debug = "Instructions: " ++ String.fromInt (Array.length model.instructions)
-    resultStr = 
-      case model.result of 
-        Nothing -> "?"
-        Just res -> String.fromInt res
+    -- resultStr = 
+    --   case model.result of 
+    --     Nothing -> "?"
+    --     Just res -> String.fromInt res
   in 
     Html.table 
       [ Html.Attributes.align "center"
@@ -671,15 +680,15 @@ view model =
                 []
               , Html.label [] [ Html.text " Duet" ]
             ] ]
-      , Html.tr 
-          []
-          [ Html.td 
-              [ Html.Attributes.align "center"
-              , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "24px" ] 
-              [ 
-                Html.div [] [ Html.text resultStr ]
-              ] ]
+      -- , Html.tr 
+      --     []
+      --     [ Html.td 
+      --         [ Html.Attributes.align "center"
+      --         , Html.Attributes.style "font-family" "Courier New"
+      --         , Html.Attributes.style "font-size" "24px" ] 
+      --         [ 
+      --           Html.div [] [ Html.text resultStr ]
+      --         ] ]
       , Html.tr 
           []
           [ Html.td 
