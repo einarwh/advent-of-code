@@ -1,5 +1,7 @@
 module Main exposing (..)
 
+{- Advent of Code 2017. Day 16: Permutation Promenade. -}
+
 import Browser 
 import Html exposing (Html)
 import Html.Attributes

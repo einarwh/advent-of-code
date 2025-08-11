@@ -1,11 +1,14 @@
 module Main exposing (..)
 
+{- Advent of Code 2016. Day 21: Scrambled Letters and Hash. -}
+
 import Browser 
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
 import Html exposing (text)
-import Array exposing (Array)
+import Svg exposing (..)
+import Svg.Attributes exposing (..)
 import Time
 
 defaultTickInterval : Float
@@ -21,6 +24,8 @@ main =
     , subscriptions = subscriptions }
 
 -- MODEL
+
+type alias Pos = (Int, Int)
 
 type PasswordState = Scrambled | PlainText
 
@@ -458,6 +463,112 @@ subscriptions model =
 
 -- VIEW
 
+toBoxElement : Float -> Pos -> Svg Msg
+toBoxElement boxSize (xInt, yInt) =
+  let
+    widthStr = boxSize |> String.fromFloat
+    heightStr = boxSize |> String.fromFloat
+    xStr = String.fromFloat (toFloat xInt * boxSize)
+    yStr = String.fromFloat (toFloat yInt * boxSize)
+  in
+    rect
+          [ x xStr
+          , y yStr
+          , width widthStr
+          , height heightStr
+          , fill "none"
+          , stroke "currentcolor"
+          , strokeWidth "1px"
+          ]
+          []
+
+toLetterElement : Float -> Char -> Pos -> Svg Msg
+toLetterElement boxSize ch (xInt, yInt) =
+  let
+    xStr = String.fromFloat (toFloat xInt * boxSize + 6)
+    yStr = String.fromFloat (toFloat yInt * boxSize - 6)
+  in
+    Svg.text_ [ x xStr, y yStr, fill "currentcolor" ] [ Svg.text (String.fromChar ch) ]
+
+createLetterElements : Float -> Int -> String -> List (Svg Msg)
+createLetterElements boxSize y password =
+  password |> String.toList |> List.indexedMap (\x ch -> toLetterElement boxSize ch (x, y))
+
+createBoxes : Float -> Int -> Int -> List (Svg Msg)
+createBoxes boxSize boxCount y =
+  List.range 0 (boxCount - 1)  |> List.map (\x -> toBoxElement boxSize (x, y))
+
+toConnexionElement : Float -> (Int, Int) -> Svg Msg
+toConnexionElement boxSize (xIntSrc, xIntTgt) =
+  let
+    toStr (x, y) = (String.fromFloat x) ++ " " ++ (String.fromFloat y)
+    xSrc = (0.5 + toFloat xIntSrc) * boxSize
+    xTgt = (0.5 + toFloat xIntTgt) * boxSize
+    ySrc = 1 * boxSize
+    yTgt = 5 * boxSize
+    pt1 = (xSrc, ySrc)
+    pt2 = (xSrc, ySrc + 2 * boxSize)
+    pt3 = (xTgt, yTgt - 2 * boxSize)
+    pt4 = (xTgt, yTgt)
+    pt1s = toStr pt1
+    pt2s = toStr pt2
+    pt3s = toStr pt3
+    pt4s = toStr pt4
+    dval = "M" ++ pt1s ++ " C " ++ pt2s ++ ", " ++ pt3s ++ ", " ++ pt4s
+  in
+    Svg.path
+      [ stroke "currentcolor"
+      , strokeWidth "1px"
+      , fill "None"
+      , d dval ] []
+
+indexOf : String -> String -> Int
+indexOf p password =
+  password |> String.indexes p |> List.head |> Maybe.withDefault 0
+
+findConnections : String -> String -> List (Int, Int)
+findConnections prevPassword password =
+  if String.isEmpty prevPassword then []
+  else
+    let
+      programList = password |> String.toList |> List.map String.fromChar
+    in
+      programList
+      |> List.map (\p -> (indexOf p prevPassword, indexOf p password))
+      |> List.filter (\(ix1, ix2) -> ix1 /= ix2)
+
+toSvg : Model -> Html Msg
+toSvg model =
+  let
+    boxSize = toFloat 24
+    connections = findConnections model.prevPassword model.password
+    connectionElements = connections |> List.map (toConnexionElement boxSize)
+    letterElements =
+      if String.isEmpty model.prevPassword then
+        createLetterElements boxSize 1 model.password
+      else
+        let
+          topRowLetterElements = createLetterElements boxSize 1 model.prevPassword
+          botRowLetterElements = createLetterElements boxSize 6 model.password
+        in
+          List.append topRowLetterElements botRowLetterElements
+    boxCount = model.password |> String.length 
+    boxElements =
+      if String.isEmpty model.prevPassword then
+        createBoxes boxSize boxCount 0
+      else
+        List.append (createBoxes boxSize boxCount 0) (createBoxes boxSize boxCount 5)
+    -- defs = Svg.defs [] [ createMarker "arrowhead" ]
+    elements = List.concat [ boxElements, connectionElements, letterElements ]
+  in
+    svg
+      [ viewBox "-5 -15 202 170"
+      , width "207"
+      , height "175"
+      , Svg.Attributes.style "font-family:Source Code Pro,monospace"
+      ]
+      elements
+
 view : Model -> Html Msg
 view model =
   let
@@ -470,6 +581,7 @@ view model =
     dbgStr = model.debug
     playButtonText =
       if model.descramble then "Unscramble" else "Scramble"
+    svgElement = toSvg model 
   in 
     Html.table 
       [ Html.Attributes.align "center"
@@ -521,7 +633,7 @@ view model =
                 [ Html.text "Slower" ] 
               , Html.button 
                 [ Html.Attributes.style "width" "100px", onClick TogglePlay ] 
-                [ if model.paused then text playButtonText else text "Pause" ] 
+                [ if model.paused then Html.text playButtonText else Html.text "Pause" ] 
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Faster ] 
                 [ Html.text "Faster" ] 
@@ -529,24 +641,24 @@ view model =
                 [ Html.Attributes.style "width" "80px", onClick Step ] 
                 [ Html.text "Step" ] 
             ] ]
-      , Html.tr 
-          []
-          [ Html.td 
-              [ Html.Attributes.align "center" ]
-              [ Html.input 
-                [ Html.Attributes.type_ "checkbox", onClick ToggleDescramble, Html.Attributes.checked model.descramble ] 
-                []
-              , Html.label [] [ Html.text " Descramble" ]
-            ] ]
+      -- , Html.tr 
+      --     []
+      --     [ Html.td 
+      --         [ Html.Attributes.align "center" ]
+      --         [ Html.input 
+      --           [ Html.Attributes.type_ "checkbox", onClick ToggleDescramble, Html.Attributes.checked model.descramble ] 
+      --           []
+      --         , Html.label [] [ Html.text " Descramble" ]
+      --       ] ]
       , Html.tr 
           []
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Source Code Pro, monospace"
-              , Html.Attributes.style "font-size" "32px"
+              , Html.Attributes.style "font-size" "20px"
               , Html.Attributes.style "padding" "10px" ] 
               [ 
-                Html.div [] [ pwdElement ]
+                Html.div [] [ svgElement ]
               ] ] 
       , Html.tr 
           []

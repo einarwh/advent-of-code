@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.P.E === region.U.E)
+	if (region.P.F === region.U.F)
 	{
-		return 'on line ' + region.P.E;
+		return 'on line ' + region.P.F;
 	}
-	return 'on lines ' + region.P.E + ' through ' + region.U.E;
+	return 'on lines ' + region.P.F + ' through ' + region.U.F;
 }
 
 
@@ -5217,16 +5217,16 @@ var $author$project$Main$initModel = F2(
 		var debug = $elm$core$String$fromInt(
 			$elm$core$List$length(operations));
 		return {
-			D: '',
-			n: descramble,
-			z: false,
+			E: '',
+			s: descramble,
+			A: false,
 			_: '',
 			K: descramble ? $elm$core$List$reverse(operations) : operations,
-			o: password,
+			h: password,
 			p: true,
-			F: '',
-			v: state,
-			w: $author$project$Main$defaultTickInterval
+			m: '',
+			w: state,
+			x: $author$project$Main$defaultTickInterval
 		};
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
@@ -5653,9 +5653,9 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (model) {
-	var tickSub = (model.p || model.z) ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = (model.p || model.A) ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.w,
+		model.x,
 		function (_v0) {
 			return 0;
 		});
@@ -5663,7 +5663,7 @@ var $author$project$Main$subscriptions = function (model) {
 };
 var $author$project$Main$Scrambled = 0;
 var $author$project$Main$updateReset = function (model) {
-	return A2($author$project$Main$initModel, model.v, model.n);
+	return A2($author$project$Main$initModel, model.w, model.s);
 };
 var $author$project$Main$movePosition = F3(
 	function (pos1, pos2, pwd) {
@@ -5964,25 +5964,25 @@ var $author$project$Main$updateStep = function (model) {
 	if (!_v0.b) {
 		return _Utils_update(
 			model,
-			{D: '', z: true, p: true});
+			{E: '', A: true, p: true});
 	} else {
 		var op = _v0.a;
 		var rest = _v0.b;
-		var pwd = model.n ? A2($author$project$Main$descramblePassword, op, model.o) : A2($author$project$Main$scramblePassword, op, model.o);
-		var prevPwd = model.o;
+		var pwd = model.s ? A2($author$project$Main$descramblePassword, op, model.h) : A2($author$project$Main$scramblePassword, op, model.h);
+		var prevPwd = model.h;
 		return _Utils_update(
 			model,
-			{D: op, K: rest, o: pwd, F: prevPwd});
+			{E: op, K: rest, h: pwd, m: prevPwd});
 	}
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Main$updateToggleDescramble = function (model) {
-	var descramble = !model.n;
-	return A2($author$project$Main$initModel, model.v, descramble);
+	var descramble = !model.s;
+	return A2($author$project$Main$initModel, model.w, descramble);
 };
 var $author$project$Main$updateTogglePlay = function (model) {
-	if (model.z) {
-		var m = A2($author$project$Main$initModel, model.v, model.n);
+	if (model.A) {
+		var m = A2($author$project$Main$initModel, model.w, model.s);
 		return _Utils_update(
 			m,
 			{p: false});
@@ -6015,13 +6015,13 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{w: model.w / 2}),
+						{x: model.x / 2}),
 					$elm$core$Platform$Cmd$none);
 			case 3:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{w: model.w * 2}),
+						{x: model.x * 2}),
 					$elm$core$Platform$Cmd$none);
 			case 5:
 				return _Utils_Tuple2(
@@ -6041,7 +6041,6 @@ var $author$project$Main$Faster = 2;
 var $author$project$Main$Reset = 8;
 var $author$project$Main$Slower = 3;
 var $author$project$Main$Step = 1;
-var $author$project$Main$ToggleDescramble = 5;
 var $author$project$Main$TogglePlay = 4;
 var $author$project$Main$UsePlainText = 6;
 var $author$project$Main$UseScrambled = 7;
@@ -6098,10 +6097,234 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$core$String$fromFloat = _String_fromNumber;
+var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
+var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
+var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
+var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
+var $author$project$Main$toBoxElement = F2(
+	function (boxSize, _v0) {
+		var xInt = _v0.a;
+		var yInt = _v0.b;
+		var yStr = $elm$core$String$fromFloat(yInt * boxSize);
+		var xStr = $elm$core$String$fromFloat(xInt * boxSize);
+		var widthStr = $elm$core$String$fromFloat(boxSize);
+		var heightStr = $elm$core$String$fromFloat(boxSize);
+		return A2(
+			$elm$svg$Svg$rect,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x(xStr),
+					$elm$svg$Svg$Attributes$y(yStr),
+					$elm$svg$Svg$Attributes$width(widthStr),
+					$elm$svg$Svg$Attributes$height(heightStr),
+					$elm$svg$Svg$Attributes$fill('none'),
+					$elm$svg$Svg$Attributes$stroke('currentcolor'),
+					$elm$svg$Svg$Attributes$strokeWidth('1px')
+				]),
+			_List_Nil);
+	});
+var $author$project$Main$createBoxes = F3(
+	function (boxSize, boxCount, y) {
+		return A2(
+			$elm$core$List$map,
+			function (x) {
+				return A2(
+					$author$project$Main$toBoxElement,
+					boxSize,
+					_Utils_Tuple2(x, y));
+			},
+			A2($elm$core$List$range, 0, boxCount - 1));
+	});
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
+var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
+var $author$project$Main$toLetterElement = F3(
+	function (boxSize, ch, _v0) {
+		var xInt = _v0.a;
+		var yInt = _v0.b;
+		var yStr = $elm$core$String$fromFloat((yInt * boxSize) - 6);
+		var xStr = $elm$core$String$fromFloat((xInt * boxSize) + 6);
+		return A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x(xStr),
+					$elm$svg$Svg$Attributes$y(yStr),
+					$elm$svg$Svg$Attributes$fill('currentcolor')
+				]),
+			_List_fromArray(
+				[
+					$elm$svg$Svg$text(
+					$elm$core$String$fromChar(ch))
+				]));
+	});
+var $author$project$Main$createLetterElements = F3(
+	function (boxSize, y, password) {
+		return A2(
+			$elm$core$List$indexedMap,
+			F2(
+				function (x, ch) {
+					return A3(
+						$author$project$Main$toLetterElement,
+						boxSize,
+						ch,
+						_Utils_Tuple2(x, y));
+				}),
+			$elm$core$String$toList(password));
+	});
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Main$indexOf = F2(
+	function (p, password) {
+		return A2(
+			$elm$core$Maybe$withDefault,
+			0,
+			$elm$core$List$head(
+				A2($elm$core$String$indexes, p, password)));
+	});
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$Main$findConnections = F2(
+	function (prevPassword, password) {
+		if ($elm$core$String$isEmpty(prevPassword)) {
+			return _List_Nil;
+		} else {
+			var programList = A2(
+				$elm$core$List$map,
+				$elm$core$String$fromChar,
+				$elm$core$String$toList(password));
+			return A2(
+				$elm$core$List$filter,
+				function (_v0) {
+					var ix1 = _v0.a;
+					var ix2 = _v0.b;
+					return !_Utils_eq(ix1, ix2);
+				},
+				A2(
+					$elm$core$List$map,
+					function (p) {
+						return _Utils_Tuple2(
+							A2($author$project$Main$indexOf, p, prevPassword),
+							A2($author$project$Main$indexOf, p, password));
+					},
+					programList));
+		}
+	});
+var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
+var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
+var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
+var $author$project$Main$toConnexionElement = F2(
+	function (boxSize, _v0) {
+		var xIntSrc = _v0.a;
+		var xIntTgt = _v0.b;
+		var yTgt = 5 * boxSize;
+		var ySrc = 1 * boxSize;
+		var xTgt = (0.5 + xIntTgt) * boxSize;
+		var xSrc = (0.5 + xIntSrc) * boxSize;
+		var toStr = function (_v1) {
+			var x = _v1.a;
+			var y = _v1.b;
+			return $elm$core$String$fromFloat(x) + (' ' + $elm$core$String$fromFloat(y));
+		};
+		var pt4 = _Utils_Tuple2(xTgt, yTgt);
+		var pt4s = toStr(pt4);
+		var pt3 = _Utils_Tuple2(xTgt, yTgt - (2 * boxSize));
+		var pt3s = toStr(pt3);
+		var pt2 = _Utils_Tuple2(xSrc, ySrc + (2 * boxSize));
+		var pt2s = toStr(pt2);
+		var pt1 = _Utils_Tuple2(xSrc, ySrc);
+		var pt1s = toStr(pt1);
+		var dval = 'M' + (pt1s + (' C ' + (pt2s + (', ' + (pt3s + (', ' + pt4s))))));
+		return A2(
+			$elm$svg$Svg$path,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$stroke('currentcolor'),
+					$elm$svg$Svg$Attributes$strokeWidth('1px'),
+					$elm$svg$Svg$Attributes$fill('None'),
+					$elm$svg$Svg$Attributes$d(dval)
+				]),
+			_List_Nil);
+	});
+var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
+var $author$project$Main$toSvg = function (model) {
+	var connections = A2($author$project$Main$findConnections, model.m, model.h);
+	var boxSize = 24;
+	var connectionElements = A2(
+		$elm$core$List$map,
+		$author$project$Main$toConnexionElement(boxSize),
+		connections);
+	var letterElements = function () {
+		if ($elm$core$String$isEmpty(model.m)) {
+			return A3($author$project$Main$createLetterElements, boxSize, 1, model.h);
+		} else {
+			var topRowLetterElements = A3($author$project$Main$createLetterElements, boxSize, 1, model.m);
+			var botRowLetterElements = A3($author$project$Main$createLetterElements, boxSize, 6, model.h);
+			return A2($elm$core$List$append, topRowLetterElements, botRowLetterElements);
+		}
+	}();
+	var boxCount = $elm$core$String$length(model.h);
+	var boxElements = $elm$core$String$isEmpty(model.m) ? A3($author$project$Main$createBoxes, boxSize, boxCount, 0) : A2(
+		$elm$core$List$append,
+		A3($author$project$Main$createBoxes, boxSize, boxCount, 0),
+		A3($author$project$Main$createBoxes, boxSize, boxCount, 5));
+	var elements = $elm$core$List$concat(
+		_List_fromArray(
+			[boxElements, connectionElements, letterElements]));
+	return A2(
+		$elm$svg$Svg$svg,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$viewBox('-5 -15 202 170'),
+				$elm$svg$Svg$Attributes$width('207'),
+				$elm$svg$Svg$Attributes$height('175'),
+				$elm$svg$Svg$Attributes$style('font-family:Source Code Pro,monospace')
+			]),
+		elements);
+};
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$view = function (model) {
-	var pwdText = (model.z || $elm$core$String$isEmpty(model.F)) ? model.o : (model.F + (' -> ' + model.o));
+	var svgElement = $author$project$Main$toSvg(model);
+	var pwdText = (model.A || $elm$core$String$isEmpty(model.m)) ? model.h : (model.m + (' -> ' + model.h));
 	var pwdElement = A2(
 		$elm$html$Html$span,
 		_List_Nil,
@@ -6109,8 +6332,8 @@ var $author$project$Main$view = function (model) {
 			[
 				$elm$html$Html$text(pwdText)
 			]));
-	var playButtonText = model.n ? 'Unscramble' : 'Scramble';
-	var dbgStr = model.D;
+	var playButtonText = model.s ? 'Unscramble' : 'Scramble';
+	var dbgStr = model.E;
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
@@ -6198,7 +6421,7 @@ var $author$project$Main$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(6),
-										$elm$html$Html$Attributes$checked(model.v === 1)
+										$elm$html$Html$Attributes$checked(model.w === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -6214,7 +6437,7 @@ var $author$project$Main$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(7),
-										$elm$html$Html$Attributes$checked(!model.v)
+										$elm$html$Html$Attributes$checked(!model.w)
 									]),
 								_List_Nil),
 								A2(
@@ -6306,40 +6529,9 @@ var $author$project$Main$view = function (model) {
 						$elm$html$Html$td,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$align('center')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$input,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$type_('checkbox'),
-										$elm$html$Html$Events$onClick(5),
-										$elm$html$Html$Attributes$checked(model.n)
-									]),
-								_List_Nil),
-								A2(
-								$elm$html$Html$label,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(' Descramble')
-									]))
-							]))
-					])),
-				A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$td,
-						_List_fromArray(
-							[
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Source Code Pro, monospace'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '32px'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '20px'),
 								A2($elm$html$Html$Attributes$style, 'padding', '10px')
 							]),
 						_List_fromArray(
@@ -6348,7 +6540,7 @@ var $author$project$Main$view = function (model) {
 								$elm$html$Html$div,
 								_List_Nil,
 								_List_fromArray(
-									[pwdElement]))
+									[svgElement]))
 							]))
 					])),
 				A2(
