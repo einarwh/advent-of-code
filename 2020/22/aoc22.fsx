@@ -15,12 +15,12 @@ let parsePlayer (line : string) : int list =
 let endGame winningCards : int = 
     winningCards |> List.rev |> List.mapi (fun i c -> (i + 1) * c) |> List.sum
 
-let rec playGame (round : int) (cards1 : int list) (cards2 : int list) : int = 
+let rec playGame (round : int) (cards1 : int list) (cards2 : int list) = 
     match (cards1, cards2) with 
     | [], _ -> 
-        endGame cards2 
+        (0, endGame cards2)
     | _, [] -> 
-        endGame cards1
+        (endGame cards1, 0)
     | h1 :: t1, h2 :: t2 -> 
         let round' = round + 1
         if h1 > h2 then 
@@ -80,11 +80,7 @@ let rec playRecursiveGame (game : int) (round : int) (seen : Set<int list * int 
 let run (cardArray : int list array) =
     let cards1 = cardArray[0]
     let cards2 = cardArray[1]
-    playGame 1 cards1 cards2 |> printfn "%d"
-    // Player 1's deck: 9, 2, 6, 3, 1
-    // Player 2's deck: 5, 8, 4, 7, 10
-    // let cards1 = [9;2;6;3;1]
-    // let cards2 = [5;8;4;7;10]
+    playGame 1 cards1 cards2 |> printfn "%A"
     playRecursiveGame 1 1 Set.empty cards1 cards2 |> printfn "%A"
 
 "input.txt"
