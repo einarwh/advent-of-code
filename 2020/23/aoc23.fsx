@@ -44,15 +44,17 @@ let play moves (cups : int array) =
         |> Array.toList 
         |> List.indexed 
         |> List.fold (fun ls (ix, c) -> ls |> Map.add c (cups[(ix + 1) % cups.Length])) Map.empty
-    loop 1 (links, cups[0]) |> fst |> toCups
+    loop 1 (links, cups[0]) |> fst 
 
 let part1 cups = 
-    cups |> play 100 |> Array.map string |> String.concat "" |> printfn "%s"
+    cups |> play 100 |> toCups |> Array.map string |> String.concat "" |> printfn "%s"
 
 let part2 cups = 
     let moreCups = Array.concat [|cups; [|10 .. 1000000|]|]
-    let order = play 10000000 moreCups 
-    int64 order[0] * int64 order[1] |> printfn "%d"
+    let links = play 10000000 moreCups 
+    let star1 = links[1]
+    let star2 = links[star1]
+    int64 star1 * int64 star2 |> printfn "%d"
 
 let run fileName = 
     let text = File.ReadAllText(fileName).Trim()
