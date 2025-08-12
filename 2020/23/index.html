@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.P.E === region.U.E)
+	if (region.N.B === region.T.B)
 	{
-		return 'on line ' + region.P.E;
+		return 'on line ' + region.N.B;
 	}
-	return 'on lines ' + region.P.E + ' through ' + region.U.E;
+	return 'on lines ' + region.N.B + ' through ' + region.T.B;
 }
 
 
@@ -1871,9 +1871,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aB,
-		impl.aJ,
-		impl.aH,
+		impl.aC,
+		impl.aK,
+		impl.aI,
 		function() { return function() {} }
 	);
 });
@@ -2734,8 +2734,8 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
 		_: func(record._),
-		Q: record.Q,
-		N: record.N
+		O: record.O,
+		L: record.L
 	}
 });
 
@@ -3004,10 +3004,10 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 
 		var value = result.a;
 		var message = !tag ? value : tag < 3 ? value.a : value._;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.Q;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.O;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.N) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.L) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3957,11 +3957,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aB,
-		impl.aJ,
-		impl.aH,
+		impl.aC,
+		impl.aK,
+		impl.aI,
 		function(sendToApp, initialModel) {
-			var view = impl.aK;
+			var view = impl.aL;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3993,12 +3993,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aB,
-		impl.aJ,
-		impl.aH,
+		impl.aC,
+		impl.aK,
+		impl.aI,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.O && impl.O(sendToApp)
-			var view = impl.aK;
+			var divertHrefToApp = impl.M && impl.M(sendToApp)
+			var view = impl.aL;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -4006,12 +4006,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.au);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.av);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.aI) && (_VirtualDom_doc.title = title = doc.aI);
+				(title !== doc.aJ) && (_VirtualDom_doc.title = title = doc.aJ);
 			});
 		}
 	);
@@ -4067,12 +4067,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aD;
-	var onUrlRequest = impl.aE;
+	var onUrlChange = impl.aE;
+	var onUrlRequest = impl.aF;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		O: function(sendToApp)
+		M: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4088,9 +4088,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.ah === next.ah
-							&& curr.Y === next.Y
-							&& curr.ae.a === next.ae.a
+							&& curr.ai === next.ai
+							&& curr.X === next.X
+							&& curr.af.a === next.af.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4098,13 +4098,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aB: function(flags)
+		aC: function(flags)
 		{
-			return A3(impl.aB, flags, _Browser_getUrl(), key);
+			return A3(impl.aC, flags, _Browser_getUrl(), key);
 		},
+		aL: impl.aL,
 		aK: impl.aK,
-		aJ: impl.aJ,
-		aH: impl.aH
+		aI: impl.aI
 	});
 }
 
@@ -4170,17 +4170,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { az: 'hidden', av: 'visibilitychange' }
+		? { aA: 'hidden', aw: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { az: 'mozHidden', av: 'mozvisibilitychange' }
+		? { aA: 'mozHidden', aw: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { az: 'msHidden', av: 'msvisibilitychange' }
+		? { aA: 'msHidden', aw: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { az: 'webkitHidden', av: 'webkitvisibilitychange' }
-		: { az: 'hidden', av: 'visibilitychange' };
+		? { aA: 'webkitHidden', aw: 'webkitvisibilitychange' }
+		: { aA: 'hidden', aw: 'visibilitychange' };
 }
 
 
@@ -4261,12 +4261,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		al: _Browser_getScene(),
-		ao: {
-			aq: _Browser_window.pageXOffset,
-			ar: _Browser_window.pageYOffset,
-			ap: _Browser_doc.documentElement.clientWidth,
-			X: _Browser_doc.documentElement.clientHeight
+		am: _Browser_getScene(),
+		ap: {
+			ar: _Browser_window.pageXOffset,
+			as: _Browser_window.pageYOffset,
+			aq: _Browser_doc.documentElement.clientWidth,
+			W: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4276,8 +4276,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		ap: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		X: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		aq: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		W: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4300,15 +4300,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			al: {
-				ap: node.scrollWidth,
-				X: node.scrollHeight
+			am: {
+				aq: node.scrollWidth,
+				W: node.scrollHeight
 			},
-			ao: {
-				aq: node.scrollLeft,
-				ar: node.scrollTop,
-				ap: node.clientWidth,
-				X: node.clientHeight
+			ap: {
+				ar: node.scrollLeft,
+				as: node.scrollTop,
+				aq: node.clientWidth,
+				W: node.clientHeight
 			}
 		};
 	});
@@ -4338,18 +4338,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			al: _Browser_getScene(),
-			ao: {
-				aq: x,
-				ar: y,
-				ap: _Browser_doc.documentElement.clientWidth,
-				X: _Browser_doc.documentElement.clientHeight
+			am: _Browser_getScene(),
+			ap: {
+				ar: x,
+				as: y,
+				aq: _Browser_doc.documentElement.clientWidth,
+				W: _Browser_doc.documentElement.clientHeight
 			},
-			ax: {
-				aq: x + rect.left,
-				ar: y + rect.top,
-				ap: rect.width,
-				X: rect.height
+			ay: {
+				ar: x + rect.left,
+				as: y + rect.top,
+				aq: rect.width,
+				W: rect.height
 			}
 		};
 	});
@@ -4839,22 +4839,22 @@ var $elm$core$Array$builderToArray = F2(
 		if (!builder.a) {
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
-				$elm$core$Elm$JsArray$length(builder.b),
+				$elm$core$Elm$JsArray$length(builder.c),
 				$elm$core$Array$shiftStep,
 				$elm$core$Elm$JsArray$empty,
-				builder.b);
+				builder.c);
 		} else {
 			var treeLen = builder.a * $elm$core$Array$branchFactor;
 			var depth = $elm$core$Basics$floor(
 				A2($elm$core$Basics$logBase, $elm$core$Array$branchFactor, treeLen - 1));
-			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.c) : builder.c;
+			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.d) : builder.d;
 			var tree = A2($elm$core$Array$treeFromBuilder, correctNodeList, builder.a);
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
-				$elm$core$Elm$JsArray$length(builder.b) + treeLen,
+				$elm$core$Elm$JsArray$length(builder.c) + treeLen,
 				A2($elm$core$Basics$max, 5, depth * $elm$core$Array$shiftStep),
 				tree,
-				builder.b);
+				builder.c);
 		}
 	});
 var $elm$core$Basics$idiv = _Basics_idiv;
@@ -4867,7 +4867,7 @@ var $elm$core$Array$initializeHelp = F5(
 				return A2(
 					$elm$core$Array$builderToArray,
 					false,
-					{c: nodeList, a: (len / $elm$core$Array$branchFactor) | 0, b: tail});
+					{d: nodeList, a: (len / $elm$core$Array$branchFactor) | 0, c: tail});
 			} else {
 				var leaf = $elm$core$Array$Leaf(
 					A3($elm$core$Elm$JsArray$initialize, $elm$core$Array$branchFactor, fromIndex, fn));
@@ -4934,7 +4934,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {W: fragment, Y: host, ac: path, ae: port_, ah: protocol, ai: query};
+		return {V: fragment, X: host, ad: path, af: port_, ai: protocol, aj: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5213,39 +5213,74 @@ var $elm$core$Task$perform = F2(
 			A2($elm$core$Task$map, toMessage, task));
 	});
 var $elm$browser$Browser$document = _Browser_document;
-var $author$project$Aoc23$PlainText = 1;
 var $author$project$Aoc23$defaultTickInterval = 100;
-var $author$project$Aoc23$input = 'rotate right 4 steps\nswap letter b with letter e\nswap position 1 with position 3\nreverse positions 0 through 4\nrotate left 5 steps\nswap position 6 with position 5\nmove position 3 to position 2\nmove position 6 to position 5\nreverse positions 1 through 4\nrotate based on position of letter e\nreverse positions 3 through 7\nreverse positions 4 through 7\nrotate left 1 step\nreverse positions 2 through 6\nswap position 7 with position 5\nswap letter e with letter c\nswap letter f with letter d\nswap letter a with letter e\nswap position 2 with position 7\nswap position 1 with position 7\nswap position 6 with position 3\nswap letter g with letter h\nreverse positions 2 through 5\nrotate based on position of letter f\nrotate left 1 step\nrotate right 2 steps\nreverse positions 2 through 7\nreverse positions 5 through 6\nrotate left 6 steps\nmove position 2 to position 6\nrotate based on position of letter a\nrotate based on position of letter a\nswap letter f with letter a\nrotate right 5 steps\nreverse positions 0 through 4\nswap letter d with letter c\nswap position 4 with position 7\nswap letter f with letter h\nswap letter h with letter a\nrotate left 0 steps\nrotate based on position of letter e\nswap position 5 with position 4\nswap letter e with letter h\nswap letter h with letter d\nrotate right 2 steps\nrotate right 3 steps\nswap position 1 with position 7\nswap letter b with letter e\nswap letter b with letter e\nrotate based on position of letter e\nrotate based on position of letter h\nswap letter a with letter h\nmove position 7 to position 2\nrotate left 2 steps\nmove position 3 to position 2\nswap position 4 with position 6\nrotate right 7 steps\nreverse positions 1 through 4\nmove position 7 to position 0\nmove position 2 to position 0\nreverse positions 4 through 6\nrotate left 3 steps\nrotate left 7 steps\nmove position 2 to position 3\nrotate left 6 steps\nswap letter a with letter h\nrotate based on position of letter f\nswap letter f with letter c\nswap position 3 with position 0\nreverse positions 1 through 3\nswap letter h with letter a\nswap letter b with letter a\nreverse positions 2 through 3\nrotate left 5 steps\nswap position 7 with position 5\nrotate based on position of letter g\nrotate based on position of letter h\nrotate right 6 steps\nswap letter a with letter e\nswap letter b with letter g\nmove position 4 to position 6\nmove position 6 to position 5\nrotate based on position of letter e\nreverse positions 2 through 6\nswap letter c with letter f\nswap letter h with letter g\nmove position 7 to position 2\nreverse positions 1 through 7\nreverse positions 1 through 2\nrotate right 0 steps\nmove position 5 to position 6\nswap letter f with letter a\nmove position 3 to position 1\nmove position 2 to position 4\nreverse positions 1 through 2\nswap letter g with letter c\nrotate based on position of letter f\nrotate left 7 steps\nrotate based on position of letter e\nswap position 6 with position 1';
-var $author$project$Aoc23$inputPlain = 'abcdefgh';
-var $author$project$Aoc23$inputScrambled = 'fbgdceah';
-var $author$project$Aoc23$initModel = F2(
-	function (state, descramble) {
-		var password = function () {
-			if (!state) {
-				return $author$project$Aoc23$inputScrambled;
-			} else {
-				return $author$project$Aoc23$inputPlain;
-			}
-		}();
-		var operations = A2($elm$core$String$split, '\n', $author$project$Aoc23$input);
-		return {
-			C: '',
-			w: descramble,
-			D: false,
-			_: '',
-			J: descramble ? $elm$core$List$reverse(operations) : operations,
-			y: password,
-			n: true,
-			M: '',
-			t: state,
-			u: $author$project$Aoc23$defaultTickInterval
-		};
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (!_v0.$) {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
 	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Aoc23$input = '326519478';
+var $elm$core$String$foldr = _String_foldr;
+var $elm$core$String$toList = function (string) {
+	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
+};
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Aoc23$initModel = function (largeNumbers) {
+	var links = $elm$core$Dict$empty;
+	var cups = A2(
+		$elm$core$List$filterMap,
+		$elm$core$String$toInt,
+		A2(
+			$elm$core$List$map,
+			$elm$core$String$fromChar,
+			$elm$core$String$toList($author$project$Aoc23$input)));
+	var current = A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		$elm$core$List$head(cups));
+	return {H: cups, R: current, I: '', G: false, A: largeNumbers, Z: links, _: '', ab: 0, s: true, u: $author$project$Aoc23$defaultTickInterval};
+};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Aoc23$init = function (_v0) {
 	return _Utils_Tuple2(
-		A2($author$project$Aoc23$initModel, 1, false),
+		$author$project$Aoc23$initModel(false),
 		$elm$core$Platform$Cmd$none);
 };
 var $author$project$Aoc23$Tick = 0;
@@ -5255,10 +5290,8 @@ var $elm$time$Time$Every = F2(
 	});
 var $elm$time$Time$State = F2(
 	function (taggers, processes) {
-		return {ag: processes, an: taggers};
+		return {ah: processes, ao: taggers};
 	});
-var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
-var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $elm$time$Time$init = $elm$core$Task$succeed(
 	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
 var $elm$core$Basics$compare = _Utils_compare;
@@ -5547,7 +5580,7 @@ var $elm$time$Time$spawnHelp = F3(
 	});
 var $elm$time$Time$onEffects = F3(
 	function (router, subs, _v0) {
-		var processes = _v0.ag;
+		var processes = _v0.ah;
 		var rightStep = F3(
 			function (_v6, id, _v7) {
 				var spawns = _v7.a;
@@ -5616,7 +5649,7 @@ var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
 var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $elm$time$Time$onSelfMsg = F3(
 	function (router, interval, state) {
-		var _v0 = A2($elm$core$Dict$get, interval, state.an);
+		var _v0 = A2($elm$core$Dict$get, interval, state.ao);
 		if (_v0.$ === 1) {
 			return $elm$core$Task$succeed(state);
 		} else {
@@ -5665,7 +5698,7 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc23$subscriptions = function (model) {
-	var tickSub = (model.n || model.D) ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = (model.s || model.G) ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
 		model.u,
 		function (_v0) {
@@ -5673,341 +5706,33 @@ var $author$project$Aoc23$subscriptions = function (model) {
 		});
 	return tickSub;
 };
-var $author$project$Aoc23$Scrambled = 0;
 var $author$project$Aoc23$updateReset = function (model) {
-	return A2($author$project$Aoc23$initModel, model.t, model.w);
+	return $author$project$Aoc23$initModel(model.A);
 };
-var $author$project$Aoc23$movePosition = F3(
-	function (pos1, pos2, pwd) {
-		var ch = A3($elm$core$String$slice, pos1, pos1 + 1, pwd);
-		var before1 = A2($elm$core$String$left, pos1, pwd);
-		var after1 = A2($elm$core$String$dropLeft, pos1 + 1, pwd);
-		var removed = _Utils_ap(before1, after1);
-		var after2 = A2($elm$core$String$dropLeft, pos2, removed);
-		var before2 = A2($elm$core$String$left, pos2, removed);
-		return _Utils_ap(
-			before2,
-			_Utils_ap(ch, after2));
-	});
-var $author$project$Aoc23$tryMovePositionInverse = F2(
-	function (op, pwd) {
-		var _v0 = A2($elm$core$String$split, ' ', op);
-		if ((((((_v0.b && _v0.b.b) && _v0.b.b.b) && _v0.b.b.b.b) && _v0.b.b.b.b.b) && _v0.b.b.b.b.b.b) && (!_v0.b.b.b.b.b.b.b)) {
-			var _v1 = _v0.b;
-			var _v2 = _v1.b;
-			var str1 = _v2.a;
-			var _v3 = _v2.b;
-			var _v4 = _v3.b;
-			var _v5 = _v4.b;
-			var str2 = _v5.a;
-			var _v6 = _Utils_Tuple2(
-				$elm$core$String$toInt(str1),
-				$elm$core$String$toInt(str2));
-			if ((!_v6.a.$) && (!_v6.b.$)) {
-				var pos1 = _v6.a.a;
-				var pos2 = _v6.b.a;
-				return A3($author$project$Aoc23$movePosition, pos2, pos1, pwd);
-			} else {
-				return pwd;
-			}
-		} else {
-			return pwd;
-		}
-	});
-var $elm$core$String$fromList = _String_fromList;
-var $elm$core$String$foldr = _String_foldr;
-var $elm$core$String$toList = function (string) {
-	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
-};
-var $author$project$Aoc23$tryReversePositions = F2(
-	function (op, pwd) {
-		var _v0 = A2($elm$core$String$split, ' ', op);
-		if (((((_v0.b && _v0.b.b) && _v0.b.b.b) && _v0.b.b.b.b) && _v0.b.b.b.b.b) && (!_v0.b.b.b.b.b.b)) {
-			var _v1 = _v0.b;
-			var _v2 = _v1.b;
-			var str1 = _v2.a;
-			var _v3 = _v2.b;
-			var _v4 = _v3.b;
-			var str2 = _v4.a;
-			var _v5 = _Utils_Tuple2(
-				$elm$core$String$toInt(str1),
-				$elm$core$String$toInt(str2));
-			if ((!_v5.a.$) && (!_v5.b.$)) {
-				var pos1 = _v5.a.a;
-				var pos2 = _v5.b.a;
-				var section = A2(
-					$elm$core$String$dropLeft,
-					pos1,
-					A2($elm$core$String$left, pos2 + 1, pwd));
-				var reversed = $elm$core$String$fromList(
-					$elm$core$List$reverse(
-						$elm$core$String$toList(section)));
-				var before = A2($elm$core$String$left, pos1, pwd);
-				var after = A2($elm$core$String$dropLeft, pos2 + 1, pwd);
-				return _Utils_ap(
-					before,
-					_Utils_ap(reversed, after));
-			} else {
-				return pwd;
-			}
-		} else {
-			return pwd;
-		}
-	});
-var $author$project$Aoc23$tryReversePositionsInverse = $author$project$Aoc23$tryReversePositions;
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
-var $elm$core$String$dropRight = F2(
-	function (n, string) {
-		return (n < 1) ? string : A3($elm$core$String$slice, 0, -n, string);
-	});
-var $elm$core$String$right = F2(
-	function (n, string) {
-		return (n < 1) ? '' : A3(
-			$elm$core$String$slice,
-			-n,
-			$elm$core$String$length(string),
-			string);
-	});
-var $author$project$Aoc23$rotateRight = F2(
-	function (steps, pwd) {
-		var right = A2($elm$core$String$right, steps, pwd);
-		var left = A2($elm$core$String$dropRight, steps, pwd);
-		return _Utils_ap(right, left);
-	});
-var $author$project$Aoc23$tryRotateRight = F2(
-	function (op, pwd) {
-		var _v0 = A2($elm$core$String$split, ' ', op);
-		if ((((_v0.b && _v0.b.b) && _v0.b.b.b) && _v0.b.b.b.b) && (!_v0.b.b.b.b.b)) {
-			var _v1 = _v0.b;
-			var _v2 = _v1.b;
-			var str = _v2.a;
-			var _v3 = _v2.b;
-			var _v4 = $elm$core$String$toInt(str);
-			if (!_v4.$) {
-				var steps = _v4.a;
-				return A2($author$project$Aoc23$rotateRight, steps, pwd);
-			} else {
-				return pwd;
-			}
-		} else {
-			return pwd;
-		}
-	});
-var $author$project$Aoc23$tryRotateLeftInverse = $author$project$Aoc23$tryRotateRight;
-var $elm$core$Basics$ge = _Utils_ge;
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $elm$core$Basics$modBy = _Basics_modBy;
-var $author$project$Aoc23$rotateLeft = F2(
-	function (steps, pwd) {
-		var right = A2($elm$core$String$dropLeft, steps, pwd);
-		var left = A2($elm$core$String$left, steps, pwd);
-		return _Utils_ap(right, left);
-	});
-var $author$project$Aoc23$tryRotatePositionInverse = F2(
-	function (op, pwd) {
-		var _v0 = $elm$core$List$head(
-			$elm$core$List$reverse(
-				A2($elm$core$String$split, ' ', op)));
-		if (!_v0.$) {
-			var letter = _v0.a;
-			var _v1 = $elm$core$List$head(
-				A2($elm$core$String$indexes, letter, pwd));
-			if (!_v1.$) {
-				var ix = _v1.a;
-				var reversedIx = (!ix) ? ((((2 * $elm$core$String$length(pwd)) - 2) / 2) | 0) : ((!A2($elm$core$Basics$modBy, 2, ix)) ? ((((ix + $elm$core$String$length(pwd)) - 2) / 2) | 0) : (((ix - 1) / 2) | 0));
-				var steps = (reversedIx >= 4) ? (reversedIx + 2) : (reversedIx + 1);
-				return A2($author$project$Aoc23$rotateLeft, steps, pwd);
-			} else {
-				return pwd;
-			}
-		} else {
-			return pwd;
-		}
-	});
-var $author$project$Aoc23$tryRotateLeft = F2(
-	function (op, pwd) {
-		var _v0 = A2($elm$core$String$split, ' ', op);
-		if ((((_v0.b && _v0.b.b) && _v0.b.b.b) && _v0.b.b.b.b) && (!_v0.b.b.b.b.b)) {
-			var _v1 = _v0.b;
-			var _v2 = _v1.b;
-			var str = _v2.a;
-			var _v3 = _v2.b;
-			var _v4 = $elm$core$String$toInt(str);
-			if (!_v4.$) {
-				var steps = _v4.a;
-				return A2($author$project$Aoc23$rotateLeft, steps, pwd);
-			} else {
-				return pwd;
-			}
-		} else {
-			return pwd;
-		}
-	});
-var $author$project$Aoc23$tryRotateRightInverse = $author$project$Aoc23$tryRotateLeft;
-var $elm$core$String$replace = F3(
-	function (before, after, string) {
-		return A2(
-			$elm$core$String$join,
-			after,
-			A2($elm$core$String$split, before, string));
-	});
-var $author$project$Aoc23$swapLetters = F3(
-	function (letter1, letter2, password) {
-		return A3(
-			$elm$core$String$replace,
-			'_',
-			letter2,
-			A3(
-				$elm$core$String$replace,
-				letter2,
-				letter1,
-				A3($elm$core$String$replace, letter1, '_', password)));
-	});
-var $author$project$Aoc23$trySwapLetters = F2(
-	function (op, pwd) {
-		var _v0 = A2($elm$core$String$split, ' ', op);
-		if ((((((_v0.b && _v0.b.b) && _v0.b.b.b) && _v0.b.b.b.b) && _v0.b.b.b.b.b) && _v0.b.b.b.b.b.b) && (!_v0.b.b.b.b.b.b.b)) {
-			var _v1 = _v0.b;
-			var _v2 = _v1.b;
-			var letter1 = _v2.a;
-			var _v3 = _v2.b;
-			var _v4 = _v3.b;
-			var _v5 = _v4.b;
-			var letter2 = _v5.a;
-			return A3($author$project$Aoc23$swapLetters, letter1, letter2, pwd);
-		} else {
-			return pwd;
-		}
-	});
-var $author$project$Aoc23$trySwapLettersInverse = $author$project$Aoc23$trySwapLetters;
-var $author$project$Aoc23$trySwapPositions = F2(
-	function (op, pwd) {
-		var _v0 = A2($elm$core$String$split, ' ', op);
-		if ((((((_v0.b && _v0.b.b) && _v0.b.b.b) && _v0.b.b.b.b) && _v0.b.b.b.b.b) && _v0.b.b.b.b.b.b) && (!_v0.b.b.b.b.b.b.b)) {
-			var _v1 = _v0.b;
-			var _v2 = _v1.b;
-			var str1 = _v2.a;
-			var _v3 = _v2.b;
-			var _v4 = _v3.b;
-			var _v5 = _v4.b;
-			var str2 = _v5.a;
-			var _v6 = _Utils_Tuple2(
-				$elm$core$String$toInt(str1),
-				$elm$core$String$toInt(str2));
-			if ((!_v6.a.$) && (!_v6.b.$)) {
-				var pos1 = _v6.a.a;
-				var pos2 = _v6.b.a;
-				var letter2 = A3($elm$core$String$slice, pos2, pos2 + 1, pwd);
-				var letter1 = A3($elm$core$String$slice, pos1, pos1 + 1, pwd);
-				return A3($author$project$Aoc23$swapLetters, letter1, letter2, pwd);
-			} else {
-				return pwd;
-			}
-		} else {
-			return pwd;
-		}
-	});
-var $author$project$Aoc23$trySwapPositionsInverse = $author$project$Aoc23$trySwapPositions;
-var $author$project$Aoc23$descramblePassword = F2(
-	function (op, pwd) {
-		return A2($elm$core$String$startsWith, 'swap letter', op) ? A2($author$project$Aoc23$trySwapLettersInverse, op, pwd) : (A2($elm$core$String$startsWith, 'swap position', op) ? A2($author$project$Aoc23$trySwapPositionsInverse, op, pwd) : (A2($elm$core$String$startsWith, 'rotate left', op) ? A2($author$project$Aoc23$tryRotateLeftInverse, op, pwd) : (A2($elm$core$String$startsWith, 'rotate right', op) ? A2($author$project$Aoc23$tryRotateRightInverse, op, pwd) : (A2($elm$core$String$startsWith, 'rotate based', op) ? A2($author$project$Aoc23$tryRotatePositionInverse, op, pwd) : (A2($elm$core$String$startsWith, 'reverse positions', op) ? A2($author$project$Aoc23$tryReversePositionsInverse, op, pwd) : (A2($elm$core$String$startsWith, 'move position', op) ? A2($author$project$Aoc23$tryMovePositionInverse, op, pwd) : pwd))))));
-	});
-var $author$project$Aoc23$tryMovePosition = F2(
-	function (op, pwd) {
-		var _v0 = A2($elm$core$String$split, ' ', op);
-		if ((((((_v0.b && _v0.b.b) && _v0.b.b.b) && _v0.b.b.b.b) && _v0.b.b.b.b.b) && _v0.b.b.b.b.b.b) && (!_v0.b.b.b.b.b.b.b)) {
-			var _v1 = _v0.b;
-			var _v2 = _v1.b;
-			var str1 = _v2.a;
-			var _v3 = _v2.b;
-			var _v4 = _v3.b;
-			var _v5 = _v4.b;
-			var str2 = _v5.a;
-			var _v6 = _Utils_Tuple2(
-				$elm$core$String$toInt(str1),
-				$elm$core$String$toInt(str2));
-			if ((!_v6.a.$) && (!_v6.b.$)) {
-				var pos1 = _v6.a.a;
-				var pos2 = _v6.b.a;
-				return A3($author$project$Aoc23$movePosition, pos1, pos2, pwd);
-			} else {
-				return pwd;
-			}
-		} else {
-			return pwd;
-		}
-	});
-var $author$project$Aoc23$tryRotatePosition = F2(
-	function (op, pwd) {
-		var _v0 = $elm$core$List$head(
-			$elm$core$List$reverse(
-				A2($elm$core$String$split, ' ', op)));
-		if (!_v0.$) {
-			var letter = _v0.a;
-			var _v1 = $elm$core$List$head(
-				A2($elm$core$String$indexes, letter, pwd));
-			if (!_v1.$) {
-				var ix = _v1.a;
-				var steps = (ix >= 4) ? (ix + 2) : (ix + 1);
-				return A2($author$project$Aoc23$rotateRight, steps, pwd);
-			} else {
-				return pwd;
-			}
-		} else {
-			return pwd;
-		}
-	});
-var $author$project$Aoc23$scramblePassword = F2(
-	function (op, pwd) {
-		return A2($elm$core$String$startsWith, 'swap letter', op) ? A2($author$project$Aoc23$trySwapLetters, op, pwd) : (A2($elm$core$String$startsWith, 'swap position', op) ? A2($author$project$Aoc23$trySwapPositions, op, pwd) : (A2($elm$core$String$startsWith, 'rotate left', op) ? A2($author$project$Aoc23$tryRotateLeft, op, pwd) : (A2($elm$core$String$startsWith, 'rotate right', op) ? A2($author$project$Aoc23$tryRotateRight, op, pwd) : (A2($elm$core$String$startsWith, 'rotate based', op) ? A2($author$project$Aoc23$tryRotatePosition, op, pwd) : (A2($elm$core$String$startsWith, 'reverse positions', op) ? A2($author$project$Aoc23$tryReversePositions, op, pwd) : (A2($elm$core$String$startsWith, 'move position', op) ? A2($author$project$Aoc23$tryMovePosition, op, pwd) : pwd))))));
-	});
 var $author$project$Aoc23$updateStep = function (model) {
-	var _v0 = model.J;
-	if (!_v0.b) {
-		return _Utils_update(
-			model,
-			{C: '', D: true, n: true});
-	} else {
-		var op = _v0.a;
-		var rest = _v0.b;
-		var pwd = model.w ? A2($author$project$Aoc23$descramblePassword, op, model.y) : A2($author$project$Aoc23$scramblePassword, op, model.y);
-		var prevPwd = model.y;
-		return _Utils_update(
-			model,
-			{C: op, J: rest, y: pwd, M: prevPwd});
-	}
+	return model;
 };
 var $elm$core$Basics$not = _Basics_not;
-var $author$project$Aoc23$updateToggleDescramble = function (model) {
-	var descramble = !model.w;
-	return A2($author$project$Aoc23$initModel, model.t, descramble);
+var $author$project$Aoc23$updateToggleLargeNumbers = function (model) {
+	var largeNumbers = !model.A;
+	return $author$project$Aoc23$initModel(largeNumbers);
 };
 var $author$project$Aoc23$updateTogglePlay = function (model) {
-	if (model.D) {
-		var m = A2($author$project$Aoc23$initModel, model.t, model.w);
+	if (model.G) {
+		var m = $author$project$Aoc23$initModel(model.A);
 		return _Utils_update(
 			m,
-			{n: false});
+			{s: false});
 	} else {
 		return _Utils_update(
 			model,
-			{n: !model.n});
+			{s: !model.s});
 	}
 };
 var $author$project$Aoc23$update = F2(
 	function (msg, model) {
 		switch (msg) {
-			case 8:
+			case 6:
 				return _Utils_Tuple2(
 					$author$project$Aoc23$updateReset(model),
 					$elm$core$Platform$Cmd$none);
@@ -6035,27 +5760,17 @@ var $author$project$Aoc23$update = F2(
 						model,
 						{u: model.u * 2}),
 					$elm$core$Platform$Cmd$none);
-			case 5:
-				return _Utils_Tuple2(
-					$author$project$Aoc23$updateToggleDescramble(model),
-					$elm$core$Platform$Cmd$none);
-			case 6:
-				return _Utils_Tuple2(
-					A2($author$project$Aoc23$initModel, 1, false),
-					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(
-					A2($author$project$Aoc23$initModel, 0, true),
+					$author$project$Aoc23$updateToggleLargeNumbers(model),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Aoc23$Faster = 2;
-var $author$project$Aoc23$Reset = 8;
+var $author$project$Aoc23$Reset = 6;
 var $author$project$Aoc23$Slower = 3;
 var $author$project$Aoc23$Step = 1;
 var $author$project$Aoc23$TogglePlay = 4;
-var $author$project$Aoc23$UsePlainText = 6;
-var $author$project$Aoc23$UseScrambled = 7;
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -6067,15 +5782,6 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$align = $elm$html$Html$Attributes$stringProperty('align');
 var $elm$html$Html$button = _VirtualDom_node('button');
-var $elm$json$Json$Encode$bool = _Json_wrap;
-var $elm$html$Html$Attributes$boolProperty = F2(
-	function (key, bool) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$bool(bool));
-	});
-var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$Attributes$href = function (url) {
 	return A2(
@@ -6083,8 +5789,6 @@ var $elm$html$Html$Attributes$href = function (url) {
 		'href',
 		_VirtualDom_noJavaScriptUri(url));
 };
-var $elm$html$Html$input = _VirtualDom_node('input');
-var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 0, a: a};
 };
@@ -6108,32 +5812,64 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
+var $elm$core$Basics$cos = _Basics_cos;
 var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
 var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
-var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
-var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
-var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
-var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
-var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
-var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
-var $elm$core$Basics$cos = _Basics_cos;
 var $elm$core$Basics$pi = _Basics_pi;
 var $elm$core$Basics$degrees = function (angleInDegrees) {
 	return (angleInDegrees * $elm$core$Basics$pi) / 180;
 };
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var $elm$core$String$fromFloat = _String_fromNumber;
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
 var $elm$core$Basics$sin = _Basics_sin;
-var $author$project$Aoc23$toCircleElement = F2(
-	function (color, angle) {
-		var yPos = (-1) * $elm$core$Basics$sin(
+var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
+var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
+var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
+var $author$project$Aoc23$toCircleElement = F3(
+	function (color, angle, cup) {
+		var cyPos = (-1) * $elm$core$Basics$sin(
 			$elm$core$Basics$degrees(90 - angle));
-		var xPos = $elm$core$Basics$cos(
+		var cyStr = $elm$core$String$fromFloat(160 * cyPos);
+		var yStr = $elm$core$String$fromFloat((160 * cyPos) + 6.5);
+		var cxPos = $elm$core$Basics$cos(
 			$elm$core$Basics$degrees(90 - angle));
-		var cyStr = $elm$core$String$fromFloat(160 * yPos);
-		var cxStr = $elm$core$String$fromFloat(160 * xPos);
-		return A2(
+		var cxStr = $elm$core$String$fromFloat(160 * cxPos);
+		var xStr = $elm$core$String$fromFloat((160 * cxPos) - 6.2);
+		var txt = A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x(xStr),
+					$elm$svg$Svg$Attributes$y(yStr),
+					$elm$svg$Svg$Attributes$fill('currentcolor')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text(
+					$elm$core$String$fromInt(cup))
+				]));
+		var cc = A2(
 			$elm$svg$Svg$circle,
 			_List_fromArray(
 				[
@@ -6144,30 +5880,23 @@ var $author$project$Aoc23$toCircleElement = F2(
 					$elm$svg$Svg$Attributes$fill(color)
 				]),
 			_List_Nil);
+		return _List_fromArray(
+			[cc, txt]);
 	});
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $author$project$Aoc23$toSvg = function (model) {
-	var center = A2(
-		$elm$svg$Svg$circle,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$cx('0'),
-				$elm$svg$Svg$Attributes$cy('0'),
-				$elm$svg$Svg$Attributes$r('20'),
-				$elm$svg$Svg$Attributes$stroke('currentcolor'),
-				$elm$svg$Svg$Attributes$fill('red')
-			]),
-		_List_Nil);
+	var circleElements = $elm$core$List$concat(
+		A2(
+			$elm$core$List$indexedMap,
+			F2(
+				function (i, c) {
+					return A3($author$project$Aoc23$toCircleElement, 'lightyellow', 40 * i, c);
+				}),
+			model.H));
+	var elements = circleElements;
 	var angles = _List_fromArray(
 		[0, 1, 2, 3, 4, 5, 6, 7, 8]);
-	var circleElements = A2(
-		$elm$core$List$map,
-		function (i) {
-			return A2($author$project$Aoc23$toCircleElement, 'yellow', 40 * i);
-		},
-		angles);
-	var elements = circleElements;
 	return A2(
 		$elm$svg$Svg$svg,
 		_List_fromArray(
@@ -6180,11 +5909,10 @@ var $author$project$Aoc23$toSvg = function (model) {
 		elements);
 };
 var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Aoc23$viewBody = function (model) {
 	var svgElement = $author$project$Aoc23$toSvg(model);
 	var playButtonText = 'Play';
-	var dbgStr = model.C;
+	var dbgStr = model.I;
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
@@ -6262,53 +5990,6 @@ var $author$project$Aoc23$viewBody = function (model) {
 						$elm$html$Html$td,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$align('center')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$input,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$type_('radio'),
-										$elm$html$Html$Events$onClick(6),
-										$elm$html$Html$Attributes$checked(model.t === 1)
-									]),
-								_List_Nil),
-								A2(
-								$elm$html$Html$label,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Plain')
-									])),
-								A2(
-								$elm$html$Html$input,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$type_('radio'),
-										$elm$html$Html$Events$onClick(7),
-										$elm$html$Html$Attributes$checked(!model.t)
-									]),
-								_List_Nil),
-								A2(
-								$elm$html$Html$label,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Scrambled')
-									]))
-							]))
-					])),
-				A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$td,
-						_List_fromArray(
-							[
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'padding', '10px')
 							]),
@@ -6319,7 +6000,7 @@ var $author$project$Aoc23$viewBody = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick(8)
+										$elm$html$Html$Events$onClick(6)
 									]),
 								_List_fromArray(
 									[
@@ -6345,7 +6026,7 @@ var $author$project$Aoc23$viewBody = function (model) {
 									]),
 								_List_fromArray(
 									[
-										model.n ? $elm$html$Html$text(playButtonText) : $elm$html$Html$text('Pause')
+										model.s ? $elm$html$Html$text(playButtonText) : $elm$html$Html$text('Pause')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -6423,15 +6104,15 @@ var $author$project$Aoc23$viewBody = function (model) {
 };
 var $author$project$Aoc23$view = function (model) {
 	return {
-		au: _List_fromArray(
+		av: _List_fromArray(
 			[
 				$author$project$Aoc23$viewBody(model)
 			]),
-		aI: 'Advent of Code 2020 | Day 23: Crab Cups'
+		aJ: 'Advent of Code 2020 | Day 23: Crab Cups'
 	};
 };
 var $author$project$Aoc23$main = $elm$browser$Browser$document(
-	{aB: $author$project$Aoc23$init, aH: $author$project$Aoc23$subscriptions, aJ: $author$project$Aoc23$update, aK: $author$project$Aoc23$view});
+	{aC: $author$project$Aoc23$init, aI: $author$project$Aoc23$subscriptions, aK: $author$project$Aoc23$update, aL: $author$project$Aoc23$view});
 _Platform_export({'Aoc23':{'init':$author$project$Aoc23$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
 
