@@ -41,48 +41,50 @@ let rec playRecursiveGame (game : int) (round : int) (seen : Set<int list * int 
         | _, [] -> 
             (endGame cards1, 0)
         | c1 :: t1, c2 :: t2 -> 
-            printfn "-- Round %d (Game %d) --" round game  
-            printfn "Player 1's deck: %s" (serializeCards cards1) 
-            printfn "Player 2's deck: %s" (serializeCards cards2) 
+            // printfn "-- Round %d (Game %d) --" round game  
+            // printfn "Player 1's deck: %s" (serializeCards cards1) 
+            // printfn "Player 2's deck: %s" (serializeCards cards2) 
             let round' = round + 1
             let seen' = Set.add (cards1, cards2) seen 
             if c1 <= List.length t1 && c2 <= List.length t2 then 
-                printfn "Playing a sub-game to determine the winner..."
-                printfn ""
+                // printfn "Playing a sub-game to determine the winner..."
+                // printfn ""
                 // Recur.
                 let nextCards1 = t1 |> List.take c1 
                 let nextCards2 = t2 |> List.take c2 
                 let (score1, score2) = playRecursiveGame (game + 1) 1 Set.empty nextCards1 nextCards2 
                 if score1 > score2 then 
-                    printfn "The winner of %d is player 1!" (game + 1)
-                    printfn ""
-                    printfn "...anyway, back to game %d" game
-                    printfn "Player 1 wins round %d of game %d!" round game 
+                    // printfn "The winner of %d is player 1!" (game + 1)
+                    // printfn ""
+                    // printfn "...anyway, back to game %d" game
+                    // printfn "Player 1 wins round %d of game %d!" round game 
                     playRecursiveGame game round' seen' (t1 @ [c1; c2]) t2
                 else 
-                    printfn "The winner of %d is player 2!" (game + 1)
-                    printfn ""
-                    printfn "...anyway, back to game %d" game
-                    printfn "Player 2 wins round %d of game %d!" round game 
+                    // printfn "The winner of %d is player 2!" (game + 1)
+                    // printfn ""
+                    // printfn "...anyway, back to game %d" game
+                    // printfn "Player 2 wins round %d of game %d!" round game 
                     playRecursiveGame game round' seen' t1 (t2 @ [c2; c1])
             else 
-                printfn "Player 1 plays: %d" c1
-                printfn "Player 2 plays: %d" c2
+                // printfn "Player 1 plays: %d" c1
+                // printfn "Player 2 plays: %d" c2
                 if c1 > c2 then 
-                    printfn "Player 1 wins round %d of game %d!" round game 
-                    printfn ""
+                    // printfn "Player 1 wins round %d of game %d!" round game 
+                    // printfn ""
                     playRecursiveGame game round' seen' (t1 @ [c1; c2]) t2
                 else 
-                    printfn "Player 2 wins round %d of game %d!" round game 
-                    printfn ""
+                    // printfn "Player 2 wins round %d of game %d!" round game 
+                    // printfn ""
                     playRecursiveGame game round' seen' t1 (t2 @ [c2; c1])
 
-let run (cardArray : int list array) = 
-    playGame 0 cardArray.[0] cardArray.[1] |> printfn "%d"
+let run (cardArray : int list array) =
+    let cards1 = cardArray[0]
+    let cards2 = cardArray[1]
+    playGame 1 cards1 cards2 |> printfn "%d"
     // Player 1's deck: 9, 2, 6, 3, 1
     // Player 2's deck: 5, 8, 4, 7, 10
-    let cards1 = [9;2;6;3;1]
-    let cards2 = [5;8;4;7;10]
+    // let cards1 = [9;2;6;3;1]
+    // let cards2 = [5;8;4;7;10]
     playRecursiveGame 1 1 Set.empty cards1 cards2 |> printfn "%A"
 
 "input.txt"
