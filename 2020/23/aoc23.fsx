@@ -61,6 +61,5 @@ let run fileName =
     let cups = text |> Seq.toArray |> Array.map (fun ch -> Int32.Parse(ch.ToString()))
     cups |> part1 
     cups |> part2
-    0
 
 run "input.txt"
