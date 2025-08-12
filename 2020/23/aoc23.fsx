@@ -33,7 +33,6 @@ let toCups (links : Map<int,int>) =
     loop [] 1 |> List.toArray
 
 let play moves (cups : int array) = 
-    // printfn "cups: %A" cups
     let maxCup = cups |> Array.max 
     let rec loop i (links, curr) = 
         if i <= moves then 
@@ -45,7 +44,6 @@ let play moves (cups : int array) =
         |> Array.toList 
         |> List.indexed 
         |> List.fold (fun ls (ix, c) -> ls |> Map.add c (cups[(ix + 1) % cups.Length])) Map.empty
-    // printfn "%A" links
     loop 1 (links, cups[0]) |> fst |> toCups
 
 let part1 cups = 
@@ -53,10 +51,7 @@ let part1 cups =
 
 let part2 cups = 
     let moreCups = Array.concat [|cups; [|10 .. 1000000|]|]
-    printfn "%A" (Array.max moreCups)
-    printfn "%A" (Array.take 20 moreCups)
     let order = play 10000000 moreCups 
-    printfn "%A" (Array.take 20 order)
     int64 order[0] * int64 order[1] |> printfn "%d"
 
 let run fileName = 
