@@ -12,11 +12,22 @@ let getPowerLevel serialNumber (x, y) =
     let d = getHundredsDigit <| (rackId * y + serialNumber) * rackId 
     d - 5
 
+let getTotalPower serialNumber (x, y) = 
+    [ for x in [x..x+2] do for y in [y..y+2] do yield (x, y) ]
+    |> List.map (getPowerLevel serialNumber)
+    |> List.sum 
+
+let findFuelCell serialNumber = 
+    let range = [0..300-2]
+    [ for x in range do for y in range do yield (x, y) ]
+    |> List.map (fun pos -> (pos, getTotalPower serialNumber pos))
+    |> List.sortByDescending snd 
+    |> List.map fst 
+    |> List.head
+
 let run fileName = 
-    let text = File.ReadAllText(fileName).Trim()
-    text |> printfn "%s"
-    getPowerLevel 57 (122, 79) |> printfn "-5 = %d"
-    getPowerLevel 39 (217,196) |> printfn "0 = %d"
-    getPowerLevel 71 (101,153) |> printfn "4 = %d"
+    let serialNumber = File.ReadAllText(fileName).Trim() |> int 
+    let (x, y) = findFuelCell serialNumber
+    printfn "%d,%d" x y
 
 run "input.txt"
