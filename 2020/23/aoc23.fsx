@@ -30,7 +30,7 @@ let toCups (links : Map<int,int>) =
         match links[curr] with 
         | 1 -> List.rev acc 
         | c -> loop (c :: acc) c 
-    loop [] 1 |> List.toArray
+    loop [] 1 
 
 let play moves (cups : int array) = 
     let maxCup = cups |> Array.max 
@@ -47,7 +47,7 @@ let play moves (cups : int array) =
     loop 1 (links, cups[0]) |> fst 
 
 let part1 cups = 
-    cups |> play 100 |> toCups |> Array.map string |> String.concat "" |> printfn "%s"
+    cups |> play 100 |> toCups |> List.map string |> String.concat "" |> printfn "%s"
 
 let part2 cups = 
     let moreCups = Array.concat [|cups; [|10 .. 1000000|]|]
