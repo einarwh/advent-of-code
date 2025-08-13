@@ -1,11 +1,12 @@
 module Main exposing (..)
 
-{- Advent of Code 2016. Day 21: Scrambled Letters and Hash. -}
+{- Advent of Code 2020. Day 23: Crab Cups -}
 
 import Browser 
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
+import Dict exposing (Dict)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Time
@@ -25,144 +26,57 @@ main =
 
 -- MODEL
 
-type alias Pos = (Int, Int)
-
-type PasswordState = Scrambled | PlainText
+type DataSource = Input | Sample
 
 type alias Model = 
-  { state : PasswordState
-  , password : String
-  , prevPassword : String 
-  , operations : List String
-  , descramble : Bool 
+  { dataSource : DataSource 
+  , links : Dict Int Int
+  , current : Int 
+  , moveNumber : Int 
+  , maxCup : Int 
+  , largeNumbers : Bool 
   , paused : Bool 
   , finished : Bool 
   , tickInterval : Float 
   , message : String
   , debug : String }
 
-inputPlain : String
-inputPlain = "abcdefgh"
-
-inputScrambled : String
-inputScrambled = "fbgdceah"
+sample : String 
+sample = "389125467"
 
 input : String 
-input = """rotate right 4 steps
-swap letter b with letter e
-swap position 1 with position 3
-reverse positions 0 through 4
-rotate left 5 steps
-swap position 6 with position 5
-move position 3 to position 2
-move position 6 to position 5
-reverse positions 1 through 4
-rotate based on position of letter e
-reverse positions 3 through 7
-reverse positions 4 through 7
-rotate left 1 step
-reverse positions 2 through 6
-swap position 7 with position 5
-swap letter e with letter c
-swap letter f with letter d
-swap letter a with letter e
-swap position 2 with position 7
-swap position 1 with position 7
-swap position 6 with position 3
-swap letter g with letter h
-reverse positions 2 through 5
-rotate based on position of letter f
-rotate left 1 step
-rotate right 2 steps
-reverse positions 2 through 7
-reverse positions 5 through 6
-rotate left 6 steps
-move position 2 to position 6
-rotate based on position of letter a
-rotate based on position of letter a
-swap letter f with letter a
-rotate right 5 steps
-reverse positions 0 through 4
-swap letter d with letter c
-swap position 4 with position 7
-swap letter f with letter h
-swap letter h with letter a
-rotate left 0 steps
-rotate based on position of letter e
-swap position 5 with position 4
-swap letter e with letter h
-swap letter h with letter d
-rotate right 2 steps
-rotate right 3 steps
-swap position 1 with position 7
-swap letter b with letter e
-swap letter b with letter e
-rotate based on position of letter e
-rotate based on position of letter h
-swap letter a with letter h
-move position 7 to position 2
-rotate left 2 steps
-move position 3 to position 2
-swap position 4 with position 6
-rotate right 7 steps
-reverse positions 1 through 4
-move position 7 to position 0
-move position 2 to position 0
-reverse positions 4 through 6
-rotate left 3 steps
-rotate left 7 steps
-move position 2 to position 3
-rotate left 6 steps
-swap letter a with letter h
-rotate based on position of letter f
-swap letter f with letter c
-swap position 3 with position 0
-reverse positions 1 through 3
-swap letter h with letter a
-swap letter b with letter a
-reverse positions 2 through 3
-rotate left 5 steps
-swap position 7 with position 5
-rotate based on position of letter g
-rotate based on position of letter h
-rotate right 6 steps
-swap letter a with letter e
-swap letter b with letter g
-move position 4 to position 6
-move position 6 to position 5
-rotate based on position of letter e
-reverse positions 2 through 6
-swap letter c with letter f
-swap letter h with letter g
-move position 7 to position 2
-reverse positions 1 through 7
-reverse positions 1 through 2
-rotate right 0 steps
-move position 5 to position 6
-swap letter f with letter a
-move position 3 to position 1
-move position 2 to position 4
-reverse positions 1 through 2
-swap letter g with letter c
-rotate based on position of letter f
-rotate left 7 steps
-rotate based on position of letter e
-swap position 6 with position 1"""
+input = "326519478"
 
-initModel : PasswordState -> Bool -> Model 
-initModel state descramble = 
+    -- let links = 
+    --     cups 
+    --     |> Array.toList 
+    --     |> List.indexed 
+    --     |> List.fold (fun ls (ix, c) -> ls |> Map.add c (cups[(ix + 1) % cups.Length])) Map.empty
+
+createLinks : List Int -> Dict Int Int 
+createLinks cups = 
+  cups 
+  |> List.indexedMap (\i c -> ((i + 1) |> modBy (List.length cups), c))
+  |> List.map (\(i, c) -> (c, cups |> itemAt i |> Maybe.withDefault 0))
+  |> Dict.fromList 
+
+initModel : Bool -> DataSource -> Model 
+initModel largeNumbers dataSource = 
   let
-    operations = input |> String.split "\n"
-    password = 
-      case state of 
-        Scrambled -> inputScrambled
-        PlainText -> inputPlain
+    data = 
+      case dataSource of 
+        Sample -> sample 
+        Input -> input
+    cups = data |> String.toList |> List.map (String.fromChar) |> List.filterMap (String.toInt)
+    links = createLinks cups
+    current = cups |> List.head |> Maybe.withDefault 0 
   in 
-    { state = state
-    , password = password
-    , prevPassword = ""
-    , operations = if descramble then List.reverse operations else operations
-    , descramble = descramble 
+    { dataSource = dataSource
+    , links = links
+    , current = current 
+    , moveNumber = 0
+    , maxCup = cups |> List.maximum |> Maybe.withDefault 0
+    , largeNumbers = largeNumbers 
     , paused = True
     , finished = False 
     , tickInterval = defaultTickInterval
@@ -171,7 +85,7 @@ initModel state descramble =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel PlainText False, Cmd.none)
+  (initModel False Input, Cmd.none)
 
 -- UPDATE
 
@@ -181,260 +95,69 @@ type Msg =
   | Faster 
   | Slower 
   | TogglePlay 
-  | ToggleDescramble
-  | UsePlainText
-  | UseScrambled
+  | ToggleLargeNumbers
+  | UseDataSource DataSource
   | Reset 
+
+lookup : Int -> Dict Int Int -> Int 
+lookup curr links =
+  Dict.get curr links |> Maybe.withDefault -1
+
+findDestination : List Int -> Int -> Int -> Int 
+findDestination removed maxCup i = 
+  if i < 1 then findDestination removed maxCup maxCup 
+  else if List.member i removed then findDestination removed maxCup (i - 1)
+  else i 
+
+move : Int -> (Dict Int Int, Int) -> (Dict Int Int, Int) 
+move maxCup (links, curr) = 
+  let 
+    cup1 = lookup curr links 
+    cup2 = lookup cup1 links 
+    cup3 = lookup cup2 links 
+    next = lookup cup3 links 
+    removed = [cup1, cup2, cup3]
+    dest = findDestination removed maxCup (curr - 1) 
+    updatedLinks = 
+      links 
+      |> Dict.insert curr next 
+      |> Dict.insert dest cup1 
+      |> Dict.insert cup3 (lookup dest links)
+  in 
+    (updatedLinks, next)
 
 updateReset : Model -> Model
 updateReset model = 
-  initModel model.state model.descramble
-
-swapLetters : String -> String -> String -> String
-swapLetters letter1 letter2 password = 
-  password |> String.replace letter1 "_" |> String.replace letter2 letter1 |> String.replace "_" letter2
-
-trySwapLetters : String -> String -> String 
-trySwapLetters op pwd = 
-  case op |> String.split " " of 
-    [ _, _, letter1, _, _, letter2 ] -> 
-      pwd |> swapLetters letter1 letter2
-    _ ->
-      pwd
-
-trySwapLettersInverse : String -> String -> String 
-trySwapLettersInverse = trySwapLetters
-
-trySwapPositions : String -> String -> String 
-trySwapPositions op pwd =
-  case op |> String.split " " of 
-    [ _, _, str1, _, _, str2 ] -> 
-      case (String.toInt str1, String.toInt str2) of 
-        (Just pos1, Just pos2) -> 
-          let 
-            letter1 = String.slice pos1 (pos1 + 1) pwd 
-            letter2 = String.slice pos2 (pos2 + 1) pwd 
-          in 
-            swapLetters letter1 letter2 pwd 
-        _ -> 
-          pwd 
-    _ ->
-      pwd
-
-trySwapPositionsInverse : String -> String -> String 
-trySwapPositionsInverse = trySwapPositions
-
-rotateLeft : Int -> String -> String
-rotateLeft steps pwd = 
-  let 
-    left = String.left steps pwd 
-    right = String.dropLeft steps pwd 
-  in 
-    right ++ left
-
-rotateRight : Int -> String -> String
-rotateRight steps pwd = 
-  let 
-    right = String.right steps pwd 
-    left = String.dropRight steps pwd 
-  in 
-    right ++ left
-
-tryRotateLeft : String -> String -> String 
-tryRotateLeft op pwd =
-  case op |> String.split " " of 
-    [ _, _, str, _ ] -> 
-      case String.toInt str of 
-        Just steps -> 
-          rotateLeft steps pwd
-        Nothing -> 
-          pwd 
-    _ ->
-      pwd
-
-tryRotateLeftInverse : String -> String -> String 
-tryRotateLeftInverse = tryRotateRight
-
-tryRotateRight : String -> String -> String 
-tryRotateRight op pwd = 
-  case op |> String.split " " of 
-    [ _, _, str, _ ] -> 
-      case String.toInt str of 
-        Just steps -> 
-          rotateRight steps pwd 
-        Nothing -> 
-          pwd 
-    _ ->
-      pwd
-
-tryRotateRightInverse : String -> String -> String 
-tryRotateRightInverse = tryRotateLeft 
-
-tryRotatePosition : String -> String -> String 
-tryRotatePosition op pwd = 
-  -- rotate based on position of letter e
-  case op |> String.split " " |> List.reverse |> List.head of 
-    Just letter -> 
-      case pwd |> String.indexes letter |> List.head of 
-        Just ix -> 
-          let
-            steps = if ix >= 4 then ix + 2 else ix + 1 
-          in 
-            rotateRight steps pwd 
-        Nothing -> 
-          pwd  
-    Nothing ->
-      pwd 
-
-tryRotatePositionInverse : String -> String -> String 
-tryRotatePositionInverse op pwd = 
-  -- rotate based on position of letter e
-  case op |> String.split " " |> List.reverse |> List.head of 
-    Just letter -> 
-      case pwd |> String.indexes letter |> List.head of 
-        Just ix -> 
-          let
-            reversedIx = 
-              if ix == 0 then 
-                (2 * String.length pwd - 2) // 2
-              else if (ix |> modBy 2) == 0 then 
-                (ix + String.length pwd - 2) // 2
-              else 
-                (ix - 1) // 2        
-            steps = if reversedIx >= 4 then reversedIx + 2 else reversedIx + 1 
-          in 
-            rotateLeft steps pwd 
-        Nothing -> 
-          pwd  
-    Nothing ->
-      pwd 
-
-tryReversePositions : String -> String -> String 
-tryReversePositions op pwd = 
-  -- reverse positions 0 through 4
-  case op |> String.split " " of 
-    [ _, _, str1, _, str2 ] -> 
-      case (String.toInt str1, String.toInt str2) of 
-        (Just pos1, Just pos2) -> 
-          let
-            before = String.left pos1 pwd 
-            after = String.dropLeft (pos2 + 1) pwd  
-            section = pwd |> String.left (pos2 + 1) |> String.dropLeft pos1 
-            reversed = section |> String.toList |> List.reverse |> String.fromList 
-          in 
-            before ++ reversed ++ after
-        _ -> 
-          pwd 
-    _ ->
-      pwd
-
-tryReversePositionsInverse : String -> String -> String 
-tryReversePositionsInverse = tryReversePositions
-
-movePosition : Int -> Int -> String -> String
-movePosition pos1 pos2 pwd = 
-  let 
-    ch = String.slice pos1 (pos1 + 1) pwd 
-    before1 = String.left pos1 pwd 
-    after1 = String.dropLeft (pos1 + 1) pwd 
-    removed = before1 ++ after1 
-    before2 = String.left pos2 removed 
-    after2 = String.dropLeft (pos2) removed 
-  in 
-    before2 ++ ch ++ after2
-
-tryMovePosition : String -> String -> String 
-tryMovePosition op pwd =
-  -- move position 3 to position 2
-  case op |> String.split " " of 
-    [ _, _, str1, _, _, str2 ] -> 
-      case (String.toInt str1, String.toInt str2) of 
-        (Just pos1, Just pos2) -> 
-          movePosition pos1 pos2 pwd 
-        _ -> 
-          pwd 
-    _ ->
-      pwd
-
-tryMovePositionInverse : String -> String -> String 
-tryMovePositionInverse op pwd =
-  -- move position 3 to position 2
-  case op |> String.split " " of 
-    [ _, _, str1, _, _, str2 ] -> 
-      case (String.toInt str1, String.toInt str2) of 
-        (Just pos1, Just pos2) -> 
-          movePosition pos2 pos1 pwd 
-        _ -> 
-          pwd 
-    _ ->
-      pwd
-
-scramblePassword : String -> String -> String 
-scramblePassword op pwd =
-  if op |> String.startsWith "swap letter" then 
-    trySwapLetters op pwd
-  else if op |> String.startsWith "swap position" then 
-    trySwapPositions op pwd 
-  else if op |> String.startsWith "rotate left" then 
-    tryRotateLeft op pwd 
-  else if op |> String.startsWith "rotate right" then 
-    tryRotateRight op pwd 
-  else if op |> String.startsWith "rotate based" then 
-    tryRotatePosition op pwd 
-  else if op |> String.startsWith "reverse positions" then 
-    tryReversePositions op pwd  
-  else if op |> String.startsWith "move position" then 
-    tryMovePosition op pwd 
-  else 
-    pwd
-
-descramblePassword : String -> String -> String 
-descramblePassword op pwd = 
-  if op |> String.startsWith "swap letter" then 
-    trySwapLettersInverse op pwd
-  else if op |> String.startsWith "swap position" then 
-    trySwapPositionsInverse op pwd 
-  else if op |> String.startsWith "rotate left" then 
-    tryRotateLeftInverse op pwd 
-  else if op |> String.startsWith "rotate right" then 
-    tryRotateRightInverse op pwd 
-  else if op |> String.startsWith "rotate based" then 
-    tryRotatePositionInverse op pwd 
-  else if op |> String.startsWith "reverse positions" then 
-    tryReversePositionsInverse op pwd  
-  else if op |> String.startsWith "move position" then 
-    tryMovePositionInverse op pwd 
-  else 
-    pwd
+  initModel model.largeNumbers model.dataSource
 
 updateStep : Model -> Model
 updateStep model = 
-  case model.operations of 
-    [] -> 
-      { model | finished = True, paused = True, debug = "" }
-    op :: rest ->
-      let 
-        prevPwd = model.password 
-        pwd = if model.descramble then descramblePassword op model.password else scramblePassword op model.password 
-      in 
-        { model | password = pwd, prevPassword = prevPwd, operations = rest, debug = op }
+  let 
+    (links, current) = move model.maxCup (model.links, model.current)
+    pause = model.paused || model.moveNumber + 1 == 100
+  in 
+    { model | links = links, current = current, moveNumber = model.moveNumber + 1, paused = pause }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
   if model.finished then 
     let 
-      m = initModel model.state model.descramble
+      m = initModel model.largeNumbers model.dataSource
     in 
       {m | paused = False }
   else 
     { model | paused = not model.paused }
 
-updateToggleDescramble : Model -> Model
-updateToggleDescramble model = 
+updateToggleLargeNumbers : Model -> Model
+updateToggleLargeNumbers model = 
   let
-    descramble = not model.descramble
+    largeNumbers = not model.largeNumbers
   in
-    initModel model.state descramble
+    initModel largeNumbers model.dataSource
+
+updateDataSource : DataSource -> Model -> Model
+updateDataSource dataSource model = 
+  initModel model.largeNumbers dataSource 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -451,12 +174,10 @@ update msg model =
       ({model | tickInterval = model.tickInterval / 2 }, Cmd.none)
     Slower -> 
       ({model | tickInterval = model.tickInterval * 2 }, Cmd.none)
-    ToggleDescramble -> 
-      (updateToggleDescramble model, Cmd.none)
-    UsePlainText -> 
-      (initModel PlainText False, Cmd.none)
-    UseScrambled -> 
-      (initModel Scrambled True, Cmd.none)
+    ToggleLargeNumbers -> 
+      (updateToggleLargeNumbers model, Cmd.none)
+    UseDataSource dataSource -> 
+      (updateDataSource dataSource model, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -469,118 +190,91 @@ subscriptions model =
 
 -- VIEW
 
-toBoxElement : Float -> Pos -> Svg Msg
-toBoxElement boxSize (xInt, yInt) =
-  let
-    widthStr = boxSize |> String.fromFloat
-    heightStr = boxSize |> String.fromFloat
-    xStr = String.fromFloat (toFloat xInt * boxSize)
-    yStr = String.fromFloat (toFloat yInt * boxSize)
-  in
-    rect
-          [ x xStr
-          , y yStr
-          , width widthStr
-          , height heightStr
-          , fill "none"
-          , stroke "currentcolor"
-          , strokeWidth "1px"
-          ]
-          []
+toScale : Float -> String 
+toScale v = 160 * v |> String.fromFloat 
 
-toLetterElement : Float -> Char -> Pos -> Svg Msg
-toLetterElement boxSize ch (xInt, yInt) =
-  let
-    xStr = String.fromFloat (toFloat xInt * boxSize + 6)
-    yStr = String.fromFloat (toFloat yInt * boxSize - 6)
-  in
-    Svg.text_ [ x xStr, y yStr, fill "currentcolor" ] [ Svg.text (String.fromChar ch) ]
+toCircleElement : Bool -> Float -> Int -> List (Html Msg)
+toCircleElement isCurrent angle cup = 
+  let 
+    color = if isCurrent then "lightgreen" else "none"
+    cxPos = cos (degrees (90 - angle))
+    cyPos = -1 * sin (degrees (90 - angle))
+    cxStr = 160 * cxPos |> String.fromFloat 
+    cyStr = 160 * cyPos |> String.fromFloat
+    xStr = 160 * cxPos - 6.2 |> String.fromFloat
+    yStr = 160 * cyPos + 6.5 |> String.fromFloat
+    basicAttrs = [ cx cxStr, cy cyStr, r "20", stroke "currentcolor", fill color ]
+    -- attrs = 
+    --   if isCurrent then (class "ok adaptive") :: basicAttrs else basicAttrs
+    cc = circle basicAttrs []
+    txt = text_ [ x xStr, y yStr, fill "currentcolor" ] [ Html.text (String.fromInt cup) ]
+  in 
+    [ cc, txt ]
 
-createLetterElements : Float -> Int -> String -> List (Svg Msg)
-createLetterElements boxSize y password =
-  password |> String.toList |> List.indexedMap (\x ch -> toLetterElement boxSize ch (x, y))
+toCupsLoop : List Int -> Int -> Int -> Dict Int Int -> List Int 
+toCupsLoop acc curr ix links =
+  let 
+    next = lookup ix links
+  in 
+    if next == curr then List.reverse acc 
+    else if List.length acc > 9 then List.reverse acc
+    else toCupsLoop (next :: acc) curr next links 
 
-createBoxes : Float -> Int -> Int -> List (Svg Msg)
-createBoxes boxSize boxCount y =
-  List.range 0 (boxCount - 1)  |> List.map (\x -> toBoxElement boxSize (x, y))
+toCups : Int -> Dict Int Int -> List Int 
+toCups curr links = 
+  toCupsLoop [ curr ] curr curr links
 
-toConnexionElement : Float -> (Int, Int) -> Svg Msg
-toConnexionElement boxSize (xIntSrc, xIntTgt) =
-  let
-    toStr (x, y) = (String.fromFloat x) ++ " " ++ (String.fromFloat y)
-    xSrc = (0.5 + toFloat xIntSrc) * boxSize
-    xTgt = (0.5 + toFloat xIntTgt) * boxSize
-    ySrc = 1 * boxSize
-    yTgt = 5 * boxSize
-    pt1 = (xSrc, ySrc)
-    pt2 = (xSrc, ySrc + 2 * boxSize)
-    pt3 = (xTgt, yTgt - 2 * boxSize)
-    pt4 = (xTgt, yTgt)
-    pt1s = toStr pt1
-    pt2s = toStr pt2
-    pt3s = toStr pt3
-    pt4s = toStr pt4
-    dval = "M" ++ pt1s ++ " C " ++ pt2s ++ ", " ++ pt3s ++ ", " ++ pt4s
-  in
-    Svg.path
-      [ stroke "currentcolor"
-      , strokeWidth "1px"
-      , fill "None"
-      , d dval ] []
+shiftRight : Int -> List Int -> List Int 
+shiftRight steps cups = 
+  let 
+    n = List.length cups - steps 
+    left = List.take n cups 
+    right = List.drop n cups 
+  in 
+    List.append right left  
 
-indexOf : String -> String -> Int
-indexOf p password =
-  password |> String.indexes p |> List.head |> Maybe.withDefault 0
-
-findConnections : String -> String -> List (Int, Int)
-findConnections prevPassword password =
-  if String.isEmpty prevPassword then []
-  else
-    let
-      programList = password |> String.toList |> List.map String.fromChar
-    in
-      programList
-      |> List.map (\p -> (indexOf p prevPassword, indexOf p password))
-      |> List.filter (\(ix1, ix2) -> ix1 /= ix2)
+recreateCups : Int -> Int -> Dict Int Int -> List Int 
+recreateCups moveNumber curr links = 
+  let 
+    cups = toCups curr links 
+    steps = moveNumber |> modBy (Dict.size links)
+    moved = shiftRight steps cups 
+  in 
+    moved 
 
 toSvg : Model -> Html Msg
 toSvg model =
   let
-    boxSize = toFloat 24
-    connections = findConnections model.prevPassword model.password
-    connectionElements = connections |> List.map (toConnexionElement boxSize)
-    letterElements =
-      if String.isEmpty model.prevPassword then
-        createLetterElements boxSize 1 model.password
-      else
-        let
-          topRowLetterElements = createLetterElements boxSize 1 model.prevPassword
-          botRowLetterElements = createLetterElements boxSize 6 model.password
-        in
-          List.append topRowLetterElements botRowLetterElements
-    boxCount = model.password |> String.length 
-    boxElements =
-      if String.isEmpty model.prevPassword then
-        createBoxes boxSize boxCount 0
-      else
-        List.append (createBoxes boxSize boxCount 0) (createBoxes boxSize boxCount 5)
-    -- defs = Svg.defs [] [ createMarker "arrowhead" ]
-    elements = List.concat [ boxElements, connectionElements, letterElements ]
+    -- x axis: cosine (90 - deg)
+    -- y axis: sine (90 - deg)
+    angles = [0,1,2,3,4,5,6,7,8]
+    cups = recreateCups model.moveNumber model.current model.links 
+    circleElements = 
+      cups 
+      |> List.indexedMap (\i c -> toCircleElement (c == model.current) (toFloat (40 * i)) c)
+      |> List.concat
+    elements = circleElements
   in
     svg
-      [ viewBox "-5 -15 202 170"
-      , width "207"
-      , height "175"
+      [ viewBox "-200 -200 400 400"
+      , width "400"
+      , height "400"
       , Svg.Attributes.style "font-family:Source Code Pro,monospace"
       ]
       elements
 
+itemAt : Int -> List a -> Maybe a 
+itemAt index list = 
+  list |> List.drop index |> List.head
+
 view : Model -> Html Msg
 view model =
   let
-    dbgStr = model.debug
-    playButtonText =
-      if model.descramble then "Unscramble" else "Scramble"
+    cups = input |> String.toList |> List.map (String.fromChar) |> List.filterMap (String.toInt)
+    moveStr = if model.moveNumber > 0 then String.fromInt model.moveNumber else ""
+    dbgStr = ""
+
+    playButtonText = "Play"
     svgElement = toSvg model 
   in 
     Html.table 
@@ -594,31 +288,32 @@ view model =
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "32px"
               , Html.Attributes.style "padding" "20px"]
-              [ Html.div [] [Html.text "Advent of Code 2016" ]
-              , Html.div [] [Html.text "Day 21: Scrambled Letters and Hash" ] ] ]
+              [ Html.div [] [Html.text "Advent of Code 2020" ]
+              , Html.div [] [Html.text "Day 23: Crab Cups" ] ] ]
       , Html.tr 
           []
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "padding-bottom" "10px" ]
               [ Html.a 
-                [ Html.Attributes.href "https://adventofcode.com/2016/day/21" ] 
-                [ Html.text "https://adventofcode.com/2016/day/21" ]
+                [ Html.Attributes.href "https://adventofcode.com/2020/day/23" ] 
+                [ Html.text "https://adventofcode.com/2020/day/23" ]
             ] ]
       , Html.tr 
           []
           [ Html.td 
-              [ Html.Attributes.align "center" ]
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "font-family" "Courier New"
+              , Html.Attributes.style "font-size" "16px" ]
               [ 
                 Html.input 
-                [ Html.Attributes.type_ "radio", onClick UsePlainText, Html.Attributes.checked (model.state == PlainText) ] 
+                [ Html.Attributes.type_ "radio", onClick (UseDataSource Input), Html.Attributes.checked (model.dataSource == Input) ] 
                 []
-              , Html.label [] [ Html.text "Plain" ]
-              , 
-                Html.input 
-                [ Html.Attributes.type_ "radio", onClick UseScrambled, Html.Attributes.checked (model.state == Scrambled) ] 
+              , Html.label [] [ Html.text "Input" ]
+              , Html.input 
+                [ Html.Attributes.type_ "radio", onClick (UseDataSource Sample), Html.Attributes.checked (model.dataSource == Sample) ] 
                 []
-              , Html.label [] [ Html.text "Scrambled" ]
+              , Html.label [] [ Html.text "Sample" ]
             ] ]
       , Html.tr 
           []
@@ -646,9 +341,9 @@ view model =
       --     [ Html.td 
       --         [ Html.Attributes.align "center" ]
       --         [ Html.input 
-      --           [ Html.Attributes.type_ "checkbox", onClick ToggleDescramble, Html.Attributes.checked model.descramble ] 
+      --           [ Html.Attributes.type_ "checkbox", onClick ToggleLargeNumbers, Html.Attributes.checked model.largeNumbers ] 
       --           []
-      --         , Html.label [] [ Html.text " Descramble" ]
+      --         , Html.label [] [ Html.text " LargeNumbers" ]
       --       ] ]
       , Html.tr 
           []
@@ -665,9 +360,10 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Source Code Pro, monospace"
-              , Html.Attributes.style "font-size" "16px"
-              , Html.Attributes.style "padding" "10px" ] 
+              , Html.Attributes.style "font-size" "24px"
+              , Html.Attributes.style "padding" "0px" ] 
               [ 
-                Html.div [] [ Html.text dbgStr ]
+                Html.div [] [ Html.text moveStr ]
+              , Html.div [] [ Html.text dbgStr ]
               ] ] 
               ]

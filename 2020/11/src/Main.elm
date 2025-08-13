@@ -441,7 +441,7 @@ toCircleElement c =
     rStr = String.fromInt c.r
     circleClass = 
       case c.status of 
-        Occupied -> "err adaptive"
+        Occupied -> "wrong adaptive"
         Empty -> "ok adaptive"
   in
     circle [ class circleClass, cx xStr, cy yStr, r rStr, fill "currentcolor" ] []

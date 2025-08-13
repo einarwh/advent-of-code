@@ -798,11 +798,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.O.B === region.U.B)
+	if (region.P.D === region.V.D)
 	{
-		return 'on line ' + region.O.B;
+		return 'on line ' + region.P.D;
 	}
-	return 'on lines ' + region.O.B + ' through ' + region.U.B;
+	return 'on lines ' + region.P.D + ' through ' + region.V.D;
 }
 
 
@@ -1871,9 +1871,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aB,
-		impl.aJ,
-		impl.aH,
+		impl.aC,
+		impl.aK,
+		impl.aI,
 		function() { return function() {} }
 	);
 });
@@ -2733,9 +2733,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		_: func(record._),
-		P: record.P,
-		M: record.M
+		aa: func(record.aa),
+		Q: record.Q,
+		N: record.N
 	}
 });
 
@@ -3003,11 +3003,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value._;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.P;
+		var message = !tag ? value : tag < 3 ? value.a : value.aa;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.Q;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.M) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.N) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3957,11 +3957,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aB,
-		impl.aJ,
-		impl.aH,
+		impl.aC,
+		impl.aK,
+		impl.aI,
 		function(sendToApp, initialModel) {
-			var view = impl.aK;
+			var view = impl.aL;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3993,12 +3993,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aB,
-		impl.aJ,
-		impl.aH,
+		impl.aC,
+		impl.aK,
+		impl.aI,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.N && impl.N(sendToApp)
-			var view = impl.aK;
+			var divertHrefToApp = impl.O && impl.O(sendToApp)
+			var view = impl.aL;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -4006,12 +4006,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.au);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.av);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.aI) && (_VirtualDom_doc.title = title = doc.aI);
+				(title !== doc.aJ) && (_VirtualDom_doc.title = title = doc.aJ);
 			});
 		}
 	);
@@ -4067,12 +4067,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aD;
-	var onUrlRequest = impl.aE;
+	var onUrlChange = impl.aE;
+	var onUrlRequest = impl.aF;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		N: function(sendToApp)
+		O: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4088,9 +4088,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.ah === next.ah
-							&& curr.Y === next.Y
-							&& curr.ae.a === next.ae.a
+							&& curr.ai === next.ai
+							&& curr.Z === next.Z
+							&& curr.af.a === next.af.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4098,13 +4098,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aB: function(flags)
+		aC: function(flags)
 		{
-			return A3(impl.aB, flags, _Browser_getUrl(), key);
+			return A3(impl.aC, flags, _Browser_getUrl(), key);
 		},
+		aL: impl.aL,
 		aK: impl.aK,
-		aJ: impl.aJ,
-		aH: impl.aH
+		aI: impl.aI
 	});
 }
 
@@ -4170,17 +4170,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { az: 'hidden', av: 'visibilitychange' }
+		? { aA: 'hidden', aw: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { az: 'mozHidden', av: 'mozvisibilitychange' }
+		? { aA: 'mozHidden', aw: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { az: 'msHidden', av: 'msvisibilitychange' }
+		? { aA: 'msHidden', aw: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { az: 'webkitHidden', av: 'webkitvisibilitychange' }
-		: { az: 'hidden', av: 'visibilitychange' };
+		? { aA: 'webkitHidden', aw: 'webkitvisibilitychange' }
+		: { aA: 'hidden', aw: 'visibilitychange' };
 }
 
 
@@ -4261,12 +4261,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		al: _Browser_getScene(),
-		ao: {
-			aq: _Browser_window.pageXOffset,
-			ar: _Browser_window.pageYOffset,
-			ap: _Browser_doc.documentElement.clientWidth,
-			X: _Browser_doc.documentElement.clientHeight
+		am: _Browser_getScene(),
+		ap: {
+			ar: _Browser_window.pageXOffset,
+			as: _Browser_window.pageYOffset,
+			aq: _Browser_doc.documentElement.clientWidth,
+			Y: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4276,8 +4276,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		ap: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		X: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		aq: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		Y: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4300,15 +4300,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			al: {
-				ap: node.scrollWidth,
-				X: node.scrollHeight
+			am: {
+				aq: node.scrollWidth,
+				Y: node.scrollHeight
 			},
-			ao: {
-				aq: node.scrollLeft,
-				ar: node.scrollTop,
-				ap: node.clientWidth,
-				X: node.clientHeight
+			ap: {
+				ar: node.scrollLeft,
+				as: node.scrollTop,
+				aq: node.clientWidth,
+				Y: node.clientHeight
 			}
 		};
 	});
@@ -4338,18 +4338,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			al: _Browser_getScene(),
-			ao: {
-				aq: x,
-				ar: y,
-				ap: _Browser_doc.documentElement.clientWidth,
-				X: _Browser_doc.documentElement.clientHeight
+			am: _Browser_getScene(),
+			ap: {
+				ar: x,
+				as: y,
+				aq: _Browser_doc.documentElement.clientWidth,
+				Y: _Browser_doc.documentElement.clientHeight
 			},
-			ax: {
-				aq: x + rect.left,
-				ar: y + rect.top,
-				ap: rect.width,
-				X: rect.height
+			ay: {
+				ar: x + rect.left,
+				as: y + rect.top,
+				aq: rect.width,
+				Y: rect.height
 			}
 		};
 	});
@@ -4934,7 +4934,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {W: fragment, Y: host, ac: path, ae: port_, ah: protocol, ai: query};
+		return {X: fragment, Z: host, ad: path, af: port_, ai: protocol, aj: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5431,7 +5431,17 @@ var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
 };
-var $author$project$Aoc23$input = '326519478';
+var $elm$core$List$maximum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Aoc23$sample = '389125467';
 var $elm$core$String$foldr = _String_foldr;
 var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
@@ -5443,13 +5453,27 @@ var $author$project$Aoc23$initModel = function (largeNumbers) {
 		A2(
 			$elm$core$List$map,
 			$elm$core$String$fromChar,
-			$elm$core$String$toList($author$project$Aoc23$input)));
+			$elm$core$String$toList($author$project$Aoc23$sample)));
 	var current = A2(
 		$elm$core$Maybe$withDefault,
 		0,
 		$elm$core$List$head(cups));
 	var links = $author$project$Aoc23$createLinks(cups);
-	return {G: current, T: '', H: false, A: largeNumbers, I: links, _: '', K: 1, s: true, u: $author$project$Aoc23$defaultTickInterval};
+	return {
+		x: current,
+		U: '',
+		J: false,
+		C: largeNumbers,
+		E: links,
+		K: A2(
+			$elm$core$Maybe$withDefault,
+			0,
+			$elm$core$List$maximum(cups)),
+		aa: '',
+		p: 0,
+		m: true,
+		v: $author$project$Aoc23$defaultTickInterval
+	};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -5465,7 +5489,7 @@ var $elm$time$Time$Every = F2(
 	});
 var $elm$time$Time$State = F2(
 	function (taggers, processes) {
-		return {ag: processes, an: taggers};
+		return {ah: processes, ao: taggers};
 	});
 var $elm$time$Time$init = $elm$core$Task$succeed(
 	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
@@ -5646,7 +5670,7 @@ var $elm$time$Time$spawnHelp = F3(
 	});
 var $elm$time$Time$onEffects = F3(
 	function (router, subs, _v0) {
-		var processes = _v0.ag;
+		var processes = _v0.ah;
 		var rightStep = F3(
 			function (_v6, id, _v7) {
 				var spawns = _v7.a;
@@ -5715,7 +5739,7 @@ var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
 var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $elm$time$Time$onSelfMsg = F3(
 	function (router, interval, state) {
-		var _v0 = A2($elm$core$Dict$get, interval, state.an);
+		var _v0 = A2($elm$core$Dict$get, interval, state.ao);
 		if (_v0.$ === 1) {
 			return $elm$core$Task$succeed(state);
 		} else {
@@ -5764,35 +5788,133 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Aoc23$subscriptions = function (model) {
-	var tickSub = (model.s || model.H) ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = (model.m || model.J) ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.u,
+		model.v,
 		function (_v0) {
 			return 0;
 		});
 	return tickSub;
 };
 var $author$project$Aoc23$updateReset = function (model) {
-	return $author$project$Aoc23$initModel(model.A);
+	return $author$project$Aoc23$initModel(model.C);
 };
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
+var $author$project$Aoc23$findDestination = F3(
+	function (removed, maxCup, i) {
+		findDestination:
+		while (true) {
+			if (i < 1) {
+				var $temp$removed = removed,
+					$temp$maxCup = maxCup,
+					$temp$i = maxCup;
+				removed = $temp$removed;
+				maxCup = $temp$maxCup;
+				i = $temp$i;
+				continue findDestination;
+			} else {
+				if (A2($elm$core$List$member, i, removed)) {
+					var $temp$removed = removed,
+						$temp$maxCup = maxCup,
+						$temp$i = i - 1;
+					removed = $temp$removed;
+					maxCup = $temp$maxCup;
+					i = $temp$i;
+					continue findDestination;
+				} else {
+					return i;
+				}
+			}
+		}
+	});
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $author$project$Aoc23$lookup = F2(
+	function (curr, links) {
+		return A2(
+			$elm$core$Maybe$withDefault,
+			-1,
+			A2($elm$core$Dict$get, curr, links));
+	});
+var $author$project$Aoc23$move = F2(
+	function (maxCup, _v0) {
+		var links = _v0.a;
+		var curr = _v0.b;
+		var cup1 = A2($author$project$Aoc23$lookup, curr, links);
+		var cup2 = A2($author$project$Aoc23$lookup, cup1, links);
+		var cup3 = A2($author$project$Aoc23$lookup, cup2, links);
+		var next = A2($author$project$Aoc23$lookup, cup3, links);
+		var removed = _List_fromArray(
+			[cup1, cup2, cup3]);
+		var dest = A3($author$project$Aoc23$findDestination, removed, maxCup, curr - 1);
+		var updatedLinks = A3(
+			$elm$core$Dict$insert,
+			cup3,
+			A2($author$project$Aoc23$lookup, dest, links),
+			A3(
+				$elm$core$Dict$insert,
+				dest,
+				cup1,
+				A3($elm$core$Dict$insert, curr, next, links)));
+		return _Utils_Tuple2(updatedLinks, next);
+	});
 var $author$project$Aoc23$updateStep = function (model) {
-	return model;
+	var pause = model.m || ((model.p + 1) === 100);
+	var _v0 = A2(
+		$author$project$Aoc23$move,
+		model.K,
+		_Utils_Tuple2(model.E, model.x));
+	var links = _v0.a;
+	var current = _v0.b;
+	return _Utils_update(
+		model,
+		{x: current, E: links, p: model.p + 1, m: pause});
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Aoc23$updateToggleLargeNumbers = function (model) {
-	var largeNumbers = !model.A;
+	var largeNumbers = !model.C;
 	return $author$project$Aoc23$initModel(largeNumbers);
 };
 var $author$project$Aoc23$updateTogglePlay = function (model) {
-	if (model.H) {
-		var m = $author$project$Aoc23$initModel(model.A);
+	if (model.J) {
+		var m = $author$project$Aoc23$initModel(model.C);
 		return _Utils_update(
 			m,
-			{s: false});
+			{m: false});
 	} else {
 		return _Utils_update(
 			model,
-			{s: !model.s});
+			{m: !model.m});
 	}
 };
 var $author$project$Aoc23$update = F2(
@@ -5818,13 +5940,13 @@ var $author$project$Aoc23$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{u: model.u / 2}),
+						{v: model.v / 2}),
 					$elm$core$Platform$Cmd$none);
 			case 3:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{u: model.u * 2}),
+						{v: model.v * 2}),
 					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(
@@ -5855,9 +5977,7 @@ var $elm$html$Html$Attributes$href = function (url) {
 		'href',
 		_VirtualDom_noJavaScriptUri(url));
 };
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
+var $author$project$Aoc23$input = '326519478';
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 0, a: a};
 };
@@ -5893,13 +6013,159 @@ var $elm$core$List$concat = function (lists) {
 	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
 };
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
-var $author$project$Aoc23$lookup = F2(
-	function (curr, links) {
-		return A2(
-			$elm$core$Maybe$withDefault,
-			-1,
-			A2($elm$core$Dict$get, curr, links));
+var $elm$core$List$takeReverse = F3(
+	function (n, list, kept) {
+		takeReverse:
+		while (true) {
+			if (n <= 0) {
+				return kept;
+			} else {
+				if (!list.b) {
+					return kept;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs,
+						$temp$kept = A2($elm$core$List$cons, x, kept);
+					n = $temp$n;
+					list = $temp$list;
+					kept = $temp$kept;
+					continue takeReverse;
+				}
+			}
+		}
 	});
+var $elm$core$List$takeTailRec = F2(
+	function (n, list) {
+		return $elm$core$List$reverse(
+			A3($elm$core$List$takeReverse, n, list, _List_Nil));
+	});
+var $elm$core$List$takeFast = F3(
+	function (ctr, n, list) {
+		if (n <= 0) {
+			return _List_Nil;
+		} else {
+			var _v0 = _Utils_Tuple2(n, list);
+			_v0$1:
+			while (true) {
+				_v0$5:
+				while (true) {
+					if (!_v0.b.b) {
+						return list;
+					} else {
+						if (_v0.b.b.b) {
+							switch (_v0.a) {
+								case 1:
+									break _v0$1;
+								case 2:
+									var _v2 = _v0.b;
+									var x = _v2.a;
+									var _v3 = _v2.b;
+									var y = _v3.a;
+									return _List_fromArray(
+										[x, y]);
+								case 3:
+									if (_v0.b.b.b.b) {
+										var _v4 = _v0.b;
+										var x = _v4.a;
+										var _v5 = _v4.b;
+										var y = _v5.a;
+										var _v6 = _v5.b;
+										var z = _v6.a;
+										return _List_fromArray(
+											[x, y, z]);
+									} else {
+										break _v0$5;
+									}
+								default:
+									if (_v0.b.b.b.b && _v0.b.b.b.b.b) {
+										var _v7 = _v0.b;
+										var x = _v7.a;
+										var _v8 = _v7.b;
+										var y = _v8.a;
+										var _v9 = _v8.b;
+										var z = _v9.a;
+										var _v10 = _v9.b;
+										var w = _v10.a;
+										var tl = _v10.b;
+										return (ctr > 1000) ? A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A2($elm$core$List$takeTailRec, n - 4, tl))))) : A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A3($elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
+									} else {
+										break _v0$5;
+									}
+							}
+						} else {
+							if (_v0.a === 1) {
+								break _v0$1;
+							} else {
+								break _v0$5;
+							}
+						}
+					}
+				}
+				return list;
+			}
+			var _v1 = _v0.b;
+			var x = _v1.a;
+			return _List_fromArray(
+				[x]);
+		}
+	});
+var $elm$core$List$take = F2(
+	function (n, list) {
+		return A3($elm$core$List$takeFast, 0, n, list);
+	});
+var $author$project$Aoc23$shiftRight = F2(
+	function (steps, cups) {
+		var n = $elm$core$List$length(cups) - steps;
+		var right = A2($elm$core$List$drop, n, cups);
+		var left = A2($elm$core$List$take, n, cups);
+		return A2($elm$core$List$append, right, left);
+	});
+var $elm$core$Dict$sizeHelp = F2(
+	function (n, dict) {
+		sizeHelp:
+		while (true) {
+			if (dict.$ === -2) {
+				return n;
+			} else {
+				var left = dict.d;
+				var right = dict.e;
+				var $temp$n = A2($elm$core$Dict$sizeHelp, n + 1, right),
+					$temp$dict = left;
+				n = $temp$n;
+				dict = $temp$dict;
+				continue sizeHelp;
+			}
+		}
+	});
+var $elm$core$Dict$size = function (dict) {
+	return A2($elm$core$Dict$sizeHelp, 0, dict);
+};
 var $author$project$Aoc23$toCupsLoop = F4(
 	function (acc, curr, ix, links) {
 		toCupsLoop:
@@ -5936,8 +6202,12 @@ var $author$project$Aoc23$toCups = F2(
 	});
 var $author$project$Aoc23$recreateCups = F3(
 	function (moveNumber, curr, links) {
+		var steps = A2(
+			$elm$core$Basics$modBy,
+			$elm$core$Dict$size(links),
+			moveNumber);
 		var cups = A2($author$project$Aoc23$toCups, curr, links);
-		var moved = cups;
+		var moved = A2($author$project$Aoc23$shiftRight, steps, cups);
 		return moved;
 	});
 var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
@@ -6000,7 +6270,7 @@ var $author$project$Aoc23$toCircleElement = F3(
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $author$project$Aoc23$toSvg = function (model) {
-	var cups = A3($author$project$Aoc23$recreateCups, model.K, model.G, model.I);
+	var cups = A3($author$project$Aoc23$recreateCups, model.p, model.x, model.E);
 	var circleElements = $elm$core$List$concat(
 		A2(
 			$elm$core$List$indexedMap,
@@ -6008,7 +6278,7 @@ var $author$project$Aoc23$toSvg = function (model) {
 				function (i, c) {
 					return A3(
 						$author$project$Aoc23$toCircleElement,
-						_Utils_eq(c, model.G),
+						_Utils_eq(c, model.x),
 						40 * i,
 						c);
 				}),
@@ -6031,8 +6301,8 @@ var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $author$project$Aoc23$viewBody = function (model) {
 	var svgElement = $author$project$Aoc23$toSvg(model);
 	var playButtonText = 'Play';
-	var ix = 9;
-	var cupsStr = '?';
+	var moveStr = (model.p > 0) ? $elm$core$String$fromInt(model.p) : '';
+	var dbgStr = '';
 	var cups = A2(
 		$elm$core$List$filterMap,
 		$elm$core$String$toInt,
@@ -6040,16 +6310,6 @@ var $author$project$Aoc23$viewBody = function (model) {
 			$elm$core$List$map,
 			$elm$core$String$fromChar,
 			$elm$core$String$toList($author$project$Aoc23$input)));
-	var index = A2(
-		$elm$core$Basics$modBy,
-		$elm$core$List$length(cups),
-		ix + 1);
-	var cup = A2(
-		$elm$core$Maybe$withDefault,
-		-1,
-		$elm$core$List$head(
-			A2($elm$core$List$drop, index - 1, cups)));
-	var dbgStr = 'index: ' + ($elm$core$String$fromInt(index) + (', cup: ' + $elm$core$String$fromInt(cup)));
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
@@ -6163,7 +6423,7 @@ var $author$project$Aoc23$viewBody = function (model) {
 									]),
 								_List_fromArray(
 									[
-										model.s ? $elm$html$Html$text(playButtonText) : $elm$html$Html$text('Pause')
+										model.m ? $elm$html$Html$text(playButtonText) : $elm$html$Html$text('Pause')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -6223,8 +6483,8 @@ var $author$project$Aoc23$viewBody = function (model) {
 							[
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Source Code Pro, monospace'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '16px'),
-								A2($elm$html$Html$Attributes$style, 'padding', '10px')
+								A2($elm$html$Html$Attributes$style, 'font-size', '24px'),
+								A2($elm$html$Html$Attributes$style, 'padding', '0px')
 							]),
 						_List_fromArray(
 							[
@@ -6233,7 +6493,7 @@ var $author$project$Aoc23$viewBody = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text(cupsStr)
+										$elm$html$Html$text(moveStr)
 									])),
 								A2(
 								$elm$html$Html$div,
@@ -6248,15 +6508,15 @@ var $author$project$Aoc23$viewBody = function (model) {
 };
 var $author$project$Aoc23$view = function (model) {
 	return {
-		au: _List_fromArray(
+		av: _List_fromArray(
 			[
 				$author$project$Aoc23$viewBody(model)
 			]),
-		aI: 'Advent of Code 2020 | Day 23: Crab Cups'
+		aJ: 'Advent of Code 2020 | Day 23: Crab Cups'
 	};
 };
 var $author$project$Aoc23$main = $elm$browser$Browser$document(
-	{aB: $author$project$Aoc23$init, aH: $author$project$Aoc23$subscriptions, aJ: $author$project$Aoc23$update, aK: $author$project$Aoc23$view});
+	{aC: $author$project$Aoc23$init, aI: $author$project$Aoc23$subscriptions, aK: $author$project$Aoc23$update, aL: $author$project$Aoc23$view});
 _Platform_export({'Aoc23':{'init':$author$project$Aoc23$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
 

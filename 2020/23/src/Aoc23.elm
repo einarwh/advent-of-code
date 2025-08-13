@@ -30,12 +30,16 @@ type alias Model =
   { links : Dict Int Int
   , current : Int 
   , moveNumber : Int 
+  , maxCup : Int 
   , largeNumbers : Bool 
   , paused : Bool 
   , finished : Bool 
   , tickInterval : Float 
   , message : String
   , debug : String }
+
+sample : String 
+sample = "389125467"
 
 input : String 
 input = "326519478"
@@ -56,13 +60,14 @@ createLinks cups =
 initModel : Bool -> Model 
 initModel largeNumbers = 
   let
-    cups = input |> String.toList |> List.map (String.fromChar) |> List.filterMap (String.toInt)
+    cups = sample |> String.toList |> List.map (String.fromChar) |> List.filterMap (String.toInt)
     links = createLinks cups
     current = cups |> List.head |> Maybe.withDefault 0 
   in 
     { links = links
     , current = current 
-    , moveNumber = 1
+    , moveNumber = 0
+    , maxCup = cups |> List.maximum |> Maybe.withDefault 0
     , largeNumbers = largeNumbers 
     , paused = True
     , finished = False 
@@ -117,7 +122,12 @@ updateReset model =
   initModel model.largeNumbers
 
 updateStep : Model -> Model
-updateStep model = model
+updateStep model = 
+  let 
+    (links, current) = move model.maxCup (model.links, model.current)
+    pause = model.paused || model.moveNumber + 1 == 100
+  in 
+    { model | links = links, current = current, moveNumber = model.moveNumber + 1, paused = pause }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -196,11 +206,21 @@ toCups : Int -> Dict Int Int -> List Int
 toCups curr links = 
   toCupsLoop [ curr ] curr curr links
 
+shiftRight : Int -> List Int -> List Int 
+shiftRight steps cups = 
+  let 
+    n = List.length cups - steps 
+    left = List.take n cups 
+    right = List.drop n cups 
+  in 
+    List.append right left  
+
 recreateCups : Int -> Int -> Dict Int Int -> List Int 
 recreateCups moveNumber curr links = 
   let 
     cups = toCups curr links 
-    moved = cups 
+    steps = moveNumber |> modBy (Dict.size links)
+    moved = shiftRight steps cups 
   in 
     moved 
 
@@ -238,21 +258,8 @@ viewBody : Model -> Html Msg
 viewBody model =
   let
     cups = input |> String.toList |> List.map (String.fromChar) |> List.filterMap (String.toInt)
-    cupsStr = "?"
-    -- cupsStr = cups |> List.map String.fromInt |> String.concat
-    -- dbgStr = 
-    --   model.links 
-    --   |> Dict.toList 
-    --   |> List.map (\(k, v) -> String.fromInt k ++ ":" ++ String.fromInt v)
-    --   |> String.join ","
-    -- cups = recreateCups model.moveNumber model.current model.links 
-    -- next = lookup model.current model.links
-    -- dbgStr = cups |> List.map String.fromInt |> String.join "."
-    -- dbgStr = "next?" ++ (next |> String.fromInt)
-    ix = 9
-    index = (ix + 1) |> modBy (List.length cups)
-    cup = cups |> List.drop (index - 1) |> List.head |> Maybe.withDefault -1
-    dbgStr = "index: " ++ (String.fromInt index) ++ ", cup: " ++ String.fromInt cup
+    moveStr = if model.moveNumber > 0 then String.fromInt model.moveNumber else ""
+    dbgStr = ""
 
     playButtonText = "Play"
     svgElement = toSvg model 
@@ -324,10 +331,10 @@ viewBody model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Source Code Pro, monospace"
-              , Html.Attributes.style "font-size" "16px"
-              , Html.Attributes.style "padding" "10px" ] 
+              , Html.Attributes.style "font-size" "24px"
+              , Html.Attributes.style "padding" "0px" ] 
               [ 
-                Html.div [] [ Html.text cupsStr ]
+                Html.div [] [ Html.text moveStr ]
               , Html.div [] [ Html.text dbgStr ]
               ] ] 
               ]
