@@ -1,0 +1,1 @@
+cp aoc03.js ../../../experiments-in-powerblog/resources/public/js/aoc/2020/
