@@ -135,8 +135,9 @@ updateStep model =
   let 
     (links, current) = move model.maxCup (model.links, model.current)
     pause = model.paused || model.moveNumber + 1 == 100
+    finish = model.moveNumber + 1 == 100
   in 
-    { model | links = links, current = current, moveNumber = model.moveNumber + 1, paused = pause }
+    { model | links = links, current = current, moveNumber = model.moveNumber + 1, paused = pause, finished = finish }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -193,23 +194,33 @@ subscriptions model =
 toScale : Float -> String 
 toScale v = 160 * v |> String.fromFloat 
 
-toCircleElement : Bool -> Float -> Int -> List (Html Msg)
-toCircleElement isCurrent angle cup = 
+toCircleElements : Bool -> Bool -> Bool -> Float -> Int -> List (Html Msg)
+toCircleElements isCup1 isFinished isCurrent angle cup = 
   let 
-    color = if isCurrent then "lightgreen" else "none"
     cxPos = cos (degrees (90 - angle))
     cyPos = -1 * sin (degrees (90 - angle))
     cxStr = 160 * cxPos |> String.fromFloat 
     cyStr = 160 * cyPos |> String.fromFloat
     xStr = 160 * cxPos - 6.2 |> String.fromFloat
     yStr = 160 * cyPos + 6.5 |> String.fromFloat
-    basicAttrs = [ cx cxStr, cy cyStr, r "20", stroke "currentcolor", fill color ]
-    -- attrs = 
-    --   if isCurrent then (class "ok adaptive") :: basicAttrs else basicAttrs
-    cc = circle basicAttrs []
+    cc = circle [ cx cxStr, cy cyStr, r "20", stroke "currentcolor", fill "none" ] []
     txt = text_ [ x xStr, y yStr, fill "currentcolor" ] [ Html.text (String.fromInt cup) ]
-  in 
-    [ cc, txt ]
+    basicCircles = [ cc, txt ]
+  in
+    if isFinished then 
+      if isCup1 then basicCircles 
+      else 
+        let 
+          fc = circle [ class "draw-highlight adaptive", cx cxStr, cy cyStr, r "20", stroke "none", fill "currentcolor" ] []
+        in 
+          fc :: basicCircles
+    else if isCurrent then 
+      let 
+        fc = circle [ class "draw-light-green adaptive", cx cxStr, cy cyStr, r "20", stroke "none", fill "currentcolor" ] []
+      in 
+        fc :: basicCircles
+    else 
+      basicCircles
 
 toCupsLoop : List Int -> Int -> Int -> Dict Int Int -> List Int 
 toCupsLoop acc curr ix links =
@@ -251,7 +262,7 @@ toSvg model =
     cups = recreateCups model.moveNumber model.current model.links 
     circleElements = 
       cups 
-      |> List.indexedMap (\i c -> toCircleElement (c == model.current) (toFloat (40 * i)) c)
+      |> List.indexedMap (\i c -> toCircleElements (c == 1) model.finished (c == model.current) (toFloat (40 * i)) c)
       |> List.concat
     elements = circleElements
   in

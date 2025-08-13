@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.Q.E === region.W.E)
+	if (region.Q.F === region.W.F)
 	{
-		return 'on line ' + region.Q.E;
+		return 'on line ' + region.Q.F;
 	}
-	return 'on lines ' + region.Q.E + ' through ' + region.W.E;
+	return 'on lines ' + region.Q.F + ' through ' + region.W.F;
 }
 
 
@@ -5459,16 +5459,16 @@ var $author$project$Main$initModel = F2(
 			y: current,
 			s: dataSource,
 			V: '',
-			K: false,
-			A: largeNumbers,
-			F: links,
+			A: false,
+			B: largeNumbers,
+			G: links,
 			L: A2(
 				$elm$core$Maybe$withDefault,
 				0,
 				$elm$core$List$maximum(cups)),
 			ab: '',
-			p: 0,
-			m: true,
+			m: 0,
+			n: true,
 			w: $author$project$Main$defaultTickInterval
 		};
 	});
@@ -5785,7 +5785,7 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (model) {
-	var tickSub = (model.m || model.K) ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = (model.n || model.A) ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
 		model.w,
 		function (_v0) {
@@ -5795,10 +5795,10 @@ var $author$project$Main$subscriptions = function (model) {
 };
 var $author$project$Main$updateDataSource = F2(
 	function (dataSource, model) {
-		return A2($author$project$Main$initModel, model.A, dataSource);
+		return A2($author$project$Main$initModel, model.B, dataSource);
 	});
 var $author$project$Main$updateReset = function (model) {
-	return A2($author$project$Main$initModel, model.A, model.s);
+	return A2($author$project$Main$initModel, model.B, model.s);
 };
 var $elm$core$List$any = F2(
 	function (isOkay, list) {
@@ -5890,32 +5890,33 @@ var $author$project$Main$move = F2(
 		return _Utils_Tuple2(updatedLinks, next);
 	});
 var $author$project$Main$updateStep = function (model) {
-	var pause = model.m || ((model.p + 1) === 100);
+	var pause = model.n || ((model.m + 1) === 100);
+	var finish = (model.m + 1) === 100;
 	var _v0 = A2(
 		$author$project$Main$move,
 		model.L,
-		_Utils_Tuple2(model.F, model.y));
+		_Utils_Tuple2(model.G, model.y));
 	var links = _v0.a;
 	var current = _v0.b;
 	return _Utils_update(
 		model,
-		{y: current, F: links, p: model.p + 1, m: pause});
+		{y: current, A: finish, G: links, m: model.m + 1, n: pause});
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Main$updateToggleLargeNumbers = function (model) {
-	var largeNumbers = !model.A;
+	var largeNumbers = !model.B;
 	return A2($author$project$Main$initModel, largeNumbers, model.s);
 };
 var $author$project$Main$updateTogglePlay = function (model) {
-	if (model.K) {
-		var m = A2($author$project$Main$initModel, model.A, model.s);
+	if (model.A) {
+		var m = A2($author$project$Main$initModel, model.B, model.s);
 		return _Utils_update(
 			m,
-			{m: false});
+			{n: false});
 	} else {
 		return _Utils_update(
 			model,
-			{m: !model.m});
+			{n: !model.n});
 	}
 };
 var $author$project$Main$update = F2(
@@ -6234,6 +6235,7 @@ var $elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
+var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
 var $elm$core$Basics$cos = _Basics_cos;
 var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
 var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
@@ -6249,8 +6251,8 @@ var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
 var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
 var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
 var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
-var $author$project$Main$toCircleElement = F3(
-	function (isCurrent, angle, cup) {
+var $author$project$Main$toCircleElements = F5(
+	function (isCup1, isFinished, isCurrent, angle, cup) {
 		var cyPos = (-1) * $elm$core$Basics$sin(
 			$elm$core$Basics$degrees(90 - angle));
 		var cyStr = $elm$core$String$fromFloat(160 * cyPos);
@@ -6272,7 +6274,6 @@ var $author$project$Main$toCircleElement = F3(
 					$elm$html$Html$text(
 					$elm$core$String$fromInt(cup))
 				]));
-		var color = isCurrent ? 'lightgreen' : 'none';
 		var cc = A2(
 			$elm$svg$Svg$circle,
 			_List_fromArray(
@@ -6281,23 +6282,62 @@ var $author$project$Main$toCircleElement = F3(
 					$elm$svg$Svg$Attributes$cy(cyStr),
 					$elm$svg$Svg$Attributes$r('20'),
 					$elm$svg$Svg$Attributes$stroke('currentcolor'),
-					$elm$svg$Svg$Attributes$fill(color)
+					$elm$svg$Svg$Attributes$fill('none')
 				]),
 			_List_Nil);
-		return _List_fromArray(
+		var basicCircles = _List_fromArray(
 			[cc, txt]);
+		if (isFinished) {
+			if (isCup1) {
+				return basicCircles;
+			} else {
+				var fc = A2(
+					$elm$svg$Svg$circle,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$class('draw-highlight adaptive'),
+							$elm$svg$Svg$Attributes$cx(cxStr),
+							$elm$svg$Svg$Attributes$cy(cyStr),
+							$elm$svg$Svg$Attributes$r('20'),
+							$elm$svg$Svg$Attributes$stroke('none'),
+							$elm$svg$Svg$Attributes$fill('currentcolor')
+						]),
+					_List_Nil);
+				return A2($elm$core$List$cons, fc, basicCircles);
+			}
+		} else {
+			if (isCurrent) {
+				var fc = A2(
+					$elm$svg$Svg$circle,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$class('draw-light-green adaptive'),
+							$elm$svg$Svg$Attributes$cx(cxStr),
+							$elm$svg$Svg$Attributes$cy(cyStr),
+							$elm$svg$Svg$Attributes$r('20'),
+							$elm$svg$Svg$Attributes$stroke('none'),
+							$elm$svg$Svg$Attributes$fill('currentcolor')
+						]),
+					_List_Nil);
+				return A2($elm$core$List$cons, fc, basicCircles);
+			} else {
+				return basicCircles;
+			}
+		}
 	});
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $author$project$Main$toSvg = function (model) {
-	var cups = A3($author$project$Main$recreateCups, model.p, model.y, model.F);
+	var cups = A3($author$project$Main$recreateCups, model.m, model.y, model.G);
 	var circleElements = $elm$core$List$concat(
 		A2(
 			$elm$core$List$indexedMap,
 			F2(
 				function (i, c) {
-					return A3(
-						$author$project$Main$toCircleElement,
+					return A5(
+						$author$project$Main$toCircleElements,
+						c === 1,
+						model.A,
 						_Utils_eq(c, model.y),
 						40 * i,
 						c);
@@ -6322,7 +6362,7 @@ var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('
 var $author$project$Main$view = function (model) {
 	var svgElement = $author$project$Main$toSvg(model);
 	var playButtonText = 'Play';
-	var moveStr = (model.p > 0) ? $elm$core$String$fromInt(model.p) : '';
+	var moveStr = (model.m > 0) ? $elm$core$String$fromInt(model.m) : '';
 	var dbgStr = '';
 	var cups = A2(
 		$elm$core$List$filterMap,
@@ -6495,7 +6535,7 @@ var $author$project$Main$view = function (model) {
 									]),
 								_List_fromArray(
 									[
-										model.m ? $elm$html$Html$text(playButtonText) : $elm$html$Html$text('Pause')
+										model.n ? $elm$html$Html$text(playButtonText) : $elm$html$Html$text('Pause')
 									])),
 								A2(
 								$elm$html$Html$button,

@@ -5,6 +5,12 @@
     <title>My Elm App</title>
     <script src="aoc23.js"></script>
     <style>
+      .draw-highlight {
+        color: #ffff8f;
+      }
+      .draw-light-green {
+        color: #afe1af;
+      }
       .mark-ok {
         background: #afe1af;
       }
@@ -15,6 +21,12 @@
         color: #808080;
       }
       @media (prefers-color-scheme: dark) {
+        .draw-highlight.adaptive {
+          color: #d5b60a;
+        }
+        .draw-light-green.adaptive {
+          color: #228b22;
+        }
         .mark-err.adaptive {
           background: #e34444;
         }
