@@ -408,7 +408,12 @@ initModel : Bool -> DataSource -> Model
 initModel allSlopes dataSource = 
   let 
     area = initArea dataSource
-    toboggans = [ { slope = (3, 1), pos = (0, 0), crashes = 0 }]
+    slopes = 
+      if allSlopes then 
+        [(1, 1), (3, 1), (5, 1), (7, 1), (1, 2) ]
+      else 
+        [(3, 1)]
+    toboggans = slopes |> List.map (\s -> { slope = s, pos = (0, 0), crashes = 0 })
     xMax = Array2D.columns area
     yMax = Array2D.rows area 
   in 
@@ -554,7 +559,7 @@ toRowElements rowText =
 toCharElement : Array2D Char -> List Pos -> Pos -> Html Msg 
 toCharElement area tobogganPositions (x, y) = 
   if List.member (x, y) tobogganPositions then 
-    Html.span [Html.Attributes.class "hero adaptive" ] [ Html.text (String.fromChar '@') ] 
+    Html.span [Html.Attributes.class "draw-dark-blue adaptive" ] [ Html.text (String.fromChar '@') ] 
   else 
     case Array2D.get y x area of 
       Nothing -> Html.text "?"

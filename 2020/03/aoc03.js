@@ -5629,14 +5629,27 @@ var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
 };
 var $author$project$Main$initModel = F2(
 	function (allSlopes, dataSource) {
-		var toboggans = _List_fromArray(
+		var slopes = allSlopes ? _List_fromArray(
 			[
-				{
-				G: 0,
-				I: _Utils_Tuple2(0, 0),
-				J: _Utils_Tuple2(3, 1)
-			}
+				_Utils_Tuple2(1, 1),
+				_Utils_Tuple2(3, 1),
+				_Utils_Tuple2(5, 1),
+				_Utils_Tuple2(7, 1),
+				_Utils_Tuple2(1, 2)
+			]) : _List_fromArray(
+			[
+				_Utils_Tuple2(3, 1)
 			]);
+		var toboggans = A2(
+			$elm$core$List$map,
+			function (s) {
+				return {
+					G: 0,
+					I: _Utils_Tuple2(0, 0),
+					J: s
+				};
+			},
+			slopes);
 		var area = $author$project$Main$initArea(dataSource);
 		var xMax = $tortus$elm_array_2d$Array2D$columns(area);
 		var yMax = $tortus$elm_array_2d$Array2D$rows(area);
@@ -6489,7 +6502,7 @@ var $author$project$Main$toCharElement = F3(
 				$elm$html$Html$span,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('hero adaptive')
+						$elm$html$Html$Attributes$class('draw-dark-blue adaptive')
 					]),
 				_List_fromArray(
 					[
