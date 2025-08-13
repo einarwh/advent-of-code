@@ -6287,39 +6287,39 @@ var $author$project$Main$toCircleElements = F5(
 			_List_Nil);
 		var basicCircles = _List_fromArray(
 			[cc, txt]);
-		if (isFinished) {
-			if (isCup1) {
-				return basicCircles;
-			} else {
-				var fc = A2(
-					$elm$svg$Svg$circle,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$class('draw-highlight adaptive'),
-							$elm$svg$Svg$Attributes$cx(cxStr),
-							$elm$svg$Svg$Attributes$cy(cyStr),
-							$elm$svg$Svg$Attributes$r('20'),
-							$elm$svg$Svg$Attributes$stroke('none'),
-							$elm$svg$Svg$Attributes$fill('currentcolor')
-						]),
-					_List_Nil);
-				return A2($elm$core$List$cons, fc, basicCircles);
-			}
+		if (isCurrent) {
+			var fc = A2(
+				$elm$svg$Svg$circle,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$class('draw-light-green adaptive'),
+						$elm$svg$Svg$Attributes$cx(cxStr),
+						$elm$svg$Svg$Attributes$cy(cyStr),
+						$elm$svg$Svg$Attributes$r('20'),
+						$elm$svg$Svg$Attributes$stroke('none'),
+						$elm$svg$Svg$Attributes$fill('currentcolor')
+					]),
+				_List_Nil);
+			return A2($elm$core$List$cons, fc, basicCircles);
 		} else {
-			if (isCurrent) {
-				var fc = A2(
-					$elm$svg$Svg$circle,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$class('draw-light-green adaptive'),
-							$elm$svg$Svg$Attributes$cx(cxStr),
-							$elm$svg$Svg$Attributes$cy(cyStr),
-							$elm$svg$Svg$Attributes$r('20'),
-							$elm$svg$Svg$Attributes$stroke('none'),
-							$elm$svg$Svg$Attributes$fill('currentcolor')
-						]),
-					_List_Nil);
-				return A2($elm$core$List$cons, fc, basicCircles);
+			if (isFinished) {
+				if (isCup1) {
+					return basicCircles;
+				} else {
+					var fc = A2(
+						$elm$svg$Svg$circle,
+						_List_fromArray(
+							[
+								$elm$svg$Svg$Attributes$class('draw-highlight adaptive'),
+								$elm$svg$Svg$Attributes$cx(cxStr),
+								$elm$svg$Svg$Attributes$cy(cyStr),
+								$elm$svg$Svg$Attributes$r('20'),
+								$elm$svg$Svg$Attributes$stroke('none'),
+								$elm$svg$Svg$Attributes$fill('currentcolor')
+							]),
+						_List_Nil);
+					return A2($elm$core$List$cons, fc, basicCircles);
+				}
 			} else {
 				return basicCircles;
 			}

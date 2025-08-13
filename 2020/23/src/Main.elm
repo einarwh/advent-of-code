@@ -207,18 +207,18 @@ toCircleElements isCup1 isFinished isCurrent angle cup =
     txt = text_ [ x xStr, y yStr, fill "currentcolor" ] [ Html.text (String.fromInt cup) ]
     basicCircles = [ cc, txt ]
   in
-    if isFinished then 
+    if isCurrent then 
+      let 
+        fc = circle [ class "draw-light-green adaptive", cx cxStr, cy cyStr, r "20", stroke "none", fill "currentcolor" ] []
+      in 
+        fc :: basicCircles
+    else if isFinished then 
       if isCup1 then basicCircles 
       else 
         let 
           fc = circle [ class "draw-highlight adaptive", cx cxStr, cy cyStr, r "20", stroke "none", fill "currentcolor" ] []
         in 
           fc :: basicCircles
-    else if isCurrent then 
-      let 
-        fc = circle [ class "draw-light-green adaptive", cx cxStr, cy cyStr, r "20", stroke "none", fill "currentcolor" ] []
-      in 
-        fc :: basicCircles
     else 
       basicCircles
 

@@ -1,6 +1,6 @@
-module Aoc15Element exposing (..)
+module Aoc15 exposing (..)
 
-import Browser
+import Browser exposing (Document)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
@@ -19,7 +19,7 @@ defaultTickInterval = 10
 -- MAIN
 
 main =
-  Browser.element
+  Browser.document
     { init = init
     , view = view
     , update = update
@@ -500,8 +500,13 @@ toRowElements rowText =
 isBox wh (x, y) = 
   if (Array2D.get y x wh == Just 'O' || Array2D.get y x wh == Just '[') then Just (x, y) else Nothing
 
-view : Model -> Html Msg
-view model =
+view : Model -> Document Msg
+view model = 
+  { title = "Advent of Code 2024 | Day 15: Warehouse Woes"
+  , body = [ viewBody model ] }
+
+viewBody : Model -> Html Msg
+viewBody model =
   let
     textFontSize = if model.large then "12px" else "28px"
     warehouse = model.warehouse

@@ -1,6 +1,8 @@
-module Aoc15Include exposing (..)
+module Main exposing (..)
 
-import Browser exposing (Document)
+{-| Advent of Code 2024 | Day 15: Warehouse Woes. -}
+
+import Browser
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
@@ -208,7 +210,7 @@ initModel wide dataSource =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel False SampleLarger, Cmd.none)
+  (initModel False Input, Cmd.none)
 
 -- UPDATE
 
@@ -495,7 +497,37 @@ toWarehouseRows warehouse =
 
 toRowElements : String -> List (Html Msg)
 toRowElements rowText = 
-  [ Html.text rowText, Html.br [] [] ]
+  case String.split "@" rowText of 
+    [ before, after ] -> 
+      let 
+        player = Html.span [ Html.Attributes.class "hero adaptive" ] [ Html.text "@" ]
+      in 
+        [ Html.text before, player, Html.text after, Html.br [] [] ]
+    _ -> 
+        [ Html.text rowText, Html.br [] [] ]
+
+toStyledHtmlElement : String -> Html Msg
+toStyledHtmlElement symbol = 
+  let
+    cssClass = 
+      case symbol of 
+        "." -> "draw-empty adaptive"
+        "#" -> "draw-wall adaptive"
+        "O" -> "draw-brown adaptive"
+        "[" -> "draw-brown adaptive"
+        "]" -> "draw-brown adaptive"
+        "@" -> "draw-hero adaptive"
+        _ -> "draw adaptive"
+  in
+    Html.span [ Html.Attributes.class cssClass ]  [ Html.text symbol ]
+
+toStyledRowElements : String -> List (Html Msg)
+toStyledRowElements rowText = 
+  let
+    chars = rowText |> String.toList   
+    elements = chars |> List.map (String.fromChar >> toStyledHtmlElement) 
+  in
+    List.append elements [ Html.br [] [] ]
 
 isBox wh (x, y) = 
   if (Array2D.get y x wh == Just 'O' || Array2D.get y x wh == Just '[') then Just (x, y) else Nothing
@@ -507,7 +539,7 @@ view model =
     warehouse = model.warehouse
     rows = toWarehouseRows warehouse
     -- Insert robot symbol.
-    elements = rows |> List.concatMap (toRowElements)
+    elements = rows |> List.concatMap (toStyledRowElements)
 
     gpsSum = 
       if List.isEmpty model.moves then
@@ -520,7 +552,8 @@ view model =
         "?"
   in 
     Html.table 
-      [ Html.Attributes.style "width" "1080px"
+      [ Html.Attributes.align "center"
+      , Html.Attributes.style "width" "100%"
       , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
@@ -531,28 +564,6 @@ view model =
               , Html.Attributes.style "padding" "10px"]
               [ Html.div [] [Html.text "Advent of Code 2024" ]
               , Html.div [] [Html.text "Day 15: Warehouse Woes" ] ] ]
-      , Html.tr 
-          []
-          [ Html.td 
-              [ Html.Attributes.align "center"
-              , Html.Attributes.style "padding-bottom" "10px" ]
-              [ 
-                Html.text " ["
-              , Html.a [ Html.Attributes.href "../../2024/"] [ Html.text "2024" ]
-              , Html.text "] " 
-              , Html.text " ["
-              , Html.a [ Html.Attributes.href "../../2023/"] [ Html.text "2023" ]
-              , Html.text "] "
-              , Html.text " ["
-              , Html.a [ Html.Attributes.href "../../2022/"] [ Html.text "2022" ]
-              , Html.text "] "
-              , Html.text " ["
-              , Html.a [ Html.Attributes.href "../../2021/"] [ Html.text "2021" ]
-              , Html.text "] "
-              , Html.text " ["
-              , Html.a [ Html.Attributes.href "../../2020/"] [ Html.text "2020" ]
-              , Html.text "] " ] 
-          ]
       , Html.tr 
           []
           [ Html.td 
@@ -619,11 +630,9 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "24px"
-              , Html.Attributes.style "padding-top" "10px"
-              , Html.Attributes.style "width" "200px" ] 
+              , Html.Attributes.style "padding-top" "10px" ] 
               [ 
                 Html.div [] [ Html.text gpsSum ]
               ] ]
@@ -631,11 +640,11 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Source Code Pro, monospace"
               , Html.Attributes.style "font-size" textFontSize
-              , Html.Attributes.style "padding" "10px"
-              , Html.Attributes.style "width" "200px" ] 
+              , Html.Attributes.style "padding" "10px" ] 
               [ 
-                Html.div [] elements
+                Html.div [
+                  Html.Attributes.style "max-width" "100%"
+                ] elements
               ] ] ]
