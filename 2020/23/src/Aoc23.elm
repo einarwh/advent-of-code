@@ -27,8 +27,7 @@ main =
 -- MODEL
 
 type alias Model = 
-  { cups : List Int 
-  , links : Dict Int Int
+  { links : Dict Int Int
   , current : Int 
   , moveNumber : Int 
   , largeNumbers : Bool 
@@ -41,17 +40,29 @@ type alias Model =
 input : String 
 input = "326519478"
 
+    -- let links = 
+    --     cups 
+    --     |> Array.toList 
+    --     |> List.indexed 
+    --     |> List.fold (fun ls (ix, c) -> ls |> Map.add c (cups[(ix + 1) % cups.Length])) Map.empty
+
+createLinks : List Int -> Dict Int Int 
+createLinks cups = 
+  cups 
+  |> List.indexedMap (\i c -> ((i + 1) |> modBy (List.length cups), c))
+  |> List.map (\(i, c) -> (c, cups |> itemAt i |> Maybe.withDefault 0))
+  |> Dict.fromList 
+
 initModel : Bool -> Model 
 initModel largeNumbers = 
   let
     cups = input |> String.toList |> List.map (String.fromChar) |> List.filterMap (String.toInt)
-    links = Dict.empty 
+    links = createLinks cups
     current = cups |> List.head |> Maybe.withDefault 0 
   in 
-    { cups = cups 
-    , links = links
+    { links = links
     , current = current 
-    , moveNumber = 0
+    , moveNumber = 1
     , largeNumbers = largeNumbers 
     , paused = True
     , finished = False 
@@ -73,6 +84,33 @@ type Msg =
   | TogglePlay 
   | ToggleLargeNumbers
   | Reset 
+
+lookup : Int -> Dict Int Int -> Int 
+lookup curr links =
+  Dict.get curr links |> Maybe.withDefault -1
+
+findDestination : List Int -> Int -> Int -> Int 
+findDestination removed maxCup i = 
+  if i < 1 then findDestination removed maxCup maxCup 
+  else if List.member i removed then findDestination removed maxCup (i - 1)
+  else i 
+
+move : Int -> (Dict Int Int, Int) -> (Dict Int Int, Int) 
+move maxCup (links, curr) = 
+  let 
+    cup1 = lookup curr links 
+    cup2 = lookup cup1 links 
+    cup3 = lookup cup2 links 
+    next = lookup cup3 links 
+    removed = [cup1, cup2, cup3]
+    dest = findDestination removed maxCup (curr - 1) 
+    updatedLinks = 
+      links 
+      |> Dict.insert curr next 
+      |> Dict.insert dest cup1 
+      |> Dict.insert cup3 (lookup dest links)
+  in 
+    (updatedLinks, next)
 
 updateReset : Model -> Model
 updateReset model = 
@@ -130,9 +168,10 @@ subscriptions model =
 toScale : Float -> String 
 toScale v = 160 * v |> String.fromFloat 
 
-toCircleElement : String -> Float -> Int -> List (Html Msg)
-toCircleElement color angle cup = 
+toCircleElement : Bool -> Float -> Int -> List (Html Msg)
+toCircleElement isCurrent angle cup = 
   let 
+    color = if isCurrent then "lightgreen" else "none"
     cxPos = cos (degrees (90 - angle))
     cyPos = -1 * sin (degrees (90 - angle))
     cxStr = 160 * cxPos |> String.fromFloat 
@@ -144,15 +183,37 @@ toCircleElement color angle cup =
   in 
     [ cc, txt ]
 
+toCupsLoop : List Int -> Int -> Int -> Dict Int Int -> List Int 
+toCupsLoop acc curr ix links =
+  let 
+    next = lookup ix links
+  in 
+    if next == curr then List.reverse acc 
+    else if List.length acc > 9 then List.reverse acc
+    else toCupsLoop (next :: acc) curr next links 
+
+toCups : Int -> Dict Int Int -> List Int 
+toCups curr links = 
+  toCupsLoop [ curr ] curr curr links
+
+recreateCups : Int -> Int -> Dict Int Int -> List Int 
+recreateCups moveNumber curr links = 
+  let 
+    cups = toCups curr links 
+    moved = cups 
+  in 
+    moved 
+
 toSvg : Model -> Html Msg
 toSvg model =
   let
     -- x axis: cosine (90 - deg)
     -- y axis: sine (90 - deg)
     angles = [0,1,2,3,4,5,6,7,8]
+    cups = recreateCups model.moveNumber model.current model.links 
     circleElements = 
-      model.cups 
-      |> List.indexedMap (\i c -> toCircleElement "lightyellow" (toFloat (40 * i)) c)
+      cups 
+      |> List.indexedMap (\i c -> toCircleElement (c == model.current) (toFloat (40 * i)) c)
       |> List.concat
     elements = circleElements
   in
@@ -169,10 +230,30 @@ view model =
   { title = "Advent of Code 2020 | Day 23: Crab Cups"
   , body = [ viewBody model ] }
 
+itemAt : Int -> List a -> Maybe a 
+itemAt index list = 
+  list |> List.drop index |> List.head
+
 viewBody : Model -> Html Msg
 viewBody model =
   let
-    dbgStr = model.debug
+    cups = input |> String.toList |> List.map (String.fromChar) |> List.filterMap (String.toInt)
+    cupsStr = "?"
+    -- cupsStr = cups |> List.map String.fromInt |> String.concat
+    -- dbgStr = 
+    --   model.links 
+    --   |> Dict.toList 
+    --   |> List.map (\(k, v) -> String.fromInt k ++ ":" ++ String.fromInt v)
+    --   |> String.join ","
+    -- cups = recreateCups model.moveNumber model.current model.links 
+    -- next = lookup model.current model.links
+    -- dbgStr = cups |> List.map String.fromInt |> String.join "."
+    -- dbgStr = "next?" ++ (next |> String.fromInt)
+    ix = 9
+    index = (ix + 1) |> modBy (List.length cups)
+    cup = cups |> List.drop (index - 1) |> List.head |> Maybe.withDefault -1
+    dbgStr = "index: " ++ (String.fromInt index) ++ ", cup: " ++ String.fromInt cup
+
     playButtonText = "Play"
     svgElement = toSvg model 
   in 
@@ -246,6 +327,7 @@ viewBody model =
               , Html.Attributes.style "font-size" "16px"
               , Html.Attributes.style "padding" "10px" ] 
               [ 
-                Html.div [] [ Html.text dbgStr ]
+                Html.div [] [ Html.text cupsStr ]
+              , Html.div [] [ Html.text dbgStr ]
               ] ] 
               ]

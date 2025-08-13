@@ -1,0 +1,57 @@
+// Advent of Code 2020. Day 23: Crab Cups.
+// dotnet fsi aoc23.fsx
+
+open System
+open System.IO
+
+let findDestination (cups : int list) (maxCup : int) (curr : int) = 
+    let rec loop i = 
+        if i < 1 then loop maxCup 
+        else if List.contains i cups then loop (i - 1)
+        else i 
+    loop (curr - 1)
+
+let move (maxCup : int) (cups : int list, links : Map<int, int>, curr : int) = 
+    let cup1 = links[curr]
+    let cup2 = links[cup1]
+    let cup3 = links[cup2]
+    let next = links[cup3]
+    let cups = [cup1; cup2; cup3]
+    let dest = findDestination cups maxCup curr 
+    let links' = 
+        links 
+        |> Map.add curr next 
+        |> Map.add dest cup1 
+        |> Map.add cup3 links[dest]
+    (links', next)
+
+let toCups (links : Map<int,int>) = 
+    let rec loop acc curr = 
+        match links[curr] with 
+        | 1 -> List.rev acc 
+        | c -> loop (c :: acc) c 
+    loop [] 1 
+
+let play moves (cups : int array) = 
+    let maxCup = cups |> Array.max 
+    let rec loop i (links, curr) = 
+        if i <= moves then 
+            loop (i + 1) (move maxCup (links, curr))
+        else 
+            (links, curr)
+    let links = 
+        cups 
+        |> Array.toList 
+        |> List.indexed 
+        |> List.fold (fun ls (ix, c) -> ls |> Map.add c (cups[(ix + 1) % cups.Length])) Map.empty
+    loop 1 (links, cups[0]) |> fst 
+
+let part1 cups = 
+    cups |> play 100 |> toCups |> List.map string |> String.concat "" |> printfn "%s"
+
+let run fileName = 
+    let text = File.ReadAllText(fileName).Trim()
+    let cups = text |> Seq.toArray |> Array.map (fun ch -> Int32.Parse(ch.ToString()))
+    cups |> part1 
+
+run "input.txt"
