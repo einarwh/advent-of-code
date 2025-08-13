@@ -48,6 +48,8 @@ type alias Model =
   { area : Array2D Char
   , allSlopes : Bool 
   , toboggans : List Toboggan 
+  , xMax : Int 
+  , yMax : Int 
   , dataSource : DataSource
   , paused : Bool 
   , finished : Bool 
@@ -406,11 +408,15 @@ initModel : Bool -> DataSource -> Model
 initModel allSlopes dataSource = 
   let 
     area = initArea dataSource
-    toboggans = []
+    toboggans = [ { slope = (3, 1), pos = (0, 0), crashes = 0 }]
+    xMax = Array2D.columns area
+    yMax = Array2D.rows area 
   in 
     { area = area
     , allSlopes = allSlopes
-    , toboggans = toboggans 
+    , toboggans = toboggans
+    , xMax = xMax
+    , yMax = yMax 
     , dataSource = dataSource
     , paused = True
     , finished = False  
@@ -441,165 +447,57 @@ getAllPositions board =
   in 
     ys |> List.concatMap (\y -> xs |> List.map (\x -> (x, y)))
 
-findRobotLoop : Array2D Char -> List Pos -> Pos 
-findRobotLoop warehouse positions = 
-  case positions of 
-    [] -> (0, 0)
-    (x, y) :: rest -> 
-      case Array2D.get y x warehouse of 
-        Just '@' -> (x, y)
-        _ -> findRobotLoop warehouse rest 
-
-findRobot : Array2D Char -> Pos 
-findRobot warehouse = 
-  findRobotLoop warehouse (getAllPositions warehouse)
-
-moveToOffset : Char -> Pos 
-moveToOffset move = 
-  case move of 
-    '^' -> (0, -1)
-    '<' -> (-1, 0)
-    'v' -> (0, 1)
-    '>' -> (1, 0)
-    _ -> (0, 0)
-
-moveStep move (x, y) = 
-  let 
-    (dx, dy) = moveToOffset move 
+getNestedPositions : Array2D Char -> List (List Pos)
+getNestedPositions board = 
+  let
+    ys = List.range 0 (Array2D.rows board - 1)
+    xs = List.range 0 (Array2D.columns board - 1)
   in 
-    (x + dx, y + dy)
-
-zip : List a -> List b -> List (a, b) 
-zip lst1 lst2 = 
-  case (lst1, lst2) of 
-    ((h1 :: r1), (h2 :: r2)) -> (h1, h2) :: zip r1 r2 
-    _ -> []
-
-tryFindSpaceDoubleLoop : Array2D Char -> Char -> List Pos -> List (Pos, Pos) -> List (Pos, Pos)
-tryFindSpaceDoubleLoop warehouse move positionsToMove swaps = 
-  let 
-    nextPositions = positionsToMove |> List.map (moveStep move)
-    things = nextPositions |> List.map (\(x, y) -> Array2D.get y x warehouse |> Maybe.withDefault '?')
-    proposedSwaps = zip positionsToMove nextPositions
-    nextSwaps = proposedSwaps ++ swaps 
-  in 
-    if things |> List.any (\ch -> ch == '#') then 
-      -- Met a wall! 
-      []
-    else if things |> List.all (\ch -> ch == '.') then 
-      -- Free space for all!
-      nextSwaps 
-    else 
-      -- Boxes...
-      let 
-        positionsAndThings = nextPositions |> List.map (\(x, y) -> ((x, y), Array2D.get y x warehouse |> Maybe.withDefault '?'))
-        openPositions = positionsAndThings |> List.filterMap (\(p, ch) -> if ch == '[' then Just p else Nothing)
-        closePositions = positionsAndThings |> List.filterMap (\(p, ch) -> if ch == ']' then Just p else Nothing)
-        toTheRight (x, y) = (x + 1, y)
-        toTheLeft (x, y) = (x - 1, y)
-        rightPositions = openPositions |> List.map toTheRight 
-        leftPositions = closePositions |> List.map toTheLeft 
-        nextPositionsToMove = (openPositions ++ rightPositions ++ closePositions ++ leftPositions) |> Set.fromList |> Set.toList 
-      in 
-        tryFindSpaceDoubleLoop warehouse move nextPositionsToMove nextSwaps
-
-tryFindSpaceDouble : Array2D Char -> Pos -> Char -> List (Pos, Pos)
-tryFindSpaceDouble warehouse robot move = 
-  tryFindSpaceDoubleLoop warehouse move [ robot ] []
-
-tryFindSpaceSimpleLoop : Array2D Char -> Char -> Pos -> List (Pos, Pos) -> List (Pos, Pos)
-tryFindSpaceSimpleLoop warehouse move pos swaps = 
-  let 
-    (dx, dy) = moveToOffset move 
-    (x, y) = moveStep move pos
-    nextSwaps = (pos, (x, y)) :: swaps 
-  in 
-    case Array2D.get y x warehouse of 
-      Just '#' -> []
-      Just '.' -> nextSwaps 
-      Just '[' -> 
-        tryFindSpaceSimpleLoop warehouse move (x, y) nextSwaps 
-      Just ']' -> 
-        tryFindSpaceSimpleLoop warehouse move (x, y) nextSwaps 
-      Just 'O' -> 
-        tryFindSpaceSimpleLoop warehouse move (x, y) nextSwaps 
-      _ -> [] 
-
-tryFindSpaceSimple : Array2D Char -> Pos -> Char -> List (Pos, Pos) 
-tryFindSpaceSimple warehouse robot move = 
-  tryFindSpaceSimpleLoop warehouse move robot []
-
-tryFindSpace : Bool -> Array2D Char -> Pos -> Char -> List (Pos, Pos) 
-tryFindSpace allSlopes warehouse robot move = 
-  if allSlopes then 
-    case move of 
-      '^' -> tryFindSpaceDouble warehouse robot move 
-      'v' -> tryFindSpaceDouble warehouse robot move 
-      '<' -> tryFindSpaceSimple warehouse robot move 
-      '>' -> tryFindSpaceSimple warehouse robot move 
-      _ -> tryFindSpaceSimple warehouse robot move 
-  else 
-    tryFindSpaceSimple warehouse robot move
-
-moveStuff : Array2D Char -> List (Pos, Pos) -> Array2D Char
-moveStuff warehouse swaps = 
-  case swaps of
-    [] -> warehouse 
-    ((x1, y1), (x2, y2)) :: rest -> 
-      let 
-        maybeCell1 = Array2D.get y1 x1 warehouse
-        maybeCell2 = Array2D.get y2 x2 warehouse
-      in 
-        case (maybeCell1, maybeCell2) of 
-          (Just cell1, Just cell2) -> 
-            let 
-              wh = warehouse |> Array2D.set y1 x1 cell2 |> Array2D.set y2 x2 cell1 
-            in 
-              moveStuff wh rest  
-          _ -> 
-            let 
-              wh = Array2D.set 0 0 '?' warehouse  
-              wh2 = Array2D.set 3 3 '?' wh  
-            in 
-              moveStuff wh2 rest
-
-tryMoveRobot : Bool -> Array2D Char -> Pos -> Char -> (Array2D Char, Pos) 
-tryMoveRobot allSlopes warehouse robot move = 
-  let 
-    swaps = tryFindSpace allSlopes warehouse robot move
-  in 
-    if List.length swaps == 0 then 
-      (warehouse, robot) 
-    else 
-      let 
-        wh = moveStuff warehouse swaps
-        rb = moveStep move robot
-      in 
-        (wh, rb)
-
-swapsToText swaps = 
-  case swaps of 
-    [] -> ""
-    ((x1, y1), (x2, y2)) :: rest -> 
-      let 
-        x1s = String.fromInt x1
-        y1s = String.fromInt y1
-        x2s = String.fromInt x2
-        y2s = String.fromInt y2
-        s = "(" ++ x1s ++ "," ++ y1s ++ ") -> (" ++ x2s ++ "," ++ y2s ++ ")"
-      in 
-        s ++ (swapsToText rest)
-
-gpsCoordinate : Pos -> Int 
-gpsCoordinate (x, y) = 
-    y * 100 + x
+    ys |> List.map (\y -> xs |> List.map (\x -> (x, y)))
 
 updateClear : Model -> Model
 updateClear model = 
   initModel model.allSlopes model.dataSource
 
+isCrash : Array2D Char -> Pos -> Bool 
+isCrash area (x, y) = 
+  case Array2D.get y x area of 
+    Just '#' -> True 
+    Just 'X' -> True 
+    _ -> False 
+
+replaceToboggan : Toboggan -> List Toboggan -> List Toboggan
+replaceToboggan toboggan toboggans = 
+  toboggans |> List.map (\t -> if t.slope == toboggan.slope then toboggan else t)
+
+updateToboggan : Toboggan -> Model -> Model 
+updateToboggan toboggan model =
+  let
+    (x, y) = toboggan.pos 
+    (dx, dy) = toboggan.slope 
+    crashes = toboggan.crashes
+  in
+    if y < model.yMax then 
+      let 
+        xNext = x+dx |> modBy model.xMax
+        yNext = y+dy 
+        movedToboggan = { toboggan | pos = (xNext, yNext) }
+        toboggans = model.toboggans
+      in 
+      if isCrash model.area (x, y) then
+        let 
+          area = Array2D.set y x 'X' model.area
+          crashedToboggan = { movedToboggan | crashes = crashes + 1 }
+        in 
+          { model | toboggans = replaceToboggan crashedToboggan toboggans, area = area }
+      else 
+        { model | toboggans = replaceToboggan movedToboggan toboggans }
+    else 
+      model 
+
 updateStep : Model -> Model
-updateStep model = model 
+updateStep model = 
+  model.toboggans |> List.foldl (\t m -> updateToboggan t m) model
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -653,8 +551,21 @@ toRowElements : String -> List (Html Msg)
 toRowElements rowText = 
   [ Html.text rowText, Html.br [] [] ]
 
-isBox wh (x, y) = 
-  if (Array2D.get y x wh == Just 'O' || Array2D.get y x wh == Just '[') then Just (x, y) else Nothing
+toCharElement : Array2D Char -> List Pos -> Pos -> Html Msg 
+toCharElement area tobogganPositions (x, y) = 
+  if List.member (x, y) tobogganPositions then 
+    Html.span [Html.Attributes.class "hero adaptive" ] [ Html.text (String.fromChar '@') ] 
+  else 
+    case Array2D.get y x area of 
+      Nothing -> Html.text "?"
+      Just symbol -> 
+        case symbol of 
+          '#' -> 
+            Html.span [Html.Attributes.class "draw-dark-green adaptive" ] [ Html.text (String.fromChar symbol) ] 
+          'X' -> 
+            Html.span [Html.Attributes.class "wrong adaptive" ] [ Html.text (String.fromChar symbol) ] 
+          _ -> 
+            Html.span [Html.Attributes.class "draw-empty adaptive" ] [ Html.text (String.fromChar symbol) ] 
 
 view : Model -> Document Msg
 view model = 
@@ -664,9 +575,14 @@ view model =
 viewBody : Model -> Html Msg
 viewBody model =
   let
-    textFontSize = if model.allSlopes then "12px" else "28px"
-    -- Insert robot symbol.
-    elements = []
+    textFontSize = 
+      case model.dataSource of 
+        Input -> "16px"
+        Sample -> "32px"
+    tobogganPositions = model.toboggans |> List.map (\t -> t.pos)
+    nestedPositions = getNestedPositions model.area
+    nestedElements = nestedPositions |> List.map (\positions -> positions |> List.map (toCharElement model.area tobogganPositions))
+    elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
 
   in 
     Html.table 
@@ -755,7 +671,7 @@ viewBody model =
               [ Html.input 
                 [ Html.Attributes.type_ "checkbox", onClick ToggleWide, Html.Attributes.checked model.allSlopes ] 
                 []
-              , Html.label [] [ Html.text " Wide" ]
+              , Html.label [] [ Html.text " all slopes" ]
             ] ]
       , Html.tr 
           []

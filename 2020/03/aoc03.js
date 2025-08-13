@@ -1,17 +1,3 @@
-<!DOCTYPE HTML>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Aoc03</title>
-  <style>body { padding: 0; margin: 0; }</style>
-</head>
-
-<body>
-
-<pre id="elm"></pre>
-
-<script>
-try {
 (function(scope){
 'use strict';
 
@@ -798,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.S.G === region.Z.G)
+	if (region.S.H === region.Z.H)
 	{
-		return 'on line ' + region.S.G;
+		return 'on line ' + region.S.H;
 	}
-	return 'on lines ' + region.S.G + ' through ' + region.Z.G;
+	return 'on lines ' + region.S.H + ' through ' + region.Z.H;
 }
 
 
@@ -5249,12 +5235,12 @@ var $elm$core$Task$perform = F2(
 		return $elm$core$Task$command(
 			A2($elm$core$Task$map, toMessage, task));
 	});
-var $elm$browser$Browser$document = _Browser_document;
-var $author$project$Aoc03$Input = 0;
+var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Main$Input = 0;
 var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
 	return array2d.h;
 };
-var $author$project$Aoc03$defaultTickInterval = 10;
+var $author$project$Main$defaultTickInterval = 10;
 var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
 var $elm$core$Array$foldl = F3(
 	function (func, baseCase, _v0) {
@@ -5618,18 +5604,18 @@ var $tortus$elm_array_2d$Array2D$fromList = function (list) {
 		$elm$core$Array$fromList(
 			A2($elm$core$List$map, $elm$core$Array$fromList, list)));
 };
-var $author$project$Aoc03$input = '....#...............##...#...#.\n#...#..#.....##.##.#.##....#...\n...#.....#...#.................\n#..#..#.......#...#.#..........\n...##..#.#..........##...#.....\n........###.#.##..#............\n...###......##.#..#.#...#.#....\n......##..#.#....#...#.........\n.................#......#......\n..............##....#..........\n#.....................#...#.#.#\n.##..#............##...##.##..#\n.....#.####...#..##......#.#..#\n#.......#.#..#......##.#.#....#\n.....##...###.#..........##....\n#...........#.##....##.....#..#\n..###..##.##.....#....#........\n...#.#.#............#.#..#....#\n#......#....#...##.#.#.#.#..#..\n.......#.#...#..#..#..##......#\n.....#..#.............#..#...#.\n##..#.##.....#........#........\n....##....#..#...........#...#.\n.......#........##.......##....\n..##...#.......#........##.#...\n..........#..#.....##........#.\n..#..##..#............#........\n.#.#...#...#.......#......#....\n....#....#.....#.#.........###.\n.............#...#....#..#.#...\n##.#...#..#......#.#.##.....#..\n#...##.#..........#..#.#...#...\n#####.......#.#.....#..#.......\n#...#...#........#....#...#....\n......##.#..#..#............#..\n....#....#.......#...###.......\n.#......##...#.##....#...#.....\n..#....#...##.....#.#...##.#...\n#.......#........#.####........\n#.##..#..#.........#.#........#\n.#...#.#.#.#......#....#.#..#..\n#...####...##.##.#....#......##\n..#...#......##........#.....#.\n...#.#....##...................\n...##................#.........\n...##.....##........#....#..#..\n.........#..#.....#............\n.#..#.......................#..\n.#.........#..##........#.#.#.#\n......#.....##..#.##...#..#.##.\n..#..............##.......#....\n...............##....#...##..#.\n###...#..###.........#...#.....\n...#..#...#....#.....##........\n....#..##...#........#.........\n..#......#.......#.....#..#....\n.#...........##.....###....#...\n.#..#.....##.........##.....#..\n....##.#.....#................#\n..#..#......#.#..#....#..##....\n#.....#...##............#......\n.#.............#....#.......#..\n#.........#..#...##.#...#.#.##.\n...#......#..####....#.#.....#.\n......#........#..........##.##\n......##.#..##.##.....#........\n##.....#..##.##..#.......##....\n.##.........#...........#...#..\n.....#...###..#...#...........#\n..........#.#......#.###.....#.\n...#.............#.##......##..\n#.##.........#..###...........#\n....#..##....#..#..#........###\n...#........##.......##..#..#..\n...#......#..#.#...............\n#......###....#.#..#.#..#....#.\n#.#.####.#.........#..#.#.#....\n.....#....#...............#...#\n.#........#......#.#...#.......\n................#...#.....##...\n.............#...####..........\n.................##....##.###..\n#................#......#......\n.###.#........#..##.....#..###.\n..#.#..#...#..#.#...#.#.....#.#\n.....#............#..##..#..#.#\n#........##.#...#.....#........\n#.#.#..###......###............\n...#..#...........##...#.....#.\n......#........#...#.#....#....\n....#..........#.#..#.#....##..\n...#.....##..#......#.#.##...#.\n.........#..#................#.\n..#....#.##.....#.......#......\n...#.....#.......##.##.....#...\n#...#..............#..###..#...\n#.#......#.#....#........##..#.\n...#...##...##..#.........#....\n..#...#......##.#.#.#....##....\n#.......#.......#..#..#........\n.........#..#.....#....#.....##\n.#......#.......#.#..#..#...#.#\n..#....#.#..#..................\n#.....####..........#.#.....#.#\n.#..#.#.#....#.#.....#.#.......\n....##......#..#.....#.#.#...#.\n...##...#......##.#....##.#....\n..#..##....#...#...........#...\n.......#........#...##.#.......\n#.#..#....##.#....##...........\n.......#............#..##..##..\n#.#.#.....#....##.#.#.#.....#..\n##...#...#.......#..#...#.....#\n##..##.##..........#........##.\n..............#.....#..#..##...\n.......#...#.........#....#.#..\n...#..#..#....#.#....##........\n..#.......#....#....##.........\n#...#.....#..#.#...##....#.....\n.....##..#..##..#..............\n.....##............#....#.#....\n..#.....#....##.#.....#..#.....\n#...#..#..#......#.#.#..##.....\n.............................##\n#...#.#................#....#.#\n.#.#.#....##......###..##......\n#.....#..#.##.#.#.##...###.....\n.........#............##..#....\n.#..#...#....#.....#.#........#\n...............#......#..#.....\n...................###........#\n.###..##..##.......#.#.........\n#.........#......#....#.#...#..\n.#.#....#.......#.#..##...##...\n.#.....#....##.......#.#.....#.\n.........#...#....#.#..........\n....###..#..##.#...##....#..#..\n...#.#..##.#.........###.#..#..\n#...#...........#....#.........\n....##...........#.#.#......###\n#....#...........##..#.........\n###....#.....#.......#....###..\n.#.......#....#.#.#.#......#.#.\n........#...............#.#.#..\n....#.........#.....#...##.##.#\n...#............#.............#\n..........#..#.................\n........#.....##............#.#\n..#...##........#...#.....#.#..\n....#........#.#.#..........#..\n#.#...#...........#............\n....#.#...##...........#.....#.\n...........#.#..#.....#........\n.....#..#..#..#.....#.#.....#.#\n#.....#.......#.......#...#....\n#.........#....#.#........#..#.\n...#..#.........#.....#..#.....\n...#..#.............#..........\n.#.......#..........#.....#...#\n.....#.#......#.......#....#...\n...#.....#..#..##....##....#...\n.#.#.#..#...#.....#....#.......\n..##.#..........#.....#.#......\n..#..#.............#...##..##..\n.#.............#..#....##...#..\n..#...#.....#.................#\n..##.......#.....#...#....#....\n.#..#.##.........#...#.#...#...\n...##.......##..#.....##.##...#\n........####.#.........#.......\n..#.#...##.#..#..#.......##.#..\n.#..#............###..#..#.....\n#.....#.#...#.#.......#........\n..........#......#.#...#...#...\n..#......#..#..#.#...#.........\n..###........#.#....#.#...##...\n.#.....#..#.#......#........#..\n.#...#..#...#....#.......#..#..\n..#....#..#.....#.#........#...\n#..#.#.........#..........#..#.\n.#.....##....#.........#.#.#.#.\n#.#...#.....#.#.#....#.#..#....\n.........#...................#.\n..#.....#..##...#..........#.#.\n..............#....#.........#.\n.#....#.....#..............##..\n#...#...#.#........##.........#\n....###....#.#....#.#.........#\n.....#........#.....##.........\n.#...##..##..#.........##......\n............#.....#........#...\n..#....#.......#......#..#.#.#.\n#.......#.#...........#..##.#..\n......#.##......#....#.......#.\n.....#........#...###.....#....\n###..........#........#.#.#....\n.....#...#.#...#...#...##.....#\n.##...#.#........#.#....#......\n......#.........#.....#.#......\n.....#.##.....###.#...#...##..#\n.#.#.......##....#..#..#.##....\n.####...###.#.#.#.#............\n......#..##...#..........#.##.#\n......#............#...........\n.....#.#..#.......##...##......\n......#........#..#....#.#.#.#.\n#..#..#.....#..#.....#.......#.\n.#...#.....#..............#....\n.#....#..#.##.#............####\n..........#....#.##...#.#......\n...#.#.#.#.#.......#.........#.\n##........#..##..#.........#...\n..#......#...#..#.#.....#......\n..#.#......#...#...#.#.........\n........................##.....\n...#.##.#........#...#.......#.\n..#.#......#....##........#.#..\n#......#.##........#..#......#.\n.....#..#..#.............#.....\n......#......#........#....#...\n...#....###.....#..#.#....#....\n#.......................#....#.\n..#...#...................#....\n....#..#.....##.#..#...#.....#.\n...#.........#...#.......#.....\n..#....#.....#...#...#.#####...\n.....####......#...........#...\n......#.#..........#...#.#.#..#\n###..#.#....#..#...............\n...#...###..#..#.#.#...........\n.....#...#.##.#.#.###..##......\n.........#...........#....##.#.\n....#..#......#................\n...........#..#..#...#.#.......\n..#.....#......##.###..........\n.........#...................#.\n..........#...#.#....##........\n..#...##....#....#.......#...##\n#......#.....#...#...#...#.....\n....##...#.#.......#.#...##....\n...#.....#....#.....#....#.....\n#....##.....##..##..........##.\n.....#.....#.#.#...............\n.#.##....#.....#.#..#....#..##.\n.....#.#.....##....#...........\n.........#..#.......##..##.....\n..#....##.....###...#....#.#...\n............#......#.#...#..#..\n#..##......#.#.##....#.#.......\n.#.#.....#...#.#.#....#.....#..\n#....#..#.#....#...#...........\n......#.#.....#...#.#.#......#.\n###..#....#.###.............#..\n..............#####........###.\n..#..#.#.#.#......#......#.....\n###.........#.#..........#..#.#\n.#.........#...#......####.....\n..#.......####..#....#...#..#..\n#.#..#.#...............#.#.#.#.\n###....#.....##.#....#......##.\n..#..#........#....###.#.#.....\n...#.#..........#.....#...#....\n....#......##.#............#..#\n...##...#.....#..##....#..#.#.#\n.......#.....#..#....#....##.#.\n.#..#....#..#......##....##...#\n..#......#...#.#..###..#.##....\n#...#.....#......##...#.......#\n.....#.#.....#...##............\n.#..##.##..#..##.#........#....\n....#.#......##...#.#.#.#..##..\n.#..............##........#....\n.##....#..#..#....#...#......#.\n............###....##.......##.\n..............####.....#.......\n........##..##.#...#.......#...\n....#..#.....##.......#####...#\n.##..##..#.....#...#..#..#....#\n##..#.#.#...........#..........\n#..#......#...#....#...........\n...#..##.#..........#..#.......\n........#.#.....#......##......\n.....#....#............#.......\n.#.#..#....##......#.......###.\n.#..#.#........#......#...##..#\n...#....#......#..#........#.##\n.........#..#...#..#.#.##......\n....###.#...........#...#......\n.##............#.......#..##...\n##...#.#...............#.#...##\n..#..#.....#.#..#..#...........\n..#..#.##..#......#.##..#.#....\n..#...#......#.#...#....##.#...\n...###....####......#....#...#.\n.......##........#.....##....#.\n.........##..........#...#.....\n.....#............#.##.#....#.#\n..........#...#....##..........\n....................#......#...\n#......#..#...#.............##.\n...........#...................\n..#...#.........#.##.#..##.#...\n#.#....#.#.....#............#..\n.#..#.....#.....####......#.#..\n#....#.......##..#...........#.\n............#...#.....#..#.#...\n#...........#...#####....#...#.\n..........#...###..##.........#\n#.....###............#..#..#.#.\n...##.....#....#......#.....#..\n#....#.......#..#......###...#.\n...##.##......##..##..........#\n.......#.#..#.#..#.#.#.#..#..#.\n..#..###...#....#.....#......#.\n...#.........#..#.##.#.....###.\n..#.........#.##.#..#..#..###..\n..####..#.........#.........#.#\n..#.#...#.......#....##........\n.#......#.#....................\n..........#.......#.#..#..#....\n..#........#....#.#..#.........\n..#.....#.............#....#...\n##...#.........#.....#...#.....';
-var $author$project$Aoc03$sample = '..##.......\n#...#...#..\n.#....#..#.\n..#.#...#.#\n.#...##..#.\n..#.##.....\n.#.#.#....#\n.#........#\n#.##...#...\n#...##....#\n.#..#...#.#';
+var $author$project$Main$input = '....#...............##...#...#.\n#...#..#.....##.##.#.##....#...\n...#.....#...#.................\n#..#..#.......#...#.#..........\n...##..#.#..........##...#.....\n........###.#.##..#............\n...###......##.#..#.#...#.#....\n......##..#.#....#...#.........\n.................#......#......\n..............##....#..........\n#.....................#...#.#.#\n.##..#............##...##.##..#\n.....#.####...#..##......#.#..#\n#.......#.#..#......##.#.#....#\n.....##...###.#..........##....\n#...........#.##....##.....#..#\n..###..##.##.....#....#........\n...#.#.#............#.#..#....#\n#......#....#...##.#.#.#.#..#..\n.......#.#...#..#..#..##......#\n.....#..#.............#..#...#.\n##..#.##.....#........#........\n....##....#..#...........#...#.\n.......#........##.......##....\n..##...#.......#........##.#...\n..........#..#.....##........#.\n..#..##..#............#........\n.#.#...#...#.......#......#....\n....#....#.....#.#.........###.\n.............#...#....#..#.#...\n##.#...#..#......#.#.##.....#..\n#...##.#..........#..#.#...#...\n#####.......#.#.....#..#.......\n#...#...#........#....#...#....\n......##.#..#..#............#..\n....#....#.......#...###.......\n.#......##...#.##....#...#.....\n..#....#...##.....#.#...##.#...\n#.......#........#.####........\n#.##..#..#.........#.#........#\n.#...#.#.#.#......#....#.#..#..\n#...####...##.##.#....#......##\n..#...#......##........#.....#.\n...#.#....##...................\n...##................#.........\n...##.....##........#....#..#..\n.........#..#.....#............\n.#..#.......................#..\n.#.........#..##........#.#.#.#\n......#.....##..#.##...#..#.##.\n..#..............##.......#....\n...............##....#...##..#.\n###...#..###.........#...#.....\n...#..#...#....#.....##........\n....#..##...#........#.........\n..#......#.......#.....#..#....\n.#...........##.....###....#...\n.#..#.....##.........##.....#..\n....##.#.....#................#\n..#..#......#.#..#....#..##....\n#.....#...##............#......\n.#.............#....#.......#..\n#.........#..#...##.#...#.#.##.\n...#......#..####....#.#.....#.\n......#........#..........##.##\n......##.#..##.##.....#........\n##.....#..##.##..#.......##....\n.##.........#...........#...#..\n.....#...###..#...#...........#\n..........#.#......#.###.....#.\n...#.............#.##......##..\n#.##.........#..###...........#\n....#..##....#..#..#........###\n...#........##.......##..#..#..\n...#......#..#.#...............\n#......###....#.#..#.#..#....#.\n#.#.####.#.........#..#.#.#....\n.....#....#...............#...#\n.#........#......#.#...#.......\n................#...#.....##...\n.............#...####..........\n.................##....##.###..\n#................#......#......\n.###.#........#..##.....#..###.\n..#.#..#...#..#.#...#.#.....#.#\n.....#............#..##..#..#.#\n#........##.#...#.....#........\n#.#.#..###......###............\n...#..#...........##...#.....#.\n......#........#...#.#....#....\n....#..........#.#..#.#....##..\n...#.....##..#......#.#.##...#.\n.........#..#................#.\n..#....#.##.....#.......#......\n...#.....#.......##.##.....#...\n#...#..............#..###..#...\n#.#......#.#....#........##..#.\n...#...##...##..#.........#....\n..#...#......##.#.#.#....##....\n#.......#.......#..#..#........\n.........#..#.....#....#.....##\n.#......#.......#.#..#..#...#.#\n..#....#.#..#..................\n#.....####..........#.#.....#.#\n.#..#.#.#....#.#.....#.#.......\n....##......#..#.....#.#.#...#.\n...##...#......##.#....##.#....\n..#..##....#...#...........#...\n.......#........#...##.#.......\n#.#..#....##.#....##...........\n.......#............#..##..##..\n#.#.#.....#....##.#.#.#.....#..\n##...#...#.......#..#...#.....#\n##..##.##..........#........##.\n..............#.....#..#..##...\n.......#...#.........#....#.#..\n...#..#..#....#.#....##........\n..#.......#....#....##.........\n#...#.....#..#.#...##....#.....\n.....##..#..##..#..............\n.....##............#....#.#....\n..#.....#....##.#.....#..#.....\n#...#..#..#......#.#.#..##.....\n.............................##\n#...#.#................#....#.#\n.#.#.#....##......###..##......\n#.....#..#.##.#.#.##...###.....\n.........#............##..#....\n.#..#...#....#.....#.#........#\n...............#......#..#.....\n...................###........#\n.###..##..##.......#.#.........\n#.........#......#....#.#...#..\n.#.#....#.......#.#..##...##...\n.#.....#....##.......#.#.....#.\n.........#...#....#.#..........\n....###..#..##.#...##....#..#..\n...#.#..##.#.........###.#..#..\n#...#...........#....#.........\n....##...........#.#.#......###\n#....#...........##..#.........\n###....#.....#.......#....###..\n.#.......#....#.#.#.#......#.#.\n........#...............#.#.#..\n....#.........#.....#...##.##.#\n...#............#.............#\n..........#..#.................\n........#.....##............#.#\n..#...##........#...#.....#.#..\n....#........#.#.#..........#..\n#.#...#...........#............\n....#.#...##...........#.....#.\n...........#.#..#.....#........\n.....#..#..#..#.....#.#.....#.#\n#.....#.......#.......#...#....\n#.........#....#.#........#..#.\n...#..#.........#.....#..#.....\n...#..#.............#..........\n.#.......#..........#.....#...#\n.....#.#......#.......#....#...\n...#.....#..#..##....##....#...\n.#.#.#..#...#.....#....#.......\n..##.#..........#.....#.#......\n..#..#.............#...##..##..\n.#.............#..#....##...#..\n..#...#.....#.................#\n..##.......#.....#...#....#....\n.#..#.##.........#...#.#...#...\n...##.......##..#.....##.##...#\n........####.#.........#.......\n..#.#...##.#..#..#.......##.#..\n.#..#............###..#..#.....\n#.....#.#...#.#.......#........\n..........#......#.#...#...#...\n..#......#..#..#.#...#.........\n..###........#.#....#.#...##...\n.#.....#..#.#......#........#..\n.#...#..#...#....#.......#..#..\n..#....#..#.....#.#........#...\n#..#.#.........#..........#..#.\n.#.....##....#.........#.#.#.#.\n#.#...#.....#.#.#....#.#..#....\n.........#...................#.\n..#.....#..##...#..........#.#.\n..............#....#.........#.\n.#....#.....#..............##..\n#...#...#.#........##.........#\n....###....#.#....#.#.........#\n.....#........#.....##.........\n.#...##..##..#.........##......\n............#.....#........#...\n..#....#.......#......#..#.#.#.\n#.......#.#...........#..##.#..\n......#.##......#....#.......#.\n.....#........#...###.....#....\n###..........#........#.#.#....\n.....#...#.#...#...#...##.....#\n.##...#.#........#.#....#......\n......#.........#.....#.#......\n.....#.##.....###.#...#...##..#\n.#.#.......##....#..#..#.##....\n.####...###.#.#.#.#............\n......#..##...#..........#.##.#\n......#............#...........\n.....#.#..#.......##...##......\n......#........#..#....#.#.#.#.\n#..#..#.....#..#.....#.......#.\n.#...#.....#..............#....\n.#....#..#.##.#............####\n..........#....#.##...#.#......\n...#.#.#.#.#.......#.........#.\n##........#..##..#.........#...\n..#......#...#..#.#.....#......\n..#.#......#...#...#.#.........\n........................##.....\n...#.##.#........#...#.......#.\n..#.#......#....##........#.#..\n#......#.##........#..#......#.\n.....#..#..#.............#.....\n......#......#........#....#...\n...#....###.....#..#.#....#....\n#.......................#....#.\n..#...#...................#....\n....#..#.....##.#..#...#.....#.\n...#.........#...#.......#.....\n..#....#.....#...#...#.#####...\n.....####......#...........#...\n......#.#..........#...#.#.#..#\n###..#.#....#..#...............\n...#...###..#..#.#.#...........\n.....#...#.##.#.#.###..##......\n.........#...........#....##.#.\n....#..#......#................\n...........#..#..#...#.#.......\n..#.....#......##.###..........\n.........#...................#.\n..........#...#.#....##........\n..#...##....#....#.......#...##\n#......#.....#...#...#...#.....\n....##...#.#.......#.#...##....\n...#.....#....#.....#....#.....\n#....##.....##..##..........##.\n.....#.....#.#.#...............\n.#.##....#.....#.#..#....#..##.\n.....#.#.....##....#...........\n.........#..#.......##..##.....\n..#....##.....###...#....#.#...\n............#......#.#...#..#..\n#..##......#.#.##....#.#.......\n.#.#.....#...#.#.#....#.....#..\n#....#..#.#....#...#...........\n......#.#.....#...#.#.#......#.\n###..#....#.###.............#..\n..............#####........###.\n..#..#.#.#.#......#......#.....\n###.........#.#..........#..#.#\n.#.........#...#......####.....\n..#.......####..#....#...#..#..\n#.#..#.#...............#.#.#.#.\n###....#.....##.#....#......##.\n..#..#........#....###.#.#.....\n...#.#..........#.....#...#....\n....#......##.#............#..#\n...##...#.....#..##....#..#.#.#\n.......#.....#..#....#....##.#.\n.#..#....#..#......##....##...#\n..#......#...#.#..###..#.##....\n#...#.....#......##...#.......#\n.....#.#.....#...##............\n.#..##.##..#..##.#........#....\n....#.#......##...#.#.#.#..##..\n.#..............##........#....\n.##....#..#..#....#...#......#.\n............###....##.......##.\n..............####.....#.......\n........##..##.#...#.......#...\n....#..#.....##.......#####...#\n.##..##..#.....#...#..#..#....#\n##..#.#.#...........#..........\n#..#......#...#....#...........\n...#..##.#..........#..#.......\n........#.#.....#......##......\n.....#....#............#.......\n.#.#..#....##......#.......###.\n.#..#.#........#......#...##..#\n...#....#......#..#........#.##\n.........#..#...#..#.#.##......\n....###.#...........#...#......\n.##............#.......#..##...\n##...#.#...............#.#...##\n..#..#.....#.#..#..#...........\n..#..#.##..#......#.##..#.#....\n..#...#......#.#...#....##.#...\n...###....####......#....#...#.\n.......##........#.....##....#.\n.........##..........#...#.....\n.....#............#.##.#....#.#\n..........#...#....##..........\n....................#......#...\n#......#..#...#.............##.\n...........#...................\n..#...#.........#.##.#..##.#...\n#.#....#.#.....#............#..\n.#..#.....#.....####......#.#..\n#....#.......##..#...........#.\n............#...#.....#..#.#...\n#...........#...#####....#...#.\n..........#...###..##.........#\n#.....###............#..#..#.#.\n...##.....#....#......#.....#..\n#....#.......#..#......###...#.\n...##.##......##..##..........#\n.......#.#..#.#..#.#.#.#..#..#.\n..#..###...#....#.....#......#.\n...#.........#..#.##.#.....###.\n..#.........#.##.#..#..#..###..\n..####..#.........#.........#.#\n..#.#...#.......#....##........\n.#......#.#....................\n..........#.......#.#..#..#....\n..#........#....#.#..#.........\n..#.....#.............#....#...\n##...#.........#.....#...#.....';
+var $author$project$Main$sample = '..##.......\n#...#...#..\n.#....#..#.\n..#.#...#.#\n.#...##..#.\n..#.##.....\n.#.#.#....#\n.#........#\n#.##...#...\n#...##....#\n.#..#...#.#';
 var $elm$core$String$foldr = _String_foldr;
 var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
 };
-var $author$project$Aoc03$initArea = function (dataSource) {
+var $author$project$Main$initArea = function (dataSource) {
 	var data = function () {
 		if (dataSource === 1) {
-			return $author$project$Aoc03$sample;
+			return $author$project$Main$sample;
 		} else {
-			return $author$project$Aoc03$input;
+			return $author$project$Main$input;
 		}
 	}();
 	return $tortus$elm_array_2d$Array2D$fromList(
@@ -5641,29 +5627,29 @@ var $author$project$Aoc03$initArea = function (dataSource) {
 var $tortus$elm_array_2d$Array2D$rows = function (array2d) {
 	return $elm$core$Array$length(array2d.a);
 };
-var $author$project$Aoc03$initModel = F2(
+var $author$project$Main$initModel = F2(
 	function (allSlopes, dataSource) {
 		var toboggans = _List_fromArray(
 			[
 				{
-				N: 0,
-				H: _Utils_Tuple2(0, 0),
-				I: _Utils_Tuple2(3, 1)
+				G: 0,
+				I: _Utils_Tuple2(0, 0),
+				J: _Utils_Tuple2(3, 1)
 			}
 			]);
-		var area = $author$project$Aoc03$initArea(dataSource);
+		var area = $author$project$Main$initArea(dataSource);
 		var xMax = $tortus$elm_array_2d$Array2D$columns(area);
 		var yMax = $tortus$elm_array_2d$Array2D$rows(area);
-		return {A: allSlopes, s: area, t: dataSource, aa: false, af: '?', C: true, x: $author$project$Aoc03$defaultTickInterval, y: toboggans, U: xMax, V: yMax};
+		return {A: allSlopes, t: area, u: dataSource, aa: false, af: '?', C: true, y: $author$project$Main$defaultTickInterval, r: toboggans, U: xMax, V: yMax};
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Aoc03$init = function (_v0) {
+var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		A2($author$project$Aoc03$initModel, false, 0),
+		A2($author$project$Main$initModel, false, 0),
 		$elm$core$Platform$Cmd$none);
 };
-var $author$project$Aoc03$Tick = {$: 0};
+var $author$project$Main$Tick = {$: 0};
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$time$Time$Every = F2(
 	function (a, b) {
@@ -6079,19 +6065,19 @@ var $elm$time$Time$every = F2(
 			A2($elm$time$Time$Every, interval, tagger));
 	});
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $author$project$Aoc03$subscriptions = function (model) {
+var $author$project$Main$subscriptions = function (model) {
 	var tickSub = model.C ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.x,
+		model.y,
 		function (_v0) {
-			return $author$project$Aoc03$Tick;
+			return $author$project$Main$Tick;
 		});
 	return $elm$core$Platform$Sub$batch(
 		_List_fromArray(
 			[tickSub]));
 };
-var $author$project$Aoc03$updateClear = function (model) {
-	return A2($author$project$Aoc03$initModel, model.A, model.t);
+var $author$project$Main$updateClear = function (model) {
+	return A2($author$project$Main$initModel, model.A, model.u);
 };
 var $elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
@@ -6146,7 +6132,7 @@ var $tortus$elm_array_2d$Array2D$get = F3(
 			$elm$core$Array$get(col),
 			A2($tortus$elm_array_2d$Array2D$getRow, row, array2d));
 	});
-var $author$project$Aoc03$isCrash = F2(
+var $author$project$Main$isCrash = F2(
 	function (area, _v0) {
 		var x = _v0.a;
 		var y = _v0.b;
@@ -6169,12 +6155,12 @@ var $author$project$Aoc03$isCrash = F2(
 		return false;
 	});
 var $elm$core$Basics$modBy = _Basics_modBy;
-var $author$project$Aoc03$replaceToboggan = F2(
+var $author$project$Main$replaceToboggan = F2(
 	function (toboggan, toboggans) {
 		return A2(
 			$elm$core$List$map,
 			function (t) {
-				return _Utils_eq(t.I, toboggan.I) ? toboggan : t;
+				return _Utils_eq(t.J, toboggan.J) ? toboggan : t;
 			},
 			toboggans);
 	});
@@ -6259,118 +6245,118 @@ var $tortus$elm_array_2d$Array2D$set = F4(
 				},
 				A2($tortus$elm_array_2d$Array2D$getRow, row, array2d)));
 	});
-var $author$project$Aoc03$updateToboggan = F2(
+var $author$project$Main$updateToboggan = F2(
 	function (toboggan, model) {
-		var crashes = toboggan.N;
-		var _v0 = toboggan.H;
+		var crashes = toboggan.G;
+		var _v0 = toboggan.I;
 		var x = _v0.a;
 		var y = _v0.b;
-		var _v1 = toboggan.I;
+		var _v1 = toboggan.J;
 		var dx = _v1.a;
 		var dy = _v1.b;
 		if (_Utils_cmp(y, model.V) < 0) {
 			var yNext = y + dy;
 			var xNext = A2($elm$core$Basics$modBy, model.U, x + dx);
-			var toboggans = model.y;
+			var toboggans = model.r;
 			var movedToboggan = _Utils_update(
 				toboggan,
 				{
-					H: _Utils_Tuple2(xNext, yNext)
+					I: _Utils_Tuple2(xNext, yNext)
 				});
 			if (A2(
-				$author$project$Aoc03$isCrash,
-				model.s,
+				$author$project$Main$isCrash,
+				model.t,
 				_Utils_Tuple2(x, y))) {
 				var crashedToboggan = _Utils_update(
 					movedToboggan,
-					{N: crashes + 1});
-				var area = A4($tortus$elm_array_2d$Array2D$set, y, x, 'X', model.s);
+					{G: crashes + 1});
+				var area = A4($tortus$elm_array_2d$Array2D$set, y, x, 'X', model.t);
 				return _Utils_update(
 					model,
 					{
-						s: area,
-						y: A2($author$project$Aoc03$replaceToboggan, crashedToboggan, toboggans)
+						t: area,
+						r: A2($author$project$Main$replaceToboggan, crashedToboggan, toboggans)
 					});
 			} else {
 				return _Utils_update(
 					model,
 					{
-						y: A2($author$project$Aoc03$replaceToboggan, movedToboggan, toboggans)
+						r: A2($author$project$Main$replaceToboggan, movedToboggan, toboggans)
 					});
 			}
 		} else {
 			return model;
 		}
 	});
-var $author$project$Aoc03$updateStep = function (model) {
+var $author$project$Main$updateStep = function (model) {
 	return A3(
 		$elm$core$List$foldl,
 		F2(
 			function (t, m) {
-				return A2($author$project$Aoc03$updateToboggan, t, m);
+				return A2($author$project$Main$updateToboggan, t, m);
 			}),
 		model,
-		model.y);
+		model.r);
 };
 var $elm$core$Basics$not = _Basics_not;
-var $author$project$Aoc03$updateTogglePlay = function (model) {
+var $author$project$Main$updateTogglePlay = function (model) {
 	return _Utils_update(
 		model,
 		{C: !model.C});
 };
-var $author$project$Aoc03$updateToggleWide = function (model) {
-	return A2($author$project$Aoc03$initModel, !model.A, model.t);
+var $author$project$Main$updateToggleWide = function (model) {
+	return A2($author$project$Main$initModel, !model.A, model.u);
 };
-var $author$project$Aoc03$update = F2(
+var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 6:
 				return _Utils_Tuple2(
-					$author$project$Aoc03$updateClear(model),
+					$author$project$Main$updateClear(model),
 					$elm$core$Platform$Cmd$none);
 			case 0:
 				return _Utils_Tuple2(
-					$author$project$Aoc03$updateStep(model),
+					$author$project$Main$updateStep(model),
 					$elm$core$Platform$Cmd$none);
 			case 1:
 				return _Utils_Tuple2(
-					$author$project$Aoc03$updateStep(model),
+					$author$project$Main$updateStep(model),
 					$elm$core$Platform$Cmd$none);
 			case 4:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{x: model.x / 2}),
+						{y: model.y / 2}),
 					$elm$core$Platform$Cmd$none);
 			case 5:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{x: model.x * 2}),
+						{y: model.y * 2}),
 					$elm$core$Platform$Cmd$none);
 			case 2:
 				return _Utils_Tuple2(
-					$author$project$Aoc03$updateTogglePlay(model),
+					$author$project$Main$updateTogglePlay(model),
 					$elm$core$Platform$Cmd$none);
 			case 3:
 				return _Utils_Tuple2(
-					$author$project$Aoc03$updateToggleWide(model),
+					$author$project$Main$updateToggleWide(model),
 					$elm$core$Platform$Cmd$none);
 			default:
 				var dataSource = msg.a;
 				return _Utils_Tuple2(
-					A2($author$project$Aoc03$initModel, model.A, dataSource),
+					A2($author$project$Main$initModel, model.A, dataSource),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Aoc03$Clear = {$: 6};
-var $author$project$Aoc03$Faster = {$: 4};
-var $author$project$Aoc03$Sample = 1;
-var $author$project$Aoc03$Slower = {$: 5};
-var $author$project$Aoc03$Step = {$: 1};
-var $author$project$Aoc03$TogglePlay = {$: 2};
-var $author$project$Aoc03$ToggleWide = {$: 3};
-var $author$project$Aoc03$UseDataSource = function (a) {
+var $author$project$Main$Clear = {$: 6};
+var $author$project$Main$Faster = {$: 4};
+var $author$project$Main$Sample = 1;
+var $author$project$Main$Slower = {$: 5};
+var $author$project$Main$Step = {$: 1};
+var $author$project$Main$TogglePlay = {$: 2};
+var $author$project$Main$ToggleWide = {$: 3};
+var $author$project$Main$UseDataSource = function (a) {
 	return {$: 7, a: a};
 };
 var $elm$html$Html$a = _VirtualDom_node('a');
@@ -6403,7 +6389,7 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 	});
 var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $author$project$Aoc03$getNestedPositions = function (board) {
+var $author$project$Main$getNestedPositions = function (board) {
 	var ys = A2(
 		$elm$core$List$range,
 		0,
@@ -6491,7 +6477,7 @@ var $elm$core$List$member = F2(
 			xs);
 	});
 var $elm$html$Html$span = _VirtualDom_node('span');
-var $author$project$Aoc03$toCharElement = F3(
+var $author$project$Main$toCharElement = F3(
 	function (area, tobogganPositions, _v0) {
 		var x = _v0.a;
 		var y = _v0.b;
@@ -6559,28 +6545,28 @@ var $author$project$Aoc03$toCharElement = F3(
 	});
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
-var $author$project$Aoc03$viewBody = function (model) {
+var $author$project$Main$view = function (model) {
 	var tobogganPositions = A2(
 		$elm$core$List$map,
 		function (t) {
-			return t.H;
+			return t.I;
 		},
-		model.y);
+		model.r);
 	var textFontSize = function () {
-		var _v0 = model.t;
+		var _v0 = model.u;
 		if (!_v0) {
 			return '16px';
 		} else {
 			return '32px';
 		}
 	}();
-	var nestedPositions = $author$project$Aoc03$getNestedPositions(model.s);
+	var nestedPositions = $author$project$Main$getNestedPositions(model.t);
 	var nestedElements = A2(
 		$elm$core$List$map,
 		function (positions) {
 			return A2(
 				$elm$core$List$map,
-				A2($author$project$Aoc03$toCharElement, model.s, tobogganPositions),
+				A2($author$project$Main$toCharElement, model.t, tobogganPositions),
 				positions);
 		},
 		nestedPositions);
@@ -6598,6 +6584,19 @@ var $author$project$Aoc03$viewBody = function (model) {
 			}),
 		_List_Nil,
 		nestedElements);
+	var crashScore = A3(
+		$elm$core$List$foldl,
+		F2(
+			function (n, p) {
+				return n * p;
+			}),
+		1,
+		A2(
+			$elm$core$List$map,
+			function (t) {
+				return t.G;
+			},
+			model.r));
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
@@ -6653,82 +6652,6 @@ var $author$project$Aoc03$viewBody = function (model) {
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2024/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2024')
-									])),
-								$elm$html$Html$text('] '),
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2023/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2023')
-									])),
-								$elm$html$Html$text('] '),
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2022/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2022')
-									])),
-								$elm$html$Html$text('] '),
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2021/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2021')
-									])),
-								$elm$html$Html$text('] '),
-								$elm$html$Html$text(' ['),
-								A2(
-								$elm$html$Html$a,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$href('../../2020/')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('2020')
-									])),
-								$elm$html$Html$text('] ')
-							]))
-					])),
-				A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$td,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'padding-bottom', '10px')
-							]),
-						_List_fromArray(
-							[
 								A2(
 								$elm$html$Html$a,
 								_List_fromArray(
@@ -6760,8 +6683,8 @@ var $author$project$Aoc03$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(
-										$author$project$Aoc03$UseDataSource(0)),
-										$elm$html$Html$Attributes$checked(!model.t)
+										$author$project$Main$UseDataSource(0)),
+										$elm$html$Html$Attributes$checked(!model.u)
 									]),
 								_List_Nil),
 								A2(
@@ -6777,8 +6700,8 @@ var $author$project$Aoc03$viewBody = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(
-										$author$project$Aoc03$UseDataSource(1)),
-										$elm$html$Html$Attributes$checked(model.t === 1)
+										$author$project$Main$UseDataSource(1)),
+										$elm$html$Html$Attributes$checked(model.u === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -6809,7 +6732,7 @@ var $author$project$Aoc03$viewBody = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Aoc03$Clear)
+										$elm$html$Html$Events$onClick($author$project$Main$Clear)
 									]),
 								_List_fromArray(
 									[
@@ -6820,7 +6743,7 @@ var $author$project$Aoc03$viewBody = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Aoc03$Slower)
+										$elm$html$Html$Events$onClick($author$project$Main$Slower)
 									]),
 								_List_fromArray(
 									[
@@ -6831,7 +6754,7 @@ var $author$project$Aoc03$viewBody = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Aoc03$TogglePlay)
+										$elm$html$Html$Events$onClick($author$project$Main$TogglePlay)
 									]),
 								_List_fromArray(
 									[
@@ -6842,7 +6765,7 @@ var $author$project$Aoc03$viewBody = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Aoc03$Faster)
+										$elm$html$Html$Events$onClick($author$project$Main$Faster)
 									]),
 								_List_fromArray(
 									[
@@ -6853,7 +6776,7 @@ var $author$project$Aoc03$viewBody = function (model) {
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'width', '80px'),
-										$elm$html$Html$Events$onClick($author$project$Aoc03$Step)
+										$elm$html$Html$Events$onClick($author$project$Main$Step)
 									]),
 								_List_fromArray(
 									[
@@ -6879,7 +6802,7 @@ var $author$project$Aoc03$viewBody = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$type_('checkbox'),
-										$elm$html$Html$Events$onClick($author$project$Aoc03$ToggleWide),
+										$elm$html$Html$Events$onClick($author$project$Main$ToggleWide),
 										$elm$html$Html$Attributes$checked(model.A)
 									]),
 								_List_Nil),
@@ -6915,7 +6838,8 @@ var $author$project$Aoc03$viewBody = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('?')
+										$elm$html$Html$text(
+										$elm$core$String$fromInt(crashScore))
 									]))
 							]))
 					])),
@@ -6942,34 +6866,7 @@ var $author$project$Aoc03$viewBody = function (model) {
 					]))
 			]));
 };
-var $author$project$Aoc03$view = function (model) {
-	return {
-		aA: _List_fromArray(
-			[
-				$author$project$Aoc03$viewBody(model)
-			]),
-		aO: 'Advent of Code 2020 | Day 3: Toboggan Trajectory'
-	};
-};
-var $author$project$Aoc03$main = $elm$browser$Browser$document(
-	{aH: $author$project$Aoc03$init, aN: $author$project$Aoc03$subscriptions, aP: $author$project$Aoc03$update, aQ: $author$project$Aoc03$view});
-_Platform_export({'Aoc03':{'init':$author$project$Aoc03$main(
+var $author$project$Main$main = $elm$browser$Browser$element(
+	{aH: $author$project$Main$init, aN: $author$project$Main$subscriptions, aP: $author$project$Main$update, aQ: $author$project$Main$view});
+_Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
-
-  var app = Elm.Aoc03.init({ node: document.getElementById("elm") });
-}
-catch (e)
-{
-  // display initialization errors (e.g. bad flags, infinite recursion)
-  var header = document.createElement("h1");
-  header.style.fontFamily = "monospace";
-  header.innerText = "Initialization Error";
-  var pre = document.getElementById("elm");
-  document.body.insertBefore(header, pre);
-  pre.innerText = e;
-  throw e;
-}
-</script>
-
-</body>
-</html>
