@@ -39,13 +39,16 @@ type Visit = Vertical | Horizontal | Both
 
 type Cell = Highlight Char | Plain Char 
 
+type alias Toboggan =
+  { slope : Pos
+  , pos : Pos
+  , crashes : Int }
+
 type alias Model = 
-  { warehouse : Array2D Char
-  , large : Bool 
-  , wide : Bool 
-  , robot : Pos 
+  { area : Array2D Char
+  , allSlopes : Bool 
+  , toboggans : List Toboggan 
   , dataSource : DataSource
-  , moves : List Char 
   , paused : Bool 
   , finished : Bool 
   , tickInterval : Float 
@@ -389,35 +392,26 @@ input = """....#...............##...#...#.
 ..#.....#.............#....#...
 ##...#.........#.....#...#....."""
 
-read : DataSource -> String
-read dataSource = 
-  case dataSource of 
-    Input -> input
-    Sample -> sample
-
-widen text = 
-    text |> String.replace "#" "##" |> String.replace "O" "[]" |> String.replace "." ".." |> String.replace "@" "@."
+initArea : DataSource -> Array2D Char
+initArea dataSource = 
+  let 
+    data = 
+      case dataSource of 
+        Sample -> sample 
+        Input -> input 
+  in 
+    data |> String.split "\n" |> List.map (String.toList) |> Array2D.fromList
 
 initModel : Bool -> DataSource -> Model 
-initModel wide dataSource = 
+initModel allSlopes dataSource = 
   let 
-    data = read dataSource
-    (basicRows, moves) = 
-      case String.split "\n\n" data of 
-        a :: b :: _ -> (a |> String.split "\n", b |> String.toList)
-        _ -> ([], [])
-    rows = if wide then basicRows |> List.map widen else basicRows
-    numberOfRows = rows |> List.length 
-    numberOfCols = rows |> List.head |> Maybe.withDefault "?" |> String.length 
-    warehouse = rows |> List.map (String.toList) |> Array2D.fromList
-    robot = findRobot warehouse 
+    area = initArea dataSource
+    toboggans = []
   in 
-    { warehouse = warehouse
-    , large = dataSource == Input 
-    , wide = wide
-    , robot = robot 
+    { area = area
+    , allSlopes = allSlopes
+    , toboggans = toboggans 
     , dataSource = dataSource
-    , moves = moves
     , paused = True
     , finished = False  
     , tickInterval = defaultTickInterval 
@@ -536,8 +530,8 @@ tryFindSpaceSimple warehouse robot move =
   tryFindSpaceSimpleLoop warehouse move robot []
 
 tryFindSpace : Bool -> Array2D Char -> Pos -> Char -> List (Pos, Pos) 
-tryFindSpace wide warehouse robot move = 
-  if wide then 
+tryFindSpace allSlopes warehouse robot move = 
+  if allSlopes then 
     case move of 
       '^' -> tryFindSpaceDouble warehouse robot move 
       'v' -> tryFindSpaceDouble warehouse robot move 
@@ -570,9 +564,9 @@ moveStuff warehouse swaps =
               moveStuff wh2 rest
 
 tryMoveRobot : Bool -> Array2D Char -> Pos -> Char -> (Array2D Char, Pos) 
-tryMoveRobot wide warehouse robot move = 
+tryMoveRobot allSlopes warehouse robot move = 
   let 
-    swaps = tryFindSpace wide warehouse robot move
+    swaps = tryFindSpace allSlopes warehouse robot move
   in 
     if List.length swaps == 0 then 
       (warehouse, robot) 
@@ -602,34 +596,10 @@ gpsCoordinate (x, y) =
 
 updateClear : Model -> Model
 updateClear model = 
-  initModel model.wide model.dataSource
+  initModel model.allSlopes model.dataSource
 
 updateStep : Model -> Model
-updateStep model = 
-  let 
-    wide = model.wide 
-    warehouse = model.warehouse 
-    robot = model.robot
-  in 
-    case model.moves of 
-      [] -> model 
-      move :: movesLeft -> 
-        let 
-          (wh, rb) = tryMoveRobot wide warehouse robot move
-          (rx, ry) = rb 
-        in 
-          { model | warehouse = wh, robot = rb, moves = movesLeft, message = ""  }
-
-updateKey : Char -> Model -> Model
-updateKey move model = 
-  let 
-    wide = model.wide 
-    warehouse = model.warehouse 
-    robot = model.robot
-    (wh, rb) = tryMoveRobot wide warehouse robot move
-    (rx, ry) = rb 
-    in 
-      { model | warehouse = wh, robot = rb, message = ""  }
+updateStep model = model 
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -637,7 +607,7 @@ updateTogglePlay model =
 
 updateToggleWide : Model -> Model
 updateToggleWide model = 
-  initModel (not model.wide) model.dataSource 
+  initModel (not model.allSlopes) model.dataSource 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -657,7 +627,7 @@ update msg model =
     ToggleWide -> 
       (updateToggleWide model, Cmd.none)
     UseDataSource dataSource -> 
-      (initModel model.wide dataSource, Cmd.none)
+      (initModel model.allSlopes dataSource, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -694,21 +664,10 @@ view model =
 viewBody : Model -> Html Msg
 viewBody model =
   let
-    textFontSize = if model.large then "12px" else "28px"
-    warehouse = model.warehouse
-    rows = toWarehouseRows warehouse
+    textFontSize = if model.allSlopes then "12px" else "28px"
     -- Insert robot symbol.
-    elements = rows |> List.concatMap (toRowElements)
+    elements = []
 
-    gpsSum = 
-      if List.isEmpty model.moves then
-        let 
-          positions = warehouse |> getAllPositions
-          boxPositions = positions |> List.filterMap (isBox warehouse)  
-        in 
-          boxPositions |> List.map gpsCoordinate |> List.sum |> String.fromInt 
-      else 
-        "?"
   in 
     Html.table 
       [ Html.Attributes.style "width" "1080px"
@@ -794,7 +753,7 @@ viewBody model =
           [ Html.td 
               [ Html.Attributes.align "center" ]
               [ Html.input 
-                [ Html.Attributes.type_ "checkbox", onClick ToggleWide, Html.Attributes.checked model.wide ] 
+                [ Html.Attributes.type_ "checkbox", onClick ToggleWide, Html.Attributes.checked model.allSlopes ] 
                 []
               , Html.label [] [ Html.text " Wide" ]
             ] ]
@@ -808,7 +767,7 @@ viewBody model =
               , Html.Attributes.style "padding-top" "10px"
               , Html.Attributes.style "width" "200px" ] 
               [ 
-                Html.div [] [ Html.text gpsSum ]
+                Html.div [] [ Html.text "?" ]
               ] ]
       , Html.tr 
           []
