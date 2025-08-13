@@ -568,7 +568,8 @@ view model =
 
   in 
     Html.table 
-      [ Html.Attributes.style "width" "1080px"
+      [ Html.Attributes.align "center"
+      , Html.Attributes.style "width" "100%"
       , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
@@ -637,11 +638,9 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "24px"
-              , Html.Attributes.style "padding-top" "10px"
-              , Html.Attributes.style "width" "200px" ] 
+              , Html.Attributes.style "padding-top" "10px" ] 
               [ 
                 Html.div [] [ Html.text (String.fromInt crashScore) ]
               ] ]
@@ -649,11 +648,9 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Source Code Pro, monospace"
               , Html.Attributes.style "font-size" textFontSize
-              , Html.Attributes.style "padding" "10px"
-              , Html.Attributes.style "width" "200px" ] 
+              , Html.Attributes.style "padding" "10px" ] 
               [ 
                 Html.div [] elements
               ] ] ]
