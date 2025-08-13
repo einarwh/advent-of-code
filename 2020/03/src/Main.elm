@@ -6,15 +6,12 @@ import Browser
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
-import Dict exposing (Dict)
-import Array exposing (Array)
-import Set exposing (Set)
 import Array2D exposing (Array2D)
 import Html exposing (text)
 import Time
 
 defaultTickInterval : Float
-defaultTickInterval = 10
+defaultTickInterval = 100
 
 -- MAIN
 
@@ -30,14 +27,6 @@ main =
 type DataSource = Input | Sample
 
 type alias Pos = (Int, Int)
-
-type Dir = N | W | S | E
-
-type Move = Turn | Forward
-
-type Visit = Vertical | Horizontal | Both 
-
-type Cell = Highlight Char | Plain Char 
 
 type alias Toboggan =
   { slope : Pos
@@ -438,19 +427,11 @@ type Msg =
   Tick 
   | Step 
   | TogglePlay 
-  | ToggleWide 
+  | ToggleAllSlopes 
   | Faster 
   | Slower 
   | Clear 
   | UseDataSource DataSource
-
-getAllPositions : Array2D Char -> List Pos
-getAllPositions board = 
-  let
-    ys = List.range 0 (Array2D.rows board - 1)
-    xs = List.range 0 (Array2D.columns board - 1)
-  in 
-    ys |> List.concatMap (\y -> xs |> List.map (\x -> (x, y)))
 
 getNestedPositions : Array2D Char -> List (List Pos)
 getNestedPositions board = 
@@ -500,16 +481,29 @@ updateToboggan toboggan model =
     else 
       model 
 
+hasFinished : Int -> Toboggan -> Bool 
+hasFinished yMax toboggan = 
+  let
+    (_, y) = toboggan.pos 
+  in
+    y >= yMax 
+
 updateStep : Model -> Model
 updateStep model = 
-  model.toboggans |> List.foldl (\t m -> updateToboggan t m) model
+  let 
+    updated = model.toboggans |> List.foldl (\t m -> updateToboggan t m) model
+    allFinished = (updated.toboggans |> List.all (hasFinished model.yMax))
+    finish = model.finished || allFinished 
+    pause = model.paused || finish 
+  in 
+    { updated | finished = finish, paused = pause }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
   { model | paused = not model.paused }
 
-updateToggleWide : Model -> Model
-updateToggleWide model = 
+updateToggleAllSlopes : Model -> Model
+updateToggleAllSlopes model = 
   initModel (not model.allSlopes) model.dataSource 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -527,8 +521,8 @@ update msg model =
       ({model | tickInterval = model.tickInterval * 2 }, Cmd.none)
     TogglePlay -> 
       (updateTogglePlay model, Cmd.none)
-    ToggleWide -> 
-      (updateToggleWide model, Cmd.none)
+    ToggleAllSlopes -> 
+      (updateToggleAllSlopes model, Cmd.none)
     UseDataSource dataSource -> 
       (initModel model.allSlopes dataSource, Cmd.none)
 
@@ -542,19 +536,6 @@ subscriptions model =
     Sub.batch [ tickSub ] 
 
 -- VIEW
-
-toWarehouseRows : Array2D Char -> List String 
-toWarehouseRows warehouse = 
-  let
-    ys = List.range 0 (Array2D.rows warehouse - 1)
-    xs = List.range 0 (Array2D.columns warehouse - 1)
-    rows = ys |> List.map (\y -> xs |> List.filterMap (\x -> Array2D.get y x warehouse) |> String.fromList)
-  in 
-    rows 
-
-toRowElements : String -> List (Html Msg)
-toRowElements rowText = 
-  [ Html.text rowText, Html.br [] [] ]
 
 toCharElement : Array2D Char -> List Pos -> Pos -> Html Msg 
 toCharElement area tobogganPositions (x, y) = 
@@ -648,7 +629,7 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center" ]
               [ Html.input 
-                [ Html.Attributes.type_ "checkbox", onClick ToggleWide, Html.Attributes.checked model.allSlopes ] 
+                [ Html.Attributes.type_ "checkbox", onClick ToggleAllSlopes, Html.Attributes.checked model.allSlopes ] 
                 []
               , Html.label [] [ Html.text " all slopes" ]
             ] ]

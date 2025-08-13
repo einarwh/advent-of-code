@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.S.H === region.Z.H)
+	if (region.U.I === region._.I)
 	{
-		return 'on line ' + region.S.H;
+		return 'on line ' + region.U.I;
 	}
-	return 'on lines ' + region.S.H + ' through ' + region.Z.H;
+	return 'on lines ' + region.U.I + ' through ' + region._.I;
 }
 
 
@@ -2720,8 +2720,8 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
 		af: func(record.af),
-		T: record.T,
-		Q: record.Q
+		V: record.V,
+		S: record.S
 	}
 });
 
@@ -2990,10 +2990,10 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 
 		var value = result.a;
 		var message = !tag ? value : tag < 3 ? value.a : value.af;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.T;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.V;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.Q) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.S) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3983,7 +3983,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 		impl.aP,
 		impl.aN,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.R && impl.R(sendToApp)
+			var divertHrefToApp = impl.T && impl.T(sendToApp)
 			var view = impl.aQ;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
@@ -4058,7 +4058,7 @@ function _Browser_application(impl)
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		R: function(sendToApp)
+		T: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -5240,7 +5240,7 @@ var $author$project$Main$Input = 0;
 var $tortus$elm_array_2d$Array2D$columns = function (array2d) {
 	return array2d.h;
 };
-var $author$project$Main$defaultTickInterval = 10;
+var $author$project$Main$defaultTickInterval = 100;
 var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
 var $elm$core$Array$foldl = F3(
 	function (func, baseCase, _v0) {
@@ -5644,8 +5644,8 @@ var $author$project$Main$initModel = F2(
 			$elm$core$List$map,
 			function (s) {
 				return {
-					G: 0,
-					I: _Utils_Tuple2(0, 0),
+					H: 0,
+					D: _Utils_Tuple2(0, 0),
 					J: s
 				};
 			},
@@ -5653,7 +5653,7 @@ var $author$project$Main$initModel = F2(
 		var area = $author$project$Main$initArea(dataSource);
 		var xMax = $tortus$elm_array_2d$Array2D$columns(area);
 		var yMax = $tortus$elm_array_2d$Array2D$rows(area);
-		return {A: allSlopes, t: area, u: dataSource, aa: false, af: '?', C: true, y: $author$project$Main$defaultTickInterval, r: toboggans, U: xMax, V: yMax};
+		return {B: allSlopes, u: area, v: dataSource, O: false, af: '?', r: true, z: $author$project$Main$defaultTickInterval, o: toboggans, W: xMax, P: yMax};
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -6079,9 +6079,9 @@ var $elm$time$Time$every = F2(
 	});
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (model) {
-	var tickSub = model.C ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = model.r ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.y,
+		model.z,
 		function (_v0) {
 			return $author$project$Main$Tick;
 		});
@@ -6090,8 +6090,43 @@ var $author$project$Main$subscriptions = function (model) {
 			[tickSub]));
 };
 var $author$project$Main$updateClear = function (model) {
-	return A2($author$project$Main$initModel, model.A, model.u);
+	return A2($author$project$Main$initModel, model.B, model.v);
 };
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$Basics$not = _Basics_not;
+var $elm$core$List$all = F2(
+	function (isOkay, list) {
+		return !A2(
+			$elm$core$List$any,
+			A2($elm$core$Basics$composeL, $elm$core$Basics$not, isOkay),
+			list);
+	});
+var $author$project$Main$hasFinished = F2(
+	function (yMax, toboggan) {
+		var _v0 = toboggan.D;
+		var y = _v0.b;
+		return _Utils_cmp(y, yMax) > -1;
+	});
 var $elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
 		if (!maybeValue.$) {
@@ -6260,41 +6295,41 @@ var $tortus$elm_array_2d$Array2D$set = F4(
 	});
 var $author$project$Main$updateToboggan = F2(
 	function (toboggan, model) {
-		var crashes = toboggan.G;
-		var _v0 = toboggan.I;
+		var crashes = toboggan.H;
+		var _v0 = toboggan.D;
 		var x = _v0.a;
 		var y = _v0.b;
 		var _v1 = toboggan.J;
 		var dx = _v1.a;
 		var dy = _v1.b;
-		if (_Utils_cmp(y, model.V) < 0) {
+		if (_Utils_cmp(y, model.P) < 0) {
 			var yNext = y + dy;
-			var xNext = A2($elm$core$Basics$modBy, model.U, x + dx);
-			var toboggans = model.r;
+			var xNext = A2($elm$core$Basics$modBy, model.W, x + dx);
+			var toboggans = model.o;
 			var movedToboggan = _Utils_update(
 				toboggan,
 				{
-					I: _Utils_Tuple2(xNext, yNext)
+					D: _Utils_Tuple2(xNext, yNext)
 				});
 			if (A2(
 				$author$project$Main$isCrash,
-				model.t,
+				model.u,
 				_Utils_Tuple2(x, y))) {
 				var crashedToboggan = _Utils_update(
 					movedToboggan,
-					{G: crashes + 1});
-				var area = A4($tortus$elm_array_2d$Array2D$set, y, x, 'X', model.t);
+					{H: crashes + 1});
+				var area = A4($tortus$elm_array_2d$Array2D$set, y, x, 'X', model.u);
 				return _Utils_update(
 					model,
 					{
-						t: area,
-						r: A2($author$project$Main$replaceToboggan, crashedToboggan, toboggans)
+						u: area,
+						o: A2($author$project$Main$replaceToboggan, crashedToboggan, toboggans)
 					});
 			} else {
 				return _Utils_update(
 					model,
 					{
-						r: A2($author$project$Main$replaceToboggan, movedToboggan, toboggans)
+						o: A2($author$project$Main$replaceToboggan, movedToboggan, toboggans)
 					});
 			}
 		} else {
@@ -6302,23 +6337,31 @@ var $author$project$Main$updateToboggan = F2(
 		}
 	});
 var $author$project$Main$updateStep = function (model) {
-	return A3(
+	var updated = A3(
 		$elm$core$List$foldl,
 		F2(
 			function (t, m) {
 				return A2($author$project$Main$updateToboggan, t, m);
 			}),
 		model,
-		model.r);
+		model.o);
+	var allFinished = A2(
+		$elm$core$List$all,
+		$author$project$Main$hasFinished(model.P),
+		updated.o);
+	var finish = model.O || allFinished;
+	var pause = model.r || finish;
+	return _Utils_update(
+		updated,
+		{O: finish, r: pause});
 };
-var $elm$core$Basics$not = _Basics_not;
+var $author$project$Main$updateToggleAllSlopes = function (model) {
+	return A2($author$project$Main$initModel, !model.B, model.v);
+};
 var $author$project$Main$updateTogglePlay = function (model) {
 	return _Utils_update(
 		model,
-		{C: !model.C});
-};
-var $author$project$Main$updateToggleWide = function (model) {
-	return A2($author$project$Main$initModel, !model.A, model.u);
+		{r: !model.r});
 };
 var $author$project$Main$update = F2(
 	function (msg, model) {
@@ -6339,13 +6382,13 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{y: model.y / 2}),
+						{z: model.z / 2}),
 					$elm$core$Platform$Cmd$none);
 			case 5:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{y: model.y * 2}),
+						{z: model.z * 2}),
 					$elm$core$Platform$Cmd$none);
 			case 2:
 				return _Utils_Tuple2(
@@ -6353,12 +6396,12 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 3:
 				return _Utils_Tuple2(
-					$author$project$Main$updateToggleWide(model),
+					$author$project$Main$updateToggleAllSlopes(model),
 					$elm$core$Platform$Cmd$none);
 			default:
 				var dataSource = msg.a;
 				return _Utils_Tuple2(
-					A2($author$project$Main$initModel, model.A, dataSource),
+					A2($author$project$Main$initModel, model.B, dataSource),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
@@ -6367,8 +6410,8 @@ var $author$project$Main$Faster = {$: 4};
 var $author$project$Main$Sample = 1;
 var $author$project$Main$Slower = {$: 5};
 var $author$project$Main$Step = {$: 1};
+var $author$project$Main$ToggleAllSlopes = {$: 3};
 var $author$project$Main$TogglePlay = {$: 2};
-var $author$project$Main$ToggleWide = {$: 3};
 var $author$project$Main$UseDataSource = function (a) {
 	return {$: 7, a: a};
 };
@@ -6459,27 +6502,6 @@ var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
 };
-var $elm$core$List$any = F2(
-	function (isOkay, list) {
-		any:
-		while (true) {
-			if (!list.b) {
-				return false;
-			} else {
-				var x = list.a;
-				var xs = list.b;
-				if (isOkay(x)) {
-					return true;
-				} else {
-					var $temp$isOkay = isOkay,
-						$temp$list = xs;
-					isOkay = $temp$isOkay;
-					list = $temp$list;
-					continue any;
-				}
-			}
-		}
-	});
 var $elm$core$List$member = F2(
 	function (x, xs) {
 		return A2(
@@ -6562,24 +6584,24 @@ var $author$project$Main$view = function (model) {
 	var tobogganPositions = A2(
 		$elm$core$List$map,
 		function (t) {
-			return t.I;
+			return t.D;
 		},
-		model.r);
+		model.o);
 	var textFontSize = function () {
-		var _v0 = model.u;
+		var _v0 = model.v;
 		if (!_v0) {
 			return '16px';
 		} else {
 			return '32px';
 		}
 	}();
-	var nestedPositions = $author$project$Main$getNestedPositions(model.t);
+	var nestedPositions = $author$project$Main$getNestedPositions(model.u);
 	var nestedElements = A2(
 		$elm$core$List$map,
 		function (positions) {
 			return A2(
 				$elm$core$List$map,
-				A2($author$project$Main$toCharElement, model.t, tobogganPositions),
+				A2($author$project$Main$toCharElement, model.u, tobogganPositions),
 				positions);
 		},
 		nestedPositions);
@@ -6607,9 +6629,9 @@ var $author$project$Main$view = function (model) {
 		A2(
 			$elm$core$List$map,
 			function (t) {
-				return t.G;
+				return t.H;
 			},
-			model.r));
+			model.o));
 	return A2(
 		$elm$html$Html$table,
 		_List_fromArray(
@@ -6697,7 +6719,7 @@ var $author$project$Main$view = function (model) {
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(
 										$author$project$Main$UseDataSource(0)),
-										$elm$html$Html$Attributes$checked(!model.u)
+										$elm$html$Html$Attributes$checked(!model.v)
 									]),
 								_List_Nil),
 								A2(
@@ -6714,7 +6736,7 @@ var $author$project$Main$view = function (model) {
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(
 										$author$project$Main$UseDataSource(1)),
-										$elm$html$Html$Attributes$checked(model.u === 1)
+										$elm$html$Html$Attributes$checked(model.v === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -6771,7 +6793,7 @@ var $author$project$Main$view = function (model) {
 									]),
 								_List_fromArray(
 									[
-										model.C ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
+										model.r ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -6815,8 +6837,8 @@ var $author$project$Main$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$type_('checkbox'),
-										$elm$html$Html$Events$onClick($author$project$Main$ToggleWide),
-										$elm$html$Html$Attributes$checked(model.A)
+										$elm$html$Html$Events$onClick($author$project$Main$ToggleAllSlopes),
+										$elm$html$Html$Attributes$checked(model.B)
 									]),
 								_List_Nil),
 								A2(
