@@ -62,5 +62,4 @@ let run fileName =
     let text = File.ReadAllText(fileName).Trim()
     [1 .. 20] |> List.map presents |> List.iter (printfn "%d")
 
-
 run "input.txt"
