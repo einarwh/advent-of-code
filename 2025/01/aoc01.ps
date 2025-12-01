@@ -2,100 +2,88 @@
 % gs -DNOSAFER aoc01.ps
 
 /read-input
-{                                       % fn
-    [                                   % fn [
-    exch                                % [ fn 
-    (r) file                            % [ F
+{                                           % fn
+    [                                       % fn [
+    exch                                    % [ fn 
+    (r) file                                % [ F
     {   
-        dup                             % [ .. F F
-        20 string                       % [ ... F F buf
-        readline                        % [ ... F (s) 
+        dup                                 % [ .. F F
+        20 string                           % [ ... F F buf
+        readline                            % [ ... F (s) 
         {   
-            exch                        % [ ... (s) F
+            exch                            % [ ... (s) F
         }   
         {   
-            exch                        % [ ... (s) F 
-            closefile                   % [ ... (s) 
-            ]                           % [ ... (s) ] 
+            exch                            % [ ... (s) F 
+            closefile                       % [ ... (s) 
+            ]                               % [ ... (s) ] 
             exit    
         } ifelse    
-    } loop                              % Rs
+    } loop                                  % Rs
 } def 
 
 /left {                                     % z c p r 
-    (\nleft\n) print
-    1 index 0 eq                            % z c p r p=0?
-    {
-        (starting a 0!\n) print
-        3 -1 roll
-        1 sub  
-        3 1 roll 
-    } if 
-    sub                                     % z c n
-    % pstack
-    {
-        dup 0 lt                            % z c n n<0?
-        {                                   % z c n 
-            (less than 0\n) print
-            100 add                         % z c n'
-            dup 0 ne
-            {
-                (!= 0 => add 1 passby\n) print
-                exch 1 add exch             % z c++ n' 
-            } if 
-        } 
-        {
+    { 
+        dup 0 eq                            % z c p r r=0?
+        {                                   % z c n r
+            pop                             % z c n 
             dup 0 eq                        % z c n n=0?
-            {                               % z c n
-                (landed on zero!\n) print
+            {
                 3 -1 roll                   % c n z  
                 1 add                       % c n z++
                 3 1 roll                    % z c n 
-            }                               % z c n 
-            if 
-            pstack
+            } if 
             exit
+        }                                   % z c n 
+        {
+            1 sub                           % z c n r--
+            exch 1 sub                      % z c r n--
+            dup 0 lt                        % z c r n n<0?
+            {
+                100 add                     % z c r n'
+            } if 
+            dup 0 eq                        % z c r n n=0?
+            {
+                3 -1 roll                   % z r n' c 
+                1 add                       % z r n' c++
+                3 1 roll                    % z c r n'
+            } if 
+            exch                            % z c n' r
         }
-        ifelse 
-    } loop 
+        ifelse  
+    } loop
 } def 
 
 /right {                                    % z c p r 
-    (\nright\n) print
-    % 1 index 0 eq                            % z c p r p=0?
-    % {
-    %     (starting a 0!\n) print
-    %     3 -1 roll
-    %     1 sub  
-    %     3 1 roll 
-    % } if 
-    add                                     % z c n
-    % pstack
-    {
-        dup 99 gt                           % z c n n>99?
-        {                                   % z c n 
-            (greater than 99\n) print
-            100 sub                         % z c n'
-            dup 0 ne
-            {
-                (!= 0 => add 1 passby\n) print
-                exch 1 add exch             % z c++ n' 
-            } if 
-        } 
-        {
+    { 
+        dup 0 eq                            % z c p r r=0?
+        {                                   % z c n r
+            pop                             % z c n 
             dup 0 eq                        % z c n n=0?
-            {                               % z c n
-                (landed on zero!\n) print
+            {
                 3 -1 roll                   % c n z  
                 1 add                       % c n z++
                 3 1 roll                    % z c n 
-            }                               % z c n 
-            if 
-            pstack
+            } if 
             exit
+        }                                   % z c n 
+        {
+            1 sub                           % z c n r--
+            exch 1 add                      % z c r n++
+            dup 99 gt                       % z c r n n>99?
+            {
+                100 sub                     % z c r n'
+            } if 
+            dup 0 eq                        % z c r n n=0?
+            {
+                3 -1 roll                   % z r n' c 
+                1 add                       % z r n' c++
+                3 1 roll                    % z c r n'
+            } if 
+            exch                            % z c n' r
         }
-        ifelse 
-    } loop 
+        ifelse  
+    } loop
 } def 
 
 /compile {                                  % s
@@ -115,19 +103,11 @@
     ifelse
 } def 
 
-% 0
-% 0
-% 50
-% (L68) compile 
-
-% exec 
-
 /run {
-    % Read
-    read-input
+    0 0 50
+    (input.txt) read-input  
     { compile exec } forall
-
+    pop 
 } def 
 
-0 0 50 
-(input.txt) run 
+run 
