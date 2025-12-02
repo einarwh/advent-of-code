@@ -18,15 +18,10 @@ let isSimplePattern (s : string) =
     s.Substring(0, len) = s.Substring len
 
 let rec check (p : string) (s : string) = 
-    if s.Length = 0 then 
-        true
-    else if s.Length < p.Length then 
-        false  
-    else 
-        s.Substring(0, p.Length) = p && check p (s.Substring p.Length)
+    s.Length = 0 || s.Length >= p.Length && s.Substring(0, p.Length) = p && check p (s.Substring p.Length)
 
 let isAnyPattern (s : string) = 
-    [1 .. s.Length / 2] |> List.exists (fun r -> check (s.Substring(0, r)) s)
+    [ 1 .. s.Length / 2 ] |> List.exists (fun r -> check (s.Substring(0, r)) s)
 
 let findInvalid pattern (start, stop) = 
     [ start .. stop ] |> List.filter (string >> pattern)
