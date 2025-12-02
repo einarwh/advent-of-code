@@ -12,7 +12,7 @@ import Svg.Attributes exposing (..)
 import Time
 
 defaultTickInterval : Float
-defaultTickInterval = 100
+defaultTickInterval = 10
 
 -- MAIN
 
