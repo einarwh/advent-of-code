@@ -4655,8 +4655,12 @@ toDialElement number =
     lineElement = line [ x1 "0", x2 x2Str, y1 "0", y2 y2Str, stroke "currentcolor" ] []
 
     cc = circle [ cx "0", cy "0", r "160", fill "lightgrey" ] []
+-- <polygon points="100,100 150,25 150,75 200,0" fill="none" stroke="black" />
+    angleStr = angle |> String.fromFloat
+    transformStr = "rotate(" ++ angleStr ++ ", 0, 0)"
+    arrow = polygon [ points "-10,-120 10,-120 0,-155", fill "currentcolor", transform transformStr ] []
   in 
-    [ cc, lineElement ]
+    [ cc, arrow ]
 
 toSvg : Model -> Html Msg
 toSvg model =
@@ -4777,8 +4781,6 @@ viewBody model =
               , Html.Attributes.style "padding" "0px" ] 
               [ 
                 Html.div [] [ Html.text (model.moves |> List.length |> String.fromInt ) ]
-              -- , Html.div [] [ Html.text dbgStr ]
-              -- , Html.div [] [ Html.text model.debug ]
               , Html.div [] [ Html.text (String.fromInt model.position) ]
               , Html.div [] [ Html.text (String.fromInt model.zeroes) ]
               , Html.div [] [ Html.text (String.fromInt model.allZeroes) ]
