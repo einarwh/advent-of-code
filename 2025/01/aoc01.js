@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.Q.H === region.V.H)
+	if (region.R.I === region.W.I)
 	{
-		return 'on line ' + region.Q.H;
+		return 'on line ' + region.R.I;
 	}
-	return 'on lines ' + region.Q.H + ' through ' + region.V.H;
+	return 'on lines ' + region.R.I + ' through ' + region.W.I;
 }
 
 
@@ -2727,9 +2727,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		aa: func(record.aa),
-		R: record.R,
-		O: record.O
+		q: func(record.q),
+		S: record.S,
+		P: record.P
 	}
 });
 
@@ -2997,11 +2997,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.aa;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.R;
+		var message = !tag ? value : tag < 3 ? value.a : value.q;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.S;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.O) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.P) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3991,7 +3991,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 		impl.aK,
 		impl.aI,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.P && impl.P(sendToApp)
+			var divertHrefToApp = impl.Q && impl.Q(sendToApp)
 			var view = impl.aL;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
@@ -4066,7 +4066,7 @@ function _Browser_application(impl)
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		P: function(sendToApp)
+		Q: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4083,7 +4083,7 @@ function _Browser_application(impl)
 					sendToApp(onUrlRequest(
 						(next
 							&& curr.ai === next.ai
-							&& curr.Z === next.Z
+							&& curr._ === next._
 							&& curr.af.a === next.af.a
 						)
 							? $elm$browser$Browser$Internal(next)
@@ -4260,7 +4260,7 @@ function _Browser_getViewport()
 			ar: _Browser_window.pageXOffset,
 			as: _Browser_window.pageYOffset,
 			aq: _Browser_doc.documentElement.clientWidth,
-			Y: _Browser_doc.documentElement.clientHeight
+			Z: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4271,7 +4271,7 @@ function _Browser_getScene()
 	var elem = _Browser_doc.documentElement;
 	return {
 		aq: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		Y: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		Z: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4296,13 +4296,13 @@ function _Browser_getViewportOf(id)
 		return {
 			am: {
 				aq: node.scrollWidth,
-				Y: node.scrollHeight
+				Z: node.scrollHeight
 			},
 			ap: {
 				ar: node.scrollLeft,
 				as: node.scrollTop,
 				aq: node.clientWidth,
-				Y: node.clientHeight
+				Z: node.clientHeight
 			}
 		};
 	});
@@ -4337,13 +4337,13 @@ function _Browser_getElement(id)
 				ar: x,
 				as: y,
 				aq: _Browser_doc.documentElement.clientWidth,
-				Y: _Browser_doc.documentElement.clientHeight
+				Z: _Browser_doc.documentElement.clientHeight
 			},
 			ay: {
 				ar: x + rect.left,
 				as: y + rect.top,
 				aq: rect.width,
-				Y: rect.height
+				Z: rect.height
 			}
 		};
 	});
@@ -4928,7 +4928,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {X: fragment, Z: host, ad: path, af: port_, ai: protocol, aj: query};
+		return {Y: fragment, _: host, ad: path, af: port_, ai: protocol, aj: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5247,7 +5247,7 @@ var $author$project$Main$initModel = function (dataSource) {
 		$elm$core$List$map,
 		$author$project$Main$parseMove,
 		A2($elm$core$String$split, '\n', data));
-	return {t: 0, B: dataSource, u: '----', G: false, aa: '', q: moves, m: true, n: position, y: $author$project$Main$defaultTickInterval, A: 0};
+	return {u: 0, C: dataSource, v: '----', H: false, r: moves, m: true, n: position, z: $author$project$Main$defaultTickInterval, B: 0};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -5673,83 +5673,79 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (model) {
-	var tickSub = (model.m || model.G) ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = (model.m || model.H) ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.y,
+		model.z,
 		function (_v0) {
 			return $author$project$Main$Tick;
 		});
 	return tickSub;
 };
 var $author$project$Main$updateReset = function (model) {
-	return $author$project$Main$initModel(model.B);
+	return $author$project$Main$initModel(model.C);
 };
 var $author$project$Main$updateStep = function (model) {
 	var position = model.n;
 	var pause = model.m;
-	var _v0 = model.q;
+	var _v0 = model.r;
 	if (!_v0.b) {
 		return _Utils_update(
 			model,
-			{u: 'paused?', G: true, m: true, n: position});
+			{v: 'paused?', H: true, m: true, n: position});
 	} else {
 		var move = _v0.a;
 		var rest = _v0.b;
 		if (!move.$) {
 			var steps = move.a;
 			if (steps > 0) {
-				var _v2 = ((position - 1) < 0) ? _Utils_Tuple2(99, 1) : _Utils_Tuple2(position - 1, 0);
-				var pos = _v2.a;
-				var z = _v2.b;
-				var allZeroes = model.t + z;
+				var pos = ((position - 1) < 0) ? 99 : (position - 1);
+				var allZeroes = model.u + ((!position) ? 1 : 0);
 				return _Utils_update(
 					model,
 					{
-						t: allZeroes,
-						u: 'lefty',
-						q: A2(
+						u: allZeroes,
+						v: 'lefty',
+						r: A2(
 							$elm$core$List$cons,
 							$author$project$Main$Left(steps - 1),
 							rest),
 						n: pos
 					});
 			} else {
-				var zeroes = model.A + ((!position) ? 1 : 0);
+				var zeroes = model.B + ((!position) ? 1 : 0);
 				return _Utils_update(
 					model,
-					{u: 'L done', q: rest, n: position, A: zeroes});
+					{v: 'L done', r: rest, n: position, B: zeroes});
 			}
 		} else {
 			var steps = move.a;
 			if (steps > 0) {
-				var _v3 = ((position + 1) > 99) ? _Utils_Tuple2(0, 1) : _Utils_Tuple2(position + 1, 0);
-				var pos = _v3.a;
-				var z = _v3.b;
-				var allZeroes = model.t + z;
+				var pos = ((position + 1) > 99) ? 0 : (position + 1);
+				var allZeroes = model.u + ((!position) ? 1 : 0);
 				return _Utils_update(
 					model,
 					{
-						t: allZeroes,
-						u: 'righty',
-						q: A2(
+						u: allZeroes,
+						v: 'righty',
+						r: A2(
 							$elm$core$List$cons,
 							$author$project$Main$Right(steps - 1),
 							rest),
 						n: pos
 					});
 			} else {
-				var zeroes = model.A + ((!position) ? 1 : 0);
+				var zeroes = model.B + ((!position) ? 1 : 0);
 				return _Utils_update(
 					model,
-					{u: 'R done', q: rest, n: position, A: zeroes});
+					{v: 'R done', r: rest, n: position, B: zeroes});
 			}
 		}
 	}
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Main$updateTogglePlay = function (model) {
-	if (model.G) {
-		var m = $author$project$Main$initModel(model.B);
+	if (model.H) {
+		var m = $author$project$Main$initModel(model.C);
 		return _Utils_update(
 			m,
 			{m: false});
@@ -5782,13 +5778,13 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{y: model.y / 2}),
+						{z: model.z / 2}),
 					$elm$core$Platform$Cmd$none);
 			case 3:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{y: model.y * 2}),
+						{z: model.z * 2}),
 					$elm$core$Platform$Cmd$none);
 			default:
 				var dataSource = msg.a;
@@ -5975,14 +5971,13 @@ var $author$project$Main$toNumberElement = function (angle) {
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $author$project$Main$toSvg = function (model) {
-	var numbers = A2($elm$core$List$range, 0, 99);
 	var numberElements = $elm$core$List$concat(
 		A2(
 			$elm$core$List$map,
 			function (n) {
 				return $author$project$Main$toNumberElement(3.6 * n);
 			},
-			numbers));
+			A2($elm$core$List$range, 0, 99)));
 	var dialElement = $author$project$Main$toDialElement(model.n);
 	var elements = _Utils_ap(dialElement, numberElements);
 	return A2(
@@ -6099,7 +6094,7 @@ var $author$project$Main$view = function (model) {
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(
 										$author$project$Main$UseDataSource(0)),
-										$elm$html$Html$Attributes$checked(!model.B)
+										$elm$html$Html$Attributes$checked(!model.C)
 									]),
 								_List_Nil),
 								A2(
@@ -6116,7 +6111,7 @@ var $author$project$Main$view = function (model) {
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(
 										$author$project$Main$UseDataSource(1)),
-										$elm$html$Html$Attributes$checked(model.B === 1)
+										$elm$html$Html$Attributes$checked(model.C === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -6222,7 +6217,7 @@ var $author$project$Main$view = function (model) {
 									[
 										$elm$html$Html$text(
 										$elm$core$String$fromInt(
-											$elm$core$List$length(model.q)))
+											$elm$core$List$length(model.r)))
 									]))
 							]))
 					])),
@@ -6271,7 +6266,7 @@ var $author$project$Main$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										$elm$core$String$fromInt(model.A))
+										$elm$core$String$fromInt(model.B))
 									])),
 								A2(
 								$elm$html$Html$div,
@@ -6279,7 +6274,7 @@ var $author$project$Main$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										$elm$core$String$fromInt(model.t))
+										$elm$core$String$fromInt(model.u))
 									]))
 							]))
 					]))

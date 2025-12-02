@@ -6,7 +6,6 @@ import Browser
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
-import Dict exposing (Dict)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Time
@@ -39,7 +38,6 @@ type alias Model =
   , paused : Bool 
   , finished : Bool 
   , tickInterval : Float 
-  , message : String
   , debug : String }
 
 sample : String 
@@ -4529,7 +4527,6 @@ initModel dataSource =
     , paused = True
     , finished = False 
     , tickInterval = defaultTickInterval
-    , message = ""
     , debug = "----" }
 
 init : () -> (Model, Cmd Msg)
@@ -4565,8 +4562,8 @@ updateStep model =
           Left steps -> 
             if steps > 0 then 
               let 
-                (pos, z) = if position - 1 < 0 then (99, 1) else (position - 1, 0)
-                allZeroes = model.allZeroes + z 
+                allZeroes = model.allZeroes + if position == 0 then 1 else 0  
+                pos = if position - 1 < 0 then 99 else position - 1
               in 
                 { model | moves = Left (steps - 1) :: rest, position = pos, allZeroes = allZeroes, debug = "lefty" }
             else 
@@ -4577,8 +4574,8 @@ updateStep model =
           Right steps -> 
             if steps > 0 then 
               let 
-                (pos, z) = if position + 1 > 99 then (0, 1) else (position + 1, 0)
-                allZeroes = model.allZeroes + z 
+                allZeroes = model.allZeroes + if position == 0 then 1 else 0  
+                pos = if position + 1 > 99 then 0 else position + 1
               in 
                 { model | moves = Right (steps - 1) :: rest, position = pos, allZeroes = allZeroes, debug = "righty" }
             else 
@@ -4626,9 +4623,6 @@ subscriptions model =
 
 -- VIEW
 
-toScale : Float -> String 
-toScale v = 160 * v |> String.fromFloat 
-
 toNumberElement : Float -> List (Html Msg)
 toNumberElement angle = 
   let 
@@ -4646,10 +4640,7 @@ toDialElement : Int -> List (Html Msg)
 toDialElement number = 
   let 
     angle = 3.6 * toFloat number 
-    -- xPos = cos (degrees (90 - angle))
-    -- yPos = -1 * sin (degrees (90 - angle))
     cc = circle [ cx "0", cy "0", r "140", fill "lightgrey" ] []
--- <polygon points="100,100 150,25 150,75 200,0" fill="none" stroke="black" />
     angleStr = angle |> String.fromFloat
     transformStr = "rotate(" ++ angleStr ++ ", 0, 0)"
     arrow = polygon [ points "-10,-100 10,-100 0,-135", fill "black", transform transformStr ] []
@@ -4659,17 +4650,12 @@ toDialElement number =
 toSvg : Model -> Html Msg
 toSvg model =
   let
-    -- x axis: cosine (90 - deg)
-    -- y axis: sine (90 - deg)
     dialElement = toDialElement model.position
-    
-    numbers = List.range 0 99
     numberElements = 
-      numbers 
+      List.range 0 99 
       |> List.map (\n -> toNumberElement (3.6 * toFloat n))
       |> List.concat
     elements = dialElement ++ numberElements
-
   in
     svg
       [ viewBox "-150 -150 300 300"
@@ -4775,8 +4761,6 @@ view model =
               , Html.Attributes.style "font-size" "24px"
               , Html.Attributes.style "padding" "0px" ] 
               [ 
-                -- Html.div [] [ Html.text (model.moves |> List.length |> String.fromInt ) ]
-              -- , Html.div [] [ Html.text (String.fromInt model.position) ]
                 Html.div [] [ Html.text (String.fromInt model.zeroes) ]
               , Html.div [] [ Html.text (String.fromInt model.allZeroes) ]
               ] ] 
