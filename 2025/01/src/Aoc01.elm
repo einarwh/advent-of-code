@@ -4678,9 +4678,9 @@ toSvg model =
 
   in
     svg
-      [ viewBox "-200 -200 400 400"
-      , width "400"
-      , height "400"
+      [ viewBox "-170 -170 340 340"
+      , width "340"
+      , height "340"
       , Svg.Attributes.style "font-family:Source Code Pro,monospace"
       ]
       elements
@@ -4767,6 +4767,16 @@ viewBody model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Source Code Pro, monospace"
+              , Html.Attributes.style "font-size" "24px"
+              , Html.Attributes.style "padding" "0px" ] 
+              [ 
+                Html.div [] [ Html.text (model.moves |> List.length |> String.fromInt ) ]
+              ] ] 
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "font-family" "Source Code Pro, monospace"
               , Html.Attributes.style "font-size" "20px"
               , Html.Attributes.style "padding" "10px" ] 
               [ 
@@ -4780,9 +4790,9 @@ viewBody model =
               , Html.Attributes.style "font-size" "24px"
               , Html.Attributes.style "padding" "0px" ] 
               [ 
-                Html.div [] [ Html.text (model.moves |> List.length |> String.fromInt ) ]
-              , Html.div [] [ Html.text (String.fromInt model.position) ]
-              , Html.div [] [ Html.text (String.fromInt model.zeroes) ]
+                -- Html.div [] [ Html.text (model.moves |> List.length |> String.fromInt ) ]
+              -- , Html.div [] [ Html.text (String.fromInt model.position) ]
+                Html.div [] [ Html.text (String.fromInt model.zeroes) ]
               , Html.div [] [ Html.text (String.fromInt model.allZeroes) ]
               ] ] 
               ]
