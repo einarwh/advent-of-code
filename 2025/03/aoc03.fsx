@@ -1,45 +1,30 @@
-// Advent of Code 2025. Day 03.
+// Advent of Code 2025. Day 03: Lobby.
 // dotnet fsi aoc03.fsx
 
 open System
 open System.IO
-
-let toDigits (s : string) = 
-    s |> Seq.toList |> List.map (Char.GetNumericValue >> int64)
 
 let readLines = 
     File.ReadAllLines
     >> Array.filter (fun line -> line <> String.Empty)
     >> Array.toList
 
-let toJoltage bank : int64 =
-    let rec fn acc bank = 
-        match bank with 
-        | [] -> acc 
-        | h :: t -> 
-            fn (acc * 10L + h) t 
-    fn 0L bank 
-
-let rec findBest (batteries : int) (joltage : int64) bank = 
-    // printfn "findBest %d %d %A" batteries joltage bank
-    if batteries = 0 then Some joltage 
-    else if List.length bank < batteries then None 
-    else 
-        match bank with 
-        | [] -> None 
-        | h :: t -> 
-            let r1 = findBest batteries joltage t 
-            let r2 = findBest (batteries - 1) (joltage * 10L + h) t
-            max r1 r2 
-
-let findMax (batteries : int) bank = 
-    printfn "findMax %d %A" batteries bank
-    findBest batteries 0 bank
+let findMaxJoltage batteries bank = 
+    let rec find joltage batteries bank = 
+        if batteries = 0 then joltage
+        else 
+            let ix, battery = 
+                bank 
+                |> List.take (List.length bank - batteries + 1)
+                |> List.mapi (fun i d -> i, d) 
+                |> List.maxBy snd 
+            find (joltage * 10L + battery) (batteries - 1) (List.skip (ix + 1) bank)
+    find 0 batteries bank 
 
 let run fileName = 
-    let lines = readLines fileName
-    let digits = lines |> List.map toDigits 
-    // digits |> List.map (findJoltages 12) |> printfn "%A" 
-    digits |> List.choose (findMax 12) |> List.sum |> printfn "%d" 
+    let toDigits = Seq.toList >> List.map (Char.GetNumericValue >> int64)
+    let digits = fileName |> readLines |> List.map toDigits 
+    digits |> List.sumBy (findMaxJoltage 2) |> printfn "%d" 
+    digits |> List.sumBy (findMaxJoltage 12) |> printfn "%d" 
 
-run "sample.txt"
+run "input.txt"
