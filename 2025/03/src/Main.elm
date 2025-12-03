@@ -286,7 +286,7 @@ initModel dataSource =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel Sample, Cmd.none)
+  (initModel Input, Cmd.none)
 
 -- UPDATE
 
