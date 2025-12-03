@@ -1,6 +1,6 @@
-module Aoc03 exposing (..)
+module Main exposing (..)
 
-import Browser exposing (Document)
+import Browser
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
@@ -14,7 +14,7 @@ defaultDelay = 1
 -- MAIN
 
 main =
-  Browser.document
+  Browser.element
     { init = init
     , view = view
     , update = update
@@ -346,13 +346,8 @@ toScannedHtmlElement segment =
     Instruction s -> toInstructionHtmlElement s
     Disabled s -> toDisabledHtmlElement s
 
-view : Model -> Document Msg
-view model = 
-  { title = "Advent of Code 2024 | Day 3: Mull It Over"
-  , body = [ viewBody model ] }
-
-viewBody : Model -> Html Msg
-viewBody model =
+view : Model -> Html Msg
+view model =
   let
     -- Need to move something according to position! Update function.
     scannedElements = model.scanned |> List.map toScannedHtmlElement
@@ -368,10 +363,9 @@ viewBody model =
     commandsStr = ""
   in 
     Html.table 
-      [ 
-        Html.Attributes.style "width" "1080px"
-      , Html.Attributes.style "font-family" "Courier New"
-      ]
+      [ Html.Attributes.align "center"
+      , Html.Attributes.style "width" "100%"
+      , Html.Attributes.style "font-family" "Courier New" ]
       [ Html.tr 
           [] 
           [ Html.td 
@@ -381,27 +375,6 @@ viewBody model =
               , Html.Attributes.style "padding" "10px"]
               [ Html.div [] [Html.text "Advent of Code 2024" ]
               , Html.div [] [Html.text "Day 3: Mull It Over" ] ] ]
-      , Html.tr 
-          []
-          [ Html.td 
-              [ Html.Attributes.align "center"
-              , Html.Attributes.style "padding-bottom" "10px" ]
-              [ Html.text " ["
-              , Html.a [ Html.Attributes.href "../../2024/"] [ Html.text "2024" ]
-              , Html.text "] " 
-              , Html.text " ["
-              , Html.a [ Html.Attributes.href "../../2023/"] [ Html.text "2023" ]
-              , Html.text "] "
-              , Html.text " ["
-              , Html.a [ Html.Attributes.href "../../2022/"] [ Html.text "2022" ]
-              , Html.text "] "
-              , Html.text " ["
-              , Html.a [ Html.Attributes.href "../../2021/"] [ Html.text "2021" ]
-              , Html.text "] "
-              , Html.text " ["
-              , Html.a [ Html.Attributes.href "../../2020/"] [ Html.text "2020" ]
-              , Html.text "] "
-            ] ]
       , Html.tr 
           []
           [ Html.td 
@@ -445,10 +418,8 @@ viewBody model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "24px"
-              , Html.Attributes.style "width" "200px"
               , Html.Attributes.style "padding-top" "10px" ] 
               [ 
                 Html.div [] [ Html.text (String.fromInt model.value) ]
@@ -458,11 +429,12 @@ viewBody model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "background-color" "white" 
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "12px"
-              , Html.Attributes.style "padding" "10px"
-              , Html.Attributes.style "width" "200px" ] 
+              , Html.Attributes.style "font-size" "10px"
+              , Html.Attributes.style "padding" "10px"] 
               [ 
-                Html.div [ Html.Attributes.align "left" ] textElements
+                Html.div [ 
+                  Html.Attributes.style "max-width" "100%"
+                , Html.Attributes.align "left" 
+                ] textElements
               ] ] ]
