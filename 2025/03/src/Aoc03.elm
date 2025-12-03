@@ -6,11 +6,11 @@ import Browser exposing (Document)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
-import Dict exposing (Dict)
+import List.Extra
 import Time
 
 defaultTickInterval : Float
-defaultTickInterval = 10
+defaultTickInterval = 50
 
 -- MAIN
 
@@ -30,7 +30,11 @@ main =
 
 type alias Model = 
   { position : Int 
-  , banks : List (List Char) 
+  , processed : List (List (Char, Bool))
+  , unprocessed : List (List Char) 
+  , lastJoltage : Int 
+  , joltages : List Int 
+  , batteryCount : Int 
   , dataSource : DataSource 
   , paused : Bool 
   , finished : Bool 
@@ -264,10 +268,15 @@ initModel dataSource =
       case dataSource of 
         Sample -> sample 
         Input -> input 
-    banks = data |> String.split "\n" |> List.map String.toList
+    batteryCount = 12
+    unprocessed = data |> String.split "\n" |> List.map String.toList
   in 
     { position = position 
-    , banks = banks
+    , processed = []
+    , unprocessed = unprocessed
+    , joltages = []
+    , lastJoltage = 0
+    , batteryCount = batteryCount
     , dataSource = dataSource 
     , paused = True
     , finished = False 
@@ -294,9 +303,36 @@ updateReset : Model -> Model
 updateReset model = 
   initModel model.dataSource
 
+findMaxJoltage : (Int, Int, List Int) -> Int -> List Int -> (Int, List Int)
+findMaxJoltage (joltage, offset, indexes) batteryCount bank = 
+  if batteryCount == 0 then 
+    (joltage, indexes) 
+  else 
+    let 
+      (ix, battery) = 
+        bank 
+        |> List.take (List.length bank - batteryCount + 1)
+        |> List.indexedMap (\i -> \b -> (i, b))
+        |> List.Extra.maximumBy Tuple.second 
+        |> Maybe.withDefault (0, 0)
+    in 
+      findMaxJoltage (joltage * 10 + battery, offset + ix + 1, (offset + ix) :: indexes) (batteryCount - 1) (List.drop (ix + 1) bank)
+
 updateStep : Model -> Model
 updateStep model = 
-  model 
+  case model.unprocessed of
+    [] -> { model | paused = True, finished = True }
+    bank :: t -> 
+      let 
+        (joltage, indexes) = 
+          bank 
+          |> List.map (\ch -> ch |> String.fromChar |> String.toInt |> Maybe.withDefault 0)
+          |> findMaxJoltage (0, 0, []) model.batteryCount
+        highlighted = 
+          bank 
+          |> List.indexedMap (\i -> \ch -> (ch, List.member i indexes))
+      in 
+        { model | lastJoltage = joltage, joltages = joltage :: model.joltages, unprocessed = t, processed = highlighted :: model.processed, debug = String.fromInt joltage, message = String.fromInt (List.length indexes) } 
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
@@ -337,34 +373,37 @@ subscriptions model =
 
 -- VIEW
 
-toCharElement : Model -> Char -> Html Msg 
-toCharElement model ch = 
+toCharElement : (Char, Bool) -> Html Msg 
+toCharElement (ch, highlight) = 
   let
     str = String.fromChar ch 
   in
-    Html.text str 
+    if highlight then 
+      Html.span [ Html.Attributes.style "font-weight" "bold" ] [ Html.text str ]
+    else 
+      Html.text str 
 
 view : Model -> Document Msg
 view model = 
   { title = "Advent of Code 2025 | Day 03: Lobby"
   , body = [ viewBody model ] }
 
--- itemAt : Int -> List a -> Maybe a 
--- itemAt index list = 
---   list |> List.drop index |> List.head
-
 viewBody : Model -> Html Msg
 viewBody model =
   let
 
     playButtonText = "Play"
-    nestedElements = 
-      model.banks |> List.map (\bank -> bank |> List.map (toCharElement model))
+    nestedProcessedElements = 
+      model.processed |> List.reverse |> List.map (\lst -> lst |> List.map toCharElement)
+    nestedUnprocessedElements = 
+      model.unprocessed |> List.map (\bank -> bank |> List.map (\ch -> toCharElement (ch, False)))
+    nestedElements = nestedProcessedElements ++ nestedUnprocessedElements
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
     textFontSize =
       case model.dataSource of 
-        Sample -> "32px"
-        Input -> "10px"
+        Sample -> "24px"
+        Input -> "12px"
+    totalJoltage = model.joltages |> List.sum 
   in 
     Html.table 
       [ Html.Attributes.align "center"
@@ -433,7 +472,8 @@ viewBody model =
               , Html.Attributes.style "font-size" "24px"
               , Html.Attributes.style "padding" "0px" ] 
               [ 
-                Html.div [] [ Html.text "blah" ]
+                Html.div [] [ Html.text (String.fromInt totalJoltage) ]
+              , Html.div [] [ Html.text (String.fromInt model.lastJoltage) ]
               ] ] 
       , Html.tr 
           []
@@ -455,7 +495,7 @@ viewBody model =
               [ 
                 -- Html.div [] [ Html.text (model.moves |> List.length |> String.fromInt ) ]
               -- , Html.div [] [ Html.text (String.fromInt model.position) ]
-                Html.div [] [ Html.text "?" ]
-              , Html.div [] [ Html.text "!" ]
+              --   Html.div [] [ Html.text model.debug ]
+              -- , Html.div [] [ Html.text model.message ]
               ] ] 
               ]
