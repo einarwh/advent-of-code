@@ -63,6 +63,5 @@ let run fileName =
     grid 
     |> solve
     |> printfn "%d"
-    0
 
 run "input.txt"
