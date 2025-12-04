@@ -368,13 +368,15 @@ subscriptions model =
 
 -- VIEW
 
-toCharElement : (Char, Bool) -> Html Msg 
-toCharElement (ch, highlight) = 
+toCharElement : Bool -> (Char, Bool) -> Html Msg 
+toCharElement processed (ch, highlight) = 
   let
     str = String.fromChar ch 
   in
     if highlight then 
       Html.span [ Html.Attributes.style "font-weight" "bold" ] [ Html.text str ]
+    else if processed then 
+      Html.span [ Html.Attributes.class "greyed adaptive" ] [ Html.text str ]
     else 
       Html.text str 
 
@@ -383,9 +385,9 @@ view model =
   let
     playButtonText = "Play"
     nestedProcessedElements = 
-      model.processed |> List.reverse |> List.map (\lst -> lst |> List.map toCharElement)
+      model.processed |> List.reverse |> List.map (\lst -> lst |> List.map (toCharElement True))
     nestedUnprocessedElements = 
-      model.unprocessed |> List.map (\bank -> bank |> List.map (\ch -> toCharElement (ch, False)))
+      model.unprocessed |> List.map (\bank -> bank |> List.map (\ch -> toCharElement False (ch, False)))
     nestedElements = nestedProcessedElements ++ nestedUnprocessedElements
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []
     textFontSize =

@@ -6111,22 +6111,33 @@ var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$span = _VirtualDom_node('span');
-var $author$project$Main$toCharElement = function (_v0) {
-	var ch = _v0.a;
-	var highlight = _v0.b;
-	var str = $elm$core$String$fromChar(ch);
-	return highlight ? A2(
-		$elm$html$Html$span,
-		_List_fromArray(
-			[
-				A2($elm$html$Html$Attributes$style, 'font-weight', 'bold')
-			]),
-		_List_fromArray(
-			[
-				$elm$html$Html$text(str)
-			])) : $elm$html$Html$text(str);
-};
+var $author$project$Main$toCharElement = F2(
+	function (processed, _v0) {
+		var ch = _v0.a;
+		var highlight = _v0.b;
+		var str = $elm$core$String$fromChar(ch);
+		return highlight ? A2(
+			$elm$html$Html$span,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'font-weight', 'bold')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text(str)
+				])) : (processed ? A2(
+			$elm$html$Html$span,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('greyed adaptive')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text(str)
+				])) : $elm$html$Html$text(str));
+	});
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$view = function (model) {
@@ -6146,7 +6157,9 @@ var $author$project$Main$view = function (model) {
 			return A2(
 				$elm$core$List$map,
 				function (ch) {
-					return $author$project$Main$toCharElement(
+					return A2(
+						$author$project$Main$toCharElement,
+						false,
 						_Utils_Tuple2(ch, false));
 				},
 				bank);
@@ -6155,7 +6168,10 @@ var $author$project$Main$view = function (model) {
 	var nestedProcessedElements = A2(
 		$elm$core$List$map,
 		function (lst) {
-			return A2($elm$core$List$map, $author$project$Main$toCharElement, lst);
+			return A2(
+				$elm$core$List$map,
+				$author$project$Main$toCharElement(true),
+				lst);
 		},
 		$elm$core$List$reverse(model.G));
 	var nestedElements = _Utils_ap(nestedProcessedElements, nestedUnprocessedElements);
