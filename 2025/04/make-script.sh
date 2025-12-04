@@ -1,1 +1,1 @@
-elm make --optimize src/Main.elm --output=aoc03.js
+elm make --optimize src/Main.elm --output=aoc04.js

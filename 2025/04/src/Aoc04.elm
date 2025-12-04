@@ -6,14 +6,12 @@ import Browser exposing (Document)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
--- import Dict exposing (Dict)
--- import Array exposing (Array)
 import Set exposing (Set)
 import Html exposing (text)
 import Time
 
 defaultTickInterval : Float
-defaultTickInterval = 10
+defaultTickInterval = 50
 
 chamberWidth : Int 
 chamberWidth = 7 
