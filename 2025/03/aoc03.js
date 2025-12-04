@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.T.D === region.Z.D)
+	if (region.T.F === region.Z.F)
 	{
-		return 'on line ' + region.T.D;
+		return 'on line ' + region.T.F;
 	}
-	return 'on lines ' + region.T.D + ' through ' + region.Z.D;
+	return 'on lines ' + region.T.F + ' through ' + region.Z.F;
 }
 
 
@@ -2727,7 +2727,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		O: func(record.O),
+		p: func(record.p),
 		U: record.U,
 		R: record.R
 	}
@@ -2997,7 +2997,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.O;
+		var message = !tag ? value : tag < 3 ? value.a : value.p;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.U;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -5215,27 +5215,27 @@ var $elm$core$String$foldr = _String_foldr;
 var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
 };
-var $author$project$Main$initModel = function (dataSource) {
-	var position = 50;
-	var data = function () {
-		if (dataSource === 1) {
-			return $author$project$Main$sample;
-		} else {
-			return $author$project$Main$input;
-		}
-	}();
-	var unprocessed = A2(
-		$elm$core$List$map,
-		$elm$core$String$toList,
-		A2($elm$core$String$split, '\n', data));
-	var batteryCount = 12;
-	return {L: batteryCount, r: dataSource, M: '----', B: false, C: _List_Nil, K: 0, O: '', o: true, aj: position, E: _List_Nil, v: $author$project$Main$defaultTickInterval, J: unprocessed};
-};
+var $author$project$Main$initModel = F2(
+	function (highJoltage, dataSource) {
+		var position = 50;
+		var data = function () {
+			if (dataSource === 1) {
+				return $author$project$Main$sample;
+			} else {
+				return $author$project$Main$input;
+			}
+		}();
+		var unprocessed = A2(
+			$elm$core$List$map,
+			$elm$core$String$toList,
+			A2($elm$core$String$split, '\n', data));
+		return {t: dataSource, N: '', D: false, l: highJoltage, E: _List_Nil, M: 0, q: true, aj: position, G: _List_Nil, x: $author$project$Main$defaultTickInterval, L: unprocessed};
+	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		$author$project$Main$initModel(0),
+		A2($author$project$Main$initModel, false, 0),
 		$elm$core$Platform$Cmd$none);
 };
 var $author$project$Main$Tick = {$: 0};
@@ -5655,16 +5655,16 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (model) {
-	var tickSub = (model.o || model.B) ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = (model.q || model.D) ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.v,
+		model.x,
 		function (_v0) {
 			return $author$project$Main$Tick;
 		});
 	return tickSub;
 };
 var $author$project$Main$updateReset = function (model) {
-	return $author$project$Main$initModel(model.r);
+	return A2($author$project$Main$initModel, model.l, model.t);
 };
 var $elm$core$List$drop = F2(
 	function (n, list) {
@@ -5932,18 +5932,19 @@ var $elm$core$List$member = F2(
 			xs);
 	});
 var $author$project$Main$updateStep = function (model) {
-	var _v0 = model.J;
+	var _v0 = model.L;
 	if (!_v0.b) {
 		return _Utils_update(
 			model,
-			{B: true, o: true});
+			{D: true, q: true});
 	} else {
 		var bank = _v0.a;
 		var t = _v0.b;
+		var batteryCount = model.l ? 12 : 2;
 		var _v1 = A3(
 			$author$project$Main$findMaxJoltage,
 			_Utils_Tuple3(0, 0, _List_Nil),
-			model.L,
+			batteryCount,
 			A2(
 				$elm$core$List$map,
 				function (ch) {
@@ -5969,33 +5970,35 @@ var $author$project$Main$updateStep = function (model) {
 		return _Utils_update(
 			model,
 			{
-				M: $elm$core$String$fromInt(joltage),
-				C: A2($elm$core$List$cons, joltage, model.C),
-				K: joltage,
-				O: $elm$core$String$fromInt(
-					$elm$core$List$length(indexes)),
-				E: A2($elm$core$List$cons, highlighted, model.E),
-				J: t
+				E: A2($elm$core$List$cons, joltage, model.E),
+				M: joltage,
+				G: A2($elm$core$List$cons, highlighted, model.G),
+				L: t
 			});
 	}
 };
 var $elm$core$Basics$not = _Basics_not;
+var $author$project$Main$updateToggleHighJoltage = function (model) {
+	return _Utils_update(
+		model,
+		{l: !model.l});
+};
 var $author$project$Main$updateTogglePlay = function (model) {
-	if (model.B) {
-		var m = $author$project$Main$initModel(model.r);
+	if (model.D) {
+		var m = A2($author$project$Main$initModel, model.l, model.t);
 		return _Utils_update(
 			m,
-			{o: false});
+			{q: false});
 	} else {
 		return _Utils_update(
 			model,
-			{o: !model.o});
+			{q: !model.q});
 	}
 };
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
-			case 6:
+			case 7:
 				return _Utils_Tuple2(
 					$author$project$Main$updateReset(model),
 					$elm$core$Platform$Cmd$none);
@@ -6011,33 +6014,38 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					$author$project$Main$updateTogglePlay(model),
 					$elm$core$Platform$Cmd$none);
+			case 5:
+				return _Utils_Tuple2(
+					$author$project$Main$updateToggleHighJoltage(model),
+					$elm$core$Platform$Cmd$none);
 			case 2:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{v: model.v / 2}),
+						{x: model.x / 2}),
 					$elm$core$Platform$Cmd$none);
 			case 3:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{v: model.v * 2}),
+						{x: model.x * 2}),
 					$elm$core$Platform$Cmd$none);
 			default:
 				var dataSource = msg.a;
 				return _Utils_Tuple2(
-					$author$project$Main$initModel(dataSource),
+					A2($author$project$Main$initModel, model.l, dataSource),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Main$Faster = {$: 2};
-var $author$project$Main$Reset = {$: 6};
+var $author$project$Main$Reset = {$: 7};
 var $author$project$Main$Sample = 1;
 var $author$project$Main$Slower = {$: 3};
 var $author$project$Main$Step = {$: 1};
+var $author$project$Main$ToggleHighJoltage = {$: 5};
 var $author$project$Main$TogglePlay = {$: 4};
 var $author$project$Main$UseDataSource = function (a) {
-	return {$: 5, a: a};
+	return {$: 6, a: a};
 };
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$json$Json$Encode$string = _Json_wrap;
@@ -6122,9 +6130,9 @@ var $author$project$Main$toCharElement = function (_v0) {
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$view = function (model) {
-	var totalJoltage = $elm$core$List$sum(model.C);
+	var totalJoltage = $elm$core$List$sum(model.E);
 	var textFontSize = function () {
-		var _v0 = model.r;
+		var _v0 = model.t;
 		if (_v0 === 1) {
 			return '24px';
 		} else {
@@ -6143,13 +6151,13 @@ var $author$project$Main$view = function (model) {
 				},
 				bank);
 		},
-		model.J);
+		model.L);
 	var nestedProcessedElements = A2(
 		$elm$core$List$map,
 		function (lst) {
 			return A2($elm$core$List$map, $author$project$Main$toCharElement, lst);
 		},
-		$elm$core$List$reverse(model.E));
+		$elm$core$List$reverse(model.G));
 	var nestedElements = _Utils_ap(nestedProcessedElements, nestedUnprocessedElements);
 	var elements = A3(
 		$elm$core$List$foldr,
@@ -6255,7 +6263,7 @@ var $author$project$Main$view = function (model) {
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(
 										$author$project$Main$UseDataSource(0)),
-										$elm$html$Html$Attributes$checked(!model.r)
+										$elm$html$Html$Attributes$checked(!model.t)
 									]),
 								_List_Nil),
 								A2(
@@ -6272,7 +6280,7 @@ var $author$project$Main$view = function (model) {
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(
 										$author$project$Main$UseDataSource(1)),
-										$elm$html$Html$Attributes$checked(model.r === 1)
+										$elm$html$Html$Attributes$checked(model.t === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -6329,7 +6337,7 @@ var $author$project$Main$view = function (model) {
 									]),
 								_List_fromArray(
 									[
-										model.o ? $elm$html$Html$text(playButtonText) : $elm$html$Html$text('Pause')
+										model.q ? $elm$html$Html$text(playButtonText) : $elm$html$Html$text('Pause')
 									])),
 								A2(
 								$elm$html$Html$button,
@@ -6364,6 +6372,37 @@ var $author$project$Main$view = function (model) {
 						$elm$html$Html$td,
 						_List_fromArray(
 							[
+								$elm$html$Html$Attributes$align('center')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('checkbox'),
+										$elm$html$Html$Events$onClick($author$project$Main$ToggleHighJoltage),
+										$elm$html$Html$Attributes$checked(model.l)
+									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(' High Joltage')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$tr,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
 								$elm$html$Html$Attributes$align('center'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'Source Code Pro, monospace'),
 								A2($elm$html$Html$Attributes$style, 'font-size', '24px'),
@@ -6385,7 +6424,7 @@ var $author$project$Main$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										$elm$core$String$fromInt(model.K))
+										$elm$core$String$fromInt(model.M))
 									]))
 							]))
 					])),
@@ -6422,7 +6461,16 @@ var $author$project$Main$view = function (model) {
 								A2($elm$html$Html$Attributes$style, 'font-size', '24px'),
 								A2($elm$html$Html$Attributes$style, 'padding', '0px')
 							]),
-						_List_Nil)
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(model.N)
+									]))
+							]))
 					]))
 			]));
 };

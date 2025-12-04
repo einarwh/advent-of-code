@@ -34,12 +34,11 @@ type alias Model =
   , unprocessed : List (List Char) 
   , lastJoltage : Int 
   , joltages : List Int 
-  , batteryCount : Int 
   , dataSource : DataSource 
+  , highJoltage : Bool 
   , paused : Bool 
   , finished : Bool 
   , tickInterval : Float 
-  , message : String
   , debug : String }
 
 sample : String 
@@ -250,25 +249,14 @@ input = """464114424441345444442442334254444434245242233423343344444444443344124
 7433384734436364342237476254418424144144346647924444342446548344343224336344333444345733475294534354
 3222512323622425223322562322134722122131422232112272412232462322223422252215126343354353937233529334"""
 
-parseMove : String -> Move 
-parseMove line = 
-  let 
-    steps = line |> String.dropLeft 1 |> String.toInt |> Maybe.withDefault 0 
-  in 
-    if line |> String.startsWith "L" then 
-      Left steps 
-    else 
-      Right steps 
-
-initModel : DataSource -> Model 
-initModel dataSource = 
+initModel : Bool -> DataSource -> Model 
+initModel highJoltage dataSource = 
   let
     position = 50
     data = 
       case dataSource of 
         Sample -> sample 
         Input -> input 
-    batteryCount = 12
     unprocessed = data |> String.split "\n" |> List.map String.toList
   in 
     { position = position 
@@ -276,17 +264,16 @@ initModel dataSource =
     , unprocessed = unprocessed
     , joltages = []
     , lastJoltage = 0
-    , batteryCount = batteryCount
     , dataSource = dataSource 
+    , highJoltage = highJoltage
     , paused = True
     , finished = False 
     , tickInterval = defaultTickInterval
-    , message = ""
-    , debug = "----" }
+    , debug = "" }
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel Input, Cmd.none)
+  (initModel False Input, Cmd.none)
 
 -- UPDATE
 
@@ -296,12 +283,13 @@ type Msg =
   | Faster 
   | Slower 
   | TogglePlay 
+  | ToggleHighJoltage 
   | UseDataSource DataSource
   | Reset 
 
 updateReset : Model -> Model
 updateReset model = 
-  initModel model.dataSource
+  initModel model.highJoltage model.dataSource
 
 findMaxJoltage : (Int, Int, List Int) -> Int -> List Int -> (Int, List Int)
 findMaxJoltage (joltage, offset, indexes) batteryCount bank = 
@@ -324,25 +312,30 @@ updateStep model =
     [] -> { model | paused = True, finished = True }
     bank :: t -> 
       let 
+        batteryCount = if model.highJoltage then 12 else 2
         (joltage, indexes) = 
           bank 
           |> List.map (\ch -> ch |> String.fromChar |> String.toInt |> Maybe.withDefault 0)
-          |> findMaxJoltage (0, 0, []) model.batteryCount
+          |> findMaxJoltage (0, 0, []) batteryCount
         highlighted = 
           bank 
           |> List.indexedMap (\i -> \ch -> (ch, List.member i indexes))
       in 
-        { model | lastJoltage = joltage, joltages = joltage :: model.joltages, unprocessed = t, processed = highlighted :: model.processed, debug = String.fromInt joltage, message = String.fromInt (List.length indexes) } 
+        { model | lastJoltage = joltage, joltages = joltage :: model.joltages, unprocessed = t, processed = highlighted :: model.processed } 
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
   if model.finished then 
     let 
-      m = initModel model.dataSource
+      m = initModel model.highJoltage model.dataSource
     in 
       {m | paused = False }
   else 
     { model | paused = not model.paused }
+
+updateToggleHighJoltage : Model -> Model
+updateToggleHighJoltage model = 
+  { model | highJoltage = not model.highJoltage }
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -355,12 +348,14 @@ update msg model =
       (updateStep model, Cmd.none)
     TogglePlay -> 
       (updateTogglePlay model, Cmd.none)
+    ToggleHighJoltage -> 
+      (updateToggleHighJoltage model, Cmd.none)
     Faster -> 
       ({model | tickInterval = model.tickInterval / 2 }, Cmd.none)
     Slower -> 
       ({model | tickInterval = model.tickInterval * 2 }, Cmd.none)
     UseDataSource dataSource -> 
-      (initModel dataSource, Cmd.none)
+      (initModel model.highJoltage dataSource, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -386,7 +381,6 @@ toCharElement (ch, highlight) =
 view : Model -> Html Msg
 view model =
   let
-
     playButtonText = "Play"
     nestedProcessedElements = 
       model.processed |> List.reverse |> List.map (\lst -> lst |> List.map toCharElement)
@@ -462,6 +456,15 @@ view model =
       , Html.tr 
           []
           [ Html.td 
+              [ Html.Attributes.align "center" ]
+              [ Html.input 
+                [ Html.Attributes.type_ "checkbox", onClick ToggleHighJoltage, Html.Attributes.checked model.highJoltage ] 
+                []
+              , Html.label [] [ Html.text " High Joltage" ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Source Code Pro, monospace"
               , Html.Attributes.style "font-size" "24px"
@@ -488,9 +491,6 @@ view model =
               , Html.Attributes.style "font-size" "24px"
               , Html.Attributes.style "padding" "0px" ] 
               [ 
-                -- Html.div [] [ Html.text (model.moves |> List.length |> String.fromInt ) ]
-              -- , Html.div [] [ Html.text (String.fromInt model.position) ]
-              --   Html.div [] [ Html.text model.debug ]
-              -- , Html.div [] [ Html.text model.message ]
+                Html.div [] [ Html.text model.debug ]
               ] ] 
               ]
