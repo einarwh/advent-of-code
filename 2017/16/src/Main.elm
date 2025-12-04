@@ -6,7 +6,6 @@ import Browser
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
-import Set exposing (Set)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Time

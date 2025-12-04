@@ -7,7 +7,6 @@ import Html.Events exposing (onClick)
 import Set exposing (Set)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
-import Html exposing (text)
 import Time
 
 defaultTickInterval : Float

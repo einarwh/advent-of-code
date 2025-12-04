@@ -6,11 +6,7 @@ import Browser
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
-import Dict exposing (Dict)
-import Array exposing (Array)
-import Set exposing (Set)
 import Array2D exposing (Array2D)
-import Html exposing (text)
 import Time
 
 defaultDelay : Float

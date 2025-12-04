@@ -8,7 +8,6 @@ import Html.Attributes
 import Html.Events exposing (onClick)
 import Html exposing (text)
 import Dict exposing (Dict)
-import Set exposing (Set)
 import Time
 
 defaultTickInterval : Float
