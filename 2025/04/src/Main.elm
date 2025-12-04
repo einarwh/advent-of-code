@@ -269,11 +269,17 @@ updateStep model =
     if removed > 0 then 
       { model | rolls = updatedRolls, removed = model.removed + removed }
     else 
-      { model | finished = True }
+      { model | finished = True, paused = True }
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
-  { model | paused = not model.paused }
+  if model.finished then 
+    let 
+      m = initModel model.dataSource
+    in 
+      { m | paused = False }
+  else
+    { model | paused = not model.paused }
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =

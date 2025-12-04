@@ -5428,7 +5428,7 @@ var $author$project$Main$initModel = function (dataSource) {
 			$elm$core$Maybe$withDefault,
 			_List_Nil,
 			$elm$core$List$head(symbolLists)));
-	return {v: dataSource, I: false, J: height, Z: '?', x: true, D: 0, y: rolls, t: $author$project$Main$defaultTickInterval, Q: width};
+	return {r: dataSource, I: false, J: height, Z: '?', o: true, D: 0, y: rolls, v: $author$project$Main$defaultTickInterval, Q: width};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -5743,9 +5743,9 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (model) {
-	var tickSub = model.x ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = model.o ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.t,
+		model.v,
 		function (_v0) {
 			return 0;
 		});
@@ -5753,7 +5753,7 @@ var $author$project$Main$subscriptions = function (model) {
 };
 var $author$project$Main$Sample = 1;
 var $author$project$Main$updateClear = function (model) {
-	return $author$project$Main$initModel(model.v);
+	return $author$project$Main$initModel(model.r);
 };
 var $elm$core$Dict$filter = F2(
 	function (isGood, dict) {
@@ -5853,13 +5853,20 @@ var $author$project$Main$updateStep = function (model) {
 		model,
 		{D: model.D + removed, y: updatedRolls}) : _Utils_update(
 		model,
-		{I: true});
+		{I: true, o: true});
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Main$updateTogglePlay = function (model) {
-	return _Utils_update(
-		model,
-		{x: !model.x});
+	if (model.I) {
+		var m = $author$project$Main$initModel(model.r);
+		return _Utils_update(
+			m,
+			{o: false});
+	} else {
+		return _Utils_update(
+			model,
+			{o: !model.o});
+	}
 };
 var $author$project$Main$update = F2(
 	function (msg, model) {
@@ -5880,13 +5887,13 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{t: model.t / 2}),
+						{v: model.v / 2}),
 					$elm$core$Platform$Cmd$none);
 			case 4:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{t: model.t * 2}),
+						{v: model.v * 2}),
 					$elm$core$Platform$Cmd$none);
 			case 2:
 				return _Utils_Tuple2(
@@ -6007,7 +6014,7 @@ var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$view = function (model) {
 	var textFontSize = function () {
-		var _v0 = model.v;
+		var _v0 = model.r;
 		if (_v0 === 1) {
 			return '24px';
 		} else {
@@ -6128,7 +6135,7 @@ var $author$project$Main$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(6),
-										$elm$html$Html$Attributes$checked(!model.v)
+										$elm$html$Html$Attributes$checked(!model.r)
 									]),
 								_List_Nil),
 								A2(
@@ -6144,7 +6151,7 @@ var $author$project$Main$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(7),
-										$elm$html$Html$Attributes$checked(model.v === 1)
+										$elm$html$Html$Attributes$checked(model.r === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -6201,7 +6208,7 @@ var $author$project$Main$view = function (model) {
 									]),
 								_List_fromArray(
 									[
-										model.x ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
+										model.o ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
 									])),
 								A2(
 								$elm$html$Html$button,
