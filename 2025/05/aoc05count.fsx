@@ -36,8 +36,7 @@ let count ranges =
 let run fileName = 
     let ranges, ingredients = fileName |> File.ReadAllText |> parse 
     ingredients 
-    |> Array.filter (fun it -> ranges |> Array.exists (fresh it)) |> Array.length 
-    |> printfn "%d"
+    |> Array.filter (fun it -> ranges |> Array.exists (fresh it)) |> Array.length |> printfn "%d"
     ranges 
     |> Array.toList |> count |> printfn "%d"
 
