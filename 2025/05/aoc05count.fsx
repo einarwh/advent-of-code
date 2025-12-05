@@ -19,13 +19,19 @@ let parse (s : string) =
 
 let fresh ingredient (start, stop)  = 
     start <= ingredient && ingredient <= stop 
-
-let rec combine ranges = 
-    match ranges with 
-    | (a, b) :: (c, d) :: rest ->
-        if b + 1L >= c then combine ((a, max b d) :: rest) 
-        else (a, b) :: combine ((c, d) :: rest) 
-    | _ -> ranges 
+    
+let count ranges = 
+    let rec loop fresh ingredient ranges = 
+        match ranges with 
+        | [] -> fresh 
+        | (s, e) :: rest -> 
+            if ingredient < s then 
+                loop fresh s ranges 
+            else if ingredient > e then 
+                loop fresh ingredient rest 
+            else 
+                loop (fresh + e - ingredient + 1L) (e + 1L) ranges 
+    ranges |> List.sort |> loop 0L 0L  
 
 let run fileName = 
     let ranges, ingredients = fileName |> File.ReadAllText |> parse 
@@ -33,7 +39,6 @@ let run fileName =
     |> Array.filter (fun it -> ranges |> Array.exists (fresh it)) |> Array.length 
     |> printfn "%d"
     ranges 
-    |> Array.toList |> List.sort |> combine |> List.sumBy (fun (start, stop) -> stop - start + 1L) 
-    |> printfn "%d"
+    |> Array.toList |> count |> printfn "%d"
 
 run "input.txt"
