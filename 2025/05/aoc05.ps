@@ -22,6 +22,190 @@
     } loop                                  % Rs
 } def 
 
+/split-at {                             % i A 
+    2 copy                              % i A i A 
+    0 exch                              % i 0 A i A 
+    getinterval                         % A'=A[0,i-1] i A
+    3 1 roll                            % i A A' 
+    1 index length                      % L i A A'
+    1 index                             % i L i A A'
+    sub                                 % c i A A'
+    getinterval                         % A''=A[i,L-1] A'           
+} def 
+
+% A => [ more? ix A ]
+/iter-state {                           % A  
+    dup length                          % A L  
+    0                                   % A L 0 
+    exch                                % A 0 L 
+    1 index                             % A 0 L 0  
+    gt                                  % A 0 L>0? 
+    3 array                             % A 0 L>0? A' 
+    astore                              % A' % [ L>0? 0 A ]
+} def 
+
+/next-state {                           % I 
+    dup                                 % I I 
+    aload pop                           % ? i A I
+    {                                   % i A I (true)
+        1 add                           % i+1 A I 
+        1 index length                  % L i+1 A I
+        1 index                         % i+1 L i+1 A I 
+        gt                              % L>i+1? i+1 A I
+        3 array astore                  % I' I 
+        exch pop                        % I'
+    }
+    {                                   % i A I (false)
+        pop pop                         % I 
+    } ifelse
+} def
+
+/compare-ranges {                       % [a b] [c d]
+    1 index 0 get                       % [a b] [c d] a 
+    1 index 0 get                       % [a b] [c d] a c 
+    sub                                 % [a b] [c d] a-c 
+    dup                                 % [a b] [c d] a-c a-c
+    0 eq                                % [a b] [c d] a-c a=c?
+    {                                   % [a b] [c d] a-c %%% a=c
+        pop                             % [a b] [c d]
+        1 index 1 get                   % [a b] [c d] b
+        1 index 1 get                   % [a b] [c d] b d
+        sub                             % [a b] [c d] b-d
+    } if
+    3 1 roll                            % b-d [a b] [c d]
+    pop pop                             % b-d
+} def 
+
+/range-lt {                             % [a b] [c d]
+    compare-ranges                      % cmp 
+    0 lt                                % [a b] < [c d]
+} def 
+
+% I1 I2 => a I1' I2
+/choose-next                            % I1 I2 
+{
+    dup                                 % I1 I1 I2
+    aload pop                           % more1? i1 A1 I1 I2
+    {                                   % i1 A1 I1 I2 (i1 in range)
+        get                             % a1 I1 I2 
+        2 index                         % I2 a1 I1 I2 
+        aload pop                       % more2? i2 A2 a1 I1 I2 
+        {                               % i2 A2 a1 I1 I2 (i2 in range)
+            get                         % a2 a1 I1 I2 
+            2 copy                      % a2 a1 a2 a1 I1 I2 
+            range-lt                    % a1<a2? a2 a1 I1 I2 
+            {                           % a2 a1 (a1 < a2) I1 I2 
+                pop                     % a1 I1 I2 
+                exch                    % I1 a1 I2 
+                next-state              % I1' a1 I2 
+                exch                    % a1 I1' I2 
+            }
+            {                           % a2 a1 (a2 < a1)
+                exch pop                % a2 I1 I2
+                3 -1 roll               % I2 a2 I1 
+                next-state              % I2' a2 I1 
+                3 1 roll                % a2 I1 I2'
+            } ifelse                    % a I1 I2
+        }
+        {                               % i2 A2 a1 I1 I2 (i2 out of range)
+            pop pop                     % a1 I1 I2 
+            exch                        % I1 a1 I2 
+            next-state                  % I1' a1 I2 
+            exch                        % a1 I1' I2 
+        } ifelse                        % a I1 I2
+    } 
+    {                                   % i1 A1 I1 I2 (i1 out of range, i2 must be in range)
+        pop pop                         % I1 I2 
+        1 index                         % I2 I1 I2 
+        aload pop                       % more2? i2 A2 I1 I2 
+        {                               % i2 A2 I1 I2 (i2 in range)
+            get                         % a2 I1 I2 
+            3 -1 roll                   % I2 a2 I1 
+            next-state                  % I2' a2 I1 
+            3 1 roll                    % a2 I1 I2'
+        }
+        {                               % I2 A2 I1 I2 (i2 out of range)
+            (out of range\n) print
+            pop pop "err"
+        } ifelse                        % a I1 I2 
+    } ifelse                            % a I1 I2 
+} def
+
+/merge {                                % A2 A1  
+    2 copy                              % A2 A1 A2 A1 
+    length                              % A2 A1 A2 L1 
+    exch                                % A2 A1 L1 A2 
+    length                              % A2 A1 L1 L2 
+    add                                 % A2 A1 L 
+    array                               % A2 A1 A 
+    3 1 roll                            % A A2 A1 
+    iter-state                          % A A2 I1 
+    exch                                % A I1 A 
+    iter-state                          % A I1 I2 
+    2 index                             % A I1 I2 A  
+    length                              % A I1 I2 L 
+    1 sub                               % A I1 I2 L-1 
+    0 exch                              % A I1 I2 j=0 L-1 
+    1 exch                              % A I1 I2 j k=1 L-1 
+    {                                   % A I1 I2 i 
+        3 1 roll                        % A i I1 I2  
+        choose-next                     % A i I1 I2 a  
+        4 index                         % A i I1 I2 a A  
+        5 -1 roll                       % A I1 I2 a A i  
+        3 -1 roll                       % A I1 I2 A i a 
+        put                             % A I1 I2 
+    } for                               % A I1 I2  
+    pop pop                             % A 
+} def
+
+% A => A' 
+/merge-sort {                           % A 
+    dup length                          % A L 
+    1                                   % A L 1 
+    gt                                  % A L>1? 
+    {                                   % A %%% (L>1)
+        dup length                      % A L 
+        2 idiv                          % A L/2 
+        split-at                        % A2 A1
+        merge-sort                      % A2 A1'
+        exch                            % A1' A2
+        merge-sort                      % A1' A2'
+        merge                           % A' 
+    } if                                % A'
+} def 
+
+% A => A' 
+/merge-sort {                           % C A 
+    dup length                          % C A L 
+    1                                   % C A L 1 
+    gt                                  % C A L>1? 
+    {                                   % C A %%% (L>1)
+        dup length                      % C A L 
+        2 idiv                          % C A L/2 
+        split-at                        % C A2 A1
+        merge-sort                      % C A2 A1'
+        exch                            % C A1' A2
+        merge-sort                      % C A1' A2'
+        merge                           % C A' 
+    } if                                % C A'
+} def 
+
+/compare-ranges {                       % [a b] [c d]
+    1 index 0 get                       % [a b] [c d] a 
+    1 index 0 get                       % [a b] [c d] a c 
+    sub                                 % [a b] [c d] a-c 
+    dup                                 % [a b] [c d] a-c a-c
+    0 eq                                % [a b] [c d] a-c a=c?
+    {                                   % [a b] [c d] a-c %%% a=c
+        pop                             % [a b] [c d]
+        1 index 1 get                   % [a b] [c d] b
+        1 index 1 get                   % [a b] [c d] b d
+        sub                             % [a b] [c d] b-d
+    } if
+    3 1 roll                            % b-d [a b] [c d]
+    pop pop                             % b-d
+} def 
+
 % A = [ s1 s2 ... sn ] => [ G1 G2 ... Gn ]
 /group-lines {                  % A
     [ exch                      % A | 
@@ -125,52 +309,110 @@
     and                                 % s<=i && i<=e
 } def 
 
+/in-any-range {                         % (rs:ranges=[[s e]...]) (i=num) 
+    [ exch                              % rs [ i 
+    /in-range cvx                       % rs [ i in-range
+    ] cvx                               % rs { i in-range } 
+    exists-array 
+} def 
+
+/create-range-filter {
+    [ exch /exch cvx /in-any-range cvx ] cvx 
+} def 
+
+% let count ranges = 
+%     let rec loop fresh ingredient ranges = 
+%         match ranges with 
+%         | [] -> fresh 
+%         | (s, e) :: rest -> 
+%             if ingredient < s then 
+%                 loop fresh s ranges 
+%             else if ingredient > e then 
+%                 loop fresh ingredient rest 
+%             else 
+%                 loop (fresh + e - ingredient + 1L) (e + 1L) ranges 
+%     ranges |> List.sort |> loop 0L 0L  
+
+/head {                             % A
+    0 get                           % A[0] 
+} def 
+
+/tail {                             % A
+    dup length                      % A L 
+    1 sub                           % A L-1 
+    1 exch                          % A 1 L-1
+    getinterval                     % A[1:]
+} def 
+
+/count-fresh {                          % rs 
+    (count-fresh\n) print
+    0 exch                              % n rs 
+    0 exch                              % n i rs
+    {                                   % n i rs 
+        dup length                      % n i rs L 
+        0 eq                            % n i rs L=0?
+        {
+            pop                         % n i 
+            exit                        % n i 
+        } if
+        dup 0 get                       % n i rs [x y]
+        (\nloop\n) print
+        pstack
+        (.\n) print
+        dup 0 get                       % n i rs [x y] x 
+        3 index exch                    % n i rs [x y] i x 
+        lt                              % n i rs [x y] i<x?
+        {                               % n i rs [x y] %%% i<x
+            (i<x\n) print
+            0 get                       % n i rs x
+            3 -1 roll pop               % n rs x
+            exch                        % n x rs
+        }
+        {                               % n i rs [x y] %%% i>=x
+            (i>=x\n) print
+            dup 1 get                   % n i rs [x y] y
+            3 index exch                % n i rs [x y] i y
+            gt                          % n i rs [x y] i>y?
+            {                           % n i rs [x y] %%% i>y
+                (i>y\n) print
+                (next range\n) print
+                pstack
+                pop                     % n i rs
+                tail                    % n i t
+            }
+            {                           % n i rs [x y] %%% i<=y
+                (i<=y\n) print
+                (in range\n) print
+                1 get                   % n i rs y 
+                exch                    % n i y rs 
+                4 1 roll                % rs n i y 
+                3 1 roll                % rs y n i 
+                sub                     % rs y n-i
+                1 add                   % rs y n-i+1
+                1 index add             % rs y n-i+1+y
+                exch 1 add              % rs n-i+1+y y+1
+                3 -1 roll               % n-i+1+y y+1 rs
+            } ifelse
+        } ifelse 
+    } loop                            % n i 
+    pop                                 % n
+} def 
+
 /run {
-    % (sample.txt) read-input  
-    % group-lines
-    % aload pop 
-    % { cvi } map-array 
-    % exch 
-    % { (-) split-string { cvi } map-array } map-array
-    % [ exch /exch cvx /exists-array cvx ] cvx
-    % ()
-    %%%%
-    % 17
-    % [[10 14] [16 20]]
-    % [ 3 1 roll 
-    % exch 
-    % [ exch 
-    % /in-range-2 cvx
-    % ] cvx 
-    % /exists-array cvx 
-    % ] cvx 
-    %%%%
-                                    % n
-    % [[10 14] [16 20]]               % n A
-    % [ exch                          % n [ A 
-    % /exch cvx                       % n [ A exch 
-    % % /exch cvx                     % n [ A exch [ exch 
-    % /in-range-wrong cvx             % n [ A exch [ exch in-range 
-    % % /cvx cvx                      % n [ A exch [ exch in-range ] cvx 
-    % ] cvx                           % n { A exch [ exch in-range ] cvx }
-    % % [ 3 1 roll ] cvx
-
-
-
-    17 
-    {                                       % n 
-        [[10 14] [16 20]]                   % n A 
-        exch                                % A n 
-        [ 3 1 roll                          % [ A n 
-        [ exch                              % [ A [ n 
-        /in-range cvx                       % [ A [ n in-range
-        ] cvx                               % [ A { n in-range }
-        /exists-array cvx                   % [ A { n in-range } exists-array 
-        ] cvx                               % { A { n in-range } exists-array }
-    }
-
-    % n Rs [ exch [ 3 1 roll exch [ exch /in-range-2 cvx ] cvx /exists-array cvx ] cvx /exec cvx ] cvx 
-
+    (sample.txt) read-input  
+    group-lines
+    aload pop 
+    { cvi } map-array 
+    exch 
+    { (-) split-string { cvi } map-array } map-array
+    exch 1 index 
+    create-range-filter
+    filter-array
+    length 
+    exch 
+    merge-sort
+    exch pop % remove this
+    count-fresh
 } def 
 
 run 
