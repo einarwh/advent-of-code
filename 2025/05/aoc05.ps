@@ -1,0 +1,176 @@
+% Advent of Code 2025. Day 05: Cafeteria. 
+% gs -DNOSAFER aoc05.ps
+
+/read-input
+{                                           % fn
+    [                                       % fn [
+    exch                                    % [ fn 
+    (r) file                                % [ F
+    {   
+        dup                                 % [ .. F F
+        80 string                           % [ ... F F buf
+        readline                            % [ ... F (s) 
+        {   
+            exch                            % [ ... (s) F
+        }   
+        {   
+            exch                            % [ ... (s) F 
+            closefile                       % [ ... (s) 
+            ]                               % [ ... (s) ] 
+            exit    
+        } ifelse    
+    } loop                                  % Rs
+} def 
+
+% A = [ s1 s2 ... sn ] => [ G1 G2 ... Gn ]
+/group-lines {                  % A
+    [ exch                      % A | 
+    [ exch                      % A | | 
+    {                           % s ... | ... |
+        dup length              % L[s] s ... | ... | 
+        0 eq                    % empty? s ... | ... |
+        {                       % () ... | ... |
+            pop                 % ... | ... |
+            ]                   % G ... | 
+            [                   % | G ... |
+        }
+        {                       % s ... | ... | 
+        } ifelse                % ... | 
+    } forall 
+    ]                           % G ... | 
+    dup length                  % L[G] G ... | 
+    0 eq                        % empty? G ... | 
+    {                           % () ... | 
+        pop
+    } if
+    ]                           % [ G1 G2 ... Gn ]
+} def 
+
+/map-array {                            % A {op} %%% {op} is operation to be called for each element in A
+    [ 3 1 roll                          % [ A {op}
+    exch                                % [ {op} A
+    {                                   % [ {op} e
+        1 index                         % [ {op} e {op}
+        exec                            % [ {op} r %%% r is result of executing {op} on e
+        exch                            % [ r {op}
+    } forall                            % [ ... {op}
+    pop                                 % [ ...
+    ]                                   % [ r1 r2 ... ]
+} def
+
+% { [rs...] }
+
+/filter-array {                         % A {p} %%% {p} is predicate to be called for each element in A
+    [ 3 1 roll                          % [ A {p}
+    exch                                % [ {p} A
+    {                                   % [ {p} e
+        2 copy                          % [ {p} e {p} e
+        exch                            % [ {p} e e {p}
+        exec                            % [ {p} e include?
+        {                               % [ {p} e %%% yes, keep e
+            exch                        % [ e {p}
+        }
+        {                               % [ {p} e %%% no, reject e
+            pop                         % [ {p}
+        } ifelse                        % [ e? {p}
+    } forall                            % [ ... {p}
+    pop                                 % [ ...
+    ]                                   % [ e... ]
+} def 
+
+/exists-array {                         % A {p} %%% {p} is predicate to be called for each element in A
+    false 3 1 roll                      % F A {p} %%% Assume F
+    exch                                % F {p} A
+    {                                   % F {p} e
+        1 index                         % F {p} e {p}
+        exec                            % F {p} satisfied?
+        {                               % F {p} yes! %%% terminate with true
+            exch pop                    % {p} %%% dropped default false
+            true exch                   % T {p}
+            exit                        % T {p} - out of loop
+        } if                            % 
+    } forall                            % B {p}
+    pop                                 % B
+} def 
+
+/split-string {                         % (s=string) (z=sep) 
+    [                                   % s z [ 
+    3 1 roll                            % [ s z  
+    {                                   % [ s z
+        search                          % [ s'=rest (h=head z)? found?
+        {                               % [ s' z h (yes, found)
+            3 1 roll                    % [ h s' z  
+        }       
+        {                               % [ s  (not found)
+            exit                        % [ s
+        } ifelse        
+    } loop      
+    ]                                   % [ .. ]
+} def 
+
+/in-range-wrong {                             % (i=num) (r:range=[s e])
+    aload pop                           % i s e 
+    2 index ge                          % i s i<=e
+    3 1 roll                            % i<=e i s 
+    ge                                  % i<=e i>=s
+    and                                 % s<=i && i<=e
+} def 
+
+/in-range {                             % (r:range=[s e]) (i=num) 
+    exch                                % i r 
+    aload pop                           % i s e 
+    2 index ge                          % i s i<=e
+    3 1 roll                            % i<=e i s 
+    ge                                  % i<=e i>=s
+    and                                 % s<=i && i<=e
+} def 
+
+/run {
+    % (sample.txt) read-input  
+    % group-lines
+    % aload pop 
+    % { cvi } map-array 
+    % exch 
+    % { (-) split-string { cvi } map-array } map-array
+    % [ exch /exch cvx /exists-array cvx ] cvx
+    % ()
+    %%%%
+    % 17
+    % [[10 14] [16 20]]
+    % [ 3 1 roll 
+    % exch 
+    % [ exch 
+    % /in-range-2 cvx
+    % ] cvx 
+    % /exists-array cvx 
+    % ] cvx 
+    %%%%
+                                    % n
+    % [[10 14] [16 20]]               % n A
+    % [ exch                          % n [ A 
+    % /exch cvx                       % n [ A exch 
+    % % /exch cvx                     % n [ A exch [ exch 
+    % /in-range-wrong cvx             % n [ A exch [ exch in-range 
+    % % /cvx cvx                      % n [ A exch [ exch in-range ] cvx 
+    % ] cvx                           % n { A exch [ exch in-range ] cvx }
+    % % [ 3 1 roll ] cvx
+
+
+
+    17 
+    {                                       % n 
+        [[10 14] [16 20]]                   % n A 
+        exch                                % A n 
+        [ 3 1 roll                          % [ A n 
+        [ exch                              % [ A [ n 
+        /in-range cvx                       % [ A [ n in-range
+        ] cvx                               % [ A { n in-range }
+        /exists-array cvx                   % [ A { n in-range } exists-array 
+        ] cvx                               % { A { n in-range } exists-array }
+    }
+
+    % n Rs [ exch [ 3 1 roll exch [ exch /in-range-2 cvx ] cvx /exists-array cvx ] cvx /exec cvx ] cvx 
+
+} def 
+
+run 
