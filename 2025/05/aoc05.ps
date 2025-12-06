@@ -2,24 +2,24 @@
 % gs -DNOSAFER aoc05.ps
 
 /read-input
-{                                           % fn
-    [                                       % fn [
-    exch                                    % [ fn 
-    (r) file                                % [ F
+{                                       % fn
+    [                                   % fn [
+    exch                                % [ fn 
+    (r) file                            % [ F
     {   
-        dup                                 % [ .. F F
-        80 string                           % [ ... F F buf
-        readline                            % [ ... F (s) 
+        dup                             % [ .. F F
+        80 string                       % [ ... F F buf
+        readline                        % [ ... F (s) 
         {   
-            exch                            % [ ... (s) F
+            exch                        % [ ... (s) F
         }   
         {   
-            exch                            % [ ... (s) F 
-            closefile                       % [ ... (s) 
-            ]                               % [ ... (s) ] 
+            exch                        % [ ... (s) F 
+            closefile                   % [ ... (s) 
+            ]                           % [ ... (s) ] 
             exit    
         } ifelse    
-    } loop                                  % Rs
+    } loop                              % Rs
 } def 
 
 /split-at {                             % i A 
@@ -30,7 +30,7 @@
     1 index length                      % L i A A'
     1 index                             % i L i A A'
     sub                                 % c i A A'
-    getinterval                         % A''=A[i,L-1] A'           
+    getinterval                         % A''=A[i,L-1] A'
 } def 
 
 % A => [ more? ix A ]
@@ -159,22 +159,6 @@
 } def
 
 % A => A' 
-/merge-sort {                           % A 
-    dup length                          % A L 
-    1                                   % A L 1 
-    gt                                  % A L>1? 
-    {                                   % A %%% (L>1)
-        dup length                      % A L 
-        2 idiv                          % A L/2 
-        split-at                        % A2 A1
-        merge-sort                      % A2 A1'
-        exch                            % A1' A2
-        merge-sort                      % A1' A2'
-        merge                           % A' 
-    } if                                % A'
-} def 
-
-% A => A' 
 /merge-sort {                           % C A 
     dup length                          % C A L 
     1                                   % C A L 1 
@@ -207,27 +191,27 @@
 } def 
 
 % A = [ s1 s2 ... sn ] => [ G1 G2 ... Gn ]
-/group-lines {                  % A
-    [ exch                      % A | 
-    [ exch                      % A | | 
-    {                           % s ... | ... |
-        dup length              % L[s] s ... | ... | 
-        0 eq                    % empty? s ... | ... |
-        {                       % () ... | ... |
-            pop                 % ... | ... |
-            ]                   % G ... | 
-            [                   % | G ... |
+/group-lines {                          % A
+    [ exch                              % A | 
+    [ exch                              % A | | 
+    {                                   % s ... | ... |
+        dup length                      % L[s] s ... | ... | 
+        0 eq                            % empty? s ... | ... |
+        {                               % () ... | ... |
+            pop                         % ... | ... |
+            ]                           % G ... | 
+            [                           % | G ... |
         }
-        {                       % s ... | ... | 
-        } ifelse                % ... | 
+        {                               % s ... | ... | 
+        } ifelse                        % ... | 
     } forall 
-    ]                           % G ... | 
-    dup length                  % L[G] G ... | 
-    0 eq                        % empty? G ... | 
-    {                           % () ... | 
+    ]                                   % G ... | 
+    dup length                          % L[G] G ... | 
+    0 eq                                % empty? G ... | 
+    {                                   % () ... | 
         pop
     } if
-    ]                           % [ G1 G2 ... Gn ]
+    ]                                   % [ G1 G2 ... Gn ]
 } def 
 
 /map-array {                            % A {op} %%% {op} is operation to be called for each element in A
@@ -241,8 +225,6 @@
     pop                                 % [ ...
     ]                                   % [ r1 r2 ... ]
 } def
-
-% { [rs...] }
 
 /filter-array {                         % A {p} %%% {p} is predicate to be called for each element in A
     [ 3 1 roll                          % [ A {p}
@@ -292,14 +274,6 @@
     ]                                   % [ .. ]
 } def 
 
-/in-range-wrong {                             % (i=num) (r:range=[s e])
-    aload pop                           % i s e 
-    2 index ge                          % i s i<=e
-    3 1 roll                            % i<=e i s 
-    ge                                  % i<=e i>=s
-    and                                 % s<=i && i<=e
-} def 
-
 /in-range {                             % (r:range=[s e]) (i=num) 
     exch                                % i r 
     aload pop                           % i s e 
@@ -320,32 +294,14 @@
     [ exch /exch cvx /in-any-range cvx ] cvx 
 } def 
 
-% let count ranges = 
-%     let rec loop fresh ingredient ranges = 
-%         match ranges with 
-%         | [] -> fresh 
-%         | (s, e) :: rest -> 
-%             if ingredient < s then 
-%                 loop fresh s ranges 
-%             else if ingredient > e then 
-%                 loop fresh ingredient rest 
-%             else 
-%                 loop (fresh + e - ingredient + 1L) (e + 1L) ranges 
-%     ranges |> List.sort |> loop 0L 0L  
-
-/head {                             % A
-    0 get                           % A[0] 
-} def 
-
-/tail {                             % A
-    dup length                      % A L 
-    1 sub                           % A L-1 
-    1 exch                          % A 1 L-1
-    getinterval                     % A[1:]
+/tail {                                 % A
+    dup length                          % A L 
+    1 sub                               % A L-1 
+    1 exch                              % A 1 L-1
+    getinterval                         % A[1:]
 } def 
 
 /count-fresh {                          % rs 
-    (count-fresh\n) print
     0 exch                              % n rs 
     0 exch                              % n i rs
     {                                   % n i rs 
@@ -356,33 +312,23 @@
             exit                        % n i 
         } if
         dup 0 get                       % n i rs [x y]
-        (\nloop\n) print
-        pstack
-        (.\n) print
         dup 0 get                       % n i rs [x y] x 
         3 index exch                    % n i rs [x y] i x 
         lt                              % n i rs [x y] i<x?
         {                               % n i rs [x y] %%% i<x
-            (i<x\n) print
             0 get                       % n i rs x
             3 -1 roll pop               % n rs x
             exch                        % n x rs
         }
         {                               % n i rs [x y] %%% i>=x
-            (i>=x\n) print
             dup 1 get                   % n i rs [x y] y
             3 index exch                % n i rs [x y] i y
             gt                          % n i rs [x y] i>y?
             {                           % n i rs [x y] %%% i>y
-                (i>y\n) print
-                (next range\n) print
-                pstack
                 pop                     % n i rs
                 tail                    % n i t
             }
             {                           % n i rs [x y] %%% i<=y
-                (i<=y\n) print
-                (in range\n) print
                 1 get                   % n i rs y 
                 exch                    % n i y rs 
                 4 1 roll                % rs n i y 
@@ -394,12 +340,12 @@
                 3 -1 roll               % n-i+1+y y+1 rs
             } ifelse
         } ifelse 
-    } loop                            % n i 
+    } loop                              % n i 
     pop                                 % n
 } def 
 
 /run {
-    (sample.txt) read-input  
+    (input.txt) read-input  
     group-lines
     aload pop 
     { cvi } map-array 
@@ -411,7 +357,6 @@
     length 
     exch 
     merge-sort
-    exch pop % remove this
     count-fresh
 } def 
 
