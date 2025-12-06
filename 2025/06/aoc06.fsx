@@ -33,8 +33,7 @@ let cephalopod (grid : char array array) =
 let eval (toNumbers : char array array -> int64 list) (group : char array array) = 
     let op = group |> Array.map Array.last |> operation
     let grid = group |> Array.map (fun cs -> cs[0 .. cs.Length - 2])
-    let numbers = grid |> toNumbers
-    numbers |> List.reduce op
+    grid |> toNumbers |> List.reduce op
 
 let run fileName = 
     let rows = fileName |> File.ReadAllLines |> Array.filter (fun line -> line <> String.Empty)
