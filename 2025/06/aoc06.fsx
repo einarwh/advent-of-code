@@ -1,12 +1,8 @@
-// Advent of Code 2025. Day 06.
+// Advent of Code 2025. Day 06: Trash Compactor.
 // dotnet fsi aoc06.fsx
 
 open System
 open System.IO
-
-let readLines = 
-    File.ReadAllLines
-    >> Array.filter (fun line -> line <> String.Empty)
 
 let isNonEmpty (cs : char array) = 
     let s = (new string(cs)).Trim()
@@ -15,7 +11,6 @@ let isNonEmpty (cs : char array) =
 let rec group (cols : char array array) = 
     if Array.isEmpty cols then []
     else 
-
         let g = cols |> Array.takeWhile isNonEmpty 
         if g = cols then [ g ]
         else 
@@ -42,10 +37,8 @@ let eval (toNumbers : char array array -> int64 list) (group : char array array)
     numbers |> List.reduce op
 
 let run fileName = 
-    let lines = readLines fileName
-    let rows = lines 
-    let xs = rows[0].Length  
-    let cols = [|0 .. xs - 1|] |> Array.map (fun x -> rows |> Array.map (fun r -> r[x]))
+    let rows = fileName |> File.ReadAllLines |> Array.filter (fun line -> line <> String.Empty)
+    let cols = [|0 .. rows[0].Length - 1|] |> Array.map (fun x -> rows |> Array.map (fun r -> r[x]))
     let grouped = group cols
     grouped |> List.map (eval normal) |> List.sum |> printfn "%d"
     grouped |> List.map (eval cephalopod) |> List.sum |> printfn "%d"
