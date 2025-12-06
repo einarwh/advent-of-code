@@ -3,56 +3,51 @@
 
 open System
 open System.IO
-open System.Text.RegularExpressions
-
-module Grid =
-    let width grid =
-        Array2D.length2 grid
-    let height grid =
-        Array2D.length1 grid
-    let get (grid : string[,]) (x, y) =
-        Array2D.get grid y x
-    let tryGet (grid : string[,]) (x, y) =
-        if x < 0 || x >= width grid || y < 0 || y >= height grid then
-            None
-        else
-            Some (get grid (x, y))
-    let set (grid : string[,]) (x, y) value =
-        Array2D.set grid y x value
-    let getPositions (grid : string[,]) =
-        let w = width grid
-        let h = height grid
-        [for x in [0..w-1] do for y in [0..h-1] -> (x, y)]
-    let getNeighbours (grid : string[,]) (x, y) =
-        let positions = [(x-1, y-1); (x, y-1); (x+1, y-1); (x-1,y); (x+1,y); (x-1, y+1); (x, y+1); (x+1, y+1)]
-        positions |> List.choose (tryGet grid)
-    let fromNestedList (lst : string list list) =
-        let width = lst |> List.head |> List.length
-        let height = lst |> List.length
-        Array2D.init height width (fun y x -> lst |> List.item y |> List.item x)
 
 let readLines = 
     File.ReadAllLines
     >> Array.filter (fun line -> line <> String.Empty)
 
-let parse (s : string) = 
-    Regex.Split(s.Trim(), "\s+")
+let isNonEmpty (cs : char array) = 
+    let s = (new string(cs)).Trim()
+    s.Length > 0
 
-let evaluate (a : string array) = 
-    match a |> Array.toList |> List.rev with 
-    | h :: t -> 
-        let numbers = t |> List.map int64
-        match h with 
-        | "+" -> numbers |> List.sum 
-        | "*" -> numbers |> List.reduce (*)
-        | _ -> failwith "?"
+let rec group (cols : char array array) = 
+    if Array.isEmpty cols then []
+    else 
+
+        let g = cols |> Array.takeWhile isNonEmpty 
+        if g = cols then [ g ]
+        else 
+            let rest = cols |> Array.skip (1 + g.Length)
+            g :: group rest 
+
+let operation (cs : char array) = 
+    match (new string(cs)).Trim() with 
+    | "*" -> (*)
+    | "+" -> (+)
     | _ -> failwith "?"
+
+let normal (grid : char array array) = 
+    [0 .. grid.Length - 1]
+    |> List.map (fun c -> grid |> Array.map (fun r -> r[c]) |> fun cs -> new string(cs) |> int64)
+
+let cephalopod (grid : char array array) = 
+    grid |> Array.toList |> List.map (fun cs -> new string(cs) |> int64)
+
+let eval (toNumbers : char array array -> int64 list) (group : char array array) = 
+    let op = group |> Array.map Array.last |> operation
+    let grid = group |> Array.map (fun cs -> cs[0 .. cs.Length - 2])
+    let numbers = grid |> toNumbers
+    numbers |> List.reduce op
 
 let run fileName = 
     let lines = readLines fileName
-    let rows = lines |> Array.map parse
-    let xs = rows[0].Length
-    let cols = [0 .. xs - 1] |> List.map (fun x -> rows |> Array.map (fun r -> r[x]))
-    cols |> List.map evaluate |> List.sum |> printfn "%d"
+    let rows = lines 
+    let xs = rows[0].Length  
+    let cols = [|0 .. xs - 1|] |> Array.map (fun x -> rows |> Array.map (fun r -> r[x]))
+    let grouped = group cols
+    grouped |> List.map (eval normal) |> List.sum |> printfn "%d"
+    grouped |> List.map (eval cephalopod) |> List.sum |> printfn "%d"
 
 run "input.txt"
