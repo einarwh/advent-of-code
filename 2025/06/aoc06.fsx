@@ -23,7 +23,7 @@ let operation (cs : char array) =
     | "+" -> (+)
     | _ -> failwith "?"
 
-let normal (grid : char array array) = 
+let human (grid : char array array) = 
     [0 .. grid.Length - 1]
     |> List.map (fun c -> grid |> Array.map (fun r -> r[c]) |> fun cs -> new string(cs) |> int64)
 
@@ -40,7 +40,7 @@ let run fileName =
     let rows = fileName |> File.ReadAllLines |> Array.filter (fun line -> line <> String.Empty)
     let cols = [|0 .. rows[0].Length - 1|] |> Array.map (fun x -> rows |> Array.map (fun r -> r[x]))
     let grouped = group cols
-    grouped |> List.map (eval normal) |> List.sum |> printfn "%d"
+    grouped |> List.map (eval human) |> List.sum |> printfn "%d"
     grouped |> List.map (eval cephalopod) |> List.sum |> printfn "%d"
 
 run "input.txt"
