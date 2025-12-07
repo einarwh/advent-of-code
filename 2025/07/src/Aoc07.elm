@@ -274,19 +274,6 @@ updateStep model =
       in 
         { model | steps = rest, accumulated = nextAcc, debug = debug }
 
--- let splitCount (beam, lines) = 
---     let rec loop count beams lines = 
---         match lines with 
---         | [] -> count 
---         | h :: t -> 
---             let indexes = h |> Seq.toList |> List.indexed |> List.choose (fun (i, c) -> if c = '^' then Some i else None)
---             let collisions = beams |> Set.filter (fun b -> indexes |> List.contains b)
---             let splitBeams = collisions |> Set.fold (fun s b -> s |> Set.add (b - 1) |> Set.add (b + 1)) Set.empty
---             let beams' = Set.difference beams collisions |> Set.union splitBeams
---             let count' = count + Set.count collisions 
---             loop count' beams' t
---     loop 0 (Set.empty |> Set.add beam) lines 
-
 splitCount : List State -> Set Int -> Int -> List (List Char) -> List State
 splitCount acc beams depth lines = 
   case lines of 
@@ -297,9 +284,10 @@ splitCount acc beams depth lines =
           h |> List.indexedMap (\i -> \c -> (i, c)) 
             |> List.filterMap (\(i, c) -> if c == '^' then Just i else Nothing)
         collisions = beams |> Set.filter (\b -> indexes |> List.member b)
+        uncollisions = Set.diff beams collisions
         splitBeams = Set.union (collisions |> Set.map (\b -> b - 1)) (collisions |> Set.map (\b -> b + 1))
-        nextBeams = Set.diff beams collisions |> Set.union splitBeams 
-        seen = Set.union collisions splitBeams |> Set.map (\b -> (b, depth))
+        nextBeams = uncollisions |> Set.union splitBeams 
+        seen = nextBeams |> Set.map (\b -> (b, depth))
         state = { count = Set.size collisions, seen = seen }
       in 
         splitCount (state :: acc) nextBeams (depth + 1) t 
@@ -370,15 +358,21 @@ subscriptions model =
 
 -- VIEW
 
-toCharElement : String -> Html Msg 
-toCharElement symbol = 
+toCharElement : Set Pos -> Pos -> String -> Html Msg 
+toCharElement seen pos symbol = 
   let
-    cssClass = 
-      case symbol of 
-        "." -> "draw-empty adaptive"
-        _ -> "draw adaptive"
+    cssClass =
+      if Set.member pos seen then 
+        if symbol == "^" then "draw-red adaptive" else "draw-green adaptive"
+      else 
+        "draw-empty adaptive"
+    sym = 
+      if symbol == "." && Set.member pos seen then 
+        "|"
+      else
+        symbol  
   in
-    Html.span [ Html.Attributes.class cssClass ]  [ Html.text symbol ]
+    Html.span [ Html.Attributes.class cssClass ]  [ Html.text sym ]
 
 view : Model -> Document Msg
 view model = 
@@ -392,8 +386,9 @@ selectSymbol rolls pos =
 viewBody : Model -> Html Msg
 viewBody model =
   let
+    seen = model.accumulated.seen
     nestedElements = 
-      model.lines |> List.map (\line -> line |> List.map (\ch -> toCharElement (String.fromChar ch)))
+      model.lines |> List.indexedMap (\y -> \line -> line |> List.indexedMap (\x -> \ch -> toCharElement seen (x, y) (String.fromChar ch)))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []    
     textFontSize =
       case model.dataSource of 
