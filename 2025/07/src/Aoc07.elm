@@ -31,17 +31,22 @@ type DataSource = Input | Sample
 
 type alias Pos = (Int, Int)
 
+type alias State = 
+  { count : Int 
+  , seen : Set Pos }
+
 type alias Model = 
   { dataSource : DataSource
   , width : Int 
   , height : Int 
-  , rolls : Set Pos 
+  , steps : List State 
+  , accumulated : State  
   , lines : List (List Char) 
   , removed : Int 
   , paused : Bool 
   , finished : Bool 
   , tickInterval : Float 
-  , message : String }
+  , debug : String }
 
 sample : String
 sample = """.......S.......
@@ -216,29 +221,22 @@ initModel dataSource =
   let 
     data = read dataSource
     symbolLists = data |> String.split "\n" |> List.map String.toList
-    rolls = 
-      symbolLists 
-      |> List.indexedMap (\y -> \lst -> lst |> List.indexedMap (\x -> \sym -> (sym, (x, y))) |> List.filter (\(sym, pos) -> sym == '@'))
-      |> List.concat
-      |> List.map Tuple.second
-      |> Set.fromList
-    width = symbolLists |> List.head |> Maybe.withDefault [] |> List.length 
-    height = symbolLists |> List.length 
   in 
     { dataSource = dataSource
-    , width = width 
-    , height = height
-    , rolls = rolls
+    , width = 0 
+    , height = 0
+    , steps = []
+    , accumulated = { count = 0, seen = Set.empty }
     , lines = symbolLists
     , removed = 0
     , paused = True
     , finished = False  
     , tickInterval = defaultTickInterval 
-    , message = "?" }
+    , debug = "?" }
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel Input, Cmd.none)
+  (initModel Sample, Cmd.none)
 
 -- UPDATE
 
@@ -264,32 +262,82 @@ updateClear : Model -> Model
 updateClear model = 
   initModel model.dataSource
 
-inaccessible : Set Pos -> Pos -> Bool 
-inaccessible rolls (x, y) =
-  let 
-    neighbours = [(x-1, y-1), (x, y-1), (x+1, y-1), (x-1, y), (x+1, y), (x-1, y+1), (x, y+1), (x+1, y+1)]
-    count = neighbours |> List.filter (\p -> Set.member p rolls) |> List.length 
-  in 
-    count >= 4
-
-remove : Set Pos -> Set Pos 
-remove rolls = 
-  rolls |> Set.filter (inaccessible rolls)
-
 updateStep : Model -> Model
 updateStep model = 
-  let 
-    updatedRolls = remove model.rolls 
-    removed = Set.size model.rolls - Set.size updatedRolls 
-  in 
-    if removed > 0 then 
-      { model | rolls = updatedRolls, removed = model.removed + removed }
-    else 
-      { model | finished = True }
+  case model.steps of 
+    [] -> { model | paused = True, finished = True }
+    step :: rest -> 
+      let 
+        a = model.accumulated
+        nextAcc = { count = a.count + step.count, seen = Set.union a.seen step.seen }
+        debug = model.steps |> List.length |> String.fromInt 
+      in 
+        { model | steps = rest, accumulated = nextAcc, debug = debug }
+
+-- let splitCount (beam, lines) = 
+--     let rec loop count beams lines = 
+--         match lines with 
+--         | [] -> count 
+--         | h :: t -> 
+--             let indexes = h |> Seq.toList |> List.indexed |> List.choose (fun (i, c) -> if c = '^' then Some i else None)
+--             let collisions = beams |> Set.filter (fun b -> indexes |> List.contains b)
+--             let splitBeams = collisions |> Set.fold (fun s b -> s |> Set.add (b - 1) |> Set.add (b + 1)) Set.empty
+--             let beams' = Set.difference beams collisions |> Set.union splitBeams
+--             let count' = count + Set.count collisions 
+--             loop count' beams' t
+--     loop 0 (Set.empty |> Set.add beam) lines 
+
+splitCount : List State -> Set Int -> Int -> List (List Char) -> List State
+splitCount acc beams depth lines = 
+  case lines of 
+    [] -> acc |> List.reverse 
+    h :: t -> 
+      let 
+        indexes = 
+          h |> List.indexedMap (\i -> \c -> (i, c)) 
+            |> List.filterMap (\(i, c) -> if c == '^' then Just i else Nothing)
+        collisions = beams |> Set.filter (\b -> indexes |> List.member b)
+        splitBeams = Set.union (collisions |> Set.map (\b -> b - 1)) (collisions |> Set.map (\b -> b + 1))
+        nextBeams = Set.diff beams collisions |> Set.union splitBeams 
+        seen = Set.union collisions splitBeams |> Set.map (\b -> (b, depth))
+        state = { count = Set.size collisions, seen = seen }
+      in 
+        splitCount (state :: acc) nextBeams (depth + 1) t 
+
+indexOf : Int -> a -> List a -> Maybe Int 
+indexOf ix it lst =
+  case lst of 
+    [] -> Nothing 
+    h :: t -> 
+      if h == it then Just ix else indexOf (ix + 1) it t 
+
+solve : List (List Char) -> List State 
+solve lines = 
+  case lines of 
+    [] -> [] 
+    h :: t -> 
+      case indexOf 0 'S' h of 
+        Nothing -> []
+        Just ix -> 
+          let 
+            initState = { count = 0, seen = Set.empty }
+            beams = Set.empty |> Set.insert ix 
+          in 
+            splitCount [ initState ] beams 1 t 
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
-  { model | paused = not model.paused }
+  if model.paused then 
+    if model.steps == [] then 
+      let 
+        steps = solve model.lines 
+        debug = steps |> List.length |> String.fromInt
+      in 
+        { model | paused = False, steps = steps, accumulated = { count = 0, seen = Set.empty }, debug = debug } 
+    else 
+      { model | paused = False }
+  else 
+    { model | paused = True }
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -334,7 +382,7 @@ toCharElement symbol =
 
 view : Model -> Document Msg
 view model = 
-  { title = "Advent of Code 2025 | Day 4: Printing Department"
+  { title = "Advent of Code 2025 | Day 7: Laboratories"
   , body = [ viewBody model ] }
 
 selectSymbol : Set Pos -> Pos -> String 
@@ -416,7 +464,7 @@ viewBody model =
               , Html.Attributes.style "font-size" "1.2rem"
               , Html.Attributes.style "padding-top" "10px" ] 
               [ 
-                Html.div [] [ Html.text ("Removed: " ++ String.fromInt model.removed)]
+                Html.div [] [ Html.text (String.fromInt model.accumulated.count) ]
               ] ]
       , Html.tr 
           []
@@ -430,4 +478,18 @@ viewBody model =
                   Html.Attributes.align "center" 
                 , Html.Attributes.style "max-width" "100%"
                 ] elements
-              ] ] ]
+              ] ] 
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center"
+              , Html.Attributes.style "font-family" "Source Code Pro, monospace"
+              , Html.Attributes.style "font-size" "24px"
+              , Html.Attributes.style "padding" "0px" ] 
+              [ 
+                -- Html.div [] [ Html.text (model.moves |> List.length |> String.fromInt ) ]
+              -- , Html.div [] [ Html.text (String.fromInt model.position) ]
+                Html.div [] [ Html.text model.debug ]
+              -- , Html.div [] [ Html.text model.message ]
+              ] ] 
+              ]
