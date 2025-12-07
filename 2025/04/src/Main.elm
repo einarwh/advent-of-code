@@ -248,13 +248,16 @@ updateClear : Model -> Model
 updateClear model = 
   initModel model.dataSource
 
-inaccessible : Set Pos -> Pos -> Bool 
-inaccessible rolls (x, y) =
+getNeighbourCount : Set Pos -> Pos -> Int 
+getNeighbourCount rolls (x, y) =
   let 
     neighbours = [(x-1, y-1), (x, y-1), (x+1, y-1), (x-1, y), (x+1, y), (x-1, y+1), (x, y+1), (x+1, y+1)]
-    count = neighbours |> List.filter (\p -> Set.member p rolls) |> List.length 
   in 
-    count >= 4
+    neighbours |> List.filter (\p -> Set.member p rolls) |> List.length 
+
+inaccessible : Set Pos -> Pos -> Bool 
+inaccessible rolls pos =
+  getNeighbourCount rolls pos >= 4 
 
 remove : Set Pos -> Set Pos 
 remove rolls = 
@@ -312,8 +315,8 @@ subscriptions model =
 
 -- VIEW
 
-toCharElement : String -> Html Msg 
-toCharElement symbol = 
+toCharElementOld : String -> Html Msg 
+toCharElementOld symbol = 
   let
     cssClass = 
       case symbol of 
@@ -326,12 +329,22 @@ selectSymbol : Set Pos -> Pos -> String
 selectSymbol rolls pos = 
   if Set.member pos rolls then "@" else "."
 
+toCharElement : Bool -> Set Pos -> Pos -> Html Msg 
+toCharElement paused rolls pos = 
+  if Set.member pos rolls then 
+    if paused || inaccessible rolls pos then 
+      Html.span [ Html.Attributes.class "draw adaptive" ]  [ Html.text "@" ]
+    else 
+      Html.span [ Html.Attributes.class "wrong adaptive" ]  [ Html.text "@" ]
+  else 
+    Html.span [ Html.Attributes.class "draw-empty adaptive" ]  [ Html.text "." ]
+
 view : Model -> Html Msg
 view model =
   let
     nestedPositions = getNestedPositions model.height model.width 
     nestedElements = 
-      nestedPositions |> List.map (\row -> row |> List.map (\pos -> toCharElement (selectSymbol model.rolls pos)))
+      nestedPositions |> List.map (\row -> row |> List.map (\pos -> toCharElement model.paused model.rolls pos))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []    
     textFontSize =
       case model.dataSource of 

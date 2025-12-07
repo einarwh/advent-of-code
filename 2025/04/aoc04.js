@@ -5428,7 +5428,7 @@ var $author$project$Main$initModel = function (dataSource) {
 			$elm$core$Maybe$withDefault,
 			_List_Nil,
 			$elm$core$List$head(symbolLists)));
-	return {r: dataSource, I: false, J: height, Z: '?', o: true, D: 0, y: rolls, v: $author$project$Main$defaultTickInterval, Q: width};
+	return {r: dataSource, I: false, J: height, Z: '?', m: true, D: 0, y: rolls, v: $author$project$Main$defaultTickInterval, Q: width};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -5743,7 +5743,7 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (model) {
-	var tickSub = model.o ? $elm$core$Platform$Sub$none : A2(
+	var tickSub = model.m ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
 		model.v,
 		function (_v0) {
@@ -5792,7 +5792,7 @@ var $elm$core$Set$member = F2(
 		var dict = _v0;
 		return A2($elm$core$Dict$member, key, dict);
 	});
-var $author$project$Main$inaccessible = F2(
+var $author$project$Main$getNeighbourCount = F2(
 	function (rolls, _v0) {
 		var x = _v0.a;
 		var y = _v0.b;
@@ -5807,14 +5807,17 @@ var $author$project$Main$inaccessible = F2(
 				_Utils_Tuple2(x, y + 1),
 				_Utils_Tuple2(x + 1, y + 1)
 			]);
-		var count = $elm$core$List$length(
+		return $elm$core$List$length(
 			A2(
 				$elm$core$List$filter,
 				function (p) {
 					return A2($elm$core$Set$member, p, rolls);
 				},
 				neighbours));
-		return count >= 4;
+	});
+var $author$project$Main$inaccessible = F2(
+	function (rolls, pos) {
+		return A2($author$project$Main$getNeighbourCount, rolls, pos) >= 4;
 	});
 var $author$project$Main$remove = function (rolls) {
 	return A2(
@@ -5853,7 +5856,7 @@ var $author$project$Main$updateStep = function (model) {
 		model,
 		{D: model.D + removed, y: updatedRolls}) : _Utils_update(
 		model,
-		{I: true, o: true});
+		{I: true, m: true});
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Main$updateTogglePlay = function (model) {
@@ -5861,11 +5864,11 @@ var $author$project$Main$updateTogglePlay = function (model) {
 		var m = $author$project$Main$initModel(model.r);
 		return _Utils_update(
 			m,
-			{o: false});
+			{m: false});
 	} else {
 		return _Utils_update(
 			model,
-			{o: !model.o});
+			{m: !model.m});
 	}
 };
 var $author$project$Main$update = F2(
@@ -5979,10 +5982,6 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
-var $author$project$Main$selectSymbol = F2(
-	function (rolls, pos) {
-		return A2($elm$core$Set$member, pos, rolls) ? '@' : '.';
-	});
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$html$Html$table = _VirtualDom_node('table');
@@ -5991,25 +5990,37 @@ var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$span = _VirtualDom_node('span');
-var $author$project$Main$toCharElement = function (symbol) {
-	var cssClass = function () {
-		if (symbol === '.') {
-			return 'draw-empty adaptive';
-		} else {
-			return 'draw adaptive';
-		}
-	}();
-	return A2(
-		$elm$html$Html$span,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$class(cssClass)
-			]),
-		_List_fromArray(
-			[
-				$elm$html$Html$text(symbol)
-			]));
-};
+var $author$project$Main$toCharElement = F3(
+	function (paused, rolls, pos) {
+		return A2($elm$core$Set$member, pos, rolls) ? ((paused || A2($author$project$Main$inaccessible, rolls, pos)) ? A2(
+			$elm$html$Html$span,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('draw adaptive')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('@')
+				])) : A2(
+			$elm$html$Html$span,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('wrong adaptive')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('@')
+				]))) : A2(
+			$elm$html$Html$span,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('draw-empty adaptive')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('.')
+				]));
+	});
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$view = function (model) {
@@ -6028,8 +6039,7 @@ var $author$project$Main$view = function (model) {
 			return A2(
 				$elm$core$List$map,
 				function (pos) {
-					return $author$project$Main$toCharElement(
-						A2($author$project$Main$selectSymbol, model.y, pos));
+					return A3($author$project$Main$toCharElement, model.m, model.y, pos);
 				},
 				row);
 		},
@@ -6208,7 +6218,7 @@ var $author$project$Main$view = function (model) {
 									]),
 								_List_fromArray(
 									[
-										model.o ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
+										model.m ? $elm$html$Html$text('Play') : $elm$html$Html$text('Pause')
 									])),
 								A2(
 								$elm$html$Html$button,
