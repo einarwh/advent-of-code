@@ -9,12 +9,6 @@ let readLines =
     >> Array.filter (fun line -> line <> String.Empty)
     >> Array.toList
 
-let memoizeRec f =
-    let cache = System.Collections.Concurrent.ConcurrentDictionary()
-    let rec recF x =
-        cache.GetOrAdd(x, lazy f recF x).Value
-    recF
-
 let split (lines : string list) = 
     let rec loop (count : int) (beams : Set<int>) (lines : string list) = 
         match lines with 
@@ -45,6 +39,12 @@ let rec timelineCount fn (beam : int, lines : string list) =
             count 
         else 
             fn (beam, t) 
+
+let memoizeRec f =
+    let cache = System.Collections.Concurrent.ConcurrentDictionary()
+    let rec recF x =
+        cache.GetOrAdd(x, lazy f recF x).Value
+    recF
 
 let timelines (lines : string list) = 
     match lines with 
