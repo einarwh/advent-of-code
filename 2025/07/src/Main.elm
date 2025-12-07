@@ -7,6 +7,7 @@ import Html exposing (Html)
 import Html.Attributes
 import Html.Events exposing (onClick)
 import Set exposing (Set)
+import Dict exposing (Dict)
 import Time
 
 defaultTickInterval : Float
@@ -42,6 +43,7 @@ type alias Model =
   , accumulated : State  
   , lines : List (List Char) 
   , removed : Int 
+  , quantum : Bool 
   , paused : Bool 
   , finished : Bool 
   , tickInterval : Float 
@@ -215,8 +217,8 @@ read dataSource =
     Input -> input
     Sample -> sample
 
-initModel : DataSource -> Model 
-initModel dataSource = 
+initModel : Bool -> DataSource -> Model 
+initModel quantum dataSource = 
   let 
     data = read dataSource
     symbolLists = data |> String.split "\n" |> List.map String.toList
@@ -228,6 +230,7 @@ initModel dataSource =
     , accumulated = { count = 0, seen = Set.empty }
     , lines = symbolLists
     , removed = 0
+    , quantum = quantum
     , paused = True
     , finished = False  
     , tickInterval = defaultTickInterval 
@@ -235,7 +238,7 @@ initModel dataSource =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel Sample, Cmd.none)
+  (initModel False Sample, Cmd.none)
 
 -- UPDATE
 
@@ -243,6 +246,7 @@ type Msg =
   Tick 
   | Step 
   | TogglePlay 
+  | ToggleQuantum
   | Faster 
   | Slower 
   | Clear 
@@ -259,7 +263,7 @@ getNestedPositions rows columns =
 
 updateClear : Model -> Model
 updateClear model = 
-  initModel model.dataSource
+  initModel model.quantum model.dataSource
 
 updateStep : Model -> Model
 updateStep model = 
@@ -268,10 +272,78 @@ updateStep model =
     step :: rest -> 
       let 
         a = model.accumulated
-        nextAcc = { count = a.count + step.count, seen = Set.union a.seen step.seen }
+        nextAcc = { count = step.count, seen = Set.union a.seen step.seen }
         debug = model.steps |> List.length |> String.fromInt 
       in 
         { model | steps = rest, accumulated = nextAcc, debug = debug }
+
+prevState : List State -> State 
+prevState acc = 
+  acc |> List.head |> Maybe.withDefault { count = 0, seen = Set.empty }
+
+timelineCount : List State -> Dict Pos Int -> Int -> Int -> List (List Char) -> (Dict Pos Int, List State, Int) 
+timelineCount acc mem beam depth lines = 
+  let 
+    prev = prevState acc 
+  in 
+    case Dict.get (beam, depth) mem of 
+      Just cached ->
+        let 
+          st = { count = prev.count + cached, seen = prev.seen }
+        in 
+          (mem, st :: acc, cached) 
+      Nothing -> 
+        case lines of 
+          [] -> 
+            let 
+              st = { count = prev.count + 1, seen = prev.seen }
+            in 
+              (mem, st :: acc, 1) 
+          h :: t -> 
+            let 
+              indexes = 
+                h |> List.indexedMap (\i -> \c -> (i, c)) 
+                  |> List.filterMap (\(i, c) -> if c == '^' then Just i else Nothing)
+            in 
+              if indexes |> List.member beam then 
+                let 
+                  seen0 = prev.seen |> Set.insert (beam, depth) |> Set.insert (beam - 1, depth)
+                  state0 = { count = prev.count, seen = seen0 }
+                  acc0 = state0 :: acc
+                  (memL, accL, countL) = timelineCount acc0 mem (beam - 1) (depth + 1) t 
+                  prevL = prevState accL 
+                  seen1 = prevL.seen |> Set.insert (beam + 1, depth)
+                  state1 = { count = prevL.count, seen = seen1 }
+                  acc1 = state1 :: accL
+                  (memR, accR, countR) = timelineCount acc1 memL (beam + 1) (depth + 1) t 
+                  prevR = prevState accR 
+                  seen2 = prevR.seen 
+                  state2 = { count = prevR.count, seen = seen2 }
+                  acc2 = state2 :: accR
+                  totalCount = countL + countR 
+                  nextMem = memR |> Dict.insert (beam, depth) totalCount 
+                in 
+                  (nextMem, accR, totalCount) 
+              else 
+                let
+                  seen0 = prev.seen |> Set.insert (beam, depth) 
+                  state0 = { count = prev.count, seen = seen0 }
+                  acc0 = state0 :: acc
+                  (m, a, c) = timelineCount acc0 mem beam (depth + 1) t
+                  -- afterState = { count = prev.count, seen = Set.empty }
+                in 
+                  (m, a, c)
+
+timeline : Int -> List (List Char) -> List State 
+timeline beam lines = 
+  let 
+    initState = { count = 0, seen = Set.empty |> Set.insert (beam, 0) }
+    acc = [ initState ]
+    mem = Dict.empty 
+    depth = 0
+    (_, result, _) = timelineCount acc mem beam depth lines 
+  in 
+    result |> List.reverse
 
 splitCount : List State -> Set Int -> Int -> List (List Char) -> List State
 splitCount acc beams depth lines = 
@@ -287,7 +359,8 @@ splitCount acc beams depth lines =
         splitBeams = Set.union (collisions |> Set.map (\b -> b - 1)) (collisions |> Set.map (\b -> b + 1))
         nextBeams = uncollisions |> Set.union splitBeams 
         seen = nextBeams |> Set.union collisions |> Set.map (\b -> (b, depth))
-        state = { count = Set.size collisions, seen = seen }
+        count = acc |> List.head |> Maybe.map (\st -> st.count) |> Maybe.withDefault 0 
+        state = { count = count + Set.size collisions, seen = seen }
       in 
         splitCount (state :: acc) nextBeams (depth + 1) t 
 
@@ -298,26 +371,29 @@ indexOf ix it lst =
     h :: t -> 
       if h == it then Just ix else indexOf (ix + 1) it t 
 
-solve : List (List Char) -> List State 
-solve lines = 
+solve : Bool -> List (List Char) -> List State 
+solve quantum lines = 
   case lines of 
     [] -> [] 
     h :: t -> 
       case indexOf 0 'S' h of 
         Nothing -> []
         Just ix -> 
-          let 
-            initState = { count = 0, seen = Set.empty |> Set.insert (ix, 0) }
-            beams = Set.empty |> Set.insert ix 
-          in 
-            splitCount [ initState ] beams 1 lines 
+          if quantum then 
+            timeline ix lines 
+          else 
+            let 
+              initState = { count = 0, seen = Set.empty |> Set.insert (ix, 0) }
+              beams = Set.empty |> Set.insert ix 
+            in 
+              splitCount [ initState ] beams 1 lines 
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
   if model.paused then 
     if model.steps == [] then 
       let 
-        steps = solve model.lines 
+        steps = solve model.quantum model.lines 
         debug = steps |> List.length |> String.fromInt
       in 
         { model | paused = False, steps = steps, accumulated = { count = 0, seen = Set.empty }, debug = debug } 
@@ -325,6 +401,10 @@ updateTogglePlay model =
       { model | paused = False }
   else 
     { model | paused = True }
+
+updateToggleQuantum : Model -> Model
+updateToggleQuantum model = 
+  { model | quantum = not model.quantum }
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -341,10 +421,12 @@ update msg model =
       ({model | tickInterval = model.tickInterval * 2 }, Cmd.none)
     TogglePlay -> 
       (updateTogglePlay model, Cmd.none)
+    ToggleQuantum -> 
+      (updateToggleQuantum model, Cmd.none)
     UseInput -> 
-      (initModel Input, Cmd.none)
+      (initModel model.quantum Input, Cmd.none)
     UseSample -> 
-      (initModel Sample, Cmd.none)
+      (initModel model.quantum Sample, Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -444,6 +526,15 @@ view model =
               , Html.button 
                 [ Html.Attributes.style "width" "80px", onClick Step ] 
                 [ Html.text "Step" ]
+            ] ]
+      , Html.tr 
+          []
+          [ Html.td 
+              [ Html.Attributes.align "center" ]
+              [ Html.input 
+                [ Html.Attributes.type_ "checkbox", onClick ToggleQuantum, Html.Attributes.checked model.quantum ] 
+                []
+              , Html.label [] [ Html.text " Quantum Manifold" ]
             ] ]
       , Html.tr 
           []
