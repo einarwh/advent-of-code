@@ -37,12 +37,10 @@ type alias State =
 
 type alias Model = 
   { dataSource : DataSource
-  , width : Int 
-  , height : Int 
   , steps : List State 
   , accumulated : State  
   , lines : List (List Char) 
-  , removed : Int 
+  , solved : Bool  
   , quantum : Bool 
   , paused : Bool 
   , finished : Bool 
@@ -221,15 +219,13 @@ initModel : Bool -> DataSource -> Model
 initModel quantum dataSource = 
   let 
     data = read dataSource
-    symbolLists = data |> String.split "\n" |> List.map String.toList
+    lines = data |> String.split "\n" |> List.map String.toList
   in 
     { dataSource = dataSource
-    , width = 0 
-    , height = 0
     , steps = []
     , accumulated = { count = 0, seen = Set.empty }
-    , lines = symbolLists
-    , removed = 0
+    , lines = lines
+    , solved = False
     , quantum = quantum
     , paused = True
     , finished = False  
@@ -238,7 +234,7 @@ initModel quantum dataSource =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  (initModel False Sample, Cmd.none)
+  (initModel False Input, Cmd.none)
 
 -- UPDATE
 
@@ -267,15 +263,23 @@ updateClear model =
 
 updateStep : Model -> Model
 updateStep model = 
-  case model.steps of 
-    [] -> { model | paused = True, finished = True }
-    step :: rest -> 
-      let 
-        a = model.accumulated
-        nextAcc = { count = step.count, seen = Set.union a.seen step.seen }
-        debug = model.steps |> List.length |> String.fromInt 
-      in 
-        { model | steps = rest, accumulated = nextAcc, debug = debug }
+  if model.solved then 
+    case model.steps of 
+      [] -> { model | paused = True, finished = True, solved = False }
+      step :: rest -> 
+        let 
+          a = model.accumulated
+          nextAcc = { count = step.count, seen = Set.union a.seen step.seen }
+          debug = model.steps |> List.length |> String.fromInt 
+        in 
+          { model | steps = rest, accumulated = nextAcc, debug = debug }
+  else 
+    let 
+      steps = solve model.quantum model.lines 
+      debug = steps |> List.length |> String.fromInt
+      m = { model | solved = True, steps = steps, accumulated = { count = 0, seen = Set.empty }, debug = debug }
+    in 
+      updateStep m 
 
 prevState : List State -> State 
 prevState acc = 
@@ -334,6 +338,16 @@ timelineCount acc mem beam depth lines =
                 in 
                   (m, a, c)
 
+compact : List State -> List State 
+compact steps = 
+  case steps of 
+    a :: b :: rest -> 
+      if Set.size b.seen == Set.size a.seen then 
+        b :: compact rest 
+      else 
+        a :: compact (b :: rest)
+    _ -> steps
+
 timeline : Int -> List (List Char) -> List State 
 timeline beam lines = 
   let 
@@ -343,7 +357,7 @@ timeline beam lines =
     depth = 0
     (_, result, _) = timelineCount acc mem beam depth lines 
   in 
-    result |> List.reverse
+    result |> List.reverse |> compact
 
 splitCount : List State -> Set Int -> Int -> List (List Char) -> List State
 splitCount acc beams depth lines = 
@@ -386,19 +400,14 @@ solve quantum lines =
               initState = { count = 0, seen = Set.empty |> Set.insert (ix, 0) }
               beams = Set.empty |> Set.insert ix 
             in 
-              splitCount [ initState ] beams 1 lines 
+              splitCount [ initState ] beams 0 lines 
 
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
-  if model.paused then 
-    if model.steps == [] then 
-      let 
-        steps = solve model.quantum model.lines 
-        debug = steps |> List.length |> String.fromInt
-      in 
-        { model | paused = False, steps = steps, accumulated = { count = 0, seen = Set.empty }, debug = debug } 
-    else 
-      { model | paused = False }
+  if model.finished then 
+    updateTogglePlay (initModel model.quantum model.dataSource)
+  else if model.paused then 
+    { model | paused = False }
   else 
     { model | paused = True }
 
@@ -541,7 +550,7 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Courier New"
-              , Html.Attributes.style "font-size" "1.2rem"
+              , Html.Attributes.style "font-size" "16px"
               , Html.Attributes.style "padding-top" "10px" ] 
               [ 
                 Html.div [] [ Html.text (String.fromInt model.accumulated.count) ]
@@ -564,12 +573,12 @@ view model =
           [ Html.td 
               [ Html.Attributes.align "center"
               , Html.Attributes.style "font-family" "Source Code Pro, monospace"
-              , Html.Attributes.style "font-size" "24px"
+              , Html.Attributes.style "font-size" "16px"
               , Html.Attributes.style "padding" "0px" ] 
               [ 
                 -- Html.div [] [ Html.text (model.moves |> List.length |> String.fromInt ) ]
               -- , Html.div [] [ Html.text (String.fromInt model.position) ]
-                Html.div [] [ Html.text model.debug ]
+                Html.div [] [ Html.text (model.steps |> List.length |> String.fromInt) ]
               -- , Html.div [] [ Html.text model.message ]
               ] ] 
               ]
