@@ -34,7 +34,7 @@ let useConnection (box1, box2) circuits =
     let b = circuits |> List.filter (Set.contains box2)
     let included = a @ b 
     let excluded = circuits |> List.except included
-    let connected = included |> List.reduce (fun a b -> Set.union a b) 
+    let connected = included |> List.reduce Set.union
     connected :: excluded 
 
 let rec connect connections circuits = 
