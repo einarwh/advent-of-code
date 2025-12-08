@@ -19,14 +19,14 @@ let distance (x1, y1, z1) (x2, y2, z2) =
     let sq n = double <| n * n
     sqrt <| sq dx + sq dy + sq dz 
     
-let getDistances boxes = 
+let getConnections boxes = 
     let rec loop acc boxes = 
         match boxes with 
         | a :: rest -> 
-            let distances = rest |> List.map (fun b -> distance a b, (a, b)) 
-            loop (distances :: acc) rest 
+            let ds = rest |> List.map (fun b -> distance a b, (a, b)) 
+            loop (ds :: acc) rest 
         | _ -> 
-            acc |> List.concat |> List.sortBy fst
+            acc |> List.concat |> List.sortBy fst |> List.map snd
     loop [] boxes
 
 let connect (box1, box2) circuits = 
@@ -64,7 +64,7 @@ let solveB circuits connections =
     
 let run count fileName = 
     let boxes = fileName |> readLines |> List.map parse
-    let connections = boxes |> getDistances |> List.map snd
+    let connections = boxes |> getConnections
     let circuits = boxes |> List.map singleton
     connections |> List.take count |> solveA |> printfn "%d"
     connections |> solveB circuits |> printfn "%d"
