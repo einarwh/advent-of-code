@@ -23,8 +23,8 @@ let getDistances boxes =
     let rec loop acc boxes = 
         match boxes with 
         | a :: rest -> 
-            let these = rest |> List.map (fun b -> (distance a b, (a, b))) 
-            loop (these :: acc) rest 
+            let distances = rest |> List.map (fun b -> distance a b, (a, b)) 
+            loop (distances :: acc) rest 
         | _ -> 
             acc |> List.concat |> List.sortBy fst
     loop [] boxes
