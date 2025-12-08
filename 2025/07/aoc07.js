@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.U.H === region.Z.H)
+	if (region.T.I === region.Y.I)
 	{
-		return 'on line ' + region.U.H;
+		return 'on line ' + region.T.I;
 	}
-	return 'on lines ' + region.U.H + ' through ' + region.Z.H;
+	return 'on lines ' + region.T.I + ' through ' + region.Y.I;
 }
 
 
@@ -1861,9 +1861,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aF,
-		impl.aN,
-		impl.aL,
+		impl.aE,
+		impl.aM,
+		impl.aK,
 		function() { return function() {} }
 	);
 });
@@ -2728,8 +2728,8 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
 		r: func(record.r),
-		V: record.V,
-		S: record.S
+		U: record.U,
+		R: record.R
 	}
 });
 
@@ -2998,10 +2998,10 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 
 		var value = result.a;
 		var message = !tag ? value : tag < 3 ? value.a : value.r;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.V;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.U;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.S) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.R) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3951,11 +3951,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aF,
-		impl.aN,
-		impl.aL,
+		impl.aE,
+		impl.aM,
+		impl.aK,
 		function(sendToApp, initialModel) {
-			var view = impl.aO;
+			var view = impl.aN;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3987,12 +3987,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aF,
-		impl.aN,
-		impl.aL,
+		impl.aE,
+		impl.aM,
+		impl.aK,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.T && impl.T(sendToApp)
-			var view = impl.aO;
+			var divertHrefToApp = impl.S && impl.S(sendToApp)
+			var view = impl.aN;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -4000,12 +4000,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.ay);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.ax);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.aM) && (_VirtualDom_doc.title = title = doc.aM);
+				(title !== doc.aL) && (_VirtualDom_doc.title = title = doc.aL);
 			});
 		}
 	);
@@ -4061,12 +4061,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aH;
-	var onUrlRequest = impl.aI;
+	var onUrlChange = impl.aG;
+	var onUrlRequest = impl.aH;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		T: function(sendToApp)
+		S: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4082,9 +4082,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.al === next.al
-							&& curr.ac === next.ac
-							&& curr.ai.a === next.ai.a
+							&& curr.ak === next.ak
+							&& curr.ab === next.ab
+							&& curr.ah.a === next.ah.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4092,13 +4092,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aF: function(flags)
+		aE: function(flags)
 		{
-			return A3(impl.aF, flags, _Browser_getUrl(), key);
+			return A3(impl.aE, flags, _Browser_getUrl(), key);
 		},
-		aO: impl.aO,
 		aN: impl.aN,
-		aL: impl.aL
+		aM: impl.aM,
+		aK: impl.aK
 	});
 }
 
@@ -4164,17 +4164,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aD: 'hidden', az: 'visibilitychange' }
+		? { aC: 'hidden', ay: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aD: 'mozHidden', az: 'mozvisibilitychange' }
+		? { aC: 'mozHidden', ay: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aD: 'msHidden', az: 'msvisibilitychange' }
+		? { aC: 'msHidden', ay: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aD: 'webkitHidden', az: 'webkitvisibilitychange' }
-		: { aD: 'hidden', az: 'visibilitychange' };
+		? { aC: 'webkitHidden', ay: 'webkitvisibilitychange' }
+		: { aC: 'hidden', ay: 'visibilitychange' };
 }
 
 
@@ -4255,12 +4255,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		ap: _Browser_getScene(),
-		as: {
-			au: _Browser_window.pageXOffset,
-			av: _Browser_window.pageYOffset,
-			at: _Browser_doc.documentElement.clientWidth,
-			ab: _Browser_doc.documentElement.clientHeight
+		ao: _Browser_getScene(),
+		ar: {
+			at: _Browser_window.pageXOffset,
+			au: _Browser_window.pageYOffset,
+			as: _Browser_doc.documentElement.clientWidth,
+			aa: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4270,8 +4270,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		at: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		ab: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		as: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		aa: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4294,15 +4294,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			ap: {
-				at: node.scrollWidth,
-				ab: node.scrollHeight
+			ao: {
+				as: node.scrollWidth,
+				aa: node.scrollHeight
 			},
-			as: {
-				au: node.scrollLeft,
-				av: node.scrollTop,
-				at: node.clientWidth,
-				ab: node.clientHeight
+			ar: {
+				at: node.scrollLeft,
+				au: node.scrollTop,
+				as: node.clientWidth,
+				aa: node.clientHeight
 			}
 		};
 	});
@@ -4332,18 +4332,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			ap: _Browser_getScene(),
-			as: {
-				au: x,
-				av: y,
-				at: _Browser_doc.documentElement.clientWidth,
-				ab: _Browser_doc.documentElement.clientHeight
+			ao: _Browser_getScene(),
+			ar: {
+				at: x,
+				au: y,
+				as: _Browser_doc.documentElement.clientWidth,
+				aa: _Browser_doc.documentElement.clientHeight
 			},
-			aB: {
-				au: x + rect.left,
-				av: y + rect.top,
-				at: rect.width,
-				ab: rect.height
+			aA: {
+				at: x + rect.left,
+				au: y + rect.top,
+				as: rect.width,
+				aa: rect.height
 			}
 		};
 	});
@@ -4928,7 +4928,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {aa: fragment, ac: host, ag: path, ai: port_, al: protocol, am: query};
+		return {_: fragment, ab: host, af: path, ah: port_, ak: protocol, al: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5222,76 +5222,25 @@ var $author$project$Main$read = function (dataSource) {
 		return $author$project$Main$sample;
 	}
 };
-var $elm$core$String$foldr = _String_foldr;
-var $elm$core$String$toList = function (string) {
-	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
-};
-var $author$project$Main$initModel = F2(
-	function (quantum, dataSource) {
-		var data = $author$project$Main$read(dataSource);
-		var lines = A2(
-			$elm$core$List$map,
-			$elm$core$String$toList,
-			A2($elm$core$String$split, '\n', data));
-		return {
-			v: {b: 0, a: $elm$core$Set$empty},
-			w: dataSource,
-			N: '?',
-			O: false,
-			P: lines,
-			s: true,
-			n: quantum,
-			I: false,
-			A: _List_Nil,
-			B: $author$project$Main$defaultTickInterval
-		};
-	});
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Main$init = function (_v0) {
-	return _Utils_Tuple2(
-		A2($author$project$Main$initModel, false, 0),
-		$elm$core$Platform$Cmd$none);
-};
-var $author$project$Main$Tick = 0;
-var $elm$time$Time$Every = F2(
-	function (a, b) {
-		return {$: 0, a: a, b: b};
-	});
-var $elm$time$Time$State = F2(
-	function (taggers, processes) {
-		return {ak: processes, ar: taggers};
-	});
-var $elm$time$Time$init = $elm$core$Task$succeed(
-	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
-var $elm$core$Basics$compare = _Utils_compare;
-var $elm$core$Dict$get = F2(
-	function (targetKey, dict) {
-		get:
+var $author$project$Main$indexOf = F3(
+	function (ix, it, lst) {
+		indexOf:
 		while (true) {
-			if (dict.$ === -2) {
+			if (!lst.b) {
 				return $elm$core$Maybe$Nothing;
 			} else {
-				var key = dict.b;
-				var value = dict.c;
-				var left = dict.d;
-				var right = dict.e;
-				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
-				switch (_v1) {
-					case 0:
-						var $temp$targetKey = targetKey,
-							$temp$dict = left;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-					case 1:
-						return $elm$core$Maybe$Just(value);
-					default:
-						var $temp$targetKey = targetKey,
-							$temp$dict = right;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
+				var h = lst.a;
+				var t = lst.b;
+				if (_Utils_eq(h, it)) {
+					return $elm$core$Maybe$Just(ix);
+				} else {
+					var $temp$ix = ix + 1,
+						$temp$it = it,
+						$temp$lst = t;
+					ix = $temp$ix;
+					it = $temp$it;
+					lst = $temp$lst;
+					continue indexOf;
 				}
 			}
 		}
@@ -5356,6 +5305,7 @@ var $elm$core$Dict$balance = F5(
 			}
 		}
 	});
+var $elm$core$Basics$compare = _Utils_compare;
 var $elm$core$Dict$insertHelp = F3(
 	function (key, value, dict) {
 		if (dict.$ === -2) {
@@ -5404,28 +5354,11 @@ var $elm$core$Dict$insert = F3(
 			return x;
 		}
 	});
-var $elm$time$Time$addMySub = F2(
-	function (_v0, state) {
-		var interval = _v0.a;
-		var tagger = _v0.b;
-		var _v1 = A2($elm$core$Dict$get, interval, state);
-		if (_v1.$ === 1) {
-			return A3(
-				$elm$core$Dict$insert,
-				interval,
-				_List_fromArray(
-					[tagger]),
-				state);
-		} else {
-			var taggers = _v1.a;
-			return A3(
-				$elm$core$Dict$insert,
-				interval,
-				A2($elm$core$List$cons, tagger, taggers),
-				state);
-		}
+var $elm$core$Set$insert = F2(
+	function (key, _v0) {
+		var dict = _v0;
+		return A3($elm$core$Dict$insert, key, 0, dict);
 	});
-var $elm$core$Process$kill = _Scheduler_kill;
 var $elm$core$Dict$foldl = F3(
 	function (func, acc, dict) {
 		foldl:
@@ -5450,263 +5383,6 @@ var $elm$core$Dict$foldl = F3(
 				continue foldl;
 			}
 		}
-	});
-var $elm$core$Dict$merge = F6(
-	function (leftStep, bothStep, rightStep, leftDict, rightDict, initialResult) {
-		var stepState = F3(
-			function (rKey, rValue, _v0) {
-				stepState:
-				while (true) {
-					var list = _v0.a;
-					var result = _v0.b;
-					if (!list.b) {
-						return _Utils_Tuple2(
-							list,
-							A3(rightStep, rKey, rValue, result));
-					} else {
-						var _v2 = list.a;
-						var lKey = _v2.a;
-						var lValue = _v2.b;
-						var rest = list.b;
-						if (_Utils_cmp(lKey, rKey) < 0) {
-							var $temp$rKey = rKey,
-								$temp$rValue = rValue,
-								$temp$_v0 = _Utils_Tuple2(
-								rest,
-								A3(leftStep, lKey, lValue, result));
-							rKey = $temp$rKey;
-							rValue = $temp$rValue;
-							_v0 = $temp$_v0;
-							continue stepState;
-						} else {
-							if (_Utils_cmp(lKey, rKey) > 0) {
-								return _Utils_Tuple2(
-									list,
-									A3(rightStep, rKey, rValue, result));
-							} else {
-								return _Utils_Tuple2(
-									rest,
-									A4(bothStep, lKey, lValue, rValue, result));
-							}
-						}
-					}
-				}
-			});
-		var _v3 = A3(
-			$elm$core$Dict$foldl,
-			stepState,
-			_Utils_Tuple2(
-				$elm$core$Dict$toList(leftDict),
-				initialResult),
-			rightDict);
-		var leftovers = _v3.a;
-		var intermediateResult = _v3.b;
-		return A3(
-			$elm$core$List$foldl,
-			F2(
-				function (_v4, result) {
-					var k = _v4.a;
-					var v = _v4.b;
-					return A3(leftStep, k, v, result);
-				}),
-			intermediateResult,
-			leftovers);
-	});
-var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
-var $elm$time$Time$Name = function (a) {
-	return {$: 0, a: a};
-};
-var $elm$time$Time$Offset = function (a) {
-	return {$: 1, a: a};
-};
-var $elm$time$Time$Zone = F2(
-	function (a, b) {
-		return {$: 0, a: a, b: b};
-	});
-var $elm$time$Time$customZone = $elm$time$Time$Zone;
-var $elm$time$Time$setInterval = _Time_setInterval;
-var $elm$core$Process$spawn = _Scheduler_spawn;
-var $elm$time$Time$spawnHelp = F3(
-	function (router, intervals, processes) {
-		if (!intervals.b) {
-			return $elm$core$Task$succeed(processes);
-		} else {
-			var interval = intervals.a;
-			var rest = intervals.b;
-			var spawnTimer = $elm$core$Process$spawn(
-				A2(
-					$elm$time$Time$setInterval,
-					interval,
-					A2($elm$core$Platform$sendToSelf, router, interval)));
-			var spawnRest = function (id) {
-				return A3(
-					$elm$time$Time$spawnHelp,
-					router,
-					rest,
-					A3($elm$core$Dict$insert, interval, id, processes));
-			};
-			return A2($elm$core$Task$andThen, spawnRest, spawnTimer);
-		}
-	});
-var $elm$time$Time$onEffects = F3(
-	function (router, subs, _v0) {
-		var processes = _v0.ak;
-		var rightStep = F3(
-			function (_v6, id, _v7) {
-				var spawns = _v7.a;
-				var existing = _v7.b;
-				var kills = _v7.c;
-				return _Utils_Tuple3(
-					spawns,
-					existing,
-					A2(
-						$elm$core$Task$andThen,
-						function (_v5) {
-							return kills;
-						},
-						$elm$core$Process$kill(id)));
-			});
-		var newTaggers = A3($elm$core$List$foldl, $elm$time$Time$addMySub, $elm$core$Dict$empty, subs);
-		var leftStep = F3(
-			function (interval, taggers, _v4) {
-				var spawns = _v4.a;
-				var existing = _v4.b;
-				var kills = _v4.c;
-				return _Utils_Tuple3(
-					A2($elm$core$List$cons, interval, spawns),
-					existing,
-					kills);
-			});
-		var bothStep = F4(
-			function (interval, taggers, id, _v3) {
-				var spawns = _v3.a;
-				var existing = _v3.b;
-				var kills = _v3.c;
-				return _Utils_Tuple3(
-					spawns,
-					A3($elm$core$Dict$insert, interval, id, existing),
-					kills);
-			});
-		var _v1 = A6(
-			$elm$core$Dict$merge,
-			leftStep,
-			bothStep,
-			rightStep,
-			newTaggers,
-			processes,
-			_Utils_Tuple3(
-				_List_Nil,
-				$elm$core$Dict$empty,
-				$elm$core$Task$succeed(0)));
-		var spawnList = _v1.a;
-		var existingDict = _v1.b;
-		var killTask = _v1.c;
-		return A2(
-			$elm$core$Task$andThen,
-			function (newProcesses) {
-				return $elm$core$Task$succeed(
-					A2($elm$time$Time$State, newTaggers, newProcesses));
-			},
-			A2(
-				$elm$core$Task$andThen,
-				function (_v2) {
-					return A3($elm$time$Time$spawnHelp, router, spawnList, existingDict);
-				},
-				killTask));
-	});
-var $elm$time$Time$Posix = $elm$core$Basics$identity;
-var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
-var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
-var $elm$time$Time$onSelfMsg = F3(
-	function (router, interval, state) {
-		var _v0 = A2($elm$core$Dict$get, interval, state.ar);
-		if (_v0.$ === 1) {
-			return $elm$core$Task$succeed(state);
-		} else {
-			var taggers = _v0.a;
-			var tellTaggers = function (time) {
-				return $elm$core$Task$sequence(
-					A2(
-						$elm$core$List$map,
-						function (tagger) {
-							return A2(
-								$elm$core$Platform$sendToApp,
-								router,
-								tagger(time));
-						},
-						taggers));
-			};
-			return A2(
-				$elm$core$Task$andThen,
-				function (_v1) {
-					return $elm$core$Task$succeed(state);
-				},
-				A2($elm$core$Task$andThen, tellTaggers, $elm$time$Time$now));
-		}
-	});
-var $elm$core$Basics$composeL = F3(
-	function (g, f, x) {
-		return g(
-			f(x));
-	});
-var $elm$time$Time$subMap = F2(
-	function (f, _v0) {
-		var interval = _v0.a;
-		var tagger = _v0.b;
-		return A2(
-			$elm$time$Time$Every,
-			interval,
-			A2($elm$core$Basics$composeL, f, tagger));
-	});
-_Platform_effectManagers['Time'] = _Platform_createManager($elm$time$Time$init, $elm$time$Time$onEffects, $elm$time$Time$onSelfMsg, 0, $elm$time$Time$subMap);
-var $elm$time$Time$subscription = _Platform_leaf('Time');
-var $elm$time$Time$every = F2(
-	function (interval, tagger) {
-		return $elm$time$Time$subscription(
-			A2($elm$time$Time$Every, interval, tagger));
-	});
-var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $author$project$Main$subscriptions = function (model) {
-	var tickSub = model.s ? $elm$core$Platform$Sub$none : A2(
-		$elm$time$Time$every,
-		model.B,
-		function (_v0) {
-			return 0;
-		});
-	return tickSub;
-};
-var $author$project$Main$Sample = 1;
-var $author$project$Main$updateClear = function (model) {
-	return A2($author$project$Main$initModel, model.n, model.w);
-};
-var $author$project$Main$indexOf = F3(
-	function (ix, it, lst) {
-		indexOf:
-		while (true) {
-			if (!lst.b) {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var h = lst.a;
-				var t = lst.b;
-				if (_Utils_eq(h, it)) {
-					return $elm$core$Maybe$Just(ix);
-				} else {
-					var $temp$ix = ix + 1,
-						$temp$it = it,
-						$temp$lst = t;
-					ix = $temp$ix;
-					it = $temp$it;
-					lst = $temp$lst;
-					continue indexOf;
-				}
-			}
-		}
-	});
-var $elm$core$Set$insert = F2(
-	function (key, _v0) {
-		var dict = _v0;
-		return A3($elm$core$Dict$insert, key, 0, dict);
 	});
 var $elm$core$Dict$getMin = function (dict) {
 	getMin:
@@ -6346,6 +6022,37 @@ var $author$project$Main$compact = function (steps) {
 		return steps;
 	}
 };
+var $elm$core$Dict$get = F2(
+	function (targetKey, dict) {
+		get:
+		while (true) {
+			if (dict.$ === -2) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
+				switch (_v1) {
+					case 0:
+						var $temp$targetKey = targetKey,
+							$temp$dict = left;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+					case 1:
+						return $elm$core$Maybe$Just(value);
+					default:
+						var $temp$targetKey = targetKey,
+							$temp$dict = right;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+				}
+			}
+		}
+	});
 var $author$project$Main$prevState = function (acc) {
 	return A2(
 		$elm$core$Maybe$withDefault,
@@ -6495,72 +6202,348 @@ var $author$project$Main$solve = F2(
 			}
 		}
 	});
-var $author$project$Main$updateStep = function (model) {
-	updateStep:
-	while (true) {
-		if (model.I) {
-			var _v0 = model.A;
-			if (!_v0.b) {
-				return _Utils_update(
-					model,
-					{O: true, s: true, I: false});
-			} else {
-				var step = _v0.a;
-				var rest = _v0.b;
-				var debug = $elm$core$String$fromInt(
-					$elm$core$List$length(model.A));
-				var a = model.v;
-				var nextAcc = {
-					b: step.b,
-					a: A2($elm$core$Set$union, a.a, step.a)
-				};
-				return _Utils_update(
-					model,
-					{v: nextAcc, N: debug, A: rest});
-			}
+var $elm$core$String$foldr = _String_foldr;
+var $elm$core$String$toList = function (string) {
+	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
+};
+var $author$project$Main$initModel = F2(
+	function (quantum, dataSource) {
+		var data = $author$project$Main$read(dataSource);
+		var lines = A2(
+			$elm$core$List$map,
+			$elm$core$String$toList,
+			A2($elm$core$String$split, '\n', data));
+		var steps = A2($author$project$Main$solve, quantum, lines);
+		var debug = $elm$core$String$fromInt(
+			$elm$core$List$length(steps));
+		return {
+			C: {b: 0, a: $elm$core$Set$empty},
+			q: dataSource,
+			w: '?',
+			N: false,
+			O: lines,
+			s: true,
+			u: quantum,
+			F: steps,
+			A: $author$project$Main$defaultTickInterval
+		};
+	});
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$Main$init = function (_v0) {
+	return _Utils_Tuple2(
+		A2($author$project$Main$initModel, false, 0),
+		$elm$core$Platform$Cmd$none);
+};
+var $author$project$Main$Tick = 0;
+var $elm$time$Time$Every = F2(
+	function (a, b) {
+		return {$: 0, a: a, b: b};
+	});
+var $elm$time$Time$State = F2(
+	function (taggers, processes) {
+		return {aj: processes, aq: taggers};
+	});
+var $elm$time$Time$init = $elm$core$Task$succeed(
+	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
+var $elm$time$Time$addMySub = F2(
+	function (_v0, state) {
+		var interval = _v0.a;
+		var tagger = _v0.b;
+		var _v1 = A2($elm$core$Dict$get, interval, state);
+		if (_v1.$ === 1) {
+			return A3(
+				$elm$core$Dict$insert,
+				interval,
+				_List_fromArray(
+					[tagger]),
+				state);
 		} else {
-			var steps = A2($author$project$Main$solve, model.n, model.P);
-			var debug = $elm$core$String$fromInt(
-				$elm$core$List$length(steps));
-			var m = _Utils_update(
-				model,
-				{
-					v: {b: 0, a: $elm$core$Set$empty},
-					N: debug,
-					I: true,
-					A: steps
-				});
-			var $temp$model = m;
-			model = $temp$model;
-			continue updateStep;
+			var taggers = _v1.a;
+			return A3(
+				$elm$core$Dict$insert,
+				interval,
+				A2($elm$core$List$cons, tagger, taggers),
+				state);
 		}
+	});
+var $elm$core$Process$kill = _Scheduler_kill;
+var $elm$core$Dict$merge = F6(
+	function (leftStep, bothStep, rightStep, leftDict, rightDict, initialResult) {
+		var stepState = F3(
+			function (rKey, rValue, _v0) {
+				stepState:
+				while (true) {
+					var list = _v0.a;
+					var result = _v0.b;
+					if (!list.b) {
+						return _Utils_Tuple2(
+							list,
+							A3(rightStep, rKey, rValue, result));
+					} else {
+						var _v2 = list.a;
+						var lKey = _v2.a;
+						var lValue = _v2.b;
+						var rest = list.b;
+						if (_Utils_cmp(lKey, rKey) < 0) {
+							var $temp$rKey = rKey,
+								$temp$rValue = rValue,
+								$temp$_v0 = _Utils_Tuple2(
+								rest,
+								A3(leftStep, lKey, lValue, result));
+							rKey = $temp$rKey;
+							rValue = $temp$rValue;
+							_v0 = $temp$_v0;
+							continue stepState;
+						} else {
+							if (_Utils_cmp(lKey, rKey) > 0) {
+								return _Utils_Tuple2(
+									list,
+									A3(rightStep, rKey, rValue, result));
+							} else {
+								return _Utils_Tuple2(
+									rest,
+									A4(bothStep, lKey, lValue, rValue, result));
+							}
+						}
+					}
+				}
+			});
+		var _v3 = A3(
+			$elm$core$Dict$foldl,
+			stepState,
+			_Utils_Tuple2(
+				$elm$core$Dict$toList(leftDict),
+				initialResult),
+			rightDict);
+		var leftovers = _v3.a;
+		var intermediateResult = _v3.b;
+		return A3(
+			$elm$core$List$foldl,
+			F2(
+				function (_v4, result) {
+					var k = _v4.a;
+					var v = _v4.b;
+					return A3(leftStep, k, v, result);
+				}),
+			intermediateResult,
+			leftovers);
+	});
+var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
+var $elm$time$Time$Name = function (a) {
+	return {$: 0, a: a};
+};
+var $elm$time$Time$Offset = function (a) {
+	return {$: 1, a: a};
+};
+var $elm$time$Time$Zone = F2(
+	function (a, b) {
+		return {$: 0, a: a, b: b};
+	});
+var $elm$time$Time$customZone = $elm$time$Time$Zone;
+var $elm$time$Time$setInterval = _Time_setInterval;
+var $elm$core$Process$spawn = _Scheduler_spawn;
+var $elm$time$Time$spawnHelp = F3(
+	function (router, intervals, processes) {
+		if (!intervals.b) {
+			return $elm$core$Task$succeed(processes);
+		} else {
+			var interval = intervals.a;
+			var rest = intervals.b;
+			var spawnTimer = $elm$core$Process$spawn(
+				A2(
+					$elm$time$Time$setInterval,
+					interval,
+					A2($elm$core$Platform$sendToSelf, router, interval)));
+			var spawnRest = function (id) {
+				return A3(
+					$elm$time$Time$spawnHelp,
+					router,
+					rest,
+					A3($elm$core$Dict$insert, interval, id, processes));
+			};
+			return A2($elm$core$Task$andThen, spawnRest, spawnTimer);
+		}
+	});
+var $elm$time$Time$onEffects = F3(
+	function (router, subs, _v0) {
+		var processes = _v0.aj;
+		var rightStep = F3(
+			function (_v6, id, _v7) {
+				var spawns = _v7.a;
+				var existing = _v7.b;
+				var kills = _v7.c;
+				return _Utils_Tuple3(
+					spawns,
+					existing,
+					A2(
+						$elm$core$Task$andThen,
+						function (_v5) {
+							return kills;
+						},
+						$elm$core$Process$kill(id)));
+			});
+		var newTaggers = A3($elm$core$List$foldl, $elm$time$Time$addMySub, $elm$core$Dict$empty, subs);
+		var leftStep = F3(
+			function (interval, taggers, _v4) {
+				var spawns = _v4.a;
+				var existing = _v4.b;
+				var kills = _v4.c;
+				return _Utils_Tuple3(
+					A2($elm$core$List$cons, interval, spawns),
+					existing,
+					kills);
+			});
+		var bothStep = F4(
+			function (interval, taggers, id, _v3) {
+				var spawns = _v3.a;
+				var existing = _v3.b;
+				var kills = _v3.c;
+				return _Utils_Tuple3(
+					spawns,
+					A3($elm$core$Dict$insert, interval, id, existing),
+					kills);
+			});
+		var _v1 = A6(
+			$elm$core$Dict$merge,
+			leftStep,
+			bothStep,
+			rightStep,
+			newTaggers,
+			processes,
+			_Utils_Tuple3(
+				_List_Nil,
+				$elm$core$Dict$empty,
+				$elm$core$Task$succeed(0)));
+		var spawnList = _v1.a;
+		var existingDict = _v1.b;
+		var killTask = _v1.c;
+		return A2(
+			$elm$core$Task$andThen,
+			function (newProcesses) {
+				return $elm$core$Task$succeed(
+					A2($elm$time$Time$State, newTaggers, newProcesses));
+			},
+			A2(
+				$elm$core$Task$andThen,
+				function (_v2) {
+					return A3($elm$time$Time$spawnHelp, router, spawnList, existingDict);
+				},
+				killTask));
+	});
+var $elm$time$Time$Posix = $elm$core$Basics$identity;
+var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
+var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
+var $elm$time$Time$onSelfMsg = F3(
+	function (router, interval, state) {
+		var _v0 = A2($elm$core$Dict$get, interval, state.aq);
+		if (_v0.$ === 1) {
+			return $elm$core$Task$succeed(state);
+		} else {
+			var taggers = _v0.a;
+			var tellTaggers = function (time) {
+				return $elm$core$Task$sequence(
+					A2(
+						$elm$core$List$map,
+						function (tagger) {
+							return A2(
+								$elm$core$Platform$sendToApp,
+								router,
+								tagger(time));
+						},
+						taggers));
+			};
+			return A2(
+				$elm$core$Task$andThen,
+				function (_v1) {
+					return $elm$core$Task$succeed(state);
+				},
+				A2($elm$core$Task$andThen, tellTaggers, $elm$time$Time$now));
+		}
+	});
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $elm$time$Time$subMap = F2(
+	function (f, _v0) {
+		var interval = _v0.a;
+		var tagger = _v0.b;
+		return A2(
+			$elm$time$Time$Every,
+			interval,
+			A2($elm$core$Basics$composeL, f, tagger));
+	});
+_Platform_effectManagers['Time'] = _Platform_createManager($elm$time$Time$init, $elm$time$Time$onEffects, $elm$time$Time$onSelfMsg, 0, $elm$time$Time$subMap);
+var $elm$time$Time$subscription = _Platform_leaf('Time');
+var $elm$time$Time$every = F2(
+	function (interval, tagger) {
+		return $elm$time$Time$subscription(
+			A2($elm$time$Time$Every, interval, tagger));
+	});
+var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
+var $author$project$Main$subscriptions = function (model) {
+	var tickSub = model.s ? $elm$core$Platform$Sub$none : A2(
+		$elm$time$Time$every,
+		model.A,
+		function (_v0) {
+			return 0;
+		});
+	return tickSub;
+};
+var $author$project$Main$Sample = 1;
+var $author$project$Main$updateClear = function (model) {
+	return A2($author$project$Main$initModel, model.u, model.q);
+};
+var $author$project$Main$updateStep = function (model) {
+	var _v0 = model.F;
+	if (!_v0.b) {
+		return _Utils_update(
+			model,
+			{w: 'just finished', N: true, s: true});
+	} else {
+		var step = _v0.a;
+		var rest = _v0.b;
+		var debug = $elm$core$String$fromInt(
+			$elm$core$List$length(model.F));
+		var a = model.C;
+		var nextAcc = {
+			b: step.b,
+			a: A2($elm$core$Set$union, a.a, step.a)
+		};
+		return _Utils_update(
+			model,
+			{C: nextAcc, w: 'X' + debug, F: rest});
 	}
 };
 var $author$project$Main$updateTogglePlay = function (model) {
 	updateTogglePlay:
 	while (true) {
-		if (model.O) {
-			var $temp$model = A2($author$project$Main$initModel, model.n, model.w);
+		if (model.N) {
+			var m = A2($author$project$Main$initModel, model.u, model.q);
+			var $temp$model = _Utils_update(
+				m,
+				{w: 're-init'});
 			model = $temp$model;
 			continue updateTogglePlay;
 		} else {
 			if (model.s) {
 				return _Utils_update(
 					model,
-					{s: false});
+					{w: 'un-paused', s: false});
 			} else {
 				return _Utils_update(
 					model,
-					{s: true});
+					{w: 'paused', s: true});
 			}
 		}
 	}
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Main$updateToggleQuantum = function (model) {
-	return _Utils_update(
-		model,
-		{n: !model.n});
+	return A2($author$project$Main$initModel, !model.u, model.q);
 };
 var $author$project$Main$update = F2(
 	function (msg, model) {
@@ -6581,13 +6564,13 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{B: model.B / 2}),
+						{A: model.A / 2}),
 					$elm$core$Platform$Cmd$none);
 			case 5:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{B: model.B * 2}),
+						{A: model.A * 2}),
 					$elm$core$Platform$Cmd$none);
 			case 2:
 				return _Utils_Tuple2(
@@ -6599,11 +6582,11 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 7:
 				return _Utils_Tuple2(
-					A2($author$project$Main$initModel, model.n, 0),
+					A2($author$project$Main$initModel, model.u, 0),
 					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(
-					A2($author$project$Main$initModel, model.n, 1),
+					A2($author$project$Main$initModel, model.u, 1),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
@@ -6715,14 +6698,14 @@ var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$view = function (model) {
 	var textFontSize = function () {
-		var _v0 = model.w;
+		var _v0 = model.q;
 		if (_v0 === 1) {
 			return '24px';
 		} else {
 			return '8px';
 		}
 	}();
-	var seen = model.v.a;
+	var seen = model.C.a;
 	var nestedElements = A2(
 		$elm$core$List$indexedMap,
 		function (y) {
@@ -6741,7 +6724,7 @@ var $author$project$Main$view = function (model) {
 					line);
 			};
 		},
-		model.P);
+		model.O);
 	var elements = A3(
 		$elm$core$List$foldr,
 		F2(
@@ -6843,7 +6826,7 @@ var $author$project$Main$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(7),
-										$elm$html$Html$Attributes$checked(!model.w)
+										$elm$html$Html$Attributes$checked(!model.q)
 									]),
 								_List_Nil),
 								A2(
@@ -6859,7 +6842,7 @@ var $author$project$Main$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(8),
-										$elm$html$Html$Attributes$checked(model.w === 1)
+										$elm$html$Html$Attributes$checked(model.q === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -6961,7 +6944,7 @@ var $author$project$Main$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('checkbox'),
 										$elm$html$Html$Events$onClick(3),
-										$elm$html$Html$Attributes$checked(model.n)
+										$elm$html$Html$Attributes$checked(model.u)
 									]),
 								_List_Nil),
 								A2(
@@ -6995,7 +6978,7 @@ var $author$project$Main$view = function (model) {
 								_List_fromArray(
 									[
 										$elm$html$Html$text(
-										$elm$core$String$fromInt(model.v.b))
+										$elm$core$String$fromInt(model.C.b))
 									]))
 							]))
 					])),
@@ -7035,7 +7018,7 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$align('center'),
-								A2($elm$html$Html$Attributes$style, 'font-family', 'Source Code Pro, monospace'),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'Courier New'),
 								A2($elm$html$Html$Attributes$style, 'font-size', '16px'),
 								A2($elm$html$Html$Attributes$style, 'padding', '0px')
 							]),
@@ -7048,13 +7031,13 @@ var $author$project$Main$view = function (model) {
 									[
 										$elm$html$Html$text(
 										$elm$core$String$fromInt(
-											$elm$core$List$length(model.A)))
+											$elm$core$List$length(model.F)))
 									]))
 							]))
 					]))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
-	{aF: $author$project$Main$init, aL: $author$project$Main$subscriptions, aN: $author$project$Main$update, aO: $author$project$Main$view});
+	{aE: $author$project$Main$init, aK: $author$project$Main$subscriptions, aM: $author$project$Main$update, aN: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));

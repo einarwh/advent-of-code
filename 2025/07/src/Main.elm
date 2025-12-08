@@ -40,7 +40,6 @@ type alias Model =
   , steps : List State 
   , accumulated : State  
   , lines : List (List Char) 
-  , solved : Bool  
   , quantum : Bool 
   , paused : Bool 
   , finished : Bool 
@@ -220,12 +219,13 @@ initModel quantum dataSource =
   let 
     data = read dataSource
     lines = data |> String.split "\n" |> List.map String.toList
+    steps = solve quantum lines 
+    debug = steps |> List.length |> String.fromInt
   in 
     { dataSource = dataSource
-    , steps = []
+    , steps = steps 
     , accumulated = { count = 0, seen = Set.empty }
     , lines = lines
-    , solved = False
     , quantum = quantum
     , paused = True
     , finished = False  
@@ -263,23 +263,15 @@ updateClear model =
 
 updateStep : Model -> Model
 updateStep model = 
-  if model.solved then 
-    case model.steps of 
-      [] -> { model | paused = True, finished = True, solved = False }
-      step :: rest -> 
-        let 
-          a = model.accumulated
-          nextAcc = { count = step.count, seen = Set.union a.seen step.seen }
-          debug = model.steps |> List.length |> String.fromInt 
-        in 
-          { model | steps = rest, accumulated = nextAcc, debug = debug }
-  else 
-    let 
-      steps = solve model.quantum model.lines 
-      debug = steps |> List.length |> String.fromInt
-      m = { model | solved = True, steps = steps, accumulated = { count = 0, seen = Set.empty }, debug = debug }
-    in 
-      updateStep m 
+  case model.steps of 
+    [] -> { model | paused = True, finished = True, debug = "just finished" }
+    step :: rest -> 
+      let 
+        a = model.accumulated
+        nextAcc = { count = step.count, seen = Set.union a.seen step.seen }
+        debug = model.steps |> List.length |> String.fromInt 
+      in 
+        { model | steps = rest, accumulated = nextAcc, debug = "X" ++ debug }
 
 prevState : List State -> State 
 prevState acc = 
@@ -405,15 +397,18 @@ solve quantum lines =
 updateTogglePlay : Model -> Model
 updateTogglePlay model = 
   if model.finished then 
-    updateTogglePlay (initModel model.quantum model.dataSource)
+    let 
+      m = (initModel model.quantum model.dataSource)
+    in 
+      updateTogglePlay { m | debug = "re-init" }
   else if model.paused then 
-    { model | paused = False }
+    { model | paused = False, debug = "un-paused" }
   else 
-    { model | paused = True }
+    { model | paused = True, debug = "paused" }
 
 updateToggleQuantum : Model -> Model
 updateToggleQuantum model = 
-  { model | quantum = not model.quantum }
+  initModel (not model.quantum) model.dataSource
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -572,13 +567,13 @@ view model =
           []
           [ Html.td 
               [ Html.Attributes.align "center"
-              , Html.Attributes.style "font-family" "Source Code Pro, monospace"
+              , Html.Attributes.style "font-family" "Courier New"
               , Html.Attributes.style "font-size" "16px"
               , Html.Attributes.style "padding" "0px" ] 
               [ 
                 -- Html.div [] [ Html.text (model.moves |> List.length |> String.fromInt ) ]
               -- , Html.div [] [ Html.text (String.fromInt model.position) ]
                 Html.div [] [ Html.text (model.steps |> List.length |> String.fromInt) ]
-              -- , Html.div [] [ Html.text model.message ]
+              -- , Html.div [] [ Html.text model.debug ]
               ] ] 
               ]
