@@ -30,19 +30,19 @@ let getDistances boxes =
     loop [] boxes
 
 let useConnection (box1, box2) circuits = 
-    printfn "\nuseConnection %A" (box1, box2)
+    // printfn "\nuseConnection %A" (box1, box2)
     let a = circuits |> List.filter (Set.contains box1)
-    printfn "includes box1 %A" a
+    // printfn "includes box1 %A" a
     let b = circuits |> List.filter (Set.contains box2)
-    printfn "includes box2 %A" b
+    // printfn "includes box2 %A" b
     let included = a @ b 
-    printfn "included %A" included
+    // printfn "included %A" included
     let excluded = circuits |> List.except included
-    printfn "excluded %A" excluded 
+    // printfn "excluded %A" excluded 
     let connected = included |> List.reduce (fun a b -> Set.union a b) 
-    printfn "connected circuit %A" connected
+    // printfn "connected circuit %A" connected
     let result = connected :: excluded 
-    printfn "result: %A" result
+    // printfn "result: %A" result
     result
 
 let connect connections circuits = 
@@ -54,24 +54,41 @@ let connect connections circuits =
             loop rest circuits' 
     loop connections circuits 
     
+let connectUntilOne connections circuits = 
+    let rec loop connections circuits =
+        match connections with 
+        | [] -> None   
+        | conn :: rest -> 
+            let circuits' = useConnection conn circuits 
+            if List.length circuits' = 1 then 
+                Some conn 
+            else 
+                loop rest circuits' 
+    loop connections circuits 
+    
 let solve count boxes = 
     printfn "solve %d" count
     let distances = boxes |> getDistances
     printfn "# distances %d" (List.length distances)
     let shortest = distances |> List.take 100
     shortest |> List.iter (printfn "%A")
-    // let toSet (a, b) = Set.empty |> Set.add a |> Set.add b 
     let connections = distances |> List.take count |> List.map snd
     let circuits = connections |> List.collect (fun (a, b) -> [a; b]) |> List.distinct |> List.map (fun a -> Set.empty |> Set.add a) 
-    printfn "# connections %d" (List.length connections)
-    printfn "# circuits %d" (List.length circuits)
-    // printfn "%A" (List.length connections)
     let result = connect connections circuits
     let sizes = result |> List.map Set.count |> List.sortDescending 
     printfn "%A" sizes
     match sizes with 
-    | a :: b :: c :: _ -> (a * b * c)
+    | a :: b :: c :: _ -> printfn "%d" (a * b * c)
     | _ -> failwith "?"
+    let allConnections = distances |> List.map snd
+    let allCircuits = boxes |> List.map (fun b -> Set.empty |> Set.add b)
+    let res2 = connectUntilOne allConnections allCircuits
+    match res2 with 
+    | Some ((x1, _, _), (x2, _, _)) -> printfn "%d" (x1 * x2)
+    | None -> failwith "?"
+    printfn "%A" res2
+    0
+
 
 let run conns fileName = 
     let lines = readLines fileName
