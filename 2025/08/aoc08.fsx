@@ -10,13 +10,13 @@ let readLines =
     >> Array.toList
     
 let parse (s : string) = 
-    match s.Split "," |> Array.map int with 
+    match s.Split "," |> Array.map int64 with 
     | [|a; b; c|] -> (a, b, c)
     | _ -> failwith "?"
 
 let distance (x1, y1, z1) (x2, y2, z2) = 
     let dx, dy, dz = x2-x1, y2-y1, z2-z1 
-    let sq n = n * n |> float
+    let sq n = n * n |> double
     sqrt <| sq dx + sq dy + sq dz 
     
 let getDistances boxes = 
@@ -28,46 +28,55 @@ let getDistances boxes =
         | _ -> 
             acc |> List.concat |> List.sortBy fst
     loop [] boxes
-    
-let connect conn circuits = 
-    let rec loop acc circuits =
-        printfn "\nloop..."
-        circuits |> List.iter (printfn "%A")
-        printfn "."
-        match circuits with 
-        | [] -> 
-            printfn "found no match for %A, form new circuit" conn 
-            (conn :: acc) |> List.rev 
-        | circ :: rest -> 
-            let shared = circ |> Set.intersect conn |> Set.count
-            if shared > 0 then 
-                let union = circ |> Set.union conn 
-                printfn "overlap between %A and %A -> connect %A" conn circ union 
-                List.rev (union :: acc) @ rest 
-            else 
-                printfn "no overlap between %A and %A" conn circ
-                loop (circ :: acc) rest 
-    loop [] circuits
+
+let useConnection (box1, box2) circuits = 
+    printfn "\nuseConnection %A" (box1, box2)
+    let a = circuits |> List.filter (Set.contains box1)
+    printfn "includes box1 %A" a
+    let b = circuits |> List.filter (Set.contains box2)
+    printfn "includes box2 %A" b
+    let included = a @ b 
+    printfn "included %A" included
+    let excluded = circuits |> List.except included
+    printfn "excluded %A" excluded 
+    let connected = included |> List.reduce (fun a b -> Set.union a b) 
+    printfn "connected circuit %A" connected
+    let result = connected :: excluded 
+    printfn "result: %A" result
+    result
+
+let connect connections circuits = 
+    let rec loop connections circuits =
+        match connections with 
+        | [] -> circuits  
+        | conn :: rest -> 
+            let circuits' = useConnection conn circuits 
+            loop rest circuits' 
+    loop connections circuits 
     
 let solve count boxes = 
-    let rec loop circuits connections = 
-        match connections with 
-        | [] -> circuits 
-        | conn :: rest ->
-            loop (connect conn circuits) rest 
+    printfn "solve %d" count
     let distances = boxes |> getDistances
-    let toSet (a, b) = Set.empty |> Set.add a |> Set.add b 
-    let connections = distances |> List.take count |> List.map (snd >> toSet)
-    connections |> List.iter (printfn "%A")
-    let result = loop [] connections
-    printfn "%A" result
-    0
+    printfn "# distances %d" (List.length distances)
+    let shortest = distances |> List.take 100
+    shortest |> List.iter (printfn "%A")
+    // let toSet (a, b) = Set.empty |> Set.add a |> Set.add b 
+    let connections = distances |> List.take count |> List.map snd
+    let circuits = connections |> List.collect (fun (a, b) -> [a; b]) |> List.distinct |> List.map (fun a -> Set.empty |> Set.add a) 
+    printfn "# connections %d" (List.length connections)
+    printfn "# circuits %d" (List.length circuits)
+    // printfn "%A" (List.length connections)
+    let result = connect connections circuits
+    let sizes = result |> List.map Set.count |> List.sortDescending 
+    printfn "%A" sizes
+    match sizes with 
+    | a :: b :: c :: _ -> (a * b * c)
+    | _ -> failwith "?"
 
-let run fileName = 
+let run conns fileName = 
     let lines = readLines fileName
     let boxes = lines |> List.map parse
-    // boxes |> printfn "%A"
-    // boxes |> getDistances |> printfn "%A"
-    solve 10 boxes
+    solve conns boxes |> printfn "%d"
 
-run "sample.txt"
+run 10 "sample.txt"
+run 1000 "input.txt"
