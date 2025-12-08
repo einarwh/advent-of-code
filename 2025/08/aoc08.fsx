@@ -30,9 +30,8 @@ let getDistances boxes =
     loop [] boxes
 
 let useConnection (box1, box2) circuits = 
-    let a = circuits |> List.filter (Set.contains box1)
-    let b = circuits |> List.filter (Set.contains box2)
-    let included = a @ b 
+    let contains box = List.filter (Set.contains box)
+    let included = contains box1 circuits @ contains box2 circuits
     let excluded = circuits |> List.except included
     let connected = included |> List.reduce Set.union
     connected :: excluded 
@@ -48,9 +47,11 @@ let rec connectUntilOne connections circuits =
     | conn :: rest -> 
         let circuits' = useConnection conn circuits 
         if List.length circuits' = 1 then Some conn else connectUntilOne rest circuits' 
-        
+
+let singleton item = Set.empty |> Set.add item 
+
 let solveA connections = 
-    let circuits = connections |> List.collect (fun (a, b) -> [a; b]) |> List.distinct |> List.map (fun a -> Set.empty |> Set.add a) 
+    let circuits = connections |> List.collect (fun (a, b) -> [a; b]) |> List.distinct |> List.map singleton 
     let sizes = circuits |> connect connections |> List.map Set.count |> List.sortDescending 
     match sizes with 
     | a :: b :: c :: _ -> a * b * c
@@ -64,9 +65,8 @@ let solveB circuits connections =
 let run count fileName = 
     let lines = readLines fileName
     let boxes = lines |> List.map parse
-    let distances = boxes |> getDistances
-    let connections = distances |> List.map snd
-    let circuits = boxes |> List.map (fun b -> Set.empty |> Set.add b)
+    let connections = boxes |> getDistances |> List.map snd
+    let circuits = boxes |> List.map singleton
     connections |> List.take count |> solveA |> printfn "%d"
     connections |> solveB circuits |> printfn "%d"
 
