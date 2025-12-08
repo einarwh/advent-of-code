@@ -29,30 +29,30 @@ let getDistances boxes =
             acc |> List.concat |> List.sortBy fst
     loop [] boxes
 
-let useConnection (box1, box2) circuits = 
+let connect (box1, box2) circuits = 
     let contains box = List.filter (Set.contains box)
     let included = contains box1 circuits @ contains box2 circuits
     let excluded = circuits |> List.except included
     let connected = included |> List.reduce Set.union
     connected :: excluded 
 
-let rec connect connections circuits = 
+let rec connectAll connections circuits = 
     match connections with 
     | [] -> circuits  
-    | conn :: rest -> circuits |> useConnection conn |> connect rest 
+    | conn :: rest -> circuits |> connect conn |> connectAll rest 
     
 let rec connectUntilOne connections circuits = 
     match connections with 
     | [] -> None   
     | conn :: rest -> 
-        let circuits' = useConnection conn circuits 
+        let circuits' = connect conn circuits 
         if List.length circuits' = 1 then Some conn else connectUntilOne rest circuits' 
 
 let singleton item = Set.empty |> Set.add item 
 
 let solveA connections = 
     let circuits = connections |> List.collect (fun (a, b) -> [a; b]) |> List.distinct |> List.map singleton 
-    let sizes = circuits |> connect connections |> List.map Set.count |> List.sortDescending 
+    let sizes = circuits |> connectAll connections |> List.map Set.count |> List.sortDescending 
     match sizes with 
     | a :: b :: c :: _ -> a * b * c
     | _ -> failwith "?"
