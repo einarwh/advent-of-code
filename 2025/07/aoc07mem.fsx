@@ -29,10 +29,14 @@ let split (lines : string list) =
 
 let rec timelineCount (mem : Map<int * int, int64>) (beam : int, depth : int) (lines : string list) = 
     if Map.containsKey (beam, depth) mem then 
-        mem, Map.find (beam, depth) mem
+        let cached = Map.find (beam, depth) mem
+        mem, cached 
     else 
         match lines with 
-        | [] -> mem, 1L
+        | [] ->
+            let value = 1L
+            let mem' = mem |> Map.add (beam, depth) value
+            mem', value 
         | h :: t -> 
             let indexes = h |> Seq.toList |> List.indexed |> List.choose (fun (i, c) -> if c = '^' then Some i else None)
             if indexes |> List.contains beam then 
@@ -42,14 +46,17 @@ let rec timelineCount (mem : Map<int * int, int64>) (beam : int, depth : int) (l
                 let mem' = memR |> Map.add (beam, depth) count  
                 mem', count 
             else 
-                timelineCount mem (beam, depth + 1) t 
+                let memD, count = timelineCount mem (beam, depth + 1) t 
+                let mem' = memD |> Map.add (beam, depth) count 
+                mem', count
 
 let timelines (lines : string list) = 
     match lines with 
     | [] -> failwith "?"
     | h :: t -> 
         let ix = h |> Seq.findIndex ((=) 'S')
-        timelineCount Map.empty (ix, 1) t |> snd 
+        let (mem, count) = timelineCount Map.empty (ix, 1) t 
+        count 
 
 let run fileName = 
     let lines = readLines fileName
