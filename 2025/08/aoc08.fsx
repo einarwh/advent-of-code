@@ -63,8 +63,7 @@ let solveB circuits connections =
     | None -> failwith "?"
     
 let run count fileName = 
-    let lines = readLines fileName
-    let boxes = lines |> List.map parse
+    let boxes = fileName |> readLines |> List.map parse
     let connections = boxes |> getDistances |> List.map snd
     let circuits = boxes |> List.map singleton
     connections |> List.take count |> solveA |> printfn "%d"
