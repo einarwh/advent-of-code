@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.Y.O === region.ac.O)
+	if (region.Y.P === region.ac.P)
 	{
-		return 'on line ' + region.Y.O;
+		return 'on line ' + region.Y.P;
 	}
-	return 'on lines ' + region.Y.O + ' through ' + region.ac.O;
+	return 'on lines ' + region.Y.P + ' through ' + region.ac.P;
 }
 
 
@@ -2727,7 +2727,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		y: func(record.y),
+		x: func(record.x),
 		Z: record.Z,
 		W: record.W
 	}
@@ -2997,7 +2997,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.y;
+		var message = !tag ? value : tag < 3 ? value.a : value.x;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.Z;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -5213,7 +5213,7 @@ var $elm$core$Set$Set_elm_builtin = $elm$core$Basics$identity;
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $elm$core$Set$empty = $elm$core$Dict$empty;
-var $author$project$Main$defaultSplitState = {K: $elm$core$Set$empty, b: 0, M: 0, c: _List_Nil, a: $elm$core$Set$empty};
+var $author$project$Main$defaultSplitState = {M: $elm$core$Set$empty, b: 0, N: 0, c: _List_Nil, a: $elm$core$Set$empty};
 var $author$project$Main$indexOf = F3(
 	function (ix, it, lst) {
 		indexOf:
@@ -5363,7 +5363,7 @@ var $author$project$Main$initSplitState = function (lines) {
 		} else {
 			var ix = _v1.a;
 			var beams = A2($elm$core$Set$insert, ix, $elm$core$Set$empty);
-			return {K: beams, b: 0, M: 0, c: lines, a: $elm$core$Set$empty};
+			return {M: beams, b: 0, N: 0, c: lines, a: $elm$core$Set$empty};
 		}
 	}
 };
@@ -5429,7 +5429,7 @@ var $author$project$Main$initModel = F2(
 			A2($elm$core$String$split, '\n', data));
 		var splitState = $author$project$Main$initSplitState(lines);
 		var timelineState = $author$project$Main$initTimelineState(lines);
-		return {x: dataSource, L: '?', N: false, c: lines, t: true, r: quantum, P: splitState, E: $author$project$Main$defaultTickInterval, u: timelineState};
+		return {w: dataSource, A: '?', O: false, c: lines, t: true, r: quantum, E: splitState, F: $author$project$Main$defaultTickInterval, G: timelineState};
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -5746,7 +5746,7 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (model) {
 	var tickSub = model.t ? $elm$core$Platform$Sub$none : A2(
 		$elm$time$Time$every,
-		model.E,
+		model.F,
 		function (_v0) {
 			return 0;
 		});
@@ -5754,7 +5754,7 @@ var $author$project$Main$subscriptions = function (model) {
 };
 var $author$project$Main$Sample = 1;
 var $author$project$Main$updateClear = function (model) {
-	return A2($author$project$Main$initModel, model.r, model.x);
+	return A2($author$project$Main$initModel, model.r, model.w);
 };
 var $elm$core$Dict$getMin = function (dict) {
 	getMin:
@@ -6291,8 +6291,8 @@ var $author$project$Main$splitStep = function (state) {
 					};
 				},
 				h));
-		var depth = state.M;
-		var beams = state.K;
+		var depth = state.N;
+		var beams = state.M;
 		var beamsPositions = A2(
 			$elm$core$Set$map,
 			function (b) {
@@ -6332,20 +6332,20 @@ var $author$project$Main$splitStep = function (state) {
 			A2($elm$core$Set$union, splitBeamsPositions, beamsPositions));
 		var uncollisions = A2($elm$core$Set$diff, beams, collisions);
 		var nextBeams = A2($elm$core$Set$union, splitBeams, uncollisions);
-		return {K: nextBeams, b: count, M: depth + 1, c: t, a: seen};
+		return {M: nextBeams, b: count, N: depth + 1, c: t, a: seen};
 	}
 };
 var $author$project$Main$updateSplitStep = function (model) {
-	var _v0 = model.P.c;
+	var _v0 = model.E.c;
 	if (!_v0.b) {
 		return _Utils_update(
 			model,
-			{N: true, t: true});
+			{A: 'done split', O: true, t: true});
 	} else {
-		var state = $author$project$Main$splitStep(model.P);
+		var state = $author$project$Main$splitStep(model.E);
 		return _Utils_update(
 			model,
-			{P: state});
+			{A: '...', E: state});
 	}
 };
 var $author$project$Main$Combine = {$: 2};
@@ -6531,18 +6531,18 @@ var $author$project$Main$updateTimelineState = F3(
 		}
 	});
 var $author$project$Main$updateTimelineStep = function (model) {
-	var _v0 = model.u.l;
+	var _v0 = model.G.l;
 	if (!_v0.b) {
 		return _Utils_update(
 			model,
-			{N: true, t: true});
+			{O: true, t: true});
 	} else {
 		var item = _v0.a;
 		var rest = _v0.b;
-		var state = A3($author$project$Main$updateTimelineState, model.u, item, rest);
+		var state = A3($author$project$Main$updateTimelineState, model.G, item, rest);
 		return _Utils_update(
 			model,
-			{u: state});
+			{G: state});
 	}
 };
 var $author$project$Main$updateStep = function (model) {
@@ -6551,29 +6551,29 @@ var $author$project$Main$updateStep = function (model) {
 var $author$project$Main$updateTogglePlay = function (model) {
 	updateTogglePlay:
 	while (true) {
-		if (model.N) {
-			var m = A2($author$project$Main$initModel, model.r, model.x);
+		if (model.O) {
+			var m = A2($author$project$Main$initModel, model.r, model.w);
 			var $temp$model = _Utils_update(
 				m,
-				{L: 're-init'});
+				{A: 're-init'});
 			model = $temp$model;
 			continue updateTogglePlay;
 		} else {
 			if (model.t) {
 				return _Utils_update(
 					model,
-					{L: 'un-paused', t: false});
+					{A: 'un-paused', t: false});
 			} else {
 				return _Utils_update(
 					model,
-					{L: 'paused', t: true});
+					{A: 'paused', t: true});
 			}
 		}
 	}
 };
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Main$updateToggleQuantum = function (model) {
-	return A2($author$project$Main$initModel, !model.r, model.x);
+	return A2($author$project$Main$initModel, !model.r, model.w);
 };
 var $author$project$Main$update = F2(
 	function (msg, model) {
@@ -6594,13 +6594,13 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{E: model.E / 2}),
+						{F: model.F / 2}),
 					$elm$core$Platform$Cmd$none);
 			case 5:
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{E: model.E * 2}),
+						{F: model.F * 2}),
 					$elm$core$Platform$Cmd$none);
 			case 2:
 				return _Utils_Tuple2(
@@ -6727,9 +6727,9 @@ var $author$project$Main$toCharElement = F3(
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$view = function (model) {
-	var vm = model.r ? {b: model.u.b, a: model.u.a} : {b: model.u.b, a: model.u.a};
+	var vm = model.r ? {b: model.G.b, a: model.G.a} : {b: model.E.b, a: model.E.a};
 	var textFontSize = function () {
-		var _v0 = model.x;
+		var _v0 = model.w;
 		if (_v0 === 1) {
 			return '24px';
 		} else {
@@ -6856,7 +6856,7 @@ var $author$project$Main$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(7),
-										$elm$html$Html$Attributes$checked(!model.x)
+										$elm$html$Html$Attributes$checked(!model.w)
 									]),
 								_List_Nil),
 								A2(
@@ -6872,7 +6872,7 @@ var $author$project$Main$view = function (model) {
 									[
 										$elm$html$Html$Attributes$type_('radio'),
 										$elm$html$Html$Events$onClick(8),
-										$elm$html$Html$Attributes$checked(model.x === 1)
+										$elm$html$Html$Attributes$checked(model.w === 1)
 									]),
 								_List_Nil),
 								A2(
@@ -7052,16 +7052,7 @@ var $author$project$Main$view = function (model) {
 								A2($elm$html$Html$Attributes$style, 'font-size', '16px'),
 								A2($elm$html$Html$Attributes$style, 'padding', '0px')
 							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('?')
-									]))
-							]))
+						_List_Nil)
 					]))
 			]));
 };

@@ -353,12 +353,12 @@ splitStep state =
 updateSplitStep : Model -> Model
 updateSplitStep model = 
   case model.splitState.lines of 
-    [] -> { model | finished = True, paused = True }
+    [] -> { model | finished = True, paused = True, debug = "done split" }
     _ -> 
       let 
         state = splitStep model.splitState 
       in 
-        { model | splitState = state }
+        { model | splitState = state, debug = "..." }
 
 timelineStep : TimelineState -> TimelineState 
 timelineStep state = 
@@ -651,8 +651,8 @@ view model =
         { seen = model.timelineState.seen 
         , count = model.timelineState.count }
       else 
-        { seen = model.timelineState.seen 
-        , count = model.timelineState.count }
+        { seen = model.splitState.seen 
+        , count = model.splitState.count }
 
     nestedElements = 
       model.lines |> List.indexedMap (\y -> \line -> line |> List.indexedMap (\x -> \ch -> toCharElement vm.seen (x, y) (String.fromChar ch)))
@@ -760,7 +760,7 @@ view model =
               [ 
                 -- Html.div [] [ Html.text (model.moves |> List.length |> String.fromInt ) ]
               -- , Html.div [] [ Html.text (String.fromInt model.position) ]
-                Html.div [] [ Html.text "?" ]
-              -- , Html.div [] [ Html.text model.debug ]
+                -- Html.div [] [ Html.text model.debug ]
+              -- , Html.div [] [ Html.text (String.fromInt (Set.size vm.seen))  ]
               ] ] 
               ]
