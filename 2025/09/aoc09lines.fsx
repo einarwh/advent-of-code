@@ -39,27 +39,7 @@ let connect tiles =
                 loop ((a, b) :: acc) (b :: t)
         loop [] tiles 
 
-// let toLine ((x1, y1), (x2, y2)) = 
-//     let xMin, xMax = if x1 < x2 then (x1, x2) else (x2, x1)
-//     let yMin, yMax = if y1 < y2 then (y1, y2) else (y2, y1)
-//     (xMin, yMin)
-    
-//     if x1 = x2 then 
-//         let (yStart, yEnd) = if y1 < y2 then (y1, y2) else (y2, y1)
-//         [ yStart .. yEnd ] |> List.map (fun y -> (x1, y))
-//     else 
-//         let (xStart, xEnd) = if x1 < x2 then (x1, x2) else (x2, x1)
-//         [ xStart .. xEnd ] |> List.map (fun x -> (x, y1))
-
-let expand ((x1, y1), (x2, y2)) = 
-    if x1 = x2 then 
-        let (yStart, yEnd) = if y1 < y2 then (y1, y2) else (y2, y1)
-        [ yStart .. yEnd ] |> List.map (fun y -> (x1, y))
-    else 
-        let (xStart, xEnd) = if x1 < x2 then (x1, x2) else (x2, x1)
-        [ xStart .. xEnd ] |> List.map (fun x -> (x, y1))
-
-let violates tiles lines boundary (area, ((x1, y1), (x2, y2))) = 
+let violates tiles lines ((x1, y1), (x2, y2)) = 
     let xMin, xMax = if x1 < x2 then x1, x2 else x2, x1 
     let xRange = (xMin, xMax)
     let yMin, yMax = if y1 < y2 then y1, y2 else y2, y1 
@@ -69,10 +49,10 @@ let violates tiles lines boundary (area, ((x1, y1), (x2, y2))) =
     let checkLine ((xLine1, yLine1), (xLine2, yLine2)) = 
         if xLine1 = xLine2 && inRange xLine1 xRange then 
             let yLineMin, yLineMax = if yLine1 < yLine2 then yLine1, yLine2 else yLine2, yLine1 
-            inRange xLine1 xRange && yLineMin < yMin && yLineMax > yMax
+            inRange xLine1 xRange && yLineMin <= yMin && yLineMax >= yMax
         else 
             let xLineMin, xLineMax = if xLine1 < xLine2 then xLine1, xLine2 else xLine2, xLine1 
-            inRange yLine1 yRange && xLineMin < xMin && xLineMax > xMax
+            inRange yLine1 yRange && xLineMin <= xMin && xLineMax >= xMax
     tiles |> List.exists check || lines |> List.exists checkLine 
 
 let run fileName = 
@@ -80,7 +60,6 @@ let run fileName =
     let rectangles = getRectangles reds 
     rectangles |> List.head |> fst |> printfn "%d"
     let lines = reds |> connect 
-    let boundary = lines |> List.collect expand |> Set.ofList 
-    rectangles |> List.toSeq |> Seq.filter (fun r -> violates reds lines boundary r |> not) |> Seq.head |> fst |> printfn "%d"
+    rectangles |> List.toSeq |> Seq.filter (fun (_, r) -> violates reds lines r |> not) |> Seq.head |> fst |> printfn "%d"
 
 run "input.txt"
