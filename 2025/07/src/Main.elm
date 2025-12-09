@@ -13,9 +13,6 @@ import Time
 defaultTickInterval : Float
 defaultTickInterval = 50
 
-chamberWidth : Int 
-chamberWidth = 7 
-
 -- MAIN
 
 main =

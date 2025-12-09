@@ -40,18 +40,19 @@ let connect tiles =
         loop [] tiles 
 
 let violates tiles lines ((x1, y1), (x2, y2)) = 
-    let xMin, xMax = if x1 < x2 then x1, x2 else x2, x1 
+    let order (v1, v2) = if v1 < v2 then v1, v2 else v2, v1
+    let xMin, xMax = order (x1, x2) 
     let xRange = (xMin, xMax)
-    let yMin, yMax = if y1 < y2 then y1, y2 else y2, y1 
+    let yMin, yMax = order (y1, y2)
     let yRange = (yMin, yMax)
     let inRange v (vMin, vMax) = vMin < v && v < vMax 
     let check (x, y) = inRange x xRange && inRange y yRange
     let checkLine ((xLine1, yLine1), (xLine2, yLine2)) = 
-        if xLine1 = xLine2 && inRange xLine1 xRange then 
-            let yLineMin, yLineMax = if yLine1 < yLine2 then yLine1, yLine2 else yLine2, yLine1 
+        if xLine1 = xLine2 then 
+            let yLineMin, yLineMax = order (yLine1, yLine2)
             inRange xLine1 xRange && yLineMin <= yMin && yLineMax >= yMax
         else 
-            let xLineMin, xLineMax = if xLine1 < xLine2 then xLine1, xLine2 else xLine2, xLine1 
+            let xLineMin, xLineMax = order (xLine1, xLine2)
             inRange yLine1 yRange && xLineMin <= xMin && xLineMax >= xMax
     tiles |> List.exists check || lines |> List.exists checkLine 
 
@@ -60,6 +61,7 @@ let run fileName =
     let rectangles = getRectangles reds 
     rectangles |> List.head |> fst |> printfn "%d"
     let lines = reds |> connect 
+    printfn "%d lines " (List.length lines)
     rectangles |> List.toSeq |> Seq.filter (snd >> violates reds lines >> not) |> Seq.head |> fst |> printfn "%d"
 
-run "input.txt"
+run "sample.txt"
