@@ -39,34 +39,42 @@ let connect tiles =
                 loop ((a, b) :: acc) (b :: t)
         loop [] tiles 
 
-let toLine ((x1, y1), (x2, y2)) = 
+let expand ((x1, y1), (x2, y2)) = 
     if x1 = x2 then 
         let (yStart, yEnd) = if y1 < y2 then (y1, y2) else (y2, y1)
-        (x1, yStart), (x1, yEnd)
+        [ yStart .. yEnd ] |> List.map (fun y -> (x1, y))
     else 
         let (xStart, xEnd) = if x1 < x2 then (x1, x2) else (x2, x1)
-        (xStart, y1), (xEnd, y1)
+        [ xStart .. xEnd ] |> List.map (fun x -> (x, y1))
 
-let contained verticals horizontals ((x1, y1), (x2, y2)) =
-    let vs = [ toLine ((x1, y1), (x1, y2)); toLine ((x2, y1), (x2, y2)) ]
-    let hs = [ toLine ((x1, y1), (x2, y1)); toLine ((x1, y2), (x2, y2)) ]
-    let crossed = v
-    true 
+let violates i tiles boundary (area, ((x1, y1), (x2, y2))) = 
+    // printfn "check box %A" (area, ((x1, y1), (x2, y2)))
+    let xRange = if x1 < x2 then x1, x2 else x2, x1 
+    let yRange = if y1 < y2 then y1, y2 else y2, y1 
+    let inRange v (vMin, vMax) = vMin < v && v < vMax 
+    let check (x, y) = 
+        inRange x xRange && inRange y yRange
+    let checkTile (x, y) = 
+        let result = check (x, y)
+        // if result then printfn "contains tile %A" (x, y)
+        result 
+    let checkBoundaryPoint (x, y) = 
+        let result = check (x, y)
+        // if result then printfn "contains boundary point %A" (x, y)
+        result 
+    let containsTile = tiles |> List.exists (fun (x, y) -> checkTile (x, y))
+    if containsTile then true 
+    else 
+        let containsBoundaryPoint = boundary |> Set.exists (fun (x, y) -> checkBoundaryPoint (x, y))
+        containsBoundaryPoint
 
 let run fileName = 
     let reds = fileName |> readStrings |> List.map parse 
     let rectangles = getRectangles reds 
     rectangles |> List.head |> fst |> printfn "%d"
     let pairs = reds |> connect 
-    pairs |> List.iter (printfn "%A")
-    let lines = pairs |> List.map toLine 
-    let verticals = lines |> List.filter (fun ((x1, _), (x2, _)) -> x1 = x2)
-    let horizontals = lines |> List.except verticals
-    printfn "%A" verticals 
-    printfn "%A" horizontals 
-    rectangles |> List.toSeq |> Seq.filter (snd >> contained verticals horizontals) |> Seq.head |> fst |> printfn "%d"
-    // let sets = pairs |> List.map (expand >> Set.ofList)
-    // let boundary = sets |> List.reduce Set.union
-    0
+    let boundary = pairs |> List.collect expand |> Set.ofList 
+    let result = rectangles |> List.mapi (fun i r -> (i, r)) |> List.toSeq |> Seq.filter (fun (i, r) -> violates i reds boundary r |> not) |> Seq.head 
+    printfn "%d" (result |> snd |> fst)
 
-run "sample.txt"
+run "input.txt"
