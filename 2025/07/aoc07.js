@@ -5374,10 +5374,10 @@ var $author$project$Main$Down = function (a) {
 var $author$project$Main$defaultTimelineState = {
 	b: 0,
 	c: _List_Nil,
-	j: $elm$core$Dict$empty,
+	k: $elm$core$Dict$empty,
 	d: _Utils_Tuple2(0, 0),
 	a: $elm$core$Set$empty,
-	l: _List_Nil
+	j: _List_Nil
 };
 var $author$project$Main$initTimelineState = function (lines) {
 	if (!lines.b) {
@@ -5398,10 +5398,10 @@ var $author$project$Main$initTimelineState = function (lines) {
 			return {
 				b: 0,
 				c: lines,
-				j: $elm$core$Dict$empty,
+				k: $elm$core$Dict$empty,
 				d: _Utils_Tuple2(ix, 0),
 				a: $elm$core$Set$empty,
-				l: _List_fromArray(
+				j: _List_fromArray(
 					[item, $author$project$Main$Bubble])
 			};
 		}
@@ -5429,7 +5429,7 @@ var $author$project$Main$initModel = F2(
 			A2($elm$core$String$split, '\n', data));
 		var splitState = $author$project$Main$initSplitState(lines);
 		var timelineState = $author$project$Main$initTimelineState(lines);
-		return {w: dataSource, A: '?', O: false, c: lines, t: true, r: quantum, E: splitState, F: $author$project$Main$defaultTickInterval, G: timelineState};
+		return {w: dataSource, A: '?', O: false, c: lines, t: true, r: quantum, E: splitState, F: $author$project$Main$defaultTickInterval, J: timelineState};
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -6356,7 +6356,7 @@ var $author$project$Main$Right = function (a) {
 	return {$: 1, a: a};
 };
 var $author$project$Main$timelineStep = function (state) {
-	var mem = state.j;
+	var mem = state.k;
 	var lines = state.c;
 	var _v0 = state.d;
 	var beam = _v0.a;
@@ -6376,10 +6376,10 @@ var $author$project$Main$timelineStep = function (state) {
 				$elm$core$Dict$insert,
 				_Utils_Tuple2(beam, depth),
 				1,
-				state.j);
+				state.k);
 			return _Utils_update(
 				state,
-				{b: state.b + 1, j: nextMem});
+				{b: state.b + 1, k: nextMem});
 		} else {
 			var h = lines.a;
 			var t = lines.b;
@@ -6422,10 +6422,10 @@ var $author$project$Main$timelineStep = function (state) {
 					A2(
 						$elm$core$List$cons,
 						itemR,
-						A2($elm$core$List$cons, $author$project$Main$Combine, state.l)));
+						A2($elm$core$List$cons, $author$project$Main$Combine, state.j)));
 				return _Utils_update(
 					state,
-					{a: seen, l: stack});
+					{a: seen, j: stack});
 			} else {
 				var seen = A2(
 					$elm$core$Set$insert,
@@ -6439,13 +6439,13 @@ var $author$project$Main$timelineStep = function (state) {
 				var stack = A2(
 					$elm$core$List$cons,
 					item,
-					A2($elm$core$List$cons, $author$project$Main$Bubble, state.l));
+					A2($elm$core$List$cons, $author$project$Main$Bubble, state.j));
 				return _Utils_update(
 					state,
 					{
 						d: _Utils_Tuple2(beam, depth + 1),
 						a: seen,
-						l: stack
+						j: stack
 					});
 			}
 		}
@@ -6467,19 +6467,19 @@ var $author$project$Main$updateTimelineState = F3(
 				var info = item.a;
 				var nextState = _Utils_update(
 					state,
-					{c: info.c, d: info.d, l: rest});
+					{c: info.c, d: info.d, j: rest});
 				return $author$project$Main$timelineStep(nextState);
 			case 1:
 				var info = item.a;
 				var nextState = _Utils_update(
 					state,
-					{c: info.c, d: info.d, l: rest});
+					{c: info.c, d: info.d, j: rest});
 				return $author$project$Main$timelineStep(nextState);
 			case 3:
 				var info = item.a;
 				var nextState = _Utils_update(
 					state,
-					{c: info.c, d: info.d, l: rest});
+					{c: info.c, d: info.d, j: rest});
 				return $author$project$Main$timelineStep(nextState);
 			case 2:
 				var _v1 = state.d;
@@ -6498,19 +6498,19 @@ var $author$project$Main$updateTimelineState = F3(
 					A2(
 						$elm$core$Dict$get,
 						_Utils_Tuple2(b - 1, d + 1),
-						state.j));
+						state.k));
 				var countR = A2(
 					$elm$core$Maybe$withDefault,
 					0,
 					A2(
 						$elm$core$Dict$get,
 						_Utils_Tuple2(b + 1, d + 1),
-						state.j));
+						state.k));
 				var pos = _Utils_Tuple2(b, d);
-				var nextMem = A3($elm$core$Dict$insert, pos, countL + countR, state.j);
+				var nextMem = A3($elm$core$Dict$insert, pos, countL + countR, state.k);
 				return _Utils_update(
 					state,
-					{j: nextMem, d: pos, a: seen, l: rest});
+					{k: nextMem, d: pos, a: seen, j: rest});
 			default:
 				var _v3 = state.d;
 				var beam = _v3.a;
@@ -6521,28 +6521,50 @@ var $author$project$Main$updateTimelineState = F3(
 					A2(
 						$elm$core$Dict$get,
 						_Utils_Tuple2(beam, depth),
-						state.j));
+						state.k));
 				var pos = _Utils_Tuple2(beam, depth - 1);
-				var nextMem = A3($elm$core$Dict$insert, pos, countD, state.j);
+				var nextMem = A3($elm$core$Dict$insert, pos, countD, state.k);
 				var seen = A2($elm$core$Set$insert, pos, state.a);
 				return _Utils_update(
 					state,
-					{j: nextMem, d: pos, a: seen, l: rest});
+					{k: nextMem, d: pos, a: seen, j: rest});
 		}
 	});
+var $author$project$Main$updateTimelineLoop = function (state) {
+	updateTimelineLoop:
+	while (true) {
+		var _v0 = state.j;
+		if (!_v0.b) {
+			return state;
+		} else {
+			var item = _v0.a;
+			var rest = _v0.b;
+			var afterState = A3($author$project$Main$updateTimelineState, state, item, rest);
+			if (_Utils_eq(
+				$elm$core$Set$size(afterState.a),
+				$elm$core$Set$size(state.a))) {
+				var $temp$state = afterState;
+				state = $temp$state;
+				continue updateTimelineLoop;
+			} else {
+				return afterState;
+			}
+		}
+	}
+};
 var $author$project$Main$updateTimelineStep = function (model) {
-	var _v0 = model.G.l;
+	var state = model.J;
+	var _v0 = state.j;
 	if (!_v0.b) {
 		return _Utils_update(
 			model,
 			{O: true, t: true});
 	} else {
-		var item = _v0.a;
-		var rest = _v0.b;
-		var state = A3($author$project$Main$updateTimelineState, model.G, item, rest);
 		return _Utils_update(
 			model,
-			{G: state});
+			{
+				J: $author$project$Main$updateTimelineLoop(state)
+			});
 	}
 };
 var $author$project$Main$updateStep = function (model) {
@@ -6727,7 +6749,7 @@ var $author$project$Main$toCharElement = F3(
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$view = function (model) {
-	var vm = model.r ? {b: model.G.b, a: model.G.a} : {b: model.E.b, a: model.E.a};
+	var vm = model.r ? {b: model.J.b, a: model.J.a} : {b: model.E.b, a: model.E.a};
 	var textFontSize = function () {
 		var _v0 = model.w;
 		if (_v0 === 1) {

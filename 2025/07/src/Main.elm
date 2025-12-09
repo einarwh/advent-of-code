@@ -438,15 +438,27 @@ updateTimelineState state item rest =
       in 
         { state | mem = nextMem, pos = pos, stack = rest, seen = seen }
 
-updateTimelineStep : Model -> Model
-updateTimelineStep model = 
-  case model.timelineState.stack of 
-    [] -> { model | finished = True, paused = True }
+updateTimelineLoop : TimelineState -> TimelineState 
+updateTimelineLoop state = 
+  case state.stack of 
+    [] -> state 
     item :: rest -> 
       let
-        state = updateTimelineState model.timelineState item rest 
+        afterState = updateTimelineState state item rest 
       in 
-        { model | timelineState = state }
+        if Set.size afterState.seen == Set.size state.seen then 
+          updateTimelineLoop afterState 
+        else 
+          afterState
+
+updateTimelineStep : Model -> Model
+updateTimelineStep model = 
+  let 
+    state = model.timelineState 
+  in 
+    case state.stack of 
+      [] -> { model | finished = True, paused = True }
+      _ -> { model | timelineState = updateTimelineLoop state }
 
 updateStep : Model -> Model
 updateStep model = 
