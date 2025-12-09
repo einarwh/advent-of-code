@@ -35,16 +35,42 @@ type alias State =
   { count : Int 
   , seen : Set Pos }
 
+type alias SplitState = 
+  { beams : Set Int 
+  , depth : Int  
+  , lines : List (List Char)
+  , seen : Set (Int, Int)
+  , count : Int }
+
+type alias CallInfo = 
+  { pos : (Int, Int) 
+  , lines : List (List Char) }
+
+type StackItem = 
+  Left CallInfo | Right CallInfo | Combine | Down CallInfo | Bubble
+
+type alias TimelineState = 
+  { mem : Dict (Int, Int) Int 
+  , pos : (Int, Int) 
+  , lines : List (List Char)
+  , seen : Set (Int, Int)
+  , count : Int 
+  , stack : List StackItem }
+
 type alias Model = 
   { dataSource : DataSource
-  , steps : List State 
-  , accumulated : State  
-  , lines : List (List Char) 
+  , lines : List (List Char)
+  , splitState : SplitState 
+  , timelineState : TimelineState 
   , quantum : Bool 
   , paused : Bool 
   , finished : Bool 
   , tickInterval : Float 
   , debug : String }
+
+type alias ViewModel = 
+  { seen : Set (Int, Int) 
+  , count : Int }
 
 sample : String
 sample = """.......S.......
@@ -214,18 +240,59 @@ read dataSource =
     Input -> input
     Sample -> sample
 
+defaultTimelineState : TimelineState 
+defaultTimelineState = { mem = Dict.empty, pos = (0, 0), lines = [], seen = Set.empty, count = 0, stack = [] }
+
+initTimelineState : List (List Char) -> TimelineState
+initTimelineState lines = 
+  case lines of 
+    [] -> defaultTimelineState
+    h :: t ->  
+      case indexOf 0 'S' h of 
+        Nothing -> defaultTimelineState
+        Just ix -> 
+          let 
+            item = Down { pos = (ix, 0), lines = lines }
+          in 
+            { mem = Dict.empty 
+            , pos = (ix, 0)
+            , lines = lines
+            , seen = Set.empty 
+            , count = 0
+            , stack = [ item, Bubble ] }
+
+defaultSplitState : SplitState
+defaultSplitState = { beams = Set.empty, depth = 0, lines = [], seen = Set.empty, count = 0 } 
+
+initSplitState : List (List Char) -> SplitState 
+initSplitState lines = 
+  case lines of 
+    [] -> defaultSplitState
+    h :: t ->  
+      case indexOf 0 'S' h of 
+        Nothing -> defaultSplitState
+        Just ix -> 
+          let 
+            beams = Set.empty |> Set.insert ix
+          in 
+            { beams = beams 
+            , depth = 0
+            , lines = lines
+            , seen = Set.empty 
+            , count = 0 }
+
 initModel : Bool -> DataSource -> Model 
 initModel quantum dataSource = 
   let 
     data = read dataSource
     lines = data |> String.split "\n" |> List.map String.toList
-    steps = solve quantum lines 
-    debug = steps |> List.length |> String.fromInt
+    splitState = initSplitState lines 
+    timelineState = initTimelineState lines
   in 
     { dataSource = dataSource
-    , steps = steps 
-    , accumulated = { count = 0, seen = Set.empty }
-    , lines = lines
+    , lines = lines 
+    , splitState = splitState 
+    , timelineState = timelineState
     , quantum = quantum
     , paused = True
     , finished = False  
@@ -261,17 +328,130 @@ updateClear : Model -> Model
 updateClear model = 
   initModel model.quantum model.dataSource
 
+splitStep : SplitState -> SplitState 
+splitStep state = 
+  case state.lines of
+    [] -> state 
+    h :: t -> 
+      let 
+        beams = state.beams 
+        depth = state.depth 
+        indexes = 
+          h |> List.indexedMap (\i -> \c -> (i, c)) 
+            |> List.filterMap (\(i, c) -> if c == '^' then Just i else Nothing)
+        collisions = beams |> Set.filter (\b -> indexes |> List.member b)
+        uncollisions = Set.diff beams collisions
+        splitBeams = Set.union (collisions |> Set.map (\b -> b - 1)) (collisions |> Set.map (\b -> b + 1))
+        nextBeams = uncollisions |> Set.union splitBeams 
+        count = state.count + Set.size collisions 
+        beamsPositions = beams |> Set.map (\b -> (b, depth))
+        splitBeamsPositions = splitBeams |> Set.map (\b -> (b, depth))
+        seen = beamsPositions |> Set.union splitBeamsPositions |> Set.union state.seen
+      in 
+        { beams = nextBeams, depth = depth + 1, lines = t, seen = seen, count = count }
+
+updateSplitStep : Model -> Model
+updateSplitStep model = 
+  case model.splitState.lines of 
+    [] -> { model | finished = True, paused = True }
+    _ -> 
+      let 
+        state = splitStep model.splitState 
+      in 
+        { model | splitState = state }
+
+timelineStep : TimelineState -> TimelineState 
+timelineStep state = 
+  let 
+    mem = state.mem 
+    (beam, depth) = state.pos 
+    lines = state.lines 
+  in 
+    case Dict.get (beam, depth) mem of 
+      Just c -> 
+        { state | count = state.count + c }
+      Nothing -> 
+        case lines of 
+          [] -> 
+            let 
+              nextMem = state.mem |> Dict.insert (beam, depth) 1 
+            in
+              { state | count = state.count + 1, mem = nextMem }
+          h :: t -> 
+            let 
+              indexes = 
+                h |> List.indexedMap (\i -> \c -> (i, c)) 
+                  |> List.filterMap (\(i, c) -> if c == '^' then Just i else Nothing)
+            in 
+              if indexes |> List.member beam then 
+                let 
+                  seen = state.seen |> Set.insert (beam, depth) |> Set.insert (beam - 1, depth) 
+                  itemL = Left { pos = (beam - 1, depth + 1), lines = t }
+                  itemR = Right { pos = (beam + 1, depth + 1), lines = t }
+                  stack = itemL :: itemR :: Combine :: state.stack 
+                in 
+                  { state | seen = seen, stack = stack }
+              else 
+                let 
+                  seen = state.seen |> Set.insert (beam, depth) 
+                  item = Down { pos = (beam, depth + 1), lines = t }
+                  stack = item :: Bubble :: state.stack 
+                in 
+                  { state | seen = seen, pos = (beam, depth + 1), stack = stack }
+
+updateTimelineState : TimelineState -> StackItem -> List StackItem -> TimelineState
+updateTimelineState state item rest = 
+  case item of 
+    Left info -> 
+      let 
+        nextState = { state | pos = info.pos, lines = info.lines, stack = rest }
+      in 
+        timelineStep nextState 
+    Right info -> 
+      let 
+        nextState = { state | pos = info.pos, lines = info.lines, stack = rest }
+      in 
+        timelineStep nextState 
+    Down info -> 
+      let 
+        nextState = { state | pos = info.pos, lines = info.lines, stack = rest }
+      in 
+        timelineStep nextState 
+    Combine -> 
+      let 
+        (beam, depth) = state.pos 
+        (b, d) = (beam - 1, depth - 1)
+        pos = (b, d)
+        countL = Dict.get (b - 1, d + 1) state.mem |> Maybe.withDefault 0 
+        countR = Dict.get (b + 1, d + 1) state.mem |> Maybe.withDefault 0 
+        nextMem = state.mem |> Dict.insert pos (countL + countR)
+        seen = state.seen |> Set.insert (beam, depth - 1) 
+      in 
+        { state | mem = nextMem, pos = pos, stack = rest, seen = seen }
+    Bubble -> 
+      let 
+        (beam, depth) = state.pos 
+        pos = (beam, depth - 1)
+        countD = Dict.get (beam, depth) state.mem |> Maybe.withDefault 0 
+        nextMem = state.mem |> Dict.insert pos countD 
+        seen = state.seen |> Set.insert pos 
+      in 
+        { state | mem = nextMem, pos = pos, stack = rest, seen = seen }
+
+updateTimelineStep : Model -> Model
+updateTimelineStep model = 
+  case model.timelineState.stack of 
+    [] -> { model | finished = True, paused = True }
+    item :: rest -> 
+      let
+        state = updateTimelineState model.timelineState item rest 
+      in 
+        { model | timelineState = state }
+
 updateStep : Model -> Model
 updateStep model = 
-  case model.steps of 
-    [] -> { model | paused = True, finished = True, debug = "just finished" }
-    step :: rest -> 
-      let 
-        a = model.accumulated
-        nextAcc = { count = step.count, seen = Set.union a.seen step.seen }
-        debug = model.steps |> List.length |> String.fromInt 
-      in 
-        { model | steps = rest, accumulated = nextAcc, debug = "X" ++ debug }
+  if model.quantum then updateTimelineStep model 
+  else updateSplitStep model 
 
 prevState : List State -> State 
 prevState acc = 
@@ -466,9 +646,16 @@ selectSymbol rolls pos =
 view : Model -> Html Msg
 view model =
   let
-    seen = model.accumulated.seen
+    vm = 
+      if model.quantum then 
+        { seen = model.timelineState.seen 
+        , count = model.timelineState.count }
+      else 
+        { seen = model.timelineState.seen 
+        , count = model.timelineState.count }
+
     nestedElements = 
-      model.lines |> List.indexedMap (\y -> \line -> line |> List.indexedMap (\x -> \ch -> toCharElement seen (x, y) (String.fromChar ch)))
+      model.lines |> List.indexedMap (\y -> \line -> line |> List.indexedMap (\x -> \ch -> toCharElement vm.seen (x, y) (String.fromChar ch)))
     elements = nestedElements |> List.foldr (\a b -> List.append a (Html.br [] [] :: b)) []    
     textFontSize =
       case model.dataSource of 
@@ -548,7 +735,7 @@ view model =
               , Html.Attributes.style "font-size" "16px"
               , Html.Attributes.style "padding-top" "10px" ] 
               [ 
-                Html.div [] [ Html.text (String.fromInt model.accumulated.count) ]
+                Html.div [] [ Html.text (String.fromInt vm.count) ]
               ] ]
       , Html.tr 
           []
@@ -573,7 +760,7 @@ view model =
               [ 
                 -- Html.div [] [ Html.text (model.moves |> List.length |> String.fromInt ) ]
               -- , Html.div [] [ Html.text (String.fromInt model.position) ]
-                Html.div [] [ Html.text (model.steps |> List.length |> String.fromInt) ]
+                Html.div [] [ Html.text "?" ]
               -- , Html.div [] [ Html.text model.debug ]
               ] ] 
               ]
