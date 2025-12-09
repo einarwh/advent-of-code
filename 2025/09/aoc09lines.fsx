@@ -60,6 +60,6 @@ let run fileName =
     let rectangles = getRectangles reds 
     rectangles |> List.head |> fst |> printfn "%d"
     let lines = reds |> connect 
-    rectangles |> List.toSeq |> Seq.filter (fun (_, r) -> violates reds lines r |> not) |> Seq.head |> fst |> printfn "%d"
+    rectangles |> List.toSeq |> Seq.filter (snd >> violates reds lines >> not) |> Seq.head |> fst |> printfn "%d"
 
 run "input.txt"
