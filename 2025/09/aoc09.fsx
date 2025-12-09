@@ -48,25 +48,11 @@ let expand ((x1, y1), (x2, y2)) =
         [ xStart .. xEnd ] |> List.map (fun x -> (x, y1))
 
 let violates i tiles boundary (area, ((x1, y1), (x2, y2))) = 
-    // printfn "check box %A" (area, ((x1, y1), (x2, y2)))
     let xRange = if x1 < x2 then x1, x2 else x2, x1 
     let yRange = if y1 < y2 then y1, y2 else y2, y1 
     let inRange v (vMin, vMax) = vMin < v && v < vMax 
-    let check (x, y) = 
-        inRange x xRange && inRange y yRange
-    let checkTile (x, y) = 
-        let result = check (x, y)
-        // if result then printfn "contains tile %A" (x, y)
-        result 
-    let checkBoundaryPoint (x, y) = 
-        let result = check (x, y)
-        // if result then printfn "contains boundary point %A" (x, y)
-        result 
-    let containsTile = tiles |> List.exists (fun (x, y) -> checkTile (x, y))
-    if containsTile then true 
-    else 
-        let containsBoundaryPoint = boundary |> Set.exists (fun (x, y) -> checkBoundaryPoint (x, y))
-        containsBoundaryPoint
+    let check (x, y) = inRange x xRange && inRange y yRange
+    tiles |> List.exists check || boundary |> Set.exists (fun (x, y) -> check (x, y))
 
 let run fileName = 
     let reds = fileName |> readStrings |> List.map parse 
