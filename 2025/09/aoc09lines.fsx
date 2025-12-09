@@ -60,25 +60,27 @@ let expand ((x1, y1), (x2, y2)) =
         [ xStart .. xEnd ] |> List.map (fun x -> (x, y1))
 
 let violates tiles lines boundary (area, ((x1, y1), (x2, y2))) = 
-    let xRange = if x1 < x2 then x1, x2 else x2, x1 
-    let yRange = if y1 < y2 then y1, y2 else y2, y1 
+    let xMin, xMax = if x1 < x2 then x1, x2 else x2, x1 
+    let xRange = (xMin, xMax)
+    let yMin, yMax = if y1 < y2 then y1, y2 else y2, y1 
+    let yRange = (yMin, yMax)
     let inRange v (vMin, vMax) = vMin < v && v < vMax 
     let check (x, y) = inRange x xRange && inRange y yRange
-    let checkLine ((xLineStart, yLineStart), (xLineEnd, yLineEnd)) = 
-        if xLineStart = xLineEnd && inRange xLineStart xRange then 
-            inRange xLineStart xRange && not <| inRange yLineStart yRange && not <| inRange yLineEnd yRange 
+    let checkLine ((xLine1, yLine1), (xLine2, yLine2)) = 
+        if xLine1 = xLine2 && inRange xLine1 xRange then 
+            let yLineMin, yLineMax = if yLine1 < yLine2 then yLine1, yLine2 else yLine2, yLine1 
+            inRange xLine1 xRange && yLineMin < yMin && yLineMax > yMax
         else 
-            inRange yLineStart yRange && not <| inRange xLineStart xRange && not <| inRange xLineEnd xRange 
-    tiles |> List.exists check || lines |> List.exists checkLine //|| boundary |> Set.exists (fun (x, y) -> check (x, y))
+            let xLineMin, xLineMax = if xLine1 < xLine2 then xLine1, xLine2 else xLine2, xLine1 
+            inRange yLine1 yRange && xLineMin < xMin && xLineMax > xMax
+    tiles |> List.exists check || lines |> List.exists checkLine 
 
 let run fileName = 
     let reds = fileName |> readStrings |> List.map parse 
     let rectangles = getRectangles reds 
     rectangles |> List.head |> fst |> printfn "%d"
     let lines = reds |> connect 
-    lines |> List.iter (printfn "%A")
     let boundary = lines |> List.collect expand |> Set.ofList 
-    let result = rectangles |> List.toSeq |> Seq.filter (fun r -> violates reds lines boundary r |> not) |> Seq.head 
-    printfn "RES? %A" result
+    rectangles |> List.toSeq |> Seq.filter (fun r -> violates reds lines boundary r |> not) |> Seq.head |> fst |> printfn "%d"
 
 run "input.txt"
