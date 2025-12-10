@@ -41,9 +41,30 @@ let readLines =
     >> Array.filter (fun line -> line <> String.Empty)
     >> Array.toList
 
+let push (pattern : bool array) (button : bool array) : bool array = 
+    pattern |> Array.zip button |> Array.map (fun (a, b) -> a <> b)
+
+let pushAll (buttons : bool array array) (pattern : bool array) : bool array array = 
+    buttons |> Array.map (push pattern)
+
+let solveMachine (m : Machine) = 
+    let lights = m.lights 
+    let buttons = m.buttons
+    let rec loop (pushCount : int) (seen : Set<bool array>) (patterns : Set<bool array>) = 
+        if Set.contains lights patterns then pushCount
+        else
+            let patterns' = patterns |> Set.toArray |> Array.collect (pushAll buttons) |> Set.ofArray
+            let shrunk = Set.difference patterns' seen
+            let seen' = Set.union seen patterns 
+            loop (pushCount + 1) seen' shrunk
+    let allOff = lights |> Array.map (fun _ -> false)
+    let patterns = Set.empty |> Set.add allOff
+    let result = loop 0 Set.empty patterns 
+    result 
+
 let run fileName = 
     let lines = readLines fileName
     let machines = lines |> List.map parseMachine
-    machines |> printfn "%A"
+    machines |> List.sumBy solveMachine |> printfn "%d"
 
-run "sample.txt"
+run "input.txt"
