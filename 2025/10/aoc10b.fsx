@@ -1,4 +1,5 @@
 // Advent of Code 2025 - Day 10: Factory
+// dotnet fsi aoc10b.fsx
 
 #r "./z3/Microsoft.Z3.dll"
 
@@ -16,8 +17,7 @@ let middleString (s : string) = s[1 .. s.Length - 2]
 let middleArray (arr : 'a array) = arr[1 .. arr.Length - 2]
       
 let parseLights (s : string) = 
-    let booleans = middleString s |> Seq.toArray |> Array.map ((=) '#')
-    booleans 
+    middleString s |> Seq.toArray |> Array.map (fun c -> c = '#')
     
 let parseNumbers (s : string) = 
     s.Split "," |> Array.map int
@@ -41,24 +41,32 @@ let solve (buttons: int array array) (joltages: int array) =
     use ctx = new Context()
     use opt = ctx.MkOptimize()
 
-    let presses =
-        Array.init (Seq.length buttons) (fun i -> $"p{i}" |> ctx.MkIntConst :> ArithExpr)
+    let pushes = 
+        [| 0 .. Array.length buttons - 1|] 
+        |> Array.map (fun i -> $"btn{i}" |> ctx.MkIntConst :> ArithExpr)
 
-    for p in presses do
-        ctx.MkGe(p, ctx.MkInt 0) |> opt.Add // p >= 0
+    pushes |> Array.iter (fun p -> ctx.MkGe(p, ctx.MkInt 0) |> opt.Add)
 
-    for i in 0 .. Array.length joltages - 1 do
+    let addAffecting jix = 
         let affecting =
-            [| for buttonIndex in 0 .. Array.length presses - 1 do
-                   if buttons[buttonIndex] |> Array.contains i then
-                       presses[buttonIndex] |]
+            [| 0 .. Array.length pushes - 1 |]
+            |> Array.filter (fun bix -> Array.contains jix buttons[bix])
+            |> Array.map (fun bix -> pushes[bix])
 
         if Array.length affecting > 0 then
-            ctx.MkEq(ctx.MkAdd affecting, ctx.MkInt joltages[i]) |> opt.Add
+            ctx.MkEq(ctx.MkAdd affecting, ctx.MkInt joltages[jix]) |> opt.Add
 
-    ctx.MkAdd presses |> opt.MkMinimize |> ignore
+    [| 0 .. Array.length joltages - 1 |]
+    |> Array.iter addAffecting
+
+    ctx.MkAdd pushes |> opt.MkMinimize |> ignore
     opt.Check() |> ignore
-    presses |> Array.sumBy (fun p -> opt.Model.Eval(p, true) :?> IntNum |> _.Int64)
+
+    let getPushCount p = 
+        let num = opt.Model.Eval(p, true) :?> IntNum
+        num.Int64
+
+    pushes |> Array.sumBy getPushCount
 
 let readLines = 
     File.ReadAllLines
