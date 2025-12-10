@@ -47,6 +47,12 @@ let push (pattern : bool array) (button : bool array) : bool array =
 let pushAll (buttons : bool array array) (pattern : bool array) : bool array array = 
     buttons |> Array.map (push pattern)
 
+let pushJoltage (pattern : int array) (button : bool array) : int array = 
+    pattern |> Array.zip button |> Array.map (fun (b, n) -> n + if b then 1 else 0)
+
+let pushAllJoltage (buttons : bool array array) (pattern : int array) : int array array = 
+    buttons |> Array.map (pushJoltage pattern)
+
 let solvePart1 (m : Machine) = 
     let lights = m.lights 
     let buttons = m.buttons
@@ -61,9 +67,36 @@ let solvePart1 (m : Machine) =
     let patterns = Set.empty |> Set.add allOff
     loop 0 Set.empty patterns 
 
+let lessOrEqual (joltage : int array) (pattern : int array) = 
+    pattern |> Array.zip joltage |> Array.forall (fun (j, v) -> v <= j)
+
+let solvePart2 (m : Machine) = 
+    printfn "\nMACHINE"
+    let buttons = m.buttons
+    let joltage = m.joltage
+    printfn "JOLTAGE %A" joltage
+    let rec loop (pushCount : int) (seen : Set<int array>) (patterns : Set<int array>) = 
+        printfn "loop. seen %A. patterns %A." (seen.Count) (patterns.Count)
+        if Set.contains joltage patterns then pushCount
+        else
+            let patterns' = patterns |> Set.toArray |> Array.collect (pushAllJoltage buttons) |> Set.ofArray
+            // patterns' |> Set.iter (printfn "patterns' item %A")
+            // printfn "patterns' %A" patterns'
+            let shrunk = Set.difference patterns' seen
+            // shrunk |> Set.iter (printfn "shunk item %A")
+            let filtered = shrunk |> Set.filter (lessOrEqual joltage)
+            // filtered |> Set.iter (printfn "filtered %A")
+            let seen' = Set.union seen patterns 
+            // seen' |> Set.iter (printfn "seen' item %A")
+            loop (pushCount + 1) seen' filtered
+    let allZero = joltage |> Array.map (fun _ -> 0)
+    let patterns = Set.empty |> Set.add allZero
+    loop 0 Set.empty patterns 
+
 let run fileName = 
     let lines = readLines fileName
     let machines = lines |> List.map parseMachine
     machines |> List.sumBy solvePart1 |> printfn "%d"
+    machines |> List.sumBy solvePart2 |> printfn "%d"
 
 run "input.txt"
