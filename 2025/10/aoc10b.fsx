@@ -47,17 +47,17 @@ let solve (buttons: int array array) (joltages: int array) =
 
     pushes |> Array.iter (fun p -> ctx.MkGe(p, ctx.MkInt 0) |> opt.Add)
 
-    let addAffecting jix = 
-        let affecting =
+    let add jix = 
+        let arr =
             [| 0 .. Array.length pushes - 1 |]
             |> Array.filter (fun bix -> Array.contains jix buttons[bix])
             |> Array.map (fun bix -> pushes[bix])
 
-        if Array.length affecting > 0 then
-            ctx.MkEq(ctx.MkAdd affecting, ctx.MkInt joltages[jix]) |> opt.Add
+        if Array.length arr > 0 then
+            ctx.MkEq(ctx.MkAdd arr, ctx.MkInt joltages[jix]) |> opt.Add
 
     [| 0 .. Array.length joltages - 1 |]
-    |> Array.iter addAffecting
+    |> Array.iter add
 
     ctx.MkAdd pushes |> opt.MkMinimize |> ignore
     opt.Check() |> ignore
