@@ -6,16 +6,15 @@ open System.IO
 
 let parse (s : string) = 
     match s.Split ": " with 
-    | [|a; b|] -> a, b.Split " " |> Array.toList
+    | [|a; b|] -> a, b.Split " "
     | _ -> failwith "?"
 
 let readLines = 
     File.ReadAllLines
     >> Array.filter (fun line -> line <> String.Empty)
-    >> Array.toList
 
-let solve (start : string) (dac : bool) (fft : bool) (flow : Map<string, string list>) = 
-    let rec loop (device : string) (dac : bool) (fft : bool) (lookup : Map<string, int64>)  = 
+let solve start dac fft flow = 
+    let rec loop device dac fft lookup = 
         let key = $"{device}{dac}{fft}"
         if device = "out" then 
             lookup, if dac && fft then 1L else 0L
@@ -27,14 +26,14 @@ let solve (start : string) (dac : bool) (fft : bool) (flow : Map<string, string 
                 let folder (m, acc) d = 
                     let m', c = m |> loop d (dac || d = "dac") (fft || d = "fft")
                     m', acc + c
-                let lookup', count = List.fold folder (lookup, 0) devices 
+                let lookup', count = Array.fold folder (lookup, 0) devices 
                 lookup' |> Map.add key count, count
     Map.empty |> loop start dac fft |> snd
 
 let run fileName = 
     let lines = readLines fileName
-    let map = lines |> List.map parse |> Map.ofList
-    solve "you" true true map |> printfn "%d"
-    solve "svr" false false map |> printfn "%d"
+    let flow = lines |> Array.map parse |> Map.ofArray
+    solve "you" true true flow |> printfn "%d"
+    solve "svr" false false flow |> printfn "%d"
 
 run "input.txt"
