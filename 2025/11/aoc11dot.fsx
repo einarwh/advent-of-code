@@ -1,5 +1,5 @@
 // Advent of Code 2025. Day 11: Reactor.
-// dotnet fsi aoc11.fsx
+// dotnet fsi aoc11dot.fsx
 
 open System
 open System.IO
@@ -13,50 +13,52 @@ let readLines =
     File.ReadAllLines
     >> Array.filter (fun line -> line <> String.Empty)
 
-let solve start dac fft flow = 
-    let rec loop device dac fft lookup = 
-        let key = $"{device}-{dac}-{fft}"
-        if device = "out" then 
-            lookup, if dac && fft then 1L else 0L
+let reaches start goal flow = 
+    let rec loop device lookup = 
+        let key = $"{device}"
+        if device = goal then 
+            // let lookup' = lookup |> Map.add key true 
+            lookup, true
         else
             match Map.tryFind key lookup with 
-            | Some count -> lookup, count
+            | Some result -> lookup, result
             | None -> 
-                let devices = Map.find device flow 
-                let folder (m, acc) d = 
-                    let m', c = m |> loop d (dac || d = "dac") (fft || d = "fft")
-                    m', acc + c
-                let lookup', count = Array.fold folder (lookup, 0) devices 
-                lookup' |> Map.add key count, count
-    Map.empty |> loop start dac fft
+                match Map.tryFind device flow with 
+                | Some devices -> 
+                    let folder (m, acc) d = 
+                        let m', c = m |> loop d 
+                        m', acc || c
+                    let lookup', included = Array.fold folder (lookup, false) devices 
+                    lookup' |> Map.add key included, included
+                | None -> (lookup, false)
+    let lookup = Map.empty |> loop start |> fst 
+    lookup |> Map.toList |> List.choose (fun (d, included) -> if included then Some d else None)
 
-let createColorMap devices lookupKeys = 
+let createColorMap devices reachesFft = 
     let chooseColor d = 
         if d = "out" then 
             Some "black"
-        else if d = "srv" then 
+        else if d = "svr" then 
             Some "black"
-        else if d = "you" then 
-            Some "black"
+        // else if d = "you" then 
+        //     Some "red"
         else if d = "fft" then 
             Some "black"
         else if d = "dac" then 
             Some "black"
-        else if lookupKeys |> List.contains $"{d}-True-True" then 
-            Some "blue"
-        else if lookupKeys |> List.contains $"{d}-True-False" then 
-            Some "green"
-        else if lookupKeys |> List.contains $"{d}-False-True" then 
-            Some "purple"
+        else if List.contains d reachesFft then 
+            Some "lightgrey"
         else 
             None
 
+    // devices |> List.iter (fun d -> printfn "DEVICE %s" d)
     devices |> List.choose (fun d -> chooseColor d |> Option.map (fun c -> (d, c))) |> Map.ofList
 
 let toNodeDeclaration colorMap n =
     match colorMap |> Map.tryFind n with 
-    | Some color -> 
-        $"  {n} [style=filled,fillcolor={color},color={color}];"
+    | Some fill -> 
+        let fontcolor = if fill = "black" then "white" else "black"
+        $"  {n} [style=filled,fillcolor={fill},color=black,fontcolor={fontcolor}];"
     | None ->  
         $"  {n} [];"
 
@@ -67,17 +69,18 @@ let run fileName =
     let lines = readLines fileName
     let tuples = lines |> Array.map parse
     let flow = tuples |> Map.ofArray
-    // solve "you" true true flow |> printfn "%d"
-    let (lookup, count) = solve "svr" false false flow 
-    let devices = Map.keys flow |> Seq.toList
-    let lookupKeys = Map.keys lookup |> Seq.toList
-    // printfn "%A" lookupKeys
-    let colorMap = createColorMap devices lookupKeys 
+    let reachesFft = reaches "svr" "fft" flow
+    let reachesDac = reaches "fft" "dac" flow 
+    let reachesOut = reaches "dac" "out" flow
+    let included = List.concat [ reachesFft; reachesDac; reachesOut ]
+    let sources = tuples |> Array.map fst |> Set.ofArray
+    let targets = tuples |> Array.collect snd |> Set.ofArray 
+    let nodes = Set.union sources targets |> Set.toArray
+    let colorMap = createColorMap (nodes |> Array.toList) included 
     let sources = tuples |> Array.map fst |> Set.ofArray
     let targets = tuples |> Array.collect snd |> Set.ofArray 
     let nodes = Set.union sources targets |> Set.toArray
     let edges = tuples |> Array.collect (fun (a, bs) -> bs |> Array.map (fun b -> (a, b)))
-    
     let nodeDeclarations = nodes |> Array.map (toNodeDeclaration colorMap)
     let edgeDeclarations = edges |> Array.map toEdgeDeclaration 
     let prefix = [| "digraph G {" |]
