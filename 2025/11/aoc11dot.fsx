@@ -32,27 +32,59 @@ let solve start dac fft flow =
 
 let createColorMap devices lookupKeys = 
     let chooseColor d = 
-        if lookupKeys |> List.contains $"{d}-True-True" then 
-            "blue"
+        if d = "out" then 
+            Some "black"
+        else if d = "srv" then 
+            Some "black"
+        else if d = "you" then 
+            Some "black"
+        else if d = "fft" then 
+            Some "black"
+        else if d = "dac" then 
+            Some "black"
+        else if lookupKeys |> List.contains $"{d}-True-True" then 
+            Some "blue"
         else if lookupKeys |> List.contains $"{d}-True-False" then 
-            "green"
+            Some "green"
         else if lookupKeys |> List.contains $"{d}-False-True" then 
-            "purple"
+            Some "purple"
         else 
-            "yellow"
+            None
 
-    devices |> List.map (fun d -> d, chooseColor d) |> Map.ofList
+    devices |> List.choose (fun d -> chooseColor d |> Option.map (fun c -> (d, c))) |> Map.ofList
+
+let toNodeDeclaration colorMap n =
+    match colorMap |> Map.tryFind n with 
+    | Some color -> 
+        $"  {n} [style=filled,fillcolor={color},color={color}];"
+    | None ->  
+        $"  {n} [];"
+
+let toEdgeDeclaration (src, tgt) = 
+    $"  {src} -> {tgt};"
 
 let run fileName = 
     let lines = readLines fileName
-    let flow = lines |> Array.map parse |> Map.ofArray
+    let tuples = lines |> Array.map parse
+    let flow = tuples |> Map.ofArray
     // solve "you" true true flow |> printfn "%d"
     let (lookup, count) = solve "svr" false false flow 
     let devices = Map.keys flow |> Seq.toList
     let lookupKeys = Map.keys lookup |> Seq.toList
     // printfn "%A" lookupKeys
     let colorMap = createColorMap devices lookupKeys 
-    printfn "%A" colorMap
+    let sources = tuples |> Array.map fst |> Set.ofArray
+    let targets = tuples |> Array.collect snd |> Set.ofArray 
+    let nodes = Set.union sources targets |> Set.toArray
+    let edges = tuples |> Array.collect (fun (a, bs) -> bs |> Array.map (fun b -> (a, b)))
+    
+    let nodeDeclarations = nodes |> Array.map (toNodeDeclaration colorMap)
+    let edgeDeclarations = edges |> Array.map toEdgeDeclaration 
+    let prefix = [| "digraph G {" |]
+    let postfix = [| "}" |]
+    let dotLines = Array.concat [ prefix; nodeDeclarations; edgeDeclarations; postfix ]
+    let s = dotLines |> String.concat "\n"
+    printfn "%s" s 
     0
 
 run "input.txt"
