@@ -6,7 +6,7 @@ open System.IO
 
 let parse (s : string) = 
     match s.Split ": " with 
-    | [|a; b|] -> (a, b.Split " " |> Array.toList)
+    | [|a; b|] -> a, b.Split " " |> Array.toList
     | _ -> failwith "?"
 
 let readLines = 
@@ -14,36 +14,27 @@ let readLines =
     >> Array.filter (fun line -> line <> String.Empty)
     >> Array.toList
 
-let rec solvePart1 (device : string) (flow : Map<string, string list>) : int = 
-    if device = "out" then 1 
-    else 
-        let devices = Map.find device flow 
-        devices |> List.sumBy (fun d -> solvePart1 d flow)
-
-let rec solvePaths (device : string) (dac : bool) (fft : bool) (lookup : Map<string, int64>) (flow : Map<string, string list>) = 
-    let key = $"{device}{dac}{fft}"
-    if device = "out" then 
-        lookup, if dac && fft then 1L else 0L
-    else
-        match Map.tryFind key lookup with 
-        | Some count -> lookup, count
-        | None -> 
-            let devices = Map.find device flow 
-            let folder (m, acc) d = 
-                let m', c = solvePaths d (dac || d = "dac") (fft || d = "fft") m flow 
-                m', acc + c
-            let lookup', count = List.fold folder (lookup, 0) devices 
-            lookup' |> Map.add key count, count
-
-// let solve (start : string) (dac : bool) (fft : bool) (flow : Map<string, string list>) = 
-
-//     solvePaths 
-
+let solve (start : string) (dac : bool) (fft : bool) (flow : Map<string, string list>) = 
+    let rec loop (device : string) (dac : bool) (fft : bool) (lookup : Map<string, int64>)  = 
+        let key = $"{device}{dac}{fft}"
+        if device = "out" then 
+            lookup, if dac && fft then 1L else 0L
+        else
+            match Map.tryFind key lookup with 
+            | Some count -> lookup, count
+            | None -> 
+                let devices = Map.find device flow 
+                let folder (m, acc) d = 
+                    let m', c = m |> loop d (dac || d = "dac") (fft || d = "fft")
+                    m', acc + c
+                let lookup', count = List.fold folder (lookup, 0) devices 
+                lookup' |> Map.add key count, count
+    Map.empty |> loop start dac fft |> snd
 
 let run fileName = 
     let lines = readLines fileName
     let map = lines |> List.map parse |> Map.ofList
-    solve "you" map |> printfn "%d"
-    solvePaths "svr" false false Map.empty map |> printfn "%A"
+    solve "you" true true map |> printfn "%d"
+    solve "svr" false false map |> printfn "%d"
 
 run "input.txt"
