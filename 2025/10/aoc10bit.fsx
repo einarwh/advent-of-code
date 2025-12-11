@@ -1,4 +1,4 @@
-// Advent of Code 2025. Day 10: Factory.
+// Advent of Code 2025. Day 10: Factory. Part 1.
 // dotnet fsi aoc10bit.fsx
 
 open System
@@ -15,18 +15,18 @@ let parseLights (s : string) =
     |> Seq.toArray 
     |> Array.indexed
     |> Array.choose (fun (i, ch)-> if ch = '#' then Some (bit i) else None) 
-    |> Array.reduce (^^^)
+    |> Array.reduce (|||)
 
-let parseNumbers (s : string) = 
-    s.Split "," |> Array.map int
+let parseBits (s : string) = 
+    s.Split "," |> Array.map (int >> bit)
 
 let parseButton (s : string) = 
-    middleString s |> parseNumbers |> Array.map bit |> Array.reduce (|||)
+    middleString s |> parseBits |> Array.reduce (|||)
 
 let parse (s : string) = 
     let parts = s.Split " "
     let lights = parts |> Array.head |> parseLights
-    let buttons = middleArray parts |> Array.map parseButton
+    let buttons = parts |> middleArray |> Array.map parseButton
     lights, buttons
     
 let readLines = 
@@ -47,6 +47,6 @@ let solve (lights, buttons) =
     Set.empty |> Set.add 0 |> loop 0  
 
 let run fileName = 
-    fileName |> readLines |> List.map parse |> List.sumBy solve |> printfn "%d"
+    fileName |> readLines |> List.sumBy (parse >> solve) |> printfn "%d"
 
 run "input.txt"
