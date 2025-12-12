@@ -22,22 +22,23 @@ let parseRegions (s : string) =
 let parseCount (s : string) = 
     s.Split "\n" |> Array.toList |> List.tail |> List.sumBy (Seq.filter ((=) '#') >> Seq.length)
 
-let possible shapeSizes ((w, h), numbers) : bool =
-    let minimum = List.zip shapeSizes numbers |> List.sumBy (fun (size, n) -> size*n)
-    w*h >= minimum 
+let isFeasible shapeSizes ((w, h), numbers) : bool =
+    let minimum = List.zip shapeSizes numbers |> List.sumBy (fun (size, n) -> size * n)
+    w * h >= minimum 
 
-let stupidest ((w, h), numbers) = 
-    w*h >= 9 * List.sum numbers
-
-let count check regions = 
-    regions |> List.filter check |> List.length 
+let isTrivial ((w, h), numbers) = 
+    (w / 3) * (h / 3) >= List.sum numbers
 
 let run fileName = 
     let text = File.ReadAllText fileName 
     let chunks = text.Split "\n\n" |> Array.toList |> List.rev 
     let regions = chunks |> List.head |> parseRegions 
     let shapeSizes = chunks |> List.tail |> List.rev |> List.map parseCount 
-    regions |> count (possible shapeSizes) |> printfn "%d"
-    regions |> count stupidest |> printfn "%d"
+    let trivial = regions |> List.filter isTrivial 
+    let feasible = regions |> List.filter (isFeasible shapeSizes)
+    let problematic = trivial |> List.except feasible 
+    feasible |> List.length |> printfn "Feasible to fit: %d" 
+    trivial |> List.length |> printfn "Trivial to fit: %d" 
+    problematic |> List.length |> printfn "Problematic to fit: %d" 
 
 run "input.txt"
