@@ -1,8 +1,6 @@
 // Advent of Code 2025. Day 12: Christmas Tree Farm.
 // dotnet fsi aoc12stupidest.fsx
 
-open System.IO
-
 let parse (s : string) = 
     match s.Split ": " with 
     | [|a; b|] -> 
@@ -10,4 +8,4 @@ let parse (s : string) =
         area >= Array.sumBy int (b.Split " ")
     | _ -> false
 
-"input.txt" |> File.ReadAllLines |> Array.filter parse |> Array.length |> printfn "%d"
+"input.txt" |> System.IO.File.ReadAllLines |> Array.filter parse |> Array.length |> printfn "%d"
