@@ -40,5 +40,9 @@ let run fileName =
     feasible |> List.length |> printfn "Feasible: %d" 
     trivial |> List.length |> printfn "Trivial: %d" 
     nonTrivial |> List.length |> printfn "Non-trivial: %d" 
+    if nonTrivial |> List.isEmpty then 
+        printfn "Nothing more to check."
+    else 
+        nonTrivial |> List.iter (printfn "Check manually: %A")
 
 run "input.txt"
